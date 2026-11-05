@@ -66,6 +66,8 @@ procedure Lexer_Probe is
          begin
             if Result.Status = Lua.Syntax.Success then
                Put_Line ("ACCEPT");
+            elsif Result.Status = Lua.Syntax.Resource_Error then
+               Put_Line ("RESOURCE");
             else
                Put ("ERROR");
                Number (Result.Error.Line);
@@ -83,9 +85,13 @@ procedure Lexer_Probe is
          loop
             Step := Next (Reader);
             if Step.Status /= Success then
-               Put ("ERROR");
-               Number (Step.Location.Line);
-               New_Line;
+               if Step.Status = Resource_Error then
+                  Put_Line ("RESOURCE");
+               else
+                  Put ("ERROR");
+                  Number (Step.Location.Line);
+                  New_Line;
+               end if;
                exit;
             end if;
             declare

@@ -39,6 +39,9 @@ function Compare-Records {
         throw "$Name record count: C=$($Expected.Count) Ada=$($Actual.Count)"
     }
     for ($index = 0; $index -lt $Expected.Count; $index++) {
+        if ($Expected[$index] -eq 'RESOURCE' -or $Actual[$index] -eq 'RESOURCE') {
+            throw "RESOURCE EXHAUSTION: $Name record $index is outside syntax comparison"
+        }
         if ($Expected[$index] -cne $Actual[$index]) {
             throw "$Name record $index : C=$($Expected[$index]) Ada=$($Actual[$index])"
         }

@@ -76,7 +76,9 @@ static void run(const char *mode, const char *bytes, size_t length) {
     lua_pushcfunction(L, scan);
     lua_pushlightuserdata(L, &input);
     status = lua_pcall(L, 1, 0, 0);
-    if (status) printf("ERROR %d\n", input.lexer.linenumber);
+    if (status == LUA_ERRSYNTAX)
+      printf("ERROR %d\n", input.lexer.linenumber);
+    else if (status) puts("RESOURCE");
     luaZ_freebuffer(L, &input.buffer);
   } else {
     status = luaL_loadbufferx(L, bytes, length, "=oracle", "t");
