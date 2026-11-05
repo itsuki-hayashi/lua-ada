@@ -26,8 +26,13 @@ jobs:
         shell: pwsh
         run: |
           alr --version
-          alr -n toolchain --select gnat_native
+          ./scripts/select-stable-toolchain.ps1
           alr -n toolchain
+          [Runtime.InteropServices.RuntimeInformation]::OSDescription
+          [Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+          alr exec -- gcc --version
+          alr exec -- gcc -dumpmachine
+          alr exec -- gprbuild --version
       - name: Build and exercise consumers
         shell: pwsh
         run: |

@@ -37,7 +37,7 @@ package body Lua.Engine is
 
    function NaN_Image (Item : Real_Value; Host : String) return String is
    begin
-      if Host = "windows" then
+      if Host in "windows" | "macos" then
          return "nan";
       end if;
       return (if (Real_Bits (Item) and 2 ** 63) /= 0 then "-nan" else "nan");
@@ -153,9 +153,9 @@ package body Lua.Engine is
       Precision : Positive := 15;
    begin
       if Item /= Item then
-         --  Microsoft's printf spells NaNs without their sign. POSIX hosts
-         --  normally retain it. Differential fixtures verify each target's
-         --  formatting rather than assuming one host's C library behavior.
+         --  Windows and macOS printf omit NaN's sign; Linux retains it.
+         --  Three-platform differential runs established this distinction.
+         --  Numeric comparisons still use the original IEEE representation.
          return NaN_Image (Item, Lua_Ada_Config.Alire_Host_OS);
       elsif Item > Real_Value'Last then
          return "inf";
