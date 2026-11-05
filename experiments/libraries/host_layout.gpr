@@ -1,0 +1,13 @@
+project Host_Layout is
+   for Languages use ("C");
+   for Source_Dirs use (".");
+   for Source_Files use ("host_layout.c");
+   for Object_Dir use "../../build/libraries/layout-obj";
+   for Exec_Dir use "../../build/libraries";
+   for Main use ("host_layout.c");
+   for Create_Missing_Dirs use "True";
+   package Compiler is
+      for Default_Switches ("C") use
+        ("-std=c99", "-O2", "-Wall", "-Wextra", "-Werror", "-pedantic");
+   end Compiler;
+end Host_Layout;

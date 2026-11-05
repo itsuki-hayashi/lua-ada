@@ -43,6 +43,10 @@ try {
     Set-Location (Join-Path $projectRoot 'tests')
     Invoke-Alire -Arguments @('exec', '--', "bin/$LibraryType/test_runner$suffix")
     Invoke-Alire -Arguments @('exec', '--', "bin/$LibraryType/syntax_consumer$suffix")
+    $upstreamRunner = Join-Path (Get-Location).Path "bin/$LibraryType/upstream_runner$suffix"
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-upstream.ps1'),
+        '-Interpreter', $upstreamRunner)
 
     Set-Location (Join-Path $projectRoot 'cli')
     $cliExecutable = "bin/$LibraryType/lua_ada$suffix"

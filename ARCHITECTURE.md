@@ -1,42 +1,50 @@
 # Architecture
 
-The M1 runtime is implemented; complete Lua and C compatibility remain intended
-extensions. [Decisions](docs/decisions/README.md) record compatibility tradeoffs.
+The M1 runtime and M2a frontend are accepted. M2b extends the runtime with core
+metamethods, resumable native calls, libraries, and text loading, with all platform
+gates verified in [M2b validation](docs/validation-m2b.md).
+Complete Lua and C compatibility remain later
+gates. [Decisions](docs/decisions/README.md) record compatibility tradeoffs.
 
 ## Components and dependencies
 
 ```text
 Batch CLI / Ada host
         |
-  Lua.Sessions                    Future C facade
+  Lua.Sessions / Lua.Syntax       Future C facade
         |                               |
   Lua.Engine (private) <----------------+
      |          |
-  Compiler    Machine
+  Compiler    Machine / native continuation drivers
+     |          |                   |
+  Parser     values / heap      library helpers / source files
      |          |
-  Lexers     values / heap / roots / collector
+  Lexers     roots / collector
                 |
          integers / numbers / narrow platform numerics
 ```
 
 The root library never depends on AUnit, CLI, or reference C sources. The C
 oracle and ABI experiments are separate test artifacts. `Lua.Engine` and its
-children are private; public clients cannot depend on register layout or heap
-addresses. No serialized bytecode compatibility is implied.
+descendants are implementation units beneath a private ancestor; public clients
+cannot depend on register layout or heap addresses. No serialized bytecode
+compatibility is implied.
 
 The [real-world module fixtures](tests/modules/README.md) are future consumer
 compatibility inputs. They are separate from implementation/API references,
 excluded from GPR source paths, and introduce no runtime dependency.
 
-| Component        | Implemented M1 responsibility                           |
-| ---------------- | ------------------------------------------------------- |
-| Lexers           | Byte source, escapes, tokens, bounded scans, locations  |
-| Numbers/Integers | Exact conversion, wrapping arithmetic, comparisons      |
-| Engine.Compiler  | Resolving parser, scope checks, register emission       |
-| Engine.Machine   | Primitives, base calls, frames, result packets, limits  |
-| Engine           | Values, heap objects, tables, roots, tracing, lifecycle |
-| Sessions         | Unique ownership, source execution, structured errors   |
-| CLI              | Batch arguments, source streams, diagnostics, status    |
+| Component                 | Responsibility                                              |
+| ------------------------- | ----------------------------------------------------------- |
+| Lexers / Parser           | Incremental scanning, owned resolved syntax, limits         |
+| Numbers / Integers        | Exact conversion, wrapping arithmetic, comparisons          |
+| Engine.Compiler           | Lower resolved syntax to private register instructions      |
+| Engine.Machine            | Lua/native frames, dispatch, packets, protected errors      |
+| Engine                    | Values, metatables, heap, roots, tracing, lifecycle         |
+| Engine library helpers    | Strings, patterns, packing, UTF-8, bounded table/math work  |
+| Engine native drivers     | Stateful iterators, Lua callbacks, text and package loading |
+| Sessions / Syntax         | Small owned execution and independent checking interfaces   |
+| CLI / source file helpers | Batch streams, preambles, diagnostics, process status       |
 
 ## Compilation and execution
 
@@ -66,6 +74,22 @@ Ada recursion. Tail calls replace activations. Protected calls establish VM
 boundaries; errors unwind VM frames to the nearest boundary. Resource failures
 leave the VM altogether so Lua cannot restart an exhausted budget.
 
+Native activations use that same stack. A native step completes, requests a
+Lua/native call, or requests another bounded step. It stores continuation phase,
+arguments, captures, and pending results in its owned activation before control
+returns to the VM. A library callback never recursively starts an executor.
+The instruction counter covers both frame kinds and helper loops/backtracking.
+Language errors unwind abandoned native phases as well as Lua frames; a new
+chunk receives a fresh budget. See [ADR 0007](docs/decisions/0007-native-libraries.md).
+
+Metamethod lookup is raw. Ordinary indexing, assignment, calls, primitive
+fallbacks, and applicable library functions request handlers through the VM.
+Raw library operations remain genuine bypasses. Each session owns its string
+metatable; numeric-string arithmetic lives in its initial arithmetic handlers,
+so user overrides remain observable. Callable chains have a separate bound
+from index/newindex chains. Lua 5.5 equality selection and the absence of an
+obsolete less-than fallback for less-or-equal are explicit compatibility rules.
+
 See [runtime ownership](docs/decisions/0004-runtime-ownership.md) and
 [embedding](docs/embedding.md).
 
@@ -79,7 +103,9 @@ substitute for tracing cycles.
 
 An iterative stop-the-world mark/sweep collector traces globals, live frames,
 register packets, environments/captures, arguments, named vararg tables, error
-objects, and reachable compiled prototypes. It runs at instruction safe points,
+objects, table/type metatables, native-closure captures, native activation
+arguments/results, module registries, and reachable compiled prototypes. It runs
+at instruction safe points,
 after temporaries have entered traced storage. Allocation itself does not
 collect unrooted instruction temporaries. Dead table-key tombstones are cleared
 before object reclamation. Repeated chunks can reclaim compiled code.
@@ -102,7 +128,19 @@ Numeric text conversion uses standard Ada big integers for exact binary64
 rounding; formatting implements Lua's 15/17-digit general format. One isolated
 host `pow` import is justified by measured rounding/domain incompatibilities
 in standard Ada exponentiation (ADR 0005). No downloaded production dependency
-is introduced. Other platform services and complete libraries remain future.
+is introduced. Packing and UTF-8 helpers use standard Ada types and explicit
+byte/bit operations. Native pack widths and maximum alignment come from C
+interface types, including long double; an isolated C99 probe verifies the host
+layout. Virtual packsize arithmetic does not allocate. Semantic size overflow
+is a Lua error; valid allocation/work quotas remain resource failures.
+
+Text loading reuses the shared frontend and file preamble handling. A loaded
+closure retains its initial environment rather than acquiring session globals
+when called. Omitted and explicitly nil environments remain distinct. Module
+loading uses owned loaded/preload registries and callable Lua searchers. The
+public package fields initially expose those tables, but replacing a field does
+not replace the registry root. The default search path is local and portable;
+native loading and environment-driven initialization remain deferred.
 
 Selective SPARK may protect suitable bounded algorithms; no whole-runtime
 proof is claimed. Fuzz/proof tools are optional. AUnit and differential tests
@@ -119,5 +157,5 @@ mechanisms, not a public Lua API.
 Ada containers currently allocate outside a `lua_Alloc` callback. Full C
 allocator parity needs replaceable storage and an allocation audit. Private
 representations and absence of exposed handles preserve room for that work.
-Binary chunks, C layouts/addresses, modules, and LuaRocks have independent
+Binary chunks, C layouts/addresses, native modules, and LuaRocks have independent
 future acceptance gates.

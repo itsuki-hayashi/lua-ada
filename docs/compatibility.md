@@ -10,8 +10,10 @@ releases require deliberate baseline updates and fresh evidence.
 
 Long-term compatibility includes language and standard libraries, CLI behavior,
 public C API/ABI, compatible binary-chunk loading/dumping, native module loading,
-and compatible LuaRocks packages. M1 executes its documented subset through Ada
-sessions and the batch CLI. Full libraries, C exports, chunks, modules, and
+and compatible LuaRocks packages. M1 and M2b execute their documented subset
+through Ada sessions and the batch CLI; the
+[M2b record](validation-m2b.md) establishes three whole-file execution passes.
+Full libraries, C exports, chunks, native modules, and
 LuaRocks remain future gates. See [capabilities](capabilities.md).
 
 Claims must name OS, architecture, compiler/linker/C runtime, numeric settings,

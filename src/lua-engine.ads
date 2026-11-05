@@ -27,7 +27,8 @@ private package Lua.Engine is
    end record;
    --  Bounds are per session/execution, not machine-specific compile flags.
 
-   type Heap_Kind is (String_Object, Table_Object, Environment, Closure);
+   type Heap_Kind is
+     (String_Object, Table_Object, Environment, Closure, Native_Closure);
    type Heap_Object (Kind : Heap_Kind);
    type Object_Access is access Heap_Object;
    type Prototype;
@@ -41,7 +42,7 @@ private package Lua.Engine is
 
    type Value_Kind is
      (Nil_Kind, Boolean_Kind, Integer_Kind, Real_Kind, String_Kind,
-      Table_Kind, Closure_Kind, Native_Kind_Value);
+      Table_Kind, Closure_Kind, Native_Closure_Kind, Native_Kind_Value);
 
    type Value (Kind : Value_Kind := Nil_Kind) is record
       case Kind is
@@ -49,7 +50,7 @@ private package Lua.Engine is
          when Boolean_Kind => Boolean_Data : Boolean;
          when Integer_Kind => Integer_Data : Integer_Value;
          when Real_Kind => Real_Data : Real_Value;
-         when String_Kind | Table_Kind | Closure_Kind =>
+         when String_Kind | Table_Kind | Closure_Kind | Native_Closure_Kind =>
             Reference : Object_Access;
          when Native_Kind_Value => Native_Data : Native_Kind;
       end case;
@@ -80,13 +81,18 @@ private package Lua.Engine is
       Serial : Positive := 1;
       case Kind is
          when String_Object => Bytes : Unbounded_String;
-         when Table_Object => Members : Entries.Vector;
+         when Table_Object =>
+            Members : Entries.Vector;
+            Metatable : Object_Access;
          when Environment =>
             Parent : Object_Access;
             Locals : Bindings.Vector;
          when Closure =>
             Code    : Prototype_Access;
             Capture : Object_Access;
+         when Native_Closure =>
+            Native_Name : Unbounded_String;
+            Captures : Values.Vector;
       end case;
    end record;
    --  Objects never move. Pointer exposure to a future C API still requires
@@ -137,6 +143,20 @@ private package Lua.Engine is
    package Frames is new Ada.Containers.Vectors (Positive, Frame_Access);
 
    type Frame is record
+      Is_Native : Boolean := False;
+      Native_Name : Unbounded_String;
+      Native_Arguments : Values.Vector;
+      Native_Results : Values.Vector;
+      Native_Captures : Values.Vector;
+      Native_Self : Object_Access;
+      Native_Buffer : Unbounded_String;
+      Native_Stage : Natural := 0;
+      Native_Index : Natural := 0;
+      Native_Aux : Natural := 0;
+      Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
+      Call_Site : Lua.Lexers.Source_Location;
+      --  Native continuation storage is owned by the activation. Pending
+      --  arguments/results/captures remain traced while Lua callbacks run.
       Code       : Prototype_Access;
       PC         : Positive := 1;
       Scope      : Object_Access;
@@ -150,6 +170,16 @@ private package Lua.Engine is
    --  consumers read its first value; parentheses explicitly collapse it.
    --  Frames are explicit so tail calls need not consume the Ada call stack.
 
+   type Native_Action_Kind is (Finished, Invoke, Continue_Step);
+   type Native_Action is record
+      Kind : Native_Action_Kind := Finished;
+      Results : Values.Vector;
+      Function_Value : Value;
+      Arguments : Values.Vector;
+   end record;
+   --  Native drivers request calls through the VM rather than recursing into
+   --  the executor. All retained values must be stored in their activation.
+
    type World is record
       Bounds       : Limits;
       Heap         : Objects.Vector;
@@ -157,6 +187,9 @@ private package Lua.Engine is
       Stack        : Frames.Vector;
       Arguments    : Values.Vector;
       Globals      : Object_Access;
+      String_Metatable : Object_Access;
+      Loaded_Modules : Object_Access;
+      Preload_Modules : Object_Access;
       Next_Symbol  : Positive := 1;
       Next_Object  : Positive := 1;
       Entry_Count  : Natural := 0;
@@ -193,6 +226,13 @@ private package Lua.Engine is
    function New_Closure
      (State : in out World; Code : Prototype_Access;
       Capture : Object_Access) return Value;
+   function New_Native
+     (State : in out World; Name : String;
+      Captures : Values.Vector := Values.Empty_Vector) return Value;
+   --  Allocate a stateful native callable; captures are collector roots.
+   function Metafield
+     (State : in out World; Item : Value; Name : String) return Value;
+   --  Raw event lookup; it never invokes Lua or follows __index.
 
    function Equal (Left, Right : Value) return Boolean;
    function Truth (Item : Value) return Boolean;

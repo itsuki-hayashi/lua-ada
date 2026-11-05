@@ -78,12 +78,22 @@ not need artificial edits. Historical records remain dated evidence.
 
 ## Current implementation boundary
 
-The production crate executes the documented M1 Lua subset through owned Ada
-sessions and a batch CLI. Private bytecode, lexical captures, tables, tracing
-collection, base functions, and bounded diagnostics have acceptance tests.
+The production crate executes the accepted M1 subset through owned Ada sessions
+and a batch CLI. M2b adds native continuations, core metamethods, libraries, and
+text/Lua-module loading; read [M2b](docs/milestones/m2b.md) and current status
+before making acceptance claims. The [M2b validation](docs/validation-m2b.md)
+records its completed platform gates. Private bytecode, lexical captures,
+tables, tracing collection, and bounded
+diagnostics remain the execution substrate.
 Use the shared owned frontend for both checking and execution; never introduce
 a second grammar in VM lowering. Canonical opcode definitions are independent
 of the executable VM. See [frontend compatibility](docs/frontend.md) and
 [M2a](docs/milestones/m2a.md) for their distinct acceptance boundaries.
+Lua/native callbacks must use explicit activation continuations; never recurse
+into the executor. Root retained arguments, captures, and pending results before
+VM safe points, and charge native loops/backtracking to the shared budget.
+Metamethod lookup/raw operations bypass handlers. Loaded chunks retain their
+initial environment, and module registries remain distinct from replaceable
+public package fields. Follow [ADR 0007](docs/decisions/0007-native-libraries.md).
 Read current status for platform evidence and deferred facilities. A passing
 subset never establishes full upstream, C ABI, or LuaRocks compatibility.

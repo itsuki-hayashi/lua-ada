@@ -1,8 +1,13 @@
 # Documentation Index
 
+The completed [M2b validation](validation-m2b.md) records core-library and
+three-file upstream execution evidence across all 18 configurations.
+
 See [frontend compatibility](frontend.md) and the
 [M2a milestone](milestones/m2a.md) for the current frontend work.
 Its [validation record](validation-m2a.md) owns immutable acceptance evidence.
+The [M2b target](milestones/m2b.md) owns the current library/metamethod delivery;
+[status](status.md) summarizes accepted capability and remaining milestones.
 
 The completed [M1 target](milestones/m1.md) owns the interpreter subset and gates.
 The [validation record](validation.md) owns platform evidence.
@@ -22,6 +27,7 @@ The [validation record](validation.md) owns platform evidence.
 | [Validation](validation.md)                   | Passing M1 configurations and gate evidence       |
 | [Capabilities](capabilities.md)               | Implemented subset and deferred areas             |
 | [Embedding](embedding.md)                     | Ada session use and lifetime contracts            |
+| [Batch CLI](cli.md)                           | Execution/checking options and source handling    |
 | [Upstream inventory](upstream-tests.md)       | All upstream files and subset mappings            |
 | [Module fixtures](../tests/modules/README.md) | Real-world consumer pins and future parity inputs |
 | [Decisions](decisions/README.md)              | Durable rationale                                 |

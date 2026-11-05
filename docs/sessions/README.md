@@ -1,6 +1,6 @@
 # Session Records
 
-Latest: [M2a frontend implementation](2026-11-06-m2a-frontend.md).
+Latest: [M2b core libraries](2026-11-06-m2b-core-libraries.md).
 
 | Date       | Session                                                   |
 | ---------- | --------------------------------------------------------- |
@@ -9,6 +9,7 @@ Latest: [M2a frontend implementation](2026-11-06-m2a-frontend.md).
 | 2026-11-05 | [M1 interpreter](2026-11-05-m1-interpreter.md)            |
 | 2026-11-06 | [Module fixture setup](2026-11-06-ecosystem-fixtures.md)  |
 | 2026-11-06 | [M2a frontend implementation](2026-11-06-m2a-frontend.md) |
+| 2026-11-06 | [M2b core libraries](2026-11-06-m2b-core-libraries.md)    |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,

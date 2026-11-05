@@ -3,12 +3,35 @@
 Baseline: Lua v5.5.1, `7579fc9d7ed90240487251dfb69168f8e64e9294`.
 All 34 `references/lua/testes/*.lua` files are preserved unchanged.
 
-**No whole upstream file is reported passing on Ada at M1.** Each combines
-scoped behavior with deferred facilities, or is a helper/internal test.
-The table records those prerequisites and the corresponding first-party
-subset evidence. These mappings are reviewed implementation rationale, not
-equivalent full-file coverage. Project fixtures run through the pinned C
-oracle and Ada; upstream execution remains a later conformance gate.
+M1 had no whole-file upstream execution passes. The historical inventory below
+records its prerequisites and reviewed first-party subset mappings. M2a added
+compile-only evidence; M2b targets the first three unchanged execution files.
+These distinct evidence levels must not be conflated. Complete upstream
+conformance remains later work.
+
+## M2b execution targets
+
+| File           | Role                                      | Windows/Linux/macOS result       |
+| -------------- | ----------------------------------------- | -------------------------------- |
+| tpack.lua      | Packing, alignment, numbers, byte strings | Passed, default budget           |
+| utf8.lua       | UTF-8, patterns, formatting, text loading | Passed, default budget           |
+| bitwise.lua    | Bits, string handlers, loading, coercion  | Passed, default budget           |
+| bwcoercion.lua | Module loaded by bitwise.lua              | Helper, not a fourth suite       |
+
+All 18 configurations passed disposable raw-byte comparisons at default limits.
+The [M2b protocol](milestones/m2b.md) requires each primary file to run alone
+against C Lua and Ada in fresh processes, from disposable verified copies, with
+no _soft/_port/_U/_nomsg flags and no T. Require empty stderr, successful exit,
+same-host stdout byte equality, and the final success marker within 120 seconds.
+Use the default 1,000,000-instruction profile unless measured instruction-only
+exhaustion justifies the explicit documented test profile. M2b required no
+larger profile. See [M2b validation](validation-m2b.md), [status](status.md), and the
+[current session](sessions/2026-11-06-m2b-core-libraries.md).
+
+All other files below remain outside M2b whole-file acceptance. Do not invoke
+all.lua or infer their execution coverage from these three targets.
+
+## Historical M1 mappings
 
 | File                                                      | Purpose                       | Deferred prerequisites                         | M1 mapping                          |
 | --------------------------------------------------------- | ----------------------------- | ---------------------------------------------- | ----------------------------------- |
@@ -50,9 +73,10 @@ oracle and Ada; upstream execution remains a later conformance gate.
 ## Internal-code mapping
 
 M2a adds token and raw-source compile-only comparisons for every file above;
-see the [frontend guide](frontend.md). These do not change the no-whole-file
-execution claim. Exact opcode definitions are now independently tested against
-C; code.lua instruction-stream/optimization assertions remain deferred.
+see the [frontend guide](frontend.md). Those checks are parse-only evidence;
+M2b's three execution targets above are separate. Opcode definitions are
+independently tested against C; code.lua instruction-stream/optimization
+assertions remain deferred.
 
 `code.lua` inspects C register opcodes, constants, and optimization choices
 through the upstream `T` instrumentation. Those layouts do not define the
@@ -71,7 +95,7 @@ feasibility only. Do not count it as the Ada implementation passing api.lua.
 
 ## Execution policy
 
-Later unchanged-suite runs must use a disposable working copy because tests
+Unchanged-suite runs must use a disposable working copy because tests
 write files. Record mode flags (`_U`, `_soft`, `_port`, `_nomsg`), T availability,
 OS, numeric ABI, and exclusions. A reduced suite or omitted T is not a full
 upstream pass. Add actual per-file evidence when its prerequisites are delivered.

@@ -429,7 +429,10 @@ package body Lifecycle_Tests is
       Bounds : Execution_Limits;
       Result : Execution_Result;
    begin
-      Bounds.Heap_Objects := 128;
+      --  The expanded standard environment is permanent storage. Give this
+      --  regression the same 128 transient-object allowance above its live
+      --  bootstrap rather than assuming an M1-specific builtin count.
+      Bounds.Heap_Objects := Universe.Statistics.Live_Objects + 128;
       Universe.Set_Limits (Bounds);
       Result := Universe.Execute
         ("local n=0; for i=1,5000 do local t={}; t.self=t; n=n+1 " &

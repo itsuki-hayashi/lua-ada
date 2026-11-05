@@ -52,11 +52,23 @@ error-text ABI. Writes completed before a runtime failure remain observable;
 execution is not transactional. Recoverable failures leave the session usable.
 Resource failures abort the current chunk even inside `pcall`.
 
+M2b extends that rule to `xpcall` and callbacks reached through metamethods,
+pattern replacement, loading readers, and package searchers. Lua/native calls
+share one explicit activation stack and one budget. A callback language error
+can be protected; resource exhaustion unwinds all abandoned continuation state
+and aborts the chunk. Later `Execute` calls remain usable with a fresh per-chunk
+instruction budget.
+
 `Set_Limits` controls source/tokens, instructions, call depth, objects, table
 entries, strings, output, and registers. Limits are positive; instructions
 restart for each execution. These are semantic allocation/work limits, not a
 hard operating-system memory quota. Compiler nesting has an additional guard.
 A host memory allocation failure is returned as a controlled resource error.
+The work budget also covers native helper loops and pattern backtracking;
+calling a library is not an escape from bounded execution. Mathematical
+`string.packsize` results do not allocate a corresponding string. Invalid
+format-size overflow is a Lua error; valid sizes which exceed actual allocation
+quotas produce resource failure when allocation is requested.
 
 `Set_Arguments` installs the CLI-style `arg` table with index-preserving string
 entries. Use `No_Arguments` for an empty array; arbitrary integer bounds also
@@ -65,6 +77,19 @@ support negative option indexes and the script at index zero.
 `Collect` traces between executions. `Statistics` reports owned object/program
 counts and collections, not process memory. `Close` is idempotent; execution
 on a closed session returns an error. `Reset` creates a fresh default universe.
+The M2b default universe includes its [listed libraries](capabilities.md), a
+private string metatable, and loaded/preload registries. Reset removes previous
+module caches and metatable mutations; separate sessions never share these
+mutable objects.
+
+Lua code may load text through `load`, `loadfile`, `dofile`, and Lua-only
+`require`. Loaded closures retain their initial `_ENV`, including an explicitly
+nil environment. Compilation errors from `load` return nil/message; resource
+failures retain the execution-abort policy. Binary sources are unsupported.
+File preambles are handled as file input; source passed to `Execute` or `load`
+is raw text. Default package lookup is local (`./?.lua;./?/init.lua`), without
+native modules or environment-driven path initialization. The library does not
+promise a filesystem sandbox.
 
 Host callbacks, exposed object handles, C exports, and thread synchronization
 are deferred. A sink is an output destination, not a Lua host-function API.
