@@ -1,6 +1,6 @@
 # Session Records
 
-Latest: [Ecosystem module fixture setup](2026-11-06-ecosystem-fixtures.md).
+Latest: [M2a frontend implementation](2026-11-06-m2a-frontend.md).
 
 | Date       | Session                                                  |
 | ---------- | -------------------------------------------------------- |

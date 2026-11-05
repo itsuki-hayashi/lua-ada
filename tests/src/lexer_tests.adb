@@ -79,7 +79,7 @@ package body Lexer_Tests is
       --  Each Lua keyword is recognized independently of ordinary names.
       Expected : constant Kind_Array :=
         [And_Word, Break_Word, Do_Word, Else_Word, Elseif_Word, End_Word,
-         False_Word, For_Word, Function_Word, Global_Word, Goto_Word,
+         False_Word, For_Word, Function_Word, Identifier, Goto_Word,
          If_Word, In_Word, Local_Word, Nil_Word, Not_Word, Or_Word,
          Repeat_Word, Return_Word, Then_Word, True_Word, Until_Word,
          While_Word, End_Of_Input];
@@ -113,7 +113,7 @@ package body Lexer_Tests is
       R : constant Scan_Result := Scan ("1e-3");
    begin
       Assert (R.Status = Success, "decimal exponent scan");
-      Assert (R.Tokens (1).Kind = Number_Literal, "number token");
+      Assert (R.Tokens (1).Kind in Number_Literal, "number token");
       Assert (R.Tokens (1).Text = "1e-3", "full numeric spelling");
    end Decimal_Exponent_Token;
 
@@ -308,9 +308,10 @@ package body Lexer_Tests is
    end Invalid_Long_Delimiter;
 
    procedure Unexpected_Byte is
-      --  A non-token source byte must produce a located syntax diagnostic.
+      --  C Lua returns unmatched bytes to its parser as single-byte tokens.
+      --  Rejection belongs to the grammar, rather than lexical analysis.
    begin
-      Check_Bad ("@");
+      Check_Kinds ("@", [Byte_Symbol, End_Of_Input]);
    end Unexpected_Byte;
 
    procedure Arbitrary_Bytes is
@@ -322,7 +323,7 @@ package body Lexer_Tests is
       Source : String (1 .. 32);
    begin
       Random_Bytes.Reset (Generator, Initiator => 551);
-      for Trial in 1 .. 1_000 loop
+      for Trial in 1 .. 10_000 loop
          for Item of Source loop
             Item := Random_Bytes.Random (Generator);
          end loop;

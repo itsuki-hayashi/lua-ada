@@ -7,6 +7,7 @@ with Lexer_Tests;
 with Number_Tests;
 with Session_Tests;
 with Lifecycle_Tests;
+with Lua.Opcode_Tests;
 
 procedure Test_Runner is
    use type AUnit.Status;
@@ -23,6 +24,7 @@ procedure Test_Runner is
       Number_Tests.Register (Result);
       Session_Tests.Register (Result);
       Lifecycle_Tests.Register (Result);
+      Lua.Opcode_Tests.Register (Result);
       return Result;
    end Suite;
 

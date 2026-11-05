@@ -1019,8 +1019,8 @@ package body Lua.Engine.Compiler is
             else
                Declaration;
             end if;
-         elsif Kind = Global_Word and then Next_Kind in
-           Function_Word | Star | Less | Identifier | Global_Word
+         elsif Kind = Identifier and then Text = "global" and then
+           Next_Kind in Function_Word | Star | Less | Identifier
          then
             Advance;
             if Take (Function_Word) then

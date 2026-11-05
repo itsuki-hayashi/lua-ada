@@ -73,6 +73,14 @@ evidence and does not complete that gate.
 
 ## Later bounded work
 
+## M2a frontend parity
+
+The [accepted target](milestones/m2a.md) defines FRONT-001, ORACLE-002,
+LEX-002, PARSE-002, OPCODE-001, CHECK-001, and ACCEPT-002. All remain
+in progress or pending until final acceptance evidence is recorded in the
+[session](sessions/2026-11-06-m2a-frontend.md). Local opcode/lexer evidence
+does not complete the milestone or its cross-platform gates.
+
 | ID        | Work                              | Dependency                     | Acceptance                                                   |
 | --------- | --------------------------------- | ------------------------------ | ------------------------------------------------------------ |
 | LANG-002  | Deferred language facilities      | ACCEPT-001                     | Metamethod/coroutine/close/goto regressions                  |

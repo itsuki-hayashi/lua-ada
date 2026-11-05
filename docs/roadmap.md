@@ -29,3 +29,7 @@ status owns evidence. A Lua subset does not imply full conformance.
 
 The [backlog](backlog.md) records dependencies and acceptance for each task;
 [status](status.md) records implemented behavior and actual platform results.
+
+[M2a](milestones/m2a.md) is the first bounded M2 delivery: full lexer and
+grammar/static semantics, shared checking/lowering, and canonical opcode
+definitions. Canonical code generation and execution remain separate gates.
