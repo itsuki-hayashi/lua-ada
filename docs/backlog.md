@@ -1,17 +1,17 @@
 # Backlog
 
 IDs are stable. Completion requires evidence, including relevant platform gates.
-M1 remains active while final platform acceptance is running.
+M1 is complete; [all five gates passed](validation.md).
 
 | ID         | Work                          | State          | Depends on                                   |
 | ---------- | ----------------------------- | -------------- | -------------------------------------------- |
 | FND-001    | Foundation                    | done           | None                                         |
 | PLAN-001   | Accepted M1 scope             | done           | FND-001                                      |
-| BUILD-001  | Static/shared consumers       | platform check | FND-001                                      |
+| BUILD-001  | Static/shared consumers       | done           | FND-001                                      |
 | TEST-001   | Focused AUnit runner          | done           | BUILD-001                                    |
-| CI-001     | Three-OS strict matrix        | platform check | TEST-001                                     |
+| CI-001     | Three-OS strict matrix        | done           | TEST-001                                     |
 | LEX-001    | Byte lexer/diagnostics        | done           | TEST-001                                     |
-| ABI-001    | Isolated boundary feasibility | platform check | FND-001                                      |
+| ABI-001    | Isolated boundary feasibility | done           | FND-001                                      |
 | COMP-001   | Inventory/differential driver | done           | FND-001                                      |
 | CORE-001   | Ownership/roots decision      | done           | ABI-001                                      |
 | NUM-001    | Numeric grammar/primitives    | done           | TEST-001                                     |
@@ -22,7 +22,7 @@ M1 remains active while final platform acceptance is running.
 | API-001    | Owned sessions/errors         | done           | VM-001, LANG-001                             |
 | CLI-001    | Batch interface               | done           | API-001                                      |
 | BASE-001   | Scoped base library           | done           | LANG-001                                     |
-| ACCEPT-001 | All-platform M1 acceptance    | platform check | CLI-001, BASE-001, CI-001, COMP-001, ABI-001 |
+| ACCEPT-001 | All-platform M1 acceptance    | done           | CLI-001, BASE-001, CI-001, COMP-001, ABI-001 |
 
 ## Acceptance and evidence
 
@@ -31,7 +31,7 @@ PLAN-001: [accepted target](milestones/m1.md), ADR 0002.
 Current implementation evidence: [interpreter session](sessions/2026-11-05-m1-interpreter.md).
 
 - BUILD-001/CI-001: three profiles, static/shared library, real Ada consumers,
-  all target OSes. Windows six combinations pass; remote platform evidence pending.
+  all target OSes. All 18 jobs passed; see the [platform evidence](validation.md).
 - TEST-001: failing-status runner, test-only AUnit, 168 focused documented cases.
 - LEX-001: keywords/operators, byte escapes, long literals/comments, positions,
   malformed input, budgets, deterministic arbitrary-byte scans.

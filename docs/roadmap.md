@@ -1,8 +1,9 @@
 # Roadmap
 
-M0 is complete. M1 was expanded from infrastructure into the accepted
+M0 and M1 are complete. M1 expanded infrastructure into the accepted
 [basic interpreter target](milestones/m1.md). Milestones are acceptance gates,
-not calendar promises.
+not calendar promises. The [M1 validation record](validation.md) closes all five
+gates on the named Windows/Linux/macOS configurations.
 
 | Milestone | Target                                    | Completion gate                        |
 | --------- | ----------------------------------------- | -------------------------------------- |

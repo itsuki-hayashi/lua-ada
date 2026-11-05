@@ -55,6 +55,7 @@ The comparison driver builds pinned C Lua independently without changing its
 sources. OracleOnly checks fixtures, never Ada parity.
 
 The workflow covers three OS targets, three profiles, and two library modes.
-Its existence is not validation: Linux/macOS results remain unverified until
-CI runs. Record OS, architecture, compiler, linker, C runtime, and Lua settings
-with compatibility claims. Local logs belong in ignored reports/.
+The [M1 validation record](validation.md) names the exact passing configurations
+and immutable CI evidence. Future compatibility claims must also record OS,
+architecture, compiler/linker, C runtime, and Lua settings. Local logs belong in
+ignored reports/.

@@ -2,8 +2,9 @@
 
 Date: 2026-11-05, Asia/Tokyo. Objective: deliver and verify the accepted M1
 interpreter, with extensive explanatory comments and focused human-readable tests.
+Outcome: **all five M1 gates complete**; [validation evidence](../validation.md).
 
-## Changes and decisions
+## Implementation and decisions
 
 Implemented exact numeric parsing, private typed register compilation/execution,
 lexical cells and closures, tables, all M1 control flow, packet result adjustment,
@@ -11,34 +12,50 @@ tail calls, protected failures, bounded execution, tracing cycles/prototypes,
 the base subset, owned Ada sessions, and batch CLI execution.
 
 Expanded AUnit from six broad cases to 168 separately named cases with explanatory
-comments. Added process-level CLI acceptance and raw-byte differential comparison,
-including binary output and a 2,366-operation numeric matrix. ABI probes now
-exercise yield after Ada returns, variadic GC, and inherited extra space.
+comments. Added 19 CLI process cases and six raw-byte differential fixtures,
+including binary output and a 2,366-operation numeric matrix. ABI probes exercise
+allocation/failure, callbacks/reentry, varargs, extra space, yield after Ada
+returns, and C-host startup/shutdown.
 
-AGENTS and contributor guides now require implementation comments at nontrivial
-algorithms/ownership transitions and focused documented cases. ADRs 0003–0005
-record IEEE validity, ownership/C boundary limits, and narrowly justified host
+AGENTS and coding/testing guides require extensive implementation explanations
+at algorithms/ownership transitions and focused documented test cases. ADRs
+0003–0005 record IEEE validity, ownership/C boundary limits, and justified host
 exponentiation. Source representations and bytecode remain private.
 
-## Evidence so far
+## Verification
 
-Windows validation/static: 168 successful AUnit cases, no failures/unexpected
-errors; 19 CLI cases; six differential fixtures match pinned C Lua byte for
-byte. The oracle is a separately built C interpreter and is never linked into
-production. Final profile/link and remote platform checks are ongoing.
+The [final runtime CI run](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42043334409)
+passed all 18 OS/profile/link jobs. Every log was inspected: 168 successful AUnit
+cases, no failures/unexpected errors, 19 CLI cases, six differential fixtures,
+stable GNAT selection, and documentation checks. ABI probes passed in all three
+static/validation jobs. Windows static-PIC also passed with 168 cases.
 
-Tool versions: Alire 2.1.1; native GNAT 16.1.0; GPRbuild package 26.0.1
-(binary 26.0.0); AUnit 26.0.0. Standard Ada runtime dependencies plus isolated
-system math; AUnit is test-only.
+Tool versions: Alire 2.1.1; stable GNAT 16.1.0; GPRbuild package 26.0.1
+(binary 26.0.0); AUnit 26.0.0. Compiler argument records retain mandatory flags
+and ordinary runtime checks in all profiles; only optional floating validity
+classification is narrowed by ADR 0003. Reference pins remain unchanged.
 
-## Checks and handoff
+Portability checks found and resolved explicit Linux math linkage, overlapping
+oracle source ownership, byte-stream encoding, macOS NaN spelling, prerelease
+toolchain selection, and macOS C-host Ada-runtime linkage. Download HTTP 504
+failures now retry the same selected stable release, without compiler fallback.
+A final ownership review moved partial frame ownership ahead of failing scope
+allocation and added a focused recovery regression.
+
+Native HTTPS Git push lacked credentials. After explicit user approval for
+publication, the connected GitHub transport published the reviewed source to
+`codex/m1-interpreter`. Local/remote trees were synchronized and reference
+submodules remained clean. No merge or production release was performed.
+
+## Handoff
 
 Run `scripts/check.ps1` for each profile/library combination. It overrides the
-parent dependency profile explicitly, runs AUnit, CLI processes, and differential
-fixtures. `experiments/abi/abi_probe.gpr` independently checks C/Ada feasibility.
-Logs are ignored under reports. Required flags and runtime checks remain on;
-only optional floating validity classification is narrowed by ADR 0003.
+parent dependency profile, runs AUnit, CLI processes, differential fixtures, and
+documentation checks. `scripts/check-abi.ps1` resolves platform runtime linkage
+and runs isolated C/Ada feasibility. Logs belong under ignored reports.
 
-M1 remains active until all Windows/Linux/macOS static/shared acceptance jobs
-pass. No full upstream suite, drop-in C ABI, LuaRocks, binary chunks, generated
-GNATdoc, GNATtest, fuzz campaign, or formal proof is claimed.
+M1 is complete within its accepted subset. Later work is bounded in the backlog:
+remaining language/libraries, complete C facade/storage integration, binary
+chunks, module loading/LuaRocks, and full unchanged upstream conformance.
+No full upstream suite, drop-in C ABI, LuaRocks, generated GNATdoc, generated
+GNATtest coverage, fuzz campaign, formal proof, or benchmark is claimed.

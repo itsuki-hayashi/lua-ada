@@ -7,7 +7,8 @@ interface. The initial compatibility baseline is **Lua 5.5.1**.
 **Current capability:** reusable static/shared Ada sessions and a batch CLI
 execute the documented [M1 Lua subset](docs/milestones/m1.md), including closures,
 tables, tracing collection, and a small base library. Complete Lua compatibility,
-C exports, and LuaRocks remain later milestones. M1 platform acceptance is active.
+C exports, and LuaRocks remain later milestones. **M1 is complete**; see the
+[validated platform matrix](docs/validation.md).
 See [status](docs/status.md) for actual verification evidence.
 
 ## Checkout and build
@@ -49,8 +50,9 @@ Start with [agent instructions](AGENTS.md), [architecture](ARCHITECTURE.md),
 See [contributing](CONTRIBUTING.md) for the development workflow.
 
 Windows, Linux, and macOS are target platforms. Support claims require evidence
-for each platform and ABI configuration. Static/shared consumers pass on Windows;
-Linux/macOS CI awaits execution.
+for each platform and ABI configuration. Static/shared acceptance passed all
+three profiles on Windows x86-64, Linux x86-64, and macOS ARM64; see
+[exact configurations and evidence](docs/validation.md).
 
 ## License
 
