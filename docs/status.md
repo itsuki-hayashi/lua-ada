@@ -1,43 +1,44 @@
 # Project Status
 
-Updated: 2026-11-05 (Asia/Tokyo). M0 complete; **M1 active and incomplete**.
-See the accepted [M1 target](milestones/m1.md).
+Updated: 2026-11-05 (Asia/Tokyo). **M0 and M1 complete.**
+The [M1 target](milestones/m1.md) owns scope; the
+[validation record](validation.md) owns exact platform/configuration evidence.
 
 ## Implemented and verified
 
-- Reusable static/shared library, separate development CLI, nested AUnit crate.
-- Byte-oriented lexer with keywords, operators, source positions, decoded string
-  escapes, long strings/comments, syntax diagnostics, and a token budget.
-- Six AUnit cases covering lexical/integer boundaries and 1,000 deterministic
-  arbitrary-byte source scans.
-- Checked integer wrapping, floor division/modulo, and logical shifts.
-- CLI help/version and explicit failure for unsupported execution requests.
-- Isolated C reference CLI and ABI probes; three oracle-only Lua fixtures.
+The reusable Ada runtime executes the M1 language subset through
+`Lua.Sessions` and the batch CLI. It includes a resolving frontend, private
+register bytecode, explicit frames and tail calls, lexical captures, tables,
+and iterative tracing collection of objects and compiled prototypes.
 
-Windows x86-64 passed all six development/validation/release x static/shared
-build/test combinations. AUnit has 6 successes, 0 failed assertions, 0 unexpected
-errors per run. CLI contracts pass in each combination. The parent library is
-validation-profile under AUnit; the matrix also builds each requested root
-profile explicitly.
+The scoped base library is available. Sessions retain globals, capture output,
+isolate state, bound execution, and return structured errors. The CLI supports
+files, repeated snippets, stdin, arguments, help/version, byte-preserving output,
+and controlled failure status. See [capabilities](capabilities.md) and
+[embedding](embedding.md).
 
-The additional static-PIC validation build/test also passed on Windows.
+All 18 Windows/Linux/macOS x development/validation/release x static/shared
+jobs passed. Each passed 171 individually named AUnit cases, zero failed
+assertions/unexpected errors, 19 CLI cases, and six raw-byte differential
+fixtures against pinned C Lua, including 2,366 arithmetic combinations.
+The ABI probe passed on each target OS. Final Windows static-PIC acceptance
+also passed. Required flags and runtime checks remain enabled; ADR 0003
+explains the floating-validity exception.
 
-Tools: Alire 2.1.1, GNAT 16.1.0, AUnit 26.0.0, GPRbuild package 26.0.1
-(binary banner 26.0.0). Shared tests load the real library; production has no
-C reference dependency. Local logs are ignored under reports/.
+Tools: Alire 2.1.1, stable native GNAT 16.1.0, AUnit 26.0.0, GPRbuild package
+26.0.1 (binary banner 26.0.0). Compiler target triples, OS versions, test groups,
+ABI observations, commands, and immutable CI evidence are recorded in
+[validation](validation.md).
 
-ABI probe on Windows: integer=8, number=8, lua_Debug=144, extraspace=8 bytes;
-currentline offset=48. These are host observations, not portable constants.
-Callback/jump prototypes are limited; full error/yield integration is unresolved.
+## Later milestones
 
-## Not yet verified or implemented
+This is a documented Lua subset, not complete Lua 5.5 compatibility.
+Metatables, coroutines, userdata, close/goto, remaining libraries, binary
+chunks, full C API/ABI, dynamic modules, and LuaRocks remain later milestones.
+No unchanged whole upstream test file has passed on Ada; the
+[inventory](upstream-tests.md) explains prerequisites and equivalent subset
+coverage. GNATdoc rendering, GNATtest generation, fuzz campaigns, and formal
+proof have not been exercised.
 
-Linux/macOS CI has been authored but not run remotely. Neither platform has
-local evidence. No resolving parser, bytecode VM, runtime values/tables/GC,
-session embedding API, base functions, script execution, or C drop-in API exists.
-
-The Lua fixtures pass on C Lua 5.5.1 only; **Ada parity is not tested**.
-Full upstream inventory/conformance, native modules, LuaRocks, binary chunks,
-GNATdoc output, fuzz campaigns, and formal proof are not complete.
-
-See [session evidence](sessions/2026-11-05-m1-gates.md) and [backlog](backlog.md).
+See [session evidence](sessions/2026-11-05-m1-interpreter.md),
+[roadmap](roadmap.md), and [backlog](backlog.md).

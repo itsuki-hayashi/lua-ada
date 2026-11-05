@@ -1,69 +1,71 @@
 # Backlog
 
-IDs are stable. A done item must link evidence. Milestone M1 remains active.
-Implementation is distinct from verification on all target platforms.
+IDs are stable. Completion requires evidence, including relevant platform gates.
+M1 is complete; [all five gates passed](validation.md).
 
-| ID         | Work                                  | State   | Depends on |
-| ---------- | ------------------------------------- | ------- | ---------- |
-| FND-001    | Foundation                            | done    | None       |
-| PLAN-001   | Accepted M1 target and gates          | done    | FND-001    |
-| BUILD-001  | Static/shared library and consumers   | active  | FND-001    |
-| TEST-001   | Nested AUnit crate and failing runner | done    | BUILD-001  |
-| CI-001     | Three-platform profile/link matrix    | active  | TEST-001   |
-| LEX-001    | Byte lexer with locations and limits  | done    | TEST-001   |
-| ABI-001    | C boundary feasibility                | active  | FND-001    |
-| COMP-001   | Upstream inventory and differential   | active  | FND-001    |
-| CORE-001   | Ownership/roots representation        | planned | ABI-001    |
-| NUM-001    | Numeric grammar and primitive rules   | active  | TEST-001   |
-| PARSE-001  | Resolving parser and diagnostics      | planned | LEX-001    |
-| VM-001     | Typed register bytecode and frames    | planned | CORE-001   |
-| HEAP-001   | Tables, roots, tracing cycles         | planned | CORE-001   |
-| LANG-001   | Control flow/functions/results        | planned | PARSE-001  |
-| API-001    | Owned sessions and structured errors  | planned | VM-001     |
-| CLI-001    | Batch execution modes and arguments   | planned | API-001    |
-| BASE-001   | M1 base library                       | planned | LANG-001   |
-| ACCEPT-001 | M1 acceptance on all platforms        | planned | BASE-001   |
+| ID         | Work                          | State          | Depends on                                   |
+| ---------- | ----------------------------- | -------------- | -------------------------------------------- |
+| FND-001    | Foundation                    | done           | None                                         |
+| PLAN-001   | Accepted M1 scope             | done           | FND-001                                      |
+| BUILD-001  | Static/shared consumers       | done           | FND-001                                      |
+| TEST-001   | Focused AUnit runner          | done           | BUILD-001                                    |
+| CI-001     | Three-OS strict matrix        | done           | TEST-001                                     |
+| LEX-001    | Byte lexer/diagnostics        | done           | TEST-001                                     |
+| ABI-001    | Isolated boundary feasibility | done           | FND-001                                      |
+| COMP-001   | Inventory/differential driver | done           | FND-001                                      |
+| CORE-001   | Ownership/roots decision      | done           | ABI-001                                      |
+| NUM-001    | Numeric grammar/primitives    | done           | TEST-001                                     |
+| PARSE-001  | Resolving parser              | done           | LEX-001                                      |
+| VM-001     | Register instructions/frames  | done           | CORE-001                                     |
+| HEAP-001   | Tables/tracing cycles         | done           | CORE-001                                     |
+| LANG-001   | Functions/control/results     | done           | PARSE-001, VM-001, HEAP-001, NUM-001         |
+| API-001    | Owned sessions/errors         | done           | VM-001, LANG-001                             |
+| CLI-001    | Batch interface               | done           | API-001                                      |
+| BASE-001   | Scoped base library           | done           | LANG-001                                     |
+| ACCEPT-001 | All-platform M1 acceptance    | done           | CLI-001, BASE-001, CI-001, COMP-001, ABI-001 |
 
 ## Acceptance and evidence
 
-FND-001: [foundation session](sessions/2026-11-05-foundation.md).
-PLAN-001: [M1 target](milestones/m1.md) and ADR 0002.
+FND-001: [foundation record](sessions/2026-11-05-foundation.md).
+PLAN-001: [accepted target](milestones/m1.md), ADR 0002.
+Current implementation evidence: [interpreter session](sessions/2026-11-05-m1-interpreter.md).
 
-BUILD-001: static/shared targets and isolated artifacts exist; both consumer
-paths pass on Windows. Remains active pending Linux/macOS evidence.
-TEST-001: AUnit is test-only, parent-pinned, with status-returning runner and
-meaningful lexical tests. Evidence: [current session](sessions/2026-11-05-m1-gates.md).
-CI-001: 18-job OS/profile/link matrix exists; remote execution is unverified.
+- BUILD-001/CI-001: three profiles, static/shared library, real Ada consumers,
+  all target OSes. All 18 jobs passed; see the [platform evidence](validation.md).
+- TEST-001: failing-status runner, test-only AUnit, 171 focused documented cases.
+- LEX-001: keywords/operators, byte escapes, long literals/comments, positions,
+  malformed input, budgets, deterministic arbitrary-byte scans.
+- ABI-001: allocator failure/balance, varargs, callbacks/reentry, C-only jump
+  guards, extra space, layout, yield after Ada returns, startup/shutdown.
+  Scope is feasibility; complete exported API/yield integration is M3.
+- COMP-001: six raw-byte C/Ada differential fixtures, including 2,366 arithmetic
+  rows, and [all 34 upstream files inventoried](upstream-tests.md).
+- CORE-001: [ADR 0004](decisions/0004-runtime-ownership.md), explicit roots and
+  nonmoving ownership; future allocator/layout constraints recorded.
+- NUM-001: exact decimal/hex rounding, integer wrapping, mixed comparisons,
+  IEEE limits, modulo, shifts, and host exponentiation regression evidence.
+- PARSE-001: precedence, lexical symbols, global/const rules, explicit deferred
+  syntax failures, bounded nesting, source diagnostics.
+- VM-001: private instructions, packet registers, explicit calls, tail frames,
+  protected errors, instruction/call/register bounds.
+- HEAP-001: key rules/identity, sequence border, root traversal, iterative
+  cycle/prototype reclamation, live captures, automatic collection.
+- LANG-001: all scoped statements/loops, closures/mutation, varargs including
+  named tables, result adjustment, recursion and proper tail calls.
+- API-001: persistent independent sessions, named chunks, structured failures,
+  recovery, output preservation/sinks, close/reset ownership.
+- CLI-001: 19 process cases for files/stdin/snippets/options/arguments/status.
+- BASE-001: exact M1 inventory, protected failures, raw/iteration behavior.
+- ACCEPT-001: every above gate, all three OSes, no hidden skips. No full Lua,
+  upstream-suite, drop-in ABI, or LuaRocks claim follows from M1.
 
-LEX-001: keywords/operators, byte strings/escapes, long comments, source bounds,
-locations, malformed input, token limits, and independent scans are tested.
-Numeric spelling is retained; NUM-001 owns grammar/range validation.
-This is not a claim of complete frontend conformance.
+## Later bounded work
 
-ABI-001: allocator failure/balance, varargs, extra space, public layout, Ada
-lifecycle, callbacks, and C-only jump checkpoints have Windows evidence.
-General Lua API error integration, yields, stable heap addresses, and all target
-ABIs still require experiments. See [probe](../experiments/abi/README.md).
-
-COMP-001: isolated C oracle, comparison driver, and three project fixtures exist.
-Fixtures pass on C Lua only. Ada execution parity and upstream inventory/mappings
-remain undone; do not mark the work done from oracle-only runs.
-
-CORE-001: review cycles, roots, allocator callbacks, stable addresses, and
-cleanup before representation commitments. NUM-001: decimal/hex integers/floats,
-overflow, coercion, division/modulo, shifts, and reference boundary tests.
-PARSE-001: precedence, lexical resolution, 5.5 globals/constants, unsupported
-syntax, and located diagnostics with AUnit coverage.
-
-VM-001: typed instructions, bounded registers/frames, checked execution, calls,
-protected errors, and instruction budgets. HEAP-001: identity, key rules,
-root traversal, reclamation of cycles, and live captured references.
-
-LANG-001: all scoped M1 statements, functions, closures, varargs, result
-adjustment, and proper tail calls; depends also on VM-001, HEAP-001, NUM-001.
-API-001: independent sessions, output sink, persistent globals, and recoverability;
-depends also on LANG-001. CLI-001: all accepted batch modes with process tests.
-BASE-001: the exact base functions in the milestone target and regressions.
-
-ACCEPT-001 depends also on CLI-001, CI-001, BUILD-001, COMP-001, ABI-001 and
-HEAP-001: all scoped behavior, both link modes, all OS targets, no hidden skips.
+| ID        | Work                              | Dependency                 | Acceptance                                                   |
+| --------- | --------------------------------- | -------------------------- | ------------------------------------------------------------ |
+| LANG-002  | Deferred language facilities      | ACCEPT-001                 | Metamethod/coroutine/close/goto regressions                  |
+| LIB-002   | Remaining libraries and loading   | ACCEPT-001                 | Library differential and unchanged-file coverage             |
+| ABI-002   | Full C facade/storage integration | ABI-001, CORE-001          | Public header clients, callbacks/unwinding, allocator parity |
+| CHUNK-001 | Binary chunk interoperability     | ABI-002                    | Pinned C/Ada load/dump fixtures                              |
+| MOD-001   | Native modules/LuaRocks           | ABI-002, LIB-002           | Pure Lua and native rock acceptance                          |
+| CONF-001  | Complete upstream validation      | LANG-002, LIB-002, ABI-002 | Unchanged suite and reviewed full internal mappings          |

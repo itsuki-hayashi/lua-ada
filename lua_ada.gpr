@@ -13,12 +13,24 @@ library project Lua_Ada is
    for Library_Kind use Library_Mode;
    for Library_Dir use
      "lib/" & Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
+   case Library_Mode is
+      when "relocatable" =>
+         case Lua_Ada_Config.Alire_Host_OS is
+            when "linux" | "macos" =>
+               for Library_Options use ("-lm");
+            when others => null;
+         end case;
+      when others => null;
+   end case;
 
    package Compiler is
       --  Apply the project baseline after Alire's profile switches.
       for Default_Switches ("Ada") use
         Lua_Ada_Config.Ada_Compiler_Switches &
-        ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty");
+        ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty",
+         "-gnatVF");
+      --  IEEE NaNs/infinities are Lua values: see ADR 0003. Ordinary Ada
+      --  runtime checks and all other profile validity checks stay enabled.
    end Compiler;
 
    package Binder is

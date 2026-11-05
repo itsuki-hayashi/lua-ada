@@ -65,10 +65,14 @@ package body Lua.Lexers is
         (if Ahead < Input'Length and then
             Cursor.Offset <= Input'Last - Ahead
          then Input (Cursor.Offset + Ahead) else Latin.NUL);
+      --  NUL is only a lookahead sentinel. End-of-input decisions must use
+      --  the offset, because actual NUL bytes are legal inside Lua strings.
 
       procedure Advance is
          Old : constant Character := Peek;
       begin
+         --  CRLF and LFCR each count as one Lua newline. The same cursor
+         --  operation serves whitespace, comments, and escaped line endings.
          Cursor.Offset := Cursor.Offset + 1;
          if Old in Latin.CR | Latin.LF then
             if Cursor.Offset <= Input'Last and then
@@ -107,6 +111,8 @@ package body Lua.Lexers is
       function Long_Level return Integer is
          Ahead : Natural := 1;
       begin
+         --  Inspect without consuming: a plain '[' can start indexing,
+         --  while only a matching [=*[ delimiter starts a long literal.
          if Peek /= '[' then
             return -1;
          end if;
@@ -120,6 +126,9 @@ package body Lua.Lexers is
         (Level : Natural; Text : out Unbounded_String)
       is
       begin
+         --  Comments and long strings share delimiter/newline rules. Drop
+         --  one initial line break, then preserve all bytes except newline
+         --  normalization; a different equals-count is ordinary content.
          Text := Null_Unbounded_String;
          for Index in 1 .. Level + 2 loop
             Advance;
@@ -184,6 +193,9 @@ package body Lua.Lexers is
          Count : Natural;
          Code  : Character;
       begin
+         --  Decode escapes as bytes during scanning. Decimal/hex escapes
+         --  are bounded before Character conversion; Unicode escapes use
+         --  Lua's extended UTF-8 encoding rather than host text encoding.
          Text := Null_Unbounded_String;
          Advance;
          while Peek /= Quote loop

@@ -5,6 +5,7 @@ with "../../config/lua_ada_config.gpr";
 project Abi_Probe is
    for Languages use ("C");
    for Source_Dirs use ("c");
+   for Source_Files use ("abi_probe.c");
    for Object_Dir use "../../build/abi/c-obj";
    for Exec_Dir use "../../build/abi/bin";
    for Main use ("abi_probe.c");
@@ -20,7 +21,10 @@ project Abi_Probe is
          when "linux" =>
             for Default_Switches ("C") use ("-lm", "-ldl");
          when "macos" =>
-            for Default_Switches ("C") use ("-lm");
+            --  This host does not infer runtime closure for a C-only main.
+            --  The driver resolves the archive from the selected compiler.
+            for Default_Switches ("C") use
+              ("-lm", external ("LUA_ADA_ABI_RUNTIME_ARCHIVE", ""));
          when others => null;
       end case;
    end Linker;

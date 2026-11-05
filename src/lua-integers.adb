@@ -40,6 +40,9 @@ package body Lua.Integers is
    function Floor_Divide (Left, Right : Integer_Value) return Integer_Value is
       Quotient : Integer_Value;
    begin
+      --  Ada integer division truncates toward zero. Lua rounds toward
+      --  negative infinity, requiring one correction for unlike signs and
+      --  a nonzero residue. The minimum/-1 case wraps before Ada division.
       if Right = 0 then
          raise Arithmetic_Error with "attempt to divide by zero";
       elsif Left = Integer_Value'First and then Right = -1 then
@@ -54,6 +57,8 @@ package body Lua.Integers is
 
    function Modulo (Left, Right : Integer_Value) return Integer_Value is
    begin
+      --  Ada mod already follows the divisor's sign. Handle -1 separately
+      --  so the signed minimum never reaches a host division overflow.
       if Right = 0 then
          raise Arithmetic_Error with "attempt to perform modulo by zero";
       elsif Right = -1 then
@@ -66,6 +71,8 @@ package body Lua.Integers is
      (Value, Amount : Integer_Value) return Integer_Value
    is
    begin
+      --  Check the full signed count before negating it: Integer'First has
+      --  no positive signed counterpart. Out-of-word shifts are zero.
       if Amount <= -64 or else Amount >= 64 then
          return 0;
       elsif Amount < 0 then

@@ -14,6 +14,7 @@ project Lua_Ada_Tests is
    package Compiler is
       for Default_Switches ("Ada") use
         Lua_Ada_Tests_Config.Ada_Compiler_Switches &
-        ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty");
+        ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty",
+         "-gnatVF");
    end Compiler;
 end Lua_Ada_Tests;

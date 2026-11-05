@@ -17,11 +17,11 @@ developers needing a safer idiomatic interface.
   and compatibility tests, and maintained API/design documentation.
 - Prefer standard Ada libraries; justify and isolate essential C/OS glue.
 
-## Foundation boundary
+## Milestone boundaries
 
-This milestone establishes layout, compiler policy, reference revisions,
-documentation, and follow-up management. It implements no language feature and
-does not establish compatibility. See [status](status.md).
+M0 established project policies and references. M1 delivers the documented
+basic scripting subset; full compatibility is a later milestone. See
+[roadmap](roadmap.md) and [status](status.md).
 
 Do not mechanically translate C or hide a C interpreter backend. Idiomatic Ada
 does not require universal inheritance. Internal layouts may differ except

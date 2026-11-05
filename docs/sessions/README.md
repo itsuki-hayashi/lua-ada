@@ -1,10 +1,12 @@
 # Session Records
 
-Latest: [Initial M1 implementation gates](2026-11-05-m1-gates.md).
+Latest: [M1 interpreter implementation](2026-11-05-m1-interpreter.md).
 
 | Date       | Session                                             |
 | ---------- | --------------------------------------------------- |
 | 2026-11-05 | [Initial foundation](2026-11-05-foundation.md)      |
+| 2026-11-05 | [Initial M1 gates](2026-11-05-m1-gates.md)          |
+| 2026-11-05 | [M1 interpreter](2026-11-05-m1-interpreter.md)      |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,

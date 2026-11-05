@@ -1,11 +1,6 @@
-with AUnit.Test_Fixtures;
+with AUnit.Test_Suites;
 
 package Integer_Tests is
-   type Fixture is new AUnit.Test_Fixtures.Test_Fixture with null record;
-
-   procedure Wrapping (Self : in out Fixture);
-   --  Arithmetic at signed representation boundaries.
-
-   procedure Division_And_Shifts (Self : in out Fixture);
-   --  Floor/sign rules, zero failures, and extreme shift counts.
+   procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite);
+   --  One named case per arithmetic boundary or failure contract.
 end Integer_Tests;

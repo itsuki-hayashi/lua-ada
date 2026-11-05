@@ -105,6 +105,14 @@ static int allocate_userdata(lua_State *state)
     return 1;
 }
 
+static int yielding_callback(lua_State *state)
+{
+    /* Ada returns normally before Lua suspends this reference C callback. */
+    int value = ada_probe_invoke(echo_status, 42);
+    lua_pushinteger(state, value);
+    return lua_yield(state, 1);
+}
+
 int main(void)
 {
     struct allocator_state allocation = {0, 0};
@@ -144,6 +152,20 @@ int main(void)
     lua_pop(state, 1);
     lua_pushinteger(state, 42);
     assert(lua_tointeger(state, -1) == 42);
+    lua_pop(state, 1);
+
+    {
+        int count = 0;
+        lua_State *thread = lua_newthread(state);
+        memcpy(&recovered, lua_getextraspace(thread), sizeof recovered);
+        assert(recovered == marker);
+        lua_pushcfunction(thread, yielding_callback);
+        assert(lua_resume(thread, state, 0, &count) == LUA_YIELD);
+        assert(count == 1 && lua_tointeger(thread, -1) == 42);
+        assert(lua_resume(thread, state, 0, &count) == LUA_OK);
+        lua_pop(state, 1); /* release the coroutine's main-state root */
+    }
+    assert(lua_gc(state, LUA_GCCOUNT) >= 0);
     lua_close(state);
     assert(allocation.blocks == 0);
 

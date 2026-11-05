@@ -7,6 +7,8 @@ library project Abi_Bridge is
    for Library_Kind use "static";
    for Library_Interface use ("Abi_Probe");
    for Library_Standalone use "standard";
+   for Library_Auto_Init use "false";
+   --  The C main explicitly controls initialization and finalization.
    for Create_Missing_Dirs use "True";
 
    package Compiler is

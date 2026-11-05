@@ -7,12 +7,16 @@ output stays under ignored `build/`; reference submodules are not modified.
 From the repository root, after `alr build` has generated configuration:
 
 ```text
-alr exec -- gprbuild -P experiments/abi/abi_probe.gpr
-alr exec -- build/abi/bin/abi_probe
+./scripts/check-abi.ps1
 ```
 
 On Windows the executable ends in `.exe`. The C-only main explicitly invokes
 the standalone Ada library's generated initialization/finalization procedures.
+Automatic initialization is disabled to keep the host's lifecycle explicit.
+On macOS, the driver locates libgnat.a through the selected compiler and supplies
+it to the C linker. Its GPRbuild configuration does not support encapsulated
+standalone libraries or infer this C-only host's runtime closure. No absolute
+toolchain path is committed; the driver restores the caller's environment.
 The probe checks a null C callback, C-to-Ada-to-C status return, `va_list`
 formatting, failed state creation, protected allocation failure, extra-space
 access, protected Lua errors after Ada returns, state reuse, and allocator
@@ -20,6 +24,11 @@ balance after close. A second prototype calls a guarded C helper while Ada is
 active below it: the helper catches a foreign nonlocal jump entirely within C
 and returns status through Ada normally. Nested C/Ada/C reentry restores the
 outer guard. It prints public size/layout facts for the host ABI.
+
+The reference coroutine probe yields only after the Ada callback has returned,
+then resumes normally. It also checks inherited thread extra space and the
+variadic GC entry point. This investigates yield/lifecycle requirements; it
+does not claim that the M1 Ada runtime implements coroutines or exports C Lua.
 
 ## What this does not prove
 
@@ -31,6 +40,7 @@ is **unresolved**. This experiment does not establish arbitrary ABI compatibilit
 continuations, full allocator compatibility, stable Ada heap addresses, or a
 drop-in library. No general unwinding mechanism has been approved.
 
-Before fixing heap/frame representation, extend ABI-001 with reentry/yield
-experiments and a reviewed mechanism that preserves Ada resource cleanup. Do
+The reentry/yield experiments inform the private M1 representations; see
+[ownership decision](../../docs/decisions/0004-runtime-ownership.md). Full C API
+integration must preserve Ada resource cleanup on every path. Do
 not infer that wrapping a call in a C function makes longjmp across Ada safe.

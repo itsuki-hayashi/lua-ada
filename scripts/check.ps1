@@ -25,17 +25,17 @@ function Invoke-Alire {
 
 try {
     Set-Location $projectRoot
+    & (Join-Path $PSScriptRoot 'check-documentation.ps1')
     Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario)
     foreach ($crateName in @('cli', 'tests')) {
         Set-Location (Join-Path $projectRoot $crateName)
-        Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario)
+        Invoke-Alire -Arguments @('-n', 'build', $profileArgument,
+            "--profiles=lua_ada=$Profile", '--', $scenario)
     }
 
-    # Dependencies can use different Alire profiles from their consumers.
-    $libraryPaths = @('development', 'validation', 'release') | ForEach-Object {
-        Join-Path $projectRoot "lib/$_/$LibraryType"
-    }
-    $runtimePath = $libraryPaths -join [IO.Path]::PathSeparator
+    # Pin runtime lookup to the exact library that this job compiled. Searching
+    # other profiles first could accidentally load a stale, incompatible DLL.
+    $runtimePath = Join-Path $projectRoot "lib/$Profile/$LibraryType"
     $env:PATH = $runtimePath + [IO.Path]::PathSeparator + $savedPath
     $env:LD_LIBRARY_PATH = $runtimePath + [IO.Path]::PathSeparator + $savedLdPath
     $env:DYLD_LIBRARY_PATH = $runtimePath + [IO.Path]::PathSeparator + $savedDyldPath
@@ -45,6 +45,9 @@ try {
 
     Set-Location (Join-Path $projectRoot 'cli')
     $cliExecutable = "bin/$LibraryType/lua_ada$suffix"
+    $absoluteCli = Join-Path (Get-Location).Path $cliExecutable
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-cli.ps1'), '-Interpreter', $absoluteCli)
     $versionOutput = & alr exec -- $cliExecutable --version
     if ($LASTEXITCODE -ne 0 -or
         ($versionOutput -join "`n") -ne 'Lua Ada 0.1.0-dev (target 5.5.1)') {
@@ -58,6 +61,9 @@ try {
     if ($LASTEXITCODE -eq 0) {
         throw 'CLI must fail for unsupported execution requests'
     }
+    Set-Location $projectRoot
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli)
     Write-Output "PASS: $Profile / $LibraryType (AUnit and CLI contracts)"
 }
 finally {
