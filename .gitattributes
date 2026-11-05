@@ -1,0 +1,12 @@
+* text=auto
+*.ads text eol=lf
+*.adb text eol=lf
+*.gpr text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+.gitmodules text eol=lf

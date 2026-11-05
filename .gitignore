@@ -1,5 +1,23 @@
-# Object file
-*.o
+# Alire-generated state and build products (first-party crates only).
+/alire/
+/config/
+/obj/
+/bin/
+/lib/
+/build/
+/tests/alire/
+/tests/config/
+/tests/obj/
+/tests/bin/
+/cli/alire/
+/cli/config/
+/cli/obj/
+/cli/bin/
 
-# Ada Library Information
-*.ali
+# Generated documentation, analysis reports, and local logs.
+/docs/generated/
+/reports/
+/*-run.txt
+
+# Legacy generated state left by promoting the initial crate.
+/lua_ada/

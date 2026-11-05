@@ -1,0 +1,6 @@
+[submodule "references/lua"]
+	path = references/lua
+	url = https://github.com/lua/lua.git
+[submodule "references/ada-lua"]
+	path = references/ada-lua
+	url = https://github.com/Nikokrock/ada-lua.git
