@@ -14,6 +14,9 @@ The accepted [M1 target](milestones/m1.md) owns the interpreter subset and gates
 | [Roadmap](roadmap.md)                     | Milestone ordering and gates           |
 | [Backlog](backlog.md)                     | Work IDs and acceptance criteria       |
 | [Status](status.md)                       | Actual capability and evidence         |
+| [Capabilities](capabilities.md)           | Implemented subset and deferred areas  |
+| [Embedding](embedding.md)                 | Ada session use and lifetime contracts |
+| [Upstream inventory](upstream-tests.md)   | All upstream files and subset mappings |
 | [Decisions](decisions/README.md)          | Durable rationale                      |
 | [Sessions](sessions/README.md)            | Dated evidence and handoff             |
 

@@ -19,21 +19,31 @@ function Invoke-Program {
     $start.RedirectStandardError = $true
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $start
+    $outBuffer = [IO.MemoryStream]::new()
+    $errBuffer = [IO.MemoryStream]::new()
     try {
         [void]$process.Start()
-        $stdout = $process.StandardOutput.ReadToEndAsync()
-        $stderr = $process.StandardError.ReadToEndAsync()
+        # Lua strings are arbitrary bytes. TextReader decoding could replace
+        # distinct invalid UTF-8 sequences with the same replacement character.
+        $stdout = $process.StandardOutput.BaseStream.CopyToAsync($outBuffer)
+        $stderr = $process.StandardError.BaseStream.CopyToAsync($errBuffer)
         if (-not $process.WaitForExit(30000)) {
             $process.Kill($true)
             throw "Interpreter timed out: $Script"
         }
+        $stdout.GetAwaiter().GetResult()
+        $stderr.GetAwaiter().GetResult()
         return @{
             Code = $process.ExitCode
-            Out = $stdout.GetAwaiter().GetResult()
-            Err = $stderr.GetAwaiter().GetResult()
+            Out = [Convert]::ToBase64String($outBuffer.ToArray())
+            Err = [Convert]::ToBase64String($errBuffer.ToArray())
         }
     }
-    finally { $process.Dispose() }
+    finally {
+        $process.Dispose()
+        $outBuffer.Dispose()
+        $errBuffer.Dispose()
+    }
 }
 
 try {

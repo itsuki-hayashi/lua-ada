@@ -5,7 +5,7 @@ default. Keep declaration documentation adjacent, at the same indentation,
 without an intervening blank line. Packages have additional attachment rules;
 see the [GNATdoc annotations guide](https://docs.adacore.com/gnatdoc-docs/users_guide/_build/html/annotations.html).
 
-Illustrative convention only; this is not an implemented API:
+Declaration convention:
 
 ```ada
 function Count (Text : String) return Natural;
@@ -22,8 +22,10 @@ Use internal comments for invariants and Markdown for architecture/rationale.
 
 ## Planned generation workflow
 
-There are no public runtime APIs to publish yet. GNATdoc is an optional
-developer installation, not a runtime dependency. When a library exists:
+Public runtime declarations now include `Lua.Sessions` and numeric/lexical
+helpers. The [embedding guide](embedding.md) explains ownership and errors.
+GNATdoc remains an optional developer installation; rendered output has not
+been generated or verified in M1. When the tool is installed:
 
 1. Build it through Alire with the same environment used for documentation.
 2. Run GNATdoc through `alr exec`, passing explicit style, scope, and warnings.
@@ -33,7 +35,7 @@ developer installation, not a runtime dependency. When a library exists:
    output directory and `index.html`, then inspect rendered declarations/tags.
    A zero exit code alone is not documentation coverage.
 
-Future command, once the project has a documented library API:
+Planned generation command (tool availability and rendered output unverified):
 
 ```text
 alr exec -- gnatdoc -P lua_ada.gpr --backend=html --style=gnat --generate=public --warnings -O docs/generated/api

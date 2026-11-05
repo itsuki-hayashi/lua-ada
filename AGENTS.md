@@ -39,7 +39,7 @@ not need artificial edits. Historical records remain dated evidence.
 
 - Prefer standard Ada libraries. Document the need, alternatives, license, and
   portability impact before adding a runtime dependency.
-- Future AUnit belongs in a nested test crate; developer tools are not runtime
+- AUnit belongs in the nested test crate; developer tools are not runtime
   dependencies. Ordinary builds must not require optional analysis tools.
 - Isolate essential C ABI and OS glue; it must not contain interpreter logic.
 - Never link the C reference interpreter into the Ada implementation to claim
@@ -49,6 +49,13 @@ not need artificial edits. Historical records remain dated evidence.
 
 ## Documentation and verification
 
+- Implementation bodies need extensive, human-readable comments: explain each
+  nontrivial algorithm, phase, invariant, ownership transition, and compatibility
+  decision at the point where a maintainer needs it. A documented specification
+  does not replace comments explaining the implementation. Keep comments current.
+- Write focused, separately named AUnit cases for individual behaviors and
+  boundary conditions. Explain the setup, action, expected result, and regression
+  being protected. Avoid bundling unrelated checks into a few large cases.
 - Use adjacent trailing GNATdoc comments and applicable tags. Document
   ownership, lifetimes, contracts, exceptions, and callback requirements.
 - Separate architecture intent from implemented capabilities. Do not invent
@@ -64,7 +71,8 @@ not need artificial edits. Historical records remain dated evidence.
 
 ## Current implementation boundary
 
-The production crate has tested lexical analysis and integer primitives.
-Separate CLI/AUnit crates, a CI workflow, and reference/ABI fixtures exist. The CLI does
-not execute Lua yet. Read current status before claiming further capabilities;
-M1 remains active until script execution and all acceptance gates are verified.
+The production crate executes the documented M1 Lua subset through owned Ada
+sessions and a batch CLI. Private bytecode, lexical captures, tables, tracing
+collection, base functions, and bounded diagnostics have acceptance tests.
+Read current status for platform evidence and deferred facilities. A passing
+subset never establishes full upstream, C ABI, or LuaRocks compatibility.

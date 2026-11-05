@@ -10,9 +10,9 @@ releases require deliberate baseline updates and fresh evidence.
 
 Long-term compatibility includes language and standard libraries, CLI behavior,
 public C API/ABI, compatible binary-chunk loading/dumping, native module loading,
-and compatible LuaRocks packages. These are future acceptance gates; none is
-implemented end-to-end by the current development CLI. Lexical and integer
-primitives have unit evidence; script execution remains unimplemented.
+and compatible LuaRocks packages. M1 executes its documented subset through Ada
+sessions and the batch CLI. Full libraries, C exports, chunks, modules, and
+LuaRocks remain future gates. See [capabilities](capabilities.md).
 
 Claims must name OS, architecture, compiler/linker/C runtime, numeric settings,
 endianness, and relevant Lua configuration. Begin with upstream's default
@@ -20,8 +20,7 @@ endianness, and relevant Lua configuration. Begin with upstream's default
 compatibility across different chunk formats or incompatible C runtimes.
 Nondefault configurations need separate evidence.
 
-Ada clients should have an idiomatic ownership-aware interface. Its details
-remain uncommitted until runtime behavior can support it. The ada-lua reference
+Ada clients use the small [ownership-aware session interface](embedding.md). The ada-lua reference
 is an API design input, not a dependency or a promise to clone its interface.
 
 ## Upstream tests
@@ -32,7 +31,8 @@ tests: [code.lua](https://github.com/lua/lua/blob/v5.5.1/testes/code.lua)
 asserts exact opcodes/constant lists through `T`, and `ltests.c` uses internal
 C headers. The Ada implementation may use different representations.
 
-Inventory these tests and provide reviewed Ada equivalents with explicit
+The [34-file inventory](upstream-tests.md) records deferred prerequisites and
+subset mappings. Provide reviewed Ada equivalents with explicit
 upstream-to-Ada mappings and rationale. Do not silently skip tests or equate
 internal test adaptation with public API coverage. Distinguish C oracle results,
 Ada equivalents, platform exclusions, failures, and unimplemented tests.

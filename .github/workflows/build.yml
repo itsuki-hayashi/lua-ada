@@ -36,8 +36,6 @@ jobs:
         if: matrix.library == 'static' && matrix.profile == 'validation'
         shell: pwsh
         run: |
-          ./scripts/compare.ps1 -OracleOnly
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           alr exec -- gprbuild -P experiments/abi/abi_probe.gpr
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $suffix = if ($IsWindows) { '.exe' } else { '' }

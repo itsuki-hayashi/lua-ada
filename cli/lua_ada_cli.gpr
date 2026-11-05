@@ -13,6 +13,13 @@ project Lua_Ada_Cli is
    package Compiler is
       for Default_Switches ("Ada") use
         Lua_Ada_Cli_Config.Ada_Compiler_Switches &
-        ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty");
+        ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty",
+         "-gnatVF");
    end Compiler;
+
+   package Binder is
+      --  Lua streams carry bytes. GNAT's UTF-8 default would encode each
+      --  Character above 127, corrupting print output and stdin source.
+      for Switches ("Ada") use ("-Wb");
+   end Binder;
 end Lua_Ada_Cli;

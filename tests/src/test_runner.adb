@@ -1,40 +1,28 @@
 with Ada.Command_Line;
 with AUnit.Reporter.Text;
 with AUnit.Run;
-with AUnit.Test_Caller;
 with AUnit.Test_Suites;
-with Lexer_Tests;
 with Integer_Tests;
+with Lexer_Tests;
+with Number_Tests;
+with Session_Tests;
+with Lifecycle_Tests;
 
 procedure Test_Runner is
    use type AUnit.Status;
-   package Cases is new AUnit.Test_Caller (Lexer_Tests.Fixture);
-   package Integer_Cases is new AUnit.Test_Caller (Integer_Tests.Fixture);
-
    function Suite return AUnit.Test_Suites.Access_Test_Suite;
 
    function Suite return AUnit.Test_Suites.Access_Test_Suite is
       Result : constant AUnit.Test_Suites.Access_Test_Suite :=
         new AUnit.Test_Suites.Test_Suite;
    begin
-      Result.Add_Test
-        (Integer_Cases.Create ("integer wrapping",
-                               Integer_Tests.Wrapping'Access));
-      Result.Add_Test
-        (Integer_Cases.Create ("division and shifts",
-                               Integer_Tests.Division_And_Shifts'Access));
-      Result.Add_Test
-        (Cases.Create ("keywords and operators",
-                       Lexer_Tests.Keywords_And_Operators'Access));
-      Result.Add_Test
-        (Cases.Create ("strings and locations",
-                       Lexer_Tests.Strings_And_Locations'Access));
-      Result.Add_Test
-        (Cases.Create ("invalid source and budgets",
-                       Lexer_Tests.Rejected_Input'Access));
-      Result.Add_Test
-        (Cases.Create ("arbitrary source bytes",
-                       Lexer_Tests.Arbitrary_Bytes'Access));
+      --  Each registered procedure is a separate AUnit case, so one failing
+      --  boundary does not hide the results of unrelated behavior checks.
+      Integer_Tests.Register (Result);
+      Lexer_Tests.Register (Result);
+      Number_Tests.Register (Result);
+      Session_Tests.Register (Result);
+      Lifecycle_Tests.Register (Result);
       return Result;
    end Suite;
 

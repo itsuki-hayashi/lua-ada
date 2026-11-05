@@ -1,9 +1,17 @@
 # Testing and Analysis
 
-The nested AUnit suite tests lexical analysis and integer primitives. The local
-check driver exercises static/shared consumers and CLI contracts. CI is authored
-for three OS targets. A differential driver and oracle-only Lua fixtures exist;
-Ada script execution, full coverage measurement, and conformance remain undone.
+Each independently meaningful behavior and boundary condition needs a separate,
+descriptively named AUnit case. Comments should explain why the input matters,
+the action under test, and the expected Lua behavior. Do not hide unrelated
+assertions inside a few broad test procedures. Treat test code as maintained
+human-facing documentation of the interpreter contract.
+
+The nested AUnit suite has 167 individually named lexical, integer, number,
+language, and session/lifetime cases. The check driver exercises static/shared
+consumers, 19 CLI processes, and six raw-byte differential fixtures against pinned
+C Lua. The arithmetic fixture contains 2,366 combinations. See [status](status.md)
+for actual platform evidence; coverage percentages and full conformance are not
+claimed.
 See [current tests](../tests/README.md) for working commands.
 
 ## Test layers
@@ -59,7 +67,8 @@ Run upstream scripts unchanged from a disposable working copy: the suite can
 write fixtures and timing files. Keep submodules clean. Inventory every upstream
 test and distinguish language/public API coverage, platform prerequisites, and
 C-internal instrumentation. A successful reduced suite is not full conformance.
-See [the compatibility contract](compatibility.md).
+See [the compatibility contract](compatibility.md) and the complete
+[upstream-file inventory](upstream-tests.md).
 
 C tests must cover header/record layout, symbols, callbacks, allocator failures,
 protected errors/yields, nested reentry, extra space, lifetime, loading modules,

@@ -4,9 +4,10 @@ Lua Ada aims to reimplement current Lua in idiomatic Ada 2022, with compatible
 language behavior, a drop-in public C API/ABI, and a safer native Ada embedding
 interface. The initial compatibility baseline is **Lua 5.5.1**.
 
-**Current capability:** static/shared libraries, tested lexical analysis and
-integer primitives, a development CLI, and test/reference infrastructure.
-It cannot execute Lua scripts or load LuaRocks modules yet. M1 is in progress.
+**Current capability:** reusable static/shared Ada sessions and a batch CLI
+execute the documented [M1 Lua subset](docs/milestones/m1.md), including closures,
+tables, tracing collection, and a small base library. Complete Lua compatibility,
+C exports, and LuaRocks remain later milestones. M1 platform acceptance is active.
 See [status](docs/status.md) for actual verification evidence.
 
 ## Checkout and build
@@ -23,8 +24,10 @@ alr -C cli exec -- bin/static/lua_ada --help
 ```
 
 For an existing checkout, run `git submodule update --init --recursive`.
-The CLI supports help/version and rejects execution requests. Select an explicit
-binary path when multiple library kinds exist; Alire cannot infer one.
+Run scripts with `alr -C cli exec -- bin/static/lua_ada script.lua`, snippets
+with `-e 'print(6 * 7)'`, or explicit stdin with `-`. Repeated snippets share one
+session. No input displays usage. Select an explicit binary path when multiple
+library kinds exist; Alire cannot infer one. See [embedding](docs/embedding.md).
 
 ## Repository map
 
@@ -34,8 +37,8 @@ binary path when multiple library kinds exist; Alire cannot infer one.
 | `alire.toml`      | Metadata and profile-wide runtime checks         |
 | `lua_ada.gpr`     | Build entry point and mandatory compiler flags   |
 | `docs/`           | Development and project management               |
-| `tests/`          | Test strategy and future test layout             |
-| `cli/`            | Separate development CLI crate                   |
+| `tests/`          | Focused AUnit and differential Lua fixtures      |
+| `cli/`            | Separate batch CLI crate                         |
 | `scripts/`        | Build/test and differential drivers              |
 | `experiments/`    | Isolated reference and C ABI fixtures            |
 | `references/`     | Pinned reference-only submodules                 |

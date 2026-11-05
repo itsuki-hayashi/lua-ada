@@ -21,6 +21,11 @@ active below it: the helper catches a foreign nonlocal jump entirely within C
 and returns status through Ada normally. Nested C/Ada/C reentry restores the
 outer guard. It prints public size/layout facts for the host ABI.
 
+The reference coroutine probe yields only after the Ada callback has returned,
+then resumes normally. It also checks inherited thread extra space and the
+variadic GC entry point. This investigates yield/lifecycle requirements; it
+does not claim that the M1 Ada runtime implements coroutines or exports C Lua.
+
 ## What this does not prove
 
 Returning a status from Ada before C raises an error, and guarding every foreign
@@ -31,6 +36,7 @@ is **unresolved**. This experiment does not establish arbitrary ABI compatibilit
 continuations, full allocator compatibility, stable Ada heap addresses, or a
 drop-in library. No general unwinding mechanism has been approved.
 
-Before fixing heap/frame representation, extend ABI-001 with reentry/yield
-experiments and a reviewed mechanism that preserves Ada resource cleanup. Do
+The reentry/yield experiments inform the private M1 representations; see
+[ownership decision](../../docs/decisions/0004-runtime-ownership.md). Full C API
+integration must preserve Ada resource cleanup on every path. Do
 not infer that wrapping a call in a C function makes longjmp across Ada safe.

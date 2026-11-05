@@ -26,6 +26,17 @@ them. See [GNAT style checks](https://gcc.gnu.org/onlinedocs/gnat_ugn/Style-Chec
 
 ## Documentation
 
+Implementation bodies require extensive explanatory comments, not only API
+comments. Introduce algorithms and their phases; explain ownership, invariants,
+boundary arithmetic, and Lua-specific decisions beside the relevant code. Make
+the control flow understandable to a human maintainer without reverse engineering
+it. Avoid redundant commentary that merely restates a statement.
+
+Unit tests must be human-readable and narrowly focused. Give each independently
+meaningful behavior or edge condition a named AUnit case with comments explaining
+its setup, action, expected result, and the regression it guards. Shared helpers
+may remove mechanical setup, but must not conceal what a case is asserting.
+
 Use [GNATdoc conventions](api-documentation.md) for declarations. Explain
 ownership, contracts, errors, and interoperability assumptions. Keep broader
 rationale in architecture and decisions.

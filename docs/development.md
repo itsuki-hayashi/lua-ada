@@ -18,14 +18,15 @@ alr -C cli exec -- bin/static/lua_ada --help
 ```
 
 The check driver builds the requested root profile plus both consumers, runs
-AUnit, and checks current CLI contracts. Accepts development, validation,
+AUnit, 19 CLI process cases, and six byte-exact C/Ada differential fixtures. Accepts development, validation,
 release, and static/static-pic/relocatable. It configures library search paths
-and restores the calling environment. Script execution remains unimplemented.
+and restores the calling environment. See [embedding](embedding.md) for Ada use.
 
 For direct scenario builds, pass -XLUA_ADA_LIBRARY_TYPE=relocatable after the
 Alire -- separator. Apply the same scenario to the library and consumers.
 Object/library directories include profile and kind; binaries include kind.
-AUnit pins the parent build profile to validation so dependency assertions stay on.
+The driver explicitly overrides the parent dependency profile to match each
+matrix entry; a default AUnit build otherwise uses its validation setting.
 
 Avoid bare alr run when both kinds exist: it finds multiple executable candidates.
 Use alr exec with the explicit bin/<kind>/<program> path. Windows adds .exe;
@@ -38,7 +39,8 @@ The manifest keeps runtime checks enabled in every profile. Optimization/debug
 defaults remain Alire's. Inspect verbose actual commands, not only configuration.
 
 Generated config/ and alire/ files are recreated by Alire; do not copy or edit
-them. Production depends only on standard Ada; AUnit is test-only. Optional
+them. Production uses standard Ada and one isolated system math primitive (ADR 0005);
+AUnit is test-only. Optional
 GNATdoc/GNATtest/GNATfuzz/GNATprove tools are not ordinary-build prerequisites.
 
 ## References and platforms

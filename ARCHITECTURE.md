@@ -1,92 +1,110 @@
 # Architecture
 
-Most of this is intended design. The root library provides lexical analysis and
-checked integer primitives, with separate CLI and AUnit crates. Accepted
-[decisions](docs/decisions/README.md) govern the structure; runtime
-representations still need focused design evidence.
+The M1 runtime is implemented; complete Lua and C compatibility remain intended
+extensions. [Decisions](docs/decisions/README.md) record compatibility tradeoffs.
 
-## Components and dependency direction
-
-The reusable interpreter is central. CLI, Ada embedding, and C compatibility
-interfaces share it. The core must not depend on the CLI, test frameworks,
-reference sources, or C-facing representations. Do not mirror C source files
-as Ada packages.
+## Components and dependencies
 
 ```text
-CLI                 Ada embedding                 C compatibility facade
- |                        |                                |
- +------------------------+--------------------------------+
-                          |
-              Frontend / bytecode / execution
-                          |
-               Values / heap / tracing collector
-                          |
-                 Narrow platform services
-
-Standard libraries use the runtime and platform services.
-Tests exercise each layer without becoming runtime dependencies.
+Batch CLI / Ada host
+        |
+  Lua.Sessions                    Future C facade
+        |                               |
+  Lua.Engine (private) <----------------+
+     |          |
+  Compiler    Machine
+     |          |
+  Lexers     values / heap / roots / collector
+                |
+         integers / numbers / narrow platform numerics
 ```
 
-| Component        | Responsibility                                      |
-| ---------------- | --------------------------------------------------- |
-| Frontend         | Source bytes, lexer, parser, diagnostics            |
-| Bytecode         | Instructions, verified chunks, compatible load/dump |
-| Execution        | Frames, calls, closures, errors, yields, coroutines |
-| Values and heap  | Scalars, objects, identity, allocation, roots       |
-| Collector        | Cyclic tracing, barriers, weak references           |
-| Standard library | Lua library semantics and module machinery          |
-| Platform         | Files, clocks, processes, locale, module loading    |
-| Ada interface    | Owned sessions, rooted handles, typed operations    |
-| C facade         | Exports, callbacks, layout and lifecycle adapters   |
-| CLI              | Arguments, interactive use, scripts, exit status    |
+The root library never depends on AUnit, CLI, or reference C sources. The C
+oracle and ABI experiments are separate test artifacts. `Lua.Engine` and its
+children are private; public clients cannot depend on register layout or heap
+addresses. No serialized bytecode compatibility is implied.
 
-These are responsibilities, not settled package names or public types.
-Private child packages should hide internals. Use tagged interfaces for useful
-behavioral substitution, private discriminated types for value distinctions,
-and generics for reusable statically typed algorithms. Scalars need not become
-class-wide heap objects.
+| Component        | Implemented M1 responsibility                           |
+| ---------------- | ------------------------------------------------------- |
+| Lexers           | Byte source, escapes, tokens, bounded scans, locations  |
+| Numbers/Integers | Exact conversion, wrapping arithmetic, comparisons      |
+| Engine.Compiler  | Resolving parser, scope checks, register emission       |
+| Engine.Machine   | Primitives, base calls, frames, result packets, limits  |
+| Engine           | Values, heap objects, tables, roots, tracing, lifecycle |
+| Sessions         | Unique ownership, source execution, structured errors   |
+| CLI              | Batch arguments, source streams, diagnostics, status    |
 
-## Ownership and execution
+## Compilation and execution
 
-Each Lua universe owns its heap, registry, allocator policy, collector, and
-execution contexts. Coroutines share a universe but have distinct execution
-state; they are not Ada tasks. Concurrent access requires a future explicit
-synchronization contract.
+The parser emits typed internal instructions directly; it does not execute an
+AST. Lexical declarations receive unique cell symbols. Active declaration
+lookup happens at the source point, so later shadowing cannot retarget a
+capture. Nested functions retain lexical environment objects.
 
-Lua graphs have cycles and shared references. Reference counting and Ada
-finalization cannot replace tracing garbage collection. Every reference surviving
-an allocation/collection point needs a root or traced owner. Distinguish internal
-references from C-observable identities and stable addresses. The allocator
-callback contract must be investigated before choosing heap representation.
+Registers contain packets, allowing calls/varargs to produce zero or many
+results. Scalar consumers take the first result or nil; only final list
+expressions expand, and parentheses collapse. Assignment retains evaluated
+table/key operands until stores. Branch instructions implement short circuit
+logic. Loop instructions separate private controls from assignable visible
+variables; each iteration creates fresh capture cells.
 
-Controlled types may manage Ada session lifetimes, but do not implement Lua
-`__gc`, `__close`, weak tables, or collector semantics. Define invalidation,
-cross-universe rejection, cleanup, and errors before exposing handles.
+An explicit activation stack bounds calls without mapping Lua recursion onto
+Ada recursion. Tail calls replace activations. Protected calls establish VM
+boundaries; errors unwind VM frames to the nearest boundary. Resource failures
+leave the VM altogether so Lua cannot restart an exhausted budget.
 
-## Safety and interoperability
+See [runtime ownership](docs/decisions/0004-runtime-ownership.md) and
+[embedding](docs/embedding.md).
 
-Use bounded indexes, distinct types, checked conversions, contracts, and explicit
-ownership. Preserve Lua integer wrapping through intentional modular operations,
-not disabled overflow checks. Strings are bytes; UTF-8 is a library capability.
+## Ownership and collection
 
-Isolate numeric parsing/formatting, patterns, locale, I/O, and platform behavior.
-Implement portable behavior in Ada where practical. Essential OS bindings and
-minimal C ABI glue stay behind narrow interfaces and contain no interpreter.
+One limited controlled session owns globals, heap objects, prototype graphs,
+execution stack, arguments, error value, and roots. Private discriminated
+values distinguish scalars from string/table/environment/closure references.
+Objects do not move. Ada finalization releases a universe but does not
+substitute for tracing cycles.
 
-Do not allow foreign nonlocal jumps across Ada frames without a demonstrated
-safe design. Protected calls, nested callbacks, yields, allocator failures, and
-cleanup are early ABI feasibility gates. Native loading also requires matching
-symbols, numeric configuration, library names, and host ABI. Validate Ada runtime
-initialization/finalization from a C-only host.
+An iterative stop-the-world mark/sweep collector traces globals, live frames,
+register packets, environments/captures, arguments, named vararg tables, error
+objects, and reachable compiled prototypes. It runs at instruction safe points,
+after temporaries have entered traced storage. Allocation itself does not
+collect unrooted instruction temporaries. Dead table-key tombstones are cleared
+before object reclamation. Repeated chunks can reclaim compiled code.
 
-Future library artifacts must be separated by profile and library kind (static,
-static-PIC, relocatable). CLI and test crates will depend on the reusable library.
-Library targets exist; the public session execution API is not implemented yet.
+Tables currently use linear entries and insertion traversal. Sequence length
+uses a valid contiguous-prefix border. Neither order nor C hash layout is a
+compatibility promise. GC modes, barriers, finalization, weak tables, and
+coroutines are later work. Coroutines will be interpreter contexts sharing a
+universe, rather than Ada tasks.
 
-## Verification
+## Safety and platform constraints
 
-Use SPARK selectively for bounded representation-independent algorithms. Cyclic
-graphs, controlled types, callbacks, and platform services need other techniques;
-whole-runtime proof is not promised. AUnit protects local behavior, Lua
-differential tests protect semantics, and C clients/modules protect ABI.
-See [testing](docs/testing.md) and [compatibility](docs/compatibility.md).
+Strong types, bounded indexes, contracts, private representations, generics,
+and a tagged output interface express actual invariants. Scalars are not forced
+into an inheritance hierarchy. Required warning/style flags and ordinary Ada
+runtime checks remain enabled in every profile. Explicit modular operations
+implement integer wrapping. Strings remain bytes.
+
+Numeric text conversion uses standard Ada big integers for exact binary64
+rounding; formatting implements Lua's 15/17-digit general format. One isolated
+host `pow` import is justified by measured rounding/domain incompatibilities
+in standard Ada exponentiation (ADR 0005). No downloaded production dependency
+is introduced. Other platform services and complete libraries remain future.
+
+Selective SPARK may protect suitable bounded algorithms; no whole-runtime
+proof is claimed. Fuzz/proof tools are optional. AUnit and differential tests
+provide current behavioral evidence.
+
+## Future interoperability
+
+The C facade must share the core without contaminating it with ABI layouts.
+Early experiments investigate C allocation, varargs, callbacks, extra space,
+startup/shutdown, and nonlocal transfer. No foreign longjmp may cross active
+Ada frames. Status returns and C-only guarded checkpoints are feasibility
+mechanisms, not a public Lua API.
+
+Ada containers currently allocate outside a `lua_Alloc` callback. Full C
+allocator parity needs replaceable storage and an allocation audit. Private
+representations and absence of exposed handles preserve room for that work.
+Binary chunks, C layouts/addresses, modules, and LuaRocks have independent
+future acceptance gates.

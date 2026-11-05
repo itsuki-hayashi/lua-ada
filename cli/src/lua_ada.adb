@@ -1,23 +1,268 @@
+with Ada.Characters.Latin_1;
 with Ada.Command_Line;
+with Ada.Containers.Vectors;
+with Ada.Exceptions;
+with Ada.Streams;
+with Ada.Streams.Stream_IO;
+with Ada.Strings.Fixed;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 with Lua;
+with Lua.Sessions;
 
 procedure Lua_Ada is
    use Ada.Command_Line;
-begin
-   if Argument_Count = 1 and then Argument (1) = "--version" then
+   use Lua.Sessions;
+   use type Ada.Streams.Stream_Element_Offset;
+   use type Ada.Streams.Stream_IO.Count;
+
+   package Sources is new Ada.Containers.Vectors
+     (Positive, Unbounded_String);
+   Snippets : Sources.Vector;
+   Universe : Session;
+   Script_Index : Natural := 0;
+   Version_Requested : Boolean := False;
+
+   procedure Usage;
+   procedure Version;
+   procedure Report (Result : Execution_Result);
+   function Read_Source (Path : String) return String;
+   function Read_Stdin return String;
+   function File_Preamble (Source : String) return String;
+   function Arguments_After (Index : Natural) return Argument_Array;
+
+   procedure Usage is
+   begin
+      Ada.Text_IO.Put_Line
+        ("Usage: lua_ada [-e code]... [--] [script | -] [arguments...]");
+      Ada.Text_IO.Put_Line ("       lua_ada --help | --version");
+      Ada.Text_IO.Put_Line
+        ("M1 Lua 5.5 subset; REPL and binary chunks are deferred.");
+   end Usage;
+
+   procedure Version is
+   begin
       Ada.Text_IO.Put_Line
         ("Lua Ada " & Lua.Implementation_Version &
          " (target " & Lua.Reference_Release & ")");
-   elsif Argument_Count = 0 or else
-     (Argument_Count = 1 and then Argument (1) = "--help")
-   then
-      Ada.Text_IO.Put_Line ("Usage: lua_ada [--help | --version]");
-      Ada.Text_IO.Put_Line ("Script execution is not implemented yet.");
-   else
+   end Version;
+
+   procedure Report (Result : Execution_Result) is
+   begin
+      --  Output before a failed statement is observable Lua behavior.
+      --  Preserve it before sending the structured diagnostic to stderr.
+      --  Feeding LF bytes to Put would not reset Text_IO's column counter;
+      --  finalization could then append a spurious second newline. Use the
+      --  line operation, which also matches C stdout translation on Windows.
+      for Byte of To_String (Result.Output) loop
+         if Byte = Ada.Characters.Latin_1.LF then
+            Ada.Text_IO.New_Line;
+         else
+            Ada.Text_IO.Put (Byte);
+         end if;
+      end loop;
+      if Result.Status /= Succeeded then
+         declare
+            Message : constant String := To_String (Result.Error.Message);
+            Prefix : constant String := To_String (Result.Error.Source) & ":";
+         begin
+            if Message'Length >= Prefix'Length and then
+              Message (Message'First .. Message'First + Prefix'Length - 1) =
+                Prefix
+            then
+               Ada.Text_IO.Put_Line (Ada.Text_IO.Standard_Error, Message);
+            else
+               Ada.Text_IO.Put_Line
+                 (Ada.Text_IO.Standard_Error, Prefix &
+                  Ada.Strings.Fixed.Trim
+                    (Result.Error.Line'Image, Ada.Strings.Both) & ": " &
+                  Message);
+            end if;
+         end;
+         Set_Exit_Status (Failure);
+      end if;
+   end Report;
+
+   function Read_Source (Path : String) return String is
+      package Files renames Ada.Streams.Stream_IO;
+      File : Files.File_Type;
+   begin
+      --  Binary file reading preserves NULs and original line endings.
+      --  Bound the user-controlled allocation before creating its buffer.
+      Files.Open (File, Files.In_File, Path);
+      if Files.Size (File) > 1_000_000 then
+         Files.Close (File);
+         raise Constraint_Error with "source byte limit exceeded";
+      end if;
+      declare
+         Bytes : Ada.Streams.Stream_Element_Array
+           (1 .. Ada.Streams.Stream_Element_Offset (Files.Size (File)));
+         Last : Ada.Streams.Stream_Element_Offset;
+         Text : String (1 .. Bytes'Length);
+      begin
+         Files.Read (File, Bytes, Last);
+         Files.Close (File);
+         if Last /= Bytes'Last then
+            raise Ada.Text_IO.End_Error with "short source read";
+         end if;
+         for Index in Text'Range loop
+            Text (Index) := Character'Val
+              (Bytes (Ada.Streams.Stream_Element_Offset (Index)));
+         end loop;
+         return Text;
+      end;
+   exception
+      when others =>
+         if Files.Is_Open (File) then
+            Files.Close (File);
+         end if;
+         raise;
+   end Read_Source;
+
+   function Read_Stdin return String is
+      Text : Unbounded_String;
+      Item : Character;
+   begin
+      --  Character Get skips line terminators. Handle them explicitly to
+      --  retain source line structure rather than joining adjacent tokens.
+      while not Ada.Text_IO.End_Of_File loop
+         if Length (Text) >= 1_000_000 then
+            raise Constraint_Error with "source byte limit exceeded";
+         end if;
+         if Ada.Text_IO.End_Of_Line then
+            Ada.Text_IO.Skip_Line;
+            Append (Text, Ada.Characters.Latin_1.LF);
+         else
+            Ada.Text_IO.Get (Item);
+            Append (Text, Item);
+         end if;
+      end loop;
+      return To_String (Text);
+   end Read_Stdin;
+
+   function File_Preamble (Source : String) return String is
+      First : Positive := Source'First;
+      Text : String := Source;
+   begin
+      --  Only the file loader accepts a BOM/shebang. Preserve the shebang
+      --  line as spaces so diagnostics for later lines retain their numbers.
+      if Source'Length >= 3 and then Source (First .. First + 2) =
+        Character'Val (16#EF#) & Character'Val (16#BB#) &
+        Character'Val (16#BF#)
+      then
+         First := First + 3;
+      end if;
+      if First <= Source'Last and then Source (First) = '#' then
+         declare
+            Position : Positive := First;
+         begin
+            while Position <= Source'Last and then
+              Source (Position) not in Ada.Characters.Latin_1.LF |
+                Ada.Characters.Latin_1.CR
+            loop
+               Text (Position) := ' ';
+               Position := Position + 1;
+            end loop;
+         end;
+      end if;
+      return Text (First .. Text'Last);
+   end File_Preamble;
+
+   function Arguments_After (Index : Natural) return Argument_Array is
+      Result : Argument_Array (1 .. Argument_Count - Index);
+   begin
+      for Position in Result'Range loop
+         Result (Position) := To_Unbounded_String
+           (Argument (Index + Position));
+      end loop;
+      return Result;
+   end Arguments_After;
+
+   Position : Positive := 1;
+begin
+   --  Parse everything first: snippets must see the final script's arg table.
+   --  Once a script is found, remaining options are script arguments.
+   while Position <= Argument_Count loop
+      declare
+         Item : constant String := Argument (Position);
+      begin
+         if Item = "--help" or else Item = "-h" then
+            Usage;
+            return;
+         elsif Item = "--version" or else Item = "-v" then
+            Version_Requested := True;
+         elsif Item = "--" then
+            if Position < Argument_Count then
+               Script_Index := Position + 1;
+            end if;
+            exit;
+         elsif Item = "-e" then
+            if Position = Argument_Count then
+               raise Constraint_Error with "-e requires a source argument";
+            end if;
+            Position := Position + 1;
+            Snippets.Append (To_Unbounded_String (Argument (Position)));
+         elsif Item'Length > 2 and then Item (1 .. 2) = "-e" then
+            Snippets.Append (To_Unbounded_String (Item (3 .. Item'Last)));
+         elsif Item = "-" or else Item'Length = 0 or else Item (1) /= '-' then
+            Script_Index := Position;
+            exit;
+         else
+            raise Constraint_Error with "unrecognized option: " & Item;
+         end if;
+      end;
+      Position := Position + 1;
+   end loop;
+   if Version_Requested then
+      Version;
+   end if;
+   if Snippets.Is_Empty and then Script_Index = 0 then
+      if not Version_Requested then
+         Usage;
+      end if;
+      return;
+   end if;
+   declare
+      Args : Argument_Array
+        (-Integer (Script_Index) .. Argument_Count - Script_Index);
+      Result : Execution_Result;
+   begin
+      --  Index zero names the script. Negative indices preserve executable
+      --  and interpreter options, as in the reference interpreter.
+      for Index in Args'Range loop
+         Args (Index) := To_Unbounded_String
+           (if Index + Script_Index = 0 then Command_Name
+            else Argument (Index + Script_Index));
+      end loop;
+      Result := Universe.Set_Arguments (Args);
+      if Result.Status /= Succeeded then
+         Report (Result);
+         return;
+      end if;
+      for Source of Snippets loop
+         Result := Universe.Execute (To_String (Source), "(command line)");
+         Report (Result);
+         if Result.Status /= Succeeded then
+            return;
+         end if;
+      end loop;
+      if Script_Index /= 0 then
+         declare
+            Path : constant String := Argument (Script_Index);
+            Source : constant String := File_Preamble
+              (if Path = "-" then Read_Stdin else Read_Source (Path));
+         begin
+            Result := Universe.Execute
+              (Source, (if Path = "-" then "stdin" else Path),
+               Arguments => Arguments_After (Script_Index));
+            Report (Result);
+         end;
+      end if;
+   end;
+exception
+   when Error : others =>
       Ada.Text_IO.Put_Line
         (Ada.Text_IO.Standard_Error,
-         "lua_ada: script execution is not implemented yet");
+         "lua_ada: " & Ada.Exceptions.Exception_Message (Error));
       Set_Exit_Status (Failure);
-   end if;
 end Lua_Ada;
