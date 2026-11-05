@@ -79,6 +79,14 @@ try {
     [IO.File]::WriteAllLines($path, $cases, $utf8)
     Compare-Records (Invoke-Checked $oracle @('batch', $path)) (Invoke-Checked $Probe @('--batch', $path)) '10000 byte lexer cases'
 
+    # Enough distinct interned names to trigger C collections before a
+    # malformed string forces diagnostic construction. The source label must
+    # remain rooted throughout, not just while its short string is cached.
+    $gcSource = ((1..10000 | ForEach-Object { "name$_" }) -join ' ') + ' "\q"'
+    $gcPath = Join-Path $projectRoot 'reports/frontend-lexer-gc.lua'
+    [IO.File]::WriteAllText($gcPath, $gcSource, $utf8)
+    Compare-Records (Invoke-Checked $oracle @('lex', $gcPath)) (Invoke-Checked $Probe @($gcPath)) 'lexer diagnostic after allocation pressure'
+
     # Each template protects distinct grammar/resolution machinery. Mutations
     # are classified by the C parser rather than assumed to be invalid.
     $templates = @(

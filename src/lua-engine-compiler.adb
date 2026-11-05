@@ -611,7 +611,11 @@ package body Lua.Engine.Compiler is
       if Unit.Unsupported /= No_Node then
          State.Failure_At := Fetch (Unit.Unsupported).Site;
          State.Is_Unsupported := True;
-         Fail (State, "valid Lua syntax requires an unsupported feature");
+         Fail (State, "unsupported feature: " &
+               (case Fetch (Unit.Unsupported).Kind is
+                   when Goto_Statement => "goto execution",
+                   when Label_Statement => "label execution",
+                   when others => "to-be-closed local execution"));
       end if;
       if Natural (Unit.Names.Length) >= Positive'Last - Symbol_Base then
          Fail (State, "lexical symbol limit exceeded", Resource => True);

@@ -38,7 +38,11 @@ static int scan(lua_State *L) {
   ls->h = hvalue(s2v(L->top.p - 1));
   ls->buff = &input->buffer;
   luaZ_init(L, &stream, reader, input);
-  luaX_setinput(L, ls, &stream, luaS_new(L, "=oracle"), zgetc(&stream));
+  /* The source label must survive collections triggered by string scanning.
+   * Keep it on the C frame's Lua stack, just like the anchor table. */
+  lua_pushliteral(L, "=oracle");
+  luaX_setinput(L, ls, &stream, tsvalue(s2v(L->top.p - 1)),
+                zgetc(&stream));
   do {
     luaX_next(ls);
     token = ls->t.token;
@@ -86,6 +90,7 @@ int main(int argc, char **argv) {
   long length;
   char *bytes;
   if (argc != 3) return 2;
+  if (sizeof(lua_Integer) != 8 || sizeof(lua_Number) != 8) return 2;
   file = fopen(argv[2], "rb");
   if (!file) return 2;
   if (strcmp(argv[1], "batch") == 0 || strcmp(argv[1], "parse-batch") == 0) {
