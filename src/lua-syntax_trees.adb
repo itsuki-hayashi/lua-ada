@@ -159,10 +159,14 @@ package body Lua.Syntax_Trees is
       end Make;
 
       procedure Child (Parent, Item : Node_Id) is
-         Value : Node := Fetch (Parent);
+         Value : constant Nodes.Reference_Type :=
+           Unit.Tree.Reference (Positive (Parent));
       begin
+         --  Append in place: copying the parent's growing child vector for
+         --  every statement makes a flat block quadratic. This reference
+         --  guards the outer arena only while its nested vector is mutated;
+         --  no arena node is allocated until the reference leaves scope.
          Value.Children.Append (Item);
-         Save (Parent, Value);
       end Child;
 
       procedure Enter is

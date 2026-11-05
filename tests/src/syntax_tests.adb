@@ -74,6 +74,8 @@ package body Syntax_Tests is
    procedure Nested_Undeclared_Global;
    procedure Forward_Label_Across_Function;
    procedure Node_Budget;
+   procedure Flat_Chunk_Check;
+   procedure Flat_Chunk_Execute;
    procedure Explicit_Global_Attribute;
    procedure Depth_Budget;
    procedure Token_Budget;
@@ -698,6 +700,32 @@ package body Syntax_Tests is
       Assert (Result.Status = Resource_Error, "node budget");
    end Node_Budget;
 
+   procedure Flat_Chunk_Check is
+      --  99,999 statements plus EOF exactly fill the default token budget.
+      --  Each statement appends to the same block. Copying that growing
+      --  child list on every append would require billions of element copies.
+      --  Check acceptance without a fragile machine-dependent timing bound.
+      Source : constant String (1 .. 99_999) := [others => ';'];
+      Result : constant Check_Result := Check (Source, "flat-check");
+   begin
+      Assert (Result.Status = Success, "large flat chunk checks successfully");
+   end Flat_Chunk_Check;
+
+   procedure Flat_Chunk_Execute is
+      --  Ordinary execution shares the frontend, so the same large flat
+      --  input must compile before its single VM return instruction runs.
+      --  This also protects container-reference lifetimes during arena growth.
+      Source : constant String (1 .. 99_999) := [others => ';'];
+      Session : Lua.Sessions.Session;
+      Result : constant Lua.Sessions.Execution_Result :=
+        Session.Execute (Source, "flat-execute");
+      use type Lua.Sessions.Execution_Status;
+   begin
+      Assert (Result.Status = Lua.Sessions.Succeeded,
+              To_String (Result.Error.Message));
+      Assert (Result.Output = "", "empty statements have no output");
+   end Flat_Chunk_Execute;
+
    procedure Explicit_Global_Attribute is
       --  An outer explicit global retains its own mutability when an inner
       --  collective const declaration restricts otherwise implicit names.
@@ -780,6 +808,11 @@ package body Syntax_Tests is
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
+      Test_Support.Add
+        (Suite, "syntax: large flat chunk checking", Flat_Chunk_Check'Access);
+      Test_Support.Add
+        (Suite, "syntax: large flat chunk execution",
+         Flat_Chunk_Execute'Access);
       Test_Support.Add
         (Suite, "syntax: explicit global attribute",
          Explicit_Global_Attribute'Access);

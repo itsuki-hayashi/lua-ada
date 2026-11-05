@@ -63,3 +63,18 @@ No full Lua execution, canonical code generation, C ABI, binary chunk, or module
 parity is claimed. Continue with deferred M2 runtime/library work or a separately
 scoped canonical-code generation milestone; do not treat opcode definitions as
 an executable VM migration.
+
+## PR review: flat block construction
+
+The maintainer requested the P2 review on Child after verifying PR #3's
+repository, branch, and head aa21a9f matched the clean checkout. Child now
+appends through a scoped vector reference instead of copying the parent node's
+growing Children vector twice per statement. No outer arena allocation occurs
+while that reference is live. Other syntax algorithms remain unchanged.
+
+Two focused AUnit regressions separately check and execute 99,999 semicolons,
+exactly fitting the default 100,000-token budget including EOF. They retain
+normal limits and avoid timing assertions. Strict local static-validation
+passed all 349 cases with no failures/unexpected errors; the full runner took
+about 1.4 seconds on the development machine. Cross-platform CI is rechecked
+on the published review revision before handoff.
