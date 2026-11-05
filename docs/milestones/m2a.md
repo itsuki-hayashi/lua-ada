@@ -1,6 +1,7 @@
 # M2a: Frontend and Opcode Definition Parity
 
-Accepted: 2026-11-06, Asia/Tokyo. Status: **in progress**.
+Accepted: 2026-11-06, Asia/Tokyo. Status: **complete**.
+All implementation gates passed; see [validation](../validation-m2a.md).
 
 ## Contract
 

@@ -1,6 +1,6 @@
 # Capability Matrix
 
-This matrix describes the scoped M1 implementation. Platform evidence lives in
+This matrix describes M1 execution with M2a frontend extensions. Evidence lives in
 [status](status.md); a feature entry alone is not full conformance evidence.
 
 | Area       | M1 implementation                                           | Evidence                                       |
@@ -15,7 +15,7 @@ This matrix describes the scoped M1 implementation. Platform evidence lives in
 | Errors     | Located diagnostics, pcall, bounded resources, recovery     | Lifecycle cases, errors_and_bytes.lua          |
 | Lifetime   | Nonmoving iterative tracing; cycles and prototypes          | Cycle/capture/repeated-chunk cases             |
 | Ada host   | Unique sessions, persistent globals, output sink            | Lifecycle Ada consumer                         |
-| CLI        | Files, snippets, stdin, arguments, usage, stderr/status     | 19 process cases                               |
+| CLI        | Files, snippets, stdin, arguments, usage, checking/status   | 30 process cases                               |
 | Builds     | Static/shared, strict profiles                              | Acceptance matrix; see status                  |
 
 The base subset is exactly `print`, `assert`, `error`, `pcall`, `type`,

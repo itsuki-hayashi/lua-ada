@@ -75,21 +75,22 @@ evidence and does not complete that gate.
 
 The [accepted target](milestones/m2a.md) owns acceptance; the
 [session](sessions/2026-11-06-m2a-frontend.md) records evidence.
+All seven items below are **done**, with final [validation](validation-m2a.md).
 
 - FRONT-001, depends ACCEPT-001: owned syntax design/inventory and baseline;
-  implemented, pending final acceptance.
+  accepted with shared frontend design and behavior inventory.
 - ORACLE-002, depends FRONT-001: protected isolated C lex/parse/opcode probes;
-  implemented, pending final acceptance.
+  accepted on all three OSes.
 - LEX-002, depends ORACLE-002: incremental tokens/payloads/failures/locations;
-  implemented, pending final acceptance.
+  accepted with token/payload/line comparisons on all three OSes.
 - PARSE-002, depends LEX-002: full grammar/resolution and scope/jump checks;
-  implemented, pending final acceptance.
+  accepted with focused cases and generated/upstream source comparisons.
 - OPCODE-001, depends ORACLE-002: all canonical definitions/bit operations;
-  implemented, pending final acceptance.
+  accepted with all 85 definitions and checked field comparisons.
 - CHECK-001, depends PARSE-002 and OPCODE-001: shared lowering, Ada/CLI checking;
-  implemented, pending final acceptance.
+  accepted with all-platform consumer, CLI, and execution regression checks.
 - ACCEPT-002, depends all above: 18 platform/profile/link jobs, ABI probes,
-  Windows static-PIC, final verified PR; pending.
+  Windows static-PIC, and open verified PR; accepted with immutable evidence.
 
 ## Later runtime work
 

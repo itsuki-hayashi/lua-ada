@@ -574,12 +574,13 @@ package body Syntax_Tests is
    end Unexpected_Byte;
 
    procedure Syntax_Before_Lexical is
-      --  Reject this invalid grammar/resolution boundary without runtime work.
-      --  The separately named case makes this regression visible in reports.
+      --  The invalid declaration on line one must win over a bad escape on
+      --  line two. Eagerly scanning the whole source would report line two.
+      Result : constant Check_Result := Check
+        ("local =" & Character'Val (10) & "'\q'");
    begin
-      Require
-        ("local = 1; '\q'",
-         False);
+      Assert (Result.Status = Syntax_Error, "invalid declaration");
+      Assert (Result.Error.Line = 1, "earlier grammar failure takes priority");
    end Syntax_Before_Lexical;
 
    procedure Function_Recursion is

@@ -1,7 +1,8 @@
 # M2a Frontend Implementation
 
 Date: 2026-11-06, Asia/Tokyo. Branch: codex/m2a-frontend-parity.
-Baseline: master dd76522. M2a remains in progress.
+Baseline: master dd76522. M2a is complete; see
+[immutable validation](../validation-m2a.md).
 
 ## Baseline
 
@@ -45,8 +46,18 @@ validates a whole chunk before Unsupported_Feature for goto/labels/close.
 Syntax failures take precedence. Numeric and first generic-for controls now
 follow Lua 5.5 const rules, correcting the previous M1 assignment test.
 
-## Remaining acceptance
+## Final acceptance and handoff
 
-Cross-platform/profile/link acceptance must run on the final revision.
-Current local evidence does not complete ACCEPT-002. No full Lua execution,
-canonical code generation, C ABI, binary chunk, or module parity is claimed.
+All 18 OS/profile/link jobs passed at implementation commit d8770ef; every job
+log was inspected. Each OS passed the frontend/opcode campaign and ABI probe;
+Windows additionally passed static-PIC. All seven bounded backlog gates close
+with this evidence. PR #3 is open and unmerged. Final handoff changes record
+evidence and strengthen the existing multiline error-priority regression.
+
+The Linux C oracle initially needed explicit Unix math linking; that was fixed.
+The adapter now roots its source label across allocation/collection, protected
+by the allocation-pressure regression. Required compiler commands were inspected.
+No full Lua execution, canonical code generation, C ABI, binary chunk, or module
+parity is claimed. Continue with deferred M2 runtime/library work or a separately
+scoped canonical-code generation milestone; do not treat opcode definitions as
+an executable VM migration.

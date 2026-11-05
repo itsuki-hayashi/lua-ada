@@ -71,3 +71,25 @@ in the driver. Failures retain the corpus and identify the mismatching record.
 The two upstream files with leading # preambles reject identically in raw
 parse mode. CLI file-loader checking additionally accepts those preambles.
 These are syntax/token checks, not upstream execution-suite passes.
+
+## Acceptance mapping
+
+Names below identify independently reported cases/families; the opcode mapping
+is exhaustive by mnemonic. The generated campaign supplements these focused
+cases without replacing their human-readable regression descriptions.
+
+| Behavior                               | First-party evidence                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------ |
+| Keywords / punctuation / literals      | Lexer_Tests.Keywords, Longest_Operators, string/escape cases             |
+| Numeral values / boundaries            | Incremental_Lexer_Tests.Numeric_Payloads, Hex_Exponent_Boundary          |
+| Incremental state / diagnostics        | Incremental_Lexer_Tests terminal cases; Syntax_Before_Lexical            |
+| Scopes / capture identity              | Session_Tests.Local_Shadowing, Captured_Mutation, For_Iteration_Captures |
+| Globals / attributes / const           | Syntax_Tests declaration cases; Session_Tests global cases               |
+| Functions / varargs / results          | Syntax_Tests function cases; Session_Tests result/vararg cases           |
+| Control flow / labels / gotos          | Syntax_Tests loop and goto families; session loop regressions            |
+| Runtime rejection / recovery           | Syntax_Tests.Unsupported_No_Effects, Syntax_Precedes_Unsupported         |
+| Ownership / resource bounds            | Syntax_Tests budget cases; existing Lifecycle_Tests                      |
+| Each canonical opcode                  | Lua.Opcode_Tests.Test_<mnemonic> (one case for each of 85 entries)       |
+| Instruction fields / top / invalid IDs | Lua.Opcode_Tests boundaries, predicates, invalid words, round trips      |
+| Generated / upstream comparisons       | scripts/check-frontend.ps1; tests/src/lexer_probe.adb                    |
+| Embedding / process interface          | tests/src/syntax_consumer.adb; scripts/check-cli.ps1                     |

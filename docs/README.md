@@ -2,6 +2,7 @@
 
 See [frontend compatibility](frontend.md) and the
 [M2a milestone](milestones/m2a.md) for the current frontend work.
+Its [validation record](validation-m2a.md) owns immutable acceptance evidence.
 
 The completed [M1 target](milestones/m1.md) owns the interpreter subset and gates.
 The [validation record](validation.md) owns platform evidence.

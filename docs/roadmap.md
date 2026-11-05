@@ -1,6 +1,6 @@
 # Roadmap
 
-M0 and M1 are complete. M1 expanded infrastructure into the accepted
+M0, M1, and M2a are complete. M1 expanded infrastructure into the accepted
 [basic interpreter target](milestones/m1.md). Milestones are acceptance gates,
 not calendar promises. The [M1 validation record](validation.md) closes all five
 gates on the named Windows/Linux/macOS configurations.
@@ -34,3 +34,5 @@ The [backlog](backlog.md) records dependencies and acceptance for each task;
 [M2a](milestones/m2a.md) is the first bounded M2 delivery: full lexer and
 grammar/static semantics, shared checking/lowering, and canonical opcode
 definitions. Canonical code generation and execution remain separate gates.
+Its [18-job validation](validation-m2a.md) closes this frontend delivery;
+remaining M2 runtime/library work is still open.
