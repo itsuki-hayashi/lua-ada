@@ -14,6 +14,11 @@ for actual platform evidence; coverage percentages and full conformance are not
 claimed.
 See [current tests](../tests/README.md) for working commands.
 
+The [real-world module catalog](../tests/modules/README.md) records eight pinned
+consumer fixtures for future parity testing. They are checked-out source only;
+no module suites, dependency installation, or parity runners are enabled.
+Keep their sources separate from development references and runtime dependencies.
+
 ## Test layers
 
 | Layer          | Expected evidence                                         |

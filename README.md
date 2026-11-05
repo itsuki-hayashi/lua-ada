@@ -39,6 +39,7 @@ library kinds exist; Alire cannot infer one. See [embedding](docs/embedding.md).
 | `lua_ada.gpr`     | Build entry point and mandatory compiler flags   |
 | `docs/`           | Development and project management               |
 | `tests/`          | Focused AUnit and differential Lua fixtures      |
+| `tests/modules/`  | Pinned consumer modules for future parity tests  |
 | `cli/`            | Separate batch CLI crate                         |
 | `scripts/`        | Build/test and differential drivers              |
 | `experiments/`    | Isolated reference and C ABI fixtures            |
@@ -58,3 +59,5 @@ three profiles on Windows x86-64, Linux x86-64, and macOS ARM64; see
 
 First-party work uses the [MIT license](LICENSE). Reference submodules retain
 their own licenses and copyright notices; they are not runtime dependencies.
+The [consumer module fixtures](tests/modules/README.md) likewise retain their
+upstream notices and serve only as future test inputs.

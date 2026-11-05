@@ -9,6 +9,11 @@ integer (21), lexer (33, including 1,000 seeded byte scans), numbers (30),
 language/session (50), and lifecycle/resources/GC (37). Each case represents a
 specific behavior or boundary rather than an empty generated skeleton.
 
+The [modules/ catalog](modules/README.md) owns eight pinned real-world consumer
+fixtures for future C Lua/Lua Ada parity work. They are separate from authored
+scripts in lua/ and from development references. No module build, dependency
+installation, loading, or parity execution is integrated into these drivers.
+
 From the repository root using PowerShell 7:
 
 ```text

@@ -3,6 +3,9 @@
 These submodules are read-only implementation/API references, not dependencies.
 Keep their sources outside production GPR source paths and preserve their licenses.
 
+The [consumer modules](../tests/modules/README.md) live separately under
+tests/modules/ as future parity fixtures. They are not development references.
+
 | Project | Revision                                       | Purpose                    |
 | ------- | ---------------------------------------------- | -------------------------- |
 | Lua     | `v5.5.1`                                       | Semantics, C API, tests    |
@@ -15,8 +18,8 @@ Origins are [lua/lua](https://github.com/lua/lua) and
 ## Checkout
 
 ```text
-git submodule update --init --recursive
-git submodule status
+git submodule update --init --recursive -- references/lua references/ada-lua
+git submodule status -- references/lua references/ada-lua
 ```
 
 A submodule is intentionally detached at its recorded commit. Do not use

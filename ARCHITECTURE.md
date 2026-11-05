@@ -24,6 +24,10 @@ oracle and ABI experiments are separate test artifacts. `Lua.Engine` and its
 children are private; public clients cannot depend on register layout or heap
 addresses. No serialized bytecode compatibility is implied.
 
+The [real-world module fixtures](tests/modules/README.md) are future consumer
+compatibility inputs. They are separate from implementation/API references,
+excluded from GPR source paths, and introduce no runtime dependency.
+
 | Component        | Implemented M1 responsibility                           |
 | ---------------- | ------------------------------------------------------- |
 | Lexers           | Byte source, escapes, tokens, bounded scans, locations  |

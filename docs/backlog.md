@@ -59,13 +59,25 @@ Current implementation evidence: [interpreter session](sessions/2026-11-05-m1-in
 - ACCEPT-001: every above gate, all three OSes, no hidden skips. No full Lua,
   upstream-suite, drop-in ABI, or LuaRocks claim follows from M1.
 
+## Post-M1 fixture preparation
+
+TEST-MOD-001: **done**, depends on FND-001. Acceptance: the eight requested
+repositories are separate test-only submodules with exact URLs and immutable
+pins, clean detached checkouts, preserved notices, and documented checkout/update
+rules. No production source paths, runtime dependencies, or parity execution are
+introduced. Evidence: [fixture catalog](../tests/modules/README.md) and
+[setup session](sessions/2026-11-06-ecosystem-fixtures.md).
+
+Future module execution remains MOD-001 work; fixture checkout is not parity
+evidence and does not complete that gate.
+
 ## Later bounded work
 
-| ID        | Work                              | Dependency                 | Acceptance                                                   |
-| --------- | --------------------------------- | -------------------------- | ------------------------------------------------------------ |
-| LANG-002  | Deferred language facilities      | ACCEPT-001                 | Metamethod/coroutine/close/goto regressions                  |
-| LIB-002   | Remaining libraries and loading   | ACCEPT-001                 | Library differential and unchanged-file coverage             |
-| ABI-002   | Full C facade/storage integration | ABI-001, CORE-001          | Public header clients, callbacks/unwinding, allocator parity |
-| CHUNK-001 | Binary chunk interoperability     | ABI-002                    | Pinned C/Ada load/dump fixtures                              |
-| MOD-001   | Native modules/LuaRocks           | ABI-002, LIB-002           | Pure Lua and native rock acceptance                          |
-| CONF-001  | Complete upstream validation      | LANG-002, LIB-002, ABI-002 | Unchanged suite and reviewed full internal mappings          |
+| ID        | Work                              | Dependency                     | Acceptance                                                   |
+| --------- | --------------------------------- | ------------------------------ | ------------------------------------------------------------ |
+| LANG-002  | Deferred language facilities      | ACCEPT-001                     | Metamethod/coroutine/close/goto regressions                  |
+| LIB-002   | Remaining libraries and loading   | ACCEPT-001                     | Library differential and unchanged-file coverage             |
+| ABI-002   | Full C facade/storage integration | ABI-001, CORE-001              | Public header clients, callbacks/unwinding, allocator parity |
+| CHUNK-001 | Binary chunk interoperability     | ABI-002                        | Pinned C/Ada load/dump fixtures                              |
+| MOD-001   | Native modules/LuaRocks           | ABI-002, LIB-002, TEST-MOD-001 | Pure Lua and native rock acceptance                          |
+| CONF-001  | Complete upstream validation      | LANG-002, LIB-002, ABI-002     | Unchanged suite and reviewed full internal mappings          |
