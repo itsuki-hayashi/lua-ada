@@ -105,5 +105,31 @@ $cases = @(
     @{ Title = 'missing file'; Args = @('missing.lua'); Fail = $true;
        Error = 'lua_ada:'; Output = '' }
 )
+$cases += @(
+    # Checking must accept deferred grammar and suppress every Lua side effect.
+    @{ Title = 'check snippet suppresses output';
+       Args = @('--check', '-e', 'print(42)'); Output = '' },
+    @{ Title = 'check valid deferred syntax';
+       Args = @('--check', '-e', 'local x<close>; goto done; ::done::'); Output = '' },
+    @{ Title = 'check repeated independent snippets';
+       Args = @('--check', '-e', 'global x', '-e', 'print(y)'); Output = '' },
+    @{ Title = 'check explicit stdin'; Args = @('--check', '-');
+       Input = 'print(42)'; Output = '' },
+    @{ Title = 'check file ignores script arguments';
+       Args = @('--check', 'arguments.lua', '--invalid-option'); Output = '' },
+    @{ Title = 'check option terminator';
+       Args = @('--check', '--', '-script.lua'); Output = '' },
+    @{ Title = 'check file preamble';
+       Args = @('--check', 'bom.lua'); Output = '' },
+    @{ Title = 'check syntax failure'; Args = @('--check', '-e', 'local =');
+       Fail = $true; Error = 'expected'; Output = '' },
+    @{ Title = 'check stops before later input';
+       Args = @('--check', '-e', 'local =', 'missing.lua');
+       Fail = $true; Error = 'expected'; Output = '' },
+    @{ Title = 'check no input'; Args = @('--check'); Contains = 'Usage:' },
+    @{ Title = 'execute deferred syntax before effects';
+       Args = @('-e', 'print(42); ::done::'); Fail = $true;
+       Error = 'unsupported feature'; Output = '' }
+)
 foreach ($case in $cases) { Invoke-Case -Case $case }
 exit 0

@@ -9,6 +9,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 with Lua;
 with Lua.Sessions;
+with Lua.Syntax;
 
 procedure Lua_Ada is
    use Ada.Command_Line;
@@ -19,9 +20,9 @@ procedure Lua_Ada is
    package Sources is new Ada.Containers.Vectors
      (Positive, Unbounded_String);
    Snippets : Sources.Vector;
-   Universe : Session;
    Script_Index : Natural := 0;
    Version_Requested : Boolean := False;
+   Check_Requested : Boolean := False;
 
    procedure Usage;
    procedure Version;
@@ -34,8 +35,11 @@ procedure Lua_Ada is
    procedure Usage is
    begin
       Ada.Text_IO.Put_Line
-        ("Usage: lua_ada [-e code]... [--] [script | -] [arguments...]");
+        ("Usage: lua_ada [--check] [-e code]... " &
+         "[--] [script | -] [arguments...]");
       Ada.Text_IO.Put_Line ("       lua_ada --help | --version");
+      Ada.Text_IO.Put_Line
+        ("--check validates complete Lua syntax without executing source.");
       Ada.Text_IO.Put_Line
         ("M1 Lua 5.5 subset; REPL and binary chunks are deferred.");
    end Usage;
@@ -191,6 +195,8 @@ begin
             return;
          elsif Item = "--version" or else Item = "-v" then
             Version_Requested := True;
+         elsif Item = "--check" then
+            Check_Requested := True;
          elsif Item = "--" then
             if Position < Argument_Count then
                Script_Index := Position + 1;
@@ -222,7 +228,50 @@ begin
       end if;
       return;
    end if;
+   if Check_Requested then
+      --  Syntax-only operation never constructs a runtime session, creates
+      --  globals, installs arguments, or calls an output sink.
+      declare
+         function Check (Source, Name : String) return Boolean;
+         function Check (Source, Name : String) return Boolean is
+            Result : constant Lua.Syntax.Check_Result :=
+              Lua.Syntax.Check (Source, Name);
+            Reported : Execution_Result;
+            use type Lua.Syntax.Check_Status;
+         begin
+            if Result.Status = Lua.Syntax.Success then
+               return True;
+            end if;
+            Reported.Status :=
+              (if Result.Status = Lua.Syntax.Resource_Error
+               then Resource_Error else Syntax_Error);
+            Reported.Error := Result.Error;
+            Report (Reported);
+            return False;
+         end Check;
+      begin
+         for Source of Snippets loop
+            if not Check (To_String (Source), "(command line)") then
+               return;
+            end if;
+         end loop;
+         if Script_Index /= 0 then
+            declare
+               Path : constant String := Argument (Script_Index);
+               Source : constant String := File_Preamble
+                 (if Path = "-" then Read_Stdin else Read_Source (Path));
+               Ignored : constant Boolean := Check
+                 (Source, (if Path = "-" then "stdin" else Path));
+               pragma Unreferenced (Ignored);
+            begin
+               null;
+            end;
+         end if;
+      end;
+      return;
+   end if;
    declare
+      Universe : Session;
       Args : Argument_Array
         (-Integer (Script_Index) .. Argument_Count - Script_Index);
       Result : Execution_Result;

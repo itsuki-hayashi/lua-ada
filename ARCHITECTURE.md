@@ -40,10 +40,19 @@ excluded from GPR source paths, and introduce no runtime dependency.
 
 ## Compilation and execution
 
-The parser emits typed internal instructions directly; it does not execute an
-AST. Lexical declarations receive unique cell symbols. Active declaration
-lookup happens at the source point, so later shadowing cannot retarget a
-capture. Nested functions retain lexical environment objects.
+One incremental scanner feeds an owned parser/resolver. Indexed discriminated
+syntax nodes retain source order, lexical symbols, captures, and label targets.
+Lua.Syntax.Check validates this representation without VM/runtime allocation.
+The compiler lowers it into existing typed private instructions. Declaration
+lookup happens at the source point; later shadowing cannot retarget a capture.
+Nested runtime functions retain lexical environment objects. See
+[ADR 0006](docs/decisions/0006-shared-frontend.md) and
+[frontend compatibility](docs/frontend.md).
+
+The independent private Lua.Opcodes package defines the pinned 32-bit canonical
+format. It neither replaces the current VM operations nor promises canonical
+instruction streams or serialized chunks. Execution validates a complete chunk
+before returning Unsupported_Feature for valid goto/label/close constructs.
 
 Registers contain packets, allowing calls/varargs to produce zero or many
 results. Scalar consumers take the first result or nil; only final list

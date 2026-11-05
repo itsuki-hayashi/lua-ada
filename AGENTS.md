@@ -81,5 +81,9 @@ not need artificial edits. Historical records remain dated evidence.
 The production crate executes the documented M1 Lua subset through owned Ada
 sessions and a batch CLI. Private bytecode, lexical captures, tables, tracing
 collection, base functions, and bounded diagnostics have acceptance tests.
+Use the shared owned frontend for both checking and execution; never introduce
+a second grammar in VM lowering. Canonical opcode definitions are independent
+of the executable VM. See [frontend compatibility](docs/frontend.md) and
+[M2a](docs/milestones/m2a.md) for their distinct acceptance boundaries.
 Read current status for platform evidence and deferred facilities. A passing
 subset never establishes full upstream, C ABI, or LuaRocks compatibility.

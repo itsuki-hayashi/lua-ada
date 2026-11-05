@@ -11,6 +11,11 @@ C exports, and LuaRocks remain later milestones. **M1 is complete**; see the
 [validated platform matrix](docs/validation.md).
 See [status](docs/status.md) for actual verification evidence.
 
+Syntax checking uses the shared Lua 5.5.1 frontend through Lua.Syntax.Check or
+CLI --check. It accepts valid deferred syntax without executing it. See the
+[frontend guide](docs/frontend.md) for limits and compatibility boundaries.
+**M2a is complete**, with [three-platform evidence](docs/validation-m2a.md).
+
 ## Checkout and build
 
 Install [Alire](https://alire.ada.dev/) and use the latest stable native GNAT
@@ -59,5 +64,6 @@ three profiles on Windows x86-64, Linux x86-64, and macOS ARM64; see
 
 First-party work uses the [MIT license](LICENSE). Reference submodules retain
 their own licenses and copyright notices; they are not runtime dependencies.
+Canonical opcode definitions preserve the [Lua notice](docs/licenses/lua.md).
 The [consumer module fixtures](tests/modules/README.md) likewise retain their
 upstream notices and serve only as future test inputs.

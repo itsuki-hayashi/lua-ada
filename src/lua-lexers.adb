@@ -24,6 +24,10 @@ package body Lua.Lexers is
 
    function Keyword (Text : String) return Token_Kind is
    begin
+      --  Default Lua 5.5 keeps global contextual rather than reserved.
+      if Text = "global" then
+         return Identifier;
+      end if;
       for Kind in And_Word .. While_Word loop
          declare
             Image : constant String := Token_Kind'Image (Kind);
@@ -40,13 +44,20 @@ package body Lua.Lexers is
       return Identifier;
    end Keyword;
 
-   function Scan
-     (Source         : String;
-      Maximum_Tokens : Positive := 100_000) return Scan_Result
+   function Open
+     (Source : String; Maximum_Tokens : Positive := 100_000) return Scanner
    is
-      Input  : constant String (1 .. Source'Length) := Source;
+   begin
+      return Result : Scanner (Source'Length) do
+         Result.Input := Source;
+         Result.Maximum := Maximum_Tokens;
+      end return;
+   end Open;
+
+   function Next (Self : in out Scanner) return Scan_Result is
+      Input : String renames Self.Input;
       Result : Scan_Result;
-      Cursor : Source_Location;
+      Cursor : Source_Location renames Self.Cursor;
       Failed : exception;
 
       procedure Advance;
@@ -101,11 +112,16 @@ package body Lua.Lexers is
         (Kind : Token_Kind; Start : Source_Location; Text : String)
       is
       begin
-         if Natural (Result.Tokens.Length) = Maximum_Tokens then
+         if Self.Count = Self.Maximum then
             Fail ("token limit exceeded", Resource_Error);
          end if;
+         Self.Count := Self.Count + 1;
          Result.Tokens.Append
-           (Token'(Kind, Start, To_Unbounded_String (Text)));
+           (Token'(Kind => Kind, Location => Start,
+                   Text => To_Unbounded_String (Text), After => Cursor,
+                   Numeric => (if Kind in Number_Literal
+                               then Lua.Numbers.Read (Text)
+                               else (Kind => Lua.Numbers.Invalid))));
       end Emit;
 
       function Long_Level return Integer is
@@ -281,11 +297,15 @@ package body Lua.Lexers is
          Advance;
       end Quoted_String;
 
+      use type Lua.Numbers.Number_Kind;
       Start : Source_Location;
       Kind  : Token_Kind;
       Text  : Unbounded_String;
       Level : Integer;
    begin
+      if Self.Finished then
+         return Self.Terminal;
+      end if;
       while Cursor.Offset <= Input'Last loop
          Start := Cursor;
          if Is_Space (Peek) then
@@ -316,23 +336,45 @@ package body Lua.Lexers is
          elsif Is_Digit (Peek) or else
            (Peek = '.' and then Is_Digit (Peek (1)))
          then
-            loop
-               if Peek in 'e' | 'E' | 'p' | 'P' then
+            declare
+               Hexadecimal : constant Boolean :=
+                 Peek = '0' and then Peek (1) in 'x' | 'X';
+               Exponent : constant String :=
+                 (if Hexadecimal then "pP" else "eE");
+            begin
+               Advance;
+               if Hexadecimal then
                   Advance;
-                  if Peek in '+' | '-' then
-                     Advance;
-                  end if;
-               elsif Is_Letter (Peek) or else Is_Digit (Peek) or else
-                 Peek = '.'
-               then
-                  Advance;
-               else
-                  exit;
                end if;
-            end loop;
-            --  Numeric grammar/range validation belongs to the number parser.
-            Emit (Number_Literal, Start,
-                  Input (Start.Offset .. Cursor.Offset - 1));
+               loop
+                  if Peek = Exponent (1) or else Peek = Exponent (2) then
+                     Advance;
+                     if Peek in '+' | '-' then
+                        Advance;
+                     end if;
+                  elsif Hex_Value (Peek) >= 0 or else Peek = '.' then
+                     Advance;
+                  else
+                     exit;
+                  end if;
+               end loop;
+               if Is_Letter (Peek) then
+                  Advance;  --  Force rejection of a touching identifier.
+               end if;
+               declare
+                  Spelling : constant String :=
+                    Input (Start.Offset .. Cursor.Offset - 1);
+                  Value : constant Lua.Numbers.Number :=
+                    Lua.Numbers.Read (Spelling);
+               begin
+                  if Value.Kind = Lua.Numbers.Invalid then
+                     Fail ("malformed number");
+                  end if;
+                  Emit ((if Value.Kind = Lua.Numbers.Integer_Number
+                         then Integer_Literal else Float_Literal),
+                        Start, Spelling);
+               end;
+            end;
          elsif Peek in '"' | ''' then
             Quoted_String (Text);
             Emit (String_Literal, Start, To_String (Text));
@@ -366,7 +408,7 @@ package body Lua.Lexers is
                when ':' => Kind := Colon;
                when ',' => Kind := Comma;
                when '.' => Kind := Dot;
-               when others => Fail ("unexpected source byte");
+               when others => Kind := Byte_Symbol;
             end case;
             Advance;
             case Kind is
@@ -402,17 +444,54 @@ package body Lua.Lexers is
             end case;
             Emit (Kind, Start, Input (Start.Offset .. Cursor.Offset - 1));
          end if;
+         if not Result.Tokens.Is_Empty then
+            return Result;
+         end if;
       end loop;
       Emit (End_Of_Input, Cursor, "");
+      Self.Finished := True;
+      Self.Terminal := Result;
       return Result;
    exception
       when Failed =>
          Result.Tokens.Clear;
+         Self.Finished := True;
+         Self.Terminal := Result;
          return Result;
       when Storage_Error =>
          Result.Tokens.Clear;
          Result.Status := Resource_Error;
          Result.Location := Cursor;
+         Result.Message := To_Unbounded_String ("scanner storage exhausted");
+         Self.Finished := True;
+         Self.Terminal := Result;
+         return Result;
+   end Next;
+
+   function Scan
+     (Source : String;
+      Maximum_Tokens : Positive := 100_000) return Scan_Result
+   is
+      Reader : Scanner := Open (Source, Maximum_Tokens);
+      Result : Scan_Result;
+      Step : Scan_Result;
+   begin
+      --  Batch scanning is an adapter over the same incremental state
+      --  machine. Never retain a partial token list after a failed scan.
+      loop
+         Step := Next (Reader);
+         if Step.Status /= Success then
+            return Step;
+         end if;
+         Result.Tokens.Append (Step.Tokens.First_Element);
+         exit when Step.Tokens.First_Element.Kind = End_Of_Input;
+      end loop;
+      return Result;
+   exception
+      when Storage_Error =>
+         Result.Tokens.Clear;
+         Result.Status := Resource_Error;
+         Result.Location := Reader.Cursor;
          Result.Message := To_Unbounded_String ("scanner storage exhausted");
          return Result;
    end Scan;

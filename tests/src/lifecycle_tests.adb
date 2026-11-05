@@ -171,8 +171,8 @@ package body Lifecycle_Tests is
    end Runtime_Source_Location;
 
    procedure Deferred_Goto is
-      --  Deferred syntax is diagnosed during parsing, even in an unchosen
-      --  branch.
+      --  An undefined label is invalid even in an unchosen branch; valid
+      --  deferred syntax has a separate Unsupported_Feature result.
       Universe : Session;
       Result : constant Execution_Result := Universe.Execute
         ("if false then goto missing end");
@@ -187,7 +187,7 @@ package body Lifecycle_Tests is
       Result : constant Execution_Result := Universe.Execute
         ("local x <close> = nil");
    begin
-      Assert_Error (Result, Syntax_Error);
+      Assert_Error (Result, Unsupported_Feature);
    end Deferred_Close;
 
    procedure Const_Assignment is
@@ -575,7 +575,7 @@ package body Lifecycle_Tests is
         (Suite, "lifecycle: source location",
          Source_Location'Access);
       Test_Support.Add
-        (Suite, "lifecycle: deferred goto",
+        (Suite, "lifecycle: undefined goto",
          Deferred_Goto'Access);
       Test_Support.Add
         (Suite, "lifecycle: deferred close",

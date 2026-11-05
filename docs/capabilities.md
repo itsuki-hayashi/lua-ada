@@ -1,6 +1,6 @@
 # Capability Matrix
 
-This matrix describes the scoped M1 implementation. Platform evidence lives in
+This matrix describes M1 execution with M2a frontend extensions. Evidence lives in
 [status](status.md); a feature entry alone is not full conformance evidence.
 
 | Area       | M1 implementation                                           | Evidence                                       |
@@ -15,7 +15,7 @@ This matrix describes the scoped M1 implementation. Platform evidence lives in
 | Errors     | Located diagnostics, pcall, bounded resources, recovery     | Lifecycle cases, errors_and_bytes.lua          |
 | Lifetime   | Nonmoving iterative tracing; cycles and prototypes          | Cycle/capture/repeated-chunk cases             |
 | Ada host   | Unique sessions, persistent globals, output sink            | Lifecycle Ada consumer                         |
-| CLI        | Files, snippets, stdin, arguments, usage, stderr/status     | 19 process cases                               |
+| CLI        | Files, snippets, stdin, arguments, usage, checking/status   | 30 process cases                               |
 | Builds     | Static/shared, strict profiles                              | Acceptance matrix; see status                  |
 
 The base subset is exactly `print`, `assert`, `error`, `pcall`, `type`,
@@ -24,9 +24,19 @@ The base subset is exactly `print`, `assert`, `error`, `pcall`, `type`,
 
 ## Deliberately deferred
 
+M2a adds shared syntax checking and a private canonical opcode definition layer.
+Syntax accepts goto/labels/close while execution returns Unsupported_Feature.
+See the [frontend inventory](frontend.md) for scope and current evidence.
+
+- Syntax accepted: full pinned default grammar/static-semantic target.
+- Runtime behavior: M1 execution plus corrected Lua 5.5 const loop controls.
+- Opcode format: all 85 canonical definitions and six encodings.
+- Canonical code generation: deferred; compiler lowers to private operations.
+- Canonical code execution: deferred; no binary chunk compatibility claim.
+
 | Facility                              | Later gate / current response                    |
 | ------------------------------------- | ------------------------------------------------ |
-| goto / labels / close attributes      | M2; explicit unsupported syntax diagnostic       |
+| goto / labels / close attributes      | Checks accept; execution Unsupported_Feature     |
 | Metatables, weak tables, finalization | M2; no metamethod dispatch                       |
 | Coroutines, userdata, full libraries  | M2; unavailable facilities                       |
 | Runtime load/loadfile/require         | M2/M4; unavailable facilities                    |

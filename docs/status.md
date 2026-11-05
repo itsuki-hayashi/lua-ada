@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-11-06 (Asia/Tokyo). **M0 and M1 complete.**
+Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, and M2a complete.**
 The [M1 target](milestones/m1.md) owns scope; the
 [validation record](validation.md) owns exact platform/configuration evidence.
 
@@ -17,7 +17,8 @@ files, repeated snippets, stdin, arguments, help/version, byte-preserving output
 and controlled failure status. See [capabilities](capabilities.md) and
 [embedding](embedding.md).
 
-All 18 Windows/Linux/macOS x development/validation/release x static/shared
+M1 acceptance: all 18 Windows/Linux/macOS x
+development/validation/release x static/shared
 jobs passed. Each passed 171 individually named AUnit cases, zero failed
 assertions/unexpected errors, 19 CLI cases, and six raw-byte differential
 fixtures against pinned C Lua, including 2,366 arithmetic combinations.
@@ -31,6 +32,14 @@ ABI observations, commands, and immutable CI evidence are recorded in
 [validation](validation.md).
 
 ## Later milestones
+
+[M2a frontend parity](milestones/m2a.md) is complete. Shared incremental
+parsing/resolution and VM lowering, Ada/CLI checking, and canonical opcode
+definitions are implemented. All 18 configurations passed 347 focused AUnit
+cases, 30 CLI cases, and the public Ada consumer; each OS also passed the full
+frontend/opcode campaign and ABI probe. Windows static-PIC passed as well.
+Exact immutable [M2a validation](validation-m2a.md) records configurations,
+limits, and the distinction between syntax and runtime compatibility.
 
 Eight [real-world module fixtures](../tests/modules/README.md) are pinned under
 tests/modules/ for future consumer parity work. This is source checkout and

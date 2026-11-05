@@ -8,7 +8,9 @@ project Lua_Ada_Tests is
      "obj/" & Lua_Ada_Tests_Config.Build_Profile & "/" &
      Lua_Ada.Library_Mode;
    for Exec_Dir use "bin/" & Lua_Ada.Library_Mode;
-   for Main use ("test_runner.adb");
+   for Main use
+     ("test_runner.adb", "lua-opcode_probe.adb", "lexer_probe.adb",
+      "syntax_consumer.adb");
    for Create_Missing_Dirs use "True";
 
    package Compiler is

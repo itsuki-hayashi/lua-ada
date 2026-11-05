@@ -598,6 +598,7 @@ package body Lua.Engine is
       State.Failure_Text := Null_Unbounded_String;
       State.Is_Resource := False;
       State.Is_Syntax := False;
+      State.Is_Unsupported := False;
       State.Output := Null_Unbounded_String;
       State.Steps := 0;
       State.Failure_At := (others => 1);

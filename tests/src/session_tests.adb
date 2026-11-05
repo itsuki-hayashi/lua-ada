@@ -48,6 +48,8 @@ package body Session_Tests is
    procedure Method_Syntax;
    procedure Global_Keyword_Name;
    procedure Explicit_Globals;
+   procedure Global_Without_Initializer;
+   procedure Global_Shadowed_Environment;
    procedure Environment_Shadowing;
    procedure Protected_Error;
    procedure Nested_Protected_Call;
@@ -311,12 +313,11 @@ package body Session_Tests is
    end Table_Last_Call_Expands;
 
    procedure Numeric_For is
-      --  Loop variables use an internal counter unaffected by user
-      --  assignment.
+      --  Sum the inclusive sequence; Lua 5.5 control variables are const.
    begin
       Check
        (
-        "local n=0; for i=1,3 do n=n+i; i=100 end; print(n)",
+        "local n=0; for i=1,3 do n=n+i end; print(n)",
          "6");
    end Numeric_For;
 
@@ -418,6 +419,20 @@ package body Session_Tests is
         "global *; global answer=42; print(answer)",
          "42");
    end Explicit_Globals;
+
+   procedure Global_Without_Initializer is
+      --  A declaration without initialization constrains lexical lookup but
+      --  must not attempt a runtime store or read an unrecorded environment.
+   begin
+      Check ("local p=print; x=41; do global x; p(x+1) end", "42");
+   end Global_Without_Initializer;
+
+   procedure Global_Shadowed_Environment is
+      --  Initialization resolves _ENV at the declaration point, not to the
+      --  chunk's original environment. Use an outer print to observe it.
+   begin
+      Check ("local p=print; local _ENV={}; global x=42; p(_ENV.x)", "42");
+   end Global_Shadowed_Environment;
 
    procedure Environment_Shadowing is
       --  Global access resolves through the lexically visible _ENV cell.
@@ -584,6 +599,12 @@ package body Session_Tests is
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
+      Test_Support.Add
+        (Suite, "session: global without initializer",
+         Global_Without_Initializer'Access);
+      Test_Support.Add
+        (Suite, "session: global shadowed environment",
+         Global_Shadowed_Environment'Access);
       Test_Support.Add (Suite, "session: bitwise string left",
                         Bitwise_String_Left'Access);
       Test_Support.Add (Suite, "session: bitwise string right",

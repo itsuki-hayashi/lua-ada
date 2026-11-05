@@ -49,6 +49,11 @@ oracle and Ada; upstream execution remains a later conformance gate.
 
 ## Internal-code mapping
 
+M2a adds token and raw-source compile-only comparisons for every file above;
+see the [frontend guide](frontend.md). These do not change the no-whole-file
+execution claim. Exact opcode definitions are now independently tested against
+C; code.lua instruction-stream/optimization assertions remain deferred.
+
 `code.lua` inspects C register opcodes, constants, and optimization choices
 through the upstream `T` instrumentation. Those layouts do not define the
 public language contract. M1 uses private typed Ada instructions and packets.

@@ -22,6 +22,8 @@ package body Lua.Sessions is
       else
          Result.Status := (if Self.State.Is_Resource then Resource_Error
                            elsif Self.State.Is_Syntax then Syntax_Error
+                           elsif Self.State.Is_Unsupported then
+                             Unsupported_Feature
                            else Runtime_Error);
          Result.Output := Self.State.Output;
          Result.Error.Line := Self.State.Failure_At.Line;
@@ -71,7 +73,8 @@ package body Lua.Sessions is
          Self.State.Bounds :=
            (Bounds.Source_Bytes, Bounds.Tokens, Bounds.Instructions,
             Bounds.Call_Depth, Bounds.Heap_Objects, Bounds.Table_Entries,
-            Bounds.String_Bytes, Bounds.Output_Bytes, Bounds.Registers);
+            Bounds.String_Bytes, Bounds.Output_Bytes, Bounds.Registers,
+            Bounds.Syntax_Nodes, Bounds.Syntax_Depth);
          Self.State.Next_GC := Positive'Min
            (Self.State.Next_GC, Bounds.Heap_Objects);
       end if;

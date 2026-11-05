@@ -1,5 +1,12 @@
 # Testing and Analysis
 
+## M2a frontend checks
+
+The [frontend guide](frontend.md) owns token/parser/opcode campaign details.
+Run scripts/check-frontend.ps1 inside alr exec after building the nested tests.
+CI runs it in static-validation on each OS. All configurations retain focused
+AUnit and CLI coverage. Canonical code generation/execution are separate gates.
+
 Each independently meaningful behavior and boundary condition needs a separate,
 descriptively named AUnit case. Comments should explain why the input matters,
 the action under test, and the expected Lua behavior. Do not hide unrelated

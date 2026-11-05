@@ -1,5 +1,6 @@
 with Ada.Finalization;
 with Ada.Strings.Unbounded;
+with Lua.Diagnostics;
 private with Lua.Engine;
 
 package Lua.Sessions is
@@ -11,15 +12,13 @@ package Lua.Sessions is
    type Session is new Ada.Finalization.Limited_Controlled with private;
 
    type Execution_Status is
-     (Succeeded, Syntax_Error, Runtime_Error, Resource_Error, Host_Error);
+     (Succeeded, Syntax_Error, Runtime_Error, Resource_Error, Host_Error,
+      Unsupported_Feature);
    --  Host_Error identifies a failing output sink, not a Lua language error.
+   --  Unsupported_Feature identifies valid syntax awaiting runtime support;
+   --  the complete chunk is checked and rejected before executing any code.
 
-   type Diagnostic is record
-      Source  : Ada.Strings.Unbounded.Unbounded_String;
-      Line    : Positive := 1;
-      Column  : Positive := 1;
-      Message : Ada.Strings.Unbounded.Unbounded_String;
-   end record;
+   subtype Diagnostic is Lua.Diagnostics.Diagnostic;
    --  Source names and byte positions remain separate from message wording.
 
    type Execution_Result is record
@@ -40,6 +39,8 @@ package Lua.Sessions is
       String_Bytes  : Positive := 1_000_000;
       Output_Bytes  : Positive := 1_000_000;
       Registers     : Positive := 4_096;
+      Syntax_Nodes  : Positive := 200_000;
+      Syntax_Depth  : Positive := 200;
    end record;
    --  Positive bounds prevent accidental unbounded execution. Instruction
    --  budgets restart for each chunk; heap/table limits cover the universe.
