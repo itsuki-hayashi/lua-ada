@@ -3,7 +3,6 @@ with Ada.Strings.Fixed;
 with Ada.Unchecked_Conversion;
 with Interfaces;
 with Lua.Engine.Strings;
-with Lua_Ada_Config;
 
 package body Lua.Engine.Formats is
    use type Integer_Value;
@@ -225,10 +224,12 @@ package body Lua.Engine.Formats is
    end Float_Image;
 
    function Hex_Float
-     (Item : Real_Value; Precision : Integer; Alternate : Boolean)
+     (Item : Real_Value; Precision : Integer; Alternate : Boolean;
+      Host : String)
       return String;
    function Hex_Float
-     (Item : Real_Value; Precision : Integer; Alternate : Boolean)
+     (Item : Real_Value; Precision : Integer; Alternate : Boolean;
+      Host : String)
       return String
    is
       Raw : constant Interfaces.Unsigned_64 := Bits (Item);
@@ -244,10 +245,11 @@ package body Lua.Engine.Formats is
    begin
       if Field = 0 and then Mantissa = 0 then
          Exponent := 0;
-      elsif Field = 0 and then Windows_Host then
-         --  Lua's default Windows configuration uses its C89 hex formatter.
-         --  It normalizes subnormals via frexp, unlike C99 printf's fixed
-         --  minimum exponent. Shift the exact significand, losing no bits.
+      elsif Field = 0 and then Host in "windows" | "macos" then
+         --  Lua's Windows C89 formatter and macOS libc both normalize
+         --  subnormals; Linux libc retains the minimum normal exponent.
+         --  This spelling policy is independent of whether format modifiers
+         --  are available. Shift the exact significand, losing no bits.
          while Mantissa < 2 ** 52 loop
             Mantissa := Mantissa * 2;
             Exponent := Exponent - 1;
@@ -303,7 +305,8 @@ package body Lua.Engine.Formats is
    end Hex_Float;
 
    function Render
-     (State : in out World; Specification : String; Item : Value)
+     (State : in out World; Specification : String; Item : Value;
+      Host : String := Lua_Ada_Config.Alire_Host_OS)
       return String
    is
       Form : constant String (1 .. Specification'Length) := Specification;
@@ -421,7 +424,7 @@ package body Lua.Engine.Formats is
             end if;
          when 'a' | 'A' | 'e' | 'E' | 'f' | 'g' | 'G' =>
             Numeric := True;
-            if Code in 'a' | 'A' and then Windows_Host and then
+            if Code in 'a' | 'A' and then Windows_Host (Host) and then
               Form not in "%a" | "%A"
             then
                Fail (State,
@@ -441,13 +444,13 @@ package body Lua.Engine.Formats is
             if Real /= Real or else abs Real > Real_Value'Last then
                Text := To_Unbounded_String
                  ((if Real /= Real then "nan" else "inf"));
-               if Real /= Real and then Unsigned_NaN then
+               if Real /= Real and then Unsigned_NaN (Host) then
                   Negative := False;
                end if;
                Zero := False;
             elsif Code in 'a' | 'A' then
                Text := To_Unbounded_String
-                 (Hex_Float (Real, Precision, Alternate));
+                 (Hex_Float (Real, Precision, Alternate, Host));
             else
                Text := To_Unbounded_String
                  (Float_Image (Real, Code, Precision, Alternate));
@@ -529,7 +532,7 @@ package body Lua.Engine.Formats is
                else
                   Text := To_Unbounded_String
                     ((if (Bits (Real) and 2 ** 63) /= 0 then "-" else "") &
-                     Hex_Float (Real, -1, False));
+                     Hex_Float (Real, -1, False, Host));
                end if;
             elsif Item.Kind = Integer_Kind and then
               Item.Integer_Data = Integer_Value'First

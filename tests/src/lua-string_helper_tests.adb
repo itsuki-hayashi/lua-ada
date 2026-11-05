@@ -7,6 +7,7 @@ with Lua.Engine.Format_Drivers;
 with Lua.Engine.Patterns;
 with Lua.Engine.Pattern_Drivers;
 with Lua.Engine.Strings;
+with Lua.Numbers;
 with Test_Support;
 
 package body Lua.String_Helper_Tests is
@@ -61,6 +62,9 @@ package body Lua.String_Helper_Tests is
    procedure Iterator_Copy_Budget (State : in out World);
    procedure Replacement_Copy_Budget (State : in out World);
    procedure Backreference_Comparison_Budget (State : in out World);
+   procedure MacOS_Subnormal_Formatting (State : in out World);
+   procedure MacOS_Hexadecimal_Modifiers (State : in out World);
+   procedure Linux_Subnormal_Formatting (State : in out World);
 
    procedure Captured_Backreference (State : in out World) is
       Found : Patterns.Match_Result;
@@ -510,6 +514,48 @@ package body Lua.String_Helper_Tests is
       end;
    end Backreference_Comparison_Budget;
 
+   procedure MacOS_Subnormal_Formatting (State : in out World) is
+      Smallest : constant Value := (Real_Kind, Real_Value'Succ (0.0));
+   begin
+      --  Inject macOS policy on every host. Darwin normalizes subnormals for
+      --  both %a and %q, so the leading hexadecimal digit must be nonzero.
+      Assert (Formats.Render
+        (State, "%a",
+         (Real_Kind, Lua.Numbers.Read ("1e-308").Real_Item),
+         Host => "macos") =
+          "0x1.cc359e067a348p-1024", "macOS subnormal hexadecimal");
+      Assert (Formats.Render (State, "%q", Smallest, Host => "macos") =
+        "0x1p-1074", "macOS smallest quoted subnormal");
+   end MacOS_Subnormal_Formatting;
+
+   procedure MacOS_Hexadecimal_Modifiers (State : in out World) is
+   begin
+      --  Normalizing like Windows does not imply C89's modifier restriction.
+      --  macOS must still honor precision after normalization and rounding.
+      Assert (Formats.Render
+        (State, "%.3a",
+         (Real_Kind, Lua.Numbers.Read ("1e-308").Real_Item),
+         Host => "macos") =
+          "0x1.cc3p-1024", "macOS subnormal precision");
+      Assert (Formats.Render
+        (State, "%.0a", (Real_Kind, 1.5), Host => "macos") = "0x2p+0",
+        "macOS hexadecimal modifiers remain available");
+   end MacOS_Hexadecimal_Modifiers;
+
+   procedure Linux_Subnormal_Formatting (State : in out World) is
+      Smallest : constant Value := (Real_Kind, Real_Value'Succ (0.0));
+   begin
+      --  Linux's minimum-normal exponent spelling remains a distinct policy.
+      --  A fix for macOS must not silently normalize glibc-compatible output.
+      Assert (Formats.Render
+        (State, "%a",
+         (Real_Kind, Lua.Numbers.Read ("1e-308").Real_Item),
+         Host => "linux") =
+          "0x0.730d67819e8d2p-1022", "Linux subnormal hexadecimal");
+      Assert (Formats.Render (State, "%q", Smallest, Host => "linux") =
+        "0x0.0000000000001p-1022", "Linux smallest quoted subnormal");
+   end Linux_Subnormal_Formatting;
+
    procedure Backreference_Case is new Fixture (Captured_Backreference);
    procedure Balance_Case is new Fixture (Balanced_Nesting);
    procedure Frontier_Case is new Fixture (Frontier_Boundaries);
@@ -537,6 +583,12 @@ package body Lua.String_Helper_Tests is
    procedure Replacement_Budget_Case is new Fixture (Replacement_Copy_Budget);
    procedure Backreference_Budget_Case is new Fixture
      (Backreference_Comparison_Budget);
+   procedure MacOS_Subnormal_Case is new Fixture
+     (MacOS_Subnormal_Formatting);
+   procedure MacOS_Modifiers_Case is new Fixture
+     (MacOS_Hexadecimal_Modifiers);
+   procedure Linux_Subnormal_Case is new Fixture
+     (Linux_Subnormal_Formatting);
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
@@ -586,5 +638,14 @@ package body Lua.String_Helper_Tests is
       Test_Support.Add
         (Suite, "string: backreference comparison budget",
          Backreference_Budget_Case'Access);
+      Test_Support.Add
+        (Suite, "string: macOS subnormal formatting",
+         MacOS_Subnormal_Case'Access);
+      Test_Support.Add
+        (Suite, "string: macOS hexadecimal modifiers",
+         MacOS_Modifiers_Case'Access);
+      Test_Support.Add
+        (Suite, "string: Linux subnormal formatting",
+         Linux_Subnormal_Case'Access);
    end Register;
 end Lua.String_Helper_Tests;

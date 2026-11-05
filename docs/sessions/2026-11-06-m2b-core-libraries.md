@@ -71,3 +71,15 @@ objects above that baseline instead of relying on the old builtin count.
 
 Cross-platform CI, ABI probes, Windows static-PIC, and final PR acceptance remain
 pending. Local logs are ignored reports, not immutable cross-platform evidence.
+
+## First CI feedback
+
+Published implementation 7d329ae and opened
+[PR #4](https://github.com/itsuki-hayashi/lua-ada/pull/4).
+Linux configurations passed; macOS passed 472 AUnit cases and all three primary
+files but failed the added library differential campaign. Darwin libc normalizes
+hexadecimal subnormals (0x1p-1074), while Linux retains a minimum-normal exponent
+(0x0.0000000000001p-1022). The Ada formatter now selects the matching host policy.
+Three portable focused cases exercise macOS subnormal/precision behavior and
+protect the Linux representation on every host. No fixture or comparison was
+weakened. The repaired revision still requires all platform jobs to pass.
