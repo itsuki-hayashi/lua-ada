@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-11-05 (Asia/Tokyo). **M0 and M1 complete.**
+Updated: 2026-11-06 (Asia/Tokyo). **M0 and M1 complete.**
 The [M1 target](milestones/m1.md) owns scope; the
 [validation record](validation.md) owns exact platform/configuration evidence.
 
@@ -31,6 +31,12 @@ ABI observations, commands, and immutable CI evidence are recorded in
 [validation](validation.md).
 
 ## Later milestones
+
+Eight [real-world module fixtures](../tests/modules/README.md) are pinned under
+tests/modules/ for future consumer parity work. This is source checkout and
+documentation only: module builds, dependency installation, and C/Ada execution
+have not been performed. The fixtures are not development references or runtime
+dependencies and do not change the implemented M1 subset.
 
 This is a documented Lua subset, not complete Lua 5.5 compatibility.
 Metatables, coroutines, userdata, close/goto, remaining libraries, binary

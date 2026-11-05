@@ -16,6 +16,10 @@ Reference submodules are evidence, not editable production source.
    design changes in the decision log and add a dated session handoff.
 7. Report changes, validation, and limitations accurately. Missing tools,
    unimplemented checks, and skipped checks must never be called passing tests.
+8. When you created a branch for the task and the authorized work is complete,
+   commit and publish it, then open a pull request against the default branch
+   before handoff. Include verification and scope limits. Do not merge without
+   a separate instruction from the user.
 
 Update owning documents rather than duplicating facts. Unchanged Markdown does
 not need artificial edits. Historical records remain dated evidence.
@@ -46,6 +50,9 @@ not need artificial edits. Historical records remain dated evidence.
   compatibility. Build it separately only as an oracle/test fixture.
 - Do not edit reference submodules or update their revisions incidentally.
   Follow [reference maintenance](references/README.md).
+- Submodules in `tests/modules/` are future consumer test fixtures, not
+  implementation/design references or runtime dependencies. Preserve their
+  trees and pins; follow the [fixture catalog](tests/modules/README.md).
 
 ## Documentation and verification
 

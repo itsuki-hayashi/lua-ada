@@ -61,3 +61,8 @@ nonlocal jumps over Ada frames without an explicitly validated safe mechanism.
 LuaRocks compatibility is demonstrated using selected pure-Lua and native rocks
 on matching configurations, then expanded. Installation metadata alone is not
 proof that modules load and behave correctly.
+
+Eight [consumer module fixtures](../tests/modules/README.md) are pinned for
+future C Lua/Lua Ada parity checks. The catalog owns revision, dependency, and
+update notes. All module execution/platform evidence is currently unrun; the
+checkouts do not expand M1 or establish LuaRocks/native-module compatibility.

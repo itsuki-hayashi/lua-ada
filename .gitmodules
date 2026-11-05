@@ -1,6 +1,30 @@
 [submodule "references/lua"]
-	path = references/lua
-	url = https://github.com/lua/lua.git
+    path = references/lua
+    url = https://github.com/lua/lua.git
 [submodule "references/ada-lua"]
-	path = references/ada-lua
-	url = https://github.com/Nikokrock/ada-lua.git
+    path = references/ada-lua
+    url = https://github.com/Nikokrock/ada-lua.git
+[submodule "tests/modules/lpeg"]
+    path = tests/modules/lpeg
+    url = https://github.com/roberto-ieru/LPeg.git
+[submodule "tests/modules/say"]
+    path = tests/modules/say
+    url = https://github.com/lunarmodules/say.git
+[submodule "tests/modules/penlight"]
+    path = tests/modules/penlight
+    url = https://github.com/lunarmodules/Penlight.git
+[submodule "tests/modules/luasocket"]
+    path = tests/modules/luasocket
+    url = https://github.com/lunarmodules/luasocket.git
+[submodule "tests/modules/busted"]
+    path = tests/modules/busted
+    url = https://github.com/lunarmodules/busted.git
+[submodule "tests/modules/luafilesystem"]
+    path = tests/modules/luafilesystem
+    url = https://github.com/lunarmodules/luafilesystem.git
+[submodule "tests/modules/luasql"]
+    path = tests/modules/luasql
+    url = https://github.com/lunarmodules/luasql.git
+[submodule "tests/modules/luacheck"]
+    path = tests/modules/luacheck
+    url = https://github.com/lunarmodules/luacheck.git
