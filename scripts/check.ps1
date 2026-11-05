@@ -25,6 +25,7 @@ function Invoke-Alire {
 
 try {
     Set-Location $projectRoot
+    & (Join-Path $PSScriptRoot 'check-documentation.ps1')
     Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario)
     foreach ($crateName in @('cli', 'tests')) {
         Set-Location (Join-Path $projectRoot $crateName)
