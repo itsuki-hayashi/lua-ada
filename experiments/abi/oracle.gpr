@@ -1,0 +1,26 @@
+with "reference_lua";
+with "../../config/lua_ada_config.gpr";
+
+project Oracle is
+   for Languages use ("C");
+   for Source_Dirs use ("../../references/lua");
+   for Source_Files use ("lua.c");
+   for Object_Dir use "../../build/oracle/obj";
+   for Exec_Dir use "../../build/oracle/bin";
+   for Main use ("lua.c");
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("C") use ("-std=c99", "-O2");
+   end Compiler;
+
+   package Linker is
+      case Lua_Ada_Config.Alire_Host_OS is
+         when "linux" =>
+            for Default_Switches ("C") use ("-lm", "-ldl");
+         when "macos" =>
+            for Default_Switches ("C") use ("-lm");
+         when others => null;
+      end case;
+   end Linker;
+end Oracle;

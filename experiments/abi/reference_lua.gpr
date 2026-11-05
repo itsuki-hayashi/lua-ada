@@ -1,0 +1,14 @@
+library project Reference_Lua is
+   for Languages use ("C");
+   for Source_Dirs use ("../../references/lua");
+   for Excluded_Source_Files use ("lua.c", "onelua.c", "ltests.c");
+   for Object_Dir use "../../build/abi/oracle-obj";
+   for Library_Dir use "../../build/abi/oracle-lib";
+   for Library_Name use "reference_lua";
+   for Library_Kind use "static";
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("C") use ("-std=c99", "-O2");
+   end Compiler;
+end Reference_Lua;

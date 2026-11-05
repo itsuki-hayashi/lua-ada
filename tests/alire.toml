@@ -1,0 +1,19 @@
+name = "lua_ada_tests"
+description = "AUnit tests for the Lua Ada implementation"
+version = "0.1.0-dev"
+licenses = "MIT"
+project-files = ["lua_ada_tests.gpr"]
+executables = ["test_runner"]
+
+[[depends-on]]
+lua_ada = "*"
+aunit = "^26.0.0"
+
+[[pins]]
+lua_ada = { path = ".." }
+
+[build-switches]
+"*".runtime_checks = "Everything"
+
+[build-profiles]
+lua_ada = "validation"

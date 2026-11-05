@@ -1,5 +1,7 @@
 # Documentation Index
 
+The accepted [M1 target](milestones/m1.md) owns the interpreter subset and gates.
+
 | Document                                  | Owns                                   |
 | ----------------------------------------- | -------------------------------------- |
 | [Goals](goals.md)                         | Objectives and success criteria        |

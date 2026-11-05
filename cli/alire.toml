@@ -1,0 +1,15 @@
+name = "lua_ada_cli"
+description = "Development command-line consumer of Lua Ada"
+version = "0.1.0-dev"
+licenses = "MIT"
+project-files = ["lua_ada_cli.gpr"]
+executables = ["lua_ada"]
+
+[[depends-on]]
+lua_ada = "*"
+
+[[pins]]
+lua_ada = { path = ".." }
+
+[build-switches]
+"*".runtime_checks = "Everything"

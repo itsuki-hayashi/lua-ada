@@ -62,8 +62,9 @@ not need artificial edits. Historical records remain dated evidence.
 - Inspect generated documentation, fuzz crashes, and proof summaries. Record
   missing tools and blocked checks precisely.
 
-## Foundation boundary
+## Current implementation boundary
 
-There is no interpreter, library target, AUnit harness, or CI workflow yet.
-The no-op executable is a bootstrap placeholder. Advance the backlog explicitly
-rather than implying these capabilities exist.
+The production crate has tested lexical analysis and integer primitives.
+Separate CLI/AUnit crates, a CI workflow, and reference/ABI fixtures exist. The CLI does
+not execute Lua yet. Read current status before claiming further capabilities;
+M1 remains active until script execution and all acceptance gates are verified.

@@ -1,8 +1,9 @@
 # Architecture
 
-This is intended design, not an implemented runtime. Only the root executable
-scaffold exists. Accepted [decisions](docs/decisions/README.md) govern the
-foundation; detailed runtime representations need focused design evidence.
+Most of this is intended design. The root library provides lexical analysis and
+checked integer primitives, with separate CLI and AUnit crates. Accepted
+[decisions](docs/decisions/README.md) govern the structure; runtime
+representations still need focused design evidence.
 
 ## Components and dependency direction
 
@@ -80,7 +81,7 @@ initialization/finalization from a C-only host.
 
 Future library artifacts must be separated by profile and library kind (static,
 static-PIC, relocatable). CLI and test crates will depend on the reusable library.
-No library or public runtime API is introduced by this foundation.
+Library targets exist; the public session execution API is not implemented yet.
 
 ## Verification
 

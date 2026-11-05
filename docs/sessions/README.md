@@ -1,5 +1,7 @@
 # Session Records
 
+Latest: [Initial M1 implementation gates](2026-11-05-m1-gates.md).
+
 | Date       | Session                                             |
 | ---------- | --------------------------------------------------- |
 | 2026-11-05 | [Initial foundation](2026-11-05-foundation.md)      |

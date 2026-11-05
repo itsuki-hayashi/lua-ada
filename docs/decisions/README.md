@@ -1,5 +1,7 @@
 # Architecture Decision Log
 
+Latest: [ADR 0002: Executable M1](0002-m1-execution.md), accepted.
+
 | ID   | Decision                                      | State    |
 | ---- | --------------------------------------------- | -------- |
 | 0001 | [Foundation policies](0001-foundation.md)     | accepted |

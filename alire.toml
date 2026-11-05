@@ -1,5 +1,5 @@
 name = "lua_ada"
-description = "An idiomatic Ada 2022 implementation of Lua (foundation stage)"
+description = "An idiomatic Ada 2022 Lua interpreter (in development)"
 version = "0.1.0-dev"
 
 authors = ["Itsuki Hayashi"]
@@ -9,7 +9,6 @@ licenses = "MIT"
 website = "https://github.com/itsuki-hayashi/lua-ada"
 tags = ["lua", "interpreter", "ada2022"]
 project-files = ["lua_ada.gpr"]
-executables = ["lua_ada"]
 
 [build-switches]
 "*".runtime_checks = "Everything"

@@ -1,0 +1,27 @@
+with "reference_lua";
+with "abi_bridge";
+with "../../config/lua_ada_config.gpr";
+
+project Abi_Probe is
+   for Languages use ("C");
+   for Source_Dirs use ("c");
+   for Object_Dir use "../../build/abi/c-obj";
+   for Exec_Dir use "../../build/abi/bin";
+   for Main use ("abi_probe.c");
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("C") use
+        ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic");
+   end Compiler;
+
+   package Linker is
+      case Lua_Ada_Config.Alire_Host_OS is
+         when "linux" =>
+            for Default_Switches ("C") use ("-lm", "-ldl");
+         when "macos" =>
+            for Default_Switches ("C") use ("-lm");
+         when others => null;
+      end case;
+   end Linker;
+end Abi_Probe;

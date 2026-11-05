@@ -1,0 +1,17 @@
+library project Abi_Bridge is
+   for Languages use ("Ada");
+   for Source_Dirs use ("ada");
+   for Object_Dir use "../../build/abi/ada-obj";
+   for Library_Dir use "../../build/abi/ada-lib";
+   for Library_Name use "abi_bridge";
+   for Library_Kind use "static";
+   for Library_Interface use ("Abi_Probe");
+   for Library_Standalone use "standard";
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("Ada") use
+        ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty",
+         "-gnato", "-gnata");
+   end Compiler;
+end Abi_Bridge;

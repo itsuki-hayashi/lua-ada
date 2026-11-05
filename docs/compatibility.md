@@ -11,7 +11,8 @@ releases require deliberate baseline updates and fresh evidence.
 Long-term compatibility includes language and standard libraries, CLI behavior,
 public C API/ABI, compatible binary-chunk loading/dumping, native module loading,
 and compatible LuaRocks packages. These are future acceptance gates; none is
-implemented by the current no-op executable.
+implemented end-to-end by the current development CLI. Lexical and integer
+primitives have unit evidence; script execution remains unimplemented.
 
 Claims must name OS, architecture, compiler/linker/C runtime, numeric settings,
 endianness, and relevant Lua configuration. Begin with upstream's default

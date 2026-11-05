@@ -4,8 +4,9 @@ Lua Ada aims to reimplement current Lua in idiomatic Ada 2022, with compatible
 language behavior, a drop-in public C API/ABI, and a safer native Ada embedding
 interface. The initial compatibility baseline is **Lua 5.5.1**.
 
-**Current capability:** a no-op executable and project foundation. It cannot
-execute Lua, provide a Lua library, or load LuaRocks modules yet.
+**Current capability:** static/shared libraries, tested lexical analysis and
+integer primitives, a development CLI, and test/reference infrastructure.
+It cannot execute Lua scripts or load LuaRocks modules yet. M1 is in progress.
 See [status](docs/status.md) for actual verification evidence.
 
 ## Checkout and build
@@ -17,21 +18,26 @@ available through Alire. Run these commands from a PowerShell or POSIX shell:
 git clone --recurse-submodules https://github.com/itsuki-hayashi/lua-ada.git
 cd lua-ada
 alr build --development
-alr run
+alr -C cli build
+alr -C cli exec -- bin/static/lua_ada --help
 ```
 
 For an existing checkout, run `git submodule update --init --recursive`.
-The `lua_ada` executable currently exits successfully without output.
+The CLI supports help/version and rejects execution requests. Select an explicit
+binary path when multiple library kinds exist; Alire cannot infer one.
 
 ## Repository map
 
 | Location          | Responsibility                                   |
 | ----------------- | ------------------------------------------------ |
-| `src/`            | First-party Ada sources; currently a placeholder |
+| `src/`            | Reusable Ada library sources                     |
 | `alire.toml`      | Metadata and profile-wide runtime checks         |
 | `lua_ada.gpr`     | Build entry point and mandatory compiler flags   |
 | `docs/`           | Development and project management               |
 | `tests/`          | Test strategy and future test layout             |
+| `cli/`            | Separate development CLI crate                   |
+| `scripts/`        | Build/test and differential drivers              |
+| `experiments/`    | Isolated reference and C ABI fixtures            |
 | `references/`     | Pinned reference-only submodules                 |
 | `config/`, `obj/` | Generated local configuration and build products |
 
@@ -40,7 +46,8 @@ Start with [agent instructions](AGENTS.md), [architecture](ARCHITECTURE.md),
 See [contributing](CONTRIBUTING.md) for the development workflow.
 
 Windows, Linux, and macOS are target platforms. Support claims require evidence
-for each platform and ABI configuration. Static/shared libraries are planned.
+for each platform and ABI configuration. Static/shared consumers pass on Windows;
+Linux/macOS CI awaits execution.
 
 ## License
 

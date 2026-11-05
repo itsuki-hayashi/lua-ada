@@ -1,8 +1,10 @@
 # Testing and Analysis
 
-The foundation has build/run checks only. No AUnit suite, interpreter harness,
-compatibility runner, coverage measurement, or CI workflow exists yet.
-The workflows below are requirements for subsequent milestones.
+The nested AUnit suite tests lexical analysis and integer primitives. The local
+check driver exercises static/shared consumers and CLI contracts. CI is authored
+for three OS targets. A differential driver and oracle-only Lua fixtures exist;
+Ada script execution, full coverage measurement, and conformance remain undone.
+See [current tests](../tests/README.md) for working commands.
 
 ## Test layers
 
@@ -21,10 +23,9 @@ tool versions, commands, test counts, failures, exclusions, and relevant seeds.
 
 ## AUnit and GNATtest
 
-Create a future `tests/alire.toml` crate with AUnit as a test-only dependency
-and `lua_ada` pinned to `..`. Do not add AUnit to the production manifest.
-Use a handwritten AUnit runner initially and return a failing process status
-when any test fails. Exercise meaningful behavior as APIs arrive.
+The `tests/alire.toml` crate has test-only AUnit and `lua_ada` pinned to `..`.
+Its handwritten runner returns a failing process status when any case fails.
+Keep AUnit out of production and expand tests as implemented behavior grows.
 
 GNATtest is an optional developer executable, not a linked dependency. Install
 it separately if desired, then invoke through the test crate's environment:

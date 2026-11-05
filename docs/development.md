@@ -1,60 +1,54 @@
 # Development Setup
 
-Install [Alire](https://alire.ada.dev/) and use the latest stable native GNAT
-available through its index with compatible GPRbuild. Record exact versions;
-do not commit local tool paths or silently change global toolchain selections.
+Use Alire and the latest stable native GNAT available through its index.
+Record exact versions; do not silently change globally selected compilers.
+Alire first-use operations may install tools/MSYS2 and need normal network access.
 
-```text
-alr --version
-alr toolchain
-alr exec -- gnat --version
-alr exec -- gprbuild --version
-```
+## Build and check
 
-Alire can trigger first-use setup, including MSYS2 on Windows. These commands
-are operational instructions, not guaranteed side-effect-free probes. Complete
-needed setup in an authorized normal shell if restrictions prevent it.
-
-## Root-level workflow
-
-Run from the repository root in PowerShell or a POSIX shell:
+The root is now a library crate. CLI and AUnit are separate local-pinned crates.
+Run from the root in PowerShell 7:
 
 ```text
 alr build --development
-alr run
-alr build --validation
-alr run
-alr build --release
-alr run
+alr -C cli build
+alr -C cli exec -- bin/static/lua_ada --help
+./scripts/check.ps1 -LibraryType static -Profile validation
+./scripts/check.ps1 -LibraryType relocatable -Profile validation
 ```
 
-The current executable succeeds without output. To inspect compiler arguments,
-force a verbose rebuild of each profile:
+The check driver builds the requested root profile plus both consumers, runs
+AUnit, and checks current CLI contracts. Accepts development, validation,
+release, and static/static-pic/relocatable. It configures library search paths
+and restores the calling environment. Script execution remains unimplemented.
 
-```text
-alr build --development -- -f -v
-alr build --validation -- -f -v
-alr build --release -- -f -v
-```
+For direct scenario builds, pass -XLUA_ADA_LIBRARY_TYPE=relocatable after the
+Alire -- separator. Apply the same scenario to the library and consumers.
+Object/library directories include profile and kind; binaries include kind.
+AUnit pins the parent build profile to validation so dependency assertions stay on.
 
-The GPR appends `-gnat2022 -gnatwa -gnatwe -gnatv -gnaty` after generated
-profile switches. The manifest enables runtime checks for every profile; no
-build may silently substitute `-gnatp`. Optimization/debug defaults remain
-Alire's. See [profile configuration](https://alire.ada.dev/docs/catalog-format-spec#build-profiles-and-switches).
+Avoid bare alr run when both kinds exist: it finds multiple executable candidates.
+Use alr exec with the explicit bin/<kind>/<program> path. Windows adds .exe;
+Alire also resolves the documented extensionless path on Windows.
 
-Generated `config/` and `alire/` state is recreated by Alire. Never copy it from
-the old nested crate or edit it. Objects use `obj/<profile>`, executables `bin/`.
-Future library builds must also separate artifact directories by library kind.
+## Compiler and generated state
 
-## Platforms and dependencies
+Every first-party GPR appends -gnat2022 -gnatwa -gnatwe -gnatv -gnaty.
+The manifest keeps runtime checks enabled in every profile. Optimization/debug
+defaults remain Alire's. Inspect verbose actual commands, not only configuration.
 
-Windows, Linux, and macOS are targets, not automatically validated platforms.
-Record OS, architecture, compiler, linker, C runtime, and Lua configuration with
-compatibility evidence. No CI or library targets exist yet.
+Generated config/ and alire/ files are recreated by Alire; do not copy or edit
+them. Production depends only on standard Ada; AUnit is test-only. Optional
+GNATdoc/GNATtest/GNATfuzz/GNATprove tools are not ordinary-build prerequisites.
 
-The production crate has no external dependencies. AUnit will belong to a nested
-test crate pinned to the local parent. GNATdoc, GNATtest, GNATfuzz, and GNATprove
-are developer tools, not prerequisites for ordinary builds.
+## References and platforms
 
-See [reference maintenance](../references/README.md). Keep reference sources
-outside `Source_Dirs`; build C Lua separately as an oracle once tests exist.
+See [reference maintenance](../references/README.md),
+[ABI experiments](../experiments/abi/README.md), and [tests](../tests/README.md).
+The comparison driver builds pinned C Lua independently without changing its
+sources. OracleOnly checks fixtures, never Ada parity.
+
+The workflow covers three OS targets, three profiles, and two library modes.
+Its existence is not validation: Linux/macOS results remain unverified until
+CI runs. Record OS, architecture, compiler, linker, C runtime, and Lua settings
+with compatibility claims. Local logs belong in ignored reports/.

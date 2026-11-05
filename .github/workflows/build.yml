@@ -1,0 +1,45 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        library: [static, relocatable]
+        profile: [development, validation, release]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+      - uses: alire-project/setup-alire@v6
+      - name: Record tools
+        shell: pwsh
+        run: |
+          alr --version
+          alr -n toolchain --select gnat_native
+          alr -n toolchain
+      - name: Build and exercise consumers
+        shell: pwsh
+        run: |
+          ./scripts/check.ps1 -LibraryType '${{ matrix.library }}' -Profile '${{ matrix.profile }}'
+      - name: Reference fixtures and ABI experiments
+        if: matrix.library == 'static' && matrix.profile == 'validation'
+        shell: pwsh
+        run: |
+          ./scripts/compare.ps1 -OracleOnly
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          alr exec -- gprbuild -P experiments/abi/abi_probe.gpr
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          alr exec -- "build/abi/bin/abi_probe$suffix"
+          exit $LASTEXITCODE
