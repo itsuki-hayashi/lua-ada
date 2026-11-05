@@ -279,6 +279,9 @@ package body Lua.Engine is
         Table.Reference.Members.Last_Index
       loop
          if Equal (Table.Reference.Members (Index).Key, Key) then
+            --  Equality handles integer/float-equivalent keys. A nil value
+            --  leaves a tombstone for next(t, removed_key); that storage
+            --  remains charged until the table itself is freed.
             Table.Reference.Members.Replace_Element (Index, (Key, Item));
             return;
          end if;

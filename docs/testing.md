@@ -6,7 +6,7 @@ the action under test, and the expected Lua behavior. Do not hide unrelated
 assertions inside a few broad test procedures. Treat test code as maintained
 human-facing documentation of the interpreter contract.
 
-The nested AUnit suite has 167 individually named lexical, integer, number,
+The nested AUnit suite has 168 individually named lexical, integer, number,
 language, and session/lifetime cases. The check driver exercises static/shared
 consumers, 19 CLI processes, and six raw-byte differential fixtures against pinned
 C Lua. The arithmetic fixture contains 2,366 combinations. See [status](status.md)

@@ -4,9 +4,9 @@ This nested Alire crate keeps AUnit out of the production dependencies and pins
 Lua Ada to the local parent. The handwritten runner exits unsuccessfully on any
 failed assertion or unexpected exception.
 
-There are 167 focused, separately named cases with explanatory comments:
+There are 168 focused, separately named cases with explanatory comments:
 integer (21), lexer (33, including 1,000 seeded byte scans), numbers (30),
-language/session (47), and lifecycle/resources/GC (36). Each case represents a
+language/session (47), and lifecycle/resources/GC (37). Each case represents a
 specific behavior or boundary rather than an empty generated skeleton.
 
 From the repository root using PowerShell 7:

@@ -41,8 +41,4 @@ jobs:
         if: matrix.library == 'static' && matrix.profile == 'validation'
         shell: pwsh
         run: |
-          alr exec -- gprbuild -P experiments/abi/abi_probe.gpr
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $suffix = if ($IsWindows) { '.exe' } else { '' }
-          alr exec -- "build/abi/bin/abi_probe$suffix"
-          exit $LASTEXITCODE
+          ./scripts/check-abi.ps1

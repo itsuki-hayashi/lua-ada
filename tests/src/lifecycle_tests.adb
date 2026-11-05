@@ -41,6 +41,7 @@ package body Lifecycle_Tests is
    procedure Output_Budget;
    procedure Table_Entry_Budget;
    procedure Heap_Object_Budget;
+   procedure Frame_Setup_Failure_Recovery;
    procedure Collect_Table_Cycle;
    procedure Collect_Closure_Cycle;
    procedure Keep_Captured_Root;
@@ -355,6 +356,31 @@ package body Lifecycle_Tests is
       Assert_Error (Result, Resource_Error);
    end Heap_Object_Budget;
 
+   procedure Frame_Setup_Failure_Recovery is
+      --  Exhaust the heap before the first activation can create its scope.
+      --  Repeated failures must release partial execution state; restoring
+      --  the budget then permits a fresh chunk on the same owned session.
+      Universe : Session;
+      Bounds : Execution_Limits;
+      Baseline : constant Heap_Statistics := Universe.Statistics;
+      Result : Execution_Result;
+   begin
+      Bounds.Heap_Objects := Baseline.Live_Objects;
+      Universe.Set_Limits (Bounds);
+      for Attempt in 1 .. 20 loop
+         Result := Universe.Execute ("print(42)", "frame-setup");
+         Assert_Error (Result, Resource_Error);
+         Assert (Universe.Statistics.Live_Objects = Baseline.Live_Objects,
+                 "failed activation retains no owned objects");
+         Assert (Universe.Statistics.Programs = 0,
+                 "failed activation retains no compiled program");
+      end loop;
+      Bounds.Heap_Objects := 100_000;
+      Universe.Set_Limits (Bounds);
+      Result := Universe.Execute ("print(42)");
+      Assert_Output (Result, "42");
+   end Frame_Setup_Failure_Recovery;
+
    procedure Collect_Table_Cycle is
       --  Unreachable self-referencing tables must return to the bootstrap
       --  live count.
@@ -593,6 +619,9 @@ package body Lifecycle_Tests is
       Test_Support.Add
         (Suite, "lifecycle: heap object budget",
          Heap_Object_Budget'Access);
+      Test_Support.Add
+        (Suite, "lifecycle: frame setup failure recovery",
+         Frame_Setup_Failure_Recovery'Access);
       Test_Support.Add
         (Suite, "lifecycle: collect table cycle",
          Collect_Table_Cycle'Access);

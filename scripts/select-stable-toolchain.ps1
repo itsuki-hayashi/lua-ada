@@ -19,6 +19,13 @@ foreach ($line in $releases) {
 if ($candidates.Count -eq 0) { throw 'No stable native GNAT is available for this host' }
 $selected = $candidates | Sort-Object { [version]$_ } -Descending | Select-Object -First 1
 Write-Output "Selecting latest stable native GNAT: $selected"
-& alr -n toolchain --select "gnat_native=$selected"
-if ($LASTEXITCODE -ne 0) { throw "Cannot select native GNAT $selected" }
+for ($attempt = 1; $attempt -le 3; $attempt++) {
+    & alr -n toolchain --select "gnat_native=$selected"
+    if ($LASTEXITCODE -eq 0) { break }
+    if ($attempt -eq 3) { throw "Cannot select native GNAT $selected" }
+    # GitHub archive downloads occasionally return HTTP 504. Retry the same
+    # stable release; never silently fall back to a different compiler.
+    Write-Output "Retrying stable compiler deployment (attempt $($attempt + 1))"
+    Start-Sleep -Seconds 2
+}
 exit 0

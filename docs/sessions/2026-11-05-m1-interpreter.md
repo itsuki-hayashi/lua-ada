@@ -10,7 +10,7 @@ lexical cells and closures, tables, all M1 control flow, packet result adjustmen
 tail calls, protected failures, bounded execution, tracing cycles/prototypes,
 the base subset, owned Ada sessions, and batch CLI execution.
 
-Expanded AUnit from six broad cases to 167 separately named cases with explanatory
+Expanded AUnit from six broad cases to 168 separately named cases with explanatory
 comments. Added process-level CLI acceptance and raw-byte differential comparison,
 including binary output and a 2,366-operation numeric matrix. ABI probes now
 exercise yield after Ada returns, variadic GC, and inherited extra space.
@@ -22,7 +22,7 @@ exponentiation. Source representations and bytecode remain private.
 
 ## Evidence so far
 
-Windows validation/static: 167 successful AUnit cases, no failures/unexpected
+Windows validation/static: 168 successful AUnit cases, no failures/unexpected
 errors; 19 CLI cases; six differential fixtures match pinned C Lua byte for
 byte. The oracle is a separately built C interpreter and is never linked into
 production. Final profile/link and remote platform checks are ongoing.

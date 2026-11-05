@@ -32,7 +32,7 @@ Current implementation evidence: [interpreter session](sessions/2026-11-05-m1-in
 
 - BUILD-001/CI-001: three profiles, static/shared library, real Ada consumers,
   all target OSes. Windows six combinations pass; remote platform evidence pending.
-- TEST-001: failing-status runner, test-only AUnit, 167 focused documented cases.
+- TEST-001: failing-status runner, test-only AUnit, 168 focused documented cases.
 - LEX-001: keywords/operators, byte escapes, long literals/comments, positions,
   malformed input, budgets, deterministic arbitrary-byte scans.
 - ABI-001: allocator failure/balance, varargs, callbacks/reentry, C-only jump

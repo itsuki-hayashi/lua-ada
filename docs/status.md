@@ -15,14 +15,14 @@ capture output, isolate state, bound execution, and return structured errors.
 The CLI supports files, repeated snippets, stdin, arguments, help/version,
 byte-preserving output, and controlled failure status.
 
-There are 167 individually named AUnit cases across lexical, integer, numeric,
+There are 168 individually named AUnit cases across lexical, integer, numeric,
 language, and lifetime groups. Six differential fixtures compare raw bytes
 against pinned C Lua, including 2,366 arithmetic combinations. Nineteen CLI
 process cases exercise input/output and exit behavior.
 
 ## Verification in progress
 
-Windows x86-64 validation/static acceptance passed with 167 successes, no
+Windows x86-64 validation/static acceptance passed with 168 successes, no
 failed assertions or unexpected errors, 19 CLI cases, and all six differential
 fixtures. Final profile/shared checks and Linux/macOS CI are in progress.
 Do not infer all-platform completion from this snapshot.

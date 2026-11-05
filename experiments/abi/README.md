@@ -7,16 +7,16 @@ output stays under ignored `build/`; reference submodules are not modified.
 From the repository root, after `alr build` has generated configuration:
 
 ```text
-alr exec -- gprbuild -P experiments/abi/abi_probe.gpr
-alr exec -- build/abi/bin/abi_probe
+./scripts/check-abi.ps1
 ```
 
 On Windows the executable ends in `.exe`. The C-only main explicitly invokes
 the standalone Ada library's generated initialization/finalization procedures.
-The probe uses an encapsulated static standalone library so its Ada runtime
-closure is present even when the C linker does not infer Ada dependencies.
 Automatic initialization is disabled to keep the host's lifecycle explicit.
-See [GPR encapsulated libraries](https://docs.adacore.com/gprbuild-docs/html/gprbuild_ug/gnat_project_manager.html).
+On macOS, the driver locates libgnat.a through the selected compiler and supplies
+it to the C linker. Its GPRbuild configuration does not support encapsulated
+standalone libraries or infer this C-only host's runtime closure. No absolute
+toolchain path is committed; the driver restores the caller's environment.
 The probe checks a null C callback, C-to-Ada-to-C status return, `va_list`
 formatting, failed state creation, protected allocation failure, extra-space
 access, protected Lua errors after Ada returns, state reuse, and allocator

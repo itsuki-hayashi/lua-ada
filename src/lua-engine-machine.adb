@@ -10,6 +10,10 @@ with Lua.Lexers; use Lua.Lexers;
 with Lua.Platform_Numerics;
 
 package body Lua.Engine.Machine is
+   --  The VM is the only executor of compiled chunks. Registers hold result
+   --  packets rather than plain values; every primitive explicitly chooses
+   --  scalar or expanding consumption. Lua calls use the owned frame vector,
+   --  leaving the Ada call stack independent of user recursion depth.
    use type Ada.Containers.Count_Type;
    use type Integer_Value;
    use type Real_Value;
@@ -411,6 +415,9 @@ package body Lua.Engine.Machine is
       begin
          case Function_Id is
             when Print_Function =>
+               --  Capture output inside the universe first. The host sink
+               --  runs only after execution, so it cannot reenter live frames
+               --  or invalidate roots while this operation is in progress.
                for Position in Arguments.First_Index .. Arguments.Last_Index
                loop
                   if Position > 1 then
@@ -570,18 +577,24 @@ package body Lua.Engine.Machine is
          Prototype : constant Prototype_Access :=
            Function_Value.Reference.Code;
       begin
+         --  A frame owns its fresh lexical scope and register packets.
+         --  Publish it before parameter/vararg setup so the central cleanup
+         --  path also owns partially initialized activations after failure.
          if Natural (State.Stack.Length) >= State.Bounds.Call_Depth then
             Fail (State, "call depth limit exceeded", Resource => True);
          end if;
+         --  Reserve before allocating the frame: even a host allocation
+         --  failure must leave either no frame or one owned by the stack.
+         State.Stack.Reserve_Capacity (State.Stack.Length + 1);
          Item := new Frame;
          Item.Code := Prototype;
          Item.Return_To := Destination;
          Item.Protection := Protection;
+         State.Stack.Append (Item);
          Item.Scope := New_Environment
            (State, Function_Value.Reference.Capture);
          Item.Slots.Set_Length
            (Ada.Containers.Count_Type (Prototype.Register_Count));
-         State.Stack.Append (Item);
          if Prototype.Is_Main then
             Declare_Local (Item.Scope, Prototype.Environment_Symbol,
                            (Table_Kind, State.Globals));
@@ -602,6 +615,9 @@ package body Lua.Engine.Machine is
             end loop;
          end if;
          if Prototype.Vararg_Name /= 0 then
+            --  Named varargs have one authoritative mutable table. Keeping
+            --  a second packet would make ... ignore later writes to t.n
+            --  or t[i], and would retain values removed from that table.
             declare
                Table : constant Value := New_Table (State);
             begin
@@ -626,6 +642,9 @@ package body Lua.Engine.Machine is
          Packet : constant Values.Vector :=
            Wrap (Result, Activation.Protection);
       begin
+         --  Copy the outgoing packet before releasing its activation. No
+         --  collection occurs until the caller's destination owns it again.
+         --  The outermost chunk has no consumer and intentionally discards it.
          State.Stack.Delete_Last;
          Free_Frame (Activation);
          if not State.Stack.Is_Empty then
@@ -885,6 +904,10 @@ package body Lua.Engine.Machine is
                      Bound := R.Integer_Item;
                   else
                      Real_Bound := R.Real_Item;
+                     --  Integer loops round a float bound toward the valid
+                     --  side of the interval, saturating finite overflow.
+                     --  NaN or an entirely unreachable bound marks an empty
+                     --  loop with nil, without an unsafe signed conversion.
                      if Real_Bound /= Real_Bound or else
                        (Stride > 0 and then Real_Bound < -2.0 ** 63) or else
                        (Stride < 0 and then Real_Bound >= 2.0 ** 63)

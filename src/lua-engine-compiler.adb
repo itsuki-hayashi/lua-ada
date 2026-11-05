@@ -649,6 +649,9 @@ package body Lua.Engine.Compiler is
             declare
                Mark : constant Positive := Next_Register;
             begin
+               --  Statement temporaries may be recycled after their final
+               --  use. Clear packets as well as recycling register numbers:
+               --  stale heap references would otherwise keep garbage alive.
                Statement;
                if Next_Register > Mark then
                   Put ((Op => Clear_Registers, A => Mark,
@@ -674,6 +677,10 @@ package body Lua.Engine.Compiler is
          Item : Name_Binding;
          Has_Initializer : Boolean;
       begin
+         --  Collect pending declarations without adding them to Active.
+         --  Initializers therefore see the previous lexical bindings, as
+         --  required for constructs such as local x = x. Global declarations
+         --  retain _ENV/key recipes before any right-to-left stores occur.
          if Global and then Take (Star) then
             Active.Append
               (Name_Binding'(Null_Unbounded_String, Collective_Name,
