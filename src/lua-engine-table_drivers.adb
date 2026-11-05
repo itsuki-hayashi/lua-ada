@@ -146,7 +146,9 @@ package body Lua.Engine.Table_Drivers is
          --  values in traced captures, independent of Natural's host width.
          if Backwards then
             Save (3, Key (Number (4)));
-            Save (5, Key (Number (5) + Number (7) - 1));
+            --  The final destination was range-checked, but adding Count
+            --  before subtracting one can still overflow at maxinteger.
+            Save (5, Key (Number (5) + (Number (7) - 1)));
             Save (6, Key (-1));
          else
             Save (6, Key (1));
@@ -220,10 +222,23 @@ package body Lua.Engine.Table_Drivers is
                Start_Move (False);
             end if;
          else
-            Check_Table (Item, True,
-                         Name in "table.insert" | "table.remove", True);
             Activation.Native_Stage := 1;
-            return Request ("@length", Values.To_Vector (Item, 1));
+            if Name = "table.unpack" then
+               --  Unpack obtains length lazily, after validating its start
+               --  index, and only if the end is absent. Explicit empty ranges
+               --  do not even index their receiver, which need not be a table.
+               First := (if Arg (2).Kind = Nil_Kind then 1
+                         else Integral (Arg (2)));
+               if Arg (3).Kind /= Nil_Kind then
+                  Activation.Native_Results := Values.To_Vector (Arg (3), 1);
+               else
+                  return Request ("@length", Values.To_Vector (Item, 1));
+               end if;
+            else
+               Check_Table (Item, True,
+                            Name in "table.insert" | "table.remove", True);
+               return Request ("@length", Values.To_Vector (Item, 1));
+            end if;
          end if;
       end if;
 

@@ -113,6 +113,11 @@ package body Lua.Engine.Unicode is
          Item : constant Value := Arg (1);
       begin
          if Item.Kind = String_Kind then
+            --  The decoder below owns a String copy of the retained subject.
+            --  Even a one-character iterator step copies every source byte,
+            --  so charge that work before allocating or materializing it.
+            --  Repeated steps must not bypass the shared execution budget.
+            Charge (Length (Item.Reference.Bytes));
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
             return Image (Item);

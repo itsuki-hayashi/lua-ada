@@ -26,6 +26,7 @@ package body Lua.Library_Codec_Tests is
    procedure Offset_ASCII_Boundary;
    procedure Overlong_Encoding;
    procedure Native_Work_Quota;
+   procedure Iterator_Subject_Copy_Quota;
    procedure With_State (Action : access procedure (State : in out World));
 
    procedure With_State (Action : access procedure (State : in out World)) is
@@ -381,6 +382,42 @@ package body Lua.Library_Codec_Tests is
       With_State (Check'Access);
    end Native_Work_Quota;
 
+   procedure Iterator_Subject_Copy_Quota is
+      procedure Check (State : in out World);
+      procedure Check (State : in out World) is
+         Args, Result : Values.Vector;
+      begin
+         --  Each iterator step currently materializes the whole retained
+         --  subject before decoding one character. A budget which permits one
+         --  64-byte copy but not two must therefore stop the second step.
+         --  This protects against quadratic copying hidden behind apparently
+         --  constant-cost native calls and keeps exhaustion structured.
+         Args.Append (New_String (State, String'(1 .. 64 => 'a')));
+         Args.Append (Value'(Integer_Kind, 0));
+         State.Bounds.Instructions := 80;
+         State.Steps := 0;
+         Result := Unicode.Run (State, "step", Args);
+         Assert (Result (1).Integer_Data = 1, "first iterator position");
+         Assert (Result (2).Integer_Data = Character'Pos ('a'),
+                 "first decoded codepoint");
+         Assert (State.Steps = 65, "subject copy plus decoded byte charged");
+         Args.Replace_Element (2, Result (1));
+         begin
+            Result := Unicode.Run (State, "step", Args);
+            Assert (Result.Is_Empty and then False,
+                    "repeated subject copy must exhaust shared budget");
+         exception
+            when Language_Error =>
+               Assert (State.Is_Resource,
+                       "iterator copy quota is resource failure");
+               Assert (State.Steps = 65,
+                       "second copy fails before materialization");
+         end;
+      end Check;
+   begin
+      With_State (Check'Access);
+   end Iterator_Subject_Copy_Quota;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -416,5 +453,8 @@ package body Lua.Library_Codec_Tests is
         (Suite, "codec: overlong UTF-8", Overlong_Encoding'Access);
       Test_Support.Add
         (Suite, "codec: native work quota", Native_Work_Quota'Access);
+      Test_Support.Add
+        (Suite, "codec: iterator subject copy quota",
+         Iterator_Subject_Copy_Quota'Access);
    end Register;
 end Lua.Library_Codec_Tests;

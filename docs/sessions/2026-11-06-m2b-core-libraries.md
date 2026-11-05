@@ -103,3 +103,18 @@ are identical to merged master 8c001ad. No ecosystem source was used as a design
 reference or executed. Optional documentation rendering, generated testing,
 fuzzing, and proof tools were not run. Remaining work belongs to the roadmap's
 later M2/runtime and compatibility gates; no new feature work is pending in M2b.
+
+## PR review repairs
+
+The documentation-only revision ceef466 also passed all 18 jobs in
+[run 42087224454](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42087224454),
+with every log inspected. Before handoff, the automated PR review's three
+findings were addressed: explicit unpack end bounds no longer invoke __len,
+backward moves ending at maxinteger avoid intermediate overflow, and UTF-8
+subject copies consume native work budget. Three focused regressions pass in
+the 478-case local validation/static suite. The final source revision must
+rerun all platform checks before handoff; its immutable run is recorded in the
+PR description. The earlier 475-case implementation record remains historical.
+The complete check.ps1 validation/static pipeline also passes after these
+repairs: all 478 cases, Ada/CLI consumers, seven parity fixtures, and all three
+unchanged primary files at default limits. No limit or comparison was weakened.

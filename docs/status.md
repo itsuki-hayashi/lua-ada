@@ -30,8 +30,10 @@ All three OS static-validation jobs passed native C99/Ada layout comparisons,
 the 1,120-case seeded library campaign, retained frontend/opcode campaigns, and
 isolated ABI probes. Windows validation/static-PIC also passed the full pipeline.
 The [validation record](validation-m2b.md) owns exact code revision, job logs,
-tool versions, host layouts, and scope limits. The final handoff is documentation
-only; its PR checks are also required before handoff.
+tool versions, host layouts, and scope limits. Three further review regressions
+bring the current suite to 478 cases, passing local validation/static. Final PR
+checks must repeat the full matrix with those repairs before handoff; the PR
+description records the final run.
 
 Tools: Alire 2.1.1, stable native GNAT 16.1.0, AUnit 26.0.0, GPRbuild package
 26.0.1 (banner 26.0.0). Strict flags and runtime checks remain enabled; the

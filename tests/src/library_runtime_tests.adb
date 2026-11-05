@@ -50,6 +50,8 @@ package body Library_Runtime_Tests is
    procedure Table_Remove_Events;
    procedure Table_Move_Equality_Order;
    procedure Table_Callback_Failure;
+   procedure Table_Unpack_Explicit_End;
+   procedure Table_Move_Maximum_Destination;
 
    procedure Compilation_Work_Budget is
       Universe : Session;
@@ -503,6 +505,33 @@ package body Library_Runtime_Tests is
              "assert(table.concat({'a','b'})=='ab')");
    end Table_Callback_Failure;
 
+   procedure Table_Unpack_Explicit_End is
+      --  An explicit end bypasses __len even on a nonempty traversal. Empty
+      --  ranges must additionally bypass receiver indexing/type checks; an
+      --  invalid start is rejected before requesting a default length.
+   begin
+      Check
+        ("local calls=0; local t=setmetatable({1,2},{__len=function() " &
+         "calls=calls+1; error('unexpected length') end}); " &
+         "local a,b=table.unpack(t,1,2); assert(a==1 and b==2); " &
+         "assert(select('#',table.unpack(t,3,2))==0); " &
+         "assert(select('#',table.unpack(nil,3,2))==0); " &
+         "assert(not pcall(table.unpack,t,{})); assert(calls==0); " &
+         "assert(not pcall(table.unpack,t)); assert(calls==1)");
+   end Table_Unpack_Explicit_End;
+
+   procedure Table_Move_Maximum_Destination is
+      --  The backward copy ends exactly at maxinteger. Parenthesizing the
+      --  validated Count-1 offset prevents an intermediate overflow while
+      --  preserving both values across the overlapping source/destination.
+   begin
+      Check
+        ("local m=math.maxinteger; local t=setmetatable({" &
+         "[m-2]='a',[m-1]='b'},{}); " &
+         "assert(rawequal(table.move(t,m-2,m-1,m-1),t)); " &
+         "assert(t[m-1]=='a' and t[m]=='b')");
+   end Table_Move_Maximum_Destination;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "load text closure",
@@ -595,5 +624,9 @@ package body Library_Runtime_Tests is
                         Table_Move_Equality_Order'Access);
       Test_Support.Add (Suite, "table metamethod callback failure",
                         Table_Callback_Failure'Access);
+      Test_Support.Add (Suite, "table unpack explicit end bypass",
+                        Table_Unpack_Explicit_End'Access);
+      Test_Support.Add (Suite, "table move maximum destination",
+                        Table_Move_Maximum_Destination'Access);
    end Register;
 end Library_Runtime_Tests;

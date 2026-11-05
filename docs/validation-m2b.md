@@ -90,3 +90,21 @@ runtime/libraries, full C API/ABI, native modules, and LuaRocks remain deferred.
 Reference and ecosystem-fixture pins are unchanged; ecosystem tests were not
 run. GNATdoc rendering, GNATtest generation, GNATfuzz, and proof were not run.
 The PR is open for review and has not been merged.
+
+## Post-acceptance review regressions
+
+The PR review identified three additional edges, repaired before handoff:
+
+- Explicit-end table.unpack bypasses __len, including an empty range over a
+  non-table receiver; default-length requests retain normal callback behavior.
+- Backward overlapping table.move computes Position + (Count - 1), avoiding
+  intermediate overflow when the validated final destination is maxinteger.
+- UTF-8 iteration charges the whole retained subject before copying it, so
+  repeated decoding cannot hide quadratic copy work behind linear budgets.
+
+Three separately named regressions bring the current AUnit suite to 478 cases.
+The Windows validation/static AUnit run passes all 478 with zero assertions or
+unexpected errors. The recorded 475-case matrix above remains immutable earlier
+implementation evidence. The final [PR checks](https://github.com/itsuki-hayashi/lua-ada/pull/4/checks)
+must rerun the complete matrix, including these repairs, before handoff; the PR
+description records that final revision/run. No upstream fixture is modified.
