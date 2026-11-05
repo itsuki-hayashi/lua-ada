@@ -13,6 +13,10 @@ alr exec -- build/abi/bin/abi_probe
 
 On Windows the executable ends in `.exe`. The C-only main explicitly invokes
 the standalone Ada library's generated initialization/finalization procedures.
+The probe uses an encapsulated static standalone library so its Ada runtime
+closure is present even when the C linker does not infer Ada dependencies.
+Automatic initialization is disabled to keep the host's lifecycle explicit.
+See [GPR encapsulated libraries](https://docs.adacore.com/gprbuild-docs/html/gprbuild_ug/gnat_project_manager.html).
 The probe checks a null C callback, C-to-Ada-to-C status return, `va_list`
 formatting, failed state creation, protected allocation failure, extra-space
 access, protected Lua errors after Ada returns, state reuse, and allocator
