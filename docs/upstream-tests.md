@@ -11,21 +11,21 @@ conformance remains later work.
 
 ## M2b execution targets
 
-| File           | Role                                      | Direct Windows result            |
+| File           | Role                                      | Windows/Linux/macOS result       |
 | -------------- | ----------------------------------------- | -------------------------------- |
-| tpack.lua      | Packing, alignment, numbers, byte strings | Provisional pass, default budget |
-| utf8.lua       | UTF-8, patterns, formatting, text loading | Provisional pass, default budget |
-| bitwise.lua    | Bits, string handlers, loading, coercion  | Provisional pass, default budget |
+| tpack.lua      | Packing, alignment, numbers, byte strings | Passed, default budget           |
+| utf8.lua       | UTF-8, patterns, formatting, text loading | Passed, default budget           |
+| bitwise.lua    | Bits, string handlers, loading, coercion  | Passed, default budget           |
 | bwcoercion.lua | Module loaded by bitwise.lua              | Helper, not a fourth suite       |
 
-Windows disposable raw-byte comparisons now also pass at the default budget.
+All 18 configurations passed disposable raw-byte comparisons at default limits.
 The [M2b protocol](milestones/m2b.md) requires each primary file to run alone
 against C Lua and Ada in fresh processes, from disposable verified copies, with
 no _soft/_port/_U/_nomsg flags and no T. Require empty stderr, successful exit,
 same-host stdout byte equality, and the final success marker within 120 seconds.
 Use the default 1,000,000-instruction profile unless measured instruction-only
-exhaustion justifies the explicit documented test profile. Linux/macOS and final
-revision matrix evidence remain unverified. See [status](status.md) and the
+exhaustion justifies the explicit documented test profile. M2b required no
+larger profile. See [M2b validation](validation-m2b.md), [status](status.md), and the
 [current session](sessions/2026-11-06-m2b-core-libraries.md).
 
 All other files below remain outside M2b whole-file acceptance. Do not invoke

@@ -7,7 +7,7 @@ interface. The initial compatibility baseline is **Lua 5.5.1**.
 **Current capability:** reusable static/shared Ada sessions and a batch CLI
 execute the accepted [M1 Lua subset](docs/milestones/m1.md). M2b implementation
 adds core metamethods, strings/patterns/packing, UTF-8, common table/math helpers,
-and text/module loading; its full platform acceptance is in progress. See the
+and text/module loading; its full platform matrix has passed. See the
 [export inventory](docs/capabilities.md) and [status](docs/status.md) for exact
 scope and evidence. Complete Lua compatibility, C exports, native modules, and
 LuaRocks remain later milestones. **M1 is complete**, with its
@@ -19,8 +19,9 @@ CLI --check. It accepts valid deferred syntax without executing it. See the
 **M2a is complete**, with [three-platform evidence](docs/validation-m2a.md).
 [M2b](docs/milestones/m2b.md) targets three unchanged upstream execution files:
 tpack.lua, utf8.lua, and bitwise.lua. bwcoercion.lua is their helper, not a fourth
-suite. Local Windows byte comparisons pass; remaining acceptance is tracked
-separately and does not establish full standard-suite conformance.
+suite. All three pass on Windows, Linux, and macOS; the
+[M2b validation record](docs/validation-m2b.md) documents exact evidence and
+does not establish full standard-suite conformance.
 
 ## Checkout and build
 

@@ -1,8 +1,9 @@
 # Architecture
 
 The M1 runtime and M2a frontend are accepted. M2b extends the runtime with core
-metamethods, resumable native calls, libraries, and text loading; its platform
-acceptance remains in progress. Complete Lua and C compatibility remain later
+metamethods, resumable native calls, libraries, and text loading, with all platform
+gates verified in [M2b validation](docs/validation-m2b.md).
+Complete Lua and C compatibility remain later
 gates. [Decisions](docs/decisions/README.md) record compatibility tradeoffs.
 
 ## Components and dependencies

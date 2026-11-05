@@ -1,8 +1,8 @@
 # Capability Matrix
 
 This matrix separates implemented runtime facilities from accepted milestones.
-M1 and M2a are accepted; [M2b](milestones/m2b.md) implementation and validation
-are in progress. Evidence lives in [status](status.md); source existence alone
+M1, M2a, and [M2b](milestones/m2b.md) are accepted. Exact
+[M2b validation](validation-m2b.md) complements [status](status.md); source alone
 does not establish platform acceptance or full conformance.
 
 | Area       | Runtime implementation                                      | Evidence                                       |
@@ -23,8 +23,8 @@ does not establish platform acceptance or full conformance.
 ## M2b export inventory
 
 Fresh sessions register the following library surface. This is the declared
-M2b implementation scope; the milestone remains open until its full acceptance
-matrix passes. CLI execution additionally supplies `arg`.
+M2b implementation scope, verified in its acceptance matrix.
+CLI execution additionally supplies `arg`.
 
 | Library / group        | Functions and fields                                                  |
 | ---------------------- | --------------------------------------------------------------------- |
@@ -70,7 +70,7 @@ Syntax accepts goto/labels/close while execution returns Unsupported_Feature.
 See the [frontend inventory](frontend.md) for scope and current evidence.
 
 - Syntax accepted: full pinned default grammar/static-semantic target.
-- Runtime behavior: M1 execution plus the M2b surface above; acceptance open.
+- Runtime behavior: M1 execution plus the accepted M2b surface above.
 - Opcode format: all 85 canonical definitions and six encodings.
 - Canonical code generation: deferred; compiler lowers to private operations.
 - Canonical code execution: deferred; no binary chunk compatibility claim.

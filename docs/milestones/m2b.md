@@ -1,6 +1,6 @@
 # M2b: Core Libraries and First Upstream Execution Passes
 
-Accepted: 2026-11-06, Asia/Tokyo. Status: **in progress**.
+Accepted: 2026-11-06, Asia/Tokyo. Status: **complete**.
 Baseline: merged M2a at master commit 8c001ad.
 
 ## Target
@@ -57,18 +57,19 @@ opcode execution, full C ABI, and LuaRocks are not M2b claims.
 - M2B-ACCEPT-001: all delivered features, focused tests, three unchanged files,
   complete platform matrix, evidence, and open PR; depends every item above.
 
-Each item remains open until its actual evidence is recorded. Helper source
-existence, a built test program, or a generated harness is not a passing gate.
+Every item is complete with the evidence in
+[M2b validation](../validation-m2b.md). Helper source existence, a built test
+program, or a generated harness is not a passing gate.
 
-## Provisional local evidence
+## Accepted evidence
 
-The integration owner's Windows development/static run recorded 439/439 AUnit
-cases passing in reports/m2b-aunit.log. The disposable driver subsequently
-recorded all three primary files passing in reports/m2b-upstream.log with
-the unchanged 1,000,000-instruction profile and 120-second timeout.
-These are work-in-progress results, not final-revision acceptance: additional
-table-event tests and native-loop accounting were added afterwards. Required
-final checks and platform jobs must be rerun before closing any gate.
+All 18 OS/profile/link configurations passed 475 AUnit cases, 30 CLI cases,
+the public Ada consumer, seven differential fixtures, and all three primary
+files at the default 1,000,000-instruction profile and 120-second timeout.
+All three OSes passed layout, expanded differential, frontend/opcode, and ABI
+checks; Windows static-PIC passed as well. The
+[acceptance record](../validation-m2b.md) links immutable implementation evidence.
+[PR #4](https://github.com/itsuki-hayashi/lua-ada/pull/4) remains open, unmerged.
 
 ## Test protocol
 

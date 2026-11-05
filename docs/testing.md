@@ -31,6 +31,10 @@ Keep their sources separate from development references and runtime dependencies
 
 ## M2b library and unchanged-file acceptance
 
+The completed [M2b validation](validation-m2b.md) records the 475-case suite,
+three unchanged execution files, and all 18 configurations. The commands below
+remain the reproducible protocol for later changes.
+
 The [M2b milestone](milestones/m2b.md) owns exact exports and acceptance. Focused
 AUnit cases exercise nested Lua/native calls, retained callback roots, error and
 resource unwind/recovery, metamethod selection/raw bypass/isolation, pattern

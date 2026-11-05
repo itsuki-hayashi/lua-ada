@@ -81,8 +81,9 @@ not need artificial edits. Historical records remain dated evidence.
 The production crate executes the accepted M1 subset through owned Ada sessions
 and a batch CLI. M2b adds native continuations, core metamethods, libraries, and
 text/Lua-module loading; read [M2b](docs/milestones/m2b.md) and current status
-before making acceptance claims. Its local passes do not close missing platform
-gates. Private bytecode, lexical captures, tables, tracing collection, and bounded
+before making acceptance claims. The [M2b validation](docs/validation-m2b.md)
+records its completed platform gates. Private bytecode, lexical captures,
+tables, tracing collection, and bounded
 diagnostics remain the execution substrate.
 Use the shared owned frontend for both checking and execution; never introduce
 a second grammar in VM lowering. Canonical opcode definitions are independent

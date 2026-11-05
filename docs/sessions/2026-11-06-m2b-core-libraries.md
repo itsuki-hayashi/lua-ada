@@ -83,3 +83,23 @@ hexadecimal subnormals (0x1p-1074), while Linux retains a minimum-normal exponen
 Three portable focused cases exercise macOS subnormal/precision behavior and
 protect the Linux representation on every host. No fixture or comparison was
 weakened. The repaired revision still requires all platform jobs to pass.
+
+## Accepted implementation and handoff
+
+Commit 5057fa151cfb608c52cc32308d8ede045fd71ddf passed all 18 jobs in
+[run 42085233906](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42085233906).
+All logs were inspected: each contains 475 successful AUnit cases, zero failed
+assertions/unexpected errors, 30 CLI cases, the public consumer, seven parity
+fixtures, and three upstream passes. Each upstream pass uses default 1M
+instructions and a 120-second timeout. Windows static-PIC repeats that complete
+pipeline. Each OS static-validation job also passes layout, 1,120-case library,
+frontend/opcode, and ABI checks. Exact tools, OS configurations, measured layouts,
+and scope are owned by [M2b validation](../validation-m2b.md).
+
+All M2B backlog items are complete. The final commit updates documentation only;
+inspect its final PR matrix before handoff. The branch remains
+codex/m2b-core-libraries and PR #4 is open, unmerged. Reference/module gitlinks
+are identical to merged master 8c001ad. No ecosystem source was used as a design
+reference or executed. Optional documentation rendering, generated testing,
+fuzzing, and proof tools were not run. Remaining work belongs to the roadmap's
+later M2/runtime and compatibility gates; no new feature work is pending in M2b.

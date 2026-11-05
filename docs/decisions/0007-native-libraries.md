@@ -1,6 +1,7 @@
 # ADR 0007: Native Continuations and Owned Library State
 
-Date: 2026-11-06, Asia/Tokyo. Status: accepted design; M2b acceptance in progress.
+Date: 2026-11-06, Asia/Tokyo. Status: accepted and verified in
+[M2b validation](../validation-m2b.md).
 
 ## Context
 

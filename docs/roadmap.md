@@ -1,6 +1,6 @@
 # Roadmap
 
-M0, M1, and M2a are complete. M1 expanded infrastructure into the accepted
+M0, M1, M2a, and M2b are complete. M1 expanded infrastructure into the accepted
 [basic interpreter target](milestones/m1.md). Milestones are acceptance gates,
 not calendar promises. The [M1 validation record](validation.md) closes all five
 gates on the named Windows/Linux/macOS configurations.
@@ -11,7 +11,7 @@ gates on the named Windows/Linux/macOS configurations.
 | M1        | Basic Lua scripting interpreter           | Core scripts, Ada API, batch CLI, GC       |
 | M2a       | Frontend and opcode definitions           | Full checking, shared lowering, format     |
 | M2b       | Core libraries and metamethods            | Three unchanged execution files and matrix |
-| M2        | Remaining language and standard libraries | Deferred syntax, metatables, libraries     |
+| M2        | Remaining language and standard libraries | Closing, coroutines, remaining libraries   |
 | M3        | Full C embedding and binary compatibility | C API/ABI, chunks, lifecycle evidence      |
 | M4        | Modules and ecosystem                     | Native loading and LuaRocks fixtures       |
 | M5        | Conformance and release hardening         | Published platform acceptance matrix       |
@@ -42,8 +42,8 @@ remaining M2 runtime/library work is still open.
 unchanged execution targets are tpack.lua, utf8.lua, and bitwise.lua;
 bwcoercion.lua is a dependency/helper, not a fourth suite. It adds resumable
 native callbacks, core metamethods, strings/patterns/packing, UTF-8, common
-table/math operations, and Lua-only text/module loading. Implementation is in
-progress; missing platform evidence prevents acceptance.
+table/math operations, and Lua-only text/module loading. Its
+[18-job validation](validation-m2b.md) closes all six gates.
 
 | M2b gate            | Bounded work                                                    | Backlog owner             |
 | ------------------- | --------------------------------------------------------------- | ------------------------- |
