@@ -4,6 +4,7 @@ with Ada.Strings.Fixed;
 with Ada.Unchecked_Conversion;
 with Ada.Unchecked_Deallocation;
 with Interfaces;
+with Interfaces.C;
 with Lua.Integers;
 with Lua.Lexers; use Lua.Lexers;
 with Lua.Platform_Numerics;
@@ -262,7 +263,7 @@ package body Lua.Engine.Machine is
             --  Preserve host libm rounding and all signed-zero/infinity
             --  cases. The differential matrix checks these systematically.
             Result := Real_Value (Lua.Platform_Numerics.Power
-              (Long_Float (FL), Long_Float (FR)));
+              (Interfaces.C.double (FL), Interfaces.C.double (FR)));
          when others => raise Program_Error with "invalid binary opcode";
       end case;
       return (Real_Kind, Result);

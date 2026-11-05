@@ -1,5 +1,12 @@
+with Interfaces.C;
+
 private package Lua.Platform_Numerics is
-   function Power (Left, Right : Long_Float) return Long_Float
+   pragma Linker_Options ("-lm");
+   --  Carry the math dependency to static Ada consumers as well as shared
+   --  builds. It cannot be inferred from this foreign symbol's declaration.
+
+   function Power (Left, Right : Interfaces.C.double)
+                   return Interfaces.C.double
      with Import, Convention => C, External_Name => "pow";
    --  Use the host binary64 pow primitive used by the pinned C oracle.
    --  GNAT's generic real exponentiation has a different negative-domain

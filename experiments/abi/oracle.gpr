@@ -3,12 +3,16 @@ with "../../config/lua_ada_config.gpr";
 
 project Oracle is
    for Languages use ("C");
-   for Source_Dirs use ("../../references/lua");
-   for Source_Files use ("lua.c");
+   for Source_Dirs use ("c");
+   for Source_Files use ("oracle_main.c");
    for Object_Dir use "../../build/oracle/obj";
    for Exec_Dir use "../../build/oracle/bin";
-   for Main use ("lua.c");
+   for Main use ("oracle_main.c");
    for Create_Missing_Dirs use "True";
+
+   package Builder is
+      for Executable ("oracle_main.c") use "lua";
+   end Builder;
 
    package Compiler is
       for Default_Switches ("C") use ("-std=c99", "-O2");

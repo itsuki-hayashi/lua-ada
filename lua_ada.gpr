@@ -13,6 +13,11 @@ library project Lua_Ada is
    for Library_Kind use Library_Mode;
    for Library_Dir use
      "lib/" & Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
+   case Lua_Ada_Config.Alire_Host_OS is
+      when "linux" | "macos" =>
+         for Library_Options use ("-lm");
+      when others => null;
+   end case;
 
    package Compiler is
       --  Apply the project baseline after Alire's profile switches.
