@@ -8,6 +8,14 @@ with Interfaces.C;
 with Lua.Integers;
 with Lua.Lexers; use Lua.Lexers;
 with Lua.Platform_Numerics;
+with Lua.Engine.Strings;
+with Lua.Engine.Packing;
+with Lua.Engine.Unicode;
+with Lua.Engine.Core_Libraries;
+with Lua.Engine.Pattern_Drivers;
+with Lua.Engine.Loaders;
+with Lua.Engine.Format_Drivers;
+with Lua.Engine.Table_Drivers;
 
 package body Lua.Engine.Machine is
    --  The VM is the only executor of compiled chunks. Registers hold result
@@ -47,6 +55,8 @@ package body Lua.Engine.Machine is
       Expand_Last : Boolean := True) return Values.Vector;
    function Numeric (State : in out World; Item : Value)
                      return Lua.Numbers.Number;
+   function Diagnostic_Type (State : in out World; Item : Value)
+                            return String;
    function Integral (State : in out World; Item : Value) return Integer_Value;
    function Binary_Value
      (State : in out World; Operator : Token_Kind; Left, Right : Value)
@@ -93,6 +103,17 @@ package body Lua.Engine.Machine is
       return Result;
    end Flatten;
 
+   function Diagnostic_Type (State : in out World; Item : Value)
+                            return String
+   is
+      Name : constant Value := Metafield (State, Item, "__name");
+   begin
+      --  type() remains the language's primitive category. Error wording
+      --  alone honors a raw string __name supplied by the object's owner.
+      return (if Name.Kind = String_Kind then Image (Name)
+              else Type_Name (Item));
+   end Diagnostic_Type;
+
    function Numeric (State : in out World; Item : Value)
                      return Lua.Numbers.Number
    is
@@ -110,7 +131,7 @@ package body Lua.Engine.Machine is
          when others => null;
       end case;
       Fail (State, "attempt to perform arithmetic on a " &
-              Type_Name (Item) & " value");
+              Diagnostic_Type (State, Item) & " value");
       return (Kind => Lua.Numbers.Invalid);
    end Numeric;
 
@@ -155,8 +176,8 @@ package body Lua.Engine.Machine is
          then
             return Lua.Numbers.Less (Numeric (State, A), Numeric (State, B));
          end if;
-         Fail (State, "attempt to compare " & Type_Name (A) &
-                 " with " & Type_Name (B));
+         Fail (State, "attempt to compare " & Diagnostic_Type (State, A) &
+                 " with " & Diagnostic_Type (State, B));
          return False;
       end Ordered;
    begin
@@ -337,6 +358,10 @@ package body Lua.Engine.Machine is
       procedure Complete (Result : Values.Vector);
       procedure Recover;
       procedure Step;
+      procedure Native_Step;
+      procedure Schedule
+        (Name : String; Arguments : Values.Vector; Destination : Natural;
+         Operator : Token_Kind := End_Of_Input);
       function Native
         (Function_Id : Native_Kind; Arguments : Values.Vector)
          return Values.Vector;
@@ -346,6 +371,43 @@ package body Lua.Engine.Machine is
       procedure Push_Frame
         (Function_Value : Value; Arguments : Values.Vector;
          Destination, Protection : Natural);
+      procedure Deliver
+        (Activation : Frame_Access; Destination : Natural;
+         Packet : Values.Vector);
+
+      procedure Deliver
+        (Activation : Frame_Access; Destination : Natural;
+         Packet : Values.Vector)
+      is
+      begin
+         --  A callback resumes its owning native activation instead of
+         --  writing a Lua register. This is the single return-channel bridge.
+         if Activation.Is_Native then
+            Activation.Native_Results := Packet;
+         elsif Destination /= 0 then
+            Put_Packet (Activation, Destination, Packet);
+         end if;
+      end Deliver;
+
+      procedure Schedule
+        (Name : String; Arguments : Values.Vector; Destination : Natural;
+         Operator : Token_Kind := End_Of_Input)
+      is
+         Activation : Frame_Access;
+      begin
+         if Natural (State.Stack.Length) >= State.Bounds.Call_Depth then
+            Fail (State, "call depth limit exceeded", Resource => True);
+         end if;
+         State.Stack.Reserve_Capacity (State.Stack.Length + 1);
+         Activation := new Frame;
+         Activation.Is_Native := True;
+         Activation.Native_Name := To_Unbounded_String (Name);
+         Activation.Native_Arguments := Arguments;
+         Activation.Native_Operator := Operator;
+         Activation.Call_Site := State.Failure_At;
+         Activation.Return_To := Destination;
+         State.Stack.Append (Activation);
+      end Schedule;
 
       function Wrap (Result : Values.Vector; Count : Natural;
                      Success : Boolean := True) return Values.Vector
@@ -378,11 +440,14 @@ package body Lua.Engine.Machine is
             declare
                Activation : constant Frame_Access := State.Stack
                  (State.Stack.Last_Index - Level + 1);
-               Line : constant Positive := Activation.Code.Code
-                 (Positive'Max (1, Activation.PC - 1)).Location.Line;
+               Line : constant Positive :=
+                 (if Activation.Is_Native then Activation.Call_Site.Line
+                  else Activation.Code.Code
+                    (Positive'Max (1, Activation.PC - 1)).Location.Line);
             begin
                Error_Value := New_String
-                 (State, To_String (Activation.Code.Name) & ":" &
+                 (State, (if Activation.Is_Native then "(native)"
+                          else To_String (Activation.Code.Name)) & ":" &
                   Ada.Strings.Fixed.Trim (Line'Image, Ada.Strings.Both) &
                   ": " & Image (Item));
             end;
@@ -607,7 +672,10 @@ package body Lua.Engine.Machine is
            (Ada.Containers.Count_Type (Prototype.Register_Count));
          if Prototype.Is_Main then
             Declare_Local (Item.Scope, Prototype.Environment_Symbol,
-                           (Table_Kind, State.Globals));
+              (if Function_Value.Reference.Capture = null
+               then (Table_Kind, State.Globals)
+               else Read_Local (Function_Value.Reference.Capture,
+                                Prototype.Environment_Symbol)));
          end if;
          for Position in Prototype.Parameters.First_Index ..
            Prototype.Parameters.Last_Index
@@ -658,7 +726,7 @@ package body Lua.Engine.Machine is
          State.Stack.Delete_Last;
          Free_Frame (Activation);
          if not State.Stack.Is_Empty then
-            Put_Packet (State.Stack.Last_Element, Destination, Packet);
+            Deliver (State.Stack.Last_Element, Destination, Packet);
          end if;
       end Complete;
 
@@ -675,19 +743,43 @@ package body Lua.Engine.Machine is
          --  pcall is a frame boundary, not a recursive invocation of Run.
          --  Tail calls replace the current frame while retaining the outer
          --  protected-return contract and the caller's destination register.
-         while Function_Item.Kind = Native_Kind_Value and then
-           Function_Item.Native_Data = Pcall_Function
-         loop
-            Protection := Protection + 1;
-            if Protection > State.Bounds.Call_Depth then
-               Fail (State, "protected call limit exceeded", True);
-            end if;
-            Function_Item := First (Args);
-            if not Args.Is_Empty then
-               Args.Delete_First;
-            end if;
-         end loop;
-         if Function_Item.Kind = Closure_Kind then
+         declare
+            Hops : Natural := 0;
+            Handler : Value;
+         begin
+            loop
+               if Function_Item.Kind = Native_Kind_Value and then
+                 Function_Item.Native_Data = Pcall_Function
+               then
+                  Protection := Protection + 1;
+                  if Protection > State.Bounds.Call_Depth then
+                     Fail (State, "protected call limit exceeded", True);
+                  end if;
+                  Function_Item := First (Args);
+                  if not Args.Is_Empty then
+                     Args.Delete_First;
+                  end if;
+               elsif Function_Item.Kind in Closure_Kind |
+                 Native_Closure_Kind | Native_Kind_Value
+               then
+                  exit;
+               else
+                  Handler := Metafield (State, Function_Item, "__call");
+                  if Handler.Kind = Nil_Kind then
+                     Fail (State, "attempt to call a " &
+                             Diagnostic_Type (State, Function_Item) &
+                             " value");
+                  end if;
+                  Hops := Hops + 1;
+                  if Hops > 15 then
+                     Fail (State, "call metamethod chain too long");
+                  end if;
+                  Args.Prepend (Function_Item);
+                  Function_Item := Handler;
+               end if;
+            end loop;
+         end;
+         if Function_Item.Kind in Closure_Kind | Native_Closure_Kind then
             if Tail then
                declare
                   Old : Frame_Access := State.Stack.Last_Element;
@@ -698,7 +790,16 @@ package body Lua.Engine.Machine is
                   Free_Frame (Old);
                end;
             end if;
-            Push_Frame (Function_Item, Args, Return_To, Protection);
+            if Function_Item.Kind = Closure_Kind then
+               Push_Frame (Function_Item, Args, Return_To, Protection);
+            else
+               Schedule (To_String (Function_Item.Reference.Native_Name),
+                         Args, Return_To);
+               State.Stack.Last_Element.Protection := Protection;
+               State.Stack.Last_Element.Native_Captures :=
+                 Function_Item.Reference.Captures;
+               State.Stack.Last_Element.Native_Self := Function_Item.Reference;
+            end if;
          else
             if Function_Item.Kind /= Native_Kind_Value then
                Fail (State, "attempt to call a " &
@@ -709,7 +810,7 @@ package body Lua.Engine.Machine is
             if Tail then
                Complete (Packet);
             else
-               Put_Packet (State.Stack.Last_Element, Destination, Packet);
+               Deliver (State.Stack.Last_Element, Destination, Packet);
             end if;
          end if;
       exception
@@ -727,7 +828,7 @@ package body Lua.Engine.Machine is
             if Tail then
                Complete (Packet);
             else
-               Put_Packet (State.Stack.Last_Element, Destination, Packet);
+               Deliver (State.Stack.Last_Element, Destination, Packet);
             end if;
             State.Failure := Nil_Value;
             State.Has_Failure_Value := False;
@@ -772,10 +873,499 @@ package body Lua.Engine.Machine is
                Free_Frame (Old);
             end;
          end loop;
-         Put_Packet (State.Stack.Last_Element, Destination, Packet);
+         --  A protected tail call may have replaced the outermost chunk.
+         --  Its caught failure completes that chunk successfully; there is
+         --  no caller packet to receive the intentionally discarded results.
+         if not State.Stack.Is_Empty then
+            Deliver (State.Stack.Last_Element, Destination, Packet);
+         end if;
          State.Failure := Nil_Value;
          State.Has_Failure_Value := False;
       end Recover;
+
+      procedure Native_Step is
+         Activation : constant Frame_Access := State.Stack.Last_Element;
+         Name : constant String := To_String (Activation.Native_Name);
+         function Arg (Index : Positive) return Value is
+           (if Index <= Natural (Activation.Native_Arguments.Length)
+            then Activation.Native_Arguments (Index) else Nil_Value);
+         Packet : Values.Vector;
+         Left : Value := Arg (1);
+         Right : Value := Arg (2);
+         Handler : Value;
+         Event : Unbounded_String;
+         Operator : Token_Kind := Activation.Native_Operator;
+         Primitive : Boolean := False;
+         Action : Native_Action;
+         Library_Step : Boolean := True;
+         procedure Finish (Item : Value);
+         procedure Invoke (Function_Value : Value; Args : Values.Vector);
+         procedure Finish (Item : Value) is
+            Result : Values.Vector;
+         begin
+            Result.Append (Item);
+            Complete (Result);
+         end Finish;
+         procedure Invoke (Function_Value : Value; Args : Values.Vector) is
+         begin
+            --  Publish the resume phase before dispatch: immediate builtins
+            --  may return immediately; Lua closures suspend this frame.
+            Activation.Native_Stage := 1;
+            Dispatch (Function_Value, Args, 0);
+         end Invoke;
+      begin
+         State.Failure_At := Activation.Call_Site;
+         --  Stateful libraries own their continuation phase. Dispatch their
+         --  requested callback through this same activation stack, so neither
+         --  Lua nesting nor a protected error creates a second VM or budget.
+         if Name in "string.gmatch" | "gmatch.iterator" | "string.gsub" then
+            Action := Pattern_Drivers.Advance (State, Activation);
+         elsif Name = "string.format" then
+            Action := Format_Drivers.Advance (State, Activation);
+         elsif Name in "table.concat" | "table.insert" | "table.remove" |
+           "table.move" | "table.unpack"
+         then
+            Action := Table_Drivers.Advance (State, Activation);
+         elsif Name in "base.load" | "base.loadfile" | "base.dofile" |
+           "base.require" | "package.searchpath" |
+           "package.preload_searcher" | "package.lua_searcher"
+         then
+            Action := Loaders.Advance (State, Activation);
+         else
+            Library_Step := False;
+            Action.Kind := Continue_Step;
+         end if;
+         if Action.Kind = Finished then
+            Complete (Action.Results);
+            return;
+         elsif Action.Kind = Invoke then
+            Dispatch (Action.Function_Value, Action.Arguments, 0);
+            return;
+         elsif Library_Step then
+            return;
+         end if;
+         if Activation.Native_Stage = 1 and then
+           (Name in "@set" | "@invoke" | "@get" | "@binary" | "@unary" or else
+            (Name'Length > 6 and then Name (1 .. 6) = "arith."))
+         then
+            if Name = "@set" then
+               Complete (Values.Empty_Vector);
+            elsif Name = "@invoke" then
+               Complete (Activation.Native_Results);
+            elsif Name = "@binary" and then
+              Activation.Native_Operator in Equal | Not_Equal |
+                Less | Less_Equal | Greater | Greater_Equal
+            then
+               Finish ((Boolean_Kind,
+                        Truth (First (Activation.Native_Results)) xor
+                        (Activation.Native_Operator = Not_Equal)));
+            else
+               Finish (First (Activation.Native_Results));
+            end if;
+            return;
+         end if;
+         if Name = "@invoke" then
+            Handler := First (Activation.Native_Captures);
+            Invoke (Handler, Activation.Native_Arguments);
+         elsif Name in "@length" | "@equal" then
+            if Activation.Native_Stage = 1 then
+               Finish (First (Activation.Native_Results));
+            else
+               Activation.Native_Stage := 1;
+               Schedule
+                 ((if Name = "@length" then "@unary" else "@binary"),
+                  Activation.Native_Arguments, 0,
+                  (if Name = "@length" then Length else Equal));
+            end if;
+         elsif Name in "math.min" | "math.max" then
+            if Activation.Native_Stage = 0 then
+               if Activation.Native_Arguments.Is_Empty then
+                  Fail (State, "value expected");
+               end if;
+               Activation.Native_Captures := Values.To_Vector (Left, 1);
+               Activation.Native_Index := 2;
+            elsif Truth (First (Activation.Native_Results)) then
+               Activation.Native_Captures.Replace_Element
+                 (1, Arg (Activation.Native_Index));
+               Activation.Native_Index := Activation.Native_Index + 1;
+            else
+               Activation.Native_Index := Activation.Native_Index + 1;
+            end if;
+            if Activation.Native_Index >
+              Natural (Activation.Native_Arguments.Length)
+            then
+               Finish (First (Activation.Native_Captures));
+            else
+               Left := First (Activation.Native_Captures);
+               Right := Arg (Activation.Native_Index);
+               Packet.Append ((if Name = "math.max" then Left else Right));
+               Packet.Append ((if Name = "math.max" then Right else Left));
+               Activation.Native_Stage := 1;
+               Schedule ("@binary", Packet, 0, Less);
+            end if;
+         elsif Name = "base.xpcall" then
+            --  The protected target is an ordinary dispatched call. Its
+            --  packet returns to this rooted continuation before the error
+            --  handler is requested, retaining arbitrary error objects.
+            if Activation.Native_Stage = 0 then
+               if Natural (Activation.Native_Arguments.Length) < 2 then
+                  Fail (State, "xpcall needs a function and error handler");
+               end if;
+               if Arg (2).Kind not in Closure_Kind | Native_Closure_Kind |
+                 Native_Kind_Value
+               then
+                  Fail (State, "error handler must be a function");
+               end if;
+               Packet.Append (Arg (1));
+               for Index in 3 ..
+                 Natural (Activation.Native_Arguments.Length)
+               loop
+                  Packet.Append (Arg (Index));
+               end loop;
+               Activation.Native_Stage := 1;
+               Dispatch ((Native_Kind_Value, Pcall_Function), Packet, 0);
+            elsif Activation.Native_Stage = 1 then
+               if Truth (First (Activation.Native_Results)) then
+                  Complete (Activation.Native_Results);
+               else
+                  Packet.Append (Arg (2));
+                  Packet.Append (Activation.Native_Results (2));
+                  Activation.Native_Stage := 2;
+                  Dispatch ((Native_Kind_Value, Pcall_Function), Packet, 0);
+               end if;
+            else
+               Packet.Append (Value'(Boolean_Kind, False));
+               Packet.Append
+                 ((if Truth (First (Activation.Native_Results)) then
+                     (if Activation.Native_Results.Length >= 2 then
+                         Activation.Native_Results (2) else Nil_Value)
+                   else New_String (State, "error in error handling")));
+               Complete (Packet);
+            end if;
+         elsif Name = "base.tostring" then
+            if Activation.Native_Arguments.Is_Empty then
+               Fail (State, "value expected");
+            end if;
+            if Activation.Native_Stage = 1 then
+               Handler := First (Activation.Native_Results);
+               if Handler.Kind not in String_Kind | Integer_Kind | Real_Kind
+               then
+                  Fail (State, "__tostring must return a string");
+               end if;
+               Finish (New_String (State, Image (Handler)));
+            else
+               Handler := Metafield (State, Left, "__tostring");
+               if Handler.Kind /= Nil_Kind then
+                  Packet.Append (Left);
+                  Invoke (Handler, Packet);
+               else
+                  Finish (New_String (State, Image (Left)));
+               end if;
+            end if;
+         elsif Name = "base.print" then
+            if Activation.Native_Stage = 1 then
+               Handler := First (Activation.Native_Results);
+               if Image (Handler)'Length +
+                 Boolean'Pos (Activation.Native_Index > 1) >
+                 State.Bounds.Output_Bytes - Length (State.Output)
+               then
+                  Fail (State, "output byte limit exceeded", Resource => True);
+               end if;
+               if Activation.Native_Index > 1 then
+                  Append (State.Output, Ada.Characters.Latin_1.HT);
+               end if;
+               Append (State.Output, Image (Handler));
+               Activation.Native_Index := Activation.Native_Index + 1;
+               Activation.Native_Stage := 0;
+            elsif Activation.Native_Index = 0 then
+               Activation.Native_Index := 1;
+            end if;
+            if Activation.Native_Index >
+              Natural (Activation.Native_Arguments.Length)
+            then
+               if Length (State.Output) >= State.Bounds.Output_Bytes then
+                  Fail (State, "output byte limit exceeded", Resource => True);
+               end if;
+               Append (State.Output, Ada.Characters.Latin_1.LF);
+               Complete (Values.Empty_Vector);
+            else
+               Packet.Append (Arg (Activation.Native_Index));
+               Activation.Native_Stage := 1;
+               Schedule ("base.tostring", Packet, 0);
+            end if;
+         elsif Name = "base.pairs" then
+            if Activation.Native_Stage = 1 then
+               Packet := Activation.Native_Results;
+            else
+               Handler := Metafield (State, Left, "__pairs");
+               if Handler.Kind /= Nil_Kind then
+                  Packet.Append (Left);
+                  Invoke (Handler, Packet);
+                  return;
+               end if;
+               Packet := Native (Pairs_Function, Activation.Native_Arguments);
+            end if;
+            Packet.Set_Length (4);
+            Complete (Packet);
+         elsif Name = "base.ipairs" then
+            if Activation.Native_Arguments.Is_Empty then
+               Fail (State, "value expected");
+            end if;
+            Packet.Append (New_Native (State, "@ipairs.step"));
+            Packet.Append (Left);
+            Packet.Append (Value'(Integer_Kind, 0));
+            Complete (Packet);
+         elsif Name = "@ipairs.step" then
+            if Activation.Native_Stage = 0 then
+               Right := (Integer_Kind,
+                 Lua.Integers.Add (Integral (State, Right), 1));
+               Activation.Native_Captures := Values.To_Vector (Right, 1);
+               Packet.Append (Left);
+               Packet.Append (Right);
+               Activation.Native_Stage := 1;
+               Schedule ("@get", Packet, 0);
+            else
+               Handler := First (Activation.Native_Results);
+               if Handler.Kind /= Nil_Kind then
+                  Packet.Append (First (Activation.Native_Captures));
+               end if;
+               Packet.Append (Handler);
+               Complete (Packet);
+            end if;
+         elsif Name in "@get" | "@set" then
+            loop
+               if Name = "@get" then
+                  if Left.Kind = Table_Kind then
+                     Handler := Get (Left, Right);
+                     if Handler.Kind /= Nil_Kind then
+                        Finish (Handler);
+                        return;
+                     end if;
+                  end if;
+                  Handler := Metafield (State, Left, "__index");
+               else
+                  if Left.Kind = Table_Kind and then
+                    Get (Left, Right).Kind /= Nil_Kind
+                  then
+                     Set (State, Left, Right, Arg (3));
+                     Complete (Values.Empty_Vector);
+                     return;
+                  end if;
+                  Handler := Metafield (State, Left, "__newindex");
+               end if;
+               if Handler.Kind = Nil_Kind then
+                  if Left.Kind /= Table_Kind then
+                     Fail (State, "attempt to index a " & Type_Name (Left));
+                  elsif Name = "@get" then
+                     Finish (Nil_Value);
+                  else
+                     Set (State, Left, Right, Arg (3));
+                     Complete (Values.Empty_Vector);
+                  end if;
+                  return;
+               elsif Handler.Kind in Closure_Kind | Native_Closure_Kind |
+                 Native_Kind_Value
+               then
+                  Activation.Native_Arguments.Replace_Element (1, Left);
+                  Invoke (Handler, Activation.Native_Arguments);
+                  return;
+               end if;
+               Activation.Native_Aux := Activation.Native_Aux + 1;
+               if State.Steps >= State.Bounds.Instructions then
+                  Fail (State, "instruction limit exceeded", Resource => True);
+               end if;
+               State.Steps := State.Steps + 1;
+               if Activation.Native_Aux >= 2000 then
+                  Fail (State, "metatable index chain too long");
+               end if;
+               Left := Handler;
+            end loop;
+         elsif Name in "@binary" | "@unary" then
+            if Name = "@unary" then
+               Primitive := Operator = Not_Word or else
+                 (Operator = Length and then Left.Kind = String_Kind) or else
+                 (Operator in Minus | Bit_Xor and then
+                    Left.Kind in Integer_Kind | Real_Kind);
+               Event := To_Unbounded_String
+                 ((case Operator is
+                      when Minus => "__unm", when Bit_Xor => "__bnot",
+                      when Length => "__len", when others => ""));
+               Right := Left;  --  Unary handlers receive duplicate operands.
+            else
+               Primitive :=
+                 (Left.Kind in Integer_Kind | Real_Kind and then
+                    Right.Kind in Integer_Kind | Real_Kind) or else
+                 (Operator in Concatenate | Less | Less_Equal |
+                    Greater | Greater_Equal and then
+                    Left.Kind = String_Kind and then Right.Kind = String_Kind);
+               if Operator = Concatenate then
+                  Primitive := Left.Kind in String_Kind | Integer_Kind |
+                    Real_Kind and then Right.Kind in String_Kind |
+                    Integer_Kind | Real_Kind;
+               end if;
+               if Operator in Equal | Not_Equal then
+                  Primitive := Equal (Left, Right) or else
+                    Left.Kind /= Table_Kind or else Right.Kind /= Table_Kind;
+               end if;
+               if Operator in Greater | Greater_Equal then
+                  Handler := Left;
+                  Left := Right;
+                  Right := Handler;
+                  Operator :=
+                    (if Operator = Greater then Less else Less_Equal);
+               end if;
+               Event := To_Unbounded_String
+                 ((case Operator is
+                      when Plus => "__add", when Minus => "__sub",
+                      when Star => "__mul", when Slash => "__div",
+                      when Floor_Divide => "__idiv", when Percent => "__mod",
+                      when Power => "__pow", when Bit_And => "__band",
+                      when Bit_Or => "__bor", when Bit_Xor => "__bxor",
+                      when Shift_Left => "__shl", when Shift_Right => "__shr",
+                      when Concatenate => "__concat",
+                      when Equal | Not_Equal => "__eq",
+                      when Less => "__lt", when Less_Equal => "__le",
+                      when others => ""));
+            end if;
+            if not Primitive then
+               Handler := Metafield (State, Left, To_String (Event));
+               if Handler.Kind = Nil_Kind and then Name = "@binary" then
+                  Handler := Metafield (State, Right, To_String (Event));
+               end if;
+               if Handler.Kind /= Nil_Kind then
+                  Packet.Append (Left);
+                  Packet.Append (Right);
+                  Invoke (Handler, Packet);
+                  return;
+               elsif Name = "@binary" and then
+                 Operator in Equal | Not_Equal
+               then
+                  Finish ((Boolean_Kind, Operator = Not_Equal));
+                  return;
+               elsif Left.Kind = String_Kind and then
+                 Operator not in Concatenate | Equal | Not_Equal |
+                   Less | Less_Equal | Greater | Greater_Equal
+               then
+                  Fail (State, "no arithmetic metamethod for string");
+               end if;
+            end if;
+            Finish ((if Name = "@unary"
+                     then Unary_Value (State, Operator, Left)
+                     else Binary_Value (State, Operator, Left, Right)));
+         elsif Name = "base.getmetatable" then
+            if Activation.Native_Arguments.Is_Empty then
+               Fail (State, "value expected");
+            end if;
+            Handler := Metafield (State, Left, "__metatable");
+            if Handler.Kind /= Nil_Kind then
+               Finish (Handler);
+            elsif Left.Kind = Table_Kind and then
+              Left.Reference.Metatable /= null
+            then
+               Finish ((Table_Kind, Left.Reference.Metatable));
+            elsif Left.Kind = String_Kind and then
+              State.String_Metatable /= null
+            then
+               Finish ((Table_Kind, State.String_Metatable));
+            else
+               Finish (Nil_Value);
+            end if;
+         elsif Name = "base.setmetatable" then
+            if Left.Kind /= Table_Kind then
+               Fail (State, "table expected");
+            elsif Right.Kind not in Nil_Kind | Table_Kind then
+               Fail (State, "nil or table expected");
+            elsif Metafield (State, Left, "__metatable").Kind /= Nil_Kind then
+               Fail (State, "cannot change a protected metatable");
+            end if;
+            Left.Reference.Metatable :=
+              (if Right.Kind = Nil_Kind then null else Right.Reference);
+            Finish (Left);
+         elsif Name'Length > 6 and then Name (1 .. 6) = "arith." then
+            Event := To_Unbounded_String (Name (7 .. Name'Last));
+            Operator :=
+              (if Event = "__add" then Plus
+               elsif Event = "__sub" or else Event = "__unm" then Minus
+               elsif Event = "__mul" then Star
+               elsif Event = "__mod" then Percent
+               elsif Event = "__div" then Slash
+               elsif Event = "__idiv" then Floor_Divide else Power);
+            if Event = "__unm" then
+               Right := Left;
+            end if;
+            declare
+               function Convert (Item : Value) return Lua.Numbers.Number;
+               function Convert (Item : Value) return Lua.Numbers.Number is
+               begin
+                  if Item.Kind = String_Kind then
+                     return Lua.Numbers.Read
+                       (To_String (Item.Reference.Bytes));
+                  elsif Item.Kind = Integer_Kind then
+                     return (Lua.Numbers.Integer_Number, Item.Integer_Data);
+                  elsif Item.Kind = Real_Kind then
+                     return (Lua.Numbers.Real_Number, Item.Real_Data);
+                  else
+                     return (Kind => Lua.Numbers.Invalid);
+                  end if;
+               end Convert;
+               L : constant Lua.Numbers.Number := Convert (Left);
+               R : constant Lua.Numbers.Number := Convert (Right);
+            begin
+               if L.Kind /= Lua.Numbers.Invalid and then
+                 R.Kind /= Lua.Numbers.Invalid
+               then
+                  Finish ((if Event = "__unm"
+                           then Unary_Value (State, Minus, Left)
+                           else Binary_Value (State, Operator, Left, Right)));
+               else
+                  Handler := (if Right.Kind /= String_Kind
+                              then Metafield (State, Right, To_String (Event))
+                              else Nil_Value);
+                  if Handler.Kind = Nil_Kind then
+                     Fail (State, "attempt to perform arithmetic on a " &
+                             Type_Name (Left));
+                  end if;
+                  Packet.Append (Left);
+                  Packet.Append (Right);
+                  Invoke (Handler, Packet);
+               end if;
+            end;
+         elsif Name'Length > 5 and then
+           (Name (1 .. 5) = "math." or else Name (1 .. 6) = "table.")
+         then
+            Complete (Core_Libraries.Run
+              (State, Name, Activation.Native_Arguments));
+         elsif Name'Length > 7 and then Name (1 .. 7) = "string." then
+            if Name in "string.pack" | "string.packsize" | "string.unpack"
+            then
+               Complete (Packing.Run
+                 (State, Name (8 .. Name'Last), Activation.Native_Arguments));
+            else
+               Complete (Strings.Run
+                 (State, Name (8 .. Name'Last), Activation.Native_Arguments));
+            end if;
+         elsif Name'Length > 5 and then Name (1 .. 5) = "utf8." then
+            if Name = "utf8.codes" then
+               Packet.Append (New_Native
+                 (State, "utf8.step", Values.To_Vector (Arg (2), 1)));
+               for Item of Unicode.Run
+                 (State, "codes", Activation.Native_Arguments)
+               loop
+                  Packet.Append (Item);
+               end loop;
+               Complete (Packet);
+            elsif Name = "utf8.step" then
+               Packet := Activation.Native_Arguments;
+               Packet.Append (First (Activation.Native_Captures));
+               Complete (Unicode.Run (State, "step", Packet));
+            else
+               Complete (Unicode.Run
+                 (State, Name (6 .. Name'Last), Activation.Native_Arguments));
+            end if;
+         else
+            Fail (State, "native continuation not implemented: " & Name);
+         end if;
+      end Native_Step;
 
       procedure Step is
          --  Copy the instruction before dispatch: calls may replace the
@@ -815,14 +1405,14 @@ package body Lua.Engine.Machine is
             when Leave_Scope => Activation.Scope := Activation.Scope.Parent;
             when New_Table => Put_One (Activation, A, New_Table (State));
             when Get_Item =>
-               Left := Scalar (Activation, B);
-               if Left.Kind /= Table_Kind then
-                  Fail (State, "attempt to index a " & Type_Name (Left));
-               end if;
-               Put_One (Activation, A, Get (Left, Scalar (Activation, C)));
+               Packet.Append (Scalar (Activation, B));
+               Packet.Append (Scalar (Activation, C));
+               Schedule ("@get", Packet, A);
             when Set_Item =>
-               Set (State, Scalar (Activation, A), Scalar (Activation, B),
-                    Scalar (Activation, C));
+               Packet.Append (Scalar (Activation, A));
+               Packet.Append (Scalar (Activation, B));
+               Packet.Append (Scalar (Activation, C));
+               Schedule ("@set", Packet, 0);
             when Set_Sequence =>
                Packet := Flatten (Activation, Code.Inputs, C /= 0);
                for Index in Packet.First_Index .. Packet.Last_Index loop
@@ -831,13 +1421,12 @@ package body Lua.Engine.Machine is
                        Packet (Index));
                end loop;
             when Unary =>
-               Put_One (Activation, A,
-                        Unary_Value (State, Code.Operator,
-                                     Scalar (Activation, B)));
+               Packet.Append (Scalar (Activation, B));
+               Schedule ("@unary", Packet, A, Code.Operator);
             when Binary =>
-               Put_One (Activation, A, Binary_Value
-                 (State, Code.Operator, Scalar (Activation, B),
-                  Scalar (Activation, C)));
+               Packet.Append (Scalar (Activation, B));
+               Packet.Append (Scalar (Activation, C));
+               Schedule ("@binary", Packet, A, Code.Operator);
             when Jump => Activation.PC := Code.Target;
             when Jump_False | Jump_True | Jump_Nil =>
                Item := Scalar (Activation, A);
@@ -1007,7 +1596,11 @@ package body Lua.Engine.Machine is
          end if;
          State.Steps := State.Steps + 1;
          begin
-            Step;
+            if State.Stack.Last_Element.Is_Native then
+               Native_Step;
+            else
+               Step;
+            end if;
          exception
             when Language_Error => Recover;
          end;

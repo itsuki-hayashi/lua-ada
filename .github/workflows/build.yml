@@ -43,6 +43,8 @@ jobs:
         run: |
           ./scripts/check-abi.ps1
           alr exec -- pwsh -NoProfile -File scripts/check-frontend.ps1
+          ./scripts/check-layout.ps1 -AdaProbe "$PWD/tests/bin/static/lua-codec_layout_probe${{ runner.os == 'Windows' && '.exe' || '' }}"
+          ./scripts/compare-libraries.ps1 -Interpreter "$PWD/cli/bin/static/lua_ada${{ runner.os == 'Windows' && '.exe' || '' }}"
       - name: Windows static-PIC acceptance
         if: matrix.os == 'windows-latest' && matrix.library == 'static' && matrix.profile == 'validation'
         shell: pwsh

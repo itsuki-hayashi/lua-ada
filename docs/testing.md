@@ -13,11 +13,14 @@ the action under test, and the expected Lua behavior. Do not hide unrelated
 assertions inside a few broad test procedures. Treat test code as maintained
 human-facing documentation of the interpreter contract.
 
-The nested AUnit suite has 171 individually named lexical, integer, number,
-language, and session/lifetime cases. The check driver exercises static/shared
-consumers, 19 CLI processes, and six raw-byte differential fixtures against pinned
-C Lua. The arithmetic fixture contains 2,366 combinations. See [status](status.md)
-for actual platform evidence; coverage percentages and full conformance are not
+The nested AUnit suite grows with each milestone. Historical M1 acceptance
+recorded 171 cases and 19 CLI processes; M2a recorded 347 cases and 30 CLI
+processes, with later merged regression additions. M2b adds individually named
+library, codec, continuation, metamethod, loading, and recovery cases. Use the
+actual final runner result rather than an intermediate build count. The check
+driver also exercises static/shared consumers and six raw-byte differential
+fixtures, including 2,366 arithmetic combinations. See [status](status.md) for
+actual platform evidence; coverage percentages and full conformance are not
 claimed.
 See [current tests](../tests/README.md) for working commands.
 
@@ -25,6 +28,46 @@ The [real-world module catalog](../tests/modules/README.md) records eight pinned
 consumer fixtures for future parity testing. They are checked-out source only;
 no module suites, dependency installation, or parity runners are enabled.
 Keep their sources separate from development references and runtime dependencies.
+
+## M2b library and unchanged-file acceptance
+
+The [M2b milestone](milestones/m2b.md) owns exact exports and acceptance. Focused
+AUnit cases exercise nested Lua/native calls, retained callback roots, error and
+resource unwind/recovery, metamethod selection/raw bypass/isolation, pattern
+boundaries, packing/float/UTF-8 limits, text-reader environments, module caches
+and searchers, and table/math result adjustment. Test comments describe the
+setup, action, expectation, and regression; a broad smoke script is insufficient.
+
+After the nested test build, run the disposable runner from the root inside the
+Alire environment, choosing the actual library-kind output path:
+
+```text
+alr exec -- pwsh -NoProfile -File scripts/check-upstream.ps1 -Interpreter tests/bin/static/upstream_runner
+```
+
+Use the platform executable suffix on Windows. The runner copies and verifies
+unchanged tpack.lua, utf8.lua, bitwise.lua, and bwcoercion.lua. Each primary file
+runs in fresh independent C/Ada processes with the same working directory and
+local package path. bwcoercion.lua is a helper, not a fourth suite. No all.lua,
+mode flags, T instrumentation, or ecosystem-module tests are run.
+
+Require zero exit status, empty stderr, complete same-host stdout byte equality,
+and the expected final marker. Capture raw bytes before decoding diagnostics.
+A 120-second timeout, crash, or resource exhaustion fails acceptance. Start with
+the default 1,000,000 instructions. Only measured instruction-only exhaustion
+permits the explicitly recorded 20,000,000 runner profile; product defaults stay
+unchanged. Keep failed inputs/output in ignored reports for diagnosis.
+
+The isolated C99 host-layout probe and Ada layout probe compare native widths,
+alignments, endianness, and Lua numeric layout, including long double in maximum
+alignment. They are test programs, never production dependencies. Virtual
+packsize checks must remain independent of allocation quotas.
+
+Every Windows/Linux/macOS × development/validation/release × static/shared job
+must run focused tests, API/CLI consumers, existing regressions, and all three
+primary files. Each OS's static-validation job adds layout/differential and ABI
+checks; Windows retains static-PIC. A local three-file success cannot substitute
+for missing matrix evidence or justify a complete standard-suite claim.
 
 ## Test layers
 

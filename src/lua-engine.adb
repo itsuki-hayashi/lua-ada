@@ -1,5 +1,7 @@
 with Ada.Containers;
 with Ada.Exceptions;
+with Ada.Numerics;
+with Lua.Engine.Unicode;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
@@ -108,6 +110,33 @@ package body Lua.Engine is
       return (Closure_Kind, Item);
    end New_Closure;
 
+   function New_Native
+     (State : in out World; Name : String;
+      Captures : Values.Vector := Values.Empty_Vector) return Value
+   is
+      Item : constant Object_Access := Allocate (State, Native_Closure);
+   begin
+      Item.Native_Name := To_Unbounded_String (Name);
+      Item.Captures := Captures;
+      return (Native_Closure_Kind, Item);
+   end New_Native;
+
+   function Metafield
+     (State : in out World; Item : Value; Name : String) return Value
+   is
+      Table : Object_Access;
+   begin
+      if Item.Kind = Table_Kind then
+         Table := Item.Reference.Metatable;
+      elsif Item.Kind = String_Kind then
+         Table := State.String_Metatable;
+      end if;
+      if Table = null then
+         return Nil_Value;
+      end if;
+      return Get ((Table_Kind, Table), New_String (State, Name));
+   end Metafield;
+
    function Equal (Left, Right : Value) return Boolean is
       function Numeric (Item : Value) return Lua.Numbers.Number is
         (if Item.Kind = Integer_Kind then
@@ -128,7 +157,7 @@ package body Lua.Engine is
          when Real_Kind => return Left.Real_Data = Right.Real_Data;
          when String_Kind =>
             return Left.Reference.Bytes = Right.Reference.Bytes;
-         when Table_Kind | Closure_Kind =>
+         when Table_Kind | Closure_Kind | Native_Closure_Kind =>
             return Left.Reference = Right.Reference;
          when Native_Kind_Value => return Left.Native_Data = Right.Native_Data;
       end case;
@@ -145,7 +174,8 @@ package body Lua.Engine is
          when Integer_Kind | Real_Kind => "number",
          when String_Kind => "string",
          when Table_Kind => "table",
-         when Closure_Kind | Native_Kind_Value => "function");
+         when Closure_Kind | Native_Closure_Kind | Native_Kind_Value =>
+            "function");
 
    function Real_Image (Item : Real_Value) return String is
       package Real_IO is new Ada.Text_IO.Float_IO (Real_Value);
@@ -245,7 +275,7 @@ package body Lua.Engine is
               (Item.Integer_Data'Image, Ada.Strings.Both);
          when Real_Kind => return Real_Image (Item.Real_Data);
          when String_Kind => return To_String (Item.Reference.Bytes);
-         when Table_Kind | Closure_Kind =>
+         when Table_Kind | Closure_Kind | Native_Closure_Kind =>
             return Type_Name (Item) & ": " &
               Ada.Strings.Fixed.Trim
                 (Item.Reference.Serial'Image, Ada.Strings.Both);
@@ -377,6 +407,35 @@ package body Lua.Engine is
    procedure Initialize (State : in out World; Bounds : Limits) is
       Table : Value;
       procedure Install (Name : String; Native : Native_Kind);
+      procedure Library (Name, Members : String);
+      procedure Arithmetic (Meta : Value; Name : String);
+      function Directory_Separator (Host : String) return String;
+      function Directory_Separator (Host : String) return String is
+        (if Host = "windows" then "\" else "/");
+      procedure Arithmetic (Meta : Value; Name : String) is
+      begin
+         Set (State, Meta, New_String (State, Name),
+              New_Native (State, "arith." & Name));
+      end Arithmetic;
+      procedure Library (Name, Members : String) is
+         Module : constant Value := New_Table (State);
+         First : Positive := Members'First;
+         Last : Natural;
+      begin
+         Set (State, Table, New_String (State, Name), Module);
+         Set (State, (Table_Kind, State.Loaded_Modules),
+              New_String (State, Name), Module);
+         while First <= Members'Last loop
+            Last := First;
+            while Last < Members'Last and then Members (Last + 1) /= ' ' loop
+               Last := Last + 1;
+            end loop;
+            Set (State, Module,
+                 New_String (State, Members (First .. Last)),
+                 New_Native (State, Name & "." & Members (First .. Last)));
+            First := Last + 2;
+         end loop;
+      end Library;
 
       procedure Install (Name : String; Native : Native_Kind) is
          Key : constant Value := New_String (State, Name);
@@ -387,6 +446,8 @@ package body Lua.Engine is
       State.Bounds := Bounds;
       Table := New_Table (State);
       State.Globals := Table.Reference;
+      State.Loaded_Modules := New_Table (State).Reference;
+      State.Preload_Modules := New_Table (State).Reference;
       --  Bootstrap performs no collection. The globals table becomes the
       --  permanent root before any builtins or version strings are installed.
       Install ("print", Print_Function);
@@ -412,6 +473,97 @@ package body Lua.Engine is
          Key := New_String (State, "_VERSION");
          Set (State, Table, Key, Version);
       end;
+      Library ("string", "byte char len lower upper sub reverse rep " &
+               "format find match gmatch gsub pack packsize unpack");
+      Library ("utf8", "char len codepoint offset codes");
+      Library ("table", "concat insert remove move pack unpack");
+      Library ("math", "abs ceil floor fmod max min modf tointeger type ult");
+      declare
+         Math : constant Value := Get (Table, New_String (State, "math"));
+         Package_Value : constant Value := New_Table (State);
+         Searchers : constant Value := New_Table (State);
+         Captures : constant Values.Vector :=
+           Values.To_Vector (Package_Value, 1);
+      begin
+         --  Capture the original package object. Public field replacement
+         --  must not retarget the registry roots used by require/preload.
+         Set (State, Table, New_String (State, "package"), Package_Value);
+         Set (State, (Table_Kind, State.Loaded_Modules),
+              New_String (State, "package"), Package_Value);
+         Set (State, Package_Value, New_String (State, "loaded"),
+              (Table_Kind, State.Loaded_Modules));
+         Set (State, Package_Value, New_String (State, "preload"),
+              (Table_Kind, State.Preload_Modules));
+         Set (State, Package_Value, New_String (State, "path"),
+              New_String (State, "./?.lua;./?/init.lua"));
+         Set (State, Package_Value, New_String (State, "config"),
+              New_String (State,
+                Directory_Separator (Lua_Ada_Config.Alire_Host_OS) &
+                Character'Val (10) & ";" &
+                Character'Val (10) & "?" & Character'Val (10) & "!" &
+                Character'Val (10) & "-" & Character'Val (10)));
+         Set (State, Package_Value,
+              New_String (State, "searchers"), Searchers);
+         Set (State, Package_Value, New_String (State, "searchpath"),
+              New_Native (State, "package.searchpath", Captures));
+         Set (State, Searchers, (Integer_Kind, 1),
+              New_Native (State, "package.preload_searcher", Captures));
+         Set (State, Searchers, (Integer_Kind, 2),
+              New_Native (State, "package.lua_searcher", Captures));
+         Set (State, Table, New_String (State, "require"),
+              New_Native (State, "base.require", Captures));
+         Set (State, Table, New_String (State, "load"),
+              New_Native (State, "base.load"));
+         Set (State, Table, New_String (State, "xpcall"),
+              New_Native (State, "base.xpcall"));
+         Set (State, Table, New_String (State, "loadfile"),
+              New_Native (State, "base.loadfile"));
+         Set (State, Table, New_String (State, "dofile"),
+              New_Native (State, "base.dofile"));
+         Set (State, Math, New_String (State, "maxinteger"),
+              (Integer_Kind, Integer_Value'Last));
+         Set (State, Math, New_String (State, "mininteger"),
+              (Integer_Kind, Integer_Value'First));
+         Set (State, Math, New_String (State, "pi"),
+              (Real_Kind, Ada.Numerics.Pi));
+         Set (State, Math, New_String (State, "huge"),
+              (Real_Kind, Lua.Numbers.Read ("1e999").Real_Item));
+      end;
+      declare
+         Strings : constant Value := Get (Table, New_String (State, "string"));
+         Unicode : constant Value := Get (Table, New_String (State, "utf8"));
+         Meta : constant Value := New_Table (State);
+      begin
+         State.String_Metatable := Meta.Reference;
+         Set (State, Meta, New_String (State, "__index"), Strings);
+         Arithmetic (Meta, "__add");
+         Arithmetic (Meta, "__sub");
+         Arithmetic (Meta, "__mul");
+         Arithmetic (Meta, "__mod");
+         Arithmetic (Meta, "__pow");
+         Arithmetic (Meta, "__div");
+         Arithmetic (Meta, "__idiv");
+         Arithmetic (Meta, "__unm");
+         Set (State, Unicode, New_String (State, "charpattern"),
+              New_String (State, Lua.Engine.Unicode.Charpattern));
+         Set (State, Table, New_String (State, "getmetatable"),
+              New_Native (State, "base.getmetatable"));
+         Set (State, Table, New_String (State, "setmetatable"),
+              New_Native (State, "base.setmetatable"));
+         Set (State, Table, New_String (State, "tostring"),
+              New_Native (State, "base.tostring"));
+         Set (State, Table, New_String (State, "print"),
+              New_Native (State, "base.print"));
+         Set (State, Table, New_String (State, "pairs"),
+              New_Native (State, "base.pairs"));
+         Set (State, Table, New_String (State, "ipairs"),
+              New_Native (State, "base.ipairs"));
+      end;
+      --  Bootstrap replaces several M1 bindings and creates temporary lookup
+      --  keys. Publish a stable live baseline before returning the session;
+      --  later heap quotas and collection statistics must describe its owned
+      --  environment, not abandoned initialization temporaries.
+      Collect (State);
    end Initialize;
 
    procedure Collect (State : in out World) is
@@ -431,7 +583,9 @@ package body Lua.Engine is
 
       procedure Mark_Value (Item : Value) is
       begin
-         if Item.Kind in String_Kind | Table_Kind | Closure_Kind then
+         if Item.Kind in String_Kind | Table_Kind | Closure_Kind |
+           Native_Closure_Kind
+         then
             Mark (Item.Reference);
          end if;
       end Mark_Value;
@@ -447,11 +601,24 @@ package body Lua.Engine is
       --  Explicit worklists avoid using the Ada stack to traverse arbitrary
       --  user graphs. Marking before enqueueing also terminates on cycles.
       Mark (State.Globals);
+      Mark (State.String_Metatable);
+      Mark (State.Loaded_Modules);
+      Mark (State.Preload_Modules);
       Mark_Value (State.Failure);
       for Item of State.Arguments loop
          Mark_Value (Item);
       end loop;
       for Activation of State.Stack loop
+         Mark (Activation.Native_Self);
+         for Item of Activation.Native_Arguments loop
+            Mark_Value (Item);
+         end loop;
+         for Item of Activation.Native_Results loop
+            Mark_Value (Item);
+         end loop;
+         for Item of Activation.Native_Captures loop
+            Mark_Value (Item);
+         end loop;
          Mark (Activation.Scope);
          Mark_Code (Activation.Code);
          Mark (Activation.Vararg_Table);
@@ -472,6 +639,7 @@ package body Lua.Engine is
             case Item.Kind is
                when String_Object => null;
                when Table_Object =>
+                  Mark (Item.Metatable);
                   for Member of Item.Members loop
                      if Member.Item.Kind /= Nil_Kind then
                         Mark_Value (Member.Key);
@@ -486,6 +654,10 @@ package body Lua.Engine is
                when Closure =>
                   Mark (Item.Capture);
                   Mark_Code (Item.Code);
+               when Native_Closure =>
+                  for Capture of Item.Captures loop
+                     Mark_Value (Capture);
+                  end loop;
             end case;
          end;
       end loop;
@@ -511,7 +683,8 @@ package body Lua.Engine is
                   Member : Table_Entry := Item.Members (Index);
                begin
                   if Member.Item.Kind = Nil_Kind and then Member.Key.Kind in
-                    String_Kind | Table_Kind | Closure_Kind and then
+                    String_Kind | Table_Kind | Closure_Kind |
+                    Native_Closure_Kind and then
                     not Member.Key.Reference.Marked
                   then
                      Member.Key := Nil_Value;

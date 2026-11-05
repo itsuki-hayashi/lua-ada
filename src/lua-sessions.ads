@@ -97,7 +97,8 @@ package Lua.Sessions is
    --  Idempotently release the universe. Execute then returns Runtime_Error.
 
    procedure Reset (Self : in out Session);
-   --  Start a fresh universe with default limits and only the M1 base library.
+   --  Start a fresh universe with default limits and standard libraries.
+   --  Reset discards globals, module caches, and string/table metatable state.
 
 private
    type Session is new Ada.Finalization.Limited_Controlled with record

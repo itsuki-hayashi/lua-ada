@@ -9,6 +9,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 with Lua;
 with Lua.Sessions;
+with Lua.Sources;
 with Lua.Syntax;
 
 procedure Lua_Ada is
@@ -29,7 +30,6 @@ procedure Lua_Ada is
    procedure Report (Result : Execution_Result);
    function Read_Source (Path : String) return String;
    function Read_Stdin return String;
-   function File_Preamble (Source : String) return String;
    function Arguments_After (Index : Natural) return Argument_Array;
 
    procedure Usage is
@@ -41,7 +41,7 @@ procedure Lua_Ada is
       Ada.Text_IO.Put_Line
         ("--check validates complete Lua syntax without executing source.");
       Ada.Text_IO.Put_Line
-        ("M1 Lua 5.5 subset; REPL and binary chunks are deferred.");
+        ("Lua 5.5 scripting subset; REPL and binary chunks are deferred.");
    end Usage;
 
    procedure Version is
@@ -144,34 +144,6 @@ procedure Lua_Ada is
       return To_String (Text);
    end Read_Stdin;
 
-   function File_Preamble (Source : String) return String is
-      First : Positive := Source'First;
-      Text : String := Source;
-   begin
-      --  Only the file loader accepts a BOM/shebang. Preserve the shebang
-      --  line as spaces so diagnostics for later lines retain their numbers.
-      if Source'Length >= 3 and then Source (First .. First + 2) =
-        Character'Val (16#EF#) & Character'Val (16#BB#) &
-        Character'Val (16#BF#)
-      then
-         First := First + 3;
-      end if;
-      if First <= Source'Last and then Source (First) = '#' then
-         declare
-            Position : Positive := First;
-         begin
-            while Position <= Source'Last and then
-              Source (Position) not in Ada.Characters.Latin_1.LF |
-                Ada.Characters.Latin_1.CR
-            loop
-               Text (Position) := ' ';
-               Position := Position + 1;
-            end loop;
-         end;
-      end if;
-      return Text (First .. Text'Last);
-   end File_Preamble;
-
    function Arguments_After (Index : Natural) return Argument_Array is
       Result : Argument_Array (1 .. Argument_Count - Index);
    begin
@@ -258,7 +230,7 @@ begin
          if Script_Index /= 0 then
             declare
                Path : constant String := Argument (Script_Index);
-               Source : constant String := File_Preamble
+               Source : constant String := Lua.Sources.File_Preamble
                  (if Path = "-" then Read_Stdin else Read_Source (Path));
                Ignored : constant Boolean := Check
                  (Source, (if Path = "-" then "stdin" else Path));
@@ -298,7 +270,7 @@ begin
       if Script_Index /= 0 then
          declare
             Path : constant String := Argument (Script_Index);
-            Source : constant String := File_Preamble
+            Source : constant String := Lua.Sources.File_Preamble
               (if Path = "-" then Read_Stdin else Read_Source (Path));
          begin
             Result := Universe.Execute

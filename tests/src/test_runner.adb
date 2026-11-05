@@ -10,6 +10,11 @@ with Lifecycle_Tests;
 with Lua.Opcode_Tests;
 with Syntax_Tests;
 with Incremental_Lexer_Tests;
+with Lua.Library_Codec_Tests;
+with Lua.String_Helper_Tests;
+with Library_Runtime_Tests;
+with Native_Tests;
+with Source_Tests;
 
 procedure Test_Runner is
    use type AUnit.Status;
@@ -29,6 +34,11 @@ procedure Test_Runner is
       Lua.Opcode_Tests.Register (Result);
       Syntax_Tests.Register (Result);
       Incremental_Lexer_Tests.Register (Result);
+      Lua.Library_Codec_Tests.Register (Result);
+      Lua.String_Helper_Tests.Register (Result);
+      Library_Runtime_Tests.Register (Result);
+      Native_Tests.Register (Result);
+      Source_Tests.Register (Result);
       return Result;
    end Suite;
 

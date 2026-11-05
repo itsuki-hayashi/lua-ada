@@ -10,7 +10,11 @@ project Lua_Ada_Tests is
    for Exec_Dir use "bin/" & Lua_Ada.Library_Mode;
    for Main use
      ("test_runner.adb", "lua-opcode_probe.adb", "lexer_probe.adb",
-      "syntax_consumer.adb");
+      "syntax_consumer.adb", "upstream_runner.adb",
+      "lua-codec_layout_probe.adb");
+   package Binder is
+      for Default_Switches ("Ada") use ("-Wb");
+   end Binder;
    for Create_Missing_Dirs use "True";
 
    package Compiler is

@@ -92,12 +92,36 @@ All seven items below are **done**, with final [validation](validation-m2a.md).
 - ACCEPT-002, depends all above: 18 platform/profile/link jobs, ABI probes,
   Windows static-PIC, and open verified PR; accepted with immutable evidence.
 
+## M2b libraries and first upstream execution
+
+The [accepted M2b target](milestones/m2b.md) owns the exact exports and runner
+protocol. All items remain **in progress** until their named evidence is
+recorded. Existing local source/tests are implementation evidence, not completed
+cross-platform gates. See [ADR 0007](decisions/0007-native-libraries.md).
+
+| ID             | Work                         | Depends on                 | Acceptance and current evidence                                                                                                                               |
+| -------------- | ---------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M2B-FND-001    | Contracts and infrastructure | ACCEPT-002                 | Scope/backlog, unchanged 349-case baseline, disposable byte runner and C/Ada host-layout probe; baseline established, final runner/probe evidence pending     |
+| M2B-VM-001     | Resumable native calls       | M2B-FND-001                | Shared stack/budget, traced retained values, tail calls, protected/resource unwind and recovery; implemented, focused validation ongoing                      |
+| M2B-META-001   | Core metamethods             | M2B-VM-001                 | Lua/native handlers, pinned ordering, raw bypass, protection, string override/isolation; implemented, focused cases added                                     |
+| M2B-STR-001    | Strings and patterns         | M2B-VM-001, M2B-META-001   | Exact declared exports except dump, full patterns/format, replacements/iterators, bounded work; implementation and differential checks ongoing                |
+| M2B-BIN-001    | Packing and UTF-8            | M2B-FND-001                | Width/endian/alignment/overflow, virtual sizes, strict/lax UTF-8 and two offsets; helpers and focused codec cases implemented, layout/matrix evidence pending |
+| M2B-LOAD-001   | Text and Lua modules         | M2B-VM-001, M2B-META-001   | Readers/modes/environments, protected load failures, registry caching, searchers/data; implemented, acceptance ongoing                                        |
+| M2B-LIB-001    | Table/math/default state     | M2B-META-001, M2B-LOAD-001 | Declared exports, metamethod-aware operations, boundaries, reset isolation; implemented, acceptance ongoing                                                   |
+| M2B-ACCEPT-001 | Complete M2b acceptance      | All M2B items above        | Final 18 jobs, ABI/static-PIC/layout/differential evidence, three unchanged files, documentation and open PR; not complete                                    |
+
+Local Windows direct runs and disposable same-host raw-byte comparisons pass
+all three primary files at the default instruction limit. The final strict
+all-platform revision remains an acceptance requirement. Record exact results
+in the current session and status rather than treating local successes as
+completed gates.
+
 ## Later runtime work
 
 | ID        | Work                              | Dependency                     | Acceptance                                                   |
 | --------- | --------------------------------- | ------------------------------ | ------------------------------------------------------------ |
-| LANG-002  | Deferred language facilities      | ACCEPT-001                     | Metamethod/coroutine/close/goto regressions                  |
-| LIB-002   | Remaining libraries and loading   | ACCEPT-001                     | Library differential and unchanged-file coverage             |
+| LANG-002  | Remaining language facilities     | M2B-ACCEPT-001                 | Coroutine/userdata/weak/finalized/close/goto regressions     |
+| LIB-002   | Remaining standard libraries      | M2B-ACCEPT-001                 | Remaining library differential and unchanged-file coverage   |
 | ABI-002   | Full C facade/storage integration | ABI-001, CORE-001              | Public header clients, callbacks/unwinding, allocator parity |
 | CHUNK-001 | Binary chunk interoperability     | ABI-002                        | Pinned C/Ada load/dump fixtures                              |
 | MOD-001   | Native modules/LuaRocks           | ABI-002, LIB-002, TEST-MOD-001 | Pure Lua and native rock acceptance                          |

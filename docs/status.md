@@ -1,6 +1,7 @@
 # Project Status
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, and M2a complete.**
+**M2b is in progress; its platform acceptance is not complete.**
 The [M1 target](milestones/m1.md) owns scope; the
 [validation record](validation.md) owns exact platform/configuration evidence.
 
@@ -31,7 +32,7 @@ Tools: Alire 2.1.1, stable native GNAT 16.1.0, AUnit 26.0.0, GPRbuild package
 ABI observations, commands, and immutable CI evidence are recorded in
 [validation](validation.md).
 
-## Later milestones
+## M2a acceptance
 
 [M2a frontend parity](milestones/m2a.md) is complete. Shared incremental
 parsing/resolution and VM lowering, Ada/CLI checking, and canonical opcode
@@ -45,15 +46,46 @@ Eight [real-world module fixtures](../tests/modules/README.md) are pinned under
 tests/modules/ for future consumer parity work. This is source checkout and
 documentation only: module builds, dependency installation, and C/Ada execution
 have not been performed. The fixtures are not development references or runtime
-dependencies and do not change the implemented M1 subset.
+dependencies. M2b does not build or execute them.
 
-This is a documented Lua subset, not complete Lua 5.5 compatibility.
-Metatables, coroutines, userdata, close/goto, remaining libraries, binary
-chunks, full C API/ABI, dynamic modules, and LuaRocks remain later milestones.
-No unchanged whole upstream test file has passed on Ada; the
-[inventory](upstream-tests.md) explains prerequisites and equivalent subset
-coverage. GNATdoc rendering, GNATtest generation, fuzz campaigns, and formal
-proof have not been exercised.
+## M2b implementation and provisional evidence
+
+[M2b](milestones/m2b.md) adds core metamethods, explicit native continuations,
+strings/patterns/formatting/packing, UTF-8, common table/math helpers, and text
+load/Lua-only require. The [capability/export inventory](capabilities.md) owns
+the exact surface; [ADR 0007](decisions/0007-native-libraries.md) owns runtime
+contracts. Focused tests cover callback roots, errors/recovery, metatable
+selection/isolation, byte/numeric boundaries, and package environments/state.
+
+Direct local Windows runs have completed the three unchanged primary files
+tpack.lua, utf8.lua, and bitwise.lua at the default 1,000,000-instruction budget.
+bitwise.lua loads bwcoercion.lua as a helper. These are provisional execution
+results. The Windows disposable runner has also passed all three same-host
+raw-byte comparisons at the default budget. The complete Windows
+validation/static pipeline passes 472 AUnit cases, 30 CLI cases, the Ada
+consumer, and seven differential fixtures with matching dependency profiles.
+The independent C99/Ada layout probe also passes. Final matrix acceptance
+must still pass before the milestone closes.
+No Linux/macOS M2b passes or final-revision CI results are claimed here.
+
+| M2b evidence                                | Windows                    | Linux      | macOS      |
+| ------------------------------------------- | -------------------------- | ---------- | ---------- |
+| Direct three-file execution, default budget | Local provisional pass     | Unverified | Unverified |
+| Disposable same-host byte comparison        | Local pass, default budget | Pending    | Pending    |
+| Final profiles × static/shared matrix       | Pending                    | Pending    | Pending    |
+| Layout/differential/ABI acceptance          | Pending                    | Pending    | Pending    |
+
+The [current session record](sessions/2026-11-06-m2b-core-libraries.md) owns
+exact evolving commands/results. Intermediate failing or stale build results
+are not accepted suite counts. Historical M1/M2a evidence remains unchanged.
+
+This is a documented Lua subset, not complete Lua 5.5 compatibility. Coroutines,
+userdata, weak/finalized objects, close/goto execution, debug/io/os, remaining
+library functions, binary chunks, full C API/ABI, native modules, and LuaRocks
+remain later work. Canonical opcode definitions exist; canonical code generation
+and execution do not. The [upstream inventory](upstream-tests.md) distinguishes
+three M2b targets from the complete suite. GNATdoc rendering, GNATtest generation,
+fuzz campaigns, and formal proof have not been exercised.
 
 See [session evidence](sessions/2026-11-05-m1-interpreter.md),
 [roadmap](roadmap.md), and [backlog](backlog.md).
