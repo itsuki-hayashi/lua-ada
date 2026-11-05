@@ -42,4 +42,16 @@ do
   print(1e308*2, 1e308+1e308, 1e308^2, 0^-1, nan)
 end
 
+-- Numeric strings convert in some arithmetic/base-function contexts, but
+-- primitive bitwise operations must reject them on either operand side.
+local bitops = {
+  function(a,b) return a & b end, function(a,b) return a | b end,
+  function(a,b) return a ~ b end, function(a,b) return a << b end,
+  function(a,b) return a >> b end
+}
+for _, operation in ipairs(bitops) do
+  assert(not pcall(operation, "3", 1))
+  assert(not pcall(operation, 1, "3"))
+end
+assert(not pcall(function() return ~"3" end))
 print('edge semantics ok')

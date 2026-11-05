@@ -188,6 +188,12 @@ package body Lua.Engine.Machine is
          return New_String (State, Image (Left) & Image (Right));
       elsif Operator in Bit_And | Bit_Or | Bit_Xor | Shift_Left | Shift_Right
       then
+         --  Base argument conversion may accept numeric strings, but Lua's
+         --  primitive bitwise operators do not. Keep that policy separate
+         --  from Integral, which also serves tonumber/select/error arguments.
+         if Left.Kind = String_Kind or else Right.Kind = String_Kind then
+            Fail (State, "attempt to perform bitwise operation on a string");
+         end if;
          IL := Integral (State, Left);
          IR := Integral (State, Right);
          case Operator is
@@ -301,6 +307,10 @@ package body Lua.Engine.Machine is
             end if;
             return (Real_Kind, -Number.Real_Item);
          when Bit_Xor =>
+            if Item.Kind = String_Kind then
+               Fail
+                 (State, "attempt to perform bitwise operation on a string");
+            end if;
             return (Integer_Kind,
                     Lua.Integers.Subtract (-1, Integral (State, Item)));
          when others => raise Program_Error with "invalid unary opcode";

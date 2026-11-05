@@ -6,6 +6,9 @@ with Test_Support;
 
 package body Session_Tests is
    procedure Check (Source, Expected : String);
+   procedure Bitwise_String_Left;
+   procedure Bitwise_String_Right;
+   procedure Bitwise_String_Unary;
    procedure Named_Vararg_Mutation;
    procedure Select_Hash_Prefix;
    procedure Ipairs_Lazy_State;
@@ -558,8 +561,35 @@ package body Session_Tests is
          "0");
    end Method_Self_Is_Scalar;
 
+   procedure Bitwise_String_Left is
+      --  A valid numeric string is still a string operand. The arithmetic
+      --  conversion helper must not make primitive bitwise AND accept it.
+   begin
+      Check ("print(pcall(function() return '3' & 1 end) == false)", "true");
+   end Bitwise_String_Left;
+
+   procedure Bitwise_String_Right is
+      --  Test the other operand independently: checking only the left kind
+      --  would permit the same invalid coercion through a shift count.
+   begin
+      Check ("print(pcall(function() return 1 << '3' end) == false)", "true");
+   end Bitwise_String_Right;
+
+   procedure Bitwise_String_Unary is
+      --  Unary complement has its own dispatch path. It must reject numeric
+      --  strings while retaining the session's protected-error behavior.
+   begin
+      Check ("print(pcall(function() return ~'3' end) == false)", "true");
+   end Bitwise_String_Unary;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
+      Test_Support.Add (Suite, "session: bitwise string left",
+                        Bitwise_String_Left'Access);
+      Test_Support.Add (Suite, "session: bitwise string right",
+                        Bitwise_String_Right'Access);
+      Test_Support.Add (Suite, "session: bitwise string unary",
+                        Bitwise_String_Unary'Access);
       Test_Support.Add
         (Suite, "session: precedence",
          Precedence'Access);

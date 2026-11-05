@@ -1,10 +1,10 @@
 # Project Status
 
-Updated: 2026-11-05 (Asia/Tokyo). **M0 and M1 complete.**
+Updated: 2026-11-05 (Asia/Tokyo). **M0 complete; M1 regression revalidation active.**
 The [M1 target](milestones/m1.md) owns scope; the
 [validation record](validation.md) owns exact platform/configuration evidence.
 
-## Implemented and verified
+## Implemented and verified baseline
 
 The reusable Ada runtime executes the M1 language subset through
 `Lua.Sessions` and the batch CLI. It includes a resolving frontend, private
@@ -16,6 +16,10 @@ isolate state, bound execution, and return structured errors. The CLI supports
 files, repeated snippets, stdin, arguments, help/version, byte-preserving output,
 and controlled failure status. See [capabilities](capabilities.md) and
 [embedding](embedding.md).
+
+Three additional focused cases now reject numeric strings in bitwise operands,
+matching the pinned oracle. Local validation passes 171 cases and all fixtures;
+the expanded platform matrix is running. The previously verified baseline follows.
 
 All 18 Windows/Linux/macOS x development/validation/release x static/shared
 jobs passed. Each passed 168 individually named AUnit cases, zero failed
