@@ -53,6 +53,8 @@ log was inspected. Each OS passed the frontend/opcode campaign and ABI probe;
 Windows additionally passed static-PIC. All seven bounded backlog gates close
 with this evidence. PR #3 is open and unmerged. Final handoff changes record
 evidence and strengthen the existing multiline error-priority regression.
+The final public scanner view also requires construction through Open, so an
+owner cannot accidentally create a scanner with uninitialized source bytes.
 
 The Linux C oracle initially needed explicit Unix math linking; that was fixed.
 The adapter now roots its source label across allocation/collection, protected

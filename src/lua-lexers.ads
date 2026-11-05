@@ -57,9 +57,11 @@ package Lua.Lexers is
    end record;
    --  A failed scan has no partial token list. Message describes the failure.
 
-   type Scanner (Source_Length : Natural) is limited private;
+   type Scanner (<>) is limited private;
    --  A scanner owns its source bytes. Its cursor advances only on Next;
    --  callers can stop before unrelated later lexical errors are encountered.
+   --  Unknown discriminants require initialization through Open, preventing
+   --  callers from constructing a scanner with uninitialized source bytes.
    function Open
      (Source : String; Maximum_Tokens : Positive := 100_000) return Scanner;
    --  Copy Source once, normalizing its lower bound without altering bytes.

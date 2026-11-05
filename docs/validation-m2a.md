@@ -6,8 +6,9 @@ Implementation evidence: [18-job acceptance run](https://github.com/itsuki-hayas
 at commit `d8770ef8ea578fd304dac766e6380ee7b9886de6`.
 All 18 job logs were inspected, including actual test totals and the three
 static-validation oracle/ABI steps. The final handoff adds documentation and
-strengthens the existing multiline error-priority test; production sources
-remain identical to this accepted implementation.
+strengthens the existing multiline error-priority test and restricts scanner
+construction to Open through unknown private discriminants. The execution
+backend and scanner/parser algorithms remain identical to this implementation.
 
 ## Configurations
 
