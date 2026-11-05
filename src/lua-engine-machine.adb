@@ -670,12 +670,15 @@ package body Lua.Engine.Machine is
            (State, Function_Value.Reference.Capture);
          Item.Slots.Set_Length
            (Ada.Containers.Count_Type (Prototype.Register_Count));
-         if Prototype.Is_Main then
+         if Prototype.Is_Main and then
+           Function_Value.Reference.Capture = null
+         then
+            --  Host chunks start with a fresh global-environment binding.
+            --  Loaded chunks already capture their persistent _ENV cell:
+            --  shadowing it here would discard assignments between calls and
+            --  split the binding observed by their nested Lua closures.
             Declare_Local (Item.Scope, Prototype.Environment_Symbol,
-              (if Function_Value.Reference.Capture = null
-               then (Table_Kind, State.Globals)
-               else Read_Local (Function_Value.Reference.Capture,
-                                Prototype.Environment_Symbol)));
+                           (Table_Kind, State.Globals));
          end if;
          for Position in Prototype.Parameters.First_Index ..
            Prototype.Parameters.Last_Index

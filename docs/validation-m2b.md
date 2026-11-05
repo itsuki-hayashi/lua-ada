@@ -108,3 +108,11 @@ unexpected errors. The recorded 475-case matrix above remains immutable earlier
 implementation evidence. The final [PR checks](https://github.com/itsuki-hayashi/lua-ada/pull/4/checks)
 must rerun the complete matrix, including these repairs, before handoff; the PR
 description records that final revision/run. No upstream fixture is modified.
+
+A further C/Ada environment comparison exposed per-call shadowing of a loaded
+closure's _ENV cell. Loaded main closures now use their persistent captured
+binding; host-created chunks still receive fresh global-environment bindings.
+Separate regressions cover repeated invocation and older nested closures
+observing subsequent rebinding. The current suite contains 480 cases. The
+complete validation/static pipeline passed the implementation change; the final
+PR matrix must exercise both new cases before handoff.

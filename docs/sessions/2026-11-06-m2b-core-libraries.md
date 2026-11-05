@@ -118,3 +118,10 @@ PR description. The earlier 475-case implementation record remains historical.
 The complete check.ps1 validation/static pipeline also passes after these
 repairs: all 478 cases, Ada/CLI consumers, seven parity fixtures, and all three
 unchanged primary files at default limits. No limit or comparison was weakened.
+
+A final C/Ada comparison confirmed that loaded _ENV rebinding incorrectly reset
+between invocations and split previously returned closures' captures. Loaded
+main frames now resolve the existing captured cell instead of shadowing it;
+host chunks retain their fresh binding. The implementation passes the complete
+validation/static pipeline. Two separate persistence/capture regressions bring
+the suite to 480; final PR checks must pass that suite before handoff.

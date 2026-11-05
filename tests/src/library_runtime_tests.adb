@@ -15,6 +15,8 @@ package body Library_Runtime_Tests is
    procedure Reader_Options_Precede_Call;
    procedure Raw_Load_Has_No_Preamble;
    procedure Explicit_Environment;
+   procedure Persistent_Environment_Cell;
+   procedure Shared_Environment_Capture;
    procedure Explicit_Nil_Environment;
    procedure Omitted_Environment;
    procedure Load_Syntax_Failure;
@@ -167,6 +169,33 @@ package body Library_Runtime_Tests is
              "local f=assert(load('return answer','env','t',env)); " &
              "env.answer=41; assert(f()==41 and answer==3)");
    end Explicit_Environment;
+
+   procedure Persistent_Environment_Cell is
+      --  Rebinding _ENV belongs to the loaded closure's captured cell, not
+      --  a temporary activation. A second invocation must read that new
+      --  environment without mutating the original environment table.
+   begin
+      Check
+        ("local original={}; local f=assert(load(" &
+         "'local old=_ENV; _ENV={value=(old.value or 0)+1}; " &
+         "return _ENV','env','t',original)); " &
+         "local a=f(); local b=f(); " &
+         "assert(a.value==1 and b.value==2); " &
+         "assert(original.value==nil)");
+   end Persistent_Environment_Cell;
+
+   procedure Shared_Environment_Capture is
+      --  A previously returned Lua closure shares the loaded function's
+      --  _ENV binding. Rebinding during a later call must also change what
+      --  that older closure observes, instead of preserving a per-call copy.
+   begin
+      Check
+        ("local f=assert(load('local old=_ENV; " &
+         "_ENV={value=(old.value or 0)+1}; " &
+         "return function() return value end','env','t',{})); " &
+         "local first=f(); local second=f(); " &
+         "assert(first()==2 and second()==2)");
+   end Shared_Environment_Capture;
 
    procedure Explicit_Nil_Environment is
       --  Explicit nil differs from omitted environment. A constant-only
@@ -554,6 +583,10 @@ package body Library_Runtime_Tests is
                         Raw_Load_Has_No_Preamble'Access);
       Test_Support.Add (Suite, "load explicit environment",
                         Explicit_Environment'Access);
+      Test_Support.Add (Suite, "load persistent environment cell",
+                        Persistent_Environment_Cell'Access);
+      Test_Support.Add (Suite, "load shared environment capture",
+                        Shared_Environment_Capture'Access);
       Test_Support.Add (Suite, "load explicit nil environment",
                         Explicit_Nil_Environment'Access);
       Test_Support.Add (Suite, "load omitted environment",
