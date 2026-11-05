@@ -36,7 +36,7 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 
 | Facility                              | Later gate / current response                    |
 | ------------------------------------- | ------------------------------------------------ |
-| goto / labels / close attributes      | M2; explicit unsupported syntax diagnostic       |
+| goto / labels / close attributes      | Checks accept; execution Unsupported_Feature     |
 | Metatables, weak tables, finalization | M2; no metamethod dispatch                       |
 | Coroutines, userdata, full libraries  | M2; unavailable facilities                       |
 | Runtime load/loadfile/require         | M2/M4; unavailable facilities                    |

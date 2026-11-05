@@ -9,6 +9,7 @@ gates on the named Windows/Linux/macOS configurations.
 | --------- | ----------------------------------------- | -------------------------------------- |
 | M0        | Foundation                                | Layout, policies, references, docs     |
 | M1        | Basic Lua scripting interpreter           | Core scripts, Ada API, batch CLI, GC   |
+| M2a       | Frontend and opcode definitions           | Full checking, shared lowering, format |
 | M2        | Remaining language and standard libraries | Deferred syntax, metatables, libraries |
 | M3        | Full C embedding and binary compatibility | C API/ABI, chunks, lifecycle evidence  |
 | M4        | Modules and ecosystem                     | Native loading and LuaRocks fixtures   |

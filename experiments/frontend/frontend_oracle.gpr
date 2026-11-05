@@ -1,4 +1,5 @@
 with "../abi/reference_lua";
+with "../../config/lua_ada_config.gpr";
 project Frontend_Oracle is
    for Languages use ("C");
    for Source_Dirs use (".");
@@ -11,4 +12,15 @@ project Frontend_Oracle is
       for Default_Switches ("C") use
         ("-std=c99", "-O2", "-Wall", "-Wextra", "-Werror");
    end Compiler;
+   package Linker is
+      --  The C parser pulls numeric VM helpers from the reference archive.
+      --  Unix hosts require an explicit math-library dependency for them.
+      case Lua_Ada_Config.Alire_Host_OS is
+         when "linux" =>
+            for Default_Switches ("C") use ("-lm", "-ldl");
+         when "macos" =>
+            for Default_Switches ("C") use ("-lm");
+         when others => null;
+      end case;
+   end Linker;
 end Frontend_Oracle;
