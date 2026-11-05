@@ -22,6 +22,8 @@ private package Lua.Engine is
       String_Bytes  : Positive := 1_000_000;
       Output_Bytes  : Positive := 1_000_000;
       Registers     : Positive := 4_096;
+      Syntax_Nodes  : Positive := 200_000;
+      Syntax_Depth  : Positive := 200;
    end record;
    --  Bounds are per session/execution, not machine-specific compile flags.
 
@@ -168,6 +170,7 @@ private package Lua.Engine is
       Failure_At   : Lua.Lexers.Source_Location;
       Is_Resource  : Boolean := False;
       Is_Syntax    : Boolean := False;
+      Is_Unsupported : Boolean := False;
    end record;
    type World_Access is access World;
 

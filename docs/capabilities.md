@@ -24,6 +24,16 @@ The base subset is exactly `print`, `assert`, `error`, `pcall`, `type`,
 
 ## Deliberately deferred
 
+M2a adds shared syntax checking and a private canonical opcode definition layer.
+Syntax accepts goto/labels/close while execution returns Unsupported_Feature.
+See the [frontend inventory](frontend.md) for scope and current evidence.
+
+- Syntax accepted: full pinned default grammar/static-semantic target.
+- Runtime behavior: M1 execution plus corrected Lua 5.5 const loop controls.
+- Opcode format: all 85 canonical definitions and six encodings.
+- Canonical code generation: deferred; compiler lowers to private operations.
+- Canonical code execution: deferred; no binary chunk compatibility claim.
+
 | Facility                              | Later gate / current response                    |
 | ------------------------------------- | ------------------------------------------------ |
 | goto / labels / close attributes      | M2; explicit unsupported syntax diagnostic       |

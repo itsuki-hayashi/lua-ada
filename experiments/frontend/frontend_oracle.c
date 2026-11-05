@@ -76,7 +76,7 @@ static void run(const char *mode, const char *bytes, size_t length) {
     luaZ_freebuffer(L, &input.buffer);
   } else {
     status = luaL_loadbufferx(L, bytes, length, "=oracle", "t");
-    if (status) printf("ERROR %s\n", lua_tostring(L, -1));
+    if (status) { const char *message = lua_tostring(L, -1); const char *colon = strchr(message, ':' ); if (status != LUA_ERRSYNTAX) puts("RESOURCE"); else printf("ERROR %ld\n", colon ? strtol(colon + 1, NULL, 10) : 0); }
     else puts("ACCEPT");
   }
   lua_close(L);
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
   if (argc != 3) return 2;
   file = fopen(argv[2], "rb");
   if (!file) return 2;
-  if (strcmp(argv[1], "batch") == 0) {
+  if (strcmp(argv[1], "batch") == 0 || strcmp(argv[1], "parse-batch") == 0) {
     char line[8192], decoded[4096];
     while (fgets(line, sizeof(line), file)) {
       size_t i, count = strcspn(line, "\r\n");
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
         if (sscanf(line + 2 * i, "%2x", &byte) != 1) return 2;
         decoded[i] = (char)byte;
       }
-      run("lex", decoded, count / 2);
+      run(strcmp(argv[1], "batch") == 0 ? "lex" : "parse", decoded, count / 2);
       puts("END");
     }
     fclose(file);

@@ -1,5 +1,16 @@
 # Ada Embedding
 
+## Syntax checking
+
+Use Lua.Syntax.Check without constructing a session. It returns structured
+syntax/resource diagnostics and never runs source. See the
+[frontend guide](frontend.md) for CLI --check and limits.
+
+Execution_Status adds Unsupported_Feature for valid deferred syntax. This is
+returned before any chunk effects; Syntax_Error remains invalid source.
+Diagnostic aliases Lua.Diagnostics.Diagnostic, preserving its record fields.
+Execution limits additionally expose Syntax_Nodes and Syntax_Depth.
+
 `Lua.Sessions` is the small ownership-aware public runtime interface. Each
 limited controlled `Session` owns a separate universe and finalizes its storage.
 Serialize calls on one session; distinct sessions share no mutable Lua state.

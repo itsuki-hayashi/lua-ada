@@ -22,21 +22,31 @@ Refactored scanning into an owned incremental scanner with a batch adapter.
 Numerals are validated lexically and classified as integer/float; tokens
 retain decoded numbers and post-token locations. Default contextual global,
 hex exponent scanning, and unmatched byte tokens match C Lua.
-The existing compiler consumes the updated batch interface pending its
-replacement by shared parsing/lowering.
+The compiler now lowers owned resolved syntax nodes; its previous grammar and
+name resolver have been removed. Nodes retain bindings, captures, declaration
+attributes, and jump targets. Checking allocates no runtime heap or globals.
 
 A protected isolated C frontend adapter provides lexical inspection and
 compile-only parsing. Neither adapter executes source or links into Lua Ada.
 10,000 arbitrary-byte C/Ada token comparisons passed (seed 551, lengths
 0 through 64); all 34 unchanged upstream files have matching lexical token
 streams, payloads, and scanner lines. This is not parser or execution evidence.
-The current 260-case AUnit runner passed with no failures/unexpected errors.
+Subsequent local validation passed 347 focused AUnit cases and 30 CLI cases,
+plus a standalone Ada syntax/session consumer. Existing six raw-byte execution
+fixtures and the arithmetic matrix still pass against the pinned interpreter.
+The generated 2,000 valid grammar cases and 2,000 mutations match C acceptance
+and reported lines. Raw-source parse comparisons match all 34 unchanged files;
+all.lua/main.lua reject their leading # preamble in both raw interfaces.
+CLI file loading handles those preambles separately. No suite was executed.
+
+Lua.Syntax.Check returns owned diagnostics and controlled resource failures.
+CLI --check supports all batch inputs without creating a session. Execution
+validates a whole chunk before Unsupported_Feature for goto/labels/close.
+Syntax failures take precedence. Numeric and first generic-for controls now
+follow Lua 5.5 const rules, correcting the previous M1 assignment test.
 
 ## Remaining acceptance
 
-Shared resolved syntax storage, complete grammar/static semantics, VM lowering
-refactor, public checking API, --check, and unsupported-feature status remain
-pending. Grammar generation/mutation campaigns and upstream parse comparison
-remain pending. Cross-platform/profile/link acceptance must run on the final
-revision. No milestone completion or full Lua compatibility is claimed.
-
+Cross-platform/profile/link acceptance must run on the final revision.
+Current local evidence does not complete ACCEPT-002. No full Lua execution,
+canonical code generation, C ABI, binary chunk, or module parity is claimed.

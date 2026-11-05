@@ -42,6 +42,7 @@ try {
 
     Set-Location (Join-Path $projectRoot 'tests')
     Invoke-Alire -Arguments @('exec', '--', "bin/$LibraryType/test_runner$suffix")
+    Invoke-Alire -Arguments @('exec', '--', "bin/$LibraryType/syntax_consumer$suffix")
 
     Set-Location (Join-Path $projectRoot 'cli')
     $cliExecutable = "bin/$LibraryType/lua_ada$suffix"

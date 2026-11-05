@@ -1,6 +1,8 @@
 with Interfaces;
 
 private package Lua.Opcodes is
+   --  Definitions follow Lua 5.5.1 lopcodes.h/c (Lua.org, PUC-Rio).
+   --  The upstream MIT notice is preserved in docs/licenses/lua.md.
    --  Canonical Lua 5.5.1 instruction definitions, independent of the M1 VM.
    --  The numeric representation is a compatibility contract with lopcodes.h;
    --  it is not a promise that the current compiler emits these instructions.
@@ -225,4 +227,3 @@ private package Lua.Opcodes is
      with Pre => Valid (Item);
    --  These predicates include instruction-dependent Lua 5.5 special cases.
 end Lua.Opcodes;
-

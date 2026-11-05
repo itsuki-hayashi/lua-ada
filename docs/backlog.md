@@ -71,15 +71,27 @@ introduced. Evidence: [fixture catalog](../tests/modules/README.md) and
 Future module execution remains MOD-001 work; fixture checkout is not parity
 evidence and does not complete that gate.
 
-## Later bounded work
-
 ## M2a frontend parity
 
-The [accepted target](milestones/m2a.md) defines FRONT-001, ORACLE-002,
-LEX-002, PARSE-002, OPCODE-001, CHECK-001, and ACCEPT-002. All remain
-in progress or pending until final acceptance evidence is recorded in the
-[session](sessions/2026-11-06-m2a-frontend.md). Local opcode/lexer evidence
-does not complete the milestone or its cross-platform gates.
+The [accepted target](milestones/m2a.md) owns acceptance; the
+[session](sessions/2026-11-06-m2a-frontend.md) records evidence.
+
+- FRONT-001, depends ACCEPT-001: owned syntax design/inventory and baseline;
+  implemented, pending final acceptance.
+- ORACLE-002, depends FRONT-001: protected isolated C lex/parse/opcode probes;
+  implemented, pending final acceptance.
+- LEX-002, depends ORACLE-002: incremental tokens/payloads/failures/locations;
+  implemented, pending final acceptance.
+- PARSE-002, depends LEX-002: full grammar/resolution and scope/jump checks;
+  implemented, pending final acceptance.
+- OPCODE-001, depends ORACLE-002: all canonical definitions/bit operations;
+  implemented, pending final acceptance.
+- CHECK-001, depends PARSE-002 and OPCODE-001: shared lowering, Ada/CLI checking;
+  implemented, pending final acceptance.
+- ACCEPT-002, depends all above: 18 platform/profile/link jobs, ABI probes,
+  Windows static-PIC, final verified PR; pending.
+
+## Later runtime work
 
 | ID        | Work                              | Dependency                     | Acceptance                                                   |
 | --------- | --------------------------------- | ------------------------------ | ------------------------------------------------------------ |

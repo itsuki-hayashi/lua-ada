@@ -8,7 +8,8 @@ $files = @('README.md', 'AGENTS.md', 'ARCHITECTURE.md', 'CONTRIBUTING.md') +
         Where-Object { $_.FullName -notmatch '[/\\]generated[/\\]' } |
         ForEach-Object { [IO.Path]::GetRelativePath($projectRoot, $_.FullName) }) +
     @('tests/README.md', 'references/README.md',
-      'experiments/abi/README.md')
+      'experiments/abi/README.md', 'experiments/frontend/README.md',
+      'tests/modules/README.md')
 $checked = 0
 
 foreach ($relativePath in $files) {

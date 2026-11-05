@@ -67,4 +67,3 @@ begin
       New_Line;
    end loop;
 end Lua.Opcode_Probe;
-

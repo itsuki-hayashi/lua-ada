@@ -32,10 +32,11 @@ ABI observations, commands, and immutable CI evidence are recorded in
 
 ## Later milestones
 
-[M2a frontend parity](milestones/m2a.md) is in progress. Incremental scanning
-and an independent canonical opcode layer have local Windows evidence in the
-[session record](sessions/2026-11-06-m2a-frontend.md). Shared parsing/lowering,
-checking interfaces, and final cross-platform acceptance remain pending.
+[M2a frontend parity](milestones/m2a.md) is in progress. Shared incremental
+parsing/resolution and VM lowering, Ada/CLI checking, and canonical opcode
+definitions are implemented. Local Windows evidence is recorded in the
+[session record](sessions/2026-11-06-m2a-frontend.md). Final cross-platform
+acceptance remains pending; implementation alone does not close the gates.
 
 Eight [real-world module fixtures](../tests/modules/README.md) are pinned under
 tests/modules/ for future consumer parity work. This is source checkout and

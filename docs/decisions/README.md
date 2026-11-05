@@ -1,6 +1,9 @@
 # Architecture Decision Log
 
-Latest: [ADR 0005: Host exponentiation](0005-host-power.md).
+Latest: [ADR 0006: Shared frontend](0006-shared-frontend.md).
+
+ADR 0006 is accepted: owned shared parsing/lowering and independent canonical
+opcode definitions. See its rationale and verification requirements above.
 
 | ID   | Decision                                              | State    |
 | ---- | ----------------------------------------------------- | -------- |

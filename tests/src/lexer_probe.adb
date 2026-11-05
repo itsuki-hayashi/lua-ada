@@ -7,11 +7,13 @@ with Ada.Unchecked_Conversion;
 with Interfaces;
 with Lua.Lexers; use Lua.Lexers;
 with Lua.Numbers;
+with Lua.Syntax;
 
 procedure Lexer_Probe is
    --  Binary-safe inspection of one source file; output is an ASCII protocol
    --  shared with the isolated C oracle. It never parses or executes source.
    use type Interfaces.Unsigned_64;
+   use type Lua.Syntax.Check_Status;
    function Bits is new Ada.Unchecked_Conversion
      (Lua.Numbers.Real_Value, Interfaces.Unsigned_64);
    Hex_Digits : constant String := "0123456789ABCDEF";
@@ -57,6 +59,21 @@ procedure Lexer_Probe is
    procedure Emit (Source : String);
    procedure Emit (Source : String) is
    begin
+      if Ada.Command_Line.Argument (1) in "--parse" | "--parse-batch" then
+         declare
+            Result : constant Lua.Syntax.Check_Result :=
+              Lua.Syntax.Check (Source, "oracle");
+         begin
+            if Result.Status = Lua.Syntax.Success then
+               Put_Line ("ACCEPT");
+            else
+               Put ("ERROR");
+               Number (Result.Error.Line);
+               New_Line;
+            end if;
+         end;
+         return;
+      end if;
       declare
          Reader : Scanner := Open (Source);
          Step : Scan_Result;
@@ -104,7 +121,7 @@ procedure Lexer_Probe is
    File : Files.File_Type;
    Batch : Ada.Text_IO.File_Type;
 begin
-   if Ada.Command_Line.Argument (1) = "--batch" then
+   if Ada.Command_Line.Argument (1) in "--batch" | "--parse-batch" then
       Ada.Text_IO.Open
         (Batch, Ada.Text_IO.In_File, Ada.Command_Line.Argument (2));
       while not Ada.Text_IO.End_Of_File (Batch) loop
@@ -123,7 +140,8 @@ begin
       Ada.Text_IO.Close (Batch);
       return;
    end if;
-   Files.Open (File, Files.In_File, Ada.Command_Line.Argument (1));
+   Files.Open (File, Files.In_File,
+               Ada.Command_Line.Argument (Ada.Command_Line.Argument_Count));
    declare
       Data : Ada.Streams.Stream_Element_Array
         (1 .. Ada.Streams.Stream_Element_Offset (Files.Size (File)));
@@ -139,4 +157,3 @@ begin
       Emit (Source);
    end;
 end Lexer_Probe;
-

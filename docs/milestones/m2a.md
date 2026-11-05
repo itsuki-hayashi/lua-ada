@@ -49,4 +49,3 @@ The current M1 VM remains the execution backend. Canonical code generation,
 full opcode execution, binary chunks, metamethods, close execution, libraries,
 C ABI, and ecosystem fixtures are later work. No runtime dependency is added.
 The [session](../sessions/2026-11-06-m2a-frontend.md) owns current evidence.
-

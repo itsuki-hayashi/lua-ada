@@ -271,4 +271,3 @@ package body Lua.Opcodes is
         (Table (Op).Output_Top and then Get (Item, C).Value = 0);
    end Sets_Top;
 end Lua.Opcodes;
-

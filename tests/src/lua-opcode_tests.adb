@@ -1223,4 +1223,3 @@ package body Lua.Opcode_Tests is
         (Suite, "opcode: 4096 round trips", Round_Trips'Access);
    end Register;
 end Lua.Opcode_Tests;
-
