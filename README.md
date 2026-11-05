@@ -7,7 +7,7 @@ interface. The initial compatibility baseline is **Lua 5.5.1**.
 **Current capability:** reusable static/shared Ada sessions and a batch CLI
 execute the documented [M1 Lua subset](docs/milestones/m1.md), including closures,
 tables, tracing collection, and a small base library. Complete Lua compatibility,
-C exports, and LuaRocks remain later milestones. M1 is undergoing final regression revalidation; see the
+C exports, and LuaRocks remain later milestones. **M1 is complete**; see the
 [validated platform matrix](docs/validation.md).
 See [status](docs/status.md) for actual verification evidence.
 

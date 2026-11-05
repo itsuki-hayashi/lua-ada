@@ -1,10 +1,10 @@
 # Project Status
 
-Updated: 2026-11-05 (Asia/Tokyo). **M0 complete; M1 regression revalidation active.**
+Updated: 2026-11-05 (Asia/Tokyo). **M0 and M1 complete.**
 The [M1 target](milestones/m1.md) owns scope; the
 [validation record](validation.md) owns exact platform/configuration evidence.
 
-## Implemented and verified baseline
+## Implemented and verified
 
 The reusable Ada runtime executes the M1 language subset through
 `Lua.Sessions` and the batch CLI. It includes a resolving frontend, private
@@ -17,12 +17,8 @@ files, repeated snippets, stdin, arguments, help/version, byte-preserving output
 and controlled failure status. See [capabilities](capabilities.md) and
 [embedding](embedding.md).
 
-Three additional focused cases now reject numeric strings in bitwise operands,
-matching the pinned oracle. Local validation passes 171 cases and all fixtures;
-the expanded platform matrix is running. The previously verified baseline follows.
-
 All 18 Windows/Linux/macOS x development/validation/release x static/shared
-jobs passed. Each passed 168 individually named AUnit cases, zero failed
+jobs passed. Each passed 171 individually named AUnit cases, zero failed
 assertions/unexpected errors, 19 CLI cases, and six raw-byte differential
 fixtures against pinned C Lua, including 2,366 arithmetic combinations.
 The ABI probe passed on each target OS. Final Windows static-PIC acceptance

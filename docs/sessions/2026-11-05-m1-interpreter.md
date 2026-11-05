@@ -11,7 +11,7 @@ lexical cells and closures, tables, all M1 control flow, packet result adjustmen
 tail calls, protected failures, bounded execution, tracing cycles/prototypes,
 the base subset, owned Ada sessions, and batch CLI execution.
 
-Expanded AUnit from six broad cases to 168 separately named cases with explanatory
+Expanded AUnit from six broad cases to 171 separately named cases with explanatory
 comments. Added 19 CLI process cases and six raw-byte differential fixtures,
 including binary output and a 2,366-operation numeric matrix. ABI probes exercise
 allocation/failure, callbacks/reentry, varargs, extra space, yield after Ada
@@ -24,11 +24,11 @@ exponentiation. Source representations and bytecode remain private.
 
 ## Verification
 
-The [final runtime CI run](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42043334409)
-passed all 18 OS/profile/link jobs. Every log was inspected: 168 successful AUnit
+The [final runtime CI run](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42045878008)
+passed all 18 OS/profile/link jobs. Every log was inspected: 171 successful AUnit
 cases, no failures/unexpected errors, 19 CLI cases, six differential fixtures,
 stable GNAT selection, and documentation checks. ABI probes passed in all three
-static/validation jobs. Windows static-PIC also passed with 168 cases.
+static/validation jobs. Windows static-PIC also passed with 171 cases.
 
 Tool versions: Alire 2.1.1; stable GNAT 16.1.0; GPRbuild package 26.0.1
 (binary 26.0.0); AUnit 26.0.0. Compiler argument records retain mandatory flags
@@ -40,7 +40,10 @@ oracle source ownership, byte-stream encoding, macOS NaN spelling, prerelease
 toolchain selection, and macOS C-host Ada-runtime linkage. Download HTTP 504
 failures now retry the same selected stable release, without compiler fallback.
 A final ownership review moved partial frame ownership ahead of failing scope
-allocation and added a focused recovery regression.
+allocation and added a focused recovery regression. A final compatibility check
+distinguished primitive bitwise operands from API integer coercion: numeric
+strings are rejected on both binary operand sides and by unary complement.
+Three focused AUnit cases and differential guards protect that distinction.
 
 Native HTTPS Git push lacked credentials. After explicit user approval for
 publication, the connected GitHub transport published the reviewed source to

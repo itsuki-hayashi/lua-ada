@@ -2,8 +2,8 @@
 
 Date: 2026-11-05, Asia/Tokyo. **All five M1 gates passed.**
 
-Runtime evidence: [18-job acceptance run](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42043334409)
-at commit `bc6b720a26e95cd3c7bba18ef92c946b4721e65d`.
+Runtime evidence: [18-job acceptance run](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42045878008)
+at commit `ec93d6dcea9322896981b3ead4b2077d6c50b68c`.
 Every job log was inspected for test totals, CLI/differential results, stable
 compiler selection, and documentation checks.
 
@@ -25,8 +25,8 @@ OS/architecture, C runtime, or nondefault numeric configuration is certified.
 
 Each of the 18 jobs passed:
 
-- 168 separately named AUnit cases: 21 integer, 33 lexer, 30 number,
-  47 language/session, and 37 lifecycle/resource/GC cases.
+- 171 separately named AUnit cases: 21 integer, 33 lexer, 30 number,
+  50 language/session, and 37 lifecycle/resource/GC cases.
 - Zero failed assertions and zero unexpected errors.
 - 19 CLI process cases for usage/version, snippets, files, stdin, preambles,
   arguments, diagnostics, output preservation, and status.
@@ -40,7 +40,7 @@ yield/resume after Ada returns, and explicit C-host Ada initialization/finalizat
 Each observed integer=8, number=8, lua_Debug=144, extra space=8, and currentline
 offset=48 bytes. Those observations are not portable representation constants.
 
-Windows additionally passed static-PIC validation with the final 168-case
+Windows additionally passed static-PIC validation with the final 171-case
 runtime. Local ignored logs live under reports. Compiler argument records
 were inspected in all three profiles: required `-gnat2022 -gnatwa -gnatwe
 -gnatv -gnaty` are present, runtime checks remain enabled, and no `-gnatp`

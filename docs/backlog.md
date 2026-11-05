@@ -1,8 +1,7 @@
 # Backlog
 
 IDs are stable. Completion requires evidence, including relevant platform gates.
-M1 baseline passed; ACCEPT-001 is revalidating three bitwise-coercion regressions.
-See [current status](status.md) and [baseline evidence](validation.md).
+M1 is complete; [all five gates passed](validation.md).
 
 | ID         | Work                          | State          | Depends on                                   |
 | ---------- | ----------------------------- | -------------- | -------------------------------------------- |
@@ -23,7 +22,7 @@ See [current status](status.md) and [baseline evidence](validation.md).
 | API-001    | Owned sessions/errors         | done           | VM-001, LANG-001                             |
 | CLI-001    | Batch interface               | done           | API-001                                      |
 | BASE-001   | Scoped base library           | done           | LANG-001                                     |
-| ACCEPT-001 | All-platform M1 acceptance    | active         | CLI-001, BASE-001, CI-001, COMP-001, ABI-001 |
+| ACCEPT-001 | All-platform M1 acceptance    | done           | CLI-001, BASE-001, CI-001, COMP-001, ABI-001 |
 
 ## Acceptance and evidence
 
