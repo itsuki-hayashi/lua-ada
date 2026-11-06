@@ -29,6 +29,15 @@ if ($Report -eq '') { $Report = Join-Path $runRoot 'report.json' }
 $Report = [IO.Path]::GetFullPath($Report)
 $evidence = [ordered]@{
     schema_version = 1
+    repository_revision = $null
+    repository_dirty = $null
+    repository_status = @()
+    host = [ordered]@{
+        os_description = [Runtime.InteropServices.RuntimeInformation]::OSDescription
+        os_architecture = [Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+        process_architecture = [Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString()
+        powershell_version = $PSVersionTable.PSVersion.ToString()
+    }
     reference_revision = $revision
     target = $Target
     requested_configuration = $Configuration
@@ -68,6 +77,10 @@ function Invoke-BuildProcess {
     $evidence.build_processes += $build
     if ($build.exit_code -ne 0 -or $build.timed_out -or $build.capture_exceeded -or
         $build.pipe_drain_failed -or $build.process_tree_kill_error) {
+        # Preserve the raw captures as artifacts, and expose a readable copy
+        # of failed compiler diagnostics directly in the CI job log as well.
+        Write-Output ([IO.File]::ReadAllText($build.stdout_path))
+        Write-Output ([IO.File]::ReadAllText($build.stderr_path))
         throw "Conformance build failed; see $($build.stderr_path)"
     }
 }
@@ -113,6 +126,16 @@ function Build-Fixtures {
 
 try {
     Set-Location $root
+    $evidence.repository_revision = (& git -c core.fsmonitor=false rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot determine first-party repository revision' }
+    # HEAD identifies committed inputs only. Record staged, unstaged and
+    # untracked first-party changes separately so a local experimental run
+    # cannot masquerade as evidence for that committed revision. Submodule
+    # contents have their own stricter immutable-reference witness below.
+    $evidence.repository_status = @(& git -c core.fsmonitor=false status --porcelain=v1 `
+        --untracked-files=normal --ignore-submodules=all)
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot determine first-party repository worktree status' }
+    $evidence.repository_dirty = $evidence.repository_status.Count -gt 0
     # A header-only check misses modified VM/parser sources and staged edits.
     # The shared witness checks the entire pinned tracked tree and rejects
     # untracked/ignored source inputs before any build or fixture execution.
@@ -131,6 +154,13 @@ try {
         $evidence.harness_source_records += [ordered]@{
             path = [IO.Path]::GetRelativePath($root, $source.FullName).Replace('\', '/')
             sha256 = (Get-FileHash -LiteralPath $source.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+        }
+    }
+    foreach ($relative in @('scripts/run-conformance.ps1', 'scripts/ConformanceRunner.psm1',
+        'scripts/ConformanceInventory.psm1', 'tests/conformance/suite.json')) {
+        $evidence.harness_source_records += [ordered]@{
+            path = $relative
+            sha256 = (Get-FileHash -LiteralPath (Join-Path $root $relative) -Algorithm SHA256).Hash.ToLowerInvariant()
         }
     }
     $suite = Get-Content -LiteralPath (Join-Path $root 'tests/conformance/suite.json') -Raw | ConvertFrom-Json

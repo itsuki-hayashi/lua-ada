@@ -18,12 +18,20 @@ Origins are [lua/lua](https://github.com/lua/lua) and
 ## Checkout
 
 ```text
-git submodule update --init --recursive -- references/lua references/ada-lua
+git -c core.autocrlf=false submodule update --init --recursive -- references/lua references/ada-lua
 git submodule status -- references/lua references/ada-lua
 ```
 
 A submodule is intentionally detached at its recorded commit. Do not use
 `git submodule update --remote` as a routine setup command.
+
+Materialize the pinned bytes with automatic newline conversion disabled,
+including on Windows. The conformance inventory hashes original LF source
+bytes; a CRLF-converted checkout is not that byte baseline even if Git reports
+it clean. Parent attributes do not govern submodule files. CI sets this Git
+policy before recursive checkout. For an existing converted checkout, preserve
+any local changes and obtain a fresh reference checkout with this policy;
+do not rewrite reference sources or regenerate the ledger to hide hash drift.
 
 ## Deliberate update
 

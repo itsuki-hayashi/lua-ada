@@ -21,7 +21,7 @@ alr -C cli exec -- bin/static/lua_ada --help
 ```
 
 The check driver builds the requested root profile plus both consumers, runs
-AUnit, 19 CLI process cases, and six byte-exact C/Ada differential fixtures.
+AUnit, 30 CLI process cases, and seven byte-exact C/Ada differential fixtures.
 It accepts development, validation, release, and static/static-pic/relocatable.
 It also validates documentation links/formatting and configures library search paths
 and restores the calling environment. See [embedding](embedding.md) for Ada use.
@@ -55,7 +55,7 @@ The comparison driver builds pinned C Lua independently without changing its
 sources. OracleOnly checks fixtures, never Ada parity.
 
 The workflow covers three OS targets, three profiles, and two library modes.
-The [M1 validation record](validation.md) names the exact passing configurations
+The [M2b validation record](validation-m2b.md) names the exact passing configurations
 and immutable CI evidence. Future compatibility claims must also record OS,
 architecture, compiler/linker, C runtime, and Lua settings. Local logs belong in
 ignored reports/.

@@ -37,7 +37,7 @@ Install [Alire](https://alire.ada.dev/) and use the latest stable native GNAT
 available through Alire. Run these commands from a PowerShell or POSIX shell:
 
 ```text
-git clone --recurse-submodules https://github.com/itsuki-hayashi/lua-ada.git
+git -c core.autocrlf=false clone --recurse-submodules https://github.com/itsuki-hayashi/lua-ada.git
 cd lua-ada
 alr build --development
 alr -C cli build

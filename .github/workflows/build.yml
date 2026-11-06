@@ -18,6 +18,9 @@ jobs:
         profile: [development, validation, release]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Preserve pinned source bytes
+        shell: pwsh
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@v5
         with:
           submodules: recursive

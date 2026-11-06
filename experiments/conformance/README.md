@@ -127,8 +127,14 @@ Each invocation writes `reports/conformance/<run-id>/report.json` unless
 and `.stderr` files stay under that run directory. JSON schema version 1 records:
 
 - Requested and observed configuration, probe process, and verification state.
+- First-party repository revision and worktree status, including uncommitted
+  tracked and untracked inputs, plus OS description, OS/process architecture,
+  and PowerShell version. A dirty run is evidence for those exact input hashes,
+  not a claim that its changed inputs belong to the recorded commit.
 - Full reference C/header and first-party harness input hashes, copied fixture
   hashes, post-execution changes, executable and shared-library hashes.
+- Runner, process collector, inventory validator, and suite manifest hashes as
+  well as the C/GPR inputs, since these select and classify the observations.
 - Exact compiler argument vectors, build process captures, and native fixture
   source/artifact hashes when the runner performs those builds.
 - Execution arguments, directory, elapsed time, exit status, timeout/capture
