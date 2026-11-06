@@ -10,7 +10,8 @@ $files = @('README.md', 'AGENTS.md', 'ARCHITECTURE.md', 'CONTRIBUTING.md') +
     @('tests/README.md', 'references/README.md',
       'experiments/abi/README.md', 'experiments/frontend/README.md',
       'experiments/conformance/README.md', 'tests/conformance/README.md',
-      'tests/modules/README.md')
+      'tests/modules/README.md', 'c_api/README.md',
+      'c_api/include/api/README.md')
 $checked = 0
 
 foreach ($relativePath in $files) {

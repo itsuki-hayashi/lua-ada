@@ -1,5 +1,4 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Unchecked_Deallocation;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Formats;
@@ -13,8 +12,6 @@ with Test_Support;
 package body Lua.String_Helper_Tests is
    use type Integer_Value;
    use type Real_Value;
-   procedure Free_Frame is new Ada.Unchecked_Deallocation
-     (Frame, Frame_Access);
 
    generic
       with procedure Action (State : in out World);
@@ -68,7 +65,7 @@ package body Lua.String_Helper_Tests is
 
    procedure Captured_Backreference (State : in out World) is
       Found : Patterns.Match_Result;
-      Captures : Values.Vector;
+      Captures : Values.Vector := Owned_Values (State);
    begin
       --  The second occurrence must equal the captured bytes, rather than
       --  merely matching the same character class independently.
@@ -100,7 +97,7 @@ package body Lua.String_Helper_Tests is
 
    procedure Capture_Rollback (State : in out World) is
       Found : Patterns.Match_Result;
-      Captures : Values.Vector;
+      Captures : Values.Vector := Owned_Values (State);
    begin
       --  Greedy expansion initially consumes too much. Failed alternatives
       --  must restore capture boundaries before trying the successful split.
@@ -122,7 +119,7 @@ package body Lua.String_Helper_Tests is
 
    procedure Position_Captures (State : in out World) is
       Found : Patterns.Match_Result;
-      Captures : Values.Vector;
+      Captures : Values.Vector := Owned_Values (State);
    begin
       --  Empty parentheses yield one-based positions, not empty strings.
       --  The last position may legitimately be one byte beyond the subject.
@@ -164,7 +161,7 @@ package body Lua.String_Helper_Tests is
    end Pattern_Budget;
 
    procedure Empty_Plain_Search (State : in out World) is
-      Args, Result : Values.Vector;
+      Args, Result : Values.Vector := Owned_Values (State);
    begin
       --  Searching after the last byte is legal. Nonempty plain text misses,
       --  while the empty pattern denotes the terminal zero-width match.
@@ -180,7 +177,7 @@ package body Lua.String_Helper_Tests is
    end Empty_Plain_Search;
 
    procedure Negative_Substring (State : in out World) is
-      Args, Result : Values.Vector;
+      Args, Result : Values.Vector := Owned_Values (State);
    begin
       --  Negative positions count from the end without negating mininteger.
       --  Extreme negative bounds clip at the start instead of overflowing.
@@ -192,7 +189,7 @@ package body Lua.String_Helper_Tests is
    end Negative_Substring;
 
    procedure Huge_Empty_Repetition (State : in out World) is
-      Args, Result : Values.Vector;
+      Args, Result : Values.Vector := Owned_Values (State);
    begin
       --  The mathematical output is empty even with maxinteger repetitions.
       --  This must finish immediately, with no gigantic loop or allocation.
@@ -299,7 +296,8 @@ package body Lua.String_Helper_Tests is
    end Binary_String_Formatting;
 
    procedure Empty_Match_Progression (State : in out World) is
-      Activation : Frame_Access := new Frame;
+      Activation : Frame_Access :=
+        New_Frame (State);
       Result : Native_Action;
    begin
       --  The native continuation emits each byte between empty matches once.
@@ -316,16 +314,17 @@ package body Lua.String_Helper_Tests is
       Assert (Result.Results (1).Reference.Bytes = "-a-b-",
               "empty matches progress");
       Assert (Result.Results (2).Integer_Data = 3, "empty replacement count");
-      Free_Frame (Activation);
+      Return_Frame (Activation);
    exception
       when others =>
-         Free_Frame (Activation);
+         Return_Frame (Activation);
          raise;
    end Empty_Match_Progression;
 
    procedure Iterator_Persistence (State : in out World) is
-      Creation : Frame_Access := new Frame;
-      Invocation : Frame_Access := new Frame;
+      Creation : Frame_Access := New_Frame (State);
+      Invocation : Frame_Access :=
+        New_Frame (State);
       Created, Result : Native_Action;
    begin
       --  Each invocation has its own frame. Position state belongs to the
@@ -343,17 +342,18 @@ package body Lua.String_Helper_Tests is
               "second iterator item");
       Result := Pattern_Drivers.Advance (State, Invocation);
       Assert (Result.Results.Is_Empty, "iterator exhaustion");
-      Free_Frame (Creation);
-      Free_Frame (Invocation);
+      Return_Frame (Creation);
+      Return_Frame (Invocation);
    exception
       when others =>
-         Free_Frame (Creation);
-         Free_Frame (Invocation);
+         Return_Frame (Creation);
+         Return_Frame (Invocation);
          raise;
    end Iterator_Persistence;
 
    procedure Formatting_Callback (State : in out World) is
-      Activation : Frame_Access := new Frame;
+      Activation : Frame_Access :=
+        New_Frame (State);
       Result : Native_Action;
    begin
       --  Formatting must suspend before %s, request ordinary tostring, and
@@ -373,15 +373,16 @@ package body Lua.String_Helper_Tests is
       end loop;
       Assert (Result.Results (1).Reference.Bytes = "[value] 7",
               "format resumed with callback result");
-      Free_Frame (Activation);
+      Return_Frame (Activation);
    exception
       when others =>
-         Free_Frame (Activation);
+         Return_Frame (Activation);
          raise;
    end Formatting_Callback;
 
    procedure Replacement_Roots (State : in out World) is
-      Activation : Frame_Access := new Frame;
+      Activation : Frame_Access :=
+        New_Frame (State);
       Result : Native_Action;
    begin
       --  A Lua replacement can trigger collection before returning. Keep the
@@ -407,11 +408,11 @@ package body Lua.String_Helper_Tests is
       Assert (Result.Results (1).Reference.Bytes = "Xb",
               "replacement result survives collection");
       State.Current.Stack.Clear;
-      Free_Frame (Activation);
+      Return_Frame (Activation);
    exception
       when others =>
          State.Current.Stack.Clear;
-         Free_Frame (Activation);
+         Return_Frame (Activation);
          raise;
    end Replacement_Roots;
 
@@ -434,8 +435,9 @@ package body Lua.String_Helper_Tests is
    end Quoting_Budget;
 
    procedure Iterator_Copy_Budget (State : in out World) is
-      Creation : Frame_Access := new Frame;
-      Invocation : Frame_Access := new Frame;
+      Creation : Frame_Access := New_Frame (State);
+      Invocation : Frame_Access :=
+        New_Frame (State);
       Created, Result : Native_Action;
    begin
       --  Each resumed iterator copies the retained subject before matching.
@@ -462,17 +464,18 @@ package body Lua.String_Helper_Tests is
               (3).Cell_Value.Integer_Data = 0,
                     "iterator position unchanged by failed copy");
       end;
-      Free_Frame (Creation);
-      Free_Frame (Invocation);
+      Return_Frame (Creation);
+      Return_Frame (Invocation);
    exception
       when others =>
-         Free_Frame (Creation);
-         Free_Frame (Invocation);
+         Return_Frame (Creation);
+         Return_Frame (Invocation);
          raise;
    end Iterator_Copy_Budget;
 
    procedure Replacement_Copy_Budget (State : in out World) is
-      Activation : Frame_Access := new Frame;
+      Activation : Frame_Access :=
+        New_Frame (State);
       Result : Native_Action;
    begin
       --  A replacement step also obtains a whole-subject view. Account for
@@ -494,10 +497,10 @@ package body Lua.String_Helper_Tests is
             Assert (Activation.Native_Stage = 0,
                     "replacement state unchanged by failed copy");
       end;
-      Free_Frame (Activation);
+      Return_Frame (Activation);
    exception
       when others =>
-         Free_Frame (Activation);
+         Return_Frame (Activation);
          raise;
    end Replacement_Copy_Budget;
 

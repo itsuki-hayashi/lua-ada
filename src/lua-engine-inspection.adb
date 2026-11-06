@@ -1,8 +1,13 @@
+with Lua.Engine.Call_Names;
+with Lua.Engine.Canonical;
+with Lua.Prototypes;
 with Lua.Engine.Strings;
 with Ada.Strings.Fixed;
 
 package body Lua.Engine.Inspection is
    use type Integer_Value;
+   use type Ada.Containers.Count_Type;
+   use type Lua.Prototypes.Prototype_Access;
 
    function Short_Source (Source : String) return String;
    function Short_Source (Source : String) return String is
@@ -41,7 +46,7 @@ package body Lua.Engine.Inspection is
       Args : constant Values.Vector := Activation.Native_Arguments;
       Context : Context_Access := State.Current;
       Base : Positive := 1;
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       Selected : Frame_Access;
       Function_Value : Value;
       Code : Prototype_Access;
@@ -50,11 +55,26 @@ package body Lua.Engine.Inspection is
         (if Index <= Natural (Args.Length) then Args (Index) else Nil_Value);
       function Integer_Arg (Index : Positive) return Integer_Value;
       function Logical_Frame (Level : Natural) return Frame_Access;
+      function Caller_Of (Callee : Frame_Access) return Frame_Access;
       function Symbol_Text
         (Prototype : Prototype_Access; Symbol : Positive) return String;
       procedure Append (Item : Value);
       procedure Work;
       procedure Field (Table : Value; Key : String; Item : Value);
+      function Line_At (Item : Frame_Access; PC : Positive) return Natural;
+      function Current_PC (Item : Frame_Access) return Natural;
+
+      function Current_PC (Item : Frame_Access) return Natural is
+        (if Context.Hook_Active and then Item = Context.Hook_Frame then
+            Item.PC - 1 else Natural'Max (1, Item.PC - 1) - 1);
+      --  A hook observes the instruction about to run; a suspended caller
+      --  observes its saved call PC. Both are zero-based canonical offsets.
+
+      function Line_At (Item : Frame_Access; PC : Positive) return Natural is
+        (if Item.Code.Canonical_Node /= null then
+            Canonical.Source_Line (Item, PC - 1)
+         elsif PC <= Item.Code.Code.Last_Index then
+            Item.Code.Code (PC).Location.Line else 0);
 
       procedure Work is
       begin
@@ -107,6 +127,26 @@ package body Lua.Engine.Inspection is
          return null;
       end Logical_Frame;
 
+      function Caller_Of (Callee : Frame_Access) return Frame_Access is
+         Found : Boolean := False;
+      begin
+         --  Name inference is deliberately lazy: ordinary function calls never
+         --  scan preceding code. Skip explicit scheduler phases when finding
+         --  the logical caller, and preserve real native library boundaries.
+         for Item of reverse Context.Stack loop
+            if Item = Callee then
+               Found := True;
+            elsif Found and then
+              (not Item.Is_Native or else
+               (Length (Item.Native_Name) > 0 and then
+                Element (Item.Native_Name, 1) /= '@'))
+            then
+               return Item;
+            end if;
+         end loop;
+         return null;
+      end Caller_Of;
+
       function Symbol_Text
         (Prototype : Prototype_Access; Symbol : Positive) return String
       is
@@ -144,7 +184,7 @@ package body Lua.Engine.Inspection is
             Context.Hook_Reported_Count := 0;
          else
             if Arg (Base).Kind not in Closure_Kind | Native_Closure_Kind |
-              Native_Kind_Value
+              Native_Kind_Value | Foreign_Function_Kind
             then
                Fail (State, "function expected");
             end if;
@@ -161,7 +201,8 @@ package body Lua.Engine.Inspection is
             Context.Hook_Mask := Null_Unbounded_String;
             for Mask of String'("crl") loop
                if Ada.Strings.Fixed.Index
-                 (C_Option (Image (Arg (Base + 1))), "" & Mask) /= 0
+                 (C_Option (Image (State.Current.Memory, Arg (Base + 1))),
+                  "" & Mask) /= 0
                then
                   Append (Context.Hook_Mask, Mask);
                end if;
@@ -190,26 +231,114 @@ package body Lua.Engine.Inspection is
          end if;
          Append (New_String (State, To_String (Context.Hook_Mask)));
          Append ((Integer_Kind, Context.Hook_Reported_Count));
+      elsif Name in "debug.getuservalue" | "debug.setuservalue" then
+         declare
+            Setting : constant Boolean := Name = "debug.setuservalue";
+            Slot : constant Positive := (if Setting then 3 else 2);
+            Number : Integer_Value :=
+              (if Arg (Slot).Kind = Nil_Kind then 1 else Integer_Arg (Slot));
+         begin
+            --  The library's optional Lua integer is converted to native C
+            --  int before indexing, including its low-bit wrap on every
+            --  supported ABI. Keep absent/nil defaults distinct from an
+            --  existing uservalue whose stored value happens to be nil.
+            Number := Number mod (2 ** Interfaces.C.int'Size);
+            if Number >= 2 ** (Interfaces.C.int'Size - 1) then
+               Number := Number - 2 ** Interfaces.C.int'Size;
+            end if;
+            if Setting then
+               if Arg (1).Kind /= Userdata_Kind then
+                  Fail (State, "full userdata expected");
+               elsif Args.Length < 2 then
+                  Fail (State, "value expected");
+               end if;
+            end if;
+            if Arg (1).Kind /= Userdata_Kind or else Number < 1 or else
+              Number > Integer_Value (Arg (1).Reference.Uservalues.Length)
+            then
+               Append (Nil_Value);
+            elsif Setting then
+               --  Mutate the actual traced slot, without allocating a proxy
+               --  table or changing the userdata's stable C payload address.
+               Arg (1).Reference.Uservalues.Replace_Element
+                 (Positive (Number), Arg (2));
+               Append (Arg (1));
+            else
+               Append (Arg (1).Reference.Uservalues (Positive (Number)));
+               Append ((Boolean_Kind, True));
+            end if;
+         end;
+      elsif Name = "debug.getregistry" then
+         Append ((Table_Kind, State.Foreign_Registry));
+      elsif Name = "debug.getmetatable" then
+         if Args.Is_Empty then
+            Fail (State, "value expected");
+         end if;
+         declare
+            Meta : constant Object_Access := Raw_Metatable (State, Arg (1));
+         begin
+            Append ((if Meta = null then Nil_Value else
+                       (Table_Kind, Meta)));
+         end;
+      elsif Name = "debug.setmetatable" then
+         if Args.Length < 2 or else
+           Arg (2).Kind not in Nil_Kind | Table_Kind
+         then
+            Fail (State, "nil or table expected");
+         end if;
+         Set_Metatable
+           (State, Arg (1), (if Arg (2).Kind = Nil_Kind then null else
+                              Arg (2).Reference));
+         Append (Arg (1));
+      elsif Name = "debug.upvaluejoin" then
+         declare
+            Target : constant Value := Arg (1);
+            Source : constant Value := Arg (3);
+            Target_Index : constant Integer_Value := Integer_Arg (2);
+            Source_Index : constant Integer_Value := Integer_Arg (4);
+         begin
+            --  This operation redirects one closure's actual cell reference;
+            --  copying the cell value would break future shared mutations,
+            --  upvalueid identity and collection after the source disappears.
+            if Target.Kind /= Closure_Kind or else
+              Source.Kind /= Closure_Kind
+            then
+               Fail (State, "Lua function expected");
+            elsif Target_Index < 1 or else Target_Index > Integer_Value
+              (Target.Reference.Upvalues.Length) or else
+              Source_Index < 1 or else Source_Index > Integer_Value
+                (Source.Reference.Upvalues.Length)
+            then
+               Fail (State, "invalid upvalue index");
+            end if;
+            Target.Reference.Upvalues.Replace_Element
+              (Positive (Target_Index),
+               Source.Reference.Upvalues (Positive (Source_Index)));
+         end;
       elsif Name in "debug.getupvalue" | "debug.setupvalue" | "debug.upvalueid"
       then
+         if Name = "debug.setupvalue" and then Args.Length < 3 then
+            Fail (State, "value expected");
+         end if;
          Function_Value := Arg (1);
          declare
             Index : constant Integer_Value := Integer_Arg (2);
             Cell : Object_Access;
          begin
             if Function_Value.Kind not in Closure_Kind | Native_Closure_Kind |
-              Native_Kind_Value
+              Native_Kind_Value | Foreign_Function_Kind
             then
                Fail (State, "function expected");
             end if;
-            if Function_Value.Kind = Native_Kind_Value or else
+            if Function_Value.Kind in Native_Kind_Value | Foreign_Function_Kind
+              or else
               Index < 1 or else Index > Integer_Value
                 ((if Function_Value.Kind = Closure_Kind then
                     Function_Value.Reference.Upvalues.Length else
                     Function_Value.Reference.Captures.Length))
             then
                if Name = "debug.upvalueid" then
-                  Fail (State, "invalid upvalue index");
+                  Append (Nil_Value);
                end if;
                return Result;
             end if;
@@ -218,15 +347,20 @@ package body Lua.Engine.Inspection is
                  Function_Value.Reference.Upvalues (Positive (Index)) else
                  Function_Value.Reference.Captures (Positive (Index)));
             if Name = "debug.upvalueid" then
-               Append ((Light_Identity_Kind, Cell.Serial));
+               Append ((Light_Identity_Kind, Cell.all'Address));
             else
                if Function_Value.Kind = Closure_Kind then
                   Code := Function_Value.Reference.Code;
                end if;
-               Append (New_String
-                 (State, (if Code = null then "" else Symbol_Text
-                    (Code, (if Code.Is_Main then Code.Environment_Symbol
-                     else Code.Capture_Symbols (Positive (Index)))))));
+               if Code /= null and then Code.Canonical_Node /= null then
+                  Append (Canonical.Upvalue_Name
+                    (State, Code, Positive (Index)));
+               else
+                  Append (New_String
+                    (State, (if Code = null then "" else Symbol_Text
+                       (Code, (if Code.Is_Main then Code.Environment_Symbol
+                        else Code.Capture_Symbols (Positive (Index)))))));
+               end if;
                if Name = "debug.setupvalue" then
                   Cell.Cell_Value := Arg (3);
                else
@@ -257,7 +391,7 @@ package body Lua.Engine.Inspection is
                Function_Value := (Native_Closure_Kind, Selected.Native_Self);
             end if;
          elsif Function_Value.Kind not in Closure_Kind | Native_Closure_Kind |
-           Native_Kind_Value
+           Native_Kind_Value | Foreign_Function_Kind
          then
             Fail (State, "function or level expected");
          end if;
@@ -267,10 +401,13 @@ package body Lua.Engine.Inspection is
          declare
             Options : constant String :=
               (if Arg (Base + 1).Kind = Nil_Kind then "flnSrtu"
-               else C_Option (Image (Arg (Base + 1))));
+               else C_Option (Image (State.Current.Memory, Arg (Base + 1))));
             Info : constant Value := New_Table (State);
             Source : constant String :=
-              (if Code = null then "=[C]" else To_String (Code.Name));
+              (if Code = null then "=[C]"
+               elsif Code.Canonical_Node /= null then
+                 To_String (Canonical.Source_Bytes (Code))
+               else To_String (Code.Name));
             Line : Integer_Value := -1;
             function Wants (Option : Character) return Boolean is
               (Ada.Strings.Fixed.Index (Options, "" & Option) /= 0);
@@ -281,19 +418,9 @@ package body Lua.Engine.Inspection is
                   Fail (State, "invalid option");
                end if;
             end loop;
-            if Selected /= null and then not Selected.Is_Native and then
-              Selected.PC > 1 and then
-              Selected.PC - 1 <= Selected.Code.Code.Last_Index
-            then
+            if Selected /= null and then not Selected.Is_Native then
                Line := Integer_Value
-                 (Selected.Code.Code (Selected.PC - 1).Location.Line);
-            end if;
-            if Context.Hook_Active and then Selected /= null and then
-              Selected = Context.Hook_Frame and then not Selected.Is_Native
-              and then Selected.PC <= Selected.Code.Code.Last_Index
-            then
-               Line := Integer_Value
-                 (Selected.Code.Code (Selected.PC).Location.Line);
+                 (Line_At (Selected, Current_PC (Selected) + 1));
             end if;
             if Wants ('l') then
                Field (Info, "currentline", (Integer_Kind, Line));
@@ -310,7 +437,9 @@ package body Lua.Engine.Inspection is
                     Integer_Value (Code.Last_Line))));
                Field (Info, "what", New_String
                  (State, (if Code = null then "C"
-                  elsif Code.Is_Main then "main" else "Lua")));
+                  elsif (if Code.Canonical_Node /= null then
+                           Code.Canonical_Node.First_Line = 0
+                         else Code.Is_Main) then "main" else "Lua")));
             end if;
             if Wants ('u') then
                Field (Info, "nups", (Integer_Kind,
@@ -320,19 +449,45 @@ package body Lua.Engine.Inspection is
                     (Function_Value.Reference.Upvalues.Length))));
                Field (Info, "nparams", (Integer_Kind,
                  (if Code = null then 0 else
-                    Integer_Value (Code.Parameters.Length))));
+                    (if Code.Canonical_Node /= null then
+                        Integer_Value (Code.Canonical_Node.Parameters)
+                     else Integer_Value (Code.Parameters.Length)))));
                Field (Info, "isvararg", (Boolean_Kind,
                  Code = null or else Code.Vararg));
             end if;
             if Wants ('n') then
-               Field (Info, "namewhat", New_String
-                 (State, (if Selected = null then "" else
-                    To_String (Selected.Name_Kind))));
-               if Selected /= null and then Length (Selected.Call_Name) > 0
-               then
-                  Field (Info, "name", New_String
-                    (State, To_String (Selected.Call_Name)));
-               end if;
+               declare
+                  Caller : Frame_Access;
+                  Inferred : Call_Names.Identity;
+                  use type Call_Names.Name_Kind;
+               begin
+                  if Selected /= null and then
+                    Length (Selected.Name_Kind) = 0 and then
+                    not Selected.Is_Tail_Call
+                  then
+                     Caller := Caller_Of (Selected);
+                     if Caller /= null and then not Caller.Is_Native and then
+                       Caller.Code.Canonical_Node /= null
+                     then
+                        Inferred := Call_Names.From_Caller (State, Caller);
+                     end if;
+                  end if;
+                  if Inferred.Kind /= Call_Names.Unknown then
+                     Field (Info, "namewhat", New_String
+                       (State, Call_Names.Kind_Image (Inferred.Kind)));
+                     Field (Info, "name", Inferred.Item);
+                  else
+                     Field (Info, "namewhat", New_String
+                       (State, (if Selected = null then "" else
+                          To_String (Selected.Name_Kind))));
+                     if Selected /= null and then
+                       Length (Selected.Call_Name) > 0
+                     then
+                        Field (Info, "name", New_String
+                          (State, To_String (Selected.Call_Name)));
+                     end if;
+                  end if;
+               end;
             end if;
             if Wants ('t') then
                Field (Info, "istailcall",
@@ -361,12 +516,21 @@ package body Lua.Engine.Inspection is
                   Lines : constant Value := New_Table (State);
                begin
                   if Code /= null then
-                     for Instruction of Code.Code loop
-                        Set (State, Lines,
-                             (Integer_Kind,
-                              Integer_Value (Instruction.Location.Line)),
-                             (Boolean_Kind, True));
-                     end loop;
+                     if Code.Canonical_Node /= null then
+                        for PC in 1 .. Code.Canonical_Node.Lines.Last_Index
+                        loop
+                           Set (State, Lines, (Integer_Kind,
+                             Integer_Value (Canonical.Source_Line
+                               (Code, PC - 1))), (Boolean_Kind, True));
+                        end loop;
+                     else
+                        for Instruction of Code.Code loop
+                           Set (State, Lines,
+                                (Integer_Kind,
+                                 Integer_Value (Instruction.Location.Line)),
+                                (Boolean_Kind, True));
+                        end loop;
+                     end if;
                   end if;
                   Field (Info, "activelines", Lines);
                end;
@@ -375,14 +539,25 @@ package body Lua.Engine.Inspection is
          end;
       elsif Name in "debug.getlocal" | "debug.setlocal" then
          if Name = "debug.getlocal" and then Arg (Base).Kind in
-           Closure_Kind | Native_Closure_Kind | Native_Kind_Value
+           Closure_Kind | Native_Closure_Kind | Native_Kind_Value |
+           Foreign_Function_Kind
          then
             declare
                Index : constant Integer_Value := Integer_Arg (Base + 1);
             begin
                if Arg (Base).Kind = Closure_Kind then
                   Code := Arg (Base).Reference.Code;
-                  if Index > 0 and then
+                  if Index > 0 and then Code.Canonical_Node /= null then
+                     declare
+                        Local : constant Value := Canonical.Local_Name
+                          (State, Code, Positive (Index), 0);
+                     begin
+                        if Local.Kind /= Nil_Kind then
+                           Append (Local);
+                           return Result;
+                        end if;
+                     end;
+                  elsif Index > 0 and then
                     Index <= Integer_Value (Code.Parameters.Length)
                   then
                      Append (New_String
@@ -406,6 +581,7 @@ package body Lua.Engine.Inspection is
             Cells : Bindings.Vector;
             Scope : Object_Access;
          begin
+            Cells.Set_Owner (Lua.Storage.Reference (State.Memory));
             if Level < 0 or else Level > Integer_Value (Natural'Last) then
                Fail (State, "level out of range");
             end if;
@@ -415,16 +591,59 @@ package body Lua.Engine.Inspection is
             end if;
             if not Selected.Is_Native then
                if Index < 0 then
-                  if Index >= -Integer_Value (Selected.Varargs.Length) then
-                     Append (New_String (State, "(vararg)"));
-                     if Name = "debug.setlocal" then
-                        Selected.Varargs.Replace_Element
-                          (Positive (-Index), Arg (Base + 2));
-                     else
-                        Append (Selected.Varargs (Positive (-Index)));
+                  declare
+                     Count : constant Natural :=
+                       (if Selected.Code.Canonical_Node /= null then
+                           Canonical.Vararg_Length (Selected) else
+                           Natural (Selected.Varargs.Length));
+                  begin
+                     if Index >= -Integer_Value (Count) then
+                        Append (New_String (State, "(vararg)"));
+                        if Selected.Code.Canonical_Node /= null then
+                           if Name = "debug.setlocal" then
+                              Canonical.Write_Vararg
+                                (State, Selected, Positive (-Index),
+                                 Arg (Base + 2));
+                           else
+                              Append (Canonical.Read_Vararg
+                                (State, Selected, Positive (-Index)));
+                           end if;
+                        elsif Name = "debug.setlocal" then
+                           Selected.Varargs.Replace_Element
+                             (Positive (-Index), Arg (Base + 2));
+                        else
+                           Append (Selected.Varargs (Positive (-Index)));
+                        end if;
                      end if;
-                  end if;
+                  end;
                   if Result.Is_Empty then
+                     Append (Nil_Value);
+                  end if;
+                  return Result;
+               end if;
+               if Selected.Code.Canonical_Node /= null then
+                  if Index > 0 and then Index <= Integer_Value
+                    (Selected.Canonical_GC_Top)
+                  then
+                     declare
+                        Local : Value := Canonical.Local_Name
+                          (State, Selected.Code, Positive (Index),
+                           Current_PC (Selected));
+                     begin
+                        if Local.Kind = Nil_Kind then
+                           Local := New_String (State, "(temporary)");
+                        end if;
+                        Append (Local);
+                        if Name = "debug.setlocal" then
+                           Canonical.Write_Register
+                             (State, Selected, Natural (Index) - 1,
+                              Arg (Base + 2));
+                        else
+                           Append (Canonical.Read_Register
+                             (State, Selected, Natural (Index) - 1));
+                        end if;
+                     end;
+                  else
                      Append (Nil_Value);
                   end if;
                   return Result;
@@ -479,7 +698,8 @@ package body Lua.Engine.Inspection is
                return Result;
             end if;
             if Arg (Base).Kind /= Nil_Kind then
-               Text := To_Unbounded_String (Image (Arg (Base)) &
+               Text := To_Unbounded_String
+                 (Image (State.Current.Memory, Arg (Base)) &
                  Character'Val (10));
             end if;
             if Arg (Base + 1).Kind /= Nil_Kind then
@@ -498,14 +718,18 @@ package body Lua.Engine.Inspection is
                   Append (Text, "[C]: in function '" &
                     To_String (Item.Native_Name) & "'");
                else
-                  Append (Text, Short_Source (To_String (Item.Code.Name)) &
+                  Append (Text, Short_Source
+                    ((if Item.Code.Canonical_Node /= null then
+                       To_String (Canonical.Source_Bytes (Item.Code))
+                      else To_String (Item.Code.Name))) &
                     ":" &
                     Ada.Strings.Fixed.Trim
                       (Natural'Image
-                        (Item.Code.Code
-                           (Positive'Max (1, Item.PC - 1)).Location.Line),
+                        (Line_At (Item, Current_PC (Item) + 1)),
                        Ada.Strings.Both) & ": in " &
-                    (if Item.Code.Is_Main then "main chunk"
+                    (if (if Item.Code.Canonical_Node /= null then
+                           Item.Code.Canonical_Node.First_Line = 0
+                         else Item.Code.Is_Main) then "main chunk"
                      else "function"));
                end if;
                Level := Level + 1;

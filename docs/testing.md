@@ -150,6 +150,93 @@ C tests must cover header/record layout, symbols, callbacks, allocator failures,
 protected errors/yields, nested reentry, extra space, lifetime, loading modules,
 and C-only host initialization. Validate static/shared linkage independently.
 
+## Mathematics and seeded RNG
+
+The complete local validation/static pipeline builds the owning library, CLI
+and AUnit consumers, then discovers mathematics_campaign.lua alongside the
+other first-party differential fixtures:
+
+```text
+pwsh -NoProfile -File scripts/check.ps1 -Profile validation -LibraryType static
+```
+
+Lua.Mathematics_Tests registers 38 separately named cases. They cover host IEEE
+domains and signed zero, subnormal frexp decomposition, ldexp's C exponent cast,
+numeric-string arguments, pinned integer/float streams, rejection consumption,
+invalid-call advancement, independent states, 32/64-bit arithmetic equivalence
+and budget-preserving initialization/retries. Setup and expected-error helpers
+must execute the tested call inside its handled sequence; declaration-time
+failure must not accidentally become an unexpected AUnit exception.
+
+The differential fixture uses explicit pairs (0,0), (17,-9),
+(maxinteger,mininteger) and (-1,-1). It encodes binary64 values as bytes, retaining
+signed zero and host NaN bits. For C frexp's unspecified infinity/NaN exponent,
+only the fraction result is compared; all finite decomposition outputs remain
+in scope. Failure messages are compared by controlled outcome rather than
+source-path-dependent wording.
+
+The same fixture executes against the isolated instrumented C oracle, where
+the compatibility-only math names add one output line. Its current 714/715
+default/instrumented C lines and empty stderr are fixture-validation evidence,
+not Ada parity or an unchanged math.lua pass. Actual instrumented Ada comparisons
+require their separate configured runtime and completed conformance launcher;
+do not substitute a default binary or enable names only inside a test script.
+
+The [host mathematics decision](decisions/0011-host-mathematics.md) records the
+standard-Ada alternative, narrow libm imports and ownership boundary. Final
+acceptance still requires each target OS/profile/link configuration and the full
+M3 coverage contract. Optional proof/fuzz tools are not prerequisites here.
+
+## Canonical compiler and codec checks
+
+Standalone canonical prototype/chunk checks use the nested Lua.Chunk_Tests
+suite and scripts/check-chunk-codec.ps1. The [codec guide](binary-chunks.md)
+owns the native-profile commands and byte-exact/C-crossload evidence boundary.
+These checks do not execute canonical instructions in Ada or replace unchanged
+upstream runtime acceptance.
+
+Lua.Canonical_Compiler_Tests and scripts/check-canonical-compiler.ps1 separately
+cover canonical lowering. Its compiler-only mode executes both C-generated and
+Ada-generated programs in isolated C processes; it supplies no Ada VM evidence.
+Passing RuntimeProbe with lua-canonical_runtime_probe adds actual Ada execution
+of both compilers' chunks, requiring all four outputs to agree. Reports retain
+which mode and configuration actually ran.
+[Runtime configurations](runtime-configurations.md) documents source selection,
+artifact separation and the distinct parser/math configuration witness.
+
+## Shared Ada/C library identity
+
+scripts/check-core-image.ps1 builds the sole production root SAL and its C API,
+mixed Ada/C and C-only startup consumers for the requested profile/library kind.
+It checks real state/thread/stack/allocator identity and the actual pool address
+and GNAT elaboration counter; the latter two are compiler-specific test probes.
+No test observer is added to the interpreter library. Raw output, executable/
+library hashes and process results are retained under reports/core-image.
+[The validation owner](validation-one-core.md) records executed configurations.
+scripts/check.ps1 invokes this campaign per job; a missing platform run is not
+implied by the workflow. Native module loading and full C exports remain separate.
+
+## Managed numeric formatting
+
+Lua.Managed_Format_Tests registers sixteen independent cases for exact rounding,
+exponent boundaries, numeric strings, actual output ownership and partial-growth
+refusal/recovery. The deterministic formatting_campaign.lua fixture adds 143
+binary64 values across ten formats, retaining seed 0x13579bdf2468ace0 and exact
+same-host output. Its 1,435 lines are compared by scripts/compare.ps1 alongside
+the other first-party scripts. [Numeric formatting](number-formatting.md) owns
+the algorithm and recorded evidence; whole upstream string/math files and other
+platforms remain separate acceptance requirements.
+
+## Owned activation storage
+
+Lua.Frame_Cache_Tests registers eleven independent cases for stable reuse,
+per-context ownership, retained packet/nested capacity, continuation reset,
+cell detachment, root removal, refusal, duplicate retirement, teardown and
+active-resumer depth preservation. The teardown case inspects actual live
+managed blocks after Finalize; passing printed assertions alone cannot hide
+shutdown leaks. [Activation storage](activation-storage.md) owns the cache
+contract and the 951-case Windows/default/static checkpoint evidence.
+
 ## Optional fuzzing
 
 GNATfuzz is an AdaCore Pro tool with Linux/AFL environment requirements. It is
@@ -197,3 +284,14 @@ named/commented cases for state transitions, close paths, cells, weak graphs,
 inspection, hooks, native callback yield restrictions and host-policy recovery.
 Seeded lifecycle campaigns preserve source and mismatch output as regressions;
 crashes, resource failures and timeouts never count as syntax rejection or skips.
+
+## Output delivery regression consumer
+
+The ordinary test crate builds output_consumer alongside its AUnit/API mains.
+scripts/check-output-policy.ps1 captures raw process stdout rather than
+decoding it, preserving NUL and 0xff observations. Nine named cases exercise
+captured defaults, immediate native delivery, callback ordering, error/recovery,
+policy switching, reset, bounded quotas, CLI byte output and version ordering.
+The standard check.ps1 pipeline runs these processes after building the CLI.
+These are owned first-party regressions; passing them adds no whole upstream
+file to the execution inventory.

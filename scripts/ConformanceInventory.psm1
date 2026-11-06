@@ -316,16 +316,69 @@ function Test-ConformanceResolvedRecord {
     param([Parameter(Mandatory)][System.Collections.IDictionary] $Record,
           [Parameter(Mandatory)][string[]] $Contexts,
           [switch] $Api, [switch] $RequireComplete)
-    if ($Record.status -notin @('pending', 'passed')) { throw "Invalid status: $($Record.id)" }
+    # A lexical candidate can be reviewed without having executed anything.
+    # Keep that state separate from a runtime pass: a guard or a string which
+    # merely contains 'assert' must never acquire fabricated process evidence.
+    $statuses = if ($Api) { @('pending', 'passed') } else { @('pending', 'reviewed', 'passed') }
+    if ($Record.status -notin $statuses) { throw "Invalid status: $($Record.id)" }
     if ($Record.status -eq 'pending') {
         if ($RequireComplete) { throw "Unresolved coverage: $($Record.id)" }
         if (-not $Api -and $Record.disposition -ne 'pending') {
             throw "Pending coverage has completed disposition: $($Record.id)"
         }
         if (@($Record.evidence).Count -ne 0) { throw "Pending coverage has pass evidence: $($Record.id)" }
+        if (-not $Api -and (($Record.Contains('classification') -and $null -ne $Record.classification) -or
+            ($Record.Contains('obligations') -and @($Record.obligations).Count -gt 0))) {
+            throw "Pending coverage has unreviewed classification: $($Record.id)"
+        }
+        return
+    }
+    if (-not $Api -and $Record.status -eq 'reviewed') {
+        $classifications = switch ($Record.kind) {
+            'conditional-guard' { @('guard') }
+            'skip-report' { @('report') }
+            'generated-template' { @('template', 'data') }
+            'internal-reference' { @('reference') }
+            'assert-call' { @('reference') }
+            default { @() }
+        }
+        if ($Record.disposition -ne 'candidate-reviewed' -or
+            $Record.classification -notin $classifications) {
+            throw "Invalid non-runtime classification: $($Record.id)"
+        }
+        if ([string]::IsNullOrWhiteSpace($Record.invariant) -or
+            @($Record.configurations).Count -eq 0 -or
+            @($Record.configurations | Where-Object { $_ -notin @('default','upstream-test') }).Count -gt 0) {
+            throw "Missing classified applicability/invariant: $($Record.id)"
+        }
+        if ($null -eq $Record.review -or [string]::IsNullOrWhiteSpace($Record.review.reviewer) -or
+            [string]::IsNullOrWhiteSpace($Record.review.author) -or
+            $Record.review.reviewer -ceq $Record.review.author -or
+            [string]::IsNullOrWhiteSpace($Record.review.rationale) -or
+            [string]::IsNullOrWhiteSpace($Record.review.artifact)) {
+            throw "Missing independent classification review: $($Record.id)"
+        }
+        if (@($Record.evidence).Count -ne 0) {
+            throw "Non-runtime candidate has execution evidence: $($Record.id)"
+        }
+        $links = @($Record.obligations)
+        if ($Record.classification -eq 'data') {
+            # Only an independently reviewed quoted template can be classified
+            # as inert data. A guard, T reference or real call cannot use this
+            # escape hatch to erase the block it controls or tests.
+            if ($links.Count -ne 0) { throw "Data candidate has runtime links: $($Record.id)" }
+        }
+        elseif ($links.Count -eq 0 -or
+            @($links | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -gt 0 -or
+            @($links | Select-Object -Unique).Count -ne $links.Count) {
+            throw "Missing/duplicate runtime obligation links: $($Record.id)"
+        }
         return
     }
     if (-not $Api) {
+        if ($Record.kind -in @('conditional-guard', 'skip-report', 'generated-template', 'internal-reference')) {
+            throw "Lexical candidate cannot claim runtime pass: $($Record.id)"
+        }
         $allowed = if ($Record.kind -eq 'manual-audit') { @('inventory-reviewed') }
             else { @('unchanged', 'ada-internal-equivalent', 'native-platform-equivalent') }
         if ($Record.disposition -notin $allowed) { throw "Invalid pass disposition: $($Record.id)" }
@@ -389,6 +442,47 @@ function Test-ConformanceResolvedRecord {
         }
         foreach ($context in $required) {
             if (-not $seen.ContainsKey($context)) { throw "Missing $context evidence: $($Record.id)" }
+        }
+    }
+}
+
+function Test-ConformanceSourceLinks {
+    param([Parameter(Mandatory)][object[]] $Records, [switch] $RequireComplete)
+    # Resolve links only after all records in one pinned file are known.
+    # Requiring direct edges to runtime obligations avoids reference cycles,
+    # whole-file pass stamping and links into another file's successful suite.
+    $indexed = @{}
+    foreach ($record in $Records) {
+        if ($indexed.ContainsKey($record.id)) { throw "Duplicate linked unit ID: $($record.id)" }
+        $indexed[$record.id] = $record
+    }
+    foreach ($record in $Records) {
+        if ($record.status -ne 'reviewed' -or $record.classification -eq 'data') { continue }
+        $covered = @{}
+        foreach ($id in $record.obligations) {
+            if (-not $indexed.ContainsKey($id) -or $id -ceq $record.id) {
+                throw "Missing/self runtime obligation link: $($record.id)/$id"
+            }
+            $target = $indexed[$id]
+            if (($record.id -split '-', 3)[1] -cne ($id -split '-', 3)[1]) {
+                throw "Runtime obligation link crosses source file: $($record.id)/$id"
+            }
+            if ($target.kind -notin @('assert-call', 'reviewed-block') -or
+                $target.status -notin @('pending', 'passed') -or
+                ($record.classification -eq 'template' -and $target.kind -ne 'reviewed-block')) {
+                throw "Link is not a direct runtime obligation: $($record.id)/$id"
+            }
+            # Foundation mode may record that review discovered still-pending
+            # tests. Completion cannot count that discovery as their execution.
+            if ($RequireComplete -and $target.status -ne 'passed') {
+                throw "Linked runtime obligation remains pending: $($record.id)/$id"
+            }
+            foreach ($configuration in $target.configurations) { $covered[$configuration] = $true }
+        }
+        foreach ($configuration in $record.configurations) {
+            if (-not $covered.ContainsKey($configuration)) {
+                throw "Linked obligation applicability gap: $($record.id)/$configuration"
+            }
         }
     }
 }
@@ -514,6 +608,7 @@ function Test-ConformanceInventory {
                 throw "Manual block source line drift: $($record.id)"
             }
         }
+        Test-ConformanceSourceLinks -Records $records -RequireComplete:$RequireComplete
     }
     if ($seenFiles.Count -ne 34) { throw 'Missing suite files' }
     foreach ($header in $manifest.headers) {
@@ -550,4 +645,5 @@ function Test-ConformanceInventory {
 Export-ModuleMember -Function Get-ConformanceHash, Get-ConformanceTokens,
     Get-ConformanceCoverageUnits, Get-ConformanceApiInventory,
     Read-ConformanceJsonLines, Write-ConformanceJsonLines,
-    Test-ConformanceReferenceTree, Test-ConformanceResolvedRecord, Test-ConformanceInventory
+    Test-ConformanceReferenceTree, Test-ConformanceResolvedRecord,
+    Test-ConformanceSourceLinks, Test-ConformanceInventory

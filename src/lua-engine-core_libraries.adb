@@ -1,6 +1,9 @@
+with Lua.Engine.Mathematics;
 with Ada.Containers;
 with Ada.Unchecked_Conversion;
 with Interfaces;
+with Interfaces.C;
+with Lua.Engine.Machine;
 with Lua.Integers;
 
 package body Lua.Engine.Core_Libraries is
@@ -147,7 +150,7 @@ package body Lua.Engine.Core_Libraries is
      (State : in out World; Name : String; Arguments : Values.Vector)
       return Values.Vector
    is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Arguments.Length) then Arguments (Index)
          else Nil_Value);
@@ -194,7 +197,7 @@ package body Lua.Engine.Core_Libraries is
             when Real_Kind =>
                return (Lua.Numbers.Real_Number, Item.Real_Data);
             when String_Kind =>
-               Parsed := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+               Parsed := Read_Number (State, Item.Reference.Bytes);
                if Parsed.Kind /= Lua.Numbers.Invalid then
                   return Parsed;
                end if;
@@ -219,7 +222,7 @@ package body Lua.Engine.Core_Libraries is
          if Item.Kind = String_Kind then
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
-            return Image (Item);
+            return Image (State.Current.Memory, Item);
          end if;
          Fail (State, "invalid value (" & Type_Name (Item) &
                ") in table for 'concat'");
@@ -264,6 +267,17 @@ package body Lua.Engine.Core_Libraries is
          Result.Append (Item);
          return Result;
       end if;
+      if Name in "math.acos" | "math.asin" | "math.atan" | "math.cos" |
+        "math.deg" | "math.exp" | "math.frexp" | "math.ldexp" | "math.log" |
+        "math.rad" | "math.sin" | "math.sqrt" | "math.tan" | "math.random" |
+        "math.randomseed" | "math.atan2" | "math.cosh" | "math.sinh" |
+        "math.tanh" | "math.pow" | "math.log10"
+      then
+         return Mathematics.Run (State, Name, Arguments);
+      end if;
+      --  Optional-argument RNG calls validate their own arity. Applying the
+      --  ordinary one-value requirement first would reject math.random() and
+      --  math.randomseed() before their native implementation can run.
       Require (1);
       Item := Arg (1);
       if Name = "math.type" then
@@ -276,7 +290,7 @@ package body Lua.Engine.Core_Libraries is
             Result.Append (Nil_Value);
          else
             Number := (if Item.Kind = String_Kind then
-                         Lua.Numbers.Read (To_String (Item.Reference.Bytes))
+                         Read_Number (State, Item.Reference.Bytes)
                        else Numeric (1));
             A := As_Integer (Number, Valid);
             Result.Append ((if Valid then Key (A) else Nil_Value));
@@ -355,11 +369,16 @@ package body Lua.Engine.Core_Libraries is
                Fail (State, "too many results to unpack");
             end if;
             Count := Last - First + 1;
-            if Name = "table.unpack" and then Count > Integer_Value
-              (1_000_000 - Natural'Min
-                 (1_000_000, State.Current.Stack_Slots))
+            if Last - First >= Integer_Value (Interfaces.C.int'Last) or else
+              State.Current.Stack_Window = null or else
+              not Lua.Engine.Machine.Reserve_Native_Results
+                (State, State.Current.Stack_Window, Natural (Count))
             then
-               Fail (State, "too many results to unpack (stack overflow)");
+               --  The plain-table fast path needs the same actual native
+               --  window reservation as the metamethod-capable driver. It
+               --  must not build a huge packet before the pinned checkstack
+               --  failure, nor consult the old summed private slot counter.
+               Fail (State, "too many results to unpack");
             end if;
             if Count > Integer_Value (State.Bounds.Table_Entries) then
                Fail (State, "result count limit exceeded", Resource => True);

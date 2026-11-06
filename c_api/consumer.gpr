@@ -1,0 +1,36 @@
+with "../lua_ada";
+with "../config/lua_ada_config.gpr";
+
+project Consumer is
+   for Languages use ("C");
+   for Source_Dirs use ("tests");
+   for Object_Dir use
+     "../build/c-api/consumer/" & Lua_Ada.Configuration_Subdir &
+       Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
+   for Exec_Dir use
+     "../build/c-api/bin/" & Lua_Ada.Configuration_Subdir &
+       Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
+   for Main use ("c_api_consumer.c");
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("C") use
+        ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
+         "-I" & Project'Project_Dir & "include",
+         "-I" & Project'Project_Dir & "include/api");
+   end Compiler;
+   package Linker is
+      case Lua_Ada_Config.Alire_Host_OS is
+         when "macos" =>
+            --  The root SAL also needs GNARL's real tasking initialization.
+            --  Darwin shared-library flat lookups do not by themselves pull
+            --  an archive member, so retain that required entry explicitly.
+            for Default_Switches ("C") use
+              ("-lm", "-Wl,-u,___gnat_tasking_runtime_initialize",
+               external ("LUA_ADA_TASKING_RUNTIME_ARCHIVE", ""),
+               external ("LUA_ADA_ABI_RUNTIME_ARCHIVE", ""));
+         when others =>
+            for Default_Switches ("C") use ("-lm");
+      end case;
+   end Linker;
+end Consumer;

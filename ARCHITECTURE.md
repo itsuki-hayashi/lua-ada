@@ -11,7 +11,7 @@ gates. [Decisions](docs/decisions/README.md) record compatibility tradeoffs.
 ```text
 Batch CLI / Ada host
         |
-  Lua.Sessions / Lua.Syntax       Future C facade
+  Lua.Sessions / Lua.Syntax       Partial C facade
         |                               |
   Lua.Engine (private) <----------------+
      |          |
@@ -27,8 +27,9 @@ Batch CLI / Ada host
 The root library never depends on AUnit, CLI, or reference C sources. The C
 oracle and ABI experiments are separate test artifacts. `Lua.Engine` and its
 descendants are implementation units beneath a private ancestor; public clients
-cannot depend on register layout or heap addresses. No serialized bytecode
-compatibility is implied.
+cannot depend on register layout or heap addresses. Checked native chunk
+loading/dumping uses the actual canonical model; its tested interoperability
+and remaining configuration gates are recorded in [binary chunks](docs/binary-chunks.md).
 
 The [real-world module fixtures](tests/modules/README.md) are future consumer
 compatibility inputs. They are separate from implementation/API references,
@@ -38,8 +39,8 @@ excluded from GPR source paths, and introduce no runtime dependency.
 | ------------------------- | ----------------------------------------------------------- |
 | Lexers / Parser           | Incremental scanning, owned resolved syntax, limits         |
 | Numbers / Integers        | Exact conversion, wrapping arithmetic, comparisons          |
-| Engine.Compiler           | Lower resolved syntax to private register instructions      |
-| Engine.Machine            | Lua/native frames, dispatch, packets, protected errors      |
+| Engine.Compiler           | Select text lowering or checked native binary decoding      |
+| Engine.Machine            | Iterative scheduler, Lua/native/C transfers and protection  |
 | Engine                    | Values, metatables, heap, roots, tracing, lifecycle         |
 | Engine library helpers    | Strings, patterns, packing, UTF-8, bounded table/math work  |
 | Engine native drivers     | Stateful iterators, Lua callbacks, text and package loading |
@@ -51,24 +52,36 @@ excluded from GPR source paths, and introduce no runtime dependency.
 One incremental scanner feeds an owned parser/resolver. Indexed discriminated
 syntax nodes retain source order, lexical symbols, captures, and label targets.
 Lua.Syntax.Check validates this representation without VM/runtime allocation.
-The compiler lowers it into existing typed private instructions. Declaration
+Lua.Canonical_Compiler lowers it to the pinned typed instruction words. Declaration
 lookup happens at the source point; later shadowing cannot retarget a capture.
 Nested runtime functions retain ordered references to stable capture cells. See
 [ADR 0006](docs/decisions/0006-shared-frontend.md) and
 [frontend compatibility](docs/frontend.md).
 
-The independent private Lua.Opcodes package defines the pinned 32-bit canonical
-format. It neither replaces the current VM operations nor promises canonical
-instruction streams or serialized chunks. Execution validates a complete chunk
-before lowering executable goto/label/close constructs. Complete validation
-still precedes execution and every runtime feature decision.
+Lua.Opcodes defines the pinned 32-bit instruction format. Production execution
+now uses scalar canonical registers and explicit top/result adjustment. The
+older packet instruction lowerer remains an internal migration comparison path
+until the expanded platform acceptance is complete. Native continuation frames
+still own argument/result packets; they do not turn a Lua scalar register into
+a permanent multivalue container.
 
-Registers contain packets, allowing calls/varargs to produce zero or many
-results. Scalar consumers take the first result or nil; only final list
-expressions expand, and parentheses collapse. Assignment retains evaluated
-table/key operands until stores. Branch instructions implement short circuit
-logic. Loop instructions separate private controls from assignable visible
-variables; each iteration creates fresh capture cells.
+Lua.Prototypes owns canonical graphs separately from runtime values. One managed
+program owns nodes, byte strings, words, constants and debug records. Runtime
+wrappers retain its actual nodes and materialized constants; shared graph
+ownership ends when the final reachable wrapper is released. Lua.Chunks validates
+and decodes native binary graphs, and serializes a selected real subtree without
+changing the owning root. Text checking still uses the independent frontend.
+See [canonical ownership](docs/decisions/0012-canonical-program-ownership.md) and
+[binary verification](docs/binary-chunks.md) for current evidence and limits.
+
+Open captured registers refer to stable individually owned cells. Reads/writes
+consult those cells; CLOSE detaches associations so reused registers create
+fresh instances. Closing snapshots preserve the exiting stack value before a
+handler can mutate a closed upvalue. Outgoing results/errors remain rooted
+through cleanup continuations. Collection traces only live canonical stack
+slots and authoritative open cells, preventing stale temporaries from retaining
+weak values. Debug inspection uses real local PC lifetimes and ordered captures;
+call-name inference scans actual caller words lazily when requested.
 
 Each context has an explicit activation stack; one iterative scheduler drives
 context transfers without mapping Lua recursion onto Ada recursion. Tail calls replace activations. Protected calls establish VM
@@ -102,6 +115,13 @@ values distinguish scalars from string/table/environment/closure references.
 Objects do not move. Ada finalization releases a universe but does not
 substitute for tracing cycles.
 
+[Full userdata](docs/userdata.md) owns inline C-aligned payload blocks,
+independent logical size, traced uservalues and an object metatable. C borrows
+the actual stable payload address. A reasoned first-party host cleanup
+attachment is separate from Lua finalizer scheduling; generic userdata has no
+implicit native destructor. Finalization and IO lifecycle integration remain
+independent acceptance requirements.
+
 An iterative stop-the-world mark/sweep collector traces globals, live frames,
 register packets, environments/captures, arguments, named vararg tables, error
 objects, table/type metatables, native-closure captures, native activation
@@ -126,10 +146,15 @@ runtime checks remain enabled in every profile. Explicit modular operations
 implement integer wrapping. Strings remain bytes.
 
 Numeric text conversion uses standard Ada big integers for exact binary64
-rounding; formatting implements Lua's 15/17-digit general format. One isolated
-host `pow` import is justified by measured rounding/domain incompatibilities
-in standard Ada exponentiation (ADR 0005). No downloaded production dependency
-is introduced. Packing and UTF-8 helpers use standard Ada types and explicit
+rounding; formatting implements Lua's 15/17-digit general format. The private
+host-math adapter extends ADR 0005's pow boundary to the pinned transcendental,
+decomposition and scaling primitives. [ADR 0011](docs/decisions/0011-host-mathematics.md)
+records their names, IEEE/domain/rounding rationale and verification limits.
+Argument handling and both xoshiro256** arithmetic paths remain Ada, with owned
+per-universe random state and explicit native-work charging. Full C-facade
+construction of independent reopened math libraries remains a later integration
+requirement. No downloaded production dependency is introduced.
+Packing and UTF-8 helpers use standard Ada types and explicit
 byte/bit operations. Native pack widths and maximum alignment come from C
 interface types, including long double; an isolated C99 probe verifies the host
 layout. Virtual packsize arithmetic does not allocate. Semantic size overflow
@@ -149,7 +174,14 @@ provide current behavioral evidence.
 
 ## Future interoperability
 
-The C facade must share the core without contaminating it with ABI layouts.
+The root Lua_Ada project owns one mixed Ada/C standalone library named lua.
+Ada sessions, CLI clients and the C facade import its same world/storage units;
+the former C-library GPR only forwards to the root build. Its explicit SAL
+interfaces preserve child AUnit inspection while Ada privacy remains unchanged.
+See [ADR 0014](docs/decisions/0014-one-core-library.md) for initialization, exports
+and the real mixed-consumer identity checks.
+
+The C facade shares the core without contaminating it with ABI layouts.
 Early experiments investigate C allocation, varargs, callbacks, extra space,
 startup/shutdown, and nonlocal transfer. No foreign longjmp may cross active
 Ada frames. Status returns and C-only guarded checkpoints are feasibility

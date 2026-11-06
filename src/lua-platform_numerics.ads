@@ -5,6 +5,27 @@ private package Lua.Platform_Numerics is
    --  Carry the math dependency to static Ada consumers as well as shared
    --  builds. It cannot be inferred from this foreign symbol's declaration.
 
+   function Divide (Left, Right : Interfaces.C.double)
+                    return Interfaces.C.double
+     with Import, Convention => C, External_Name => "lua_ada_host_divide";
+   --  Preserve native IEEE exceptional results without disabling Ada checks.
+   --  The tiny host adapter performs one arithmetic operation; all Lua
+   --  conversion and dispatch remain in Ada. See ADR 0011.
+
+   function General_Carry_Zeroes return Interfaces.C.int
+     with Import, Convention => C,
+          External_Name => "lua_ada_host_general_carry_zeroes";
+   --  Observe whether native alternate %g retains fractional zeroes when
+   --  rounding moves fixed notation into scientific notation. This differs
+   --  between libc implementations; no operating-system name decides it.
+   --  Only spelling is probed; actual values and rounding remain in Ada.
+
+   function Remainder (Left, Right : Interfaces.C.double)
+                       return Interfaces.C.double
+     with Import, Convention => C, External_Name => "fmod";
+   --  Host truncated-quotient remainder, before Lua's sign correction.
+   --  Unlike an Ada remainder attribute, this preserves host domain NaNs.
+
    function Power (Left, Right : Interfaces.C.double)
                    return Interfaces.C.double
      with Import, Convention => C, External_Name => "pow";

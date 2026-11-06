@@ -79,6 +79,16 @@ package body Lua.Sessions is
       end if;
    end Set_Execution_Policy;
 
+   procedure Set_Output_Policy
+     (Self : in out Session; Policy : Output_Policy) is
+   begin
+      if Self.State /= null then
+         Self.State.Output_Mode :=
+           (if Policy = Captured then Lua.Engine.Captured
+            else Lua.Engine.Process_Streams);
+      end if;
+   end Set_Output_Policy;
+
    procedure Set_Limits (Self : in out Session; Bounds : Execution_Limits) is
    begin
       if Self.State /= null then
@@ -110,6 +120,7 @@ package body Lua.Sessions is
       --  alive through their ordinary lexical/table owners.
       Self.State.Current.Arguments.Clear;
       Self.State.Output := Null_Unbounded_String;
+      Self.State.Output_Used := 0;
       Self.State.Current.Failure_At := (others => 1);
       for Argument of Arguments loop
          Self.State.Current.Arguments.Append
@@ -154,6 +165,7 @@ package body Lua.Sessions is
       end if;
       Self.State.Current.Failure_Class := Lua.Engine.No_Failure;
       Self.State.Output := Null_Unbounded_String;
+      Self.State.Output_Used := 0;
       Lua.Engine.Collect (Self.State.all);
       Table := Lua.Engine.New_Table (Self.State.all);
       for Index in Arguments'Range loop
@@ -165,7 +177,8 @@ package body Lua.Sessions is
       end loop;
       Key := Lua.Engine.New_String (Self.State.all, "arg");
       Lua.Engine.Set (Self.State.all,
-                      (Lua.Engine.Table_Kind, Self.State.Globals), Key, Table);
+                      Lua.Engine.Global_Environment (Self.State.all),
+                      Key, Table);
       return (others => <>);
    exception
       when Lua.Engine.Language_Error => return Failure (Self, "(arguments)");

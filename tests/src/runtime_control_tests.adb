@@ -719,13 +719,18 @@ package body Runtime_Control_Tests is
    procedure Semantic_Result_Overflow is
       --  Lua stack capacity bounds large multi-result packets.
       --  Unpack a million values in a compatible coroutine.
-      --  resume returns a catchable semantic error, not a host abort.
+      --  Pinned ltablib.c converts failed lua_checkstack into its library
+      --  diagnostic. Resume catches that error and retires the coroutine;
+      --  no result packet is allocated and the session remains usable.
    begin
       Check
         ("local co=coroutine.create(function()return " &
          "table.unpack({},1,1000000)end);" &
          "local ok,e=coroutine.resume(co);" &
-         "assert(not ok and e:find('stack overflow'))",
+         "assert(not ok and type(e)=='string' and " &
+         "e:find('too many results to unpack') and " &
+         "coroutine.status(co)=='dead',tostring(ok)..':'..tostring(e));" &
+         "assert(6*7==42)",
          Compatible => True);
    end Semantic_Result_Overflow;
 

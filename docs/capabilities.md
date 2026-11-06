@@ -63,6 +63,31 @@ loader data, caching, and mutable searchers. Its internal registries survive
 replacement of public package.loaded/preload fields. The default package.path
 is `./?.lua;./?/init.lua`; native loading is deferred.
 
+## M3 mathematics implementation
+
+The implementation extends the historical M2b inventory above with the exports
+below. [ADR 0011](decisions/0011-host-mathematics.md) owns the dependency and RNG
+decisions. Implementation is distinct from final platform/upstream acceptance;
+current [status](status.md) owns verified test counts.
+
+| Configuration / group | Added functions                        |
+| --------------------- | -------------------------------------- |
+| Default trigonometry  | acos, asin, atan, cos, sin, tan        |
+| Default real helpers  | deg, exp, frexp, ldexp, log, rad, sqrt |
+| Default owned RNG     | random, randomseed                     |
+| Compatibility only    | atan2, cosh, sinh, tanh, pow, log10    |
+
+The default table excludes the compatibility-only names. Seeded RNG output
+uses xoshiro256** with native-64 or actual split-32 arithmetic, exact two-word
+seeding and unbiased interval rejection. Both paths retain per-universe state;
+reopening math through the future public C API still needs independently
+captured RNG instances. Host mathematical primitives preserve native IEEE
+domains, signed zero and rounding rather than raising Ada domain exceptions.
+
+There are 38 new focused mathematical cases and a first-party byte-encoded
+differential campaign. Oracle fixture validation is recorded; it does not by
+itself establish Ada parity, unchanged math.lua or complete M3 acceptance.
+
 ## Deliberately deferred
 
 M2a adds shared syntax checking and a private canonical opcode definition layer.
@@ -73,29 +98,41 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 - Runtime behavior: M1/M2b plus the implemented lifecycle delivery below;
   verified runtime matrix and final publication checks are recorded separately.
 - Opcode format: all 85 canonical definitions and six encodings.
-- Canonical code generation: deferred; compiler lowers to private operations.
-- Canonical code execution: deferred; no binary chunk compatibility claim.
+- Canonical code generation: normal text compilation emits real pinned words.
+- Canonical code execution: normal sessions/CLI use scalar canonical registers;
+  the earlier backend remains only during migration/platform verification.
+- Native binary chunks: checked load/dump and selected-function string.dump
+  have focused execution/interoperability evidence in [binary chunks](binary-chunks.md).
 
-| Facility                               | Later gate / current response                    |
-| -------------------------------------- | ------------------------------------------------ |
-| Finalization                           | Deferred; no finalizer execution                 |
-| Userdata and io/os                     | Deferred; unavailable facilities                 |
-| string.dump, table.sort/create         | Remaining library work; unavailable              |
-| Math RNG and remaining transcendentals | Remaining library work; unavailable              |
-| Binary chunks                          | M3; text-source interface only                   |
-| C exports and allocator parity         | M3; isolated feasibility probes only             |
-| Dynamic native modules / LuaRocks      | M4; no compatibility claim                       |
-| Whole upstream suite                   | M3; full coverage ledger remains incomplete      |
-| Interactive REPL                       | Future CLI work; no-input usage is intentional   |
+| Facility                          | Later gate / current response                            |
+| --------------------------------- | -------------------------------------------------------- |
+| Finalization                      | Deferred; no finalizer execution                         |
+| Userdata                          | Stable payload/uservalue APIs; finalization pending      |
+| io/os                             | Deferred; unavailable facilities                         |
+| table.sort/create                 | Implemented; focused local acceptance, platforms pending |
+| Reopened C-created math libraries | C-facade integration; distinct RNG captures required     |
+| Binary chunks                     | Implemented; expanded platform acceptance pending        |
+| C exports and allocator parity    | Partial real C surface; remaining API/allocator work     |
+| Dynamic native modules / LuaRocks | M4; no compatibility claim                               |
+| Whole upstream suite              | M3; full coverage ledger remains incomplete              |
+| Interactive REPL                  | Future CLI work; no-input usage is intentional           |
 
 The runtime does not specify hash iteration order, ambiguous table borders,
 pointer text, or byte-identical diagnostic wording. Differential fixtures avoid
 relying on those implementation choices. IEEE formatting follows the matching host oracle.
 
+Decimal/hexadecimal numeric string formatting now uses the calling world's
+managed exact limbs and byte buffers, including parser scratch for numeric
+strings. It retains nearest-even rounding, signed zero and host-specific
+hexadecimal policies. The [formatting guide](number-formatting.md) records the
+sixteen focused owner/refusal cases and deterministic 1,435-line local C/Ada
+campaign. This allocation-path checkpoint does not establish whole-file string
+or math conformance, or complete callback-allocator coverage of the runtime.
+
 ## Language lifecycle implementation
 
 Goto/labels, <close>, the fourth generic-for closing value and weak-key/value
-tables are executable on the private VM. Threads have real identity and
+tables execute on the canonical backend. Threads have real identity and
 reachability-based ownership. Ephemerons use fixed-point stop-the-world tracing.
 Lua-facing coroutine exports are create, resume, yield, wrap, status, running,
 isyieldable and close. Base collectgarbage supports no argument, collect, stop,
@@ -103,12 +140,20 @@ restart and isrunning. Other options explicitly fail; no byte counts or collecto
 modes are fabricated.
 
 The debug subset is getinfo, getlocal, setlocal, getupvalue, setupvalue, upvalueid,
-sethook, gethook and traceback. It inspects actual cells and logical Lua/native
+sethook, gethook and traceback. The full-M3 implementation additionally provides
+getregistry, getmetatable, setmetatable, getuservalue, setuservalue and
+upvaluejoin, with shared primitive
+type metatables. Fifteen focused session cases exercise actual registry roots,
+cell identities, mutation and collection. It inspects actual cells and logical Lua/native
 activations, including explicit-thread forms, source ranges, call-site names,
 tail calls and per-thread call/return/line/count hooks. Native continuation phases
-are hidden. Count cadence reflects private instructions, not canonical opcodes.
-Userdata, finalizers, debug registry/metatable mutation, upvaluejoin and binary
-inspection remain outside this delivery.
+are hidden. Count cadence now follows executed canonical words and explicit native work;
+full hook-cadence parity remains an expanded acceptance obligation.
+Userdata storage and debug access to its actual traced uservalue slots are
+implemented. Existing nil slots return a second true result; absent slots
+return one nil. Finalizers remain pending. Canonical source,
+local/upvalue inspection, native binary load/dump and the added debug operations are M3
+implementation checkpoints with their own evidence and pending platform gates.
 
 [Lifecycle acceptance](milestones/m3-language-lifecycle.md) owns unchanged
 goto.lua/coroutine.lua execution, precise T-absent omissions and platform evidence.
@@ -117,9 +162,33 @@ C-API, allocator, canonical execution, binary-chunk or ecosystem compatibility.
 
 Lifecycle runtime acceptance has passed the [18-job matrix](validation-m3-lifecycle.md)
 and Windows static-PIC. upvalueid exposes opaque light-userdata identities for
-actual cells; general userdata creation and C-visible pointers remain deferred.
+actual cells. [Stable userdata](userdata.md) adds real payload pointers and
+selected C creation/uservalue/metatable operations, with local component evidence.
 
 Collector controls return C Lua's integer status where applicable. A disabled
 gethook returns one nil; active hooks retain their requested signed count while
 only positive intervals enable count events. Option flags honor the pinned
 C-string NUL boundary without changing ordinary Lua byte-string semantics.
+
+## M3 table algorithms
+
+The [table algorithm guide](table-algorithms.md) owns iterative resumable
+sorting, real capacity hints and 24 focused cases. Runtime exports add table.sort
+and table.create. The full upstream sort.lua and final platform gates remain
+pending; its collector/OS/test-adapter dependencies are separate work.
+
+## M3 output and environment ownership
+
+Ada sessions provide explicit Captured/Process_Streams delivery policies.
+The CLI and C-created states select immediate native stdout; embedding defaults
+and Reset retain capture. Seventeen focused AUnit cases and nine raw-byte
+consumer processes cover quotas, callbacks, failures, switching, reset and
+version/output ordering. The latest local focused suite passes 1,038 cases;
+full-pipeline and platform evidence remain owned by status/session records.
+
+Four environment cases cover actual registry replacement, persistent _ENV
+cells, default load and host argument publication. Eight separate userdata
+inspection cases cover result counts, actual mutation, native integer indices,
+validation, raw bypass and collection. Corresponding valid-domain C cases
+were independently checked against both pinned configurations. These additions
+do not establish complete debug/C-API or whole-suite execution parity.

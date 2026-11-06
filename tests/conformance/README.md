@@ -94,6 +94,63 @@ duplicate contexts, missing evidence, and invented M2b passes are rejected.
 Structural validation cannot prove the content of a remote artifact: the
 recorded independent review must inspect the real results and their invariant.
 
+### Reviewed candidates and linked runtime obligations
+
+The optional source-only `reviewed` status distinguishes semantic inventory
+review from executed tests. It uses `disposition: candidate-reviewed`, an
+independently reviewed invariant/applicability decision and no execution
+evidence. The 4,490 pinned anchors and 473 API entries remain untouched and
+pending until their actual reviews and tests are completed. API entries cannot
+use this source-review status.
+
+Allowed classifications are constrained by the regenerated source kind:
+
+| Source kind        | Classification | Required linkage                                      |
+| ------------------ | -------------- | ----------------------------------------------------- |
+| conditional-guard  | guard          | Direct runtime obligations controlled by the guard    |
+| skip-report        | report         | Runtime obligations whose omission is being reported  |
+| generated-template | template       | Expanded, source-cited reviewed-block obligations     |
+| generated-template | data           | No runtime links; independent inert-data review       |
+| internal-reference | reference      | The actual assert-call or reviewed-block obligations  |
+| assert-call        | reference      | The encompassing runtime obligation being reviewed    |
+
+Every non-data candidate has a nonempty, unique `obligations` list of IDs in
+the same file. Targets must directly identify runtime assert-call or
+reviewed-block records; links to another candidate, a whole-file audit, another
+file, missing records or the candidate itself fail validation. The target
+configuration union must cover the classified candidate's configurations.
+Generated assertions require expanded reviewed-block records, because an
+unrelated static assert token is not evidence for a program assembled in a string.
+
+For example, a guard review can use the following additional fields without
+claiming that the guard executed its body:
+
+```json
+{
+  "status": "reviewed",
+  "disposition": "candidate-reviewed",
+  "classification": "guard",
+  "obligations": ["LUA-API-REVIEWED-BLOCK-0001"],
+  "evidence": []
+}
+```
+
+This excerpt omits the unchanged source/span/hash fields, nonempty invariant,
+configuration list and independent review fields, all of which remain required.
+Foundation validation can retain a reviewed link to a still-pending runtime
+obligation with known applicability. Final completion requires that target's
+actual C/Ada evidence in all applicable contexts. Lexical guards, skip reports,
+templates and internal references cannot instead be stamped `passed` using an
+enclosing process result. Pending records cannot hide unaudited classifications.
+
+Review each whole file before its manual-audit obligation is complete. Retain
+all generated anchors, classify false-positive/data sites explicitly, and add
+reviewed blocks for aliased tests, generated source and data-driven assertions.
+An inactive T branch in default configuration remains linked to the real
+instrumented tests; its early return is not a runtime pass. Human/independent
+agent review must verify these semantic links; the validator enforces graph
+shape, source integrity and evidence requirements, not the truth of a review.
+
 C functions, data, and concrete types require real tests. Only a genuinely
 conditional macro definition can use `not-applicable` evidence. That requires
 a definition-specific inactive compiler/preprocessor artifact, source-derived

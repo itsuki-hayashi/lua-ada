@@ -1,4 +1,6 @@
+with Lua.Storage.Buffers;
 package body Lua.Engine.Unicode is
+   package Managed renames Lua.Storage.Buffers;
    use type Integer_Value;
    use type Real_Value;
    use type Lua.Numbers.Number_Kind;
@@ -7,7 +9,7 @@ package body Lua.Engine.Unicode is
      (State : in out World; Name : String; Arguments : Values.Vector)
       return Values.Vector
    is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Arguments.Length) then Arguments (Index)
          else Nil_Value);
@@ -24,7 +26,7 @@ package body Lua.Engine.Unicode is
       procedure Decode
         (Text : String; Position : Positive; Lax : Boolean;
          Code : out Natural; Following : out Positive; Valid : out Boolean);
-      procedure Emit (Code : Natural; Text : in out Unbounded_String);
+      procedure Emit (Code : Natural; Text : in out Managed.Buffer);
       procedure Push_Integer (Item : Integer_Value);
 
       procedure Charge (Amount : Natural := 1) is
@@ -55,7 +57,8 @@ package body Lua.Engine.Unicode is
                Number := (Lua.Numbers.Real_Number, Item.Real_Data);
             when String_Kind =>
                Charge (Length (Item.Reference.Bytes));
-               Number := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+               Number := Read_Number
+                 (State.Current.Memory, Item.Reference.Bytes);
             when others => Number := (Kind => Lua.Numbers.Invalid);
          end case;
          if Number.Kind = Lua.Numbers.Integer_Number then
@@ -92,7 +95,8 @@ package body Lua.Engine.Unicode is
                Parsed := (Lua.Numbers.Real_Number, Item.Real_Data);
             when String_Kind =>
                Charge (Length (Item.Reference.Bytes));
-               Parsed := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+               Parsed := Read_Number
+                 (State.Current.Memory, Item.Reference.Bytes);
             when others => return 0;
          end case;
          if Parsed.Kind = Lua.Numbers.Integer_Number then
@@ -122,7 +126,7 @@ package body Lua.Engine.Unicode is
             Charge (Length (Item.Reference.Bytes));
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
-            return Image (Item);
+            return Image (State.Current.Memory, Item);
          end if;
          Fail (State, "string expected");
          return "";
@@ -206,7 +210,7 @@ package body Lua.Engine.Unicode is
          Valid := True;
       end Decode;
 
-      procedure Emit (Code : Natural; Text : in out Unbounded_String) is
+      procedure Emit (Code : Natural; Text : in out Managed.Buffer) is
          Remaining : Natural := Code;
          Bytes : String (1 .. 6);
          First : Positive := Bytes'Last;
@@ -236,10 +240,11 @@ package body Lua.Engine.Unicode is
    begin
       if Name = "char" then
          declare
-            Text : Unbounded_String;
+            Text : Managed.Buffer;
             Code : Integer_Value;
             Needed : Positive;
          begin
+            Text.Set_Owner (Lua.Storage.Reference (State.Memory));
             for Index in 1 .. Natural (Arguments.Length) loop
                Charge;
                Code := Integer_Arg (Index);
@@ -256,7 +261,7 @@ package body Lua.Engine.Unicode is
                end if;
                Emit (Natural (Code), Text);
             end loop;
-            Result.Append (New_String (State, To_String (Text)));
+            Result.Append (New_String (State, Text));
          end;
          return Result;
       end if;

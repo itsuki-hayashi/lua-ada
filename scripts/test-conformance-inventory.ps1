@@ -72,6 +72,27 @@ function New-GitReferenceFixture {
     return @{root=$fixture;reference=$reference;revision=$revision}
 }
 
+function New-ReviewedCandidate {
+    # These small records exercise classification independently of the real
+    # ledger. No test ever resolves or changes an upstream pending obligation.
+    return @{id='LUA-SAMPLE-CONDITIONAL-GUARD-0001';kind='conditional-guard';status='reviewed';
+        disposition='candidate-reviewed';classification='guard';
+        invariant='This guard selects the linked runtime block';configurations=@('default');
+        obligations=@('LUA-SAMPLE-REVIEWED-BLOCK-0001');evidence=@();
+        review=@{author='author';reviewer='reviewer';rationale='Source control flow inspected';artifact='review'}}
+}
+
+function New-RuntimeObligation {
+    # A real runtime record needs a distinct C observation and concrete Ada
+    # evidence, even when a classification merely points at it as a dependency.
+    return @{id='LUA-SAMPLE-REVIEWED-BLOCK-0001';kind='reviewed-block';status='passed';
+        disposition='unchanged';invariant='The guarded block executes';configurations=@('default');
+        review=@{author='author';reviewer='reviewer';rationale='Both results inspected';
+            artifact='review';original_c_evidence='original-c-result'};
+        evidence=@(@{context='default/windows/validation/static';result='passed';
+            revision=('a'*40);artifact='ada-result';case_id='block'})}
+}
+
 Case 'pinned foundation is structurally valid, not complete' {
     # The baseline contains every pinned source/header but deliberately has
     # unresolved coverage. A foundation pass must retain those pending totals.
@@ -292,6 +313,207 @@ Case 'inactive macro branches require independent applicability review' {
         result='not-applicable';kind='preprocessor';reason='inactive';definition_id='CAPI-CONDITIONAL';
         active=$false;revision=('a'*40);artifact='artifact';case_id='case'})}
     Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -Api } 'Invalid/duplicate pass evidence'
+}
+
+Case 'reviewed guard links to a separately executed runtime obligation' {
+    # Setup a guard review with no process results and a distinct real block.
+    # Both validate in final mode: review of syntax is not reported as execution.
+    $candidate = New-ReviewedCandidate
+    $runtime = New-RuntimeObligation
+    $contexts = @('default/windows/validation/static')
+    Test-ConformanceResolvedRecord $candidate $contexts -RequireComplete
+    Test-ConformanceResolvedRecord $runtime $contexts -RequireComplete
+    Test-ConformanceSourceLinks @($candidate, $runtime) -RequireComplete
+}
+
+Case 'inert quoted data is reviewable without invented runtime evidence' {
+    # An assert-looking literal can be ordinary data. Only quoted-template
+    # candidates may take this reviewed path, and their execution list is empty.
+    $candidate = New-ReviewedCandidate
+    $candidate.kind = 'generated-template'; $candidate.classification = 'data'
+    $candidate.id = 'LUA-SAMPLE-GENERATED-TEMPLATE-0001'; $candidate.obligations = @()
+    Test-ConformanceResolvedRecord $candidate @('default/windows/validation/static') -RequireComplete
+    Test-ConformanceSourceLinks @($candidate) -RequireComplete
+}
+
+Case 'generated assertions require a source-cited runtime block' {
+    # A string later passed to load contains dynamic assertions. Link it to
+    # an explicitly inventoried block rather than pretending the literal ran.
+    $candidate = New-ReviewedCandidate
+    $candidate.kind = 'generated-template'; $candidate.classification = 'template'
+    $candidate.id = 'LUA-SAMPLE-GENERATED-TEMPLATE-0001'
+    Test-ConformanceResolvedRecord $candidate @('default/windows/validation/static') -RequireComplete
+    Test-ConformanceSourceLinks @($candidate, (New-RuntimeObligation)) -RequireComplete
+}
+
+Case 'foundation review may discover a pending runtime obligation' {
+    # Classification can be finished before implementation, but it does not
+    # change the target status or manufacture its evidence. Final mode rejects it.
+    $candidate = New-ReviewedCandidate
+    $runtime = New-RuntimeObligation
+    $runtime.status = 'pending'; $runtime.disposition = 'pending'; $runtime.evidence = @()
+    Test-ConformanceSourceLinks @($candidate, $runtime)
+    Assert-True ($runtime.status -eq 'pending') 'Link validation resolved a pending runtime obligation'
+    Assert-Rejected { Test-ConformanceSourceLinks @($candidate, $runtime) -RequireComplete } 'remains pending'
+}
+
+Case 'T-absent early return cannot stamp its guard as a runtime pass' {
+    # A successful process which returned before the T tests proves no API
+    # coverage. Even otherwise valid pass metadata cannot turn the if into a test.
+    $record = New-RuntimeObligation
+    $record.kind = 'conditional-guard'; $record.id = 'LUA-SAMPLE-CONDITIONAL-GUARD-0001'
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'Lexical candidate cannot claim runtime pass'
+}
+
+Case 'non-runtime classifications cannot contain execution evidence' {
+    # Classification is a review state. Copying the enclosing file result into
+    # it would blur that distinction, so the validator rejects the packet.
+    $record = New-ReviewedCandidate
+    $record.evidence = (New-RuntimeObligation).evidence
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'Non-runtime candidate has execution evidence'
+}
+
+Case 'API entries cannot use non-runtime source review' {
+    # Functions/types/macros retain the stricter original API evidence rules;
+    # the new source-candidate state must not become an ABI waiver.
+    $record = New-ReviewedCandidate
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -Api } 'Invalid status'
+}
+
+Case 'classification requires an independent source reviewer' {
+    # The author cannot self-approve an interpretation that removes a runtime
+    # candidate. Distinct review identities and an artifact remain mandatory.
+    $record = New-ReviewedCandidate
+    $record.review.reviewer = $record.review.author
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'independent classification review'
+}
+
+Case 'real assert calls cannot be reclassified as inert data' {
+    # The data exception belongs to quoted candidates only. A false assertion
+    # cannot disappear through a permissive classification label.
+    $record = New-ReviewedCandidate
+    $record.kind = 'assert-call'; $record.classification = 'data'; $record.obligations = @()
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'Invalid non-runtime classification'
+}
+
+Case 'reviewed guards cannot omit the runtime block they control' {
+    # False guards are not passing assertions. Their source review must retain
+    # the omitted block as a linked obligation with its own execution evidence.
+    $record = New-ReviewedCandidate
+    $record.obligations = @()
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'runtime obligation links'
+}
+
+Case 'duplicate runtime links cannot inflate classification coverage' {
+    # Repeating one block is neither independent evidence nor another branch.
+    $record = New-ReviewedCandidate
+    $record.obligations += $record.obligations[0]
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'duplicate runtime obligation links'
+}
+
+Case 'dangling obligation IDs are rejected' {
+    # A plausible string is not a real source obligation. Resolve IDs against
+    # the containing file before accepting the classification graph.
+    $record = New-ReviewedCandidate
+    Assert-Rejected { Test-ConformanceSourceLinks @($record) } 'Missing/self runtime obligation link'
+}
+
+Case 'self links cannot satisfy guard coverage' {
+    # Direct self-reference would let a reviewed candidate certify itself.
+    $record = New-ReviewedCandidate
+    $record.obligations = @($record.id)
+    Assert-Rejected { Test-ConformanceSourceLinks @($record) } 'Missing/self runtime obligation link'
+}
+
+Case 'candidate cycles cannot replace executed obligations' {
+    # Two reviews pointing at each other still execute nothing. Direct edges
+    # may terminate only at actual pending/passed runtime records.
+    $first = New-ReviewedCandidate
+    $second = New-ReviewedCandidate
+    $second.id = 'LUA-SAMPLE-INTERNAL-REFERENCE-0001'; $second.kind = 'internal-reference'
+    $second.classification = 'reference'; $second.obligations = @($first.id)
+    $first.obligations = @($second.id)
+    Assert-Rejected { Test-ConformanceSourceLinks @($first, $second) } 'not a direct runtime obligation'
+}
+
+Case 'whole-file review cannot replace runtime evidence' {
+    # Bulk stamping every anchor with a whole-file audit is forbidden. The
+    # audit inventories obligations and is never itself a runtime block.
+    $record = New-ReviewedCandidate
+    $audit = New-RuntimeObligation
+    $audit.kind = 'manual-audit'; $audit.id = 'LUA-SAMPLE-MANUAL-AUDIT-0001'
+    $record.obligations = @($audit.id)
+    Assert-Rejected { Test-ConformanceSourceLinks @($record, $audit) } 'not a direct runtime obligation'
+}
+
+Case 'runtime links cannot borrow another file result' {
+    # Per-file graphs prevent api.lua from inheriting a successful tpack case.
+    $record = New-ReviewedCandidate
+    $runtime = New-RuntimeObligation
+    $runtime.id = 'LUA-OTHER-REVIEWED-BLOCK-0001'; $record.obligations = @($runtime.id)
+    Assert-Rejected { Test-ConformanceSourceLinks @($record, $runtime) } 'crosses source file'
+}
+
+Case 'generated templates cannot link only to a static call-site token' {
+    # Dynamic source needs an expanded semantic block with accurate span/hash,
+    # rather than an unrelated assert token which happens to execute nearby.
+    $record = New-ReviewedCandidate
+    $record.kind = 'generated-template'; $record.classification = 'template'
+    $runtime = New-RuntimeObligation; $runtime.kind = 'assert-call'
+    Assert-Rejected { Test-ConformanceSourceLinks @($record, $runtime) } 'not a direct runtime obligation'
+}
+
+Case 'linked blocks must cover every classified configuration' {
+    # Default-only execution cannot resolve an instrumented branch. Preserve
+    # the distinct ltests.h configuration even when source spans overlap.
+    $record = New-ReviewedCandidate
+    $record.configurations = @('default', 'upstream-test')
+    Assert-Rejected { Test-ConformanceSourceLinks @($record, (New-RuntimeObligation)) } 'applicability gap'
+}
+
+Case 'pending records cannot carry unaudited classifications' {
+    # A status typo must not leave classification metadata silently ignored.
+    $record = New-ReviewedCandidate
+    $record.status = 'pending'; $record.disposition = 'pending'
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'unreviewed classification'
+}
+
+Case 'containing-file validation accepts reviewed links without changing source anchors' {
+    # Copy the ledger into ignored test storage. Review its first real guard
+    # and add one pending, hash-cited block; the structural pass must preserve
+    # pending runtime status and independently verify the original anchor set.
+    $fixture = Copy-Fixture 'classified-file'
+    $path = Join-Path $fixture 'coverage/api.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    $candidate = @($records | Where-Object { $_.kind -eq 'conditional-guard' })[0]
+    $review = New-ReviewedCandidate
+    foreach ($field in @('status','disposition','classification','invariant','configurations','review','evidence')) {
+        $candidate[$field] = $review[$field]
+    }
+    $block = $records[0].Clone()
+    $block.id = 'LUA-API-REVIEWED-BLOCK-0001'; $block.kind = 'reviewed-block'
+    $block.configurations = @('default')
+    $candidate.obligations = @($block.id)
+    Write-ConformanceJsonLines $path (@($records) + @($block))
+    $result = Test-ConformanceInventory -Root $root -InventoryDirectory $fixture
+    Assert-True ($result.SourceAnchors -eq 4491 -and $result.PendingSourceAnchors -eq 4490) 'Review erased or passed a runtime obligation'
+    Assert-True ($block.status -eq 'pending') 'Structural validation executed no runtime test'
+}
+
+Case 'containing-file validation rejects a dangling reviewed link' {
+    # Correct source hashes alone cannot certify a nonexistent runtime block.
+    # Exercise the integrated graph pass after regeneration/span validation.
+    $fixture = Copy-Fixture 'classified-missing-block'
+    $path = Join-Path $fixture 'coverage/api.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    $candidate = @($records | Where-Object { $_.kind -eq 'conditional-guard' })[0]
+    $review = New-ReviewedCandidate
+    foreach ($field in @('status','disposition','classification','invariant','configurations','review','evidence')) {
+        $candidate[$field] = $review[$field]
+    }
+    $candidate.obligations = @('LUA-API-REVIEWED-BLOCK-0001')
+    Write-ConformanceJsonLines $path $records
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Missing/self runtime obligation link'
 }
 
 Case 'comments and strings do not create executed assert sites' {

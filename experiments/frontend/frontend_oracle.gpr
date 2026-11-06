@@ -14,11 +14,11 @@ project Frontend_Oracle is
    end Compiler;
    package Linker is
       --  The C parser pulls numeric VM helpers from the reference archive.
-      --  Unix hosts require an explicit math-library dependency for them.
+      --  Match pinned makefile's explicit libm link on every target host.
       case Lua_Ada_Config.Alire_Host_OS is
          when "linux" =>
             for Default_Switches ("C") use ("-lm", "-ldl");
-         when "macos" =>
+         when "macos" | "windows" =>
             for Default_Switches ("C") use ("-lm");
          when others => null;
       end case;

@@ -1,0 +1,5 @@
+--  Compatibility build entry point. The sole runtime image lives in the root
+--  project; this aggregate must never compile another copy of the Ada core.
+aggregate project Lua_C_API is
+   for Project_Files use ("../lua_ada.gpr");
+end Lua_C_API;

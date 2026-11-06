@@ -19,6 +19,13 @@ package body Source_Tests is
    procedure Nonleading_Hash;
    procedure Shifted_Bounds;
    procedure Upper_Index_Bound;
+   procedure Inspection_Empty_Bounds;
+   procedure Inspection_Composition;
+   procedure Inspection_Raw_Prefixes;
+   procedure Inspection_Upper_Bounds;
+   procedure Binary_Interpreter_Line;
+   procedure Binary_BOM_CRLF;
+   procedure Binary_LFCR_Not_Skipped;
 
    procedure Empty is
       --  An empty file has no first byte. It must stay empty rather than
@@ -119,8 +126,97 @@ package body Source_Tests is
       Assert (File_Preamble (Marker) = "", "final-index BOM overflow");
    end Upper_Index_Bound;
 
-   procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
+   procedure Inspection_Empty_Bounds is
+      Source : constant String (0 .. -1) := "";
+      Info : constant File_Preamble_Info := Inspect_File_Preamble (Source);
    begin
+      --  Inspection is usable before any allocation. An empty input with
+      --  non-Positive bounds must produce no transformation or index access.
+      Assert (Info.Skipped_Bytes = 0 and Info.Blanked_Bytes = 0,
+              "empty inspection counts");
+   end Inspection_Empty_Bounds;
+
+   procedure Inspection_Composition is
+      Source : constant String (17 .. 28) := BOM & "#lua" & CR & LF & "x=1";
+      Info : constant File_Preamble_Info := Inspect_File_Preamble (Source);
+   begin
+      --  Counts are relative bytes: a BOM followed by a shebang with CRLF
+      --  preserves both newline bytes and does not depend on the lower bound.
+      Assert (Info.Skipped_Bytes = 3 and Info.Blanked_Bytes = 4,
+              "relative composite preamble counts");
+      Assert (File_Preamble (Source) = "    " & CR & LF & "x=1",
+              "copying wrapper shares inspection policy");
+   end Inspection_Composition;
+
+   procedure Inspection_Raw_Prefixes is
+      Partial : constant File_Preamble_Info :=
+        Inspect_File_Preamble (BOM (1 .. 2));
+      Nonleading : constant File_Preamble_Info :=
+        Inspect_File_Preamble (" #lua");
+   begin
+      --  These similar-looking prefixes are source bytes, not preambles.
+      --  Neither inspection nor its managed consumer may silently strip them.
+      Assert (Partial.Skipped_Bytes = 0 and Partial.Blanked_Bytes = 0,
+              "partial marker not recognized");
+      Assert (Nonleading.Skipped_Bytes = 0 and Nonleading.Blanked_Bytes = 0,
+              "nonleading hash not recognized");
+   end Inspection_Raw_Prefixes;
+
+   procedure Inspection_Upper_Bounds is
+      Hash : constant String (Positive'Last .. Positive'Last) := "#";
+      Marker : constant String (Positive'Last - 2 .. Positive'Last) := BOM;
+      Hash_Info : constant File_Preamble_Info := Inspect_File_Preamble (Hash);
+      BOM_Info : constant File_Preamble_Info := Inspect_File_Preamble (Marker);
+   begin
+      --  Even a tiny source can end at Integer'Last. Relative loops must not
+      --  compute an overflowing index one past the byte being inspected.
+      Assert (Hash_Info.Blanked_Bytes = 1, "upper-bound hash inspection");
+      Assert (BOM_Info.Skipped_Bytes = 3 and BOM_Info.Blanked_Bytes = 0,
+              "upper-bound BOM-only inspection");
+   end Inspection_Upper_Bounds;
+
+   procedure Binary_Interpreter_Line is
+      Bytes : constant String := Character'Val (27) & "Lua" &
+        Character'Val (0) & Character'Val (255);
+   begin
+      --  A native chunk must start at its signature for absolute alignment.
+      --  Remove the interpreter line and LF rather than inserting whitespace.
+      Assert (File_Preamble ("#lua" & LF & Bytes) = Bytes,
+              "binary interpreter prefix retained alignment bytes");
+   end Binary_Interpreter_Line;
+
+   procedure Binary_BOM_CRLF is
+      Bytes : constant String := Character'Val (27) & "Lua" &
+        Character'Val (0);
+      Info : constant File_Preamble_Info :=
+        Inspect_File_Preamble (BOM & "#lua" & CR & LF & Bytes);
+   begin
+      --  Compose BOM removal with the binary reopen's LF-based line skip.
+      --  Every byte after the signature, including NUL, remains unchanged.
+      Assert (Info.Skipped_Bytes = 9 and then Info.Blanked_Bytes = 0,
+              "binary preamble inspection");
+      Assert (File_Preamble (BOM & "#lua" & CR & LF & Bytes) = Bytes,
+              "binary BOM/CRLF composition");
+   end Binary_BOM_CRLF;
+
+   procedure Binary_LFCR_Not_Skipped is
+      Bytes : constant String := Character'Val (27) & "Lua";
+   begin
+      --  Pinned skipcomment consumes through LF. A CR after that byte is the
+      --  first text input; a later signature must not be promoted to binary.
+      Assert (File_Preamble ("#lua" & LF & CR & Bytes) =
+                "    " & LF & CR & Bytes,
+              "nonleading binary signature incorrectly promoted");
+   end Binary_LFCR_Not_Skipped;
+
+   procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
+   begin      Test_Support.Add (Suite, "source binary interpreter prefix",
+                        Binary_Interpreter_Line'Access);
+      Test_Support.Add (Suite, "source binary BOM/CRLF prefix",
+                        Binary_BOM_CRLF'Access);
+      Test_Support.Add (Suite, "source binary LFCR boundary",
+                        Binary_LFCR_Not_Skipped'Access);
+
       Test_Support.Add (Suite, "source empty", Empty'Access);
       Test_Support.Add (Suite, "source null zero bounds",
                         Empty_Zero_Bound'Access);
@@ -140,5 +236,13 @@ package body Source_Tests is
       Test_Support.Add (Suite, "source shifted bounds", Shifted_Bounds'Access);
       Test_Support.Add (Suite, "source upper index bound",
                         Upper_Index_Bound'Access);
+      Test_Support.Add (Suite, "source inspect empty bounds",
+                        Inspection_Empty_Bounds'Access);
+      Test_Support.Add (Suite, "source inspect composition",
+                        Inspection_Composition'Access);
+      Test_Support.Add (Suite, "source inspect raw prefixes",
+                        Inspection_Raw_Prefixes'Access);
+      Test_Support.Add (Suite, "source inspect upper bounds",
+                        Inspection_Upper_Bounds'Access);
    end Register;
 end Source_Tests;

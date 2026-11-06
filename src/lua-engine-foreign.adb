@@ -1,0 +1,1801 @@
+with Ada.Exceptions;
+with Ada.Strings.Fixed;
+with Ada.Unchecked_Conversion;
+with Ada.Unchecked_Deallocation;
+with Interfaces.C.Strings;
+with Lua.Canonical_Compiler;
+with Lua.Chunks;
+with Lua.Engine.Canonical;
+with Lua.Engine.Stacks;
+with Lua.Engine.Warnings;
+with Lua.Runtime_Configuration;
+with Lua.Syntax;
+with Lua.Syntax_Trees;
+with System.Address_To_Access_Conversions;
+with System.Storage_Elements;
+
+package body Lua.Engine.Foreign is
+   package C renames Interfaces.C;
+   package Memory renames Lua.Storage;
+   package VM renames Lua.Engine.Machine;
+   use System.Storage_Elements;
+   use type C.int;
+   use type C.long_long;
+   use type C.size_t;
+   use type Lua.Syntax.Check_Status;
+   use type Integer_Value;
+   use type Real_Value;
+   use type Memory.Allocation_Function;
+   use type C.unsigned_long_long;
+   use type System.Address;
+
+   Registry_Index : constant C.int := -(C.int'Last / 2 + 1_000);
+   Stack_Limit : constant Natural :=
+     Lua.Runtime_Configuration.Maximum_Stack;
+   Foreign_Error : exception;
+
+   type World_View is access all World;
+   type Driver_View is access all VM.Driver;
+   package World_Views is new System.Address_To_Access_Conversions (World);
+   package Driver_Views is new
+     System.Address_To_Access_Conversions (VM.Driver);
+   type Control is record
+      Universe : World_View;
+      Owned_Universe : World_Access;
+      Context : Context_Id;
+      Extra : Storage_Count;
+      Seed : C.unsigned;
+      Driver : Driver_View;
+      Owned_Driver : VM.Driver_Access;
+      Driver_Borrowed : Boolean := False;
+      Owns_Universe : Boolean := True;
+      Calls : System.Address := System.Null_Address;
+   end record;
+   --  Raw ownership metadata has no Ada finalizers or hidden allocations.
+   --  Engine context cleanup releases both it and the separate state block.
+   package Controls is new System.Address_To_Access_Conversions (Control);
+   use type Controls.Object_Pointer;
+
+   type Call_Record is record
+      Previous : System.Address := System.Null_Address;
+      Base : Natural := 0;
+      Wanted : C.int := 0;
+      Protected_Call : Boolean := False;
+      Is_Root : Boolean := False;
+      Context : Context_Id := 1;
+   end record;
+   package Calls is new System.Address_To_Access_Conversions (Call_Record);
+   function Function_Address is new Ada.Unchecked_Conversion
+     (C_Function, System.Address);
+   function Address_Function is new Ada.Unchecked_Conversion
+     (System.Address, C_Function);
+   function Warning_Address is new Ada.Unchecked_Conversion
+     (C_Warning_Function, System.Address);
+   function Address_Warning is new Ada.Unchecked_Conversion
+     (System.Address, C_Warning_Function);
+   function C_Extra_Space return C.size_t
+     with Import, Convention => C, External_Name => "lua_ada_extra_space";
+   function C_Invoke_Borrowed
+     (State : System.Address; Action : Action_Status;
+      Pending : not null access constant Response;
+      Completion : not null access Response) return C.int
+     with Import, Convention => C,
+          External_Name => "lua_ada_invoke_borrowed";
+
+   function Characters is new Ada.Unchecked_Conversion
+     (System.Address, Interfaces.C.Strings.chars_ptr);
+
+   type Surface is record
+      Owner : System.Address;
+      Guard : System.Address;
+      Main : System.Address;
+      Panic : C_Function;
+   end record with Convention => C;
+   package Surfaces is new System.Address_To_Access_Conversions (Surface);
+
+   procedure Free_World is new Ada.Unchecked_Deallocation
+     (World, World_Access);
+
+   function Context_Of (Owner : Controls.Object_Pointer)
+                        return Context_Access;
+   function Create_Surface
+     (State : World_View; Context : Context_Id; Extra : Storage_Count;
+      Seed : C.unsigned; Main : System.Address;
+      Owns_Universe : Boolean := True) return System.Address;
+   function New_State (Input : Request) return System.Address;
+   function Position
+     (Context : Context_Access; Index : C.int) return Natural;
+   function At_Index
+     (State : World; Context : Context_Access; Index : C.int) return Value;
+   function Valid_Index (Context : Context_Access; Index : C.int)
+                         return Boolean;
+   function Type_Code (Item : Value) return C.int;
+   function Numeric
+     (Arena : not null Memory.Owner_Access; Item : Value)
+      return Lua.Numbers.Number;
+   procedure Publish_Top (Context : not null Context_Access; Top : Natural);
+   procedure Set_C_Top
+     (State : in out World; Context : not null Context_Access; Top : Natural);
+   procedure Pop (Context : not null Context_Access; Count : Natural := 1);
+   procedure Push
+     (State : in out World; Context : not null Context_Access; Item : Value);
+   function Read_Bytes
+     (Pointer : System.Address; Length : C.size_t) return String;
+   function Read_Name (Pointer : System.Address; Default : String)
+                       return String;
+
+   function Read_Name (Pointer : System.Address; Default : String)
+                       return String is
+     (if Pointer = System.Null_Address then Default else
+         Interfaces.C.Strings.Value (Characters (Pointer)));
+
+   function Contract_Size (Part : C.int) return C.size_t is
+   begin
+      case Part is
+         when 0 =>
+            return C.size_t (Request'Object_Size / System.Storage_Unit);
+         when 1 =>
+            return C.size_t (Response'Object_Size / System.Storage_Unit);
+         when 2 =>
+            return C.size_t (Surface'Object_Size / System.Storage_Unit);
+         when others => return 0;
+      end case;
+   end Contract_Size;
+
+   procedure Initialize_Bridge is
+   begin
+      --  Public numeric ABI settings are checked here, while C compares the
+      --  request/response/surface layouts before calling the dispatcher.
+      pragma Assert (C.int'Size = 32);
+      pragma Assert (C.long_long'Size = 64);
+      pragma Assert (C.double'Size = 64);
+      pragma Assert (Operation_Code'Size = C.int'Size);
+      pragma Assert (C_Function'Size = System.Address'Size);
+   end Initialize_Bridge;
+
+   function Context_Of (Owner : Controls.Object_Pointer)
+                        return Context_Access is
+   begin
+      return Owner.Universe.Contexts (Positive (Owner.Context));
+   end Context_Of;
+
+   function Create_Surface
+     (State : World_View; Context : Context_Id; Extra : Storage_Count;
+      Seed : C.unsigned; Main : System.Address;
+      Owns_Universe : Boolean := True) return System.Address
+   is
+      Item : constant Context_Access := State.Contexts (Positive (Context));
+      Header, Block : System.Address := System.Null_Address;
+      Result : System.Address;
+   begin
+      if Item.Foreign_State /= System.Null_Address then
+         return Item.Foreign_State;
+      end if;
+      --  Ordinary pushes preserve one free error slot. Refusal therefore can
+      --  publish the preallocated memory object without growing this stack.
+      Stacks.Reserve
+        (State.all, Item, Natural'Max
+           (Initial_Stack_Size + Extra_Stack, Item.Stack_Used));
+      if Item.Stack.Is_Empty and then Item.Stack_Used = 0 then
+         Item.Stack_Used := Minimum_C_Stack;
+      end if;
+      if Extra mod Storage_Count (Surface'Alignment) /= 0 then
+         raise Foreign_Error with "unaligned configured extra space";
+      end if;
+      --  Object_Size includes ABI tail padding. Size can describe only the
+      --  value bits; importing a typed view into that shorter allocation
+      --  would permit an ordinary record assignment to overrun the payload.
+      Header := Memory.Allocate
+        (State.Memory, Control'Object_Size / System.Storage_Unit,
+         Control'Alignment);
+      Block := Memory.Allocate
+        (State.Memory, Extra + Surface'Object_Size / System.Storage_Unit,
+         Surface'Alignment);
+      Result := Block + Storage_Offset (Extra);
+      Controls.To_Pointer (Header).all :=
+        (Universe => State, Context => Context, Extra => Extra,
+         Seed => Seed, Driver => null,
+         Owns_Universe =>
+           (if Main = System.Null_Address then Owns_Universe else
+              Controls.To_Pointer
+                (Surfaces.To_Pointer (Main).Owner).Owns_Universe),
+         others => <>);
+      Surfaces.To_Pointer (Result).all :=
+        (Owner => Header, Guard => System.Null_Address,
+         Main => (if Main = System.Null_Address then Result else Main),
+         Panic => null);
+      if Extra > 0 then
+         declare
+            Prefix : Storage_Array (1 .. Storage_Offset (Extra))
+              with Import, Address => Block;
+         begin
+            if Main = System.Null_Address then
+               Prefix := [others => 0];
+            else
+               declare
+                  Original : constant Storage_Array (Prefix'Range)
+                    with Import,
+                    Address => Main - Storage_Offset (Extra);
+               begin
+                  Prefix := Original;
+               end;
+            end if;
+         end;
+      end if;
+      --  Publish only after both blocks and all fields are initialized. A
+      --  failed allocator callback leaves no partially usable C state pointer.
+      Item.Foreign_Control := Header;
+      Item.Foreign_Block := Block;
+      Item.Foreign_State := Result;
+      return Result;
+   exception
+      when others =>
+         Memory.Release (State.Memory, Block);
+         Memory.Release (State.Memory, Header);
+         raise;
+   end Create_Surface;
+
+   function New_State (Input : Request) return System.Address is
+      State : World_Access;
+      Result : System.Address;
+      Operation_Active : Boolean := False;
+   begin
+      State := new World;
+      if Input.Operation = Create_State then
+         if Input.Allocator = null then
+            Free_World (State);
+            return System.Null_Address;
+         end if;
+         Memory.Set_Allocator
+           (State.Memory, Input.Allocator, Input.Pointer);
+      end if;
+      State.Open_Standard_Libraries := False;
+      Initialize (State.all, (others => <>));
+      Set_Policy (State.all, Lua_Compatible);
+      if Input.Operation = Create_State then
+         State.Warning_Mode := No_Warning_Handler;
+      end if;
+      --  C-created states publish to native stdout. Ada sessions select
+      --  capture by default, independently of their execution quota policy.
+      State.Output_Mode := Process_Streams;
+      Begin_Operation (State.all);
+      Operation_Active := True;
+      Result := Create_Surface
+        (World_View (State), Context_Id (State.Main_Thread.Context_Index),
+         Storage_Count (Input.Length), Input.Seed, System.Null_Address);
+      Controls.To_Pointer (Surfaces.To_Pointer (Result).Owner).
+        Owned_Universe := State;
+      --  Engine.Initialize owns the one actual registry for every session.
+      End_Operation (State.all);
+      Operation_Active := False;
+      return Result;
+   exception
+      when others =>
+         if State /= null then
+            if Operation_Active then
+               End_Operation (State.all);
+            end if;
+            Finalize (State.all);
+            Free_World (State);
+         end if;
+         return System.Null_Address;
+   end New_State;
+
+   procedure Invoke_Borrowed
+     (State : in out World; Driver : in out VM.Driver)
+   is
+      Universe : constant World_View :=
+        World_View (World_Views.To_Pointer (State'Address));
+      Main_State, Callback_State : System.Address;
+      Owner : Controls.Object_Pointer;
+      Saved_Driver : Driver_View := null;
+      Saved_Borrowed : Boolean := False;
+      Input, Output : aliased Response;
+      Token : Callback_Identity;
+      Target : Context_Access;
+      Action, Status : Action_Status;
+      Raw_Status : C.int;
+      Attached : Boolean := False;
+      Is_Warning : constant Boolean := Warnings.Pending (State);
+
+      procedure Restore;
+      procedure Allocation_Failed;
+      procedure Restore is
+      begin
+         if not Attached then return; end if;
+         --  Every nested C boundary belongs to this borrow. On a host abort,
+         --  its C activations have already unwound; release scalar ownership
+         --  metadata without running a Lua callback or restarting a budget.
+         while Owner.Calls /= System.Null_Address loop
+            declare
+               Address : System.Address := Owner.Calls;
+            begin
+               Owner.Calls := Calls.To_Pointer (Address).Previous;
+               Memory.Release (State.Memory, Address);
+            end;
+         end loop;
+         Owner.Driver := Saved_Driver;
+         Owner.Driver_Borrowed := Saved_Borrowed;
+         Attached := False;
+      end Restore;
+
+      procedure Allocation_Failed is
+      begin
+         Restore;
+         Record_Memory_Error (State);
+         if Is_Warning then
+            State.Warning_Head.Warning_Failed := True;
+            Warnings.Discard (State, State.Warning_Head);
+         else
+            --  Native windows reserve LUA_MINSTACK beyond their arguments.
+            --  This error publication therefore needs no new stack storage,
+            --  even if constructing the first opaque C surface was refused.
+            Target := VM.Foreign_Context (Driver);
+            Target.Foreign_Top := Target.Foreign_Top + 1;
+            Stacks.Write
+              (State, Target, Target.Foreign_Top, Target.Failure);
+            Target.Stack_Window.Stack_Live_Top := Target.Foreign_Top;
+            VM.Complete_Foreign_Call
+              (Driver, 0, 4, Token => VM.Foreign_Token (Driver));
+         end if;
+      end Allocation_Failed;
+   begin
+      --  Context-owned C surfaces may retain World's stable address until
+      --  that same world releases them. Their ownership flag forbids C from
+      --  freeing an Ada-owned world. The Driver view lasts only through this
+      --  synchronous borrow and is restored before the Run activation ends;
+      --  no named access-to-nested-subprogram or abandoned stack is stored.
+      Main_State := Create_Surface
+        (Universe, Context_Id (State.Main_Thread.Context_Index),
+         Storage_Count (C_Extra_Space), 0, System.Null_Address,
+         Owns_Universe => False);
+      Owner := Controls.To_Pointer (Surfaces.To_Pointer (Main_State).Owner);
+      if Owner.Calls /= System.Null_Address or else Owner.Driver_Borrowed then
+         raise Program_Error with "Ada execution already owns a C borrow";
+      end if;
+      Saved_Driver := Owner.Driver;
+      Saved_Borrowed := Owner.Driver_Borrowed;
+      Owner.Driver :=
+        Driver_View (Driver_Views.To_Pointer (Driver'Address));
+      Owner.Driver_Borrowed := True;
+      Attached := True;
+      if Is_Warning then
+         Target := State.Warning_Head.Context;
+         Input.Warning_Function :=
+           Address_Warning (State.Warning_Head.Warning_Handler);
+         Input.Warning_Data := State.Warning_Head.Warning_Data;
+         Input.Warning_Message := State.Warning_Head.Warning_Message.Address;
+         Input.Warning_Continuation :=
+           Boolean'Pos (State.Warning_Head.Warning_To_Continue);
+         Token := Warnings.Identity (State);
+         Warnings.Begin_Callback (State);
+         Action := Action_Warning;
+      else
+         Target := VM.Foreign_Context (Driver);
+         Input.Function_Data := Address_Function (VM.Foreign_Handler (Driver));
+         Token := VM.Foreign_Token (Driver);
+         Action := Action_Call;
+      end if;
+      Callback_State := Create_Surface
+        (Universe, Context_Id (Target.Thread.Context_Index),
+         Owner.Extra, Owner.Seed, Main_State, Owns_Universe => False);
+      Input.Callback_Token := Token;
+      Raw_Status := C_Invoke_Borrowed
+        (Callback_State, Action, Input'Access, Output'Access);
+      case Raw_Status is
+         when 0 => Status := Action_Done;
+         when 2 => Status := Action_Raise;
+         when 4 => Status := Action_Memory;
+         when 5 => Status := Action_Handling;
+         when 6 => Status := Action_Abort;
+         when others =>
+            raise Program_Error with "invalid borrowed C callback transfer";
+      end case;
+      if Status = Action_Abort then
+         Restore;
+         if State.Current.Failure_Class /= Host_Abort then
+            State.Current.Failure_Class := Host_Abort;
+            State.Current.Transfer.Kind := Host_Stopped;
+            State.Current.Failure_Text :=
+              To_Unbounded_String ("foreign host abort");
+         end if;
+         raise Language_Error;
+      end if;
+      if Is_Warning then
+         if Status /= Action_Done then
+            Target.Failure := Stacks.Read (Target, Target.Foreign_Top);
+            Target.Has_Failure_Value := True;
+            Target.Failure_Text := To_Unbounded_String
+              (Image (Target.Memory, Target.Failure));
+            Target.Failure_Class :=
+              (if Status = Action_Memory then Memory_Failure
+               elsif Status = Action_Handling then Handling_Failure
+               else Language_Failure);
+            Target.Failure_Handled := Output.Error_Handled /= 0;
+            State.Warning_Head.Warning_Failed := True;
+         end if;
+         Warnings.Acknowledge (State, Token);
+      else
+         VM.Complete_Foreign_Call
+           (Driver, Natural (Output.Integer_Data),
+            Action_Status'Enum_Rep (Status), Output.Error_Handled /= 0, Token);
+      end if;
+      Restore;
+   exception
+      when Memory.Allocation_Error =>
+         Allocation_Failed;
+      when Program_Error =>
+         if Memory.Refusal_Pending (State.Memory) then
+            Allocation_Failed;
+         else
+            Restore;
+            raise;
+         end if;
+      when others =>
+         Restore;
+         raise;
+   end Invoke_Borrowed;
+
+   function Position
+     (Context : Context_Access; Index : C.int) return Natural
+   is
+      Number : constant Integer_Value :=
+        (if Index > 0 then Integer_Value (Context.Foreign_Base) +
+           Integer_Value (Index)
+         else Integer_Value (Context.Foreign_Top) +
+           Integer_Value (Index) + 1);
+   begin
+      if Index = 0 or else Index <= Registry_Index or else
+        Number <= Integer_Value (Context.Foreign_Base)
+        or else Number > Integer_Value (Context.Foreign_Top)
+      then
+         return 0;
+      end if;
+      return Natural (Number);
+   end Position;
+
+   function Valid_Index (Context : Context_Access; Index : C.int)
+                         return Boolean
+   is
+      Activation : constant Frame_Access := Context.Foreign_Activation;
+      Upvalue : constant C.long_long :=
+        C.long_long (Registry_Index) - C.long_long (Index);
+   begin
+      if Index = Registry_Index then
+         return True;
+      elsif Index < Registry_Index then
+         return Activation /= null and then Activation.Native_Self /= null
+           and then Upvalue in 1 .. C.long_long
+             (Activation.Native_Self.Captures.Length);
+      end if;
+      return Position (Context, Index) /= 0;
+   end Valid_Index;
+
+   function At_Index
+     (State : World; Context : Context_Access; Index : C.int) return Value
+   is
+      Slot : constant Natural := Position (Context, Index);
+   begin
+      if Index = Registry_Index then
+         return (Kind => Table_Kind, Reference => State.Foreign_Registry);
+      elsif Index < Registry_Index then
+         declare
+            Upvalue : constant C.long_long :=
+              C.long_long (Registry_Index) - C.long_long (Index);
+            Activation : constant Frame_Access := Context.Foreign_Activation;
+         begin
+            if Activation /= null and then Activation.Native_Self /= null
+              and then Upvalue in 1 .. C.long_long
+                (Activation.Native_Self.Captures.Length)
+            then
+               return Activation.Native_Self.Captures
+                 (Positive (Upvalue)).Cell_Value;
+            end if;
+            return Nil_Value;
+         end;
+      elsif Slot = 0 then
+         return Nil_Value;
+      end if;
+      return Stacks.Read (Context, Slot);
+   end At_Index;
+
+   function Type_Code (Item : Value) return C.int is
+   begin
+      case Item.Kind is
+         when Nil_Kind => return 0;
+         when Boolean_Kind => return 1;
+         when Light_Identity_Kind => return 2;
+         when Integer_Kind | Real_Kind => return 3;
+         when String_Kind => return 4;
+         when Table_Kind => return 5;
+         when Closure_Kind | Native_Closure_Kind | Native_Kind_Value |
+           Foreign_Function_Kind =>
+            return 6;
+         when Userdata_Kind => return 7;
+         when Thread_Kind => return 8;
+      end case;
+   end Type_Code;
+
+   function Numeric
+     (Arena : not null Memory.Owner_Access; Item : Value)
+      return Lua.Numbers.Number is
+   begin
+      case Item.Kind is
+         when Integer_Kind =>
+            return (Lua.Numbers.Integer_Number, Item.Integer_Data);
+         when Real_Kind =>
+            return (Lua.Numbers.Real_Number, Item.Real_Data);
+         when String_Kind =>
+            return Read_Number (Arena, Item.Reference.Bytes);
+         when others => return (Kind => Lua.Numbers.Invalid);
+      end case;
+   end Numeric;
+
+   procedure Publish_Top (Context : not null Context_Access; Top : Natural) is
+   begin
+      Context.Foreign_Top := Top;
+      if Context.Foreign_Activation = null then
+         Context.Host_Stack_Top := Top;
+      else
+         Context.Foreign_Activation.Stack_Live_Top := Top;
+      end if;
+   end Publish_Top;
+
+   procedure Set_C_Top
+     (State : in out World; Context : not null Context_Access; Top : Natural)
+   is
+      Old : constant Natural := Context.Foreign_Top;
+   begin
+      --  Reserve through a stable index before publishing a larger top. Both
+      --  scalar/cell arrays grow together; their retained initialized length
+      --  may exceed the visible C window and must never be truncated here.
+      if Top > Context.Stack_Used then
+         if not VM.Ensure_Stack (State, Context, Top) then
+            raise Program_Error with "raising stack check returned false";
+         end if;
+         if Context.Foreign_Activation /= null then
+            VM.Resize_Stack_Window
+              (State, Context.Foreign_Activation, Top - Context.Foreign_Base);
+         else
+            Context.Stack_Used := Top;
+         end if;
+      end if;
+      if Top < Old then
+         Stacks.Clear_Range (Context, Top + 1, Old);
+      else
+         for Index in Old + 1 .. Top loop
+            Stacks.Write (State, Context, Index, Nil_Value);
+         end loop;
+      end if;
+      Publish_Top (Context, Top);
+   end Set_C_Top;
+
+   procedure Pop (Context : not null Context_Access; Count : Natural := 1) is
+      Old : constant Natural := Context.Foreign_Top;
+   begin
+      if Count > Old - Context.Foreign_Base then
+         raise Foreign_Error with "C stack underflow";
+      end if;
+      Stacks.Clear_Range (Context, Old - Count + 1, Old);
+      Publish_Top (Context, Old - Count);
+   end Pop;
+
+   procedure Push
+     (State : in out World; Context : not null Context_Access; Item : Value) is
+      Top : constant Natural := Context.Foreign_Top;
+   begin
+      if Top + 1 > Context.Stack_Used then
+         if not VM.Ensure_Stack (State, Context, Top + 1) then
+            raise Program_Error with "raising stack check returned false";
+         end if;
+         if Context.Foreign_Activation /= null then
+            VM.Resize_Stack_Window
+              (State, Context.Foreign_Activation,
+               Top + 1 - Context.Foreign_Base);
+         else
+            Context.Stack_Used := Top + 1;
+         end if;
+      end if;
+      --  A completed callback publishes into a pre-reserved caller window.
+      --  There is no vector Append and no allocation when capacity suffices.
+      Stacks.Write (State, Context, Top + 1, Item);
+      Publish_Top (Context, Top + 1);
+   end Push;
+
+   function Read_Bytes
+     (Pointer : System.Address; Length : C.size_t) return String
+   is
+   begin
+      if Length > C.size_t (Natural'Last) or else
+        (Length > 0 and Pointer = System.Null_Address)
+      then
+         raise Foreign_Error with "invalid C string extent";
+      end if;
+      if Length = 0 then
+         return "";
+      end if;
+      declare
+         Bytes : constant String (1 .. Natural (Length))
+           with Import, Address => Pointer;
+      begin
+         return Bytes;
+      end;
+   end Read_Bytes;
+
+   function Dispatch
+     (State : System.Address; Input : not null access constant Request;
+      Output : not null access Response) return Action_Status
+   is
+      Owner : Controls.Object_Pointer;
+      Context : Context_Access;
+      Active_World : World_View;
+      Previous : Context_Access;
+      Operation_Active : Boolean := False;
+      Keep_Scheduler : Boolean := False;
+      Main_Owner : Controls.Object_Pointer;
+
+      procedure Leave_Context;
+      procedure Error_Result (Text : String);
+      procedure Memory_Result;
+      function Require_Table return Value;
+      procedure Get_Raw (Key : Value);
+      function Pump (Start_Error : Boolean := False) return Action_Status;
+
+      procedure Leave_Context is
+      begin
+         if Active_World /= null then
+            if Operation_Active then
+               End_Operation (Active_World.all);
+               Operation_Active := False;
+            end if;
+            if not Keep_Scheduler then
+               Active_World.Current := Previous;
+            end if;
+            Active_World := null;
+         end if;
+      end Leave_Context;
+
+      procedure Error_Result (Text : String) is
+         Item : Value;
+      begin
+         --  Error objects enter traced C stack storage before control returns
+         --  to the C guard. Refusal while making the error cannot recurse.
+         if Context /= null then
+            Item := New_String (Owner.Universe.all, Text);
+            Push (Owner.Universe.all, Context, Item);
+            Output.Pointer := Item.Reference.C_Bytes;
+         end if;
+      exception
+         when others => null;
+      end Error_Result;
+
+      procedure Memory_Result is
+      begin
+         if Context /= null then
+            --  The actual immutable error string was allocated during state
+            --  initialization. Its reserved stack slot needs no provider call.
+            Record_Memory_Error (Owner.Universe.all);
+            Push (Owner.Universe.all, Context, Context.Failure);
+            Output.Pointer := Context.Failure.Reference.C_Bytes;
+         end if;
+      exception
+         when others => null;
+      end Memory_Result;
+
+      function Get_Value (Index : C.int) return Value is
+        (At_Index (Owner.Universe.all, Context, Index));
+
+      function Require_Table return Value is
+         Item : constant Value := Get_Value (Input.Index);
+      begin
+         if Item.Kind /= Table_Kind then
+            raise Foreign_Error with "table expected";
+         end if;
+         return Item;
+      end Require_Table;
+
+      procedure Get_Raw (Key : Value) is
+         Item : constant Value := Get (Require_Table, Key);
+      begin
+         --  A retrieved weak value is no longer protected by the source
+         --  table's marking policy while the destination stack grows.
+         Pin (Owner.Universe.all, Item);
+         Push (Owner.Universe.all, Context, Item);
+         Output.Integer_Data := C.long_long (Type_Code (Item));
+      end Get_Raw;
+
+      function Pump (Start_Error : Boolean := False) return Action_Status is
+         Driver : VM.Driver renames Main_Owner.Driver.all;
+         Pending : constant Calls.Object_Pointer :=
+           Calls.To_Pointer (Main_Owner.Calls);
+         Caller : constant Context_Access := Owner.Universe.Contexts
+           (Positive (Pending.Context));
+         Packet : Values.Vector renames Caller.Boundary_Results;
+         Error_Status : Natural := 0;
+         Handler_Called : Boolean := False;
+         Count : Natural;
+         Address : System.Address;
+      begin
+         --  Every iteration executes one explicit scheduler phase. Returning
+         --  a callback action destroys this Ada activation before C invokes
+         --  the foreign function or establishes a nonlocal-transfer guard.
+         Keep_Scheduler := True;
+         Packet.Clear;
+         if Start_Error then
+            if Owner.Universe.Current.Failure_Class = Host_Abort then
+               return Action_Abort;
+            end if;
+            Error_Status :=
+              (if Owner.Universe.Current.Failure_Class = Memory_Failure then 4
+               elsif Owner.Universe.Current.Failure_Class = Handling_Failure
+               then 5 else 2);
+            Packet.Append
+              ((if Owner.Universe.Current.Has_Failure_Value then
+                   Owner.Universe.Current.Failure else
+                   New_String (Owner.Universe.all, To_String
+                     (Owner.Universe.Current.Failure_Text))));
+         end if;
+         loop
+            exit when Error_Status /= 0 or else VM.Is_Complete (Driver) or else
+              VM.Has_Foreign_Result (Driver);
+            if Warnings.Pending (Owner.Universe.all) then
+               declare
+                  Event : constant Frame_Access :=
+                    Owner.Universe.Warning_Head;
+               begin
+                  Output.Pointer := Create_Surface
+                    (Owner.Universe, Context_Id
+                       (Event.Context.Thread.Context_Index),
+                     Main_Owner.Extra, Main_Owner.Seed,
+                     Surfaces.To_Pointer (State).Main);
+                  Output.Warning_Function :=
+                    Address_Warning (Event.Warning_Handler);
+                  Output.Warning_Data := Event.Warning_Data;
+                  Output.Warning_Message := Event.Warning_Message.Address;
+                  Output.Warning_Continuation :=
+                    Boolean'Pos (Event.Warning_To_Continue);
+                  Output.Callback_Token :=
+                    Warnings.Identity (Owner.Universe.all);
+                  Warnings.Begin_Callback (Owner.Universe.all);
+                  return Action_Warning;
+               end;
+            elsif VM.Needs_Foreign_Call (Driver) then
+               declare
+                  Target : constant Context_Access :=
+                    VM.Foreign_Context (Driver);
+               begin
+                  Output.Pointer := Create_Surface
+                    (Owner.Universe, Context_Id (Target.Thread.Context_Index),
+                     Main_Owner.Extra, Main_Owner.Seed,
+                     Surfaces.To_Pointer (State).Main);
+                  Output.Function_Data :=
+                    Address_Function (VM.Foreign_Handler (Driver));
+                  Output.Callback_Token := VM.Foreign_Token (Driver);
+                  return Action_Call;
+               end;
+            end if;
+            begin
+               VM.Step (Driver);
+            exception
+               when Language_Error =>
+                  if Owner.Universe.Current.Failure_Class = Host_Abort then
+                     return Action_Abort;
+                  end if;
+                  Error_Status :=
+                    (if Owner.Universe.Current.Failure_Class = Memory_Failure
+                     then 4
+                     elsif Owner.Universe.Current.Failure_Class =
+                       Handling_Failure then 5 else 2);
+                  Packet.Append
+                    ((if Owner.Universe.Current.Has_Failure_Value then
+                         Owner.Universe.Current.Failure else
+                         New_String (Owner.Universe.all, To_String
+                           (Owner.Universe.Current.Failure_Text))));
+                  exit;
+            end;
+         end loop;
+         if Error_Status = 0 then
+            if Pending.Is_Root then
+               if VM.Outcome (Driver) /= Completed then
+                  raise Foreign_Error with "unexpected C-call suspension";
+               end if;
+               VM.Take_Results (Driver, Packet);
+               if Packet.Is_Empty or else
+                 Packet.First_Element.Kind /= Boolean_Kind
+               then
+                  raise Program_Error with "C entry lost protection packet";
+               end if;
+               if not Packet.First_Element.Boolean_Data then
+                  Error_Status :=
+                    (if Caller.Protected_Failure_Class = Memory_Failure then 4
+                     elsif Caller.Protected_Failure_Class = Handling_Failure
+                     then 5 else 2);
+                  Handler_Called := Caller.Protected_Handler_Called;
+               end if;
+               Packet.Delete_First;
+            else
+               VM.Take_Foreign_Result
+                 (Driver, Packet, Error_Status, Handler_Called);
+            end if;
+         end if;
+         if Pending.Is_Root then
+            VM.Finish (Driver);
+            VM.Clear_Frames (Owner.Universe.all);
+            Caller.Non_Yieldable := Caller.Non_Yieldable - 1;
+         end if;
+         Set_C_Top (Owner.Universe.all, Caller, Pending.Base);
+         Count := (if Error_Status /= 0 then 1
+                   elsif Pending.Wanted = -1 then Natural (Packet.Length)
+                   else Natural (Pending.Wanted));
+         --  The Call_Record contains only scalar ownership metadata; pop it
+         --  before publishing results so allocation refusal cannot leave a
+         --  finished operation registered as an active nested drive.
+         Address := Main_Owner.Calls;
+         Main_Owner.Calls := Pending.Previous;
+         declare
+            Protected_Call : constant Boolean := Pending.Protected_Call;
+         begin
+            Memory.Release (Owner.Universe.Memory, Address);
+            for Index in 1 .. Count loop
+               Push (Owner.Universe.all, Caller,
+                 (if Index <= Natural (Packet.Length) then Packet (Index)
+                  else Nil_Value));
+            end loop;
+            Packet.Clear;
+            Output.Integer_Data := C.long_long (Error_Status);
+            Output.Error_Handled := Boolean'Pos (Handler_Called);
+            if Error_Status /= 0 and then not Protected_Call then
+               if Stacks.Read (Caller, Caller.Foreign_Top).Kind = String_Kind
+               then
+                  Output.Pointer :=
+                    Stacks.Read (Caller, Caller.Foreign_Top).Reference.C_Bytes;
+               end if;
+               return (if Error_Status = 4 then Action_Memory
+                       elsif Error_Status = 5 then Action_Handling
+                       else Action_Raise);
+            end if;
+         end;
+         return Action_Done;
+      exception
+         when others =>
+            Packet.Clear;
+            raise;
+      end Pump;
+
+   begin
+      Output.all := (others => <>);
+      if Input.Operation in Create_State | Create_Default_State then
+         Output.Pointer := New_State (Input.all);
+         return Action_Done;
+      end if;
+      if State = System.Null_Address then
+         raise Foreign_Error with "null C state";
+      end if;
+      Owner := Controls.To_Pointer (Surfaces.To_Pointer (State).Owner);
+      Main_Owner := Controls.To_Pointer
+        (Surfaces.To_Pointer (Surfaces.To_Pointer (State).Main).Owner);
+      Context := Context_Of (Owner);
+      Active_World := Owner.Universe;
+      Previous := Active_World.Current;
+      Active_World.Current := Context;
+      Begin_Operation (Active_World.all);
+      Operation_Active := True;
+      --  Errors and safe-point roots belong to the addressed thread, even
+      --  when it is an inactive coroutine. Borrowing it never resets budgets
+      --  or resumes Lua execution, and the caller's context is restored below.
+      case Input.Operation is
+         when Create_State | Create_Default_State => null;
+         when Close_State =>
+            declare
+               Universe : World_Access := Main_Owner.Owned_Universe;
+            begin
+               if not Main_Owner.Owns_Universe then
+                  raise Foreign_Error with "cannot close an Ada-owned state";
+               elsif Main_Owner.Calls /= System.Null_Address or else
+                 Main_Owner.Driver_Borrowed
+               then
+                  raise Foreign_Error with "cannot close a running C drive";
+               end if;
+               VM.Free_Driver (Main_Owner.Owned_Driver);
+               Main_Owner.Driver := null;
+               End_Operation (Active_World.all);
+               Operation_Active := False;
+               Active_World := null;
+               Finalize (Universe.all);
+               Free_World (Universe);
+            end;
+         when Create_Thread =>
+            declare
+               Item : constant Value := New_Thread
+                 (Owner.Universe.all, Nil_Value);
+            begin
+               --  The parent stack roots the new thread before a caller can
+               --  collect. Its C surface is borrowed, not a permanent root.
+               Push (Owner.Universe.all, Context, Item);
+               Output.Pointer := Create_Surface
+                 (Owner.Universe, Context_Id (Item.Reference.Context_Index),
+                  Owner.Extra, Owner.Seed,
+                  Surfaces.To_Pointer (State).Main);
+            end;
+         when Set_Warning_Function =>
+            Owner.Universe.Warning_Mode :=
+              (if Input.Warning_Function = null then No_Warning_Handler
+               else Custom_Warning_Handler);
+            Owner.Universe.Warning_Handler :=
+              Warning_Address (Input.Warning_Function);
+            Owner.Universe.Warning_Data := Input.Pointer;
+         when Issue_Warning =>
+            if Owner.Universe.Warning_Mode = Custom_Warning_Handler then
+               --  The caller's C string already outlives this synchronous
+               --  wrapper invocation. Snapshot scalar callback data; no Lua
+               --  string, event allocation or Ada activation spans the call.
+               Output.Warning_Function :=
+                 Address_Warning (Owner.Universe.Warning_Handler);
+               Output.Warning_Data := Owner.Universe.Warning_Data;
+               Output.Warning_Message := Input.Pointer;
+               Output.Warning_Continuation := Input.Count;
+               Leave_Context;
+               return Action_Warning;
+            else
+               Warnings.Emit
+                 (Owner.Universe.all,
+                  Byte_String'(Input.Pointer, Natural (Input.Length)),
+                  To_Continue => Input.Count /= 0);
+            end if;
+         when Complete_Warning =>
+            declare
+               Event : constant Frame_Access := Owner.Universe.Warning_Head;
+               Result : Action_Status;
+            begin
+               if Input.Index not in 0 | 2 | 4 | 5 or else
+                 Event = null or else
+                 Event.Warning_Phase /= Warning_Callback_Active or else
+                 Event.all'Address /= Input.Callback_Token.Activation or else
+                 Event.Warning_Ticket /= Input.Callback_Token.Serial
+               then
+                  raise Foreign_Error with "invalid warning completion";
+               end if;
+               if Input.Index /= 0 then
+                  Context.Failure :=
+                    Stacks.Read (Context, Context.Foreign_Top);
+                  Context.Has_Failure_Value := True;
+                  Context.Failure_Text := To_Unbounded_String
+                    (Image (Context.Memory, Context.Failure));
+                  Context.Failure_Class :=
+                    (if Input.Index = 4 then Memory_Failure
+                     elsif Input.Index = 5 then Handling_Failure
+                     else Language_Failure);
+                  Context.Failure_Handled := Input.Error_Handled /= 0;
+                  Event.Warning_Failed := True;
+               end if;
+               Warnings.Acknowledge
+                 (Owner.Universe.all, Input.Callback_Token);
+               Result := Pump;
+               Leave_Context;
+               return Result;
+            end;
+         when Get_Yieldability =>
+            --  A new secondary thread is yieldable even outside execution.
+            --  Abandoned barriers on a dead thread cannot describe a current
+            --  C call; main-thread/closing restrictions remain explicit.
+            Output.Integer_Data := Boolean'Pos
+              (Context /= Owner.Universe.Main_Context and then
+               Context.Phase /= Closing and then
+               (Context.Status = Dead_Context or else
+                Context.Non_Yieldable = 0));
+         when Get_Top =>
+            Output.Integer_Data := C.long_long
+              (Context.Foreign_Top - Context.Foreign_Base);
+         when Absolute_Index =>
+            Output.Integer_Data :=
+              (if Input.Index > 0 or Input.Index <= Registry_Index then
+                  C.long_long (Input.Index)
+               else C.long_long
+                 (Context.Foreign_Top -
+                  Context.Foreign_Base) +
+                 C.long_long (Input.Index) + 1);
+         when Set_Top =>
+            declare
+               Count : constant Integer_Value :=
+                 (if Input.Index >= 0 then Integer_Value
+                    (Context.Foreign_Base) + Integer_Value (Input.Index)
+                  else Integer_Value (Context.Foreign_Top) +
+                    Integer_Value (Input.Index) + 1);
+            begin
+               if Count < Integer_Value (Context.Foreign_Base) or else
+                 Count >= Integer_Value (Context.Stack_Allocated_Bound)
+               then
+                  raise Foreign_Error with "invalid stack top";
+               end if;
+               Set_C_Top (Owner.Universe.all, Context, Natural (Count));
+            end;
+         when Check_Stack =>
+            if Input.Count >= 0 then
+               begin
+                  declare
+                     Last : constant Natural :=
+                       (if Natural (Input.Count) >
+                          Natural'Last - Context.Foreign_Top
+                        then Natural'Last else
+                          Context.Foreign_Top + Natural (Input.Count));
+                     Available : constant Boolean := VM.Ensure_Stack
+                       (Owner.Universe.all, Context, Last,
+                        Raise_Error => False);
+                  begin
+                     if not Available then
+                        null;
+                     elsif Context.Foreign_Activation /= null then
+                        VM.Resize_Stack_Window
+                          (Owner.Universe.all, Context.Foreign_Activation,
+                           Natural'Max
+                             (Context.Foreign_Activation.Stack_Window_Length,
+                              Last - Context.Foreign_Base));
+                     else
+                        Stacks.Reserve (Owner.Universe.all, Context, Last);
+                        Context.Stack_Used :=
+                          Natural'Max (Context.Stack_Used, Last);
+                     end if;
+                     Output.Integer_Data := Boolean'Pos (Available);
+                  end;
+               exception
+                  when Memory.Allocation_Error =>
+                     Memory.Acknowledge_Refusal (Owner.Universe.Memory);
+                  when Program_Error | Storage_Error =>
+                     if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                        Memory.Acknowledge_Refusal (Owner.Universe.Memory);
+                     else
+                        raise;
+                     end if;
+               end;
+            end if;
+         when Push_Value =>
+            Push (Owner.Universe.all, Context, Get_Value (Input.Index));
+         when Copy_Value =>
+            declare
+               Slot : constant Natural := Position (Context, Input.Count);
+            begin
+               if Input.Count < Registry_Index and then
+                 Valid_Index (Context, Input.Count)
+               then
+                  Context.Foreign_Activation.Native_Self.Captures
+                    (Positive (C.long_long (Registry_Index) -
+                      C.long_long (Input.Count))).Cell_Value :=
+                        Get_Value (Input.Index);
+               elsif Slot = 0 then
+                  raise Foreign_Error with "invalid C stack destination";
+               else
+                  Stacks.Write (Owner.Universe.all, Context,
+                                Slot, Get_Value (Input.Index));
+               end if;
+            end;
+         when Rotate_Values =>
+            declare
+               First : constant Natural := Position (Context, Input.Index);
+               Last : constant Natural :=
+                 Context.Foreign_Top;
+               procedure Reverse_Range (Left, Right : Natural);
+               procedure Reverse_Range (Left, Right : Natural) is
+                  Low : Natural := Left;
+                  High : Natural := Right;
+               begin
+                  while Low < High loop
+                     declare
+                        Saved : constant Value := Stacks.Read (Context, Low);
+                     begin
+                        Stacks.Write (Owner.Universe.all, Context, Low,
+                                      Stacks.Read (Context, High));
+                        Stacks.Write
+                          (Owner.Universe.all, Context, High, Saved);
+                     end;
+                     Low := Low + 1;
+                     High := High - 1;
+                  end loop;
+               end Reverse_Range;
+            begin
+               if First = 0 then
+                  raise Foreign_Error with "invalid C stack rotation";
+               end if;
+               declare
+                  Width : constant Natural := Last - First + 1;
+                  Shift : constant Natural := Natural
+                    (Integer_Value (Input.Count) mod Integer_Value (Width));
+               begin
+                  --  Three reversals rotate in place without a temporary
+                  --  stack vector or per-call input-sized host allocation.
+                  if Shift /= 0 then
+                     Reverse_Range (First, Last - Shift);
+                     Reverse_Range (Last - Shift + 1, Last);
+                     Reverse_Range (First, Last);
+                  end if;
+               end;
+            end;
+         when Move_Values =>
+            declare
+               Target_Owner : constant Controls.Object_Pointer :=
+                 Controls.To_Pointer
+                   (Surfaces.To_Pointer (Input.Pointer).Owner);
+               Target : constant Context_Access := Context_Of (Target_Owner);
+               Count : constant C.int := Input.Count;
+            begin
+               if Target_Owner.Universe /= Owner.Universe or else Count < 0
+                 or else Integer_Value (Count) >
+                   Integer_Value (Context.Foreign_Top) -
+                     Integer_Value (Context.Foreign_Base)
+               then
+                  raise Foreign_Error with "invalid cross-state move";
+               end if;
+               if Target /= Context and Count > 0 then
+                  for Index in Context.Foreign_Top -
+                    Natural (Count) + 1 .. Context.Foreign_Top
+                  loop
+                     Push (Owner.Universe.all, Target,
+                           Stacks.Read (Context, Index));
+                  end loop;
+                  Pop (Context, Natural (Count));
+               end if;
+            end;
+         when Get_Type =>
+            Output.Integer_Data :=
+              (if not Valid_Index (Context, Input.Index) then -1
+               else C.long_long (Type_Code (Get_Value (Input.Index))));
+            Output.Length := Boolean'Pos
+              (Get_Value (Input.Index).Kind = Integer_Kind);
+         when To_Boolean =>
+            Output.Integer_Data := Boolean'Pos
+              (Truth (Get_Value (Input.Index)));
+         when To_Integer | To_Number =>
+            declare
+               Number : constant Lua.Numbers.Number :=
+                 Numeric (Context.Memory, Get_Value (Input.Index));
+            begin
+               case Number.Kind is
+                  when Lua.Numbers.Invalid => null;
+                  when Lua.Numbers.Integer_Number =>
+                     Output.Integer_Data := C.long_long
+                       (Number.Integer_Item);
+                     Output.Number_Data := C.double (Number.Integer_Item);
+                     Output.Length := 1;
+                  when Lua.Numbers.Real_Number =>
+                     Output.Number_Data := C.double (Number.Real_Item);
+                     if Input.Operation = To_Number then
+                        Output.Length := 1;
+                     elsif Number.Real_Item >= -2.0 ** 63 and then
+                       Number.Real_Item < 2.0 ** 63 and then
+                       Real_Value'Truncation (Number.Real_Item) =
+                         Number.Real_Item
+                     then
+                        Output.Integer_Data := C.long_long
+                          (Number.Real_Item);
+                        Output.Length := 1;
+                     end if;
+               end case;
+            end;
+         when To_String =>
+            declare
+               Item : Value := Get_Value (Input.Index);
+               Slot : constant Natural := Position (Context, Input.Index);
+            begin
+               if Item.Kind in Integer_Kind | Real_Kind and then
+                 Valid_Index (Context, Input.Index)
+               then
+                  Item := New_String
+                    (Owner.Universe.all, Image (Context.Memory, Item));
+                  if Slot > 0 then
+                     Stacks.Write (Owner.Universe.all, Context, Slot, Item);
+                  else
+                     Context.Foreign_Activation.Native_Self.Captures
+                       (Positive (C.long_long (Registry_Index) -
+                         C.long_long (Input.Index))).Cell_Value := Item;
+                  end if;
+               end if;
+               if Item.Kind = String_Kind then
+                  Output.Pointer := Item.Reference.C_Bytes;
+                  Output.Length := C.size_t (Length (Item.Reference.Bytes));
+               end if;
+            end;
+         when Raw_Length =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+            begin
+               if Item.Kind = String_Kind then
+                  Output.Integer_Data := C.long_long
+                    (Length (Item.Reference.Bytes));
+               elsif Item.Kind = Table_Kind then
+                  Output.Integer_Data := C.long_long (Table_Length (Item));
+               elsif Item.Kind = Userdata_Kind then
+                  Output.Integer_Data := C.long_long
+                    (Item.Reference.Userdata_Size);
+               end if;
+            end;
+         when To_Pointer | To_Thread =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+            begin
+               if Item.Kind = Thread_Kind then
+                  Output.Pointer := Create_Surface
+                    (Owner.Universe, Context_Id
+                       (Item.Reference.Context_Index),
+                     Owner.Extra, Owner.Seed,
+                     Surfaces.To_Pointer (State).Main);
+               elsif Input.Operation = To_Pointer then
+                  case Item.Kind is
+                     when Light_Identity_Kind | Foreign_Function_Kind =>
+                        Output.Pointer := Item.Identity;
+                     when Userdata_Kind =>
+                        Output.Pointer := Userdata_Address (Item);
+                     when String_Kind =>
+                        Output.Pointer := Item.Reference.C_Bytes;
+                     when Table_Kind | Closure_Kind |
+                       Native_Closure_Kind =>
+                        Output.Pointer := Item.Reference.all'Address;
+                     when others => null;
+                  end case;
+               end if;
+            end;
+         when Push_Nil => Push (Owner.Universe.all, Context, Nil_Value);
+         when Push_Boolean =>
+            Push (Owner.Universe.all, Context, (Kind => Boolean_Kind,
+                            Boolean_Data => Input.Count /= 0));
+         when Push_Integer =>
+            Push (Owner.Universe.all, Context, (Kind => Integer_Kind,
+                            Integer_Data => Integer_Value
+                              (Input.Integer_Data)));
+         when Push_Number =>
+            Push (Owner.Universe.all, Context, (Kind => Real_Kind,
+                            Real_Data => Real_Value (Input.Number_Data)));
+         when Push_String =>
+            declare
+               Item : constant Value := New_String
+                 (Owner.Universe.all,
+                  Read_Bytes (Input.Pointer, Input.Length));
+            begin
+               Push (Owner.Universe.all, Context, Item);
+               Output.Pointer := Item.Reference.C_Bytes;
+            end;
+         when Push_Pointer =>
+            Push (Owner.Universe.all, Context, (Kind => Light_Identity_Kind,
+                            Identity => Input.Pointer));
+         when Push_Thread =>
+            Push (Owner.Universe.all, Context,
+                  (Kind => Thread_Kind, Reference => Context.Thread));
+            Output.Integer_Data := Boolean'Pos
+              (Context = Owner.Universe.Main_Context);
+         when Create_Table =>
+            Push (Owner.Universe.all, Context, New_Table (Owner.Universe.all));
+         when Create_Userdata =>
+            if Input.Count < 0 or else
+              Input.Count >= C.int (C.short'Last)
+            then
+               raise Foreign_Error with "invalid userdata uservalue count";
+            elsif Input.Length > C.size_t (Memory.Byte_Count'Last) then
+               raise Memory.Allocation_Error with "userdata block too large";
+            end if;
+            declare
+               Item : constant Value := New_Userdata
+                 (Owner.Universe.all, Memory.Byte_Count (Input.Length),
+                  Natural (Input.Count));
+            begin
+               Push (Owner.Universe.all, Context, Item);
+               Output.Pointer := Userdata_Address (Item);
+            end;
+         when Get_Uservalue | Set_Uservalue =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+               Valid : Boolean;
+            begin
+               if Item.Kind /= Userdata_Kind then
+                  raise Foreign_Error with "full userdata expected";
+               end if;
+               Valid := Input.Count > 0 and then
+                 C.long_long (Input.Count) <=
+                   C.long_long (Item.Reference.Uservalues.Length);
+               if Input.Operation = Get_Uservalue then
+                  declare
+                     Uservalue : constant Value :=
+                       (if Valid then Item.Reference.Uservalues
+                          (Positive (Input.Count)) else Nil_Value);
+                  begin
+                     Pin (Owner.Universe.all, Uservalue);
+                     Push (Owner.Universe.all, Context, Uservalue);
+                     Output.Integer_Data :=
+                       (if Valid then C.long_long (Type_Code (Uservalue))
+                        else -1);
+                  end;
+               else
+                  if Context.Foreign_Top <=
+                    Context.Foreign_Base
+                  then
+                     raise Foreign_Error with "missing uservalue";
+                  end if;
+                  --  Publish the traced edge before popping its source. Even
+                  --  an invalid uservalue index consumes the supplied value.
+                  if Valid then
+                     Item.Reference.Uservalues.Replace_Element
+                       (Positive (Input.Count),
+                        Stacks.Read (Context, Context.Foreign_Top));
+                  end if;
+                  Pop (Context);
+                  Output.Integer_Data := Boolean'Pos (Valid);
+               end if;
+            end;
+         when Get_Metatable =>
+            declare
+               Meta : constant Object_Access := Raw_Metatable
+                 (Owner.Universe.all, Get_Value (Input.Index));
+            begin
+               if Meta /= null then
+                  Push (Owner.Universe.all, Context, (Table_Kind, Meta));
+                  Output.Integer_Data := 1;
+               end if;
+            end;
+         when Set_Metatable =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+               Meta : Value;
+            begin
+               if Context.Foreign_Top <=
+                 Context.Foreign_Base
+               then
+                  raise Foreign_Error with "missing metatable";
+               end if;
+               Meta := Stacks.Read (Context, Context.Foreign_Top);
+               if Meta.Kind not in Nil_Kind | Table_Kind then
+                  raise Foreign_Error with "table expected";
+               end if;
+               Set_Metatable (Owner.Universe.all, Item,
+                 (if Meta.Kind = Nil_Kind then null else Meta.Reference));
+               Pop (Context);
+               Output.Integer_Data := 1;
+            end;
+         when Raw_Get =>
+            declare
+               Table : constant Value := Require_Table;
+               Key : constant Value :=
+                 Stacks.Read (Context, Context.Foreign_Top);
+               Item : constant Value := Get (Table, Key);
+            begin
+               Pin (Owner.Universe.all, Item);
+               Pop (Context);
+               Push (Owner.Universe.all, Context, Item);
+               Output.Integer_Data := C.long_long (Type_Code (Item));
+            end;
+         when Raw_Set =>
+            declare
+               Table : constant Value := Require_Table;
+               Last : constant Positive :=
+                 Context.Foreign_Top;
+               Item : constant Value := Stacks.Read (Context, Last);
+               Key : constant Value := Stacks.Read (Context, Last - 1);
+            begin
+               --  Keep original operands on the traced C stack until all
+               --  allocation/rehash work completes. Ada locals alone cannot
+               --  protect an existing key/value across emergency collection.
+               Set (Owner.Universe.all, Table, Key, Item);
+               Pop (Context, 2);
+            end;
+         when Raw_Get_Integer =>
+            Get_Raw ((Kind => Integer_Kind,
+                      Integer_Data => Integer_Value (Input.Integer_Data)));
+         when Raw_Set_Integer | Raw_Set_Pointer =>
+            declare
+               Table : constant Value := Require_Table;
+               Item : constant Value :=
+                 Stacks.Read (Context, Context.Foreign_Top);
+               Key : constant Value :=
+                 (if Input.Operation = Raw_Set_Integer then
+                    (Kind => Integer_Kind, Integer_Data => Integer_Value
+                       (Input.Integer_Data))
+                  else (Kind => Light_Identity_Kind,
+                        Identity => Input.Pointer));
+            begin
+               Set (Owner.Universe.all, Table, Key, Item);
+               Pop (Context);
+            end;
+         when Raw_Get_Pointer =>
+            Get_Raw ((Kind => Light_Identity_Kind,
+                      Identity => Input.Pointer));
+         when Raw_Equal =>
+            Output.Integer_Data := Boolean'Pos
+              (Valid_Index (Context, Input.Index) and then
+               Valid_Index (Context, Input.Count) and then
+               Equal (Get_Value (Input.Index), Get_Value (Input.Count)));
+         when Next_Item =>
+            declare
+               Table : constant Value := Require_Table;
+               Key : constant Value :=
+                 Stacks.Read (Context, Context.Foreign_Top);
+               Results : constant Values.Vector :=
+                 Next (Owner.Universe.all, Table, Key);
+            begin
+               Pin (Owner.Universe.all, Results);
+               Pop (Context);
+               --  The Lua-facing primitive returns one nil at termination.
+               --  C lua_next instead pops the exhausted key, pushes nothing,
+               --  and returns zero; exposing that nil as a row corrupts the
+               --  caller's next iteration. See pinned lapi.c:1273-1285.
+               if not Results.Is_Empty and then
+                 Results.First_Element.Kind /= Nil_Kind
+               then
+                  for Item of Results loop
+                     Push (Owner.Universe.all, Context, Item);
+                  end loop;
+                  Output.Integer_Data := 1;
+               end if;
+            end;
+         when Get_Allocator =>
+            Output.Allocator := Memory.Allocator (Owner.Universe.Memory);
+            Output.Pointer := Memory.Userdata (Owner.Universe.Memory);
+         when Set_Allocator =>
+            if Input.Allocator = null then
+               raise Foreign_Error with "null allocator callback";
+            end if;
+            Memory.Set_Allocator
+              (Owner.Universe.Memory, Input.Allocator, Input.Pointer);
+         when Push_C_Closure =>
+            if Input.Function_Data = null or else Input.Count not in 0 .. 255
+              or else Input.Count > C.int
+                (Context.Foreign_Top -
+                 Context.Foreign_Base)
+            then
+               raise Foreign_Error with "invalid C closure arguments";
+            end if;
+            if Input.Count = 0 then
+               Push (Owner.Universe.all, Context, (Foreign_Function_Kind,
+                               Function_Address (Input.Function_Data)));
+            else
+               declare
+                  Captures : Values.Vector :=
+                    Owned_Values (Owner.Universe.all);
+                  Item : Value;
+               begin
+                  for Index in Context.Foreign_Top -
+                    Natural (Input.Count) + 1 ..
+                    Context.Foreign_Top
+                  loop
+                     Captures.Append (Stacks.Read (Context, Index));
+                  end loop;
+                  Item := New_Native (Owner.Universe.all, "foreign.callback",
+                                      Captures);
+                  Item.Reference.Foreign_Handler :=
+                    Function_Address (Input.Function_Data);
+                  Pop (Context, Natural (Input.Count));
+                  Push (Owner.Universe.all, Context, Item);
+               end;
+            end if;
+         when To_C_Function =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+            begin
+               if Item.Kind = Foreign_Function_Kind then
+                  Output.Function_Data := Address_Function (Item.Identity);
+               elsif Item.Kind = Native_Closure_Kind and then
+                 Item.Reference.Foreign_Handler /= System.Null_Address
+               then
+                  Output.Function_Data :=
+                    Address_Function (Item.Reference.Foreign_Handler);
+               end if;
+            end;
+         when Begin_Call =>
+            if not Main_Owner.Owns_Universe and then
+              not Main_Owner.Driver_Borrowed
+            then
+               raise Foreign_Error with
+                 "host-owned state requires its active Ada execution";
+            end if;
+            if Input.Index < 0 or else Input.Count < -1 or else
+              Input.Count > C.int (Stack_Limit) or else
+              Natural (Input.Index) >= Context.Foreign_Top
+                - Context.Foreign_Base
+            then
+               raise Foreign_Error with "invalid C call arguments";
+            end if;
+            declare
+               Slot : constant Positive :=
+                 Context.Foreign_Top - Natural (Input.Index);
+               Callee : constant Value := Stacks.Read (Context, Slot);
+               Message_Handler : Value;
+               Arguments : Values.Vector :=
+                 Owned_Values (Owner.Universe.all);
+               Address : System.Address;
+               Root_Call : constant Boolean :=
+                 Main_Owner.Calls = System.Null_Address and then
+                 not Main_Owner.Driver_Borrowed;
+               Next : Calls.Object_Pointer;
+               Result : Action_Status;
+               Start_Error : Boolean := False;
+            begin
+               for Index in Slot + 1 .. Context.Foreign_Top loop
+                  Arguments.Append (Stacks.Read (Context, Index));
+               end loop;
+               if Input.Error_Index /= 0 then
+                  if Input.Error_Index < 1 or else
+                    not Valid_Index (Context, Input.Error_Index)
+                  then
+                     raise Foreign_Error with "invalid error handler index";
+                  end if;
+                  Message_Handler := Get_Value (Input.Error_Index);
+                  if Message_Handler.Kind not in Closure_Kind |
+                    Native_Closure_Kind | Native_Kind_Value |
+                    Foreign_Function_Kind
+                  then
+                     raise Foreign_Error with
+                       "error handler is not a function";
+                  end if;
+               elsif Input.Integer_Data = 0 and then not Root_Call then
+                  Message_Handler :=
+                    VM.Current_Message_Handler (Main_Owner.Driver.all);
+               end if;
+               Pin (Owner.Universe.all, Callee);
+               Pin (Owner.Universe.all, Arguments);
+               Pin (Owner.Universe.all, Message_Handler);
+               if Main_Owner.Driver = null then
+                  Main_Owner.Owned_Driver :=
+                    VM.New_Driver (Owner.Universe.all);
+                  Main_Owner.Driver := Driver_View (Main_Owner.Owned_Driver);
+               end if;
+               Address := Memory.Allocate
+                 (Owner.Universe.Memory,
+                  Call_Record'Object_Size / System.Storage_Unit,
+                  Call_Record'Alignment);
+               Next := Calls.To_Pointer (Address);
+               Next.all := (Previous => Main_Owner.Calls, Base => Slot - 1,
+                 Wanted => Input.Count,
+                 Protected_Call => Input.Integer_Data /= 0,
+                 Is_Root => Root_Call, Context => Owner.Context);
+               Main_Owner.Calls := Address;
+               begin
+                  if Root_Call then
+                     Context.Failure := Nil_Value;
+                     Context.Has_Failure_Value := False;
+                     Context.Failure_Class := No_Failure;
+                     Context.Failure_Handled := False;
+                     Context.Protected_Failure_Class := No_Failure;
+                     Context.Protected_Handler_Called := False;
+                     Context.Non_Yieldable := Context.Non_Yieldable + 1;
+                     VM.Start_Foreign
+                       (Main_Owner.Driver.all, Main_Owner.Owned_Universe,
+                        Callee, Arguments, Message_Handler,
+                        Call_Base => Slot, Has_Call_Window => True);
+                  else
+                     VM.Start_Foreign_Boundary
+                       (Main_Owner.Driver.all, Callee, Arguments,
+                        Message_Handler,
+                        Call_Base => Slot, Has_Call_Window => True);
+                  end if;
+               exception
+                  when Language_Error => Start_Error := True;
+                  when Memory.Allocation_Error =>
+                     Record_Memory_Error (Owner.Universe.all);
+                     Start_Error := True;
+                  when Program_Error =>
+                     if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                        Record_Memory_Error (Owner.Universe.all);
+                        Start_Error := True;
+                     else
+                        raise;
+                     end if;
+               end;
+               --  The callee/argument packet and boundary already own every
+               --  input. The suspended C caller keeps only its prefix live;
+               --  the published child owns the overlapping call window.
+               Publish_Top (Context, Slot - 1);
+               Result := Pump (Start_Error);
+               Leave_Context;
+               return Result;
+            end;
+         when Complete_Callback =>
+            if Main_Owner.Driver = null or else Input.Count < 0 or else
+              Input.Index not in 0 | 2 | 4 | 5
+            then
+               raise Foreign_Error with "invalid callback completion";
+            end if;
+            begin
+               VM.Complete_Foreign_Call
+                 (Main_Owner.Driver.all, Natural (Input.Count),
+                  Natural (Input.Index), Input.Error_Handled /= 0,
+                  Input.Callback_Token);
+            exception
+               when Memory.Allocation_Error =>
+                  Memory_Result;
+                  VM.Complete_Foreign_Call
+                    (Main_Owner.Driver.all, 0, 4,
+                     Token => Input.Callback_Token);
+               when Program_Error =>
+                  if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                     Memory_Result;
+                     VM.Complete_Foreign_Call
+                       (Main_Owner.Driver.all, 0, 4,
+                        Token => Input.Callback_Token);
+                  else
+                     raise;
+                  end if;
+            end;
+            declare
+               Result : constant Action_Status := Pump;
+            begin
+               Leave_Context;
+               return Result;
+            end;
+         when Raise_Error =>
+            if Context.Foreign_Top <= Context.Foreign_Base
+            then
+               raise Foreign_Error with "missing C error object";
+            end if;
+            if Stacks.Read (Context, Context.Foreign_Top).Kind = String_Kind
+            then
+               Output.Pointer :=
+                 Stacks.Read (Context, Context.Foreign_Top).Reference.C_Bytes;
+            end if;
+            Leave_Context;
+            return Action_Raise;
+         when Load_Buffer =>
+            declare
+               Source : constant String := Read_Bytes
+                 (Input.Pointer, Input.Length);
+               Name : constant String := Read_Name (Input.Name, "?");
+               Mode : constant String := Read_Name (Input.Mode, "bt");
+               Binary : constant Boolean := Source'Length > 0 and then
+                 Source (Source'First) = Character'Val (27);
+               Callee : Value;
+            begin
+               --  Loading validates and owns code but never executes it.
+               --  The binary decoder and text frontend both produce the real
+               --  canonical graph, adopted into this session's actual heap.
+               if Ada.Strings.Fixed.Index
+                 (Mode, (if Binary then "b" else "t")) = 0
+               then
+                  Error_Result ("attempt to load a " &
+                    (if Binary then "binary" else "text") &
+                    " chunk (mode is '" & Mode & "')");
+                  Output.Integer_Data := 3;
+               elsif Binary then
+                  declare
+                     Decoded : Lua.Chunks.Decode_Result := Lua.Chunks.Decode
+                       (Source, Memory.Reference (Owner.Universe.Memory),
+                        (Input_Bytes => Owner.Universe.Bounds.Source_Bytes,
+                         Depth => Owner.Universe.Bounds.Syntax_Depth,
+                         others => <>));
+                  begin
+                     case Decoded.Outcome is
+                        when Lua.Chunks.Succeeded =>
+                           Callee := Canonical.Adopt
+                             (Owner.Universe.all, Decoded.Code,
+                              Global_Environment (Owner.Universe.all));
+                           Push (Owner.Universe.all, Context, Callee);
+                        when Lua.Chunks.Bad_Format =>
+                           Error_Result (Name & ": " &
+                             Lua.Chunks.Message (Decoded.Error));
+                           Output.Integer_Data := 3;
+                        when Lua.Chunks.Resource_Limit =>
+                           Fail (Owner.Universe.all,
+                             "binary loading resource limit", True);
+                        when Lua.Chunks.Memory_Failure =>
+                           Memory_Result;
+                           Output.Integer_Data := 4;
+                     end case;
+                  end;
+               else
+                  declare
+                     Unit : Lua.Syntax_Trees.Compilation_Unit;
+                  begin
+                     Lua.Syntax_Trees.Parse
+                       (Unit, Source, Name,
+                        (Owner.Universe.Bounds.Source_Bytes,
+                         Owner.Universe.Bounds.Tokens,
+                         Owner.Universe.Bounds.Syntax_Nodes,
+                         Owner.Universe.Bounds.Syntax_Depth),
+                        Memory.Reference (Owner.Universe.Memory));
+                     if Unit.Result.Status = Lua.Syntax.Resource_Error then
+                        Fail (Owner.Universe.all,
+                              "source loading resource limit", True);
+                     elsif Unit.Result.Status /= Lua.Syntax.Success then
+                        Error_Result (Name & ":" & Ada.Strings.Fixed.Trim
+                          (Unit.Result.Error.Line'Image, Ada.Strings.Both) &
+                          ": " & Lua.Syntax_Trees.Text
+                            (Unit, Unit.Result.Error.Message));
+                        Output.Integer_Data := 3;
+                     else
+                        declare
+                           Lowered : Lua.Canonical_Compiler.Compilation_Result
+                             := Lua.Canonical_Compiler.Compile
+                               (Unit, Memory.Reference
+                                  (Owner.Universe.Memory), Name);
+                        begin
+                           case Lowered.Outcome is
+                              when Lua.Canonical_Compiler.Succeeded =>
+                                 Callee := Canonical.Adopt
+                                   (Owner.Universe.all, Lowered.Code,
+                                    Global_Environment (Owner.Universe.all));
+                                 Push (Owner.Universe.all, Context, Callee);
+                              when Lua.Canonical_Compiler.Compiler_Limit =>
+                                 Error_Result (Name & ": " &
+                                   Lua.Canonical_Compiler.Message
+                                     (Lowered.Error));
+                                 Output.Integer_Data := 3;
+                              when Lua.Canonical_Compiler.Resource_Limit =>
+                                 Fail (Owner.Universe.all,
+                                   "compiler resource limit", True);
+                              when Lua.Canonical_Compiler.Memory_Failure =>
+                                 Memory_Result;
+                                 Output.Integer_Data := 4;
+                           end case;
+                        end;
+                     end if;
+                  end;
+               end if;
+            exception
+               when Memory.Allocation_Error =>
+                  Memory_Result;
+                  Output.Integer_Data := 4;
+               when Program_Error =>
+                  if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                     Memory_Result;
+                     Output.Integer_Data := 4;
+                  else
+                     raise;
+                  end if;
+            end;
+      end case;
+      Leave_Context;
+      return Action_Done;
+   exception
+      when Memory.Allocation_Error =>
+         Memory_Result;
+         Leave_Context;
+         return Action_Memory;
+      when Language_Error =>
+         begin
+            if Context.Failure_Class = Host_Abort then
+               Leave_Context;
+               return Action_Abort;
+            end if;
+            if Context.Failure_Class = Memory_Failure then
+               Memory_Result;
+               Leave_Context;
+               return Action_Memory;
+            end if;
+            Error_Result (To_String (Context.Failure_Text));
+            if Memory.Refusal_Pending (Owner.Universe.Memory) then
+               Memory_Result;
+               Leave_Context;
+               return Action_Memory;
+            end if;
+            Leave_Context;
+            return Action_Raise;
+         exception
+            when others =>
+               Leave_Context;
+               return Action_Abort;
+         end;
+      when Fault : Foreign_Error =>
+         begin
+            Error_Result (Ada.Exceptions.Exception_Message (Fault));
+            if Owner /= null and then
+              Memory.Refusal_Pending (Owner.Universe.Memory)
+            then
+               Memory_Result;
+               Leave_Context;
+               return Action_Memory;
+            end if;
+            Leave_Context;
+            return Action_Raise;
+         exception
+            when others =>
+               Leave_Context;
+               return Action_Abort;
+         end;
+      when others =>
+         --  Physical Ada exhaustion or internal faults are host aborts, not
+         --  catchable Lua allocator refusal. The C boundary handles them only
+         --  after this activation has returned; it never jumps across Ada.
+         if Owner /= null and then
+           Memory.Refusal_Pending (Owner.Universe.Memory)
+         then
+            Memory_Result;
+            Leave_Context;
+            return Action_Memory;
+         end if;
+         Leave_Context;
+         return Action_Abort;
+   end Dispatch;
+end Lua.Engine.Foreign;

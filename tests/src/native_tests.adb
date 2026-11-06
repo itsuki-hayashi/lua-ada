@@ -313,12 +313,12 @@ package body Native_Tests is
 
    procedure Xpcall_Empty_Handler_Result is
    begin
-      --  An error handler may return no values. Its protected result then
-      --  contains only the success flag; xpcall adjusts the absent first
-      --  result to nil instead of indexing beyond the retained packet.
+      --  A missing first handler result adjusts to nil, then Lua 5.5's
+      --  luaG_errormsg normalizes that nil to its no-error-object string.
+      --  The pinned C oracle confirms the result, not an out-of-range read.
       Succeeds
         ("local ok,e=xpcall(function() error('x',0) end, " &
-         "function() end); assert(not ok and e==nil)");
+         "function() end); assert(not ok and e=='<no error object>')");
    end Xpcall_Empty_Handler_Result;
 
    procedure Protected_Tail_Unwind is

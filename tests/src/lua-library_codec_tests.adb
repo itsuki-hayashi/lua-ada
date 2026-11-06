@@ -46,7 +46,7 @@ package body Lua.Library_Codec_Tests is
    procedure Integer_Endianness is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  Explicit endian changes apply independently to adjacent fields.
          Args.Append (New_String (State, ">i2 <i2"));
@@ -64,7 +64,7 @@ package body Lua.Library_Codec_Tests is
    procedure Wide_Sign_Extension is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Packed, Result : Values.Vector;
+         Args, Packed, Result : Values.Vector := Owned_Values (State);
       begin
          --  A 16-byte integer extends the 64-bit sign and decodes without
          --  narrowing or overflowing an Ada machine integer.
@@ -85,7 +85,7 @@ package body Lua.Library_Codec_Tests is
    procedure Virtual_Size is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  packsize is mathematical. A size near maxinteger is valid even
          --  when it far exceeds Natural and the string allocation quota.
@@ -102,7 +102,7 @@ package body Lua.Library_Codec_Tests is
    procedure Semantic_Size_Overflow is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  Invalid total-size arithmetic must raise a catchable language
          --  error before any attempt to allocate the enormous final field.
@@ -130,7 +130,7 @@ package body Lua.Library_Codec_Tests is
    procedure Alignment_Padding is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  X requests only alignment from its next option; it consumes no
          --  input argument and contributes no data bytes for that option.
@@ -145,7 +145,7 @@ package body Lua.Library_Codec_Tests is
    procedure Negative_Zero is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  Floating packing retains the IEEE sign of zero, unlike an
          --  integer-oriented numerical conversion through zero.
@@ -163,7 +163,7 @@ package body Lua.Library_Codec_Tests is
    procedure Invalid_UTF8_Position is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  len returns nil plus the failing byte position rather than
          --  throwing a language error for an invalid input sequence.
@@ -179,7 +179,7 @@ package body Lua.Library_Codec_Tests is
    procedure Extended_UTF8 is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Encoded, Result : Values.Vector;
+         Args, Encoded, Result : Values.Vector := Owned_Values (State);
       begin
          --  Lua's lax mode accepts the full extended 31-bit encoding; the
          --  same bytes are rejected by strict Unicode scalar decoding.
@@ -205,7 +205,7 @@ package body Lua.Library_Codec_Tests is
    procedure Offset_Two_Results is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  Lua 5.5 returns both ends of the selected character, even when
          --  the initial position lies within its continuation bytes.
@@ -225,7 +225,7 @@ package body Lua.Library_Codec_Tests is
    procedure Offset_Continuation_Error is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  Nonzero offsets cannot start within a continuation sequence.
          Args.Append (New_String (State, Character'Val (16#C2#) &
@@ -249,7 +249,8 @@ package body Lua.Library_Codec_Tests is
    procedure Empty_Encoding is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args : constant Values.Vector := Owned_Values (State);
+         Result : Values.Vector;
       begin
          --  An empty codepoint list produces a real empty byte string.
          Result := Unicode.Run (State, "char", Args);
@@ -263,7 +264,7 @@ package body Lua.Library_Codec_Tests is
    procedure Iterator_Exhaustion is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  A negative iterator control is interpreted as an exhausted
          --  unsigned position, not narrowed to an Ada index.
@@ -279,7 +280,7 @@ package body Lua.Library_Codec_Tests is
    procedure Single_Precision_Rounding is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  Halfway binary64 inputs distinguish ties-to-even from truncation
          --  and ties-away rounding during binary32 packing.
@@ -303,7 +304,7 @@ package body Lua.Library_Codec_Tests is
    procedure Single_Precision_Subnormal is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Packed, Result : Values.Vector;
+         Args, Packed, Result : Values.Vector := Owned_Values (State);
       begin
          --  The smallest binary32 subnormal survives both explicit encoding
          --  and decoding without entering a constrained Ada float subtype.
@@ -325,7 +326,7 @@ package body Lua.Library_Codec_Tests is
    procedure Offset_ASCII_Boundary is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  offset is a byte-boundary operation, not a validating decoder.
          --  An ASCII byte ends at itself even before an orphan continuation.
@@ -342,7 +343,7 @@ package body Lua.Library_Codec_Tests is
    procedure Overlong_Encoding is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  Lax mode extends the scalar range; it never permits an overlong
          --  representation. C0 80 must fail even with the lax flag enabled.
@@ -362,7 +363,7 @@ package body Lua.Library_Codec_Tests is
    procedure Native_Work_Quota is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  Bulk fixed-string padding consumes the same shared work budget
          --  as VM instructions. A native helper cannot bypass exhaustion.
@@ -387,7 +388,7 @@ package body Lua.Library_Codec_Tests is
    procedure Iterator_Subject_Copy_Quota is
       procedure Check (State : in out World);
       procedure Check (State : in out World) is
-         Args, Result : Values.Vector;
+         Args, Result : Values.Vector := Owned_Values (State);
       begin
          --  Each iterator step currently materializes the whole retained
          --  subject before decoding one character. A budget which permits one

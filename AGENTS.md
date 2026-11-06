@@ -90,8 +90,10 @@ goto/closing, coroutines, stable cells, weak/ephemeron tracing, debug inspection
 and hooks, collection controls and explicit execution policies. Read its
 [validation record](docs/validation-m3-lifecycle.md) before extending claims.
 Use the shared owned frontend for both checking and execution; never introduce
-a second grammar in VM lowering. Canonical opcode definitions are independent
-of the executable VM. See [frontend compatibility](docs/frontend.md) and
+a second grammar in VM lowering. Canonical opcode definitions form the word layer now used by normal
+compilation/execution; the older packet backend remains a migration path.
+Native binary loading/dumping has focused host evidence, with complete
+acceptance tracked separately. See [frontend compatibility](docs/frontend.md) and
 [M2a](docs/milestones/m2a.md) for their distinct acceptance boundaries.
 Lua/native callbacks must use explicit activation continuations; never recurse
 into the executor. Root retained arguments, captures, and pending results before
@@ -113,3 +115,14 @@ and PRs, starting from updated master after the maintainer merges their
 predecessors. Preserve pending obligations in
 the conformance ledger. Native C observations, lexical inventory anchors, and
 successful harness collection are not passing Ada conformance evidence.
+
+The subsequent approved full-upstream delivery supersedes that separate-PR
+rule for all remaining M3 gates. Start from merged PR #7 on
+codex/m3-upstream-conformance, retain coherent intermediate commits on that
+branch, and deliver one major PR. Follow the checkpoints in the
+[M3 acceptance contract](docs/milestones/m3.md) and
+[ADR 0010](docs/decisions/0010-full-upstream-delivery.md). Do not stop after
+contract, harness or isolated library work and describe the full target as done.
+No merge is authorized. Preserve the distinction between reviewed lexical
+candidates, actual runtime obligations, unchanged execution and reviewed
+equivalents; a T-absent return never certifies the omitted C tests.

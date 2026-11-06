@@ -8,6 +8,13 @@
 #include "../../../references/lua/llimits.h"
 #include "allocator_limit.h"
 #include <string.h>
+#if defined(_WIN32)
+#include <process.h>
+#define conformance_getpid _getpid
+#else
+#include <unistd.h>
+#define conformance_getpid getpid
+#endif
 
 LUA_API unsigned conformance_stack_limit(void);
 LUA_API unsigned conformance_c_call_limit(void);
@@ -21,6 +28,7 @@ typedef struct Allocator {
   size_t bytes;
 } Allocator;
 static Allocator allocator;
+static unsigned long long refused_allocations;
 
 static void *bounded_alloc(void *ud, void *pointer, size_t oldsize,
                            size_t size) {
@@ -29,8 +37,12 @@ static void *bounded_alloc(void *ud, void *pointer, size_t oldsize,
   size_t limit = conformance_limit();
   void *result;
   if (size > old && (state->bytes > limit ||
-                    size - old > limit - state->bytes)) return NULL;
+                    size - old > limit - state->bytes)) {
+    refused_allocations++;
+    return NULL;
+  }
   result = state->original(state->userdata, pointer, oldsize, size);
+  if (result == NULL && size != 0) refused_allocations++;
   /* A failed growth leaves the old allocation live. A zero-size request is
    * a successful free even though realloc's conventional result is NULL. */
   if (result != NULL || size == 0) state->bytes = state->bytes - old + size;
@@ -56,6 +68,59 @@ static lua_State *conformance_newstate(void) {
 #include "../../../references/lua/lua.c"
 #undef main
 
+#if defined(CONFORMANCE_UPSTREAM_TEST)
+LUA_API size_t conformance_live_bytes(void);
+LUA_API size_t conformance_live_blocks(void);
+LUA_API unsigned long long conformance_refusals(void);
+#endif
+
+static int write_allocator_telemetry(void) {
+  const char *prefix = getenv("LUA_ADA_CONFORMANCE_TELEMETRY");
+  const char *run_id = getenv("LUA_ADA_CONFORMANCE_RUN_ID");
+  const char *cursor;
+  char *path;
+  FILE *output;
+  int failed;
+  unsigned long pid = (unsigned long)conformance_getpid();
+  if (prefix == NULL) return 1;  /* Ordinary observations need no sidecar. */
+  if (run_id == NULL || *run_id == '\0') return 0;
+  /* Run IDs are runner-generated hex GUIDs. Restrict their spelling before
+   * JSON emission so the environment cannot inject forged telemetry fields. */
+  for (cursor = run_id; *cursor != '\0'; cursor++) {
+    if (!((*cursor >= '0' && *cursor <= '9') ||
+          (*cursor >= 'a' && *cursor <= 'f') || *cursor == '-')) return 0;
+  }
+  if (strlen(prefix) > SIZE_MAX - 40) return 0;
+  path = (char *)malloc(strlen(prefix) + 40);
+  if (path == NULL) return 0;
+  snprintf(path, strlen(prefix) + 40, "%s.%lu.json", prefix, pid);
+  output = fopen(path, "wb");
+  free(path);
+  if (output == NULL) return 0;
+  fprintf(output, "{\"schema_version\":1,\"run_id\":\"%s\","
+          "\"process_id\":%lu,\"allocator_limit_bytes\":%llu,",
+          run_id, pid, (unsigned long long)conformance_limit());
+#if defined(CONFORMANCE_UPSTREAM_TEST)
+  fprintf(output, "\"configuration\":\"upstream-test\","
+          "\"managed_refusals\":%llu,\"outstanding_bytes\":%llu,"
+          "\"outstanding_blocks\":%llu}\n", conformance_refusals(),
+          (unsigned long long)conformance_live_bytes(),
+          (unsigned long long)conformance_live_blocks());
+#else
+  /* Initial blocks predate default allocator interposition. Zero accounted
+   * bytes proves zero positive-size live blocks. If any bytes remain, expose
+   * the block count as unknown rather than fabricate a nonzero count. */
+  fprintf(output, "\"configuration\":\"default\","
+          "\"managed_refusals\":%llu,\"outstanding_bytes\":%llu,"
+          "\"outstanding_blocks\":%s}\n", refused_allocations,
+          (unsigned long long)allocator.bytes,
+          allocator.bytes == 0 ? "0" : "null");
+#endif
+  failed = ferror(output);
+  if (fclose(output) != 0) failed = 1;
+  return !failed;
+}
+
 static void print_configuration(void) {
 #if defined(CONFORMANCE_UPSTREAM_TEST)
   const char *profile = "upstream-test";
@@ -67,6 +132,7 @@ static void print_configuration(void) {
   unsigned expected_extra = (unsigned)sizeof(void *);
 #endif
   printf("{\"schema_version\":1,\"configuration\":\"%s\","
+         "\"implementation\":\"C Lua\",\"test_adapter\":%s,"
          "\"lua_version\":\"%s\",\"lua_release\":\"%s\",\"integer_bytes\":%u,"
          "\"number_bytes\":%u,\"compat_global\":%d,"
          "\"extra_space_bytes\":%u,\"expected_extra_space_bytes\":%u,"
@@ -74,7 +140,13 @@ static void print_configuration(void) {
          "\"max_c_calls\":%u,\"aux_buffer_bytes\":%d,"
          "\"rand32\":%s,\"compat_math\":%s,"
          "\"allocator_limit_bytes\":%llu,\"allocator_accounting\":\"%s\"}\n",
-         profile, LUA_VERSION, LUA_RELEASE, (unsigned)sizeof(lua_Integer),
+         profile,
+#if defined(CONFORMANCE_UPSTREAM_TEST)
+         "true",
+#else
+         "false",
+#endif
+         LUA_VERSION, LUA_RELEASE, (unsigned)sizeof(lua_Integer),
          (unsigned)sizeof(lua_Number), LUA_COMPAT_GLOBAL,
          conformance_extra_space(), expected_extra,
          (unsigned)sizeof(void *), conformance_stack_limit(),
@@ -101,6 +173,10 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
   }
   result = conformance_cli_main(argc, argv);
+  if (!write_allocator_telemetry()) {
+    fputs("conformance allocator telemetry output failed\n", stderr);
+    return EXIT_FAILURE;
+  }
 #if !defined(CONFORMANCE_UPSTREAM_TEST)
   if (allocator.bytes != 0) {
     fputs("reference allocator balance failure\n", stderr);

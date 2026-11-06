@@ -1,0 +1,1335 @@
+with Ada.Containers;
+with Interfaces;
+with Lua.Integers;
+with Lua.Numbers;
+with Lua.Opcodes; use Lua.Opcodes;
+with Lua.Storage.Vectors;
+with Lua.Syntax;
+
+package body Lua.Canonical_Compiler is
+   use Lua.Lexers;
+   use Lua.Prototypes;
+   use Lua.Syntax_Trees;
+   use type Ada.Containers.Count_Type;
+   use type Interfaces.Integer_8;
+   use type Interfaces.Unsigned_8;
+   use type Lua.Syntax.Check_Status;
+   use type Lua.Numbers.Real_Value;
+   use type Lua.Numbers.Integer_Value;
+
+   --  These library-level managed instantiations contain compilation work,
+   --  never runtime roots. Their owner is explicit even on exceptional exits.
+   type Place_Kind is (Stack_Place, Upvalue_Place, Constant_Place);
+   type Place is record
+      Kind : Place_Kind := Stack_Place;
+      Index : Natural := 0;
+      Data : Constant_Value;
+   end record;
+   type Binding_Place is record
+      Symbol : Symbol_Id := No_Symbol;
+      Value : Place;
+      Debug_Index : Natural := 0;
+   end record;
+   package Places is new Lua.Storage.Vectors (Binding_Place);
+   package Indices is new Lua.Storage.Vectors (Natural);
+   type Label_Point is record
+      Id : Node_Id := No_Node;
+      PC : Natural := 0;
+   end record;
+   package Labels is new Lua.Storage.Vectors (Label_Point);
+   type Pending_Jump is record
+      Target : Node_Id := No_Node;
+      PC : Positive;
+   end record;
+   package Jumps is new Lua.Storage.Vectors (Pending_Jump);
+   type Loop_State is record
+      Base : Natural := 0;
+      Breaks : Indices.Vector;
+   end record;
+   package Loops is new Lua.Storage.Vectors (Loop_State);
+   type Function_State is tagged limited record
+      Code : Prototype_Access;
+      Active, Captures : Places.Vector;
+      Targets : Labels.Vector;
+      Pending : Jumps.Vector;
+      Loop_Stack : Loops.Vector;
+      Base, Next : Natural := 0;
+      Depth : Positive := 1;
+      Last_Line : Natural := 0;
+      Has_Closing : Boolean := False;
+   end record;
+   type Lvalue is record
+      Where : Place;
+      Table, Key : Natural := 0;
+      Is_Table : Boolean := False;
+   end record;
+   package Lvalues is new Lua.Storage.Vectors (Lvalue);
+
+   function Message (Error : Error_Kind) return String is
+   begin
+      return (case Error is
+         when No_Error => "",
+         when Register_Limit => "too many registers",
+         when Local_Limit => "too many local variables",
+         when Upvalue_Limit => "too many upvalues",
+         when Jump_Limit => "control structure too long",
+         when Constant_Encoding_Limit => "too many constants",
+         when Instruction_Budget => "instruction lowering limit exceeded",
+         when Constant_Budget => "constant lowering limit exceeded",
+         when Prototype_Budget => "prototype lowering limit exceeded",
+         when Nesting_Budget => "lowering nesting limit exceeded",
+         when Allocation_Refused => "not enough memory");
+   end Message;
+
+   function Compile
+     (Unit : in out Compilation_Unit;
+      Memory : not null Lua.Storage.Owner_Access;
+      Source_Name : String; Bounds : Lowering_Limits := (others => <>))
+      return Compilation_Result
+   is
+      Site : Source_Location;
+      Instruction_Count, Constant_Count, Node_Count : Natural := 0;
+      Abandon : exception;
+   begin
+      if Unit.Result.Status /= Lua.Syntax.Success then
+         raise Program_Error with "canonical lowering requires valid syntax";
+      end if;
+      return Result : Compilation_Result do
+         Set_Owner (Result.Code, Memory);
+         declare
+            function Intern_Text (Item : Text_Ref) return String_Id;
+            function Intern_Text (Item : Text_Ref) return String_Id is
+               Id : String_Id;
+               procedure Save (Text : String);
+               procedure Save (Text : String) is
+               begin
+                  Id := Intern (Result.Code, Text);
+               end Save;
+            begin
+               --  Borrow managed frontend bytes directly into the canonical
+               --  interner. Source-sized host String snapshots would otherwise
+               --  bypass the allocator on every decoded string and identifier.
+               Query_Text (Unit, Item, Save'Access);
+               return Id;
+            end Intern_Text;
+            function Fetch (Id : Node_Id) return
+              Nodes.Constant_Reference_Type is
+              (Unit.Tree.Constant_Reference (Positive (Id)));
+            function Binding_Kind (Id : Symbol_Id) return Byte;
+            function Binding_Kind (Id : Symbol_Id) return Byte is
+              (case Unit.Names (Positive (Id)).Mode is
+                 when Regular => 0, when Constant_Name => 1,
+                 when Vararg_Name => 2, when Closing_Name => 3);
+            procedure Fail (Error : Error_Kind; Host : Boolean := False);
+            procedure Fail (Error : Error_Kind; Host : Boolean := False) is
+            begin
+               Result.Error := Error;
+               Result.Location := Site;
+               Result.Outcome :=
+                 (if Host then Resource_Limit else Compiler_Limit);
+               raise Abandon;
+            end Fail;
+            procedure Reserve (Fn : in out Function_State; Last : Natural);
+            procedure Reserve (Fn : in out Function_State; Last : Natural) is
+            begin
+               if Last > 255 then Fail (Register_Limit); end if;
+               Fn.Next := Natural'Max (Fn.Next, Last);
+               Fn.Code.Max_Stack := Byte'Max
+                 (Fn.Code.Max_Stack, Byte (Last));
+            end Reserve;
+            function Temporary (Fn : in out Function_State) return Natural;
+            function Temporary (Fn : in out Function_State) return Natural is
+               Index : constant Natural := Fn.Next;
+            begin
+               Reserve (Fn, Index + 1);
+               return Index;
+            end Temporary;
+            function Field_Set
+              (Instruction : Lua.Opcodes.Word; Part : Field; Value : Integer)
+               return Lua.Opcodes.Word;
+            function Field_Set
+              (Instruction : Lua.Opcodes.Word; Part : Field; Value : Integer)
+               return Lua.Opcodes.Word
+            is
+               Changed : constant Instruction_Result :=
+                 Set (Instruction, Part, Value);
+            begin
+               if Changed.Status /= Success then Fail (Jump_Limit); end if;
+               return Changed.Value;
+            end Field_Set;
+            function ABC
+              (Op : Opcode; X : Natural := 0; Y : Natural := 0;
+               Z : Natural := 0; Flag : Boolean := False)
+               return Lua.Opcodes.Word;
+            function ABC
+              (Op : Opcode; X : Natural := 0; Y : Natural := 0;
+               Z : Natural := 0; Flag : Boolean := False)
+               return Lua.Opcodes.Word
+            is
+               Instruction : Lua.Opcodes.Word := Create (Op);
+            begin
+               Instruction := Field_Set (Instruction, A, X);
+               Instruction := Field_Set (Instruction, B, Y);
+               Instruction := Field_Set (Instruction, C, Z);
+               return Field_Set (Instruction, K, Boolean'Pos (Flag));
+            end ABC;
+            function ABx
+              (Op : Opcode; X, Y : Natural) return Lua.Opcodes.Word;
+            function ABx
+              (Op : Opcode; X, Y : Natural) return Lua.Opcodes.Word is
+              (Field_Set (Field_Set (Create (Op), A, X), Bx, Y));
+            function PC (Fn : Function_State) return Positive is
+              (Natural (Fn.Code.Code.Length) + 1);
+            procedure Put
+              (Fn : in out Function_State; Instruction : Lua.Opcodes.Word);
+            procedure Put
+              (Fn : in out Function_State; Instruction : Lua.Opcodes.Word)
+            is
+               Difference : constant Long_Long_Integer :=
+                 Long_Long_Integer (Site.Line) -
+                 Long_Long_Integer (Fn.Last_Line);
+            begin
+               if Instruction_Count = Bounds.Instructions then
+                  Fail (Instruction_Budget, Host => True);
+               end if;
+               Instruction_Count := Instruction_Count + 1;
+               --  Every canonical word receives a line entry. Large deltas
+               --  and periodic checkpoints use real absolute records, keeping
+               --  later debug lookup independent of temporary frontend nodes.
+               if Difference not in -127 .. 127 or else
+                 (PC (Fn) - 1) mod 128 = 0
+               then
+                  Fn.Code.Lines.Append (-128);
+                  Fn.Code.Absolute_Lines.Append
+                    (Absolute_Line'(PC (Fn) - 1, Site.Line));
+               else
+                  Fn.Code.Lines.Append (Interfaces.Integer_8 (Difference));
+               end if;
+               Fn.Last_Line := Site.Line;
+               Fn.Code.Code.Append (Instruction);
+            end Put;
+            function Jump (Fn : in out Function_State) return Positive;
+            function Jump (Fn : in out Function_State) return Positive is
+               Index : constant Positive := PC (Fn);
+            begin
+               Put (Fn, Field_Set (Create (Op_JMP), SJ, 0));
+               return Index;
+            end Jump;
+            procedure Patch
+              (Fn : in out Function_State; Index, Target : Positive);
+            procedure Patch
+              (Fn : in out Function_State; Index, Target : Positive) is
+            begin
+               Fn.Code.Code.Replace_Element (Index, Field_Set
+                 (Fn.Code.Code (Index), SJ, Target - Index - 1));
+            end Patch;
+            procedure Move
+              (Fn : in out Function_State; Destination, Source : Natural);
+            procedure Move
+              (Fn : in out Function_State; Destination, Source : Natural) is
+            begin
+               if Destination /= Source then
+                  Put (Fn, ABC (Op_MOVE, Destination, Source));
+               end if;
+            end Move;
+            function Constant_Index
+              (Fn : in out Function_State; Data : Constant_Value)
+               return Natural;
+            function Constant_Index
+              (Fn : in out Function_State; Data : Constant_Value)
+               return Natural
+            is
+               Index : constant Natural := Natural (Fn.Code.Constants.Length);
+            begin
+               if Constant_Count = Bounds.Constants then
+                  Fail (Constant_Budget, Host => True);
+               elsif Index >= 2 ** 25 then
+                  Fail (Constant_Encoding_Limit);
+               end if;
+               Constant_Count := Constant_Count + 1;
+               Fn.Code.Constants.Append (Data);
+               return Index;
+            end Constant_Index;
+            procedure Load
+              (Fn : in out Function_State; Register_Id : Natural;
+               Data : Constant_Value);
+            procedure Load
+              (Fn : in out Function_State; Register_Id : Natural;
+               Data : Constant_Value)
+            is
+               Index : Natural;
+            begin
+               case Data.Kind is
+                  when Nil_Constant =>
+                     Put (Fn, ABC (Op_LOADNIL, Register_Id));
+                  when Boolean_Constant =>
+                     Put (Fn, ABC ((if Data.Boolean_Data then Op_LOADTRUE
+                                   else Op_LOADFALSE), Register_Id));
+                  when others =>
+                     Index := Constant_Index (Fn, Data);
+                     if Index < 2 ** 17 then
+                        Put (Fn, ABx (Op_LOADK, Register_Id, Index));
+                     else
+                        Put (Fn, ABx (Op_LOADKX, Register_Id, 0));
+                        Put (Fn, Field_Set (Create (Op_EXTRAARG), Ax, Index));
+                     end if;
+               end case;
+            end Load;
+            function Locate
+              (Fn : Function_State; Id : Symbol_Id) return Place;
+            function Locate
+              (Fn : Function_State; Id : Symbol_Id) return Place is
+            begin
+               for Index in reverse
+                 Fn.Active.First_Index .. Fn.Active.Last_Index
+               loop
+                  if Fn.Active (Index).Symbol = Id then
+                     return Fn.Active (Index).Value;
+                  end if;
+               end loop;
+               for Item of Fn.Captures loop
+                  if Item.Symbol = Id then return Item.Value; end if;
+               end loop;
+               raise Program_Error with "resolved lexical binding missing";
+            end Locate;
+            procedure Read
+              (Fn : in out Function_State; Where : Place;
+               Destination : Natural);
+            procedure Read
+              (Fn : in out Function_State; Where : Place;
+               Destination : Natural) is
+            begin
+               case Where.Kind is
+                  when Stack_Place => Move (Fn, Destination, Where.Index);
+                  when Upvalue_Place =>
+                     Put (Fn, ABC (Op_GETUPVAL, Destination, Where.Index));
+                  when Constant_Place => Load (Fn, Destination, Where.Data);
+               end case;
+            end Read;
+            procedure Bind
+              (Fn : in out Function_State; Id : Symbol_Id;
+               Register_Id : Natural);
+            procedure Bind
+              (Fn : in out Function_State; Id : Symbol_Id;
+               Register_Id : Natural) is
+            begin
+               if Register_Id >= 200 then Fail (Local_Limit); end if;
+               Fn.Code.Locals.Append (Local'
+                 (Intern_Text (Unit.Names (Positive (Id)).Name),
+                  PC (Fn) - 1, 0));
+               Fn.Active.Append (Binding_Place'
+                 (Id, (Stack_Place, Register_Id, (Kind => Nil_Constant)),
+                  Natural (Fn.Code.Locals.Length)));
+               Fn.Base := Natural'Max (Fn.Base, Register_Id + 1);
+               Reserve (Fn, Fn.Base);
+            end Bind;
+            procedure Leave
+              (Fn : in out Function_State; Base, Active : Natural;
+               Emit_Close : Boolean := True);
+            procedure Leave
+              (Fn : in out Function_State; Base, Active : Natural;
+               Emit_Close : Boolean := True)
+            is
+               Ending : constant Natural := PC (Fn) - 1;
+            begin
+               --  CLOSE detaches captured cells before a reused stack slot
+               --  receives a new declaration instance. This is also the sole
+               --  ordinary scope-exit operation for to-be-closed variables.
+               if Emit_Close and then Fn.Base > Base then
+                  Put (Fn, ABC (Op_CLOSE, Base));
+               end if;
+               while Natural (Fn.Active.Length) > Active loop
+                  if Fn.Active.Last_Element.Debug_Index /= 0 then
+                     declare
+                        Index : constant Positive :=
+                          Fn.Active.Last_Element.Debug_Index;
+                        Data : Local := Fn.Code.Locals (Index);
+                     begin
+                        Data.End_PC := Ending;
+                        Fn.Code.Locals.Replace_Element (Index, Data);
+                     end;
+                  end if;
+                  Fn.Active.Delete_Last;
+               end loop;
+               Fn.Base := Base;
+               Fn.Next := Base;
+            end Leave;
+            function Multiple (Id : Node_Id) return Boolean is
+              (Fetch (Id).Kind = Call_Expression or else
+               (Fetch (Id).Kind = Literal and then
+                Fetch (Id).Value.Kind = Varargs));
+            procedure Expression
+              (Fn : in out Function_State; Id : Node_Id;
+               Destination : Natural; Wanted : Integer := 1;
+               Tail : Boolean := False);
+            procedure Statement
+              (Fn : in out Function_State; Id : Node_Id);
+            procedure Block
+              (Fn : in out Function_State; Id : Node_Id;
+               Own_Scope : Boolean := True);
+            procedure Build_Function
+              (Fn : in out Function_State; Id : Node_Id;
+               Parent : access Function_State := null);
+            procedure Values
+              (Fn : in out Function_State; Id : Node_Id;
+               Destination : Natural; Wanted : Integer;
+               Open_Last : out Boolean; Count : out Natural);
+            procedure Values
+              (Fn : in out Function_State; Id : Node_Id;
+               Destination : Natural; Wanted : Integer;
+               Open_Last : out Boolean; Count : out Natural)
+            is
+               Length : constant Natural :=
+                 (if Id = No_Node then 0 else
+                  Natural (Fetch (Id).Children.Length));
+               Needed : Integer;
+            begin
+               Open_Last := False;
+               Count := Length;
+               for Index in 1 .. Length loop
+                  Needed := 1;
+                  if Index = Length and then
+                    Multiple (Fetch (Id).Children (Index))
+                  then
+                     Needed := (if Wanted < 0 then -1 else
+                       Integer'Max (0, Wanted - Length + 1));
+                     Open_Last := Needed < 0;
+                  end if;
+                  Expression (Fn, Fetch (Id).Children (Index),
+                              Destination + Index - 1, Needed);
+               end loop;
+               if Wanted >= 0 then
+                  if Length = 0 or else
+                    (Length < Wanted and then
+                     not Multiple (Fetch (Id).Children (Length)))
+                  then
+                     Reserve (Fn, Destination + Wanted);
+                     if Wanted > Length then
+                        Put (Fn, ABC (Op_LOADNIL, Destination + Length,
+                                      Wanted - Length - 1));
+                     end if;
+                  end if;
+                  Count := Natural (Wanted);
+               end if;
+            end Values;
+            function Address
+              (Fn : in out Function_State; Id : Node_Id) return Lvalue;
+            function Address
+              (Fn : in out Function_State; Id : Node_Id) return Lvalue
+            is
+               Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+               Target : Lvalue;
+            begin
+               Site := Item.Site;
+               if Item.Kind = Name_Reference and then
+                 Item.Symbol /= No_Symbol
+               then
+                  Target.Where := Locate (Fn, Item.Symbol);
+               else
+                  --  Capture receiver/key bytes before RHS evaluation. The
+                  --  copied receiver preserves parallel assignment semantics
+                  --  when another target overwrites its original local/_ENV.
+                  Target.Is_Table := True;
+                  Target.Table := Temporary (Fn);
+                  if Item.Kind = Name_Reference then
+                     Read (Fn, Locate (Fn, Item.Environment), Target.Table);
+                     Target.Key := Temporary (Fn);
+                     Load (Fn, Target.Key, Constant_Value'
+                       (String_Constant, Intern_Text (Item.Text), False));
+                  else
+                     Expression (Fn, Item.Children (1), Target.Table);
+                     Target.Key := Temporary (Fn);
+                     Expression (Fn, Item.Children (2), Target.Key);
+                  end if;
+               end if;
+               return Target;
+            end Address;
+            procedure Store
+              (Fn : in out Function_State; Target : Lvalue; Source : Natural);
+            procedure Store
+              (Fn : in out Function_State; Target : Lvalue; Source :
+                Natural) is
+            begin
+               if Target.Is_Table then
+                  Put (Fn, ABC (Op_SETTABLE, Target.Table, Target.Key,
+                    Source));
+               elsif Target.Where.Kind = Stack_Place then
+                  Move (Fn, Target.Where.Index, Source);
+               elsif Target.Where.Kind = Upvalue_Place then
+                  Put (Fn, ABC (Op_SETUPVAL, Source, Target.Where.Index));
+               else
+                  raise Program_Error with "assignment to folded constant";
+               end if;
+            end Store;
+            procedure Expression
+              (Fn : in out Function_State; Id : Node_Id;
+               Destination : Natural; Wanted : Integer := 1;
+               Tail : Boolean := False)
+            is
+               Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+               Mark, Left, Right, Branch, Finish, Index : Natural;
+               Count : Natural;
+               Open_Last : Boolean;
+               Op : Opcode;
+               Where : Lvalue;
+            begin
+               Site := Item.Site;
+               Reserve (Fn, Destination + Natural (Integer'Max (1, Wanted)));
+               Mark := Fn.Next;
+               case Item.Kind is
+                  when Literal =>
+                     case Item.Value.Kind is
+                        when Integer_Literal =>
+                           Load (Fn, Destination, Constant_Value'
+                             (Integer_Constant,
+                              Item.Value.Numeric.Integer_Item));
+                        when Float_Literal =>
+                           Load (Fn, Destination, Constant_Value'
+                             (Number_Constant, Item.Value.Numeric.Real_Item));
+                        when String_Literal =>
+                           Load (Fn, Destination, Constant_Value'
+                             (String_Constant, Intern_Text (Item.Value.Text),
+                              Text_Length (Item.Value.Text) > 40));
+                        when True_Word | False_Word =>
+                           Load (Fn, Destination, Constant_Value'
+                             (Boolean_Constant, Item.Value.Kind = True_Word));
+                        when Varargs =>
+                           Put (Fn, ABC (Op_VARARG, Destination,
+                             Natural (Fn.Code.Parameters),
+                             (if Wanted < 0 then 0 else Wanted + 1),
+                             (Fn.Code.Flags and 2) /= 0));
+                        when others =>
+                           Load (Fn, Destination,
+                                 Constant_Value'(Kind => Nil_Constant));
+                     end case;
+                  when Name_Reference | Index_Expression =>
+                     Where := Address (Fn, Id);
+                     if Where.Is_Table then
+                        Put (Fn, ABC (Op_GETTABLE, Destination,
+                                      Where.Table, Where.Key));
+                     else
+                        Read (Fn, Where.Where, Destination);
+                     end if;
+                  when Parenthesized =>
+                     Expression (Fn, Item.Children (1), Destination);
+                  when Unary_Expression =>
+                     Left := Temporary (Fn);
+                     Expression (Fn, Item.Children (1), Left);
+                     Op := (case Item.Operator is
+                       when Minus => Op_UNM, when Bit_Xor => Op_BNOT,
+                       when Not_Word => Op_NOT, when Length => Op_LEN,
+                       when others => raise Program_Error);
+                     Site := Item.Site;
+                     Put (Fn, ABC (Op, Destination, Left));
+                  when Binary_Expression =>
+                     if Item.Operator in And_Word | Or_Word then
+                        --  Keep the original operand, not a booleanized copy.
+                        --  Only the selected RHS executes, and each operand
+                        --  is scalar-adjusted before its truth is inspected.
+                        Expression (Fn, Item.Children (1), Destination);
+                        Put (Fn, ABC (Op_TEST, Destination,
+                          Flag => Item.Operator = Or_Word));
+                        Branch := Jump (Fn);
+                        Expression (Fn, Item.Children (2), Destination);
+                        Patch (Fn, Branch, PC (Fn));
+                     else
+                        if Item.Operator = Concatenate then
+                           Reserve (Fn, Destination + 2);
+                        end if;
+                        Left := Temporary (Fn);
+                        Expression (Fn, Item.Children (1), Left);
+                        Right := Temporary (Fn);
+                        Expression (Fn, Item.Children (2), Right);
+                        Site := Item.Site;
+                        if Item.Operator in Equal | Not_Equal | Less |
+                          Less_Equal | Greater | Greater_Equal
+                        then
+                           Op := (case Item.Operator is
+                             when Equal | Not_Equal => Op_EQ,
+                             when Less | Greater => Op_LT,
+                             when others => Op_LE);
+                           Put (Fn, ABC (Op,
+                             (if Item.Operator in Greater | Greater_Equal
+                              then Right else Left),
+                             (if Item.Operator in Greater | Greater_Equal
+                              then Left else Right),
+                             Flag => Item.Operator /= Not_Equal));
+                           Branch := Jump (Fn);
+                           Put (Fn, ABC (Op_LOADFALSE, Destination));
+                           Finish := Jump (Fn);
+                           Patch (Fn, Branch, PC (Fn));
+                           Put (Fn, ABC (Op_LOADTRUE, Destination));
+                           Patch (Fn, Finish, PC (Fn));
+                        elsif Item.Operator = Concatenate then
+                           Move (Fn, Destination, Left);
+                           Move (Fn, Destination + 1, Right);
+                           Put (Fn, ABC (Op_CONCAT, Destination, 2));
+                        else
+                           Op := (case Item.Operator is
+                             when Plus => Op_ADD, when Minus => Op_SUB,
+                             when Star => Op_MUL, when Slash => Op_DIV,
+                             when Floor_Divide => Op_IDIV,
+                             when Percent => Op_MOD, when Power => Op_POW,
+                             when Bit_And => Op_BAND, when Bit_Or => Op_BOR,
+                             when Bit_Xor => Op_BXOR,
+                             when Shift_Left => Op_SHL,
+                             when Shift_Right => Op_SHR,
+                             when others => raise Program_Error);
+                           Put (Fn, ABC (Op, Destination, Left, Right));
+                           Put (Fn, ABC (Op_MMBIN, Left, Right,
+                             6 + Opcode'Pos (Op) - Opcode'Pos (Op_ADD)));
+                        end if;
+                     end if;
+                  when Call_Expression =>
+                     declare
+                        Callee : constant Nodes.Constant_Reference_Type :=
+                          Fetch (Item.Children (1));
+                        Receiver : constant Natural :=
+                          Boolean'Pos (Callee.Kind = Method_Expression);
+                     begin
+                        if Receiver = 0 then
+                           Expression (Fn, Item.Children (1), Destination);
+                        else
+                           Reserve (Fn, Destination + 2);
+                           Expression (Fn, Callee.Children (1),
+                                       Destination + 1);
+                           if Fetch (Callee.Children (2)).Kind = Literal and
+                             then Fetch (Callee.Children (2)).Value.Kind =
+                               String_Literal and then
+                             Text_Length (Fetch
+                               (Callee.Children (2)).Value.Text) <= 40 and
+                             then Fn.Code.Constants.Length < 256
+                           then
+                              --  SELF records an actual method call shape,
+                              --  including the implicit receiver. Debug name
+                              --  discovery can inspect this real instruction
+                              --  rather than storing fabricated call metadata.
+                              Index := Constant_Index (Fn, Constant_Value'
+                                (String_Constant, Intern_Text (Fetch
+                                  (Callee.Children (2)).Value.Text), False));
+                              Put (Fn, ABC (Op_SELF, Destination,
+                                            Destination + 1, Index));
+                           else
+                              --  The canonical C field is only eight bits;
+                              --  long keys or a full small-constant window use
+                              --  a register key, retaining the same receiver.
+                              Left := Temporary (Fn);
+                              Expression (Fn, Callee.Children (2), Left);
+                              Put (Fn, ABC (Op_GETTABLE, Destination,
+                                            Destination + 1, Left));
+                           end if;
+                        end if;
+                        Fn.Next := Destination + Receiver + 1;
+                        Values (Fn, Item.Children (2),
+                          Destination + Receiver + 1, -1, Open_Last, Count);
+                        Site := Item.Site;
+                        if Tail then
+                           Put (Fn, ABC (Op_TAILCALL, Destination,
+                             (if Open_Last then 0 else Count + Receiver + 1),
+                             (if (Fn.Code.Flags and 1) /= 0 then
+                               Natural (Fn.Code.Parameters) + 1 else 0),
+                             Flag => True));
+                        else
+                           Put (Fn, ABC (Op_CALL, Destination,
+                             (if Open_Last then 0 else Count + Receiver + 1),
+                             (if Wanted < 0 then 0 else Wanted + 1)));
+                        end if;
+                     end;
+                  when Function_Expression =>
+                     declare
+                        Child : aliased Function_State;
+                     begin
+                        Child.Depth := Fn.Depth + 1;
+                        Build_Function (Child, Id, Fn'Access);
+                        Index := Natural (Fn.Code.Children.Length);
+                        Fn.Code.Children.Append (Child.Code);
+                        Site := Item.Site;
+                        Put (Fn, ABx (Op_CLOSURE, Destination, Index));
+                     end;
+                  when Table_Expression =>
+                     Put (Fn, Field_Set
+                       (Create (Op_NEWTABLE), A, Destination));
+                     Put (Fn, Create (Op_EXTRAARG));
+                     Index := 1;
+                     for Position in 1 .. Natural (Item.Children.Length) loop
+                        declare
+                           Field_Node : constant Nodes.Constant_Reference_Type
+                             := Fetch (Item.Children (Position));
+                        begin
+                           if Field_Node.Children.Length = 1 and then
+                             Position = Natural (Item.Children.Length) and
+                             then Multiple (Field_Node.Children (1))
+                           then
+                              Fn.Next := Destination + 1;
+                              Expression (Fn, Field_Node.Children (1),
+                                          Destination + 1, -1);
+                              --  Open SETLIST may grow an initially empty
+                              --  array. Fixed stores use ordinary SETTABLE,
+                              --  avoiding assumptions about preallocated size.
+                              Put (Fn, Field_Set (Field_Set (Field_Set
+                                (Create (Op_SETLIST), A, Destination),
+                                 VC, (Index - 1) mod 1_024), K,
+                                 Boolean'Pos (Index > 1_024)));
+                              if Index > 1_024 then
+                                 Put (Fn, Field_Set (Create (Op_EXTRAARG), Ax,
+                                   (Index - 1) / 1_024));
+                              end if;
+                           else
+                              Left := Temporary (Fn);
+                              Right := Temporary (Fn);
+                              if Field_Node.Children.Length = 1 then
+                                 Load (Fn, Left, Constant_Value'
+                                   (Integer_Constant,
+                                    Lua.Numbers.Integer_Value (Index)));
+                                 Expression (Fn, Field_Node.Children (1),
+                                             Right);
+                                 Index := Index + 1;
+                              else
+                                 Expression (Fn, Field_Node.Children (1),
+                                   Left);
+                                 Expression (Fn, Field_Node.Children (2),
+                                   Right);
+                              end if;
+                              Put (Fn, ABC
+                                (Op_SETTABLE, Destination, Left, Right));
+                           end if;
+                           Fn.Next := Mark;
+                        end;
+                     end loop;
+                  when others =>
+                     raise Program_Error with "non-expression resolved node";
+               end case;
+               if Wanted > 1 and then not Multiple (Id) then
+                  Put (Fn, ABC (Op_LOADNIL, Destination + 1, Wanted - 2));
+               end if;
+               Fn.Next := Mark;
+            end Expression;
+
+            procedure Bind_Hidden
+              (Fn : in out Function_State; Name : String; Register_Id :
+                Natural;
+               Lifetime : Symbol_Id := No_Symbol);
+            procedure Bind_Hidden
+              (Fn : in out Function_State; Name : String; Register_Id :
+                Natural;
+               Lifetime : Symbol_Id := No_Symbol)
+            is
+            begin
+               if Register_Id >= 200 then Fail (Local_Limit); end if;
+               Fn.Code.Locals.Append
+                 (Local'(Intern (Result.Code, Name), PC (Fn) - 1, 0));
+               Fn.Active.Append (Binding_Place'
+                 (Lifetime, (Stack_Place, Register_Id,
+                              (Kind => Nil_Constant)),
+                  Natural (Fn.Code.Locals.Length)));
+               Fn.Base := Natural'Max (Fn.Base, Register_Id + 1);
+               Reserve (Fn, Fn.Base);
+            end Bind_Hidden;
+            procedure Begin_Loop
+              (Fn : in out Function_State; Base : Natural);
+            procedure Begin_Loop
+              (Fn : in out Function_State; Base : Natural)
+            is
+               State : Loop_State;
+            begin
+               State.Base := Base;
+               State.Breaks.Set_Owner (Memory);
+               Fn.Loop_Stack.Append (State);
+            end Begin_Loop;
+            procedure End_Loop (Fn : in out Function_State);
+            procedure End_Loop (Fn : in out Function_State) is
+            begin
+               for Index of Fn.Loop_Stack
+                 (Fn.Loop_Stack.Last_Index).Breaks
+               loop
+                  Patch (Fn, Index, PC (Fn));
+               end loop;
+               Fn.Loop_Stack.Delete_Last;
+            end End_Loop;
+            procedure Check_Global
+              (Fn : in out Function_State; Target : Lvalue;
+               Name : Text_Ref);
+            procedure Check_Global
+              (Fn : in out Function_State; Target : Lvalue;
+               Name : Text_Ref)
+            is
+               Register_Id : constant Natural := Temporary (Fn);
+               Index : constant Natural := Constant_Index
+                 (Fn, Constant_Value'
+                   (String_Constant, Intern_Text (Name), False));
+            begin
+               Put (Fn, ABC (Op_GETTABLE, Register_Id,
+                             Target.Table, Target.Key));
+               Put (Fn, ABx (Op_ERRNNIL, Register_Id,
+                             (if Index < 2 ** 17 - 1 then Index + 1 else 0)));
+            end Check_Global;
+            function Fold
+              (Fn : Function_State; Id : Node_Id; Data : out Constant_Value)
+               return Boolean;
+            function Fold
+              (Fn : Function_State; Id : Node_Id; Data : out Constant_Value)
+               return Boolean
+            is
+               Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+               Left, Right : Constant_Value;
+               Value : Place;
+            begin
+               --  Fold only provably side-effect-free values. Last const
+               --  declarations can then omit a stack slot/upvalue, matching
+               --  Lua's compile-time-constant ownership rather than exposing
+               --  a fabricated mutable cell to debug APIs.
+               case Item.Kind is
+                  when Literal =>
+                     case Item.Value.Kind is
+                        when Nil_Word => Data := (Kind => Nil_Constant);
+                        when True_Word | False_Word =>
+                           Data := (Boolean_Constant,
+                                    Item.Value.Kind = True_Word);
+                        when Integer_Literal =>
+                           Data := (Integer_Constant,
+                                    Item.Value.Numeric.Integer_Item);
+                        when Float_Literal =>
+                           Data := (Number_Constant,
+                                    Item.Value.Numeric.Real_Item);
+                        when String_Literal =>
+                           Data := (String_Constant,
+                             Intern_Text (Item.Value.Text),
+                             Text_Length (Item.Value.Text) > 40);
+                        when others => return False;
+                     end case;
+                     return True;
+                  when Parenthesized =>
+                     return Fold (Fn, Item.Children (1), Data);
+                  when Name_Reference =>
+                     if Item.Symbol /= No_Symbol then
+                        Value := Locate (Fn, Item.Symbol);
+                        if Value.Kind = Constant_Place then
+                           Data := Value.Data;
+                           return True;
+                        end if;
+                     end if;
+                  when Unary_Expression =>
+                     if Item.Operator = Minus and then
+                       Fold (Fn, Item.Children (1), Left)
+                     then
+                        if Left.Kind = Integer_Constant then
+                           Data := (Integer_Constant,
+                             Lua.Integers.Negate (Left.Integer_Data));
+                           return True;
+                        elsif Left.Kind = Number_Constant and then
+                          Left.Number_Data /= 0.0
+                        then
+                           Data := (Number_Constant, -Left.Number_Data);
+                           return True;
+                        end if;
+                     end if;
+                  when Binary_Expression =>
+                     if Fold (Fn, Item.Children (1), Left) and then
+                       Fold (Fn, Item.Children (2), Right) and then
+                       Left.Kind = Integer_Constant and then
+                       Right.Kind = Integer_Constant
+                     then
+                        case Item.Operator is
+                           when Plus =>
+                              Data := (Integer_Constant, Lua.Integers.Add
+                                (Left.Integer_Data, Right.Integer_Data));
+                           when Minus =>
+                              Data := (Integer_Constant,
+                                Lua.Integers.Subtract
+                                  (Left.Integer_Data, Right.Integer_Data));
+                           when Star =>
+                              Data := (Integer_Constant,
+                                Lua.Integers.Multiply
+                                  (Left.Integer_Data, Right.Integer_Data));
+                           when Floor_Divide | Percent =>
+                              if Right.Integer_Data = 0 then
+                                 return False;
+                              end if;
+                              Data := (Integer_Constant,
+                                (if Item.Operator = Floor_Divide then
+                                  Lua.Integers.Floor_Divide
+                                    (Left.Integer_Data, Right.Integer_Data)
+                                 else Lua.Integers.Modulo
+                                    (Left.Integer_Data, Right.Integer_Data)));
+                           when Shift_Left =>
+                              Data := (Integer_Constant,
+                                Lua.Integers.Shift_Left
+                                  (Left.Integer_Data, Right.Integer_Data));
+                           when Shift_Right =>
+                              Data := (Integer_Constant,
+                                Lua.Integers.Shift_Right
+                                  (Left.Integer_Data, Right.Integer_Data));
+                           when others => return False;
+                        end case;
+                        return True;
+                     end if;
+                  when others => null;
+               end case;
+               return False;
+            end Fold;
+            procedure Block
+              (Fn : in out Function_State; Id : Node_Id;
+               Own_Scope : Boolean := True)
+            is
+               Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+               Base : constant Natural := Fn.Base;
+               Active : constant Natural := Natural (Fn.Active.Length);
+            begin
+               for Child of Item.Children loop
+                  Fn.Next := Fn.Base;
+                  Statement (Fn, Child);
+                  Fn.Next := Fn.Base;
+               end loop;
+               if Own_Scope then Leave (Fn, Base, Active); end if;
+            end Block;
+            procedure Statement
+              (Fn : in out Function_State; Id : Node_Id)
+            is
+               Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+               Targets : Lvalues.Vector;
+               Finishes : Indices.Vector;
+               Base : constant Natural := Fn.Base;
+               Active : constant Natural := Natural (Fn.Active.Length);
+               Left, Start, Branch, Finish, Index, Count : Natural;
+               Open_Last : Boolean;
+               Folded : Constant_Value;
+            begin
+               Site := Item.Site;
+               Targets.Set_Owner (Memory);
+               Finishes.Set_Owner (Memory);
+               case Item.Kind is
+                  when Empty_Statement => null;
+                  when Block_Statement => Block (Fn, Id);
+                  when Label_Statement =>
+                     Fn.Targets.Append (Label_Point'(Id, PC (Fn)));
+                  when Goto_Statement =>
+                     Left := Fn.Base;
+                     for Binding of Fn.Active loop
+                        if Binding.Symbol /= No_Symbol and then
+                          Binding.Value.Kind = Stack_Place and then
+                          not Item.Symbols.Contains (Binding.Symbol)
+                        then
+                           Left := Natural'Min (Left, Binding.Value.Index);
+                        end if;
+                     end loop;
+                     --  The parser's resolved target already supplies its
+                     --  retained declaration set, including terminal labels.
+                     --  Close outgoing cells before the jump, so re-entered
+                     --  declarations cannot mutate an earlier capture.
+                     if Left < Fn.Base then
+                        Put (Fn, ABC (Op_CLOSE, Left));
+                     end if;
+                     Fn.Pending.Append (Pending_Jump'
+                       (Item.Target, Jump (Fn)));
+                  when Call_Statement =>
+                     Expression (Fn, Item.Children (1), Fn.Next, 0);
+                  when Assignment =>
+                     for Position in 1 ..
+                       Natural (Item.Children.Length) - 1
+                     loop
+                        Targets.Append (Address
+                          (Fn, Item.Children (Position)));
+                     end loop;
+                     Left := Fn.Next;
+                     if Fetch (Item.Children.Last_Element).Kind =
+                       Function_Expression
+                     then
+                        Expression (Fn, Item.Children.Last_Element, Left);
+                     else
+                        Values (Fn, Item.Children.Last_Element, Left,
+                          Integer (Targets.Length), Open_Last, Count);
+                     end if;
+                     Site := Item.Site;
+                     if Item.Flag then
+                        Check_Global (Fn, Targets (1),
+                          Fetch (Item.Children (1)).Text);
+                     end if;
+                     for Position in reverse 1 .. Natural (Targets.Length)
+                     loop
+                        Store (Fn, Targets (Position), Left + Position - 1);
+                     end loop;
+                  when Declaration =>
+                     if Item.Flag then
+                        if not Item.Children.Is_Empty then
+                           for Symbol of Item.Symbols loop
+                              declare
+                                 Target : Lvalue;
+                              begin
+                                 if Unit.Names (Positive (Symbol)).Kind /=
+                                   Collective_Name
+                                 then
+                                    Target.Is_Table := True;
+                                    Target.Table := Temporary (Fn);
+                                    Read (Fn, Locate (Fn, Item.Environment),
+                                          Target.Table);
+                                    Target.Key := Temporary (Fn);
+                                    Load (Fn, Target.Key, Constant_Value'
+                                      (String_Constant, Intern_Text
+                                        (Unit.Names
+                                          (Positive (Symbol)).Name), False));
+                                    Targets.Append (Target);
+                                 end if;
+                              end;
+                           end loop;
+                           Left := Fn.Next;
+                           Values (Fn, Item.Children (1), Left,
+                             Integer (Targets.Length), Open_Last, Count);
+                           Site := Item.Site;
+                           for Position in reverse
+                             1 .. Natural (Targets.Length)
+                           loop
+                              Check_Global (Fn, Targets (Position),
+                                Unit.Names
+                                  (Positive (Item.Symbols (Position))).Name);
+                              Store (Fn, Targets (Position),
+                                     Left + Position - 1);
+                           end loop;
+                        end if;
+                     elsif not Item.Children.Is_Empty and then
+                       Fetch (Item.Children (1)).Kind = Function_Expression
+                     then
+                        Bind (Fn, Item.Symbols (1), Base);
+                        Load (Fn, Base,
+                              Constant_Value'(Kind => Nil_Constant));
+                        Expression (Fn, Item.Children (1), Base);
+                     elsif not Item.Children.Is_Empty and then
+                       Fetch (Item.Children (1)).Children.Length =
+                         Item.Symbols.Length and then
+                       not Item.Symbols.Is_Empty and then
+                       Unit.Names (Positive (Item.Symbols.Last_Element)).Mode =
+                         Constant_Name and then
+                       Fold (Fn, Fetch (Item.Children
+                         (1)).Children.Last_Element,
+                             Folded)
+                     then
+                        --  Only the last declaration is a compile-time const
+                        --  candidate in the pinned compiler. Earlier values
+                        --  still evaluate and acquire ordinary lexical cells.
+                        for Position in 1 .. Natural (Item.Symbols.Length) - 1
+                        loop
+                           Expression (Fn, Fetch (Item.Children (1)).Children
+                             (Position), Base + Position - 1);
+                        end loop;
+                        for Position in 1 .. Natural (Item.Symbols.Length) - 1
+                        loop
+                           Bind (Fn, Item.Symbols (Position),
+                                 Base + Position - 1);
+                           if Unit.Names
+                             (Positive (Item.Symbols (Position))).Mode =
+                             Closing_Name
+                           then
+                              Fn.Has_Closing := True;
+                              Put (Fn, ABC (Op_TBC, Base + Position - 1));
+                           end if;
+                        end loop;
+                        Fn.Active.Append (Binding_Place'
+                          (Item.Symbols.Last_Element,
+                           (Constant_Place, 0, Folded), 0));
+                     else
+                        Left := Fn.Base;
+                        Values (Fn,
+                          (if Item.Children.Is_Empty then No_Node else
+                           Item.Children (1)), Left,
+                          Integer (Item.Symbols.Length), Open_Last, Count);
+                        for Position in 1 .. Natural (Item.Symbols.Length)
+                        loop
+                           Bind (Fn, Item.Symbols (Position),
+                                 Left + Position - 1);
+                           if Unit.Names
+                             (Positive (Item.Symbols (Position))).Mode =
+                             Closing_Name
+                           then
+                              Fn.Has_Closing := True;
+                              Put (Fn, ABC (Op_TBC, Left + Position - 1));
+                           end if;
+                        end loop;
+                     end if;
+                  when Return_Statement =>
+                     Left := Fn.Next;
+                     if not Item.Children.Is_Empty and then
+                       Fetch (Item.Children (1)).Children.Length = 1 and then
+                       Fetch (Fetch (Item.Children (1)).Children (1)).Kind =
+                         Call_Expression and then not Fn.Has_Closing
+                     then
+                        Expression (Fn,
+                          Fetch (Item.Children (1)).Children (1), Left, -1,
+                          Tail => True);
+                        Open_Last := True;
+                        Count := 1;
+                     else
+                        Values (Fn,
+                          (if Item.Children.Is_Empty then No_Node else
+                           Item.Children (1)), Left, -1, Open_Last, Count);
+                     end if;
+                     Site := Item.Site;
+                     Put (Fn, ABC (Op_RETURN, Left,
+                       (if Open_Last then 0 else Count + 1),
+                       (if (Fn.Code.Flags and 1) /= 0 then
+                         Natural (Fn.Code.Parameters) + 1 else 0),
+                       Flag => True));
+                  when Break_Statement =>
+                     Put (Fn, ABC (Op_CLOSE,
+                       Fn.Loop_Stack (Fn.Loop_Stack.Last_Index).Base));
+                     Index := Jump (Fn);
+                     declare
+                        procedure Append (Loop_Item : in out Loop_State);
+                        procedure Append (Loop_Item : in out Loop_State) is
+                        begin
+                           Loop_Item.Breaks.Append (Index);
+                        end Append;
+                     begin
+                        Fn.Loop_Stack.Update_Element
+                          (Fn.Loop_Stack.Last_Index, Append'Access);
+                     end;
+                  when If_Statement =>
+                     Index := 1;
+                     while Index < Natural (Item.Children.Length) loop
+                        Left := Temporary (Fn);
+                        Expression (Fn, Item.Children (Index), Left);
+                        Put (Fn, ABC (Op_TEST, Left));
+                        Branch := Jump (Fn);
+                        Fn.Next := Fn.Base;
+                        Block (Fn, Item.Children (Index + 1));
+                        Finishes.Append (Jump (Fn));
+                        Patch (Fn, Branch, PC (Fn));
+                        Index := Index + 2;
+                     end loop;
+                     if Index = Natural (Item.Children.Length) then
+                        Block (Fn, Item.Children (Index));
+                     end if;
+                     for Ending of Finishes loop
+                        Patch (Fn, Ending, PC (Fn));
+                     end loop;
+                  when While_Statement =>
+                     Start := PC (Fn);
+                     Left := Temporary (Fn);
+                     Expression (Fn, Item.Children (1), Left);
+                     Put (Fn, ABC (Op_TEST, Left));
+                     Branch := Jump (Fn);
+                     Fn.Next := Fn.Base;
+                     Begin_Loop (Fn, Base);
+                     Block (Fn, Item.Children (2));
+                     Finish := Jump (Fn);
+                     Patch (Fn, Finish, Start);
+                     Patch (Fn, Branch, PC (Fn));
+                     End_Loop (Fn);
+                  when Repeat_Statement =>
+                     Start := PC (Fn);
+                     Begin_Loop (Fn, Base);
+                     Block (Fn, Item.Children (1), Own_Scope => False);
+                     Fn.Next := Fn.Base;
+                     Left := Temporary (Fn);
+                     Expression (Fn, Item.Children (2), Left);
+                     Put (Fn, ABC (Op_TEST, Left));
+                     Branch := Jump (Fn);
+                     if Fn.Base > Base then
+                        Put (Fn, ABC (Op_CLOSE, Base));
+                     end if;
+                     Finish := Jump (Fn);
+                     Patch (Fn, Branch, PC (Fn));
+                     if Fn.Base > Base then
+                        Put (Fn, ABC (Op_CLOSE, Base));
+                     end if;
+                     Index := Jump (Fn);
+                     Patch (Fn, Index, Start);
+                     Patch (Fn, Finish, PC (Fn));
+                     Leave (Fn, Base, Active, Emit_Close => False);
+                     End_Loop (Fn);
+                  when Numeric_For | Generic_For =>
+                     if Item.Kind = Numeric_For then
+                        Expression (Fn, Item.Children (1), Base);
+                        Expression (Fn, Item.Children (2), Base + 1);
+                        if Item.Children.Length = 4 then
+                           Expression (Fn, Item.Children (3), Base + 2);
+                        else
+                           Reserve (Fn, Base + 3);
+                           Load (Fn, Base + 2,
+                                 Constant_Value'(Integer_Constant, 1));
+                        end if;
+                        Bind_Hidden (Fn, "(for state)", Base,
+                                     Item.Symbols (1));
+                        Bind_Hidden (Fn, "(for state)", Base + 1,
+                                     Item.Symbols (1));
+                        Branch := PC (Fn);
+                        Put (Fn, ABx (Op_FORPREP, Base, 0));
+                        Bind (Fn, Item.Symbols (1), Base + 2);
+                     else
+                        Values (Fn, Item.Children (1), Base, 4,
+                                Open_Last, Count);
+                        Bind_Hidden (Fn, "(for state)", Base,
+                                     Item.Symbols (1));
+                        Bind_Hidden (Fn, "(for state)", Base + 1,
+                                     Item.Symbols (1));
+                        Bind_Hidden (Fn, "(for state)", Base + 2,
+                                     Item.Symbols (1));
+                        Fn.Has_Closing := True;
+                        Reserve (Fn, Base + Natural'Max
+                          (6, Natural (Item.Symbols.Length) + 3));
+                        Branch := PC (Fn);
+                        Put (Fn, ABx (Op_TFORPREP, Base, 0));
+                        for Position in
+                          1 .. Natural (Item.Symbols.Length)
+                        loop
+                           Bind (Fn, Item.Symbols (Position),
+                                 Base + Position + 2);
+                        end loop;
+                     end if;
+                     Start := PC (Fn);
+                     Begin_Loop (Fn, Base);
+                     Fn.Next := Fn.Base;
+                     Block (Fn, Item.Children.Last_Element);
+                     --  Close visible iteration cells before the control
+                     --  opcode mutates their register. The next closure then
+                     --  acquires a fresh cell for the next iteration value.
+                     Put (Fn, ABC (Op_CLOSE, Base +
+                       (if Item.Kind = Numeric_For then 2 else 3)));
+                     Index := PC (Fn);
+                     if Item.Kind = Generic_For then
+                        Put (Fn, ABC (Op_TFORCALL, Base, 0,
+                                     Natural (Item.Symbols.Length)));
+                     end if;
+                     Fn.Code.Code.Replace_Element (Branch, Field_Set
+                       (Fn.Code.Code (Branch), Bx, Index - Branch - 1));
+                     Put (Fn, ABx
+                       ((if Item.Kind = Numeric_For then Op_FORLOOP
+                         else Op_TFORLOOP), Base, PC (Fn) - Start + 1));
+                     Leave (Fn, Base, Active);
+                     End_Loop (Fn);
+                  when others =>
+                     raise Program_Error with "non-statement resolved node";
+               end case;
+            end Statement;
+
+            procedure Build_Function
+              (Fn : in out Function_State; Id : Node_Id;
+               Parent : access Function_State := null)
+            is
+               Item : constant Nodes.Constant_Reference_Type :=
+                 Fetch (if Id = No_Node then Unit.Root else Id);
+               Last_Site : constant Source_Location := Site;
+               procedure Capture (Symbol : Symbol_Id);
+               procedure Capture (Symbol : Symbol_Id) is
+                  Value : Place;
+                  Index : Natural;
+               begin
+                  Value := Locate (Parent.all, Symbol);
+                  if Value.Kind = Constant_Place then
+                     Fn.Captures.Append
+                       (Binding_Place'(Symbol, Value, 0));
+                  else
+                     Index := Natural (Fn.Code.Upvalues.Length);
+                     if Index = 255 then Fail (Upvalue_Limit); end if;
+                     Fn.Code.Upvalues.Append (Upvalue'
+                       (Value.Kind = Stack_Place, Byte (Value.Index),
+                        Binding_Kind (Symbol), Intern_Text
+                          (Unit.Names (Positive (Symbol)).Name)));
+                     Fn.Captures.Append (Binding_Place'
+                       (Symbol, (Upvalue_Place, Index,
+                                 (Kind => Nil_Constant)), 0));
+                  end if;
+               end Capture;
+            begin
+               if Fn.Depth > Bounds.Nesting then
+                  Fail (Nesting_Budget, Host => True);
+               elsif Node_Count = Bounds.Prototypes then
+                  Fail (Prototype_Budget, Host => True);
+               end if;
+               Node_Count := Node_Count + 1;
+               Fn.Code := New_Prototype (Result.Code);
+               Fn.Active.Set_Owner (Memory);
+               Fn.Captures.Set_Owner (Memory);
+               Fn.Targets.Set_Owner (Memory);
+               Fn.Pending.Set_Owner (Memory);
+               Fn.Loop_Stack.Set_Owner (Memory);
+               Fn.Code.Source := Intern (Result.Code, Source_Name);
+               if Id = No_Node then
+                  Fn.Code.Flags := 1;
+                  Fn.Code.Upvalues.Append (Upvalue'
+                    (True, 0, 0, Intern (Result.Code, "_ENV")));
+                  Fn.Captures.Append (Binding_Place'
+                    (Unit.Environment,
+                     (Upvalue_Place, 0, (Kind => Nil_Constant)), 0));
+               else
+                  Fn.Code.First_Line := Item.Site.Line;
+                  Fn.Code.Last_Line := Item.End_Line;
+                  Fn.Last_Line := Item.Site.Line;
+                  if Item.Symbols.Length > 200 then Fail (Local_Limit); end if;
+                  Fn.Code.Parameters := Byte (Item.Symbols.Length);
+                  Fn.Code.Flags :=
+                    (if not Item.Flag then 0 elsif Item.Symbol = No_Symbol
+                     then 1 else 2);
+                  for Symbol of Item.Captures loop Capture (Symbol); end loop;
+               end if;
+               Site := Item.Site;
+               if Fn.Code.Flags /= 0 then
+                  Put (Fn, ABC (Op_VARARGPREP));
+               end if;
+               if Id /= No_Node then
+                  for Symbol of Item.Symbols loop
+                     Bind (Fn, Symbol, Fn.Base);
+                  end loop;
+                  if Item.Flag then
+                     if Item.Symbol /= No_Symbol then
+                        Bind (Fn, Item.Symbol, Fn.Base);
+                     else
+                        Bind_Hidden (Fn, "(vararg table)", Fn.Base);
+                     end if;
+                  end if;
+               end if;
+               Block (Fn, (if Id = No_Node then Unit.Root else
+                            Item.Children (1)), Own_Scope => False);
+               if Id /= No_Node then Site.Line := Item.End_Line; end if;
+               Put (Fn, ABC (Op_RETURN, Fn.Base, 1,
+                 (if (Fn.Code.Flags and 1) /= 0 then
+                   Natural (Fn.Code.Parameters) + 1 else 0), Flag => True));
+               Leave (Fn, 0, 0, Emit_Close => False);
+               --  Resolve label identities only within this function. The
+               --  frontend has already rejected scope entry and cross-function
+               --  jumps; source-order PCs can now be patched without parsing.
+               for Jump_Item of Fn.Pending loop
+                  declare
+                     Found : Boolean := False;
+                  begin
+                     for Label of Fn.Targets loop
+                        if Label.Id = Jump_Item.Target then
+                           Patch (Fn, Jump_Item.PC, Label.PC);
+                           Found := True;
+                           exit;
+                        end if;
+                     end loop;
+                     if not Found then
+                        raise Program_Error with "resolved label missing";
+                     end if;
+                  end;
+               end loop;
+               Site := Last_Site;
+            end Build_Function;
+            Main : Function_State;
+         begin
+            Build_Function (Main, No_Node);
+            Set_Root (Result.Code, Main.Code);
+            Result.Outcome := Succeeded;
+         exception
+            when Abandon => Close (Result.Code);
+            when Lua.Storage.Allocation_Error =>
+               Result.Outcome := Memory_Failure;
+               Result.Error := Allocation_Refused;
+               Result.Location := Site;
+               Close (Result.Code);
+            when Storage_Error | Program_Error =>
+               --  GNAT can wrap a refused controlled allocation in another
+               --  exception. Only the owner's refusal witness identifies Lua
+               --  memory failure; physical Ada stack exhaustion and ordinary
+               --  programming errors must retain their host-abort path.
+               if Lua.Storage.Refusal_Pending (Memory.all) then
+                  Result.Outcome := Memory_Failure;
+                  Result.Error := Allocation_Refused;
+                  Result.Location := Site;
+                  Close (Result.Code);
+               else
+                  raise;
+               end if;
+         end;
+      end return;
+   end Compile;
+end Lua.Canonical_Compiler;

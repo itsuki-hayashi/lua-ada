@@ -26,6 +26,9 @@ library project Reference is
       when "macos" =>
          Platform := ("-DLUA_USE_MACOSX");
          for Library_Options use ("-lm");
+      when "windows" =>
+         Platform := ("-DLUA_BUILD_AS_DLL");
+         for Library_Options use ("-lm");
       when others =>
          Platform := ("-DLUA_BUILD_AS_DLL");
    end case;

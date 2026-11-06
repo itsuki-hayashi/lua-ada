@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "license": "Lua MIT-style license; retained in lua.h and docs/licenses/lua.md",
+  "headers": [
+    {
+      "file": "lua.h",
+      "source": "references/lua/lua.h",
+      "sha256": "5e00319e803893f4310b1206394c80b82f03f42609b40ceb306d92a6740d828e"
+    },
+    {
+      "file": "luaconf.h",
+      "source": "references/lua/luaconf.h",
+      "sha256": "1e617ae6f206d701018941b64ed61851da4ffc3573a0f96b73ebe64e340bfb5d"
+    },
+    {
+      "file": "lauxlib.h",
+      "source": "references/lua/lauxlib.h",
+      "sha256": "007608c5e2abd231a9f61dc6cf4080ff6d4b54c845aa87b08162b5c778960443"
+    },
+    {
+      "file": "lualib.h",
+      "source": "references/lua/lualib.h",
+      "sha256": "ca847f045256db26a03a654c60ca4db567fc63a54679bba4233114f0c3d532d1"
+    }
+  ]
+}

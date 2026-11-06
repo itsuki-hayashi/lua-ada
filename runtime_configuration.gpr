@@ -1,0 +1,15 @@
+abstract project Runtime_Configuration is
+   type Configuration_Type is ("default", "upstream-test");
+   Configuration : Configuration_Type :=
+     external ("LUA_ADA_CONFIGURATION", "default");
+   Source_Directory := Project'Project_Dir &
+     "src/configurations/" & Configuration;
+   Artifact_Subdir := "";
+   case Configuration is
+      when "default" => null;
+      when "upstream-test" => Artifact_Subdir := "upstream-test/";
+   end case;
+   --  One real Ada specification is selected at compile time. Distinct object
+   --  and executable paths prevent either configuration reusing stale objects
+   --  from the other, while preserving all historical default artifact paths.
+end Runtime_Configuration;

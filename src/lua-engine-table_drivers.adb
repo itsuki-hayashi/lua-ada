@@ -1,7 +1,10 @@
 with Ada.Containers;
 with Ada.Unchecked_Conversion;
 with Interfaces;
+with Interfaces.C;
 with Lua.Engine.Core_Libraries;
+with Lua.Engine.Machine;
+with Lua.Engine.Stacks;
 with Lua.Integers;
 with Lua.Numbers;
 
@@ -18,7 +21,7 @@ package body Lua.Engine.Table_Drivers is
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
       Name : constant String := To_String (Activation.Native_Name);
-      Result : Native_Action;
+      Result : Native_Action := New_Action (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Activation.Native_Arguments.Length)
          then Activation.Native_Arguments (Index) else Nil_Value);
@@ -60,7 +63,7 @@ package body Lua.Engine.Table_Drivers is
          elsif Item.Kind = Real_Kind then
             Real_Item := Item.Real_Data;
          elsif Item.Kind = String_Kind then
-            Parsed := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+            Parsed := Read_Number (State, Item.Reference.Bytes);
             if Parsed.Kind = Lua.Numbers.Integer_Number then
                return Parsed.Integer_Item;
             elsif Parsed.Kind = Lua.Numbers.Real_Number then
@@ -85,7 +88,7 @@ package body Lua.Engine.Table_Drivers is
          if Item.Kind = String_Kind then
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
-            return Image (Item);
+            return Image (State.Current.Memory, Item);
          end if;
          Fail (State, "invalid value in table for concat");
          return "";
@@ -122,7 +125,7 @@ package body Lua.Engine.Table_Drivers is
       function Read (Table : Value; Index : Integer_Value)
                      return Native_Action
       is
-         Args : Values.Vector;
+         Args : Values.Vector := Owned_Values (State);
       begin
          Args.Append (Table);
          Args.Append (Key (Index));
@@ -132,7 +135,7 @@ package body Lua.Engine.Table_Drivers is
       function Write (Table : Value; Index : Integer_Value; Item : Value)
                       return Native_Action
       is
-         Args : Values.Vector;
+         Args : Values.Vector := Owned_Values (State);
       begin
          Args.Append (Table);
          Args.Append (Key (Index));
@@ -210,7 +213,7 @@ package body Lua.Engine.Table_Drivers is
                   Start_Move (True);
                elsif Arg (5).Kind /= Nil_Kind then
                   declare
-                     Args : Values.Vector;
+                     Args : Values.Vector := Owned_Values (State);
                   begin
                      Args.Append (Item);
                      Args.Append (Destination);
@@ -232,14 +235,14 @@ package body Lua.Engine.Table_Drivers is
                First := (if Arg (2).Kind = Nil_Kind then 1
                          else Integral (Arg (2)));
                if Arg (3).Kind /= Nil_Kind then
-                  Activation.Native_Results := Values.To_Vector (Arg (3), 1);
+                  Activation.Native_Results := One_Value (State, Arg (3), 1);
                else
-                  return Request ("@length", Values.To_Vector (Item, 1));
+                  return Request ("@length", One_Value (State, Item, 1));
                end if;
             else
                Check_Table (Item, True,
                             Name in "table.insert" | "table.remove", True);
-               return Request ("@length", Values.To_Vector (Item, 1));
+               return Request ("@length", One_Value (State, Item, 1));
             end if;
          end if;
       end if;
@@ -274,15 +277,24 @@ package body Lua.Engine.Table_Drivers is
                if First <= 0 and then Last >= Integer_Value'Last + First then
                   Fail (State, "too many results to unpack");
                end if;
-               --  Results occupy semantic Lua stack slots even though this
-               --  backend stores them in a packet. Check before allocating;
-               --  semantic overflow remains catchable by resume or pcall.
-               if Last - First >= Integer_Value
-                 (1_000_000 - Natural'Min
-                    (1_000_000, State.Current.Stack_Slots))
-               then
-                  Fail (State, "too many results to unpack (stack overflow)");
+               if Last - First >= Integer_Value (Interfaces.C.int'Last) then
+                  Fail (State, "too many results to unpack");
                end if;
+               declare
+                  Result_Count : constant Natural :=
+                    Natural (Last - First + 1);
+               begin
+                  --  Pinned tunpack first performs a nonthrowing checkstack
+                  --  for every result above the actual C argument prefix.
+                  --  Packet lengths and summed ancestor reservations are
+                  --  not the current native stack top. Reject before looping
+                  --  or allocating captures; this stays a catchable Lua error.
+                  if not Lua.Engine.Machine.Reserve_Native_Results
+                    (State, Activation, Result_Count)
+                  then
+                     Fail (State, "too many results to unpack");
+                  end if;
+               end;
                if Last - First >= Integer_Value (State.Bounds.Table_Entries)
                then
                   Fail (State, "table unpack result limit exceeded",
@@ -355,11 +367,18 @@ package body Lua.Engine.Table_Drivers is
                end;
             else
                Activation.Native_Captures.Append (Returned);
+               --  Returned values are actual live native stack entries too.
+               --  A subsequent __index callback starts above this accumulated
+               --  prefix, not above unused future result capacity, and GC can
+               --  inspect the same scalar slots as the public C view.
+               Activation.Stack_Live_Top := Activation.Stack_Live_Top + 1;
+               Lua.Engine.Stacks.Write
+                 (State, State.Current, Activation.Stack_Live_Top, Returned);
             end if;
             if Number (3) = Number (4) then
                if Name = "table.concat" then
                   Result.Results.Append
-                    (New_String (State, To_String (Activation.Native_Buffer)));
+                    (New_String (State, Activation.Native_Buffer));
                else
                   for Index in 9 ..
                     Natural (Activation.Native_Captures.Length)

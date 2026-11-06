@@ -19,7 +19,7 @@ package Lua.Lexers is
       Assign, Left_Paren, Right_Paren, Left_Brace, Right_Brace,
       Left_Bracket, Right_Bracket, Semicolon, Colon, Double_Colon,
       Comma, Dot, Concatenate, Varargs);
-   --  Keywords include deferred syntax so the parser can reject it clearly.
+   --  All language tokens are represented, including deferred runtime syntax.
 
    subtype Number_Literal is Token_Kind
      range Integer_Literal .. Float_Literal;
@@ -62,6 +62,8 @@ package Lua.Lexers is
    --  callers can stop before unrelated later lexical errors are encountered.
    --  Unknown discriminants require initialization through Open, preventing
    --  callers from constructing a scanner with uninitialized source bytes.
+   --  This host adapter materializes independent tokens; the parser shares
+   --  its scanner algorithm while retaining text in its compilation arena.
    function Open
      (Source : String; Maximum_Tokens : Positive := 100_000) return Scanner;
    --  Copy Source once, normalizing its lower bound without altering bytes.

@@ -233,8 +233,8 @@ package body Library_Runtime_Tests is
    end Load_Mode_Filter;
 
    procedure Binary_Load_Boundary is
-      --  Binary decoding remains deferred. Recognizing the signature must
-      --  return a documented load failure rather than executing its bytes.
+      --  A signature alone is a truncated binary chunk. Recognition must
+      --  return a controlled decoder failure without executing partial code.
    begin
       Check ("local f,e=load('\27Lua','binary','bt'); " &
              "assert(f==nil and type(e)=='string')");

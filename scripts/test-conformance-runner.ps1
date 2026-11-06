@@ -47,7 +47,7 @@ Case 'binary stdout survives invalid UTF-8 and NUL' {
     Assert-True ($p.exit_code -eq 0) 'binary helper status'
 }
 Case 'stderr warnings remain observable' {
-    # Deliberate upstream warnings are permitted only by later explicit
+    # Deliberate upstream warnings are permitted only by reviewed explicit
     # contracts; this collector preserves them rather than requiring silence.
     $p = Run-Helper 'warning' '[Console]::Error.WriteLine("Lua warning: #expected"); Write-Output "DONE"'
     $outcome = Get-ConformanceOutcome -Process $p -Marker 'DONE'
@@ -170,7 +170,253 @@ Case 'fixture destination reuse is rejected' {
     Assert-True $caught 'existing fixture directory accepted'
 }
 
+function New-Configuration {
+    param([string] $Profile = 'default')
+    # Synthetic measured records isolate validation from compiler availability.
+    # Production runs obtain the same fields from the selected executable.
+    $record = [ordered]@{schema_version=1; configuration=$Profile; lua_release='Lua 5.5.1';
+        integer_bytes=8; number_bytes=8; pointer_bytes=[IntPtr]::Size;
+        extra_space_bytes=[IntPtr]::Size; expected_extra_space_bytes=[IntPtr]::Size;
+        allocator_limit_bytes=67108864L; allocator_accounting='test-only-synthetic';
+        compat_global=1; max_stack=1000000; max_c_calls=200;
+        aux_buffer_bytes=16 * [IntPtr]::Size * 8; rand32=$false; compat_math=$false;
+        implementation='Lua Ada'; test_adapter=$false}
+    if ($Profile -eq 'upstream-test') {
+        $record.compat_global=0; $record.max_stack=68000; $record.max_c_calls=180
+        $record.aux_buffer_bytes=23; $record.rand32=$true; $record.compat_math=$true
+        $record.test_adapter=$true
+    }
+    return $record
+}
+function New-AcceptanceFixture {
+    param([string] $Name = 'acceptance', [string] $Source = 'Write-Output "DONE"')
+    # A fake helper is appropriate only for harness logic. No result from this
+    # fixture is added to the actual upstream ledger or conformance reports.
+    $p = Run-Helper $Name $Source
+    return [ordered]@{ Process=$p; Outcome=(Get-ConformanceOutcome -Process $p -Marker 'DONE');
+        Contract=[ordered]@{schema_version=1; operation='file:sample.lua';
+            context='default/windows/validation/static';
+            reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';
+            source_hashes=[ordered]@{'sample.lua'=('a' * 64)};
+            review=[ordered]@{author='fixture author'; reviewer='fixture reviewer';
+                artifact='fixture review'; rationale='exercise harness protocol';
+                original_c_evidence='fixture baseline'};
+            completion_marker='DONE'; stdout_required=@(); stderr_expected=@(); expected_skips=@()};
+        Operation='file:sample.lua'; Context='default/windows/validation/static';
+        SourceRecords=@([ordered]@{path='sample.lua';sha256=('a' * 64)});
+        RunId='fixture-run'; Configuration='default'; AllocatorLimitBytes=67108864L;
+        CoverageComplete=$true;
+        Telemetry=[ordered]@{schema_version=1; run_id='fixture-run'; process_id=$p.process_id;
+            configuration='default'; allocator_limit_bytes=67108864L;
+            managed_refusals=0; outstanding_bytes=0; outstanding_blocks=0}}
+}
+function Assert-AcceptanceRejected {
+    param([System.Collections.IDictionary] $Fixture, [string] $Reason)
+    $caught = $false
+    try { [void](Test-ConformanceAcceptance @Fixture) } catch { $caught = $true }
+    Assert-True $caught $Reason
+}
+Case 'Ada default configuration is measured and identified' {
+    # Correct numeric/ABI settings and actual runtime identity are prerequisites;
+    # validation returns true without inferring that any source suite passed.
+    $record = New-Configuration
+    Assert-True (Test-ConformanceConfiguration -Observed $record -Configuration default `
+        -Target Ada -AllocatorLimitBytes 67108864L) 'default record rejected'
+}
+Case 'instrumented Ada configuration has independent settings' {
+    # The test profile changes language compatibility and semantic stack limits.
+    # Accidentally accepting a default build here would hide missing T coverage.
+    $record = New-Configuration 'upstream-test'
+    Assert-True (Test-ConformanceConfiguration -Observed $record -Configuration upstream-test `
+        -Target Ada -AllocatorLimitBytes 67108864L) 'instrumented record rejected'
+}
+Case 'a C oracle cannot masquerade as the Ada runtime' {
+    # Keep all ABI values correct while changing identity; this detects selecting
+    # the wrong executable independently from ordinary profile drift.
+    $record = New-Configuration; $record.implementation = 'C Lua'
+    $caught = $false
+    try { [void](Test-ConformanceConfiguration -Observed $record -Configuration default `
+        -Target Ada -AllocatorLimitBytes 67108864L) } catch { $caught = $true }
+    Assert-True $caught 'renamed C oracle accepted for Ada'
+}
+Case 'instrumented configuration cannot omit its test adapter' {
+    # T is needed for the API/internal blocks; matching integer sizes alone is
+    # insufficient to call this an instrumented acceptance configuration.
+    $record = New-Configuration 'upstream-test'; $record.test_adapter=$false
+    $caught = $false
+    try { [void](Test-ConformanceConfiguration -Observed $record -Configuration upstream-test `
+        -Target Ada -AllocatorLimitBytes 67108864L) } catch { $caught = $true }
+    Assert-True $caught 'missing adapter accepted'
+}
+Case 'profile stack-limit drift fails configuration validation' {
+    # An enlarged semantic stack must not be silently introduced just to make a
+    # stress assertion pass. Check against the pinned profile's actual limit.
+    $record = New-Configuration; $record.max_stack=2000000
+    $caught = $false
+    try { [void](Test-ConformanceConfiguration -Observed $record -Configuration default `
+        -Target Ada -AllocatorLimitBytes 67108864L) } catch { $caught = $true }
+    Assert-True $caught 'semantic limit drift accepted'
+}
+Case 'configuration numeric strings cannot impersonate measured integers' {
+    # JSON numbers and strings must remain distinct. PowerShell's coercing
+    # comparisons alone would accept a malformed producer protocol here.
+    $record = New-Configuration; $record.integer_bytes='8'
+    $caught = $false
+    try { [void](Test-ConformanceConfiguration -Observed $record -Configuration default `
+        -Target Ada -AllocatorLimitBytes 67108864L) } catch { $caught = $true }
+    Assert-True $caught 'numeric string accepted as a measured integer'
+}
+Case 'reviewed execution and complete coverage permit explicit acceptance' {
+    # The positive control supplies every independent witness. Ordinary process
+    # outcomes remain unaccepted even though this explicit composite gate passes.
+    $fixture = New-AcceptanceFixture
+    $result = Test-ConformanceAcceptance @fixture
+    Assert-True $result.gate_acceptance 'complete protocol rejected'
+    Assert-True (-not $fixture.Outcome.gate_acceptance) 'observation was mutated'
+}
+Case 'an OK marker cannot replace complete coverage' {
+    # A process can pass while thousands of ledger obligations remain pending.
+    # The final acceptance switch must fail closed in that common intermediate state.
+    $fixture = New-AcceptanceFixture 'coverage-pending'; $fixture.CoverageComplete=$false
+    Assert-AcceptanceRejected $fixture 'pending coverage accepted'
+}
+Case 'self review cannot authorize an execution contract' {
+    # Independent review is substantive evidence, not merely a nonempty field.
+    # Reject identical author/reviewer even when all process checks succeed.
+    $fixture = New-AcceptanceFixture 'self-review'; $fixture.Contract.review.reviewer='fixture author'
+    Assert-AcceptanceRejected $fixture 'self-reviewed contract accepted'
+}
+Case 'execution contract source hashes cannot drift' {
+    # A valid old contract cannot silently authorize newly edited upstream source.
+    # The expected hash must identify exactly the disposable fixture's bytes.
+    $fixture = New-AcceptanceFixture 'contract-hash'; $fixture.Contract.source_hashes['sample.lua']=('b' * 64)
+    Assert-AcceptanceRejected $fixture 'stale contract source accepted'
+}
+Case 'unexpected warning text fails reviewed execution acceptance' {
+    # Unlike observation collection, acceptance enumerates every stderr line.
+    # An unexpected warning cannot disappear behind a successful exit/marker.
+    $fixture = New-AcceptanceFixture 'unexpected-warning' '[Console]::Error.WriteLine("Lua warning: unexpected"); Write-Output "DONE"'
+    Assert-AcceptanceRejected $fixture 'unexpected warning accepted'
+}
+Case 'counted expected warnings remain valid acceptance evidence' {
+    # Aggregate tests deliberately emit warnings. A counted, anchored protocol
+    # permits exactly those lines without permitting unrelated diagnostics.
+    $fixture = New-AcceptanceFixture 'expected-warning' '[Console]::Error.WriteLine("Lua warning: expected"); Write-Output "DONE"'
+    $fixture.Contract.stderr_expected=@([ordered]@{pattern='^Lua warning: expected\r?$';count=1})
+    Assert-True (Test-ConformanceAcceptance @fixture).gate_acceptance 'expected warning rejected'
+}
+Case 'T-only early returns require explicit omission dispositions' {
+    # Successful T-absent exits are still incomplete until the omitted source
+    # blocks have reviewed coverage elsewhere in the required configurations.
+    $fixture = New-AcceptanceFixture 'unreviewed-skip' 'Write-Output ">>> testC not active: skipping API tests <<<"; Write-Output "DONE"'
+    Assert-AcceptanceRejected $fixture 'T-only early return accepted'
+}
+Case 'reviewed omission cannot name an invented coverage obligation' {
+    # Nonempty review fields are not enough: the named runtime invariant must
+    # exist in the independently validated complete ledger.
+    $fixture = New-AcceptanceFixture 'invented-skip' 'Write-Output "skipping API tests"; Write-Output "DONE"'
+    $fixture.Contract.expected_skips=@([ordered]@{message='skipping API tests';
+        coverage_ids=@('LUA-SAMPLE-REVIEWED-BLOCK-0001'); review_artifact='fixture review';
+        original_c_evidence='fixture baseline'})
+    Assert-AcceptanceRejected $fixture 'invented omission coverage accepted'
+}
+Case 'a reviewed guard is not executed coverage for an omission' {
+    # Guard classification explains applicability but cannot certify its body.
+    # A linked runtime assertion/equivalent must have real passing evidence.
+    $fixture = New-AcceptanceFixture 'guard-skip' 'Write-Output "skipping API tests"; Write-Output "DONE"'
+    $id='LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips=@([ordered]@{message='skipping API tests';
+        coverage_ids=@($id); review_artifact='fixture review'; original_c_evidence='fixture baseline'})
+    $fixture.CoverageRecords=@{$id=[ordered]@{status='reviewed';kind='conditional-guard';evidence=@()}}
+    Assert-AcceptanceRejected $fixture 'guard review promoted to runtime pass'
+}
+Case 'omission requires a resolved executed invariant in another context' {
+    # This synthetic positive control models default T omission with the actual
+    # invariant covered in instrumented acceptance. It is not a suite result.
+    $fixture = New-AcceptanceFixture 'covered-skip' 'Write-Output "skipping API tests"; Write-Output "DONE"'
+    $id='LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips=@([ordered]@{message='skipping API tests';
+        coverage_ids=@($id); review_artifact='fixture review'; original_c_evidence='fixture baseline'})
+    $fixture.CoverageRecords=@{$id=[ordered]@{status='passed';kind='reviewed-block';
+        evidence=@([ordered]@{result='passed'})}}
+    Assert-True (Test-ConformanceAcceptance @fixture).gate_acceptance 'executed omission invariant rejected'
+}
+Case 'a child refusal cannot certify parent allocator telemetry' {
+    # Inherited environments create several sidecars. Bind the report to its PID
+    # rather than accepting whichever child happened to write a result last.
+    $fixture = New-AcceptanceFixture 'wrong-telemetry-pid'; $fixture.Telemetry.process_id++
+    Assert-AcceptanceRejected $fixture 'child telemetry accepted'
+}
+Case 'outstanding allocations prevent acceptance after successful exit' {
+    # A clean exit does not prove managed ownership was released. Keep the final
+    # byte/block balance part of the runtime's independent telemetry contract.
+    $fixture = New-AcceptanceFixture 'allocation-leak'; $fixture.Telemetry.outstanding_bytes=8
+    Assert-AcceptanceRejected $fixture 'outstanding allocation accepted'
+}
+Case 'negative refusal counters are invalid telemetry' {
+    # Counters are measured nonnegative quantities. Reject a corrupted provider
+    # record even for a regular test that does not require a refusal event.
+    $fixture = New-AcceptanceFixture 'negative-refusals'; $fixture.Telemetry.managed_refusals=-1
+    Assert-AcceptanceRejected $fixture 'negative allocator counter accepted'
+}
+Case 'heavy OK without an actual allocation refusal is insufficient' {
+    # heavy.lua itself does not assert the caught message. Require both measured
+    # allocator refusal and its caught error so an early loop return cannot pass.
+    $fixture = New-AcceptanceFixture 'heavy-without-refusal' 'Write-Output "expected error: not enough memory"; Write-Output "DONE"'
+    $fixture.Operation='heavy'; $fixture.Contract.operation='heavy'
+    $fixture.Contract.source_hashes=[ordered]@{'heavy.lua'=('a' * 64)}
+    $fixture.SourceRecords=@([ordered]@{path='heavy.lua';sha256=('a' * 64)})
+    Assert-AcceptanceRejected $fixture 'heavy marker promoted without allocator refusal'
+}
+Case 'heavy requires a caught allocation diagnostic as well as telemetry' {
+    # A refusal during an unrelated operation cannot satisfy heavy.lua if its
+    # protected workload never observes the language-level allocation failure.
+    $fixture = New-AcceptanceFixture 'heavy-without-catch'
+    $fixture.Operation='heavy'; $fixture.Contract.operation='heavy'
+    $fixture.Contract.source_hashes=[ordered]@{'heavy.lua'=('a' * 64)}
+    $fixture.SourceRecords=@([ordered]@{path='heavy.lua';sha256=('a' * 64)})
+    $fixture.Telemetry.managed_refusals=1
+    Assert-AcceptanceRejected $fixture 'heavy accepted without caught allocation error'
+}
+Case 'heavy accepts measured refusal caught by its protected workload' {
+    # Positive control for the stress protocol: matching PID/config/limit,
+    # balanced final storage, and a caught not-enough-memory diagnostic.
+    $fixture = New-AcceptanceFixture 'heavy-caught' 'Write-Output "expected error: not enough memory"; Write-Output "DONE"'
+    $fixture.Operation='heavy'; $fixture.Contract.operation='heavy'
+    $fixture.Contract.source_hashes=[ordered]@{'heavy.lua'=('a' * 64)}
+    $fixture.SourceRecords=@([ordered]@{path='heavy.lua';sha256=('a' * 64)})
+    $fixture.Telemetry.managed_refusals=1
+    Assert-True (Test-ConformanceAcceptance @fixture).gate_acceptance 'caught refusal rejected'
+}
+
 if ($ReferenceInterpreter -ne '') {
+    Case 'native allocator refusal sidecar is process-bound and balanced' {
+        # This case exercises the rebuilt native launcher rather than a mock:
+        # Lua catches a request larger than its backing cap, then closes cleanly.
+        # Its sidecar must record the actual refusal and final managed balance.
+        $program = (Resolve-Path -LiteralPath $ReferenceInterpreter).Path
+        $lib = Join-Path (Split-Path -Parent (Split-Path -Parent $program)) 'lib'
+        $telemetryPrefix = Join-Path $temporary 'native-allocator'
+        $environment = @{ LUA_ADA_CONFORMANCE_ALLOCATOR='1048576';
+            LUA_ADA_CONFORMANCE_TELEMETRY=$telemetryPrefix;
+            LUA_ADA_CONFORMANCE_RUN_ID='abcdef0123456789';
+            PATH=$lib + [IO.Path]::PathSeparator + $env:PATH;
+            LD_LIBRARY_PATH=$lib + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH;
+            DYLD_LIBRARY_PATH=$lib + [IO.Path]::PathSeparator + $env:DYLD_LIBRARY_PATH }
+        $code = 'global <const> *; local ok,e=pcall(string.rep,"x",2000000); ' +
+            'assert(not ok and tostring(e):find("not enough memory")); print("DONE")'
+        $p = Invoke-ConformanceProcess -Executable $program -Arguments @('-e',$code) `
+            -Directory $temporary -OutputPrefix (Join-Path $temporary 'native-refusal') `
+            -TimeoutSeconds 30 -Environment $environment
+        Assert-True ($p.exit_code -eq 0 -and $p.stderr_bytes -eq 0) 'native caught-refusal process failed'
+        $sidecar = $telemetryPrefix + '.' + $p.process_id + '.json'
+        Assert-True (Test-Path -LiteralPath $sidecar -PathType Leaf) 'native sidecar missing'
+        $record = Get-Content -LiteralPath $sidecar -Raw | ConvertFrom-Json -AsHashtable
+        Assert-True ($record.run_id -ceq 'abcdef0123456789' -and
+            $record.process_id -eq $p.process_id -and $record.allocator_limit_bytes -eq 1048576) 'native sidecar identity differs'
+        Assert-True ($record.managed_refusals -gt 0 -and
+            $record.outstanding_bytes -eq 0 -and $record.outstanding_blocks -eq 0) 'native allocation evidence differs'
+    }
     Case 'negative allocator ceiling is rejected before CLI execution' {
         # strtoull accepts -1 as a large unsigned number; the first-party
         # launcher must reject that spelling before allocating a Lua state.

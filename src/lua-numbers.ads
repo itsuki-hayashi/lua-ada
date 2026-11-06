@@ -24,6 +24,7 @@ package Lua.Numbers is
    --  @param Text Decimal/hexadecimal text, optionally signed.
    --  @param Base Zero selects Lua syntax; 2..36 selects integer-only syntax.
    --  @return The integer/real distinction, or Invalid for malformed input.
+   --  @exception Storage_Error Temporary conversion storage was exhausted.
 
    function To_Real (Item : Number) return Real_Value
      with Pre => Item.Kind /= Invalid;
