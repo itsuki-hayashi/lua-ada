@@ -9,12 +9,17 @@ root library, rather than the earlier reports-only observation prototype.
 The selected GNAT 16.1.0 and GPRbuild 26.0.1 compiled the ordinary default
 configuration with validation checks and all required strict compiler switches.
 
-| Configuration               | C API consumer | Mixed Ada/C consumer | C-only startup |
-| --------------------------- | -------------- | -------------------- | -------------- |
-| Windows validation static   | pass           | pass                 | pass           |
-| Windows validation shared   | pass           | pass                 | pass           |
-| Other profiles and systems  | pending        | pending              | pending        |
-| Instrumented upstream-test  | pending        | pending              | pending        |
+| Configuration                               | C API consumer  | Mixed Ada/C consumer | C-only startup |
+| ------------------------------------------- | --------------- | -------------------- | -------------- |
+| Windows development/static/shared           | pass            | pass                 | pass           |
+| Windows validation/static/shared            | pass            | pass                 | pass           |
+| Windows release/static/shared               | pass            | pass                 | pass           |
+| Linux development/static/shared             | pass            | pass                 | pass           |
+| Linux validation/static/shared              | pass            | pass                 | pass           |
+| Linux release/static/shared                 | pass            | pass                 | pass           |
+| macOS development/validation/release static | link failure    | not run              | not run        |
+| macOS development/validation/release shared | process failure | not run              | not run        |
+| Instrumented upstream-test                  | pending         | pending              | pending        |
 
 Each C API consumer passed its eighteen named cases, including the measured
 21-point cold constructor refusal sweep. The mixed consumer executes an Ada
@@ -23,7 +28,9 @@ the Ada dispatcher, writes a stack value from Ada, and observes that value in C.
 Both interfaces return the same actual stored allocator callback. The actual
 Storage.Pool symbol address matches its Ada object address, and GNAT's actual
 package-elaboration counter is one before and after construction/closure.
-The separate C-only executable repeats construction without an Ada main binder.
+The separate C-only executable repeats construction from an ordinary C main,
+without explicit Ada startup calls. GPRbuild still supplies generated binder
+glue for this consumer; a bare compiler/linker installation test is separate.
 
 The pool/counter assertions intentionally depend on the selected GNAT symbol
 convention. They are test-only observations of the actual production image;
@@ -33,6 +40,21 @@ The final static child-test build/run also passed **851/851 AUnit cases** with
 zero failed assertions and zero unexpected errors. This includes the three new
 host-arithmetic tests. Existing private child tests remain usable against the
 standard standalone library through its explicit interface list.
+
+The later [checkpoint-two matrix](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42201161223)
+passed all twelve Linux/Windows profile/link jobs. All six macOS jobs failed
+before retained runtime acceptance. Static C clients lacked
+__gnat_tasking_runtime_initialize because their final link named only libgnat,
+not libgnarl. Shared clients built but their first C API process failed; the
+initial driver retained stderr locally without uploading/printing it, so that
+failure's exact diagnostic was not available from the original job artifacts.
+
+The repair supplies the selected compiler's tasking archive before its core
+archive and explicitly retains the real Darwin tasking-init symbol for shared
+flat lookup. The driver now prints failed-child captures and CI uploads the
+core-image report directory for every job. These are implemented repairs;
+macOS remains failed until a new run verifies them. The shared failure is not
+assumed fixed merely because its static counterpart has a known link cause.
 
 ## Commands and reports
 

@@ -14,6 +14,7 @@ $savedPath = $env:PATH
 $savedLdPath = $env:LD_LIBRARY_PATH
 $savedDyldPath = $env:DYLD_LIBRARY_PATH
 $savedArchive = $env:LUA_ADA_ABI_RUNTIME_ARCHIVE
+$savedTaskingArchive = $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE
 $configurationPart = if ($Configuration -eq 'default') { '' } else { 'upstream-test/' }
 $reportDirectory = Join-Path $projectRoot ('reports/core-image/' + [guid]::NewGuid().ToString('N'))
 $null = New-Item -ItemType Directory -Path $reportDirectory -Force
@@ -58,6 +59,12 @@ function Invoke-Consumer {
     $records.Add($record)
     if ($timedOut -or $process.ExitCode -ne 0 -or $stderr.Length -ne 0 -or
         -not $stdout.Contains($Marker)) {
+        # Captures must also be visible in the job log when a build fails
+        # before later campaigns. Do not hide the actual loader/assertion
+        # diagnostic behind a report path that CI may not yet have uploaded.
+        [Console]::Error.WriteLine("Core-image child $Name exited $($process.ExitCode); timed_out=$timedOut")
+        [Console]::Error.WriteLine("--- captured stdout ---`n$stdout")
+        [Console]::Error.WriteLine("--- captured stderr ---`n$stderr")
         throw "Core-image consumer failed: $Name; see $reportDirectory"
     }
     Write-Output "PASS: $Name ($Profile/$LibraryType/$Configuration)"
@@ -76,6 +83,12 @@ try {
             throw 'Cannot locate the selected GNAT archive for the C-only main'
         }
         $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = ($archive -join '').Trim()
+        $tasking = & alr exec -- gcc '-print-file-name=adalib/libgnarl.a'
+        if ($LASTEXITCODE -ne 0 -or
+            -not (Test-Path -LiteralPath (($tasking -join '').Trim()) -PathType Leaf)) {
+            throw 'Cannot locate selected GNARL archive for the C-only main'
+        }
+        $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = ($tasking -join '').Trim()
     }
     Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/consumer.gpr', '-p') + $scenarios)
     Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/image_consumer.gpr', '-p') + $scenarios)
@@ -112,5 +125,6 @@ finally {
     $env:LD_LIBRARY_PATH = $savedLdPath
     $env:DYLD_LIBRARY_PATH = $savedDyldPath
     $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $savedArchive
+    $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $savedTaskingArchive
 }
 exit 0

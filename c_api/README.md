@@ -76,8 +76,10 @@ lib/PROFILE/KIND, with the existing upstream-test configuration subdirectory.
 Select the root Alire profile first;
 the project reuses its generated compiler configuration without editing it.
 Static, shared and Windows static-PIC verification must be recorded separately.
-macOS may require the selected GNAT runtime archive path through
-LUA_ADA_ABI_RUNTIME_ARCHIVE, following the existing ABI probe convention.
+The core-image driver discovers both selected GNAT archives on macOS:
+LUA_ADA_TASKING_RUNTIME_ARCHIVE for libgnarl and LUA_ADA_ABI_RUNTIME_ARCHIVE for
+libgnat. The C final link retains the required tasking-init symbol and orders
+GNARL before GNAT; standalone C builds must provide the same runtime closure.
 Windows x86-64 standalone-library partial links select BigObj for the merged
 intermediate object because the full Ada closure exceeds ordinary COFF's section
 limit. The final executable/DLL format and strict compiler checks stay enabled.

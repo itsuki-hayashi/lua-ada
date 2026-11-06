@@ -196,10 +196,25 @@ These checks do not execute canonical instructions in Ada or replace unchanged
 upstream runtime acceptance.
 
 Lua.Canonical_Compiler_Tests and scripts/check-canonical-compiler.ps1 separately
-cover canonical lowering. The latter executes both C-generated and Ada-generated
-programs in isolated C processes, so it must not be reported as Ada VM execution.
+cover canonical lowering. Its compiler-only mode executes both C-generated and
+Ada-generated programs in isolated C processes; it supplies no Ada VM evidence.
+Passing RuntimeProbe with lua-canonical_runtime_probe adds actual Ada execution
+of both compilers' chunks, requiring all four outputs to agree. Reports retain
+which mode and configuration actually ran.
 [Runtime configurations](runtime-configurations.md) documents source selection,
 artifact separation and the distinct parser/math configuration witness.
+
+## Shared Ada/C library identity
+
+scripts/check-core-image.ps1 builds the sole production root SAL and its C API,
+mixed Ada/C and C-only startup consumers for the requested profile/library kind.
+It checks real state/thread/stack/allocator identity and the actual pool address
+and GNAT elaboration counter; the latter two are compiler-specific test probes.
+No test observer is added to the interpreter library. Raw output, executable/
+library hashes and process results are retained under reports/core-image.
+[The validation owner](validation-one-core.md) records executed configurations.
+scripts/check.ps1 invokes this campaign per job; a missing platform run is not
+implied by the workflow. Native module loading and full C exports remain separate.
 
 ## Optional fuzzing
 

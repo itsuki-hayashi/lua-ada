@@ -66,7 +66,8 @@ The test also compares the actual Storage.Pool linker-symbol address with Ada's
 object address and checks GNAT's actual package-elaboration counter remains one.
 These last two assertions are explicitly GNAT-specific test observations. They
 introduce no production probe function or test-modified interpreter library.
-A separate C-only main repeats construction without an Ada main binder.
+A separate C-only main repeats construction without explicit Ada startup calls;
+GPRbuild may still supply generated binder glue for that executable.
 
 Each build profile, library kind and operating system needs its own consumer
 evidence. Local experiment results do not establish those matrix results.

@@ -107,3 +107,10 @@ jobs:
             LICENSE
             docs/licenses/lua.md
           if-no-files-found: warn
+      - name: Preserve core-image observations
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: core-image-${{ runner.os }}-${{ matrix.profile }}-${{ matrix.library }}
+          path: reports/core-image/**
+          if-no-files-found: warn

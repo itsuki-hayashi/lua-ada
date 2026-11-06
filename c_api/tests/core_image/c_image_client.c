@@ -5,9 +5,9 @@
 
 int main(void) {
     unsigned int index;
-    /* A C-only executable has no Ada main binder. Construction initializes
-     * the actual root SAL exactly once; repeated states cannot re-elaborate
-     * or accidentally switch to a facade's independent runtime image. */
+    /* This ordinary C main never calls an Ada initialization API; GPRbuild
+     * may still supply generated binder glue. Construction uses the actual
+     * root SAL once; repeated states cannot re-elaborate or switch images. */
     for (index = 0; index != 3; ++index) {
         lua_State *state = luaL_newstate();
         assert(state != NULL);
