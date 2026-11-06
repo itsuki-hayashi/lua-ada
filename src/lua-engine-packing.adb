@@ -208,7 +208,9 @@ package body Lua.Engine.Packing is
          then
             Fail (State, "instruction budget exceeded", True);
          end if;
-         State.Steps := State.Steps + Amount;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + Amount;
+         end if;
       end Charge;
 
       procedure Grow (Amount : U64) is

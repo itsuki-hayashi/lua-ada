@@ -65,10 +65,10 @@ table/math operations, and Lua-only text/module loading. Its
 | 5: Loading/helpers  | Text environments, Lua package searchers, table/math exports    | M2B-LOAD-001, M2B-LIB-001 |
 | 6: Acceptance       | Three files, focused tests, 18 jobs, probes, verified PR        | M2B-ACCEPT-001            |
 
-Remaining M2 work includes closing/goto execution, coroutines, userdata,
-weak/finalized objects, remaining libraries, and debug facilities. Canonical
-execution, binary chunks and the C ABI are also required by M3. M2b did not
-advance those claims; their dependency-ordered M3 gates now own the work.
+The language lifecycle delivery below adds closing/goto execution, coroutines,
+weak objects and the documented debug subset on the private backend. Userdata,
+finalization, remaining libraries/debug facilities, canonical execution, binary
+chunks and the C ABI remain required by M3. M2b did not advance those claims.
 
 ## M3 delivery order
 
@@ -78,8 +78,15 @@ execution contexts, allocator storage, and real C-boundary feasibility. Canonica
 execution and language lifecycle precede complete collectors, debug/chunks,
 public C APIs, remaining libraries, full CLI, internal equivalents and acceptance.
 
-Each gate gets a separate codex/m3-XX-* branch and PR against updated master.
-The next task starts after its predecessor is merged by the maintainer. No
+The approved [language lifecycle delivery](milestones/m3-language-lifecycle.md)
+supersedes that sequential PR order for selected language, collector, debug and
+CLI portions. Its six checkpoints stay in one substantial PR on
+codex/m3-language-lifecycle; allocator/ABI/canonical work remains separate. No
 automatic merge is authorized. M3 remains in progress until every required
 coverage entry, default/instrumented configuration, and final review passes.
 Ecosystem fixtures remain unbuilt/unexecuted future M4 inputs.
+
+The bounded lifecycle runtime acceptance is complete: 587 AUnit cases, five
+selected unchanged execution files and all 18 inspected platform jobs plus
+Windows static-PIC. [Its validation record](validation-m3-lifecycle.md) owns the
+exact revision and scope; PR #7 records final publication-head checks.

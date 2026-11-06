@@ -69,7 +69,9 @@ package body Lua.Engine.Core_Libraries is
          if State.Steps >= State.Bounds.Instructions then
             Fail (State, "instruction limit exceeded", Resource => True);
          end if;
-         State.Steps := State.Steps + 1;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + 1;
+         end if;
       end Charge;
    begin
       --  Reduce the exact dyadic significands, never a rounded X/Y quotient.
@@ -170,7 +172,9 @@ package body Lua.Engine.Core_Libraries is
          if State.Steps >= State.Bounds.Instructions then
             Fail (State, "instruction limit exceeded", Resource => True);
          end if;
-         State.Steps := State.Steps + 1;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + 1;
+         end if;
       end Charge;
 
       procedure Require (Count : Positive) is
@@ -351,6 +355,12 @@ package body Lua.Engine.Core_Libraries is
                Fail (State, "too many results to unpack");
             end if;
             Count := Last - First + 1;
+            if Name = "table.unpack" and then Count > Integer_Value
+              (1_000_000 - Natural'Min
+                 (1_000_000, State.Current.Stack_Slots))
+            then
+               Fail (State, "too many results to unpack (stack overflow)");
+            end if;
             if Count > Integer_Value (State.Bounds.Table_Entries) then
                Fail (State, "result count limit exceeded", Resource => True);
             end if;

@@ -158,7 +158,8 @@ package body Lua.String_Helper_Tests is
          Assert (False, "pattern bypassed instruction budget");
       exception
          when Language_Error =>
-            Assert (State.Current.Is_Resource, "budget failure category");
+            Assert ((State.Current.Failure_Class = Host_Abort),
+              "budget failure category");
       end;
    end Pattern_Budget;
 
@@ -427,7 +428,8 @@ package body Lua.String_Helper_Tests is
          Assert (False, "quote scan bypassed instruction budget");
       exception
          when Language_Error =>
-            Assert (State.Current.Is_Resource, "quote resource diagnostic");
+            Assert ((State.Current.Failure_Class = Host_Abort),
+              "quote resource diagnostic");
       end;
    end Quoting_Budget;
 
@@ -454,9 +456,10 @@ package body Lua.String_Helper_Tests is
          Assert (False, "iterator copy bypassed instruction budget");
       exception
          when Language_Error =>
-            Assert (State.Current.Is_Resource,
+            Assert ((State.Current.Failure_Class = Host_Abort),
               "iterator copy resource diagnostic");
-            Assert (Invocation.Native_Self.Captures (3).Integer_Data = 0,
+            Assert (Invocation.Native_Self.Captures
+              (3).Cell_Value.Integer_Data = 0,
                     "iterator position unchanged by failed copy");
       end;
       Free_Frame (Creation);
@@ -486,7 +489,7 @@ package body Lua.String_Helper_Tests is
          Assert (False, "replacement copy bypassed instruction budget");
       exception
          when Language_Error =>
-            Assert (State.Current.Is_Resource,
+            Assert ((State.Current.Failure_Class = Host_Abort),
               "replacement copy resource diagnostic");
             Assert (Activation.Native_Stage = 0,
                     "replacement state unchanged by failed copy");
@@ -512,7 +515,7 @@ package body Lua.String_Helper_Tests is
          Assert (False, "backreference comparisons bypassed native budget");
       exception
          when Language_Error =>
-            Assert (State.Current.Is_Resource,
+            Assert ((State.Current.Failure_Class = Host_Abort),
               "backreference resource diagnostic");
       end;
    end Backreference_Comparison_Budget;

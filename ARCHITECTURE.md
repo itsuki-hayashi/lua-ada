@@ -53,14 +53,15 @@ syntax nodes retain source order, lexical symbols, captures, and label targets.
 Lua.Syntax.Check validates this representation without VM/runtime allocation.
 The compiler lowers it into existing typed private instructions. Declaration
 lookup happens at the source point; later shadowing cannot retarget a capture.
-Nested runtime functions retain lexical environment objects. See
+Nested runtime functions retain ordered references to stable capture cells. See
 [ADR 0006](docs/decisions/0006-shared-frontend.md) and
 [frontend compatibility](docs/frontend.md).
 
 The independent private Lua.Opcodes package defines the pinned 32-bit canonical
 format. It neither replaces the current VM operations nor promises canonical
 instruction streams or serialized chunks. Execution validates a complete chunk
-before returning Unsupported_Feature for valid goto/label/close constructs.
+before lowering executable goto/label/close constructs. Complete validation
+still precedes execution and every runtime feature decision.
 
 Registers contain packets, allowing calls/varargs to produce zero or many
 results. Scalar consumers take the first result or nil; only final list
@@ -69,8 +70,8 @@ table/key operands until stores. Branch instructions implement short circuit
 logic. Loop instructions separate private controls from assignable visible
 variables; each iteration creates fresh capture cells.
 
-An explicit activation stack bounds calls without mapping Lua recursion onto
-Ada recursion. Tail calls replace activations. Protected calls establish VM
+Each context has an explicit activation stack; one iterative scheduler drives
+context transfers without mapping Lua recursion onto Ada recursion. Tail calls replace activations. Protected calls establish VM
 boundaries; errors unwind VM frames to the nearest boundary. Resource failures
 leave the VM altogether so Lua cannot restart an exhausted budget.
 
@@ -96,7 +97,7 @@ See [runtime ownership](docs/decisions/0004-runtime-ownership.md) and
 ## Ownership and collection
 
 One limited controlled session owns globals, heap objects, prototype graphs,
-execution stack, arguments, error value, and roots. Private discriminated
+context registry, per-context stacks/arguments/errors, and roots. Private discriminated
 values distinguish scalars from string/table/environment/closure references.
 Objects do not move. Ada finalization releases a universe but does not
 substitute for tracing cycles.
@@ -112,9 +113,9 @@ before object reclamation. Repeated chunks can reclaim compiled code.
 
 Tables currently use linear entries and insertion traversal. Sequence length
 uses a valid contiguous-prefix border. Neither order nor C hash layout is a
-compatibility promise. GC modes, barriers, finalization, weak tables, and
-coroutines are later work. Coroutines will be interpreter contexts sharing a
-universe, rather than Ada tasks.
+compatibility promise. Weak tables/ephemerons and reachability-owned coroutine
+contexts are implemented. Collector modes, barriers and finalization remain
+later work. Coroutines share one universe through the iterative scheduler.
 
 ## Safety and platform constraints
 
@@ -205,3 +206,25 @@ focused AUnit cases and the standard-Ada dependency policy. Necessary C ABI,
 varargs, stdio, lifecycle and OS glue stays isolated from interpreter logic.
 Reference C Lua remains a separate oracle. Native upstream test fixtures enter
 M3; the pinned ecosystem module fixtures remain future consumers only.
+
+## Language lifecycle delivery
+
+[ADR 0009](docs/decisions/0009-language-lifecycle.md) records the implemented
+private-backend lifecycle design. Explicit scheduler transfers replace running
+flags; context lifecycle and closing phase are separate. Each declaration owns a
+stable cell, closures retain exact ordered captures, and jumps use resolver
+frontiers to clean up scopes and create fresh declaration instances on reentry.
+Closing and hook callbacks use owned native continuations; outgoing packets,
+errors and temporary values stay traced across every callback.
+
+The context registry uses stable reusable slots. Main/host contexts and active
+resumers are roots; Lua-owned suspended contexts follow reachable thread objects.
+Weak tables use ephemeron fixed points and dead-entry cleanup before sweeping.
+Abandoned threads are reclaimed without executing close handlers. The collector
+remains stop-the-world, without finalizers or incremental/generational modes.
+
+Inspection uses prototype source ranges/names, actual local and upvalue cells,
+logical native frames and per-thread hook state. The CLI selects compatible
+execution quotas while Ada sessions remain bounded by default. Semantic stack
+checks and physical-storage aborts retain separate failure policies. None of
+these changes replaces the private instruction backend or fixes C ABI layouts.

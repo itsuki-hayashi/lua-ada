@@ -92,7 +92,9 @@ package body Lua.Engine.Strings is
          then
             Fail (State, "instruction limit exceeded", Resource => True);
          end if;
-         State.Steps := State.Steps + Count;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + Count;
+         end if;
       end Work;
 
       procedure Return_String (Text : String) is

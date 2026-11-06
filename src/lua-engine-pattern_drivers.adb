@@ -25,7 +25,9 @@ package body Lua.Engine.Pattern_Drivers is
          then
             Fail (State, "instruction limit exceeded", Resource => True);
          end if;
-         State.Steps := State.Steps + Count;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + Count;
+         end if;
       end Work;
 
       function Copy_Bytes (Text : Unbounded_String) return String is
@@ -90,11 +92,13 @@ package body Lua.Engine.Pattern_Drivers is
          declare
             Closure : constant Object_Access := Activation.Native_Self;
             Subject : constant String :=
-              Copy_Bytes (Closure.Captures (1).Reference.Bytes);
+              Copy_Bytes (Closure.Captures (1).Cell_Value.Reference.Bytes);
             Pattern : constant String :=
-              Copy_Bytes (Closure.Captures (2).Reference.Bytes);
-            Position : Integer_Value := Closure.Captures (3).Integer_Data;
-            Last : constant Integer_Value := Closure.Captures (4).Integer_Data;
+              Copy_Bytes (Closure.Captures (2).Cell_Value.Reference.Bytes);
+            Position : Integer_Value := Closure.Captures
+              (3).Cell_Value.Integer_Data;
+            Last : constant Integer_Value := Closure.Captures
+              (4).Cell_Value.Integer_Data;
             Found : Patterns.Match_Result;
          begin
             --  Retain positions in the native closure, not the call frame:
@@ -105,18 +109,18 @@ package body Lua.Engine.Pattern_Drivers is
                   Allow_Anchor => False);
                exit when not Found.Found;
                if Integer_Value (Found.After) /= Last then
-                  Closure.Captures.Replace_Element
-                    (3, (Integer_Kind, Integer_Value (Found.After)));
-                  Closure.Captures.Replace_Element
-                    (4, (Integer_Kind, Integer_Value (Found.After)));
+                  Closure.Captures (3).Cell_Value := (Integer_Kind,
+                    Integer_Value (Found.After));
+                  Closure.Captures (4).Cell_Value := (Integer_Kind,
+                    Integer_Value (Found.After));
                   Action.Results := Patterns.Capture_Values
                     (State, Subject, Found);
                   return Action;
                end if;
                Position := Position + 1;
             end loop;
-            Closure.Captures.Replace_Element
-              (3, (Integer_Kind, Integer_Value (Subject'Length) + 1));
+            Closure.Captures (3).Cell_Value := (Integer_Kind, Integer_Value
+              (Subject'Length) + 1);
             return Action;
          end;
       end if;

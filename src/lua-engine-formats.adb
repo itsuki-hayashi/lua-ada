@@ -35,7 +35,9 @@ package body Lua.Engine.Formats is
       then
          Fail (State, "instruction limit exceeded", Resource => True);
       end if;
-      State.Steps := State.Steps + Count;
+      if State.Policy = Bounded then
+         State.Steps := State.Steps + Count;
+      end if;
    end Work;
 
    function Unsigned_Image
@@ -616,7 +618,9 @@ package body Lua.Engine.Formats is
             if State.Steps >= State.Bounds.Instructions then
                Fail (State, "instruction limit exceeded", Resource => True);
             end if;
-            State.Steps := State.Steps + 1;
+            if State.Policy = Bounded then
+               State.Steps := State.Steps + 1;
+            end if;
             if Form (Cursor) /= '%' then
                Append (Output, Form (Cursor));
                Cursor := Cursor + 1;

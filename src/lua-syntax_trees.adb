@@ -50,19 +50,22 @@ package body Lua.Syntax_Trees is
         (Name : Unbounded_String; Mode : Attribute := Regular;
          Kind : Binding_Kind := Local_Name) return Symbol_Id;
       function Resolve
-        (Name : Unbounded_String; Environment : Boolean := False)
+        (Name : Unbounded_String; Environment : Boolean := False;
+         Referenced : Unbounded_String := Null_Unbounded_String)
          return Node_Id;
       procedure Writable (Id : Node_Id);
       function Expression (Minimum : Natural := 0) return Node_Id;
       function Prefix return Node_Id;
       function Constructor return Node_Id;
-      function Function_Body (Method : Boolean := False) return Node_Id;
+      function Function_Body
+        (Definition : Source_Location; Method : Boolean := False)
+         return Node_Id;
       function Expression_List return Node_Id;
       function Block (Own_Scope : Boolean := True) return Node_Id;
       function Statement return Node_Id;
       function Declaration
-        (Global : Boolean := False; Recursive : Boolean := False)
-         return Node_Id;
+        (Global : Boolean := False; Recursive : Boolean := False;
+         Definition : Source_Location := (others => 1)) return Node_Id;
       function Get_Attribute (Default : Attribute := Regular) return Attribute;
       procedure Finish_Scope
         (Block : Natural; Parent : Natural; Base : Symbol_Lists.Vector);
@@ -196,7 +199,8 @@ package body Lua.Syntax_Trees is
       end New_Name;
 
       function Resolve
-        (Name : Unbounded_String; Environment : Boolean := False)
+        (Name : Unbounded_String; Environment : Boolean := False;
+         Referenced : Unbounded_String := Null_Unbounded_String)
          return Node_Id
       is
          Result : Node := (Kind => Name_Reference, Site => Here,
@@ -253,11 +257,13 @@ package body Lua.Syntax_Trees is
                Result.Flag := Read_Only;
             end if;
             if Environment then
-               Error ("_ENV is global when accessing a variable");
+               Error ("_ENV is global when accessing variable '" &
+                      To_String (Referenced) & "'");
             end if;
             declare
                Env : constant Node_Id := Resolve
-                 (To_Unbounded_String ("_ENV"), Environment => True);
+                 (To_Unbounded_String ("_ENV"), Environment => True,
+                  Referenced => Name);
             begin
                Result.Environment := Fetch (Env).Symbol;
             end;
@@ -292,7 +298,8 @@ package body Lua.Syntax_Trees is
          if Item.Kind not in Name_Reference | Index_Expression then
             Error ("assignment target expected");
          elsif Item.Kind = Name_Reference and then Item.Flag then
-            Error ("attempt to assign to const variable");
+            Error ("attempt to assign to const variable '" &
+                   To_String (Item.Text) & "'");
          end if;
       end Writable;
 
@@ -358,7 +365,9 @@ package body Lua.Syntax_Trees is
          return Result;
       end Constructor;
 
-      function Function_Body (Method : Boolean := False) return Node_Id is
+      function Function_Body
+        (Definition : Source_Location; Method : Boolean := False)
+         return Node_Id is
          Result : constant Node_Id := Make (Function_Expression);
          Saved_Function : constant Node_Id := Function_Node;
          Saved_Varargs : constant Boolean := Varargs;
@@ -374,6 +383,7 @@ package body Lua.Syntax_Trees is
          --  failures discard the entire owned compilation unit.
          Enter;
          Function_Node := Result;
+         Item.Site := Definition;
          Item.Target := Saved_Function;
          Save (Result, Item);
          Varargs := False;
@@ -406,6 +416,9 @@ package body Lua.Syntax_Trees is
          Item.Flag := Varargs;
          Save (Result, Item);
          Child (Result, Block);
+         Item := Fetch (Result);
+         Item.End_Line := Here.Line;
+         Save (Result, Item);
          Expect (End_Word);
          Active := Saved;
          Function_Node := Saved_Function;
@@ -534,8 +547,10 @@ package body Lua.Syntax_Trees is
             Result := Add ((Kind => Literal, Site => Here,
                             Value => Current, others => <>));
             Advance;
-         elsif Take (Function_Word) then
-            Result := Function_Body;
+         elsif Kind = Function_Word then
+            Site := Here;
+            Advance;
+            Result := Function_Body (Site);
          elsif Kind = Left_Brace then
             Result := Constructor;
          else
@@ -575,11 +590,14 @@ package body Lua.Syntax_Trees is
                   then
                      for Id of Label.Active loop
                         if not Pending.Active.Contains (Id) then
-                           Error ("goto jumps into a declaration's scope");
+                           Error ("goto enters scope of '" &
+                                    To_String (Unit.Names
+                                      (Positive (Id)).Name) & "'");
                         end if;
                      end loop;
                      Destination := Fetch (Pending.Item);
                      Destination.Target := Label.Item;
+                     Destination.Symbols := Label.Active;
                      Save (Pending.Item, Destination);
                      Pending.Solved := True;
                      exit;
@@ -587,7 +605,8 @@ package body Lua.Syntax_Trees is
                end loop;
                if not Pending.Solved then
                   if Parent = 0 then
-                     Error ("no visible label for goto");
+                     Error ("no visible label '" &
+                            To_String (Fetch (Pending.Item).Text) & "'");
                   end if;
                   Pending.Block := Parent;
                   Pending.Active := Base;
@@ -662,8 +681,8 @@ package body Lua.Syntax_Trees is
       end Block;
 
       function Declaration
-        (Global : Boolean := False; Recursive : Boolean := False)
-         return Node_Id
+        (Global : Boolean := False; Recursive : Boolean := False;
+         Definition : Source_Location := (others => 1)) return Node_Id
       is
          Result : constant Node_Id := Make (Syntax_Trees.Declaration);
          Item : Node := Fetch (Result);
@@ -681,7 +700,7 @@ package body Lua.Syntax_Trees is
             Item.Symbols.Append (Id);
             Active.Append (Id);
             Save (Result, Item);
-            Child (Result, Function_Body);
+            Child (Result, Function_Body (Definition));
             return Result;
          end if;
          Default := Get_Attribute;
@@ -737,6 +756,7 @@ package body Lua.Syntax_Trees is
          Id : Symbol_Id;
          Value : Node;
          Method : Boolean := False;
+         Function_Site : Source_Location;
       begin
          if Take (Semicolon) then
             return Make (Empty_Statement);
@@ -744,11 +764,18 @@ package body Lua.Syntax_Trees is
             Result := Block;
             Expect (End_Word);
          elsif Take (Local_Word) then
-            return Declaration (Recursive => Take (Function_Word));
+            declare
+               Function_Site : constant Source_Location := Here;
+            begin
+               return Declaration
+                 (Recursive => Take (Function_Word),
+                  Definition => Function_Site);
+            end;
          elsif Kind = Identifier and then Text = "global" and then
            Peek in Identifier | Less | Star | Function_Word
          then
             Advance;
+            Function_Site := Here;
             if not Take (Function_Word) then
                return Declaration (Global => True);
             end if;
@@ -759,7 +786,7 @@ package body Lua.Syntax_Trees is
             Id := New_Name (Current.Text, Kind => Global_Name);
             Active.Append (Id);
             Target := Resolve (Read_Name);
-            Item := Function_Body;
+            Item := Function_Body (Function_Site);
             Child (Result, Target);
             Child (Result, Item);
          elsif Take (Function_Word) then
@@ -780,7 +807,7 @@ package body Lua.Syntax_Trees is
             end loop;
             Writable (Target);
             Child (Result, Target);
-            Child (Result, Function_Body (Method));
+            Child (Result, Function_Body (Site, Method));
          elsif Kind in While_Word | Repeat_Word then
             declare
                Repeat : constant Boolean := Kind = Repeat_Word;
@@ -887,7 +914,8 @@ package body Lua.Syntax_Trees is
                      if Previous.Owner = Function_Node and then
                        Fetch (Previous.Item).Text = Value.Text
                      then
-                        Error ("label already defined");
+                        Error ("label '" & To_String (Value.Text) &
+                               "' already defined");
                      end if;
                   end loop;
                   Labels.Append

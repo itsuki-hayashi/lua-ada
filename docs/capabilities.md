@@ -17,7 +17,7 @@ does not establish platform acceptance or full conformance.
 | Errors     | Diagnostics, pcall/xpcall, resources, callback recovery     | Lifecycle and native continuation cases        |
 | Lifetime   | Nonmoving iterative tracing; cycles and prototypes          | Cycle/capture/repeated-chunk cases             |
 | Ada host   | Unique sessions, persistent globals, output sink            | Lifecycle Ada consumer                         |
-| CLI        | Files, snippets, stdin, arguments, usage, checking/status   | 30 process cases                               |
+| CLI        | Files, snippets, stdin, arguments, usage, checking/status   | 35 process cases                               |
 | Builds     | Static/shared, strict profiles                              | Acceptance matrix; see status                  |
 
 ## M2b export inventory
@@ -66,28 +66,60 @@ is `./?.lua;./?/init.lua`; native loading is deferred.
 ## Deliberately deferred
 
 M2a adds shared syntax checking and a private canonical opcode definition layer.
-Syntax accepts goto/labels/close while execution returns Unsupported_Feature.
+Goto/labels/close now execute through the private lifecycle backend.
 See the [frontend inventory](frontend.md) for scope and current evidence.
 
 - Syntax accepted: full pinned default grammar/static-semantic target.
-- Runtime behavior: M1 execution plus the accepted M2b surface above.
+- Runtime behavior: M1/M2b plus the implemented lifecycle delivery below;
+  verified runtime matrix and final publication checks are recorded separately.
 - Opcode format: all 85 canonical definitions and six encodings.
 - Canonical code generation: deferred; compiler lowers to private operations.
 - Canonical code execution: deferred; no binary chunk compatibility claim.
 
 | Facility                               | Later gate / current response                    |
 | -------------------------------------- | ------------------------------------------------ |
-| goto / labels / close attributes       | Checks accept; execution Unsupported_Feature     |
-| Weak tables and finalization           | Remaining M2; unsupported                        |
-| Coroutines, userdata, debug, io/os     | Remaining M2; unavailable facilities             |
+| Finalization                           | Deferred; no finalizer execution                 |
+| Userdata and io/os                     | Deferred; unavailable facilities                 |
 | string.dump, table.sort/create         | Remaining library work; unavailable              |
 | Math RNG and remaining transcendentals | Remaining library work; unavailable              |
 | Binary chunks                          | M3; text-source interface only                   |
 | C exports and allocator parity         | M3; isolated feasibility probes only             |
 | Dynamic native modules / LuaRocks      | M4; no compatibility claim                       |
-| Whole upstream suite                   | M5; inventory records all deferred prerequisites |
+| Whole upstream suite                   | M3; full coverage ledger remains incomplete      |
 | Interactive REPL                       | Future CLI work; no-input usage is intentional   |
 
 The runtime does not specify hash iteration order, ambiguous table borders,
-pointer text, or byte-identical diagnostic wording. Differential fixtures avoid relying on
-those implementation choices. IEEE formatting follows the matching host oracle.
+pointer text, or byte-identical diagnostic wording. Differential fixtures avoid
+relying on those implementation choices. IEEE formatting follows the matching host oracle.
+
+## Language lifecycle implementation
+
+Goto/labels, <close>, the fourth generic-for closing value and weak-key/value
+tables are executable on the private VM. Threads have real identity and
+reachability-based ownership. Ephemerons use fixed-point stop-the-world tracing.
+Lua-facing coroutine exports are create, resume, yield, wrap, status, running,
+isyieldable and close. Base collectgarbage supports no argument, collect, stop,
+restart and isrunning. Other options explicitly fail; no byte counts or collector
+modes are fabricated.
+
+The debug subset is getinfo, getlocal, setlocal, getupvalue, setupvalue, upvalueid,
+sethook, gethook and traceback. It inspects actual cells and logical Lua/native
+activations, including explicit-thread forms, source ranges, call-site names,
+tail calls and per-thread call/return/line/count hooks. Native continuation phases
+are hidden. Count cadence reflects private instructions, not canonical opcodes.
+Userdata, finalizers, debug registry/metatable mutation, upvaluejoin and binary
+inspection remain outside this delivery.
+
+[Lifecycle acceptance](milestones/m3-language-lifecycle.md) owns unchanged
+goto.lua/coroutine.lua execution, precise T-absent omissions and platform evidence.
+Passing those targets does not complete any original M3 gate or establish full
+C-API, allocator, canonical execution, binary-chunk or ecosystem compatibility.
+
+Lifecycle runtime acceptance has passed the [18-job matrix](validation-m3-lifecycle.md)
+and Windows static-PIC. upvalueid exposes opaque light-userdata identities for
+actual cells; general userdata creation and C-visible pointers remain deferred.
+
+Collector controls return C Lua's integer status where applicable. A disabled
+gethook returns one nil; active hooks retain their requested signed count while
+only positive intervals enable count events. Option flags honor the pinned
+C-string NUL boundary without changing ordinary Lua byte-string semantics.

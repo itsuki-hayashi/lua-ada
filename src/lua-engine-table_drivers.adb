@@ -159,7 +159,9 @@ package body Lua.Engine.Table_Drivers is
       if State.Steps >= State.Bounds.Instructions then
          Fail (State, "instruction limit exceeded", Resource => True);
       end if;
-      State.Steps := State.Steps + 1;
+      if State.Policy = Bounded then
+         State.Steps := State.Steps + 1;
+      end if;
       if Activation.Native_Stage = 0 then
          Item := Arg (1);
          Destination := (if Name = "table.move" and then
@@ -271,6 +273,15 @@ package body Lua.Engine.Table_Drivers is
             if Name = "table.unpack" then
                if First <= 0 and then Last >= Integer_Value'Last + First then
                   Fail (State, "too many results to unpack");
+               end if;
+               --  Results occupy semantic Lua stack slots even though this
+               --  backend stores them in a packet. Check before allocating;
+               --  semantic overflow remains catchable by resume or pcall.
+               if Last - First >= Integer_Value
+                 (1_000_000 - Natural'Min
+                    (1_000_000, State.Current.Stack_Slots))
+               then
+                  Fail (State, "too many results to unpack (stack overflow)");
                end if;
                if Last - First >= Integer_Value (State.Bounds.Table_Entries)
                then

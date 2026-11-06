@@ -57,6 +57,7 @@ jobs:
           alr exec -- pwsh -NoProfile -File scripts/check-frontend.ps1
           ./scripts/check-layout.ps1 -AdaProbe "$PWD/tests/bin/static/lua-codec_layout_probe${{ runner.os == 'Windows' && '.exe' || '' }}"
           ./scripts/compare-libraries.ps1 -Interpreter "$PWD/cli/bin/static/lua_ada${{ runner.os == 'Windows' && '.exe' || '' }}"
+          ./scripts/compare-lifecycle.ps1 -Interpreter "$PWD/cli/bin/static/lua_ada${{ runner.os == 'Windows' && '.exe' || '' }}"
       - name: Install Linux C oracle readline prerequisite
         if: matrix.os == 'ubuntu-latest' && matrix.library == 'static' && matrix.profile == 'validation'
         shell: bash
@@ -95,3 +96,14 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/check.ps1 -LibraryType static-pic -Profile validation
+      - name: Preserve lifecycle observations
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: lifecycle-${{ runner.os }}-${{ matrix.profile }}-${{ matrix.library }}
+          path: |
+            reports/lifecycle/**
+            reports/m3-lifecycle-campaign*
+            LICENSE
+            docs/licenses/lua.md
+          if-no-files-found: warn

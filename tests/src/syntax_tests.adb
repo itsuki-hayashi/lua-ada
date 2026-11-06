@@ -82,8 +82,8 @@ package body Syntax_Tests is
    procedure Source_Budget;
    procedure Arbitrary_Bounds;
    procedure Session_Unaffected;
-   procedure Unsupported_No_Effects;
-   procedure Syntax_Precedes_Unsupported;
+   procedure Nested_Label_Execution;
+   procedure Complete_Validation_First;
    procedure Require (Source : String; Accepted : Boolean);
 
    procedure Require (Source : String; Accepted : Boolean) is
@@ -780,9 +780,9 @@ package body Syntax_Tests is
       Assert (Last.Output = "41" & Character'Val (10), "no checking effects");
    end Session_Unaffected;
 
-   procedure Unsupported_No_Effects is
-      --  Even unreachable/nested deferred syntax prevents the whole chunk
-      --  from starting. Recovery must leave the session's globals unchanged.
+   procedure Nested_Label_Execution is
+      --  A label in a nested function is executable syntax. The outer
+      --  chunk must run and retain its normal session side effects.
       Session : Lua.Sessions.Session;
       Result : constant Lua.Sessions.Execution_Result := Session.Execute
         ("x = 99; local function f() ::done:: end; print(x)");
@@ -790,21 +790,21 @@ package body Syntax_Tests is
         Session.Execute ("print(x)");
       use type Lua.Sessions.Execution_Status;
    begin
-      Assert (Result.Status = Lua.Sessions.Unsupported_Feature,
-              "valid deferred syntax has its own execution status");
-      Assert (Result.Output = "", "no partial execution");
-      Assert (Later.Output = "nil" & Character'Val (10), "no global mutation");
-   end Unsupported_No_Effects;
+      Assert (Result.Status = Lua.Sessions.Succeeded,
+              "resolved nested label executes");
+      Assert (Result.Output = "99" & Character'Val (10), "chunk output");
+      Assert (Later.Output = "99" & Character'Val (10), "persistent global");
+   end Nested_Label_Execution;
 
-   procedure Syntax_Precedes_Unsupported is
-      --  Complete validation occurs before the VM feature gate.
+   procedure Complete_Validation_First is
+      --  A valid label cannot hide a syntax error later in the chunk.
       Session : Lua.Sessions.Session;
       Result : constant Lua.Sessions.Execution_Result :=
         Session.Execute ("::done:: local = 1");
       use type Lua.Sessions.Execution_Status;
    begin
       Assert (Result.Status = Lua.Sessions.Syntax_Error, "syntax first");
-   end Syntax_Precedes_Unsupported;
+   end Complete_Validation_First;
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
@@ -1039,10 +1039,10 @@ package body Syntax_Tests is
         (Suite, "syntax: Session_Unaffected",
          Session_Unaffected'Access);
       Test_Support.Add
-        (Suite, "syntax: Unsupported_No_Effects",
-         Unsupported_No_Effects'Access);
+        (Suite, "syntax: Nested_Label_Execution",
+         Nested_Label_Execution'Access);
       Test_Support.Add
-        (Suite, "syntax: Syntax_Precedes_Unsupported",
-         Syntax_Precedes_Unsupported'Access);
+        (Suite, "syntax: Complete_Validation_First",
+         Complete_Validation_First'Access);
    end Register;
 end Syntax_Tests;

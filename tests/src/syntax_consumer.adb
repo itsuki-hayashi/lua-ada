@@ -17,7 +17,7 @@ procedure Syntax_Consumer is
    Output : constant Lua.Sessions.Execution_Result :=
      Session.Execute ("print(answer + 1)");
 begin
-   --  Checking accepts deferred syntax without mutating the host's universe.
+   --  Checking accepts lifecycle syntax without mutating the host's universe.
    --  Captured output verifies both persistence and subsequent execution.
    if Setup.Status /= Lua.Sessions.Succeeded or else
      Checked.Status /= Lua.Syntax.Success or else

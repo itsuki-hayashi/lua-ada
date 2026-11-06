@@ -30,7 +30,9 @@ package body Lua.Engine.Patterns is
          then
             Fail (State, "instruction limit exceeded", Resource => True);
          end if;
-         State.Steps := State.Steps + Count;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + Count;
+         end if;
       end Work;
 
       function Class (Byte, Code : Character) return Boolean is

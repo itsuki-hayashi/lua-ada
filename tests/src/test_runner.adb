@@ -7,6 +7,7 @@ with Lexer_Tests;
 with Number_Tests;
 with Session_Tests;
 with Lifecycle_Tests;
+with Runtime_Control_Tests;
 with Lua.Opcode_Tests;
 with Lua.Context_Tests;
 with Syntax_Tests;
@@ -32,6 +33,7 @@ procedure Test_Runner is
       Number_Tests.Register (Result);
       Session_Tests.Register (Result);
       Lifecycle_Tests.Register (Result);
+      Runtime_Control_Tests.Register (Result);
       Lua.Opcode_Tests.Register (Result);
       Lua.Context_Tests.Register (Result);
       Syntax_Tests.Register (Result);

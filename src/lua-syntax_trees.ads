@@ -32,6 +32,7 @@ private package Lua.Syntax_Trees is
       Break_Statement, Goto_Statement, Label_Statement, Empty_Statement);
    type Node (Kind : Node_Kind := Empty_Statement) is record
       Site : Lua.Lexers.Source_Location;
+      End_Line : Natural := 0;
       Children : Node_Lists.Vector;
       Symbols : Symbol_Lists.Vector;
       Captures : Symbol_Lists.Vector;

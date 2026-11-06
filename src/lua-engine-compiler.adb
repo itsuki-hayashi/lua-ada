@@ -29,6 +29,16 @@ package body Lua.Engine.Compiler is
       package Loops is new Ada.Containers.Vectors (Positive, Loop_Context);
       Loop_Stack : Loops.Vector;
 
+      type Label_Site is record
+         Id : Node_Id;
+         PC : Positive;
+         Depth : Natural;
+      end record;
+      package Label_Lists is new Ada.Containers.Vectors
+        (Positive, Label_Site);
+      Label_Places : Label_Lists.Vector;
+      Build_Start : constant Positive := State.Programs.Last_Index + 1;
+
       function Fetch (Id : Node_Id) return Node is
         (Unit.Tree (Positive (Id)));
       function Symbol (Id : Symbol_Id) return Positive is
@@ -47,6 +57,28 @@ package body Lua.Engine.Compiler is
       procedure Statement (Id : Node_Id);
       function Function_Body (Id : Node_Id) return Positive;
       procedure Close_Loop;
+      procedure Call_Name (Id : Node_Id; Code : in out Instruction);
+
+      procedure Call_Name (Id : Node_Id; Code : in out Instruction) is
+         Item : constant Node := Fetch (Id);
+      begin
+         --  Names describe the call site, not a mutable function property.
+         --  The same closure can be called through unrelated table fields.
+         if Item.Kind = Name_Reference then
+            Code.Text := Item.Text;
+            Code.Name_Kind := To_Unbounded_String
+              ((if Item.Symbol = No_Symbol then "global"
+                elsif Current.Capture_Symbols.Contains (Symbol (Item.Symbol))
+                then "upvalue" else "local"));
+         elsif Item.Kind in Index_Expression | Method_Expression and then
+           Fetch (Item.Children (2)).Kind = Literal and then
+           Fetch (Item.Children (2)).Value.Kind = String_Literal
+         then
+            Code.Text := Fetch (Item.Children (2)).Value.Text;
+            Code.Name_Kind := To_Unbounded_String
+              ((if Item.Kind = Method_Expression then "method" else "field"));
+         end if;
+      end Call_Name;
 
       function New_Register return Positive is
          Result : constant Positive := Next_Register;
@@ -147,6 +179,7 @@ package body Lua.Engine.Compiler is
          Outer : constant Prototype_Access := Current;
          Saved_Register : constant Positive := Next_Register;
          Saved_Depth : constant Natural := Scope_Depth;
+         Saved_Site : constant Source_Location := Site;
          Saved_Loops : constant Loops.Vector := Loop_Stack;
          Child : constant Prototype_Access := new Prototype;
          Result : Positive;
@@ -155,6 +188,9 @@ package body Lua.Engine.Compiler is
          --  reclaim them even when lowering exhausts a register budget.
          State.Programs.Append (Child);
          Child.Name := Outer.Name;
+         Child.Function_Node := Natural (Id);
+         Child.First_Line := Item.Site.Line;
+         Child.Last_Line := Item.End_Line;
          Child.Environment_Symbol := Outer.Environment_Symbol;
          Child.Vararg := Item.Flag;
          if Item.Symbol /= No_Symbol then
@@ -163,16 +199,22 @@ package body Lua.Engine.Compiler is
          for Parameter of Item.Symbols loop
             Child.Parameters.Append (Symbol (Parameter));
          end loop;
+         for Capture of Item.Captures loop
+            Child.Capture_Symbols.Append (Symbol (Capture));
+         end loop;
          Current := Child;
          Next_Register := 1;
          Scope_Depth := 0;
          Loop_Stack.Clear;
          Block (Item.Children (1), Own_Scope => False);
+         Site.Line := Child.Last_Line;
          Put ((Op => Return_Values, others => <>));
+         --  Resolution already propagates captures through each parent.
          Current := Outer;
          Next_Register := Saved_Register;
          Scope_Depth := Saved_Depth;
          Loop_Stack := Saved_Loops;
+         Site := Saved_Site;
          Result := New_Register;
          Put ((Op => Make_Closure, A => Result,
                Nested => Child, others => <>));
@@ -284,8 +326,14 @@ package body Lua.Engine.Compiler is
                   Inputs.Append (Argument);
                end loop;
                Site := Item.Site;
-               Put ((Op => Call_Function, A => Result, B => Left,
-                     Inputs => Inputs, others => <>));
+               declare
+                  Code : Instruction :=
+                    (Op => Call_Function, A => Result, B => Left,
+                     Inputs => Inputs, others => <>);
+               begin
+                  Call_Name (Item.Children (1), Code);
+                  Put (Code);
+               end;
             when Table_Expression =>
                Put ((Op => New_Table, A => Result, others => <>));
                for Index in Item.Children.First_Index ..
@@ -362,6 +410,16 @@ package body Lua.Engine.Compiler is
          Site := Item.Site;
          case Item.Kind is
             when Empty_Statement => null;
+            when Label_Statement =>
+               Label_Places.Append
+                 (Label_Site'(Id, Current.Code.Last_Index + 1, Scope_Depth));
+               Put ((Op => No_Operation, others => <>));
+            when Goto_Statement =>
+               for Live of Item.Symbols loop
+                  Inputs.Append (Symbol (Live));
+               end loop;
+               Put ((Op => Goto_Label, D => Natural (Item.Target),
+                     Inputs => Inputs, others => <>));
             when Block_Statement => Block (Id);
             when Call_Statement =>
                Left := Expression (Item.Children (1));
@@ -443,6 +501,16 @@ package body Lua.Engine.Compiler is
                               A => Pick (Inputs, Index),
                               B => Symbol (Item.Symbols (Index)),
                               others => <>));
+                        if Unit.Names
+                          (Positive (Item.Symbols (Index))).Mode = Closing_Name
+                        then
+                           Current.Uses_Closing := True;
+                           Put ((Op => Register_Close,
+                                 B => Symbol (Item.Symbols (Index)),
+                                 Text => Unit.Names
+                                   (Positive (Item.Symbols (Index))).Name,
+                                 others => <>));
+                        end if;
                      end loop;
                   end if;
                end if;
@@ -450,7 +518,8 @@ package body Lua.Engine.Compiler is
                if not Item.Children.Is_Empty then
                   Inputs := List (Item.Children (1));
                end if;
-               if Inputs.Length = 1 and then
+               if not Current.Uses_Closing and then
+                 Inputs.Length = 1 and then
                  Current.Code.Last_Element.Op = Call_Function and then
                  Current.Code.Last_Element.A = Inputs (1)
                then
@@ -541,6 +610,11 @@ package body Lua.Engine.Compiler is
                   Control := Pick (Inputs, 1);
                   Bound := Pick (Inputs, 2);
                   Step := Pick (Inputs, 3);
+                  Current.Uses_Closing := True;
+                  --  The fourth iterator value belongs to one scope around
+                  --  the entire loop, outside each fresh iteration binding.
+                  Put ((Op => Enter_Scope, others => <>));
+                  Scope_Depth := Scope_Depth + 1;
                   Put ((Op => Check_Iterator, A => Pick (Inputs, 4),
                         others => <>));
                end if;
@@ -592,6 +666,10 @@ package body Lua.Engine.Compiler is
                end if;
                Patch (Branch, Natural (Current.Code.Length) + 1);
                Close_Loop;
+               if Item.Kind = Generic_For then
+                  Put ((Op => Leave_Scope, others => <>));
+                  Scope_Depth := Scope_Depth - 1;
+               end if;
             when others =>
                raise Program_Error with "non-statement syntax node";
          end case;
@@ -604,19 +682,9 @@ package body Lua.Engine.Compiler is
          State.Current.Failure_At :=
            (Offset => 1, Line => Unit.Result.Error.Line,
             Column => Unit.Result.Error.Column);
-         State.Current.Is_Syntax := Unit.Result.Status =
-           Lua.Syntax.Syntax_Error;
+         State.Current.Failure_Class := Syntax_Failure;
          Fail (State, To_String (Unit.Result.Error.Message),
                Resource => Unit.Result.Status = Lua.Syntax.Resource_Error);
-      end if;
-      if Unit.Unsupported /= No_Node then
-         State.Current.Failure_At := Fetch (Unit.Unsupported).Site;
-         State.Current.Is_Unsupported := True;
-         Fail (State, "unsupported feature: " &
-               (case Fetch (Unit.Unsupported).Kind is
-                   when Goto_Statement => "goto execution",
-                   when Label_Statement => "label execution",
-                   when others => "to-be-closed local execution"));
       end if;
       if Natural (Unit.Names.Length) >= Positive'Last - Symbol_Base then
          Fail (State, "lexical symbol limit exceeded", Resource => True);
@@ -630,6 +698,44 @@ package body Lua.Engine.Compiler is
       Current.Environment_Symbol := Symbol (Unit.Environment);
       Block (Unit.Root, Own_Scope => False);
       Put ((Op => Return_Values, others => <>));
+      --  Resolve forward and backward branches only after every function has
+      --  been lowered. Node IDs are compilation-local; never rewrite older
+      --  prototypes retained by the session from a preceding source chunk.
+      for Index in Build_Start .. State.Programs.Last_Index loop
+         declare
+            Program : constant Prototype_Access := State.Programs (Index);
+         begin
+            --  Preserve source names independently of the temporary AST.
+            --  Debug lookup consults only this prototype's local/capture set.
+            for Index in Unit.Names.First_Index .. Unit.Names.Last_Index loop
+               if Natural (Unit.Names (Index).Owner) = Program.Function_Node
+                 or else Program.Capture_Symbols.Contains
+                   (Symbol (Symbol_Id (Index)))
+               then
+                  Program.Names.Append
+                    (Symbol_Name'(Symbol (Symbol_Id (Index)),
+                                  Unit.Names (Index).Name));
+               end if;
+            end loop;
+            for PC in Program.Code.First_Index .. Program.Code.Last_Index loop
+               declare
+                  Code : Instruction := Program.Code (PC);
+               begin
+                  if Code.Op = Goto_Label then
+                     for Label of Label_Places loop
+                        if Natural (Label.Id) = Code.D then
+                           Code.Target := Label.PC;
+                           Code.A := Label.Depth;
+                           exit;
+                        end if;
+                     end loop;
+                     pragma Assert (Code.Target /= 0);
+                     Program.Code.Replace_Element (PC, Code);
+                  end if;
+               end;
+            end loop;
+         end;
+      end loop;
       return Current;
    end Compile;
 end Lua.Engine.Compiler;

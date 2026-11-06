@@ -34,7 +34,9 @@ package body Lua.Engine.Unicode is
          then
             Fail (State, "instruction budget exceeded", Resource => True);
          end if;
-         State.Steps := State.Steps + Amount;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + Amount;
+         end if;
       end Charge;
 
       function Integer_Arg

@@ -54,7 +54,9 @@ package body Lua.Engine.Loaders is
          if State.Steps >= State.Bounds.Instructions then
             Fail (State, "instruction limit exceeded", Resource => True);
          end if;
-         State.Steps := State.Steps + 1;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + 1;
+         end if;
       end Work;
 
       function Bytes (Item : Value) return String is
@@ -248,9 +250,7 @@ package body Lua.Engine.Loaders is
          Saved_Has_Value : constant Boolean := State.Current.Has_Failure_Value;
          Saved_At : constant Lua.Lexers.Source_Location :=
            State.Current.Failure_At;
-         Saved_Syntax : constant Boolean := State.Current.Is_Syntax;
-         Saved_Unsupported : constant Boolean := State.Current.Is_Unsupported;
-         Saved_Resource : constant Boolean := State.Current.Is_Resource;
+         Saved_Class : constant Failure_Kind := State.Current.Failure_Class;
          procedure Restore;
          procedure Restore is
          begin
@@ -258,9 +258,7 @@ package body Lua.Engine.Loaders is
             State.Current.Failure := Saved_Value;
             State.Current.Has_Failure_Value := Saved_Has_Value;
             State.Current.Failure_At := Saved_At;
-            State.Current.Is_Syntax := Saved_Syntax;
-            State.Current.Is_Unsupported := Saved_Unsupported;
-            State.Current.Is_Resource := Saved_Resource;
+            State.Current.Failure_Class := Saved_Class;
          end Restore;
       begin
          --  Mode filtering precedes compilation. A binary-capable mode does
@@ -287,15 +285,15 @@ package body Lua.Engine.Loaders is
          then
             Fail (State, "instruction limit exceeded", Resource => True);
          end if;
-         State.Steps := State.Steps + Source'Length;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + Source'Length;
+         end if;
          begin
-            State.Current.Is_Syntax := False;
-            State.Current.Is_Unsupported := False;
-            State.Current.Is_Resource := False;
+            State.Current.Failure_Class := No_Failure;
             Code := Compiler.Compile (State, Source, Chunk_Name);
          exception
             when Language_Error =>
-               if State.Current.Is_Resource then
+               if (State.Current.Failure_Class = Host_Abort) then
                   raise;
                end if;
                declare
@@ -314,7 +312,7 @@ package body Lua.Engine.Loaders is
          --  A loaded closure captures its own root _ENV cell. Passing nil is
          --  different from omitting argument four; no caller locals leak in.
          Scope := New_Environment (State, null);
-         Declare_Local (Scope, Code.Environment_Symbol, Environment);
+         Declare_Local (State, Scope, Code.Environment_Symbol, Environment);
          Results.Append (New_Closure (State, Code, Scope));
          return Results;
       end Compile_Source;

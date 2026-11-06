@@ -15,11 +15,11 @@ a separate chunk. It stops on the first failure, prints errors on stderr, and
 emits no normal output. Script arguments are accepted but unused. File inputs
 retain BOM/shebang loader behavior; raw source and -e do not acquire it.
 
-Lua.Sessions.Execute shares this parser. Valid goto/label/close chunks return
-Unsupported_Feature before executing any part, including nested/unreachable
-constructs. Invalid source still returns Syntax_Error before this feature gate.
-Execution_Status has this additional literal; exhaustive consumers must handle
-it. Diagnostic is now an alias of Lua.Diagnostics.Diagnostic with the same
+Lua.Sessions.Execute shares this parser. Goto/label/close constructs now lower
+to executable lifecycle operations. Complete-source syntax validation still
+precedes every execution effect, including nested and unreachable constructs.
+Invalid source returns Syntax_Error. Execution_Status retains Unsupported_Feature
+for future execution boundaries; exhaustive consumers must still handle it. Diagnostic is now an alias of Lua.Diagnostics.Diagnostic with the same
 fields. Execution limits add Syntax_Nodes and Syntax_Depth.
 
 ## Behavior inventory
