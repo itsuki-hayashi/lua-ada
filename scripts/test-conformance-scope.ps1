@@ -35,6 +35,29 @@ if ($baseline.Files -ne 4 -or $baseline.SourceAnchors -lt 762 -or
     $baseline.StructuralInventory.ApiEntries -ne 473) { throw 'Incorrect scoped foundation result' }
 $script:Cases++
 Write-Output 'SCOPE TEST PASS: full structural inventory and separate incomplete scope'
+$apiPath = Join-Path $temporary 'scopes/gc-io-events.api.jsonl'
+$originalApi = [IO.File]::ReadAllText($apiPath)
+function Test-ApiRejected {
+    param([string] $Name, [scriptblock] $Mutate, [string] $Expected)
+    $entries = @(Get-Content -LiteralPath $apiPath | ForEach-Object {
+        ConvertFrom-Json -InputObject $_ -AsHashtable -Depth 32
+    })
+    $entries = @(& $Mutate $entries)
+    [IO.File]::WriteAllLines($apiPath, [string[]]@($entries | ForEach-Object {
+        ConvertTo-Json -InputObject $_ -Compress -Depth 32
+    }))
+    try { Test-Rejected $Name { param($d) } $Expected }
+    finally { [IO.File]::WriteAllText($apiPath, $originalApi) }
+}
+Test-ApiRejected 'missing scoped API record' { param($e) $e | Select-Object -Skip 1 } 'coverage set changed'
+Test-ApiRejected 'duplicate scoped API record' { param($e) $e[1]=$e[0]; $e } 'Duplicate scoped API coverage'
+Test-ApiRejected 'scoped API header drift' { param($e) $e[0].declaration='invented'; $e } 'anchor drift'
+Test-ApiRejected 'scoped API needs behavioral invariant' { param($e) $e[0].status='passed'; $e } 'invariant missing'
+Test-ApiRejected 'scoped API cannot self-review' { param($e)
+    $e[0].status='passed'; $e[0].invariant='synthetic fixture'
+    $e[0].review=@{author='same'; reviewer='same'; artifact='synthetic'; rationale='synthetic'; original_c_evidence='synthetic'}
+    $e
+} 'cannot self-review'
 Test-Rejected 'missing selected file' { param($d) $d.files = @($d.files | Select-Object -Skip 1) } 'all four'
 Test-Rejected 'duplicate selected file' { param($d) $d.files += $d.files[0] } 'all four'
 Test-Rejected 'missing API obligation' { param($d) $d.api_ids = @($d.api_ids | Select-Object -Skip 1) } 'Missing scoped API'

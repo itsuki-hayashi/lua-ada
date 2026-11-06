@@ -2,7 +2,9 @@ param(
     [Parameter(Mandatory)][string] $Interpreter,
     [Parameter(Mandatory)][string] $ReferenceInterpreter,
     [Parameter(Mandatory)][string] $ReferenceLibraryDirectory,
-    [ValidateSet('default', 'upstream-test')][string] $Configuration = 'default'
+    [ValidateSet('default', 'upstream-test')][string] $Configuration = 'default',
+    [ValidateSet('development','validation','release')][string] $Profile = 'validation',
+    [ValidateSet('static','static-pic','relocatable')][string] $LibraryType = 'static'
 )
 
 Set-StrictMode -Version Latest
@@ -44,6 +46,9 @@ $fixtures = @(
        Witness='(?m)^test done on \d{2}/\d{2}/\d+, at \d{2}:\d{2}:\d{2}\r?\nLua 5\.5\r?\n\z';
        ExpectedError=$expectedShellError }
 )
+$hostName = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
+$link = if ($LibraryType -eq 'relocatable') { 'shared' } else { $LibraryType }
+$context = "$Configuration/$hostName/$Profile/$link"
 $records = @()
 foreach ($fixtureCase in $fixtures) {
 $fixture = if ($fixtureCase.ContainsKey('Path')) { $fixtureCase.Path }
@@ -137,7 +142,7 @@ foreach ($implementation in @('c', 'ada')) {
 }
 }
 [ordered]@{ counterpart='Windows file platform obligations'; review_status='pending';
-    configuration=$Configuration; diagnostic_only=$true; scope_accepted=$false;
+    configuration=$Configuration; context=$context; diagnostic_only=$true; scope_accepted=$false;
     driver_sha256=(Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash;
     module_sha256=(Get-FileHash -LiteralPath $module -Algorithm SHA256).Hash;
     terminator_sha256=(Get-FileHash -LiteralPath $terminator -Algorithm SHA256).Hash;

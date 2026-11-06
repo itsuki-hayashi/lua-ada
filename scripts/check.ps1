@@ -30,11 +30,13 @@ function Invoke-Alire {
 try {
     Set-Location $projectRoot
     $adaRuntimeDirectory = ''
-    if ($IsMacOS) {
+    if (-not $IsWindows) {
         $runtime = Get-SelectedAdaRuntime
-        $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $runtime.CoreArchive
-        $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $runtime.TaskingArchive
-        $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $runtime.Directory
+        if ($IsMacOS) {
+            $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $runtime.CoreArchive
+            $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $runtime.TaskingArchive
+            $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $runtime.Directory
+        }
         $adaRuntimeDirectory = $runtime.Directory + [IO.Path]::PathSeparator
     }
     & (Join-Path $PSScriptRoot 'check-documentation.ps1')
@@ -53,7 +55,9 @@ try {
     # other profiles first could accidentally load a stale, incompatible DLL.
     $runtimePath = Join-Path $projectRoot "lib/$Profile/$LibraryType"
     $env:PATH = $runtimePath + [IO.Path]::PathSeparator + $savedPath
-    $env:LD_LIBRARY_PATH = $runtimePath + [IO.Path]::PathSeparator + $savedLdPath
+    # Disposable launchers lose any executable-relative compiler runtime path.
+    # Keep the selected compiler's real adalib directory for their children.
+    $env:LD_LIBRARY_PATH = $runtimePath + [IO.Path]::PathSeparator + $adaRuntimeDirectory + $savedLdPath
     $env:DYLD_LIBRARY_PATH = $runtimePath + [IO.Path]::PathSeparator + $adaRuntimeDirectory + $savedDyldPath
 
     Set-Location (Join-Path $projectRoot 'tests')
@@ -112,12 +116,14 @@ try {
         & (Join-Path $PSScriptRoot 'check-windows-buffered-failure.ps1') `
             -Interpreter (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix") `
             -ReferenceInterpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `
-            -ReferenceLibraryDirectory (Join-Path $projectRoot 'build/conformance/default/lib')
+            -ReferenceLibraryDirectory (Join-Path $projectRoot 'build/conformance/default/lib') `
+            -Profile $Profile -LibraryType $LibraryType
     } else {
         & (Join-Path $PSScriptRoot 'check-posix-files.ps1') `
             -Interpreter (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix") `
             -ReferenceInterpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `
-            -ReferenceLibraryDirectory (Join-Path $projectRoot 'build/conformance/default/lib')
+            -ReferenceLibraryDirectory (Join-Path $projectRoot 'build/conformance/default/lib') `
+            -Profile $Profile -LibraryType $LibraryType
     }
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-gc-events.ps1'),

@@ -445,3 +445,20 @@ remain pending; no selected source/API record has been promoted on lexical or
 process evidence alone. Published 31bc086's Windows/Linux jobs are green;
 macOS jobs remain queued. Independent review-agent authorization was requested
 because current session instructions prohibit unrequested delegation.
+
+The subsequent scoped API ledger regressions pass all 30 cases in
+reports/m3-scope-api-ledger-tests.log, including missing/duplicate records,
+header drift, missing behavioral invariants and self-review. The separate
+77-entry API ledger preserves the global 473-entry ABI acceptance boundary.
+File report producers now retain explicit configuration/platform/profile/linkage
+contexts. POSIX file runs require both setup-child reports, the instrumented
+pipe receiver, and all four Ada typed-exit reports; C exit children retain
+the documented upstream telemetry-writer limitation. POSIX execution of this
+new child accounting remains pending CI; local Windows results are recorded
+separately in reports/m3-file-context-default.log.
+
+CI dd44a4e run 42272716242 exposed a Linux shared executable lookup failure
+after copying the launcher into its disposable directory: libgnat-16.so was
+not found. The default and instrumented harnesses now derive the selected
+compiler's actual adalib directory and retain it in LD_LIBRARY_PATH. This
+corrects subprocess setup; validation of that fix awaits its CI revision.

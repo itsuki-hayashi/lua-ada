@@ -77,12 +77,14 @@ try {
     Set-Location $root
     $env:LUA_ADA_CONFIGURATION = 'upstream-test'
     $runtimePrefix = ''
-    if ($IsMacOS) {
+    if (-not $IsWindows) {
         Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
         $runtime = Get-SelectedAdaRuntime
-        $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $runtime.CoreArchive
-        $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $runtime.TaskingArchive
-        $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $runtime.Directory
+        if ($IsMacOS) {
+            $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $runtime.CoreArchive
+            $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $runtime.TaskingArchive
+            $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $runtime.Directory
+        }
         $runtimePrefix = $runtime.Directory + [IO.Path]::PathSeparator
     }
     # Build serially with the same strict project switches as ordinary jobs.
@@ -95,7 +97,7 @@ try {
     $selectedPath = ($selectedPath -join '').Trim()
     $library = Join-Path $root "lib/upstream-test/validation/$LibraryType"
     $env:PATH = $library + [IO.Path]::PathSeparator + $selectedPath
-    $env:LD_LIBRARY_PATH = $library + [IO.Path]::PathSeparator + $saved.LD_LIBRARY_PATH
+    $env:LD_LIBRARY_PATH = $library + [IO.Path]::PathSeparator + $runtimePrefix + $saved.LD_LIBRARY_PATH
     $env:DYLD_LIBRARY_PATH = $library + [IO.Path]::PathSeparator + $runtimePrefix + $saved.DYLD_LIBRARY_PATH
     $libraryName = if ($LibraryType -ne 'relocatable') { 'liblua.a' }
         elseif ($IsWindows) { 'liblua.dll' }
@@ -126,12 +128,12 @@ try {
         -RuntimeDirectory $library -Configuration upstream-test -LibraryType $LibraryType
     if ($IsWindows) {
         & "$PSScriptRoot/check-windows-buffered-failure.ps1" -Interpreter $runner `
-            -Configuration upstream-test `
+            -Configuration upstream-test -LibraryType $LibraryType `
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua.exe" `
             -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     } else {
         & "$PSScriptRoot/check-posix-files.ps1" -Interpreter $runner `
-            -Configuration upstream-test `
+            -Configuration upstream-test -LibraryType $LibraryType `
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua" `
             -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     }

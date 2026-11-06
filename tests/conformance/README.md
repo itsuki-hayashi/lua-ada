@@ -162,7 +162,10 @@ Header guards do not qualify. A reason string alone cannot waive a public API.
 The named scope [gc-io-events](scopes/gc-io-events.json) selects events.lua,
 files.lua, gc.lua and gengc.lua, including every original anchor and subsequent
 reviewed block in those partitions, plus 77 directly exercised public API
-entries. Its selection review remains pending. Scope validation first runs
+entries. Their separate scoped API ledger preserves the original header anchors
+while requiring reviewed behavioral invariants; it does not promote the global
+C API records or certify unrelated continuation paths. Its selection review
+remains pending. Scope validation first runs
 the full structural inventory check; unrelated missing or corrupt entries
 cannot be hidden by choosing this scope. The scope requires subprocess, stdio,
 temporary-file and platform-counterpart facilities. Unrelated interactive CLI
@@ -176,7 +179,7 @@ pwsh -NoProfile -File scripts/check-conformance-scope.ps1 -RequireScopedComplete
 
 The last command requires independent selection review and resolved coverage
 through all applicable contexts. It currently rejects incomplete coverage.
-It never sets full M3 completion. The 25 scoped inventory/process regressions
+It never sets full M3 completion. The 30 scoped inventory/process regressions
 also check out-of-scope corruption, missing files/APIs, self-review, unresolved
 runtime obligations, early returns, GC closure ordering, final files output,
 physical shutdown, leaked blocks and wrong configurations.

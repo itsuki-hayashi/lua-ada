@@ -2,7 +2,9 @@ param(
     [Parameter(Mandatory)][string] $Interpreter,
     [Parameter(Mandatory)][string] $ReferenceInterpreter,
     [Parameter(Mandatory)][string] $ReferenceLibraryDirectory,
-    [ValidateSet('default', 'upstream-test')][string] $Configuration = 'default'
+    [ValidateSet('default', 'upstream-test')][string] $Configuration = 'default',
+    [ValidateSet('development','validation','release')][string] $Profile = 'validation',
+    [ValidateSet('static','static-pic','relocatable')][string] $LibraryType = 'static'
 )
 
 Set-StrictMode -Version Latest
@@ -18,6 +20,9 @@ $oracle = (Resolve-Path -LiteralPath $ReferenceInterpreter).Path
 $referenceLibrary = (Resolve-Path -LiteralPath $ReferenceLibraryDirectory).Path
 $directory = Join-Path $root ('reports/posix-files/' + [Guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($directory)
+$hostName = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
+$link = if ($LibraryType -eq 'relocatable') { 'shared' } else { $LibraryType }
+$context = "$Configuration/$hostName/$Profile/$link"
 $records = @()
 $failures = @()
 $outputs = @{}
@@ -75,6 +80,25 @@ foreach ($implementation in @('c', 'ada')) {
             -ProcessId $process.process_id -Configuration $Configuration `
             -RequireShutdown:($implementation -eq 'ada')
         $records[-1].allocator_telemetry = $measured
+        $children = @()
+        foreach ($sidecar in Get-ChildItem -LiteralPath $working -Filter 'allocator.*.json') {
+            $child = Get-Content -LiteralPath $sidecar.FullName -Raw | ConvertFrom-Json -AsHashtable
+            $childId = [int]($sidecar.BaseName.Split('.')[-1])
+            Assert-ManagedTelemetry -Telemetry $child -RunId $runId -ProcessId $childId `
+                -Configuration $Configuration -RequireShutdown:($implementation -eq 'ada')
+            if ($childId -ne $process.process_id) { $children += $child }
+        }
+        # Both setup probes execute Lua children. The instrumented source adds
+        # its nonblocking pipe receiver. Each of two os.exit commands executes
+        # twice (popen and execute): Ada records cleanup for all four; pinned
+        # C os.exit bypasses its CLI telemetry writer, as on Windows.
+        $expectedChildren = 2
+        if ($Configuration -eq 'upstream-test') { $expectedChildren++ }
+        if ($implementation -eq 'ada') { $expectedChildren += 4 }
+        if ($children.Count -ne $expectedChildren) {
+            throw "Missing or unexpected child allocator telemetry: $implementation; expected $expectedChildren, got $($children.Count)"
+        }
+        $records[-1].child_allocator_telemetry = $children
     } catch { $failures += "$implementation allocator telemetry: $($_.Exception.Message)" }
     foreach ($line in $stderr.Split("`n", [StringSplitOptions]::RemoveEmptyEntries)) {
         if ($line -notmatch '^(?:.*not-to-be-found-command.*|Hangup.*|Killed.*)$') {
@@ -91,7 +115,7 @@ if (($outputs.c.stdout -replace $dateLine, ('[date witness]' + "`n")) -cne
 if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -cne $sourceHash) {
     $failures += 'Upstream source changed'
 }
-[ordered]@{ configuration=$Configuration; disposition='unchanged';
+[ordered]@{ configuration=$Configuration; context=$context; disposition='unchanged';
     diagnostic_only=$true; scope_accepted=$false; source_sha256=$sourceHash;
     executions=$records; failures=$failures } | ConvertTo-Json -Depth 10 |
     Set-Content -LiteralPath (Join-Path $directory 'report.json')
