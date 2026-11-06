@@ -116,7 +116,7 @@ package body Lua.Library_Codec_Tests is
             Assert (Result.Is_Empty and then False, "overflow must fail");
          exception
             when Language_Error =>
-               Assert (not State.Current.Is_Resource,
+               Assert (not (State.Current.Failure_Class = Host_Abort),
                        "semantic overflow is catchable");
                Assert (Ada.Strings.Fixed.Index
                  (To_String (State.Current.Failure_Text), "too long") /= 0,
@@ -238,7 +238,7 @@ package body Lua.Library_Codec_Tests is
                     "continuation start must fail");
          exception
             when Language_Error =>
-               Assert (not State.Current.Is_Resource,
+               Assert (not (State.Current.Failure_Class = Host_Abort),
                  "ordinary invalid position");
          end;
       end Check;
@@ -376,7 +376,7 @@ package body Lua.Library_Codec_Tests is
                     "native padding must consume work budget");
          exception
             when Language_Error =>
-               Assert (State.Current.Is_Resource,
+               Assert ((State.Current.Failure_Class = Host_Abort),
                  "native quota is resource failure");
          end;
       end Check;
@@ -410,7 +410,7 @@ package body Lua.Library_Codec_Tests is
                     "repeated subject copy must exhaust shared budget");
          exception
             when Language_Error =>
-               Assert (State.Current.Is_Resource,
+               Assert ((State.Current.Failure_Class = Host_Abort),
                        "iterator copy quota is resource failure");
                Assert (State.Steps = 65,
                        "second copy fails before materialization");

@@ -78,8 +78,10 @@ execution contexts, allocator storage, and real C-boundary feasibility. Canonica
 execution and language lifecycle precede complete collectors, debug/chunks,
 public C APIs, remaining libraries, full CLI, internal equivalents and acceptance.
 
-Each gate gets a separate codex/m3-XX-* branch and PR against updated master.
-The next task starts after its predecessor is merged by the maintainer. No
+The approved [language lifecycle delivery](milestones/m3-language-lifecycle.md)
+supersedes that sequential PR order for selected language, collector, debug and
+CLI portions. Its six checkpoints stay in one substantial PR on
+codex/m3-language-lifecycle; allocator/ABI/canonical work remains separate. No
 automatic merge is authorized. M3 remains in progress until every required
 coverage entry, default/instrumented configuration, and final review passes.
 Ecosystem fixtures remain unbuilt/unexecuted future M4 inputs.

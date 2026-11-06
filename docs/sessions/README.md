@@ -1,9 +1,10 @@
 # Session Records
 
-Latest: [M3-02A execution contexts](2026-11-06-m3-02-contexts.md).
+Current: [major M3 language lifecycle](2026-11-06-m3-language-lifecycle.md).
 
-The runtime context slice follows merged PR #5; its linked record owns current
-implementation evidence and remaining M3-02 work.
+Previous: [M3-02A execution contexts](2026-11-06-m3-02-contexts.md).
+The current combined delivery follows merged PR #6 and supersedes the small
+sequential PR order for its selected M3 portions.
 
 | Date       | Session                                                      |
 | ---------- | ---------------------------------------------------------    |

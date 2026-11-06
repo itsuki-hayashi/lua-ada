@@ -12,6 +12,8 @@ private package Lua.Engine is
    subtype Integer_Value is Lua.Numbers.Integer_Value;
    subtype Real_Value is Lua.Numbers.Real_Value;
 
+   type Execution_Policy is (Bounded, Lua_Compatible);
+
    type Limits is record
       Source_Bytes  : Positive := 1_000_000;
       Tokens        : Positive := 100_000;
@@ -28,7 +30,8 @@ private package Lua.Engine is
    --  Bounds are per session/execution, not machine-specific compile flags.
 
    type Heap_Kind is
-     (String_Object, Table_Object, Environment, Closure, Native_Closure);
+     (String_Object, Table_Object, Environment, Closure, Native_Closure,
+      Cell_Object, Thread_Object);
    type Heap_Object (Kind : Heap_Kind);
    type Object_Access is access Heap_Object;
    type Prototype;
@@ -42,7 +45,8 @@ private package Lua.Engine is
 
    type Value_Kind is
      (Nil_Kind, Boolean_Kind, Integer_Kind, Real_Kind, String_Kind,
-      Table_Kind, Closure_Kind, Native_Closure_Kind, Native_Kind_Value);
+      Table_Kind, Closure_Kind, Native_Closure_Kind, Native_Kind_Value,
+      Thread_Kind, Light_Identity_Kind);
 
    type Value (Kind : Value_Kind := Nil_Kind) is record
       case Kind is
@@ -50,9 +54,11 @@ private package Lua.Engine is
          when Boolean_Kind => Boolean_Data : Boolean;
          when Integer_Kind => Integer_Data : Integer_Value;
          when Real_Kind => Real_Data : Real_Value;
-         when String_Kind | Table_Kind | Closure_Kind | Native_Closure_Kind =>
+         when String_Kind | Table_Kind | Closure_Kind | Native_Closure_Kind |
+           Thread_Kind =>
             Reference : Object_Access;
          when Native_Kind_Value => Native_Data : Native_Kind;
+         when Light_Identity_Kind => Identity : Positive;
       end case;
    end record;
    Nil_Value : constant Value := (Kind => Nil_Kind);
@@ -72,7 +78,7 @@ private package Lua.Engine is
 
    type Binding is record
       Symbol : Positive;
-      Item   : Value;
+      Cell   : Object_Access;
    end record;
    package Bindings is new Ada.Containers.Vectors (Positive, Binding);
 
@@ -80,6 +86,8 @@ private package Lua.Engine is
       Marked : Boolean := False;
       Serial : Positive := 1;
       case Kind is
+         when Thread_Object => Context_Index : Positive := 1;
+         when Cell_Object => Cell_Value : Value;
          when String_Object => Bytes : Unbounded_String;
          when Table_Object =>
             Members : Entries.Vector;
@@ -90,9 +98,10 @@ private package Lua.Engine is
          when Closure =>
             Code    : Prototype_Access;
             Capture : Object_Access;
+            Upvalues : Objects.Vector;
          when Native_Closure =>
             Native_Name : Unbounded_String;
-            Captures : Values.Vector;
+            Captures : Objects.Vector;
       end case;
    end record;
    --  Objects never move. Pointer exposure to a future C API still requires
@@ -103,7 +112,7 @@ private package Lua.Engine is
       Load_Value, Load_String, Move_First, Read_Local, Write_Local,
       Declare_Local, Enter_Scope, Leave_Scope, New_Table, Get_Item,
       Set_Item, Set_Sequence, Unary, Binary, Jump, Jump_False, Jump_True,
-      Jump_Nil, Check_Iterator,
+      Jump_Nil, Check_Iterator, Goto_Label, Register_Close,
       Make_Closure, Call_Function, Tail_Call, Return_Values, Read_Varargs,
       Pick_Value, For_Initialize, For_Test, For_Advance, Check_Global);
 
@@ -114,6 +123,7 @@ private package Lua.Engine is
       Target   : Natural := 0;
       Literal  : Value;
       Text     : Unbounded_String;
+      Name_Kind : Unbounded_String;
       Inputs   : Registers.Vector;
       Nested   : Prototype_Access;
       Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
@@ -124,11 +134,23 @@ private package Lua.Engine is
    package Instructions is new Ada.Containers.Vectors
      (Positive, Instruction);
 
+   type Symbol_Name is record
+      Symbol : Positive;
+      Name : Unbounded_String;
+   end record;
+   package Symbol_Names is new Ada.Containers.Vectors (Positive, Symbol_Name);
+
    type Prototype is record
       Marked       : Boolean := False;
       Name         : Unbounded_String;
       Code         : Instructions.Vector;
       Parameters   : Symbols.Vector;
+      Capture_Symbols : Symbols.Vector;
+      Function_Node : Natural := 0;
+      First_Line : Natural := 0;
+      Last_Line : Natural := 0;
+      Names : Symbol_Names.Vector;
+      Uses_Closing : Boolean := False;
       Vararg       : Boolean := False;
       Is_Main      : Boolean := False;
       Vararg_Name  : Natural := 0;
@@ -138,6 +160,15 @@ private package Lua.Engine is
 
    package Packets is new Ada.Containers.Vectors
      (Positive, Values.Vector, "=" => Values."=");
+   type Close_Entry is record
+      Cell : Object_Access;
+      Symbol : Natural := 0;
+      Depth : Natural := 0;
+   end record;
+   package Close_Lists is new Ada.Containers.Vectors (Positive, Close_Entry);
+   type Unwind_Reason is
+     (No_Unwind, Scope_Exit, Jump_Exit, Return_Exit, Error_Exit,
+      Coroutine_Exit);
    type Frame;
    type Frame_Access is access Frame;
    package Frames is new Ada.Containers.Vectors (Positive, Frame_Access);
@@ -145,6 +176,7 @@ private package Lua.Engine is
    type Frame is record
       Is_Native : Boolean := False;
       Native_Name : Unbounded_String;
+      Native_Id : Native_Kind := Print_Function;
       Native_Arguments : Values.Vector;
       Native_Results : Values.Vector;
       Native_Captures : Values.Vector;
@@ -160,11 +192,35 @@ private package Lua.Engine is
       Code       : Prototype_Access;
       PC         : Positive := 1;
       Scope      : Object_Access;
+      Scope_Depth : Natural := 0;
       Slots      : Packets.Vector;
       Varargs    : Values.Vector;
       Vararg_Table : Object_Access;
       Return_To  : Natural := 0;
       Protection : Natural := 0;
+      Slot_Cost : Natural := 0;
+      Native_Charge : Boolean := False;
+      Blocks_Yield : Boolean := False;
+      Callee : Value;
+      Is_Tail_Call : Boolean := False;
+      Call_Name : Unbounded_String;
+      Name_Kind : Unbounded_String;
+      Transfer_Count : Natural := 0;
+      Entry_Hook_Done : Boolean := False;
+      Return_Hook_Done : Boolean := False;
+      Hook_Line : Natural := 0;
+      Hook_PC : Natural := 0;
+      Last_Executed_PC : Natural := 0;
+      Line_Hook_Checked : Boolean := False;
+      Closers : Close_Lists.Vector;
+      Unwind : Unwind_Reason := No_Unwind;
+      Unwind_Owner : Frame_Access;
+      Unwind_Depth : Natural := 0;
+      Unwind_PC : Natural := 0;
+      Unwind_Live : Registers.Vector;
+      Unwind_Results : Values.Vector;
+      Unwind_Error : Value;
+      Unwind_Has_Error : Boolean := False;
    end record;
    --  A packet preserves all results of a call/vararg expression. Scalar
    --  consumers read its first value; parentheses explicitly collapse it.
@@ -180,6 +236,26 @@ private package Lua.Engine is
    --  Native drivers request calls through the VM rather than recursing into
    --  the executor. All retained values must be stored in their activation.
 
+   type Context_Status is
+     (New_Context, Running_Context, Suspended_Context, Normal_Context,
+      Dead_Context);
+   type Execution_Phase is (Executing, Closing);
+   type Failure_Kind is
+     (No_Failure, Language_Failure, Syntax_Failure, Unsupported_Failure,
+      Host_Abort);
+   type Transfer_Kind is
+     (No_Transfer, Completed, Lua_Raised, Yielded, Resume_Requested,
+      Close_Requested, Host_Stopped);
+   type Control_Transfer is record
+      Kind : Transfer_Kind := No_Transfer;
+      Results : Values.Vector;
+      Target : Natural := 0;
+   end record;
+   --  Transfers are owned packets, not Ada-stack continuations. They remain
+   --  roots until the scheduler hands them to the recipient activation.
+
+   type Execution_Context;
+   type Context_Access is access Execution_Context;
    type Execution_Context is record
       Stack        : Frames.Vector;
       Arguments    : Values.Vector;
@@ -187,14 +263,28 @@ private package Lua.Engine is
       Has_Failure_Value : Boolean := False;
       Failure_Text : Unbounded_String;
       Failure_At   : Lua.Lexers.Source_Location;
-      Is_Resource  : Boolean := False;
-      Is_Syntax    : Boolean := False;
-      Is_Unsupported : Boolean := False;
-      Running : Boolean := False;
+      Failure_Class : Failure_Kind := No_Failure;
+      Status : Context_Status := New_Context;
+      Phase : Execution_Phase := Executing;
+      Transfer : Control_Transfer;
+      Resumer : Context_Access;
+      Entry_Function : Value;
+      Thread : Object_Access;
+      Host_Owned : Boolean := True;
+      Non_Yieldable : Natural := 0;
+      Stack_Slots : Natural := 0;
+      Native_Depth : Natural := 0;
+      Hook : Value;
+      Hook_Mask : Unbounded_String;
+      Hook_Count : Natural := 0;
+      Hook_Remaining : Natural := 0;
+      Hook_Active : Boolean := False;
+      Hook_Frame : Frame_Access;
+      Hook_Transfer : Boolean := False;
+      Cleanup_Depth : Natural := 0;
    end record;
    --  Contexts own frames and transient argument/error roots. Referenced
    --  heap objects belong to their world and can be shared across contexts.
-   type Context_Access is access Execution_Context;
    package Context_Lists is new Ada.Containers.Vectors
      (Positive, Context_Access);
    type Context_Id is new Positive;
@@ -202,8 +292,12 @@ private package Lua.Engine is
 
    type World is record
       Bounds       : Limits;
+      Saved_Bounds : Limits;
+      Policy : Execution_Policy := Bounded;
       Contexts     : Context_Lists.Vector;
       Current      : Context_Access;
+      Main_Context : Context_Access;
+      Main_Thread : Object_Access;
       --  Current borrows a context owned by Contexts; it never owns it twice.
       Heap         : Objects.Vector;
       Programs     : Prototypes.Vector;
@@ -215,8 +309,10 @@ private package Lua.Engine is
       Next_Object  : Positive := 1;
       Entry_Count  : Natural := 0;
       Collections  : Natural := 0;
+      GC_Running : Boolean := True;
       Next_GC      : Positive := 256;
       Steps        : Natural := 0;
+      Native_Depth : Natural := 0;
       Output       : Unbounded_String;
    end record;
    type World_Access is access World;
@@ -230,15 +326,24 @@ private package Lua.Engine is
 
    function Create_Context (State : in out World) return Context_Id;
    --  Register an empty context without selecting it or resetting budgets.
-   --  Finalize releases all registered contexts, including inactive roots.
+   --  Finalize releases all registered contexts. Host-owned inactive contexts
+   --  are roots; Lua-owned contexts instead follow reachable thread objects.
    procedure Select_Context (State : in out World; Id : Context_Id);
    --  Select between driver invocations. Invalid IDs or selection while the
    --  current driver is running raise Program_Error (internal misuse).
+
+   procedure Set_Policy (State : in out World; Policy : Execution_Policy);
+   --  Preserve explicit host limits when temporarily selecting
+   --  compatible work.
 
    procedure Initialize (State : in out World; Bounds : Limits);
    procedure Finalize (State : in out World);
    procedure Collect (State : in out World);
    --  Mark/sweep sees globals, frames, packets, captures, and current failure.
+
+   function New_Thread (State : in out World; Entry_Function : Value)
+                        return Value;
+   --  Allocate a Lua-owned context and its unique thread object.
 
    function New_String (State : in out World; Text : String) return Value;
    function New_Table (State : in out World) return Value;
@@ -270,7 +375,12 @@ private package Lua.Engine is
    procedure Write_Local
      (Scope : Object_Access; Symbol : Positive; Item : Value);
    procedure Declare_Local
-     (Scope : Object_Access; Symbol : Positive; Item : Value);
+     (State : in out World; Scope : Object_Access;
+      Symbol : Positive; Item : Value);
+
+   function Find_Cell
+     (Scope : Object_Access; Symbol : Positive) return Object_Access;
+   --  Borrow the stable cell shared by lexical reads and closure captures.
 
    function Execute
      (State : in out World; Source, Name : String) return Boolean;

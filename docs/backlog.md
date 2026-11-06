@@ -181,3 +181,17 @@ fixtures are covered by M3-10 instead.
 | CHUNK-001 | Binary chunk interoperability     | ABI-002                        | Pinned C/Ada load/dump fixtures                              |
 | MOD-001   | Native modules/LuaRocks           | ABI-002, LIB-002, TEST-MOD-001 | Pure Lua and native rock acceptance                          |
 | CONF-001  | Complete upstream validation      | LANG-002, LIB-002, ABI-002     | Unchanged suite and reviewed full internal mappings          |
+
+## Combined language lifecycle delivery
+
+The maintainer approved [M3-LC](milestones/m3-language-lifecycle.md) as one major
+PR from merged PR #6. Its sequential checkpoints M3-LC-01 through M3-LC-06 have
+explicit dependencies and exit evidence in that acceptance owner. M3-LC-01–05
+are implemented with focused local regressions; M3-LC-06 remains open until the
+final revision passes all required platform jobs and the PR is open. This
+advances selected portions of M3-02/06/07/08/11, without marking their broader
+canonical, allocator, finalizer, binary or full-CLI requirements complete.
+
+Evidence: [current session](sessions/2026-11-06-m3-language-lifecycle.md),
+Runtime_Control_Tests, check-lifecycle.ps1 and retained raw reports. No reference
+or ecosystem-fixture pins have changed.

@@ -99,6 +99,11 @@ Read current status for platform evidence and deferred facilities. A passing
 subset never establishes full upstream, C ABI, or LuaRocks compatibility.
 
 M3 follows the ordered gates in [its acceptance contract](docs/milestones/m3.md).
+The approved major language-lifecycle plan explicitly combines execution
+transfers, goto/closing, coroutines, weak collection, debug support and CLI
+policy on codex/m3-language-lifecycle. Keep these checkpoints in one PR; do not
+stop after a small infrastructure slice. Preserve separate completion evidence
+for canonical execution, C ABI, allocator parity and other deferred gates.
 Each gate is a separate task and PR; start the next gate from updated master
 after the maintainer merges its predecessor. Preserve pending obligations in
 the conformance ledger. Native C observations, lexical inventory anchors, and

@@ -60,7 +60,8 @@ package body Lua.Context_Tests is
       Assert (Index (Main.Failure_Text, "retained") > 0, "retained error");
       Select_Context (State, 1);
       Assert (Execute (State, "assert(true)", "recovery"), "main recovery");
-      Assert (not Main.Running, "driver released after recovery");
+      Assert (not (Main.Status = Running_Context),
+        "driver released after recovery");
    end Isolated_Failures;
 
    procedure Argument_Root (State : in out World) is
@@ -119,13 +120,13 @@ package body Lua.Context_Tests is
    begin
       --  A driver must never silently change the stack beneath its retained
       --  frame pointers. Rejection preserves both selector and running state.
-      Main.Running := True;
+      Main.Status := Running_Context;
       begin
          Select_Context (State, Other);
       exception
          when Program_Error => Rejected := True;
       end;
-      Main.Running := False;
+      Main.Status := Suspended_Context;
       Assert (Rejected and then State.Current = Main, "active driver guard");
       Rejected := False;
       begin

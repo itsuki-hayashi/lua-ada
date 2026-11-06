@@ -70,16 +70,17 @@ Syntax accepts goto/labels/close while execution returns Unsupported_Feature.
 See the [frontend inventory](frontend.md) for scope and current evidence.
 
 - Syntax accepted: full pinned default grammar/static-semantic target.
-- Runtime behavior: M1 execution plus the accepted M2b surface above.
+- Runtime behavior: M1/M2b plus the implemented lifecycle delivery below;
+  final platform acceptance remains separately recorded.
 - Opcode format: all 85 canonical definitions and six encodings.
 - Canonical code generation: deferred; compiler lowers to private operations.
 - Canonical code execution: deferred; no binary chunk compatibility claim.
 
 | Facility                               | Later gate / current response                    |
 | -------------------------------------- | ------------------------------------------------ |
-| goto / labels / close attributes       | Checks accept; execution Unsupported_Feature     |
-| Weak tables and finalization           | Remaining M2; unsupported                        |
-| Coroutines, userdata, debug, io/os     | Remaining M2; unavailable facilities             |
+
+| Finalization                           | Deferred; no finalizer execution                 |
+| Userdata and io/os                     | Deferred; unavailable facilities                 |
 | string.dump, table.sort/create         | Remaining library work; unavailable              |
 | Math RNG and remaining transcendentals | Remaining library work; unavailable              |
 | Binary chunks                          | M3; text-source interface only                   |
@@ -91,3 +92,26 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 The runtime does not specify hash iteration order, ambiguous table borders,
 pointer text, or byte-identical diagnostic wording. Differential fixtures avoid relying on
 those implementation choices. IEEE formatting follows the matching host oracle.
+
+## Language lifecycle implementation
+
+Goto/labels, <close>, the fourth generic-for closing value and weak-key/value
+tables are executable on the private VM. Threads have real identity and
+reachability-based ownership. Ephemerons use fixed-point stop-the-world tracing.
+Lua-facing coroutine exports are create, resume, yield, wrap, status, running,
+isyieldable and close. Base collectgarbage supports no argument, collect, stop,
+restart and isrunning. Other options explicitly fail; no byte counts or collector
+modes are fabricated.
+
+The debug subset is getinfo, getlocal, setlocal, getupvalue, setupvalue, upvalueid,
+sethook, gethook and traceback. It inspects actual cells and logical Lua/native
+activations, including explicit-thread forms, source ranges, call-site names,
+tail calls and per-thread call/return/line/count hooks. Native continuation phases
+are hidden. Count cadence reflects private instructions, not canonical opcodes.
+Userdata, finalizers, debug registry/metatable mutation, upvaluejoin and binary
+inspection remain outside this delivery.
+
+[Lifecycle acceptance](milestones/m3-language-lifecycle.md) owns unchanged
+goto.lua/coroutine.lua execution, precise T-absent omissions and platform evidence.
+Passing those targets does not complete any original M3 gate or establish full
+C-API, allocator, canonical execution, binary-chunk or ecosystem compatibility.

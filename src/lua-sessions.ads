@@ -11,6 +11,15 @@ package Lua.Sessions is
 
    type Session is new Ada.Finalization.Limited_Controlled with private;
 
+   type Execution_Policy is (Bounded, Lua_Compatible);
+   --  Ada sessions start bounded. Compatible policy removes project host
+   --  quotas, not Lua semantic stack checks or checked representation limits.
+   procedure Set_Execution_Policy
+     (Self : in out Session; Policy : Execution_Policy);
+   --  Select policy for later executions without discarding globals.
+   --  @param Self Owning session; calls must be serialized by its owner.
+   --  @param Policy Bounded restores the last explicitly configured limits.
+
    type Execution_Status is
      (Succeeded, Syntax_Error, Runtime_Error, Resource_Error, Host_Error,
       Unsupported_Feature);
@@ -42,8 +51,10 @@ package Lua.Sessions is
       Syntax_Nodes  : Positive := 200_000;
       Syntax_Depth  : Positive := 200;
    end record;
-   --  Positive bounds prevent accidental unbounded execution. Instruction
-   --  budgets restart for each chunk; heap/table limits cover the universe.
+   --  These bounds apply under Bounded policy; Set_Limits selects it.
+   --  Instruction budgets restart for each public chunk, not a resume or
+   --  callback. Heap/table limits cover the universe. Semantic Lua stack
+   --  checks and physical-storage failure handling apply under both policies.
 
    type Argument_Array is array (Integer range <>) of
      Ada.Strings.Unbounded.Unbounded_String;
@@ -79,7 +90,8 @@ package Lua.Sessions is
    --  @return Structured success/resource failure; never an engine exception.
 
    procedure Set_Limits (Self : in out Session; Bounds : Execution_Limits);
-   --  Change limits for later calls. This does not discard existing globals.
+   --  Select bounded policy and change limits for later calls. This
+   --  does not discard existing globals.
 
    procedure Collect (Self : in out Session);
    --  Force tracing collection between executions; useful for host idle time.
@@ -98,7 +110,8 @@ package Lua.Sessions is
 
    procedure Reset (Self : in out Session);
    --  Start a fresh universe with default limits and standard libraries.
-   --  Reset discards globals, module caches, and string/table metatable state.
+   --  Reset selects Bounded and discards globals, module caches, hooks,
+   --  coroutine contexts, collector controls and metatable mutations.
 
 private
    type Session is new Ada.Finalization.Limited_Controlled with record

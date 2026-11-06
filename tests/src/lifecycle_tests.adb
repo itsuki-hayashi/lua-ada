@@ -27,7 +27,7 @@ package body Lifecycle_Tests is
    procedure Source_Location;
    procedure Runtime_Source_Location;
    procedure Deferred_Goto;
-   procedure Deferred_Close;
+   procedure Nil_Close;
    procedure Const_Assignment;
    procedure Named_Global_Restriction;
    procedure Duplicate_Global;
@@ -172,7 +172,7 @@ package body Lifecycle_Tests is
 
    procedure Deferred_Goto is
       --  An undefined label is invalid even in an unchosen branch; valid
-      --  deferred syntax has a separate Unsupported_Feature result.
+      --  complete-source validation must still precede execution.
       Universe : Session;
       Result : constant Execution_Result := Universe.Execute
         ("if false then goto missing end");
@@ -180,15 +180,15 @@ package body Lifecycle_Tests is
       Assert_Error (Result, Syntax_Error);
    end Deferred_Goto;
 
-   procedure Deferred_Close is
-      --  To-be-closed declarations are explicitly outside the scoped
-      --  milestone.
+   procedure Nil_Close is
+      --  Nil is a valid closing initializer and requires no callback.
+      --  Executing it must finish normally instead of rejecting valid syntax.
       Universe : Session;
       Result : constant Execution_Result := Universe.Execute
         ("local x <close> = nil");
    begin
-      Assert_Error (Result, Unsupported_Feature);
-   end Deferred_Close;
+      Assert_OK (Result);
+   end Nil_Close;
 
    procedure Const_Assignment is
       --  Constant lexical cells reject reassignment before executing the
@@ -581,8 +581,8 @@ package body Lifecycle_Tests is
         (Suite, "lifecycle: undefined goto",
          Deferred_Goto'Access);
       Test_Support.Add
-        (Suite, "lifecycle: deferred close",
-         Deferred_Close'Access);
+        (Suite, "lifecycle: nil close",
+         Nil_Close'Access);
       Test_Support.Add
         (Suite, "lifecycle: const assignment",
          Const_Assignment'Access);

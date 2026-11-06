@@ -205,3 +205,25 @@ focused AUnit cases and the standard-Ada dependency policy. Necessary C ABI,
 varargs, stdio, lifecycle and OS glue stays isolated from interpreter logic.
 Reference C Lua remains a separate oracle. Native upstream test fixtures enter
 M3; the pinned ecosystem module fixtures remain future consumers only.
+
+## Language lifecycle delivery
+
+[ADR 0009](docs/decisions/0009-language-lifecycle.md) records the implemented
+private-backend lifecycle design. Explicit scheduler transfers replace running
+flags; context lifecycle and closing phase are separate. Each declaration owns a
+stable cell, closures retain exact ordered captures, and jumps use resolver
+frontiers to clean up scopes and create fresh declaration instances on reentry.
+Closing and hook callbacks use owned native continuations; outgoing packets,
+errors and temporary values stay traced across every callback.
+
+The context registry uses stable reusable slots. Main/host contexts and active
+resumers are roots; Lua-owned suspended contexts follow reachable thread objects.
+Weak tables use ephemeron fixed points and dead-entry cleanup before sweeping.
+Abandoned threads are reclaimed without executing close handlers. The collector
+remains stop-the-world, without finalizers or incremental/generational modes.
+
+Inspection uses prototype source ranges/names, actual local and upvalue cells,
+logical native frames and per-thread hook state. The CLI selects compatible
+execution quotas while Ada sessions remain bounded by default. Semantic stack
+checks and physical-storage aborts retain separate failure policies. None of
+these changes replaces the private instruction backend or fixes C ABI layouts.

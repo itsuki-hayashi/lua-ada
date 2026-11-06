@@ -22,6 +22,9 @@ $newline = [Environment]::NewLine
 [IO.File]::WriteAllText((Join-Path $fixtureRoot 'bom.lua'),
     "#!/usr/bin/env lua`nprint(42)", [Text.UTF8Encoding]::new($true))
 
+[IO.File]::WriteAllText((Join-Path $fixtureRoot 'large-source.lua'),
+    ('--[[' + ('a' * 1000001) + ']] print(42)'), $utf8)
+
 function Invoke-Case {
     param([hashtable] $Case)
     $start = [Diagnostics.ProcessStartInfo]::new()
@@ -127,9 +130,21 @@ $cases += @(
        Args = @('--check', '-e', 'local =', 'missing.lua');
        Fail = $true; Error = 'expected'; Output = '' },
     @{ Title = 'check no input'; Args = @('--check'); Contains = 'Usage:' },
-    @{ Title = 'execute deferred syntax before effects';
-       Args = @('-e', 'print(42); ::done::'); Fail = $true;
-       Error = 'unsupported feature'; Output = '' }
+    @{ Title = 'execute resolved label';
+       Args = @('-e', 'print(42); ::done::'); Output = "42$newline" },
+    @{ Title = 'compatible instruction policy';
+       Args = @('-e', 'local n=0; for i=1,150000 do n=n+1 end; print(n)');
+       Output = "150000$newline" },
+    @{ Title = 'compatible file source policy';
+       Args = @('large-source.lua'); Output = "42$newline" },
+    @{ Title = 'compatible stdin source policy'; Args = @('-');
+       Input = ('--[[' + ('a' * 1000001) + ']] print(42)');
+       Output = "42$newline" },
+    @{ Title = 'compatible check source policy';
+       Args = @('--check', 'large-source.lua'); Output = '' },
+    @{ Title = 'compatible runtime load source policy';
+       Args = @('-e', "assert(load('--[['..string.rep('a',1000001)..']] return 42'))(); print(42)");
+       Output = "42$newline" }
 )
 foreach ($case in $cases) { Invoke-Case -Case $case }
 exit 0

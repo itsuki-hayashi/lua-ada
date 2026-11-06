@@ -143,3 +143,15 @@ The accepted M3 resource and configuration policy lives in
 [the milestone](milestones/m3.md). Heavy stress must catch a deterministic Lua
 allocator refusal rather than exhaust the host. Existing Ada host quotas remain
 distinct hard-abort behavior; M3-01 does not change production defaults.
+
+## Language lifecycle target
+
+[The combined M3 delivery](milestones/m3-language-lifecycle.md) adds unchanged
+goto.lua and coroutine.lua execution to the three retained M2b targets. Their
+runner uses the normal compatible CLI, matching C/Ada working directories,
+900-second timeout and 2 GiB sampled resident-process watchdog. T remains absent
+and no soft/portable/Unicode/message flags are set. The acceptance owner lists
+every T-guarded omitted coroutine block by source anchor. The two expected
+upstream messages remain visible and are checked exactly, rather than ignored.
+This is default-configuration execution with documented upstream omissions, not
+complete coroutine/C-API conformance or a completed full M3 assertion ledger.

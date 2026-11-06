@@ -178,3 +178,22 @@ and warnings. No checks generated is not success. Do not use assumptions, axioms
 suppressions, weaker contracts, or `SPARK_Mode => Off` to hide proof failures.
 Levels 3/4 require prior agreement under the GNATprove skill. Use incremental
 proof normally and a clean measurement only when repeatability requires it.
+
+## Language lifecycle acceptance
+
+Run scripts/check-lifecycle.ps1 -Interpreter <normal-cli> after building the C
+oracle. The runner uses unchanged hash-verified goto.lua and coroutine.lua in
+fresh C/Ada processes, compares raw same-host output and empty stderr, requires
+OK, and rejects every omission message except the two explicitly inventoried
+T-absent coroutine messages. See the [acceptance owner](milestones/m3-language-lifecycle.md)
+for every omitted source anchor. Default coroutine execution is not C-API
+conformance. Timeout is 900 seconds and the sampled resident-process watchdog is
+2 GiB; this is distinct from C managed-allocation accounting.
+
+The product CLI selects compatible quotas. Retained M2b primary files use the
+separate bounded upstream_runner profile unchanged. scripts/check.ps1 runs both
+groups in every matrix configuration. Runtime_Control_Tests has independently
+named/commented cases for state transitions, close paths, cells, weak graphs,
+inspection, hooks, native callback yield restrictions and host-policy recovery.
+Seeded lifecycle campaigns preserve source and mismatch output as regressions;
+crashes, resource failures and timeouts never count as syntax rejection or skips.

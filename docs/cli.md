@@ -20,8 +20,8 @@ With no execution input, display usage; an interactive REPL remains deferred.
 or loading modules. It accepts the same files, snippets, explicit stdin, `--`,
 and trailing argument structure. A successful check emits no stdout unless help
 or version was requested. Stop at the first failed chunk. A valid construct may
-check successfully while execution returns Unsupported_Feature, including goto,
-labels, and closing declarations. See [frontend checking](frontend.md).
+check successfully without being executed. Goto, labels and closing declarations
+now execute through the lifecycle runtime. See [frontend checking](frontend.md).
 
 File/stdin loading preserves bytes and handles the file preamble, including BOM
 and initial interpreter line. Raw `-e` snippets are not file loading. Runtime
@@ -36,3 +36,12 @@ text loading and Lua-only require are M2b features; their local default path is
 The dedicated upstream test runner is separate from the product CLI. Its
 explicit test instruction profile does not alter CLI defaults or establish a
 new user-facing resource-limit option.
+
+Normal execution selects Lua_Compatible before installing arguments or loading
+source. Project instruction, source, heap, output and call quotas are removed;
+checked representations, frontend nesting and Lua semantic stack/native-depth
+checks remain. File/stdin, -e, load readers and runtime file loading use the same
+policy. CLI --check passes policy-derived limits explicitly; the standalone
+Lua.Syntax.Check API retains its bounded defaults. This policy name describes
+limits, not complete Lua or C ABI compatibility. See
+[execution policy](embedding.md) and [lifecycle acceptance](milestones/m3-language-lifecycle.md).

@@ -1,6 +1,6 @@
 # Architecture Decision Log
 
-Latest: [ADR 0008: M3 conformance](0008-m3-conformance.md).
+Latest: [ADR 0009: language lifecycle](0009-language-lifecycle.md).
 
 ADR 0007 records explicit native continuation frames, traced library/module
 state, shared budgets, and text loading. Its implementation passed M2b acceptance.
@@ -17,6 +17,9 @@ its runtime changes are planned, not implemented by the foundation gate.
 | 0006 | [Shared frontend and opcodes](0006-shared-frontend.md)         | accepted |
 | 0007 | [Native continuations and libraries](0007-native-libraries.md) | accepted |
 | 0008 | [M3 conformance and boundaries](0008-m3-conformance.md)        | accepted |
+
+ADR 0009 records the approved combined delivery order, iterative scheduler,
+stable cells, explicit cleanup, weak thread ownership and execution policies.
 
 Add numbered records for consequential choices. Include date, status, context,
 decision, alternatives, consequences, and verification implications. Supersede

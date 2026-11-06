@@ -20,12 +20,12 @@ package body Lua.Sessions is
          Result.Status := Runtime_Error;
          Result.Error.Message := To_Unbounded_String ("session is closed");
       else
-         Result.Status := (if Self.State.Current.Is_Resource then
-           Resource_Error
-                           elsif Self.State.Current.Is_Syntax then Syntax_Error
-                           elsif Self.State.Current.Is_Unsupported then
-                             Unsupported_Feature
-                           else Runtime_Error);
+         Result.Status :=
+           (case Self.State.Current.Failure_Class is
+               when Lua.Engine.Host_Abort => Resource_Error,
+               when Lua.Engine.Syntax_Failure => Syntax_Error,
+               when Lua.Engine.Unsupported_Failure => Unsupported_Feature,
+               when others => Runtime_Error);
          Result.Output := Self.State.Output;
          Result.Error.Line := Self.State.Current.Failure_At.Line;
          Result.Error.Column := Self.State.Current.Failure_At.Column;
@@ -68,6 +68,17 @@ package body Lua.Sessions is
       Initialize (Self);
    end Reset;
 
+   procedure Set_Execution_Policy
+     (Self : in out Session; Policy : Execution_Policy) is
+   begin
+      if Self.State /= null then
+         Lua.Engine.Set_Policy
+           (Self.State.all,
+            (if Policy = Bounded then Lua.Engine.Bounded
+             else Lua.Engine.Lua_Compatible));
+      end if;
+   end Set_Execution_Policy;
+
    procedure Set_Limits (Self : in out Session; Bounds : Execution_Limits) is
    begin
       if Self.State /= null then
@@ -76,6 +87,8 @@ package body Lua.Sessions is
             Bounds.Call_Depth, Bounds.Heap_Objects, Bounds.Table_Entries,
             Bounds.String_Bytes, Bounds.Output_Bytes, Bounds.Registers,
             Bounds.Syntax_Nodes, Bounds.Syntax_Depth);
+         Self.State.Saved_Bounds := Self.State.Bounds;
+         Self.State.Policy := Lua.Engine.Bounded;
          Self.State.Next_GC := Positive'Min
            (Self.State.Next_GC, Bounds.Heap_Objects);
       end if;
@@ -139,7 +152,7 @@ package body Lua.Sessions is
       if Self.State = null then
          return Failure (Self, "(arguments)");
       end if;
-      Self.State.Current.Is_Syntax := False;
+      Self.State.Current.Failure_Class := Lua.Engine.No_Failure;
       Self.State.Output := Null_Unbounded_String;
       Lua.Engine.Collect (Self.State.all);
       Table := Lua.Engine.New_Table (Self.State.all);

@@ -40,6 +40,14 @@ package body Lua.Engine is
       --  Registration transfers ownership. Failed vector growth leaves the
       --  allocation local, so release it before propagating Storage_Error.
       begin
+         --  Empty registry slots are reused without shifting live identities.
+         for Index in State.Contexts.First_Index .. State.Contexts.Last_Index
+         loop
+            if State.Contexts (Index) = null then
+               State.Contexts.Replace_Element (Index, Item);
+               return Context_Id (Index);
+            end if;
+         end loop;
          State.Contexts.Append (Item);
       exception
          when others =>
@@ -51,8 +59,10 @@ package body Lua.Engine is
 
    procedure Select_Context (State : in out World; Id : Context_Id) is
    begin
-      if (State.Current /= null and then State.Current.Running) or else
-        Natural (Id) > State.Contexts.Last_Index
+      if (State.Current /= null and then (State.Current.Status =
+        Running_Context)) or else
+        Natural (Id) > State.Contexts.Last_Index or else
+        State.Contexts (Positive (Id)) = null
       then
          raise Program_Error with "invalid execution context selection";
       end if;
@@ -80,7 +90,11 @@ package body Lua.Engine is
       State.Current.Failure_Text := To_Unbounded_String (Message);
       State.Current.Failure := Nil_Value;
       State.Current.Has_Failure_Value := False;
-      State.Current.Is_Resource := Resource;
+      State.Current.Failure_Class :=
+        (if Resource then Host_Abort
+         elsif State.Current.Failure_Class in Syntax_Failure |
+           Unsupported_Failure then State.Current.Failure_Class
+         else Language_Failure);
       raise Language_Error;
    end Fail;
 
@@ -100,9 +114,41 @@ package body Lua.Engine is
       Item := new Heap_Object (Kind);
       Item.Serial := State.Next_Object;
       State.Next_Object := State.Next_Object + 1;
-      State.Heap.Append (Item);
+      begin
+         State.Heap.Append (Item);
+      exception
+         when others =>
+            Free_Object (Item);
+            raise;
+      end;
       return Item;
    end Allocate;
+
+   function New_Thread (State : in out World; Entry_Function : Value)
+                        return Value
+   is
+      Id : constant Context_Id := Create_Context (State);
+      Thread : Object_Access;
+      Context : constant Context_Access := State.Contexts (Positive (Id));
+   begin
+      Thread := Allocate (State, Thread_Object);
+      Thread.Context_Index := Positive (Id);
+      Context.Thread := Thread;
+      Context.Entry_Function := Entry_Function;
+      Context.Host_Owned := False;
+      return (Thread_Kind, Thread);
+   exception
+      when others =>
+         --  Until publication there is no Lua owner for this registry slot.
+         --  Failed allocation must not leave an immortal host-owned context.
+         declare
+            Abandoned : Context_Access := Context;
+         begin
+            Free_Context (Abandoned);
+            State.Contexts.Replace_Element (Positive (Id), null);
+         end;
+         raise;
+   end New_Thread;
 
    function New_String (State : in out World; Text : String) return Value is
       Item : Object_Access;
@@ -134,7 +180,35 @@ package body Lua.Engine is
       Item : constant Object_Access := Allocate (State, Closure);
    begin
       Item.Code := Code;
-      Item.Capture := Capture;
+      if Capture = null and then Code.Is_Main then
+         --  A chunk's _ENV is an actual ordered upvalue, including host
+         --  chunks. Debug updates and nested closures share this same cell.
+         Item.Capture := New_Environment (State, null);
+         Declare_Local (State, Item.Capture, Code.Environment_Symbol,
+                        (Table_Kind, State.Globals));
+         Item.Upvalues.Append
+           (Find_Cell (Item.Capture, Code.Environment_Symbol));
+      elsif Capture /= null then
+         --  Snapshot only referenced bindings, not the mutable environment
+         --  container. Cells are shared, but later declarations cannot replace
+         --  the identity observed by an earlier closure at a backward goto.
+         Item.Capture := New_Environment (State, null);
+         if Code.Is_Main then
+            Item.Capture.Locals.Append
+              (Binding'(Code.Environment_Symbol,
+                        Find_Cell (Capture, Code.Environment_Symbol)));
+            Item.Upvalues.Append
+              (Find_Cell (Capture, Code.Environment_Symbol));
+         end if;
+         for Symbol of Code.Capture_Symbols loop
+            declare
+               Cell : constant Object_Access := Find_Cell (Capture, Symbol);
+            begin
+               Item.Upvalues.Append (Cell);
+               Item.Capture.Locals.Append (Binding'(Symbol, Cell));
+            end;
+         end loop;
+      end if;
       return (Closure_Kind, Item);
    end New_Closure;
 
@@ -145,7 +219,16 @@ package body Lua.Engine is
       Item : constant Object_Access := Allocate (State, Native_Closure);
    begin
       Item.Native_Name := To_Unbounded_String (Name);
-      Item.Captures := Captures;
+      for Capture of Captures loop
+         declare
+            Cell : constant Object_Access := Allocate (State, Cell_Object);
+         begin
+            --  Native upvalues also have stable cells. Stateful iterator
+            --  writes and debug identities refer to this same owned storage.
+            Cell.Cell_Value := Capture;
+            Item.Captures.Append (Cell);
+         end;
+      end loop;
       return (Native_Closure_Kind, Item);
    end New_Native;
 
@@ -180,12 +263,13 @@ package body Lua.Engine is
       end if;
       case Left.Kind is
          when Nil_Kind => return True;
+         when Light_Identity_Kind => return Left.Identity = Right.Identity;
          when Boolean_Kind => return Left.Boolean_Data = Right.Boolean_Data;
          when Integer_Kind => return Left.Integer_Data = Right.Integer_Data;
          when Real_Kind => return Left.Real_Data = Right.Real_Data;
          when String_Kind =>
             return Left.Reference.Bytes = Right.Reference.Bytes;
-         when Table_Kind | Closure_Kind | Native_Closure_Kind =>
+         when Table_Kind | Closure_Kind | Native_Closure_Kind | Thread_Kind =>
             return Left.Reference = Right.Reference;
          when Native_Kind_Value => return Left.Native_Data = Right.Native_Data;
       end case;
@@ -197,6 +281,8 @@ package body Lua.Engine is
 
    function Type_Name (Item : Value) return String is
      (case Item.Kind is
+         when Thread_Kind => "thread",
+         when Light_Identity_Kind => "userdata",
          when Nil_Kind => "nil",
          when Boolean_Kind => "boolean",
          when Integer_Kind | Real_Kind => "number",
@@ -295,6 +381,8 @@ package body Lua.Engine is
    function Image (Item : Value) return String is
    begin
       case Item.Kind is
+         when Light_Identity_Kind =>
+            return "userdata: " & Item.Identity'Image;
          when Nil_Kind => return "nil";
          when Boolean_Kind =>
             return (if Item.Boolean_Data then "true" else "false");
@@ -303,7 +391,7 @@ package body Lua.Engine is
               (Item.Integer_Data'Image, Ada.Strings.Both);
          when Real_Kind => return Real_Image (Item.Real_Data);
          when String_Kind => return To_String (Item.Reference.Bytes);
-         when Table_Kind | Closure_Kind | Native_Closure_Kind =>
+         when Table_Kind | Closure_Kind | Native_Closure_Kind | Thread_Kind =>
             return Type_Name (Item) & ": " &
               Ada.Strings.Fixed.Trim
                 (Item.Reference.Serial'Image, Ada.Strings.Both);
@@ -391,46 +479,55 @@ package body Lua.Engine is
       return Result;
    end Next;
 
-   function Read_Local (Scope : Object_Access; Symbol : Positive)
-                        return Value
+   function Find_Cell
+     (Scope : Object_Access; Symbol : Positive) return Object_Access
    is
       Current : Object_Access := Scope;
    begin
       while Current /= null loop
          for Local of Current.Locals loop
             if Local.Symbol = Symbol then
-               return Local.Item;
+               return Local.Cell;
             end if;
          end loop;
          Current := Current.Parent;
       end loop;
       raise Program_Error with "compiler referenced a missing lexical cell";
-   end Read_Local;
+   end Find_Cell;
+
+   function Read_Local (Scope : Object_Access; Symbol : Positive)
+                        return Value is
+     (Find_Cell (Scope, Symbol).Cell_Value);
 
    procedure Write_Local
-     (Scope : Object_Access; Symbol : Positive; Item : Value)
-   is
-      Current : Object_Access := Scope;
+     (Scope : Object_Access; Symbol : Positive; Item : Value) is
    begin
-      while Current /= null loop
-         for Index in Current.Locals.First_Index .. Current.Locals.Last_Index
-         loop
-            if Current.Locals (Index).Symbol = Symbol then
-               Current.Locals.Replace_Element (Index, (Symbol, Item));
-               return;
-            end if;
-         end loop;
-         Current := Current.Parent;
-      end loop;
-      raise Program_Error with "compiler wrote a missing lexical cell";
+      Find_Cell (Scope, Symbol).Cell_Value := Item;
    end Write_Local;
 
    procedure Declare_Local
-     (Scope : Object_Access; Symbol : Positive; Item : Value)
+     (State : in out World; Scope : Object_Access;
+      Symbol : Positive; Item : Value)
    is
+      Cell : constant Object_Access := Allocate (State, Cell_Object);
    begin
-      Scope.Locals.Append (Binding'(Symbol, Item));
+      --  Each dynamic declaration gets a new identity. It is published in the
+      --  owning environment before the VM reaches another collection point.
+      Cell.Cell_Value := Item;
+      Scope.Locals.Append (Binding'(Symbol, Cell));
    end Declare_Local;
+
+   procedure Set_Policy (State : in out World; Policy : Execution_Policy) is
+   begin
+      --  Ada embedding retains its configured bounds. Compatible execution
+      --  removes project quotas; representational failures remain checked.
+      State.Policy := Policy;
+      if Policy = Bounded then
+         State.Bounds := State.Saved_Bounds;
+      else
+         State.Bounds := (Syntax_Depth => 200, others => Positive'Last);
+      end if;
+   end Set_Policy;
 
    procedure Initialize (State : in out World; Bounds : Limits) is
       Table : Value;
@@ -473,7 +570,11 @@ package body Lua.Engine is
    begin
       --  Bootstrap needs an error root before any library allocation fails.
       Select_Context (State, Create_Context (State));
+      State.Main_Context := State.Current;
+      State.Main_Thread := Allocate (State, Thread_Object);
+      State.Current.Thread := State.Main_Thread;
       State.Bounds := Bounds;
+      State.Saved_Bounds := Bounds;
       Table := New_Table (State);
       State.Globals := Table.Reference;
       State.Loaded_Modules := New_Table (State).Reference;
@@ -503,6 +604,12 @@ package body Lua.Engine is
          Key := New_String (State, "_VERSION");
          Set (State, Table, Key, Version);
       end;
+      Set (State, Table, New_String (State, "collectgarbage"),
+           New_Native (State, "base.collectgarbage"));
+      Library ("debug", "getinfo getlocal setlocal getupvalue setupvalue " &
+                 "upvalueid sethook gethook traceback");
+      Library ("coroutine",
+               "create resume yield wrap status running isyieldable close");
       Library ("string", "byte char len lower upper sub reverse rep " &
                "format find match gmatch gsub pack packsize unpack");
       Library ("utf8", "char len codepoint offset codes");
@@ -602,6 +709,9 @@ package body Lua.Engine is
       procedure Mark (Item : Object_Access);
       procedure Mark_Value (Item : Value);
       procedure Mark_Code (Item : Prototype_Access);
+      procedure Mark_Context (Context : Context_Access);
+      function Weak_Mode (Item : Object_Access) return String;
+      function Alive (Item : Value) return Boolean;
 
       procedure Mark (Item : Object_Access) is
       begin
@@ -614,7 +724,7 @@ package body Lua.Engine is
       procedure Mark_Value (Item : Value) is
       begin
          if Item.Kind in String_Kind | Table_Kind | Closure_Kind |
-           Native_Closure_Kind
+           Native_Closure_Kind | Thread_Kind
          then
             Mark (Item.Reference);
          end if;
@@ -627,21 +737,50 @@ package body Lua.Engine is
             Code_Pending.Append (Item);
          end if;
       end Mark_Code;
-   begin
-      --  Explicit worklists avoid using the Ada stack to traverse arbitrary
-      --  user graphs. Marking before enqueueing also terminates on cycles.
-      Mark (State.Globals);
-      Mark (State.String_Metatable);
-      Mark (State.Loaded_Modules);
-      Mark (State.Preload_Modules);
-      --  Inactive stacks still own roots. Tracing only Current would reclaim
-      --  their pending arguments, captured values and error objects too soon.
-      for Context of State.Contexts loop
+
+      function Weak_Mode (Item : Object_Access) return String is
+      begin
+         --  Metamethod lookup during collection must neither allocate nor
+         --  execute Lua. Read the raw mode directly from the metatable.
+         if Item.Metatable /= null then
+            for Member of Item.Metatable.Members loop
+               if Member.Key.Kind = String_Kind and then
+                 Member.Key.Reference.Bytes = "__mode" and then
+                 Member.Item.Kind = String_Kind
+               then
+                  return To_String (Member.Item.Reference.Bytes);
+               end if;
+            end loop;
+         end if;
+         return "";
+      end Weak_Mode;
+
+      function Alive (Item : Value) return Boolean is
+        (Item.Kind not in Table_Kind | Closure_Kind | Native_Closure_Kind |
+           Thread_Kind or else Item.Reference.Marked);
+      --  Lua strings have value semantics and are never removed solely by a
+      --  weak reference. Other heap identities participate in weak liveness.
+
+      procedure Mark_Context (Context : Context_Access) is
+      begin
+         Mark_Value (Context.Hook);
+         Mark_Value (Context.Entry_Function);
+         for Item of Context.Transfer.Results loop
+            Mark_Value (Item);
+         end loop;
          Mark_Value (Context.Failure);
          for Item of Context.Arguments loop
             Mark_Value (Item);
          end loop;
          for Activation of Context.Stack loop
+            Mark_Value (Activation.Callee);
+            for Closing of Activation.Closers loop
+               Mark (Closing.Cell);
+            end loop;
+            Mark_Value (Activation.Unwind_Error);
+            for Item of Activation.Unwind_Results loop
+               Mark_Value (Item);
+            end loop;
             Mark (Activation.Native_Self);
             for Item of Activation.Native_Arguments loop
                Mark_Value (Item);
@@ -664,36 +803,97 @@ package body Lua.Engine is
                Mark_Value (Item);
             end loop;
          end loop;
+      end Mark_Context;
+   begin
+      --  Explicit worklists avoid using the Ada stack to traverse arbitrary
+      --  user graphs. Marking before enqueueing also terminates on cycles.
+      Mark (State.Main_Thread);
+      Mark (State.Globals);
+      Mark (State.String_Metatable);
+      Mark (State.Loaded_Modules);
+      Mark (State.Preload_Modules);
+      for Context of State.Contexts loop
+         if Context /= null and then
+           (Context.Host_Owned or else Context.Status in
+              Running_Context | Normal_Context)
+         then
+            Mark (Context.Thread);
+            --  Private host-owned contexts may have no Lua thread object.
+            if Context.Thread = null then
+               Mark_Context (Context);
+            end if;
+         end if;
       end loop;
-      while not Pending.Is_Empty loop
-         declare
-            Item : constant Object_Access := Pending.Last_Element;
-         begin
-            Pending.Delete_Last;
-            case Item.Kind is
-               when String_Object => null;
-               when Table_Object =>
-                  Mark (Item.Metatable);
-                  for Member of Item.Members loop
-                     if Member.Item.Kind /= Nil_Kind then
-                        Mark_Value (Member.Key);
-                        Mark_Value (Member.Item);
-                     end if;
-                  end loop;
-               when Environment =>
-                  Mark (Item.Parent);
-                  for Local of Item.Locals loop
-                     Mark_Value (Local.Item);
-                  end loop;
-               when Closure =>
-                  Mark (Item.Capture);
-                  Mark_Code (Item.Code);
-               when Native_Closure =>
-                  for Capture of Item.Captures loop
-                     Mark_Value (Capture);
-                  end loop;
-            end case;
-         end;
+      loop
+         while not Pending.Is_Empty loop
+            declare
+               Item : constant Object_Access := Pending.Last_Element;
+            begin
+               Pending.Delete_Last;
+               case Item.Kind is
+                  when Thread_Object =>
+                     Mark_Context (State.Contexts (Item.Context_Index));
+                  when Cell_Object => Mark_Value (Item.Cell_Value);
+                  when String_Object => null;
+                  when Table_Object =>
+                     Mark (Item.Metatable);
+                     declare
+                        Mode : constant String := Weak_Mode (Item);
+                        Keys : constant Boolean :=
+                          Ada.Strings.Fixed.Index (Mode, "k") /= 0;
+                        Vals : constant Boolean :=
+                          Ada.Strings.Fixed.Index (Mode, "v") /= 0;
+                     begin
+                        for Member of Item.Members loop
+                           if Member.Item.Kind /= Nil_Kind then
+                              if not Keys or else Member.Key.Kind = String_Kind
+                              then
+                                 Mark_Value (Member.Key);
+                              end if;
+                              if Member.Item.Kind = String_Kind or else
+                                (not Vals and then
+                                 (not Keys or else Alive (Member.Key)))
+                              then
+                                 Mark_Value (Member.Item);
+                              end if;
+                           end if;
+                        end loop;
+                     end;
+                  when Environment =>
+                     Mark (Item.Parent);
+                     for Local of Item.Locals loop
+                        Mark (Local.Cell);
+                     end loop;
+                  when Closure =>
+                     Mark (Item.Capture);
+                     Mark_Code (Item.Code);
+                  when Native_Closure =>
+                     for Capture of Item.Captures loop
+                        Mark (Capture);
+                     end loop;
+               end case;
+            end;
+         end loop;
+         --  Ephemerons need a fixed point: a newly reachable key can expose
+         --  its value, which may in turn expose a key in another weak table.
+         for Item of State.Heap loop
+            if Item.Marked and then Item.Kind = Table_Object then
+               declare
+                  Mode : constant String := Weak_Mode (Item);
+               begin
+                  if Ada.Strings.Fixed.Index (Mode, "k") /= 0 and then
+                    Ada.Strings.Fixed.Index (Mode, "v") = 0
+                  then
+                     for Member of Item.Members loop
+                        if Alive (Member.Key) then
+                           Mark_Value (Member.Item);
+                        end if;
+                     end loop;
+                  end if;
+               end;
+            end if;
+         end loop;
+         exit when Pending.Is_Empty;
       end loop;
       while not Code_Pending.Is_Empty loop
          declare
@@ -706,27 +906,56 @@ package body Lua.Engine is
          end;
       end loop;
 
-      --  Tombstones preserve next(t, removed_key) while the key is alive.
-      --  They must not retain removed object keys forever or leave dangling
-      --  pointers after sweep. Scalar tombstones require no special handling.
+      --  Clear weak entries and dead tombstone keys before sweeping. No
+      --  table may retain an address which the subsequent sweep releases.
       for Item of State.Heap loop
          if Item.Kind = Table_Object and then Item.Marked then
             for Index in Item.Members.First_Index .. Item.Members.Last_Index
             loop
                declare
                   Member : Table_Entry := Item.Members (Index);
+                  Mode : constant String := Weak_Mode (Item);
                begin
-                  if Member.Item.Kind = Nil_Kind and then Member.Key.Kind in
-                    String_Kind | Table_Kind | Closure_Kind |
-                    Native_Closure_Kind and then
-                    not Member.Key.Reference.Marked
+                  if (Ada.Strings.Fixed.Index (Mode, "k") /= 0 and then
+                        not Alive (Member.Key)) or else
+                    (Ada.Strings.Fixed.Index (Mode, "v") /= 0 and then
+                        not Alive (Member.Item))
+                  then
+                     Member.Item := Nil_Value;
+                  end if;
+                  if Member.Item.Kind = Nil_Kind and then
+                    Member.Key.Kind in String_Kind | Table_Kind |
+                      Closure_Kind | Native_Closure_Kind | Thread_Kind
+                    and then not Member.Key.Reference.Marked
                   then
                      Member.Key := Nil_Value;
-                     Item.Members.Replace_Element (Index, Member);
                   end if;
+                  Item.Members.Replace_Element (Index, Member);
                end;
             end loop;
          end if;
+      end loop;
+      --  The registry is an ownership index, not a root. Abandoned coroutine
+      --  frames are released without running __close; live captured cells
+      --  remain independently reachable from surviving closures.
+      for Index in State.Contexts.First_Index .. State.Contexts.Last_Index loop
+         declare
+            Context : Context_Access := State.Contexts (Index);
+         begin
+            if Context /= null and then not Context.Host_Owned and then
+              not Context.Thread.Marked
+            then
+               for Activation of Context.Stack loop
+                  declare
+                     Owned : Frame_Access := Activation;
+                  begin
+                     Free_Frame (Owned);
+                  end;
+               end loop;
+               Free_Context (Context);
+               State.Contexts.Replace_Element (Index, null);
+            end if;
+         end;
       end loop;
       for Index in reverse State.Heap.First_Index .. State.Heap.Last_Index loop
          declare
@@ -758,7 +987,9 @@ package body Lua.Engine is
             end if;
          end;
       end loop;
-      State.Collections := State.Collections + 1;
+      if State.Collections < Natural'Last then
+         State.Collections := State.Collections + 1;
+      end if;
       State.Next_GC := Positive'Min
         (State.Bounds.Heap_Objects,
          Positive'Max (64, Natural (State.Heap.Length) * 2 + 1));
@@ -772,18 +1003,22 @@ package body Lua.Engine is
          declare
             Owned : Context_Access := Context;
          begin
-            for Activation of Owned.Stack loop
-               declare
-                  Item : Frame_Access := Activation;
-               begin
-                  Free_Frame (Item);
-               end;
-            end loop;
-            Free_Context (Owned);
+            if Owned /= null then
+               for Activation of Owned.Stack loop
+                  declare
+                     Item : Frame_Access := Activation;
+                  begin
+                     Free_Frame (Item);
+                  end;
+               end loop;
+               Free_Context (Owned);
+            end if;
          end;
       end loop;
       State.Contexts.Clear;
       State.Current := null;
+      State.Main_Context := null;
+      State.Main_Thread := null;
       for Object of State.Heap loop
          declare
             Item : Object_Access := Object;
@@ -808,42 +1043,46 @@ package body Lua.Engine is
    is
       Code : Prototype_Access;
    begin
-      State.Current.Running := True;
+      State.Current.Status := Running_Context;
       State.Current.Failure := Nil_Value;
       State.Current.Has_Failure_Value := False;
       State.Current.Failure_Text := Null_Unbounded_String;
-      State.Current.Is_Resource := False;
-      State.Current.Is_Syntax := False;
-      State.Current.Is_Unsupported := False;
+      State.Current.Failure_Class := No_Failure;
       State.Output := Null_Unbounded_String;
       State.Steps := 0;
       State.Current.Failure_At := (others => 1);
-      Collect (State);
+      if State.GC_Running then
+         Collect (State);
+      end if;
       if Source'Length > State.Bounds.Source_Bytes then
          Fail (State, "source byte limit exceeded", Resource => True);
       end if;
       Code := Compiler.Compile (State, Source, Name);
       Machine.Run (State, Code);
       State.Current.Arguments.Clear;
-      Collect (State);
-      State.Current.Running := False;
+      if State.GC_Running then
+         Collect (State);
+      end if;
+      State.Current.Status := Suspended_Context;
       return True;
    exception
       when Language_Error =>
-         State.Current.Running := False;
+         State.Current.Status := Suspended_Context;
          State.Current.Arguments.Clear;
          Machine.Clear_Frames (State);
-         Collect (State);
+         if State.GC_Running then
+            Collect (State);
+         end if;
          return False;
       when Storage_Error =>
-         State.Current.Running := False;
+         State.Current.Status := Suspended_Context;
          Machine.Clear_Frames (State);
-         State.Current.Is_Resource := True;
+         State.Current.Failure_Class := Host_Abort;
          State.Current.Failure_Text := To_Unbounded_String
            ("host storage exhausted");
          return False;
       when Error : Constraint_Error | Program_Error =>
-         State.Current.Running := False;
+         State.Current.Status := Suspended_Context;
          --  Keep the embedding boundary exception-safe, but make an internal
          --  check failure explicit so tests cannot mistake it for Lua parity.
          Machine.Clear_Frames (State);

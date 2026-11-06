@@ -50,7 +50,8 @@ package body Lua.Syntax_Trees is
         (Name : Unbounded_String; Mode : Attribute := Regular;
          Kind : Binding_Kind := Local_Name) return Symbol_Id;
       function Resolve
-        (Name : Unbounded_String; Environment : Boolean := False)
+        (Name : Unbounded_String; Environment : Boolean := False;
+         Referenced : Unbounded_String := Null_Unbounded_String)
          return Node_Id;
       procedure Writable (Id : Node_Id);
       function Expression (Minimum : Natural := 0) return Node_Id;
@@ -196,7 +197,8 @@ package body Lua.Syntax_Trees is
       end New_Name;
 
       function Resolve
-        (Name : Unbounded_String; Environment : Boolean := False)
+        (Name : Unbounded_String; Environment : Boolean := False;
+         Referenced : Unbounded_String := Null_Unbounded_String)
          return Node_Id
       is
          Result : Node := (Kind => Name_Reference, Site => Here,
@@ -253,11 +255,13 @@ package body Lua.Syntax_Trees is
                Result.Flag := Read_Only;
             end if;
             if Environment then
-               Error ("_ENV is global when accessing a variable");
+               Error ("_ENV is global when accessing variable '" &
+                      To_String (Referenced) & "'");
             end if;
             declare
                Env : constant Node_Id := Resolve
-                 (To_Unbounded_String ("_ENV"), Environment => True);
+                 (To_Unbounded_String ("_ENV"), Environment => True,
+                  Referenced => Name);
             begin
                Result.Environment := Fetch (Env).Symbol;
             end;
@@ -292,7 +296,8 @@ package body Lua.Syntax_Trees is
          if Item.Kind not in Name_Reference | Index_Expression then
             Error ("assignment target expected");
          elsif Item.Kind = Name_Reference and then Item.Flag then
-            Error ("attempt to assign to const variable");
+            Error ("attempt to assign to const variable '" &
+                   To_String (Item.Text) & "'");
          end if;
       end Writable;
 
@@ -406,6 +411,9 @@ package body Lua.Syntax_Trees is
          Item.Flag := Varargs;
          Save (Result, Item);
          Child (Result, Block);
+         Item := Fetch (Result);
+         Item.End_Line := Here.Line;
+         Save (Result, Item);
          Expect (End_Word);
          Active := Saved;
          Function_Node := Saved_Function;
@@ -575,11 +583,14 @@ package body Lua.Syntax_Trees is
                   then
                      for Id of Label.Active loop
                         if not Pending.Active.Contains (Id) then
-                           Error ("goto jumps into a declaration's scope");
+                           Error ("goto enters scope of '" &
+                                    To_String (Unit.Names
+                                      (Positive (Id)).Name) & "'");
                         end if;
                      end loop;
                      Destination := Fetch (Pending.Item);
                      Destination.Target := Label.Item;
+                     Destination.Symbols := Label.Active;
                      Save (Pending.Item, Destination);
                      Pending.Solved := True;
                      exit;
@@ -587,7 +598,8 @@ package body Lua.Syntax_Trees is
                end loop;
                if not Pending.Solved then
                   if Parent = 0 then
-                     Error ("no visible label for goto");
+                     Error ("no visible label '" &
+                            To_String (Fetch (Pending.Item).Text) & "'");
                   end if;
                   Pending.Block := Parent;
                   Pending.Active := Base;
@@ -887,7 +899,8 @@ package body Lua.Syntax_Trees is
                      if Previous.Owner = Function_Node and then
                        Fetch (Previous.Item).Text = Value.Text
                      then
-                        Error ("label already defined");
+                        Error ("label '" & To_String (Value.Text) &
+                               "' already defined");
                      end if;
                   end loop;
                   Labels.Append

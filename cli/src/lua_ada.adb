@@ -94,7 +94,7 @@ procedure Lua_Ada is
       --  Binary file reading preserves NULs and original line endings.
       --  Bound the user-controlled allocation before creating its buffer.
       Files.Open (File, Files.In_File, Path);
-      if Files.Size (File) > 1_000_000 then
+      if Files.Size (File) > Files.Count (Positive'Last) then
          Files.Close (File);
          raise Constraint_Error with "source byte limit exceeded";
       end if;
@@ -130,7 +130,7 @@ procedure Lua_Ada is
       --  Character Get skips line terminators. Handle them explicitly to
       --  retain source line structure rather than joining adjacent tokens.
       while not Ada.Text_IO.End_Of_File loop
-         if Length (Text) >= 1_000_000 then
+         if Length (Text) = Positive'Last then
             raise Constraint_Error with "source byte limit exceeded";
          end if;
          if Ada.Text_IO.End_Of_Line then
@@ -207,7 +207,9 @@ begin
          function Check (Source, Name : String) return Boolean;
          function Check (Source, Name : String) return Boolean is
             Result : constant Lua.Syntax.Check_Result :=
-              Lua.Syntax.Check (Source, Name);
+              Lua.Syntax.Check
+                (Source, Name,
+                 (Nesting => 200, others => Positive'Last));
             Reported : Execution_Result;
             use type Lua.Syntax.Check_Status;
          begin
@@ -255,6 +257,7 @@ begin
            (if Index + Script_Index = 0 then Command_Name
             else Argument (Index + Script_Index));
       end loop;
+      Universe.Set_Execution_Policy (Lua_Compatible);
       Result := Universe.Set_Arguments (Args);
       if Result.Status /= Succeeded then
          Report (Result);

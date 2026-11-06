@@ -1,7 +1,8 @@
 # Project Status
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**
-**M3 is in progress; M3-01 is merged and M3-02A implements context ownership.**
+**M3 is in progress; the combined language lifecycle delivery is implemented
+and undergoing final acceptance.**
 
 ## Implemented and verified
 
@@ -40,54 +41,41 @@ Tools: Alire 2.1.1, stable native GNAT 16.1.0, AUnit 26.0.0, GPRbuild package
 26.0.1 (banner 26.0.0). Strict flags and runtime checks remain enabled; the
 existing ADR 0003 floating-validity exception is unchanged.
 
-## Current M3 foundation work
+## Current M3 language lifecycle work
 
-[M3](milestones/m3.md) targets complete covered upstream behavior, including
-language/runtime, libraries, CLI, canonical execution and the public C API/ABI.
-It uses staged PRs and reviewed Ada/native-platform equivalents for assertions
-tied to C internals or unsupported native facilities. This is not a promise to
-run every unchanged T-enabled assertion on Ada.
+Merged PR #6, master bbc6e230cc1fcf4d20eb3caf02077b6bb0c0f46a, is the baseline.
+The approved [combined delivery](milestones/m3-language-lifecycle.md) implements
+goto/labels, closing, all Lua-facing coroutine exports, thread identities,
+reachability-based context ownership, weak tables/ephemerons, debug inspection
+and hooks, collection controls, and compatible CLI execution quotas. This
+advances portions of M3-02/06/07/08/11; their full broader gates remain open.
 
-M3-01 establishes the [conformance inventory](../tests/conformance/README.md),
-default/instrumented C baseline builds, disposable runners, coverage validation,
-and focused harness checks. Baseline C outcomes and infrastructure checks are
-not Ada conformance passes. Pending coverage remains pending until actual
-execution or a reviewed equivalent supplies evidence. No later M3 runtime,
-collector, canonical VM, C facade or CLI-default gate is complete.
+Local Windows validation/static has passed 564 focused AUnit cases at the
+latest recorded test checkpoint. Hash-verified unchanged goto.lua and
+coroutine.lua have passed fresh independent same-host C/Ada process comparisons,
+with identical stdout, empty stderr and OK markers. The coroutine result is
+**default-configuration execution with documented upstream omissions**, not
+complete coroutine or C-API conformance. Exact omitted source anchors and the
+900-second/2 GiB sampled resident-process policy are in the acceptance owner.
 
-The [M3-01 implementation matrix](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42141255975)
-passed all 18 jobs at 4d52d44127f1dedc6cafbf2c7ab3cb7695a9415e, including
-Windows static-PIC. Every job retained the 480-case Ada baseline and passed
-41 inventory/16 runner cases; real C consumers add the seventeenth runner case.
-Both C profiles pass smoke, child-configuration, REPL, and bounded heavy checks
-on every OS. Linux aggregates finish with explicit T/locale omissions; native
-Windows/macOS aggregate failures remain pending platform obligations. Exact
-results and limits are in the [session record](sessions/2026-11-06-m3-01-contracts.md).
-PR [#5](https://github.com/itsuki-hayashi/lua-ada/pull/5) is merged.
-
-M3-02A separates private execution stacks, arguments and diagnostics from the
-shared world, with all-context root tracing and cleanup. Eight focused tests
-extend the 480-case baseline; local validation/static passes 488 cases and the
-retained acceptance pipeline. See the [session](sessions/2026-11-06-m3-02-contexts.md).
-Typed transfers, error-policy changes and public coroutines remain open.
-
-The current production interpreter remains the accepted M2b implementation.
-Its quotas, private packet VM, and deferred facilities are unchanged in this
-foundation gate. The [backlog](backlog.md) owns M3-01 through M3-13 and the
-[current session index](sessions/README.md) owns new execution evidence.
+Final source review, expanded differential campaigns, retained regressions,
+all 18 final platform configurations, Windows static-PIC and the open PR are
+still required. These local observations do not establish those platform gates.
+The [current session](sessions/2026-11-06-m3-language-lifecycle.md) owns commands
+and intermediate evidence. Reference and ecosystem module pins are unchanged.
 
 ## Earlier evidence and remaining work
 
 Historical [M1 validation](validation.md) and [M2a validation](validation-m2a.md)
 retain their original counts and configurations. M2a's complete checking
 interface and 85 canonical opcode definitions remain independent of execution.
-Checking accepts valid goto/label/close constructs whose execution is deferred.
+Checking and execution now share executable goto/label/close constructs.
 
-This is a documented Lua subset, not complete Lua 5.5 conformance. Coroutines,
-userdata, weak/finalized objects, close/goto execution, debug/io/os, remaining
-libraries, binary chunks, canonical code generation/execution, full C API/ABI,
-native modules, and LuaRocks remain later work. Three whole-file execution
-passes do not establish complete upstream-suite conformance.
+This remains a documented Lua subset. Userdata, finalizers, collector modes,
+remaining debug/io/os facilities and libraries, binary chunks, canonical code
+generation/execution, full C API/ABI, native modules and LuaRocks remain later
+work. Five selected default-configuration files do not establish the complete
+standard suite or T-enabled C-API conformance.
 
 The eight [consumer module fixtures](../tests/modules/README.md) retain their
 pins and remain unbuilt/unexecuted future inputs. GNATdoc rendering, GNATtest
@@ -95,4 +83,4 @@ generation, fuzz campaigns, and formal proof were not run.
 
 See [upstream coverage](upstream-tests.md), [roadmap](roadmap.md),
 [backlog](backlog.md), and the
-[current session](sessions/2026-11-06-m3-01-contracts.md).
+[current session](sessions/2026-11-06-m3-language-lifecycle.md).

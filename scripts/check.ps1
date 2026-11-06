@@ -53,6 +53,9 @@ try {
     $absoluteCli = Join-Path (Get-Location).Path $cliExecutable
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-cli.ps1'), '-Interpreter', $absoluteCli)
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-lifecycle.ps1'),
+        '-Interpreter', $absoluteCli)
     $versionOutput = & alr exec -- $cliExecutable --version
     if ($LASTEXITCODE -ne 0 -or
         ($versionOutput -join "`n") -ne 'Lua Ada 0.1.0-dev (target 5.5.1)') {
