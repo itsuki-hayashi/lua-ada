@@ -52,7 +52,7 @@ package body Lua.Engine.Compiler is
          Result : constant Positive := Next_Register;
       begin
          if Result > State.Bounds.Registers then
-            State.Failure_At := Site;
+            State.Current.Failure_At := Site;
             Fail (State, "register limit exceeded", Resource => True);
          end if;
          Next_Register := Next_Register + 1;
@@ -601,16 +601,17 @@ package body Lua.Engine.Compiler is
              (State.Bounds.Source_Bytes, State.Bounds.Tokens,
               State.Bounds.Syntax_Nodes, State.Bounds.Syntax_Depth));
       if Unit.Result.Status /= Lua.Syntax.Success then
-         State.Failure_At :=
+         State.Current.Failure_At :=
            (Offset => 1, Line => Unit.Result.Error.Line,
             Column => Unit.Result.Error.Column);
-         State.Is_Syntax := Unit.Result.Status = Lua.Syntax.Syntax_Error;
+         State.Current.Is_Syntax := Unit.Result.Status =
+           Lua.Syntax.Syntax_Error;
          Fail (State, To_String (Unit.Result.Error.Message),
                Resource => Unit.Result.Status = Lua.Syntax.Resource_Error);
       end if;
       if Unit.Unsupported /= No_Node then
-         State.Failure_At := Fetch (Unit.Unsupported).Site;
-         State.Is_Unsupported := True;
+         State.Current.Failure_At := Fetch (Unit.Unsupported).Site;
+         State.Current.Is_Unsupported := True;
          Fail (State, "unsupported feature: " &
                (case Fetch (Unit.Unsupported).Kind is
                    when Goto_Statement => "goto execution",

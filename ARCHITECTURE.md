@@ -162,6 +162,14 @@ future acceptance gates.
 
 ## Accepted M3 direction: not yet implemented
 
+M3-02A now implements the ownership split: World registers private contexts,
+each owning frames, arguments and diagnostic/error roots. The current-context
+selector borrows a registered context and cannot switch while its driver runs.
+Collection visits inactive contexts too; finalization releases every context.
+Globals, heap, module registries, output and budgets remain shared. Contexts
+live until world finalization. Suspension/closing transfers, hooks and coroutine
+values remain planned; the direction below is not a claim those features exist.
+
 The [M3 contract](docs/milestones/m3.md) expands the next milestone to complete
 covered upstream behavior. Its first gate adds inventory/baseline infrastructure
 only. The runtime described above remains implemented M2b behavior; the following

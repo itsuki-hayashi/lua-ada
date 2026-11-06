@@ -158,7 +158,7 @@ package body Lua.String_Helper_Tests is
          Assert (False, "pattern bypassed instruction budget");
       exception
          when Language_Error =>
-            Assert (State.Is_Resource, "budget failure category");
+            Assert (State.Current.Is_Resource, "budget failure category");
       end;
    end Pattern_Budget;
 
@@ -222,7 +222,7 @@ package body Lua.String_Helper_Tests is
          when Language_Error =>
             --  The pinned Windows configuration deliberately uses Lua's
             --  C89 hex formatter, which rejects every modifier.
-            Assert (State.Failure_Text =
+            Assert (State.Current.Failure_Text =
               "modifiers for format '%a'/'%A' not implemented",
               "documented C89 hex format boundary");
       end;
@@ -391,7 +391,7 @@ package body Lua.String_Helper_Tests is
       Activation.Native_Arguments.Append (New_String (State, "ab"));
       Activation.Native_Arguments.Append (New_String (State, "(a)"));
       Activation.Native_Arguments.Append (New_Native (State, "identity"));
-      State.Stack.Append (Activation);
+      State.Current.Stack.Append (Activation);
       Result := Pattern_Drivers.Advance (State, Activation);
       Assert (Result.Kind = Invoke, "replacement requests callback");
       Activation.Native_Results.Append (New_String (State, "X"));
@@ -405,11 +405,11 @@ package body Lua.String_Helper_Tests is
       end loop;
       Assert (Result.Results (1).Reference.Bytes = "Xb",
               "replacement result survives collection");
-      State.Stack.Clear;
+      State.Current.Stack.Clear;
       Free_Frame (Activation);
    exception
       when others =>
-         State.Stack.Clear;
+         State.Current.Stack.Clear;
          Free_Frame (Activation);
          raise;
    end Replacement_Roots;
@@ -427,7 +427,7 @@ package body Lua.String_Helper_Tests is
          Assert (False, "quote scan bypassed instruction budget");
       exception
          when Language_Error =>
-            Assert (State.Is_Resource, "quote resource diagnostic");
+            Assert (State.Current.Is_Resource, "quote resource diagnostic");
       end;
    end Quoting_Budget;
 
@@ -454,7 +454,8 @@ package body Lua.String_Helper_Tests is
          Assert (False, "iterator copy bypassed instruction budget");
       exception
          when Language_Error =>
-            Assert (State.Is_Resource, "iterator copy resource diagnostic");
+            Assert (State.Current.Is_Resource,
+              "iterator copy resource diagnostic");
             Assert (Invocation.Native_Self.Captures (3).Integer_Data = 0,
                     "iterator position unchanged by failed copy");
       end;
@@ -485,7 +486,8 @@ package body Lua.String_Helper_Tests is
          Assert (False, "replacement copy bypassed instruction budget");
       exception
          when Language_Error =>
-            Assert (State.Is_Resource, "replacement copy resource diagnostic");
+            Assert (State.Current.Is_Resource,
+              "replacement copy resource diagnostic");
             Assert (Activation.Native_Stage = 0,
                     "replacement state unchanged by failed copy");
       end;
@@ -510,7 +512,8 @@ package body Lua.String_Helper_Tests is
          Assert (False, "backreference comparisons bypassed native budget");
       exception
          when Language_Error =>
-            Assert (State.Is_Resource, "backreference resource diagnostic");
+            Assert (State.Current.Is_Resource,
+              "backreference resource diagnostic");
       end;
    end Backreference_Comparison_Budget;
 

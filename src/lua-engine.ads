@@ -180,12 +180,33 @@ private package Lua.Engine is
    --  Native drivers request calls through the VM rather than recursing into
    --  the executor. All retained values must be stored in their activation.
 
-   type World is record
-      Bounds       : Limits;
-      Heap         : Objects.Vector;
-      Programs     : Prototypes.Vector;
+   type Execution_Context is record
       Stack        : Frames.Vector;
       Arguments    : Values.Vector;
+      Failure      : Value;
+      Has_Failure_Value : Boolean := False;
+      Failure_Text : Unbounded_String;
+      Failure_At   : Lua.Lexers.Source_Location;
+      Is_Resource  : Boolean := False;
+      Is_Syntax    : Boolean := False;
+      Is_Unsupported : Boolean := False;
+      Running : Boolean := False;
+   end record;
+   --  Contexts own frames and transient argument/error roots. Referenced
+   --  heap objects belong to their world and can be shared across contexts.
+   type Context_Access is access Execution_Context;
+   package Context_Lists is new Ada.Containers.Vectors
+     (Positive, Context_Access);
+   type Context_Id is new Positive;
+   --  IDs are relative to one owning world, not transferable object handles.
+
+   type World is record
+      Bounds       : Limits;
+      Contexts     : Context_Lists.Vector;
+      Current      : Context_Access;
+      --  Current borrows a context owned by Contexts; it never owns it twice.
+      Heap         : Objects.Vector;
+      Programs     : Prototypes.Vector;
       Globals      : Object_Access;
       String_Metatable : Object_Access;
       Loaded_Modules : Object_Access;
@@ -197,13 +218,6 @@ private package Lua.Engine is
       Next_GC      : Positive := 256;
       Steps        : Natural := 0;
       Output       : Unbounded_String;
-      Failure      : Value;
-      Has_Failure_Value : Boolean := False;
-      Failure_Text : Unbounded_String;
-      Failure_At   : Lua.Lexers.Source_Location;
-      Is_Resource  : Boolean := False;
-      Is_Syntax    : Boolean := False;
-      Is_Unsupported : Boolean := False;
    end record;
    type World_Access is access World;
 
@@ -213,6 +227,13 @@ private package Lua.Engine is
    procedure Fail (State : in out World; Message : String;
                    Resource : Boolean := False);
    --  Record a diagnostic before raising the internal transfer exception.
+
+   function Create_Context (State : in out World) return Context_Id;
+   --  Register an empty context without selecting it or resetting budgets.
+   --  Finalize releases all registered contexts, including inactive roots.
+   procedure Select_Context (State : in out World; Id : Context_Id);
+   --  Select between driver invocations. Invalid IDs or selection while the
+   --  current driver is running raise Program_Error (internal misuse).
 
    procedure Initialize (State : in out World; Bounds : Limits);
    procedure Finalize (State : in out World);

@@ -243,23 +243,24 @@ package body Lua.Engine.Loaders is
          Results : Values.Vector;
          Code : Prototype_Access;
          Scope : Object_Access;
-         Saved_Text : constant Unbounded_String := State.Failure_Text;
-         Saved_Value : constant Value := State.Failure;
-         Saved_Has_Value : constant Boolean := State.Has_Failure_Value;
-         Saved_At : constant Lua.Lexers.Source_Location := State.Failure_At;
-         Saved_Syntax : constant Boolean := State.Is_Syntax;
-         Saved_Unsupported : constant Boolean := State.Is_Unsupported;
-         Saved_Resource : constant Boolean := State.Is_Resource;
+         Saved_Text : constant Unbounded_String := State.Current.Failure_Text;
+         Saved_Value : constant Value := State.Current.Failure;
+         Saved_Has_Value : constant Boolean := State.Current.Has_Failure_Value;
+         Saved_At : constant Lua.Lexers.Source_Location :=
+           State.Current.Failure_At;
+         Saved_Syntax : constant Boolean := State.Current.Is_Syntax;
+         Saved_Unsupported : constant Boolean := State.Current.Is_Unsupported;
+         Saved_Resource : constant Boolean := State.Current.Is_Resource;
          procedure Restore;
          procedure Restore is
          begin
-            State.Failure_Text := Saved_Text;
-            State.Failure := Saved_Value;
-            State.Has_Failure_Value := Saved_Has_Value;
-            State.Failure_At := Saved_At;
-            State.Is_Syntax := Saved_Syntax;
-            State.Is_Unsupported := Saved_Unsupported;
-            State.Is_Resource := Saved_Resource;
+            State.Current.Failure_Text := Saved_Text;
+            State.Current.Failure := Saved_Value;
+            State.Current.Has_Failure_Value := Saved_Has_Value;
+            State.Current.Failure_At := Saved_At;
+            State.Current.Is_Syntax := Saved_Syntax;
+            State.Current.Is_Unsupported := Saved_Unsupported;
+            State.Current.Is_Resource := Saved_Resource;
          end Restore;
       begin
          --  Mode filtering precedes compilation. A binary-capable mode does
@@ -288,20 +289,20 @@ package body Lua.Engine.Loaders is
          end if;
          State.Steps := State.Steps + Source'Length;
          begin
-            State.Is_Syntax := False;
-            State.Is_Unsupported := False;
-            State.Is_Resource := False;
+            State.Current.Is_Syntax := False;
+            State.Current.Is_Unsupported := False;
+            State.Current.Is_Resource := False;
             Code := Compiler.Compile (State, Source, Chunk_Name);
          exception
             when Language_Error =>
-               if State.Is_Resource then
+               if State.Current.Is_Resource then
                   raise;
                end if;
                declare
                   Message : constant String := Chunk_Name & ":" &
                     Ada.Strings.Fixed.Trim
-                      (State.Failure_At.Line'Image, Ada.Strings.Both) &
-                    ": " & To_String (State.Failure_Text);
+                      (State.Current.Failure_At.Line'Image, Ada.Strings.Both) &
+                    ": " & To_String (State.Current.Failure_Text);
                begin
                   Restore;
                   Results.Append (Nil_Value);

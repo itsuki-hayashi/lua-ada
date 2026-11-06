@@ -1,7 +1,7 @@
 # Project Status
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**
-**M3 is in progress; M3-01 is implemented and in PR review.**
+**M3 is in progress; M3-01 is merged and M3-02A implements context ownership.**
 
 ## Implemented and verified
 
@@ -63,7 +63,13 @@ Both C profiles pass smoke, child-configuration, REPL, and bounded heavy checks
 on every OS. Linux aggregates finish with explicit T/locale omissions; native
 Windows/macOS aggregate failures remain pending platform obligations. Exact
 results and limits are in the [session record](sessions/2026-11-06-m3-01-contracts.md).
-PR [#5](https://github.com/itsuki-hayashi/lua-ada/pull/5) remains open and unmerged.
+PR [#5](https://github.com/itsuki-hayashi/lua-ada/pull/5) is merged.
+
+M3-02A separates private execution stacks, arguments and diagnostics from the
+shared world, with all-context root tracing and cleanup. Eight focused tests
+extend the 480-case baseline; local validation/static passes 488 cases and the
+retained acceptance pipeline. See the [session](sessions/2026-11-06-m3-02-contexts.md).
+Typed transfers, error-policy changes and public coroutines remain open.
 
 The current production interpreter remains the accepted M2b implementation.
 Its quotas, private packet VM, and deferred facilities are unchanged in this

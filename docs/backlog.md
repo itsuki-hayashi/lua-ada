@@ -122,6 +122,12 @@ retain their original counts rather than being rewritten as newer evidence.
 
 ## M3 complete upstream coverage
 
+M3-01 is merged in PR #5. M3-02A implements context ownership, selection guards,
+all-context tracing and cleanup; its [evidence](sessions/2026-11-06-m3-02-contexts.md)
+records 488 local AUnit cases. The parent M3-02 gate remains in progress.
+M3-02B depends on this slice and must implement typed control transfers and
+semantic-error versus host-abort policy with protected-call/recovery tests.
+
 The [accepted M3 contract](milestones/m3.md) owns configuration, resource,
 coverage and delivery rules. The machine-readable
 [conformance inventory](../tests/conformance/README.md) owns source hashes,
@@ -130,8 +136,8 @@ from completed coverage: pending cases are expected now and forbidden at M3-13.
 
 | ID    | Work                           | State       | Depends on     | Acceptance                                                                                                                      |
 | ----- | ------------------------------ | ----------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| M3-01 | Contracts and baseline harness | in review   | M2B-ACCEPT-001 | Full inventory, isolated C configurations, disposable runners, native baselines, focused validation and truthful pending ledger |
-| M3-02 | Execution contexts and errors  | planned     | M3-01          | Per-coroutine state, transfer types, semantic errors versus hard quotas, preserved session/recovery cases                       |
+| M3-01 | Contracts and baseline harness | done        | M2B-ACCEPT-001 | Full inventory, isolated C configurations, disposable runners, native baselines, focused validation and truthful pending ledger |
+| M3-02 | Execution contexts and errors  | in progress | M3-01          | Per-coroutine state, transfer types, semantic errors versus hard quotas, preserved session/recovery cases                       |
 | M3-03 | Storage foundation             | planned     | M3-02          | Allocator-aware storage, tables/cells/strings/userdata/thread handles, barriers, failure and cleanup evidence                   |
 | M3-04 | Real C-boundary feasibility    | planned     | M3-03          | Actual Ada exports, callbacks/errors/panic/yields, stable layouts/addresses, automatic initialization and cleanup counters      |
 | M3-05 | Canonical compiler and VM      | planned     | M3-04          | Canonical prototypes/opcodes/registers/top/upvalues/metadata and migration comparisons                                          |
@@ -147,7 +153,7 @@ from completed coverage: pending cases are expected now and forbidden at M3-13.
 Each ID is a separate implementation task and PR. Continue from updated master
 after the predecessor is merged by the maintainer; do not merge automatically.
 M3-01's [evidence](sessions/2026-11-06-m3-01-contracts.md) and
-[open PR #5](https://github.com/itsuki-hayashi/lua-ada/pull/5) record its verified
+[merged PR #5](https://github.com/itsuki-hayashi/lua-ada/pull/5) record its verified
 implementation. Every M3 coverage obligation remains pending.
 M3-01 introduces infrastructure only. It does not change runtime semantics,
 allocator behavior, execution quotas, or the production C/CLI interface.

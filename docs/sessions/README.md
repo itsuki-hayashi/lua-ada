@@ -1,6 +1,9 @@
 # Session Records
 
-Latest: [M3-01 contracts and harness](2026-11-06-m3-01-contracts.md).
+Latest: [M3-02A execution contexts](2026-11-06-m3-02-contexts.md).
+
+The runtime context slice follows merged PR #5; its linked record owns current
+implementation evidence and remaining M3-02 work.
 
 | Date       | Session                                                      |
 | ---------- | ---------------------------------------------------------    |
