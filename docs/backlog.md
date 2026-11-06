@@ -130,7 +130,7 @@ from completed coverage: pending cases are expected now and forbidden at M3-13.
 
 | ID    | Work                           | State       | Depends on     | Acceptance                                                                                                                      |
 | ----- | ------------------------------ | ----------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| M3-01 | Contracts and baseline harness | in progress | M2B-ACCEPT-001 | Full inventory, isolated C configurations, disposable runners, native baselines, focused validation and truthful pending ledger |
+| M3-01 | Contracts and baseline harness | in review   | M2B-ACCEPT-001 | Full inventory, isolated C configurations, disposable runners, native baselines, focused validation and truthful pending ledger |
 | M3-02 | Execution contexts and errors  | planned     | M3-01          | Per-coroutine state, transfer types, semantic errors versus hard quotas, preserved session/recovery cases                       |
 | M3-03 | Storage foundation             | planned     | M3-02          | Allocator-aware storage, tables/cells/strings/userdata/thread handles, barriers, failure and cleanup evidence                   |
 | M3-04 | Real C-boundary feasibility    | planned     | M3-03          | Actual Ada exports, callbacks/errors/panic/yields, stable layouts/addresses, automatic initialization and cleanup counters      |
@@ -146,6 +146,9 @@ from completed coverage: pending cases are expected now and forbidden at M3-13.
 
 Each ID is a separate implementation task and PR. Continue from updated master
 after the predecessor is merged by the maintainer; do not merge automatically.
+M3-01's [evidence](sessions/2026-11-06-m3-01-contracts.md) and
+[open PR #5](https://github.com/itsuki-hayashi/lua-ada/pull/5) record its verified
+implementation. Every M3 coverage obligation remains pending.
 M3-01 introduces infrastructure only. It does not change runtime semantics,
 allocator behavior, execution quotas, or the production C/CLI interface.
 

@@ -1,7 +1,7 @@
 # Project Status
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**
-**M3 is in progress; M3-01 is the current foundation delivery.**
+**M3 is in progress; M3-01 is implemented and in PR review.**
 
 ## Implemented and verified
 
@@ -54,6 +54,16 @@ and focused harness checks. Baseline C outcomes and infrastructure checks are
 not Ada conformance passes. Pending coverage remains pending until actual
 execution or a reviewed equivalent supplies evidence. No later M3 runtime,
 collector, canonical VM, C facade or CLI-default gate is complete.
+
+The [M3-01 implementation matrix](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42141255975)
+passed all 18 jobs at 4d52d44127f1dedc6cafbf2c7ab3cb7695a9415e, including
+Windows static-PIC. Every job retained the 480-case Ada baseline and passed
+41 inventory/16 runner cases; real C consumers add the seventeenth runner case.
+Both C profiles pass smoke, child-configuration, REPL, and bounded heavy checks
+on every OS. Linux aggregates finish with explicit T/locale omissions; native
+Windows/macOS aggregate failures remain pending platform obligations. Exact
+results and limits are in the [session record](sessions/2026-11-06-m3-01-contracts.md).
+PR [#5](https://github.com/itsuki-hayashi/lua-ada/pull/5) remains open and unmerged.
 
 The current production interpreter remains the accepted M2b implementation.
 Its quotas, private packet VM, and deferred facilities are unchanged in this

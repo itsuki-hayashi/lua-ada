@@ -10,7 +10,9 @@ upstream coverage. It absorbs the remaining M2 runtime/libraries and the former
 C/binary compatibility target, including upstream native C fixture libraries.
 It is delivered through staged PRs, with reviewed Ada/platform equivalents
 where original assertions depend on C internals or unsupported native facilities.
-M3-01 is the current foundation gate; no later M3 runtime gate is complete.
+M3-01 is implemented and verified in
+[PR #5](https://github.com/itsuki-hayashi/lua-ada/pull/5), awaiting maintainer
+review/merge. M3-02 follows that merge; no later M3 runtime gate is complete.
 
 | Milestone | Target                                    | Completion gate                            |
 | --------- | ----------------------------------------- | ------------------------------------------ |
