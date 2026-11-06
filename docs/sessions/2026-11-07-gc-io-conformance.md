@@ -462,3 +462,22 @@ after copying the launcher into its disposable directory: libgnat-16.so was
 not found. The default and instrumented harnesses now derive the selected
 compiler's actual adalib directory and retain it in LD_LIBRARY_PATH. This
 corrects subprocess setup; validation of that fix awaits its CI revision.
+
+Author semantic candidates now cover all source bytes of the four files in
+84 contiguous hashed sections under tests/conformance/reviews. They explicitly
+retain pending independent review and have no coverage authority. Reading the
+complete files source exposed two empty-command subprocesses omitted from the
+new POSIX telemetry count: expected Ada child totals are eight/default and
+nine/instrumented (C normal-return totals four/five). The count is corrected.
+The files candidate also records that upstream's no-buffer write sequence opens
+a read-only stream and does not check that write result; its enclosing process
+success must not be used as proof of successful unbuffered output.
+
+CI 0159765 run 42273338984 confirms the corrected child cardinalities from
+actual Linux default static/shared and instrumented shared executions: C/Ada
+reported four/eight default and five/nine instrumented children, respectively.
+The prior six/seven Ada expectation caused the harness failure. Linux shared
+execution progressed beyond the repaired libgnat lookup into completed file
+execution; the next revision must still rerun the corrected gate. The existing
+IO: actual libc buffering modes AUnit case checks successful writes in all
+three buffering modes separately from the unchanged upstream sequence.

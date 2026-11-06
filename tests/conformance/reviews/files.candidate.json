@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "file": "files.lua",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86",
+  "author": "Codex",
+  "review_status": "pending",
+  "reviewer": null,
+  "coverage_authority": false,
+  "equivalent_candidate": "tests/conformance/equivalents/files-windows-platform.json",
+  "notes": [
+    "Author analysis of all pinned source bytes, not independent review or passing coverage. The Windows ten-span mapping and native counterparts require separate review and matching C evidence.",
+    "Most IO code is guarded by successful opening of os.tmpname. Date/version output alone can still occur after that block is skipped; acceptance must require the IO section witnesses and reject the temporary-file omission.",
+    "Run with _soft and _port unset. Instrumented POSIX execution must have T.nonblock; a false capability guard cannot close partial-write coverage. Windows executes the separately named native pipe counterpart.",
+    "The source launches two empty-command Lua children and four typed-exit Lua children via popen and execute. POSIX instrumented adds one bare-lua receiver. The harness adds two configuration probes: totals are eight/nine Ada and four/five normal-return C telemetry records. C os.exit bypasses its CLI writer.",
+    "Embedded Lua chunks, generated date assertions and shell receiver assertions are dynamic obligations, not inert strings or lexical pass evidence."
+  ],
+  "sections": [
+    {
+      "id": "standard-streams-and-open-errors",
+      "first_line": 1,
+      "last_line": 50,
+      "invariant": "PATH exists; input/output defaults use real full userdata and FILE* metatable identity; standard streams cannot be closed. Missing/invalid receiver, unsupported io.type values and failing paths return the specified errors and native error triples. Error-helper bodies are invoked throughout the file.",
+      "byte_offset": 0,
+      "byte_length": 1241,
+      "span_sha256": "78dd770c0590065f3ddc79a2b910a0247a1c457ab1ec7810358258b5278a46c7"
+    },
+    {
+      "id": "temporary-file-gate-modes-and-defaults",
+      "first_line": 51,
+      "last_line": 105,
+      "guard": "Temporary file must open; _port unset",
+      "invariant": "Temporary-file setup cannot skip the IO block. Opening mode validation, locale selection, failing loadfile/dofile, registry-owned defaults, seeks and writes work. Replacing default output permits its old stream to be finalized and restores stdout identity. Windows replaces only its native temporary-path/standard-input-seek assumptions with reviewed counterparts.",
+      "byte_offset": 1241,
+      "byte_length": 1658,
+      "span_sha256": "15611a69b4a32d9a8c26aa804a8bfd16e6769d2a50c059170b49342de1614c6c"
+    },
+    {
+      "id": "file-finalization-rename-and-scope-close",
+      "first_line": 106,
+      "last_line": 139,
+      "invariant": "Six hundred rounds of default input, temporary file and iterator creation survive repeated collection without leaking handles. Explicit default close, rename/failing rename, append and lexical close work; the escaped closed object retains userdata identity and closed tostring.",
+      "byte_offset": 2899,
+      "byte_length": 553,
+      "span_sha256": "4effccb4213e805a8a9a3ba11aaa5168bdb22c4c3dec41c86b1918bdf0e33084"
+    },
+    {
+      "id": "numeric-reads-and-multiple-formats",
+      "first_line": 140,
+      "last_line": 196,
+      "invariant": "Decimal/hexadecimal integers and hexadecimal floats preserve values including integer boundaries and signs. New and starred formats work. Multiple-format reads preserve result order and terminate at the first failed conversion, with exact newline and byte consumption.",
+      "byte_offset": 3452,
+      "byte_length": 1635,
+      "span_sha256": "b528616762c460e17497f90689d2f184767321994ddc6218806089afd3d02bf6"
+    },
+    {
+      "id": "yieldable-dofile",
+      "first_line": 197,
+      "last_line": 212,
+      "invariant": "The loaded file yields twice through dofile and resumes with two then one values; the final arithmetic return uses both suspended activations' state. This requires iterative execution transfer through the native callback path.",
+      "byte_offset": 5087,
+      "byte_length": 341,
+      "span_sha256": "d622465e098359ff8bc4e058435d0b46e7448c52b90e93f6a0d0461467cc2dd6"
+    },
+    {
+      "id": "numeric-scanner-prefixes-and-overflow",
+      "first_line": 213,
+      "last_line": 249,
+      "invariant": "Numeric scanning consumes exactly valid decimal/hex prefixes and leaves punctuation or malformed suffixes for following byte reads. An overlong numeral fails with unread zero suffix retained; repeated invalid scans and EOF zero-byte probes preserve position and result arity.",
+      "byte_offset": 5428,
+      "byte_length": 1291,
+      "span_sha256": "bdd1769b99a0dcabbf5b5b5db5408960dc95a3981ba5b027bfeaa9ac52e793e6"
+    },
+    {
+      "id": "iterator-eof-ownership-and-format-capacity",
+      "first_line": 250,
+      "last_line": 299,
+      "invariant": "io.lines owns and closes its file at EOF and rejects later calls; file:lines leaves ownership to the caller. Default-input iterators agree with explicit file iterators, captured handles survive until cleanup, and 250 formats work while a 251st is rejected without leaking the opened file.",
+      "byte_offset": 6719,
+      "byte_length": 1487,
+      "span_sha256": "391859084adf824ed4e279a48d96e2a0ac3a5554c2f5ca97c2b5528d83d55952"
+    },
+    {
+      "id": "read-seek-eof-and-closed-defaults",
+      "first_line": 300,
+      "last_line": 366,
+      "invariant": "Read-only writes produce native error triples. Line, keep-newline, number, fixed-byte, zero-byte and whole-file reads distinguish EOF correctly and return no spurious extra results. Relative/absolute seeking and flush preserve contents; closed registry defaults reject read/write.",
+      "byte_offset": 8206,
+      "byte_length": 1892,
+      "span_sha256": "11bcfdc4a67c7e2cdeb7ac085ac3fbe2ce6442eb222dafc3e19ad4923cffe54c"
+    },
+    {
+      "id": "native-read-write-and-iterator-errors",
+      "first_line": 367,
+      "last_line": 392,
+      "invariant": "Reading a write-only stream, writing a read-only stream and iterating an unreadable stream report textual errors with numeric codes where specified; handles remain explicitly closable.",
+      "byte_offset": 10098,
+      "byte_length": 589,
+      "span_sha256": "22ba0af019d0442069a8288fa8d5bb7b3c3d710b687e01a506268369ad2220ce"
+    },
+    {
+      "id": "newline-formats-and-reader-load-environment",
+      "first_line": 393,
+      "last_line": 428,
+      "invariant": "L retains newline and final unterminated text across all iterator forms; l removes newline. A line iterator feeds load with an explicit environment, and the resulting code performs its expected assignments.",
+      "byte_offset": 10687,
+      "byte_length": 819,
+      "span_sha256": "cfe763f8bfa02f76bf94462f64bbbd980fb4c5ba59f56e14f5d1abb5ff4482ab"
+    },
+    {
+      "id": "generic-for-close-debug-locals",
+      "first_line": 429,
+      "last_line": 465,
+      "invariant": "debug.getlocal exposes the third (for state) variable as the fourth closing value. io.lines' handle is open inside the loop and closed after both break and a propagated error, including the handle used as the error object.",
+      "byte_offset": 11506,
+      "byte_length": 837,
+      "span_sha256": "494bfdd3397009e0561123ace1f52a8a8c46f69f805ba554eeb44fc184d58844"
+    },
+    {
+      "id": "buffered-device-flush-failure",
+      "first_line": 466,
+      "last_line": 482,
+      "invariant": "Buffered writes to the sink flush successfully. Buffered writes to the failing device initially succeed but explicit file/default flush fails, and close follows the required semantics. Windows uses an actual failing FILE stream counterpart; macOS device availability needs native baseline evidence, not a broad portability skip.",
+      "byte_offset": 12343,
+      "byte_length": 533,
+      "span_sha256": "fb37224b3b9d923436de593565ada5fdd3035e33f625f960020f0d323fab7186"
+    },
+    {
+      "id": "multi-format-iterators-and-loading-chunks",
+      "first_line": 483,
+      "last_line": 546,
+      "invariant": "Iterator result tuples terminate correctly on partial EOF, numbers and whole-file reads. load from line-without-newline fails where token boundaries change; line-with-newline, one-byte and three-byte readers execute correctly. Quoted strings and final comments round-trip through loadfile and files are removed.",
+      "byte_offset": 12876,
+      "byte_length": 1384,
+      "span_sha256": "e7dd7696f5993c510771c8154d37435086b6f9389d5af84592c908b21d444a72"
+    },
+    {
+      "id": "loadfile-bom-shebang-binary-and-environments",
+      "first_line": 547,
+      "last_line": 635,
+      "invariant": "Empty files, initial comments without newline, BOMs and initial-comment line numbers load correctly. Binary files preserve zero/255 bytes and multiple returns, including no-upvalue functions and prefixed comments. Explicit table/nil/default environments and text/binary mode rejection are distinct.",
+      "byte_offset": 14260,
+      "byte_length": 2361,
+      "span_sha256": "2d4d4a331a57d63362ee2c4f9ca73811f8917bdeec56f9b08b9405848bb7e3bc"
+    },
+    {
+      "id": "binary-file-identity-and-combined-reads",
+      "first_line": 636,
+      "last_line": 689,
+      "invariant": "Two real file userdata retain distinct identity across default-stream changes. Binary reads preserve zero and byte 255 without confusing EOF; mixed fixed/number/line/all reads retain ordering and terminate correctly, with explicit close and removal.",
+      "byte_offset": 16621,
+      "byte_length": 1449,
+      "span_sha256": "81db9042e91b03ace24a09eefa2bc772e8acdd9848ccc7bf19f93cf6cc92d535"
+    },
+    {
+      "id": "buffering-visibility",
+      "first_line": 690,
+      "last_line": 717,
+      "invariant": "Full buffering hides pending output from a second reader until close; line buffering exposes output after newline. Preserve the exact upstream no-buffer sequence, but do not claim it independently proves a successful unbuffered write: its io.open call omits the write mode and its write result is unchecked. Separate focused native tests must cover that stronger contract.",
+      "byte_offset": 18070,
+      "byte_length": 792,
+      "span_sha256": "5632d3c486b6e9524c5a23468fbb3b0276a19f6db96801ae8c3997113137535c",
+      "focused_regressions": [
+        "IO: actual libc buffering modes"
+      ]
+    },
+    {
+      "id": "nonblocking-partial-write",
+      "first_line": 718,
+      "last_line": 748,
+      "guard": "T and T.nonblock and _port unset",
+      "required_adapter": [
+        "nonblock"
+      ],
+      "invariant": "An unbuffered failing device reports positive errno and zero written bytes. A real nonblocking pipe accepts a prefix then reports a partial multi-argument write count between 512 and 2^17 while the same implementation's child receives exactly 10000 bytes. Close waits for receiver completion. The Windows native equivalent preserves actual partial IO, ordering and cleanup.",
+      "byte_offset": 18862,
+      "byte_length": 899,
+      "span_sha256": "e8f5583ed566fb02bae8af12877939744620594561f1a62e107d933ff63f68a9"
+    },
+    {
+      "id": "large-buffer-crossing-reads",
+      "first_line": 749,
+      "last_line": 768,
+      "guard": "_soft unset",
+      "invariant": "A file of 5001*13+6 bytes reads identically as a whole, as differently sized segments including zero-length, and as a large line plus final text. EOF and cleanup are verified.",
+      "byte_offset": 19761,
+      "byte_length": 561,
+      "span_sha256": "d005a16c95a2e802adb84f8778f05c08ea0a729b4e7284f610d37d1ba88326c9"
+    },
+    {
+      "id": "shell-pipe-status-and-typed-exit-children",
+      "first_line": 769,
+      "last_line": 822,
+      "guard": "_port unset",
+      "invariant": "Invalid popen modes fail. Pipe write/read round-trips and temporary cleanup work. Every shell command's popen-close status matches execute: success, missing command, exit 3/129, direct HUP/KILL signals, nested-shell termination, an empty same-executable command and typed exits 0/20 with state closure. Windows mapping replaces native shell syntax/status assumptions, not Lua success/failure semantics.",
+      "byte_offset": 20322,
+      "byte_length": 1668,
+      "span_sha256": "18c6c26e1abf97f1bf88f2cb83d05536ea5bbc88c73936451d26b5ea41189dc8"
+    },
+    {
+      "id": "temporary-stream-and-end-of-io-block",
+      "first_line": 823,
+      "last_line": 833,
+      "invariant": "io.tmpfile returns a real file, supports write/seek/read and remains eligible for close-time finalization. The enclosing temporary-path guard ends here; the following date tests also run when IO was skipped, so their output is not sufficient IO evidence.",
+      "byte_offset": 21990,
+      "byte_length": 141,
+      "span_sha256": "2cd495d3b87e088caad1abd2abd89edf6af9713730e6c3ce6ad3be27526be177"
+    },
+    {
+      "id": "date-format-and-generated-table-roundtrip",
+      "first_line": 834,
+      "last_line": 866,
+      "invariant": "Date formatting preserves empty strings, embedded NUL and long literal/repeated conversion strings. Current and selected epoch boundary timestamps round-trip through date tables. Dynamically generated Lua assertions compare all calendar fields, weekday and yearday against formatting and are actually loaded/executed.",
+      "byte_offset": 22131,
+      "byte_length": 886,
+      "span_sha256": "78703b39f085fd0b366f00cc07c6ae86e8fb688decda953a3e555a76a460f274"
+    },
+    {
+      "id": "date-invalid-specifiers-and-field-ranges",
+      "first_line": 867,
+      "last_line": 893,
+      "invariant": "Unsupported or incomplete conversions fail, noninteger and missing time fields produce the expected diagnostics, and native-int year limits are checked without arithmetic overflow under the actual integer-width guards.",
+      "byte_offset": 23017,
+      "byte_length": 1010,
+      "span_sha256": "a296b750dbf19bc6f9c5465466f431f76ec8ef5e9c0426fe8850db2b95e1ddf9"
+    },
+    {
+      "id": "native-date-modifiers-normalization-and-range",
+      "first_line": 894,
+      "last_line": 950,
+      "guard": "_port unset plus actual native int/time widths",
+      "invariant": "POSIX E/O modifiers, signed 31-bit second normalization and native representability limits are exercised. Dynamic time_t probing selects the original branch; every rejected day/month/year bound and final-second overflow retains its specific failure. Windows uses the source-hashed CRT-compatible date/range counterparts. macOS must use observed native behavior.",
+      "byte_offset": 24027,
+      "byte_length": 2210,
+      "span_sha256": "e3ce52c5d6bf4409c6cd28801e5a9f6c3288ace6e324c5cc203722805170ea26"
+    },
+    {
+      "id": "dst-difftime-and-table-normalization",
+      "first_line": 951,
+      "last_line": 989,
+      "invariant": "Date tables expose boolean DST where available and reconstruct current time with default DST inference. difftime handles leap-year intervals and signed differences. Negative seconds normalize all date-table fields across the year boundary, including yearday 366.",
+      "byte_offset": 26237,
+      "byte_length": 1125,
+      "span_sha256": "bd20923ed921ac77645a1c3bf4091e946df1abbad052d5f889d81e37ef0ee266"
+    },
+    {
+      "id": "final-date-version-completion",
+      "first_line": 990,
+      "last_line": 1005,
+      "invariant": "Default output is restored to stdout, parsed current calendar fields produce the final date/time line, and the exact Lua version line terminates output. Acceptance checks this witness together with every IO guard, expected stderr, subprocess configuration and balanced physical shutdown.",
+      "byte_offset": 27362,
+      "byte_length": 442,
+      "span_sha256": "fd4a896a7453f1445d79798a6b66b112153debf969a2a2f55c1f3ee32d4eaf5d"
+    }
+  ]
+}

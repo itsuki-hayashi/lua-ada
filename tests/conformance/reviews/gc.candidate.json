@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "file": "gc.lua",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+  "author": "Codex",
+  "review_status": "pending",
+  "reviewer": null,
+  "coverage_authority": false,
+  "equivalent_candidate": "tests/conformance/equivalents/gc-ada-instrumented.json",
+  "notes": [
+    "Author analysis of the complete pinned source, not independent review or passing coverage.",
+    "Run with _soft and _port unset. Default T omission covers multiple silent guarded blocks in addition to the printed userdata message.",
+    "The program's final OK precedes required state-close callbacks. Ten shutdown warning-producing finalizers contain order/message assertions, and the older retained finalizer prints the closing-state witness afterward. Process completion, expected warnings and physical cleanup are mandatory.",
+    "The source-hashed Ada equivalent changes four spans for three representation differences. Original C execution, the explicit Ada counterpart tests, and independent mapping review are all required; equivalent execution is never an unchanged pass."
+  ],
+  "sections": [
+    {
+      "id": "mode-returns-and-extreme-parameters",
+      "first_line": 1,
+      "last_line": 49,
+      "invariant": "Collection starts running; mode changes return the actual prior mode, including repeated requests. Pause and step multiplier controls accept the eight tested values through 0x7ffffffe across their nested combinations, perform requested steps safely, and restore saved controls.",
+      "byte_offset": 0,
+      "byte_length": 1292,
+      "span_sha256": "28922c9e6bdbdb7566acd11fe869607b258324f62b0c64aa5ccc078d6e324867"
+    },
+    {
+      "id": "measured-step-work",
+      "first_line": 50,
+      "last_line": 80,
+      "invariant": "After allocating reachable and discarded tables, explicit steps complete a cycle and reduce actual live memory. With automatic collection stopped and _port unset, size 10 completes in fewer steps than size 2. Automatic collection is restarted.",
+      "byte_offset": 1292,
+      "byte_length": 570,
+      "span_sha256": "fe72b2fb5dae5cc1500fcfa1c649d2419cf571c4c81d9da18eb58330984f104c"
+    },
+    {
+      "id": "allocation-triggered-progress-helpers",
+      "first_line": 81,
+      "last_line": 125,
+      "invariant": "GC1 and GC2 each allocate tables, strings and closures until an unreachable table's finalizer runs. A neighboring live stack table remains intact. These helpers are invoked by later ephemeron tests; merely compiling their bodies is insufficient.",
+      "byte_offset": 1862,
+      "byte_length": 1467,
+      "span_sha256": "49cf0e8f2055054ddf9eb904b7251769c2e7c15417e1d258291d406866e5d6b6"
+    },
+    {
+      "id": "object-and-prototype-churn",
+      "first_line": 126,
+      "last_line": 162,
+      "invariant": "Five thousand table/string iterations and five thousand dynamically loaded function definitions complete with the expected changing return values. Replaced prototypes, temporary strings and a function with no captures are collectible.",
+      "byte_offset": 3329,
+      "byte_length": 550,
+      "span_sha256": "feb3c8e9c9612ac9e502bc2b90dfc674ee74af14fb51d9e85a21722e4635a10e"
+    },
+    {
+      "id": "failed-load-cleanup",
+      "first_line": 163,
+      "last_line": 185,
+      "invariant": "With _soft unset, every substring of the embedded source is passed through load and protected invocation. Parse failures, partial compiler ownership and runtime errors clean up without corrupting subsequent execution. Embedded source assertions/text are templates, not automatically executed anchors.",
+      "byte_offset": 3879,
+      "byte_length": 428,
+      "span_sha256": "70a38f5d62786dd4767a70b52d132b4cce84db95a5dcae142349811b391ccd4b"
+    },
+    {
+      "id": "long-string-and-global-root-retention",
+      "first_line": 186,
+      "last_line": 203,
+      "invariant": "Repeated concatenation and pattern substitution preserve exact lengths and match counts; a previously installed unusual global name remains rooted until explicit deletion.",
+      "byte_offset": 4307,
+      "byte_length": 476,
+      "span_sha256": "034a3fad1d9a31c6ce1335bd474a6c26fdcc2e6130123bae09662cb7a2e1c503"
+    },
+    {
+      "id": "stop-restart-and-memory-debt",
+      "first_line": 204,
+      "last_line": 219,
+      "invariant": "Stopped automatic collection permits actual memory growth above three times baseline. Restart reports running and allocation-driven collection eventually reduces memory to at most twice baseline; no broad portability skip is allowed.",
+      "byte_offset": 4783,
+      "byte_length": 308,
+      "span_sha256": "4713d758ec3124bb8b691c2dfd3dbb11fab7f2822377f11b236a7d82ae6a8716"
+    },
+    {
+      "id": "deleted-table-keys-and-iteration-roots",
+      "first_line": 220,
+      "last_line": 239,
+      "invariant": "Deleting collectable keys while iterating a separate retaining table and collecting each iteration keeps the iterator's live key valid. After dropping roots the first table is empty and remains reusable.",
+      "byte_offset": 5091,
+      "byte_length": 445,
+      "span_sha256": "bdb8aaa7c139d0fecefed1fe323185d7e7fd0d3fcbaed5e95beb7a6e8a124b28"
+    },
+    {
+      "id": "weak-keys-values-and-both",
+      "first_line": 240,
+      "last_line": 296,
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection.",
+      "byte_offset": 5536,
+      "byte_length": 1521,
+      "span_sha256": "c2ac0f96cd0299bff17838f2bdea269356045e0cf4ad25e73484dedfee33d00a"
+    },
+    {
+      "id": "all-weak-metatable-publication-at-atomic",
+      "first_line": 297,
+      "last_line": 306,
+      "guard": "T present",
+      "required_adapter": [
+        "gcstate"
+      ],
+      "invariant": "Advance the real collector from propagation to enteratomic, replace an already visited all-weak table's metatable, then finish the cycle. The newly published metatable remains valid.",
+      "byte_offset": 7057,
+      "byte_length": 335,
+      "span_sha256": "809eb653ca2b4add1d34f6a233b9768f9e3eebd75d7c972b4ba0c22d47e96152"
+    },
+    {
+      "id": "weak-clearing-before-finalization",
+      "first_line": 307,
+      "last_line": 326,
+      "invariant": "A target reachable only through a finalizable object is removed from weak values before its callback but remains visible as a weak key during that callback. Both weak structures empty after subsequent collection.",
+      "byte_offset": 7392,
+      "byte_length": 543,
+      "span_sha256": "dfa5a0b496907690082ab2175e856dbf8cb6f39bbc9fac8b1a3686ee9b94cdff"
+    },
+    {
+      "id": "ephemeron-fixed-point",
+      "first_line": 327,
+      "last_line": 360,
+      "invariant": "One hundred ephemeron links remain traversable from a live terminal key, then disappear when its root is dropped while numeric-key values remain. A second graph distributes one hundred links across ten ephemeron tables and survives allocation-triggered GC; dropping its root permits collection. The commented-out final assertion is not an executed obligation.",
+      "byte_offset": 7935,
+      "byte_length": 705,
+      "span_sha256": "b8508b3d515b5b457b076bd4640769795f802296f6f6326118e4b5f6b0703935"
+    },
+    {
+      "id": "finalizer-order-error-and-warning-storage",
+      "first_line": 361,
+      "last_line": 398,
+      "guard": "T present",
+      "invariant": "Reverse enrollment order is observed through a weak-key index. An error at index eight produces the stored expected warning, later finalizers still progress, and a second collection handles new enrollments. Removing gc before later invocation suppresses that callback; warning mode returns to normal.",
+      "byte_offset": 8640,
+      "byte_length": 850,
+      "span_sha256": "ea32a4cf26cc6b8fc03548020b33b9d4f1959840a170a8dc309b0ac37f626a5a"
+    },
+    {
+      "id": "full-userdata-finalization-and-weak-visibility",
+      "first_line": 399,
+      "last_line": 439,
+      "guard": "T present; default prints omission",
+      "required_adapter": [
+        "newuserdata"
+      ],
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle.",
+      "byte_offset": 9490,
+      "byte_length": 1142,
+      "span_sha256": "6c63f098efe009d1a261f4d5e6dea677b604dc305feed074ef4824f4d6600e3d"
+    },
+    {
+      "id": "invocation-time-handler-and-weak-metatable-content",
+      "first_line": 440,
+      "last_line": 458,
+      "invariant": "A gc function held only weakly is collected before invocation, so its os.exit sentinel never executes. All-weak content reachable from another finalizer's metatable is cleared before that finalizer reads it.",
+      "byte_offset": 10632,
+      "byte_length": 512,
+      "span_sha256": "249388f5fb6873736f01d91c10958d82ad37eead047d1f223a58b53e2841414d"
+    },
+    {
+      "id": "weak-long-string-storage",
+      "first_line": 459,
+      "last_line": 480,
+      "equivalent_replacements": [
+        "measure-live-payloads",
+        "reclaim-payloads"
+      ],
+      "invariant": "String-key/number entries survive while collectable-value and collectable-key entries disappear. Deleting the last entry leaves safe dead-key lookup. Original C requires at most one KiB residual storage; the Ada candidate instead measures release of both real four-MiB payloads while allowing retained Ada table capacity.",
+      "byte_offset": 11144,
+      "byte_length": 892,
+      "span_sha256": "860213c73b5389ca702caaaba333e0a0486f28afaa0dd262bb0660723b784e80"
+    },
+    {
+      "id": "ordinary-finalizer-warning",
+      "first_line": 481,
+      "last_line": 491,
+      "guard": "T present",
+      "invariant": "An ordinary finalizer error is delivered through the real warning handler into _WARN and the stored expected text is checked before restoring normal warning mode.",
+      "byte_offset": 12036,
+      "byte_length": 244,
+      "span_sha256": "f9817fb72f1816ef6557d9e464e3e5652742d4284973f77df7ef311eb2f0008e"
+    },
+    {
+      "id": "deep-list-physical-collection",
+      "first_line": 492,
+      "last_line": 501,
+      "guard": "_soft unset",
+      "invariant": "A 200000-link table chain can be discarded and collected without exhausting host recursion or leaving retained storage.",
+      "byte_offset": 12280,
+      "byte_length": 135,
+      "span_sha256": "fa11ed81b6c5e856f3d6108fb95a8281149f5092e1226fc2f56bceb2c168b290"
+    },
+    {
+      "id": "self-referential-coroutines-and-cells",
+      "first_line": 502,
+      "last_line": 548,
+      "invariant": "One thousand suspended self-referential coroutines export closures over open cells. A separate unreachable coroutine/function/table cycle containing a finalizer is reclaimed by explicit collection and sets its completion flag; rooted cells must remain safe during physical thread cleanup.",
+      "byte_offset": 12415,
+      "byte_length": 1315,
+      "span_sha256": "392f4cc6456110d120eb978f0735ea81223216502c882be8f636edcd9f4d216b"
+    },
+    {
+      "id": "explicit-step-preserves-stopped-mode",
+      "first_line": 549,
+      "last_line": 561,
+      "invariant": "A step while automatic collection is stopped does not restart it. Subsequent allocation grows above twice measured live storage before explicit restart and root removal.",
+      "byte_offset": 13730,
+      "byte_length": 287,
+      "span_sha256": "a3475540a3bb9692544d0c12cddbe15dbb196a63ad0846f4edd4e777a80d03ca"
+    },
+    {
+      "id": "orphan-cell-atomic-and-sweep-barriers",
+      "first_line": 562,
+      "last_line": 604,
+      "guard": "T present",
+      "required_adapter": [
+        "gcstate",
+        "gccolor",
+        "newuserdata"
+      ],
+      "equivalent_replacements": [
+        "stable-cell-color"
+      ],
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge.",
+      "byte_offset": 14017,
+      "byte_length": 1629,
+      "span_sha256": "178809de1cb07a502d0e271ce44c6016ce038a2d2f0dfd7ed3e9e62a13dd1f2c"
+    },
+    {
+      "id": "enrollment-order-memory-invariants",
+      "first_line": 605,
+      "last_line": 617,
+      "guard": "T present",
+      "required_adapter": [
+        "newuserdata",
+        "gccolor",
+        "checkmemory"
+      ],
+      "invariant": "Enrolling a newer userdata before an older one keeps color and actual allocator/collector ownership invariants valid under checkmemory.",
+      "byte_offset": 15646,
+      "byte_length": 342,
+      "span_sha256": "b67a6c0a8dff5cf1fbeff072aacf44671dd3386e98a0cef2b1670c0d39da5cfc"
+    },
+    {
+      "id": "delegation-write-tricolor-invariant",
+      "first_line": 618,
+      "last_line": 632,
+      "guard": "T present",
+      "required_adapter": [
+        "gcstate",
+        "gccolor"
+      ],
+      "invariant": "An assignment delegated to a black parent at enteratomic cannot leave a black-to-white edge. The new child survives completion of the cycle and accepts a later field write.",
+      "byte_offset": 15988,
+      "byte_length": 407,
+      "span_sha256": "ff84a903ebde8b027113266f4f29c1ba8300536f5469618bd5a90808a69e0b94"
+    },
+    {
+      "id": "emergency-refusal-and-real-object-counts",
+      "first_line": 633,
+      "last_line": 652,
+      "guard": "T present",
+      "required_adapter": [
+        "totalmem"
+      ],
+      "equivalent_replacements": [
+        "measured-emergency-headroom"
+      ],
+      "invariant": "The C fixed 200-byte headroom loop is replaced in the Ada candidate by 200 actual table allocations within one measured table of headroom, with at least 199 real refusals and recoveries. Limits are restored. Subsequent real table/function/thread counts increase by exactly four/one/one.",
+      "byte_offset": 16395,
+      "byte_length": 564,
+      "span_sha256": "2946e815a8a2a8a5a00a4c98273115daf9831e11771c47bd9f3643912d5c43ec"
+    },
+    {
+      "id": "state-close-resurrection-witness",
+      "first_line": 653,
+      "last_line": 669,
+      "invariant": "A globally retained object is finalized during state close, validates its metatable, allocates, resurrects itself and creates another finalizable object. Closing terminates and emits the closing-state marker after top-level OK; newly enrolled objects must not cause infinite close-time finalization.",
+      "byte_offset": 16959,
+      "byte_length": 579,
+      "span_sha256": "705b262f7e414b766535e0e55c25332e8e4bd3a6f52126366c3b348350926a55"
+    },
+    {
+      "id": "state-close-order-and-warning-assertions",
+      "first_line": 670,
+      "last_line": 694,
+      "guard": "T present; assertions execute after top-level OK",
+      "invariant": "Ten retained shutdown finalizers run in order one through ten, each raises the expected warning, and later callbacks validate the preceding stored warning and stable message text. Unexpected warnings or failure of any callback assertion must fail the run even after OK.",
+      "byte_offset": 17538,
+      "byte_length": 729,
+      "span_sha256": "3d71a6ad6da07aec5933c1edc8ba807640ff7a4ed3655a328439adf52d7625db"
+    },
+    {
+      "id": "nonreentrancy-and-mode-restoration",
+      "first_line": 695,
+      "last_line": 710,
+      "invariant": "Automatic collection remains running, a finalizer's attempt to collect returns false, and the saved previous collector mode is restored.",
+      "byte_offset": 18267,
+      "byte_length": 289,
+      "span_sha256": "312e91e3326fb8cbce8a591ad145117b81717805a58710a5521e8abb3b608e84"
+    },
+    {
+      "id": "deferred-finalizer-physical-storage-refusal",
+      "first_line": 711,
+      "last_line": 750,
+      "guard": "T present",
+      "required_adapter": [
+        "resetCI",
+        "reallocstack",
+        "alloccount"
+      ],
+      "invariant": "After real frame-cache shrinking, persistent allocation refusal prevents a finalizer call and retains it pending; lifting refusal allows eventual progress. Repeat after physical stack shrinking with retained activation capacity. Both checks observe false before retry and true afterward, not merely logical capacity counters.",
+      "byte_offset": 18556,
+      "byte_length": 1081,
+      "span_sha256": "9fbd39d0ebe2c9bae5ad636cd1f9644a4657f1035e0678dc36b7a63acfb90ad6"
+    },
+    {
+      "id": "top-level-completion-before-shutdown",
+      "first_line": 751,
+      "last_line": 752,
+      "invariant": "Top-level OK is required but does not certify close-time finalizers, warning delivery or physical allocator balance.",
+      "byte_offset": 19637,
+      "byte_length": 13,
+      "span_sha256": "15804548a950e310c6d45895dd46c245e44af6217d6ec20ba27673a3e0cbdbaf"
+    }
+  ]
+}

@@ -159,6 +159,14 @@ Header guards do not qualify. A reason string alone cannot waive a public API.
 
 ## Checks
 
+Author semantic candidates are available for [events](reviews/events.candidate.json),
+[gc](reviews/gc.candidate.json), [gengc](reviews/gengc.candidate.json) and
+[files](reviews/files.candidate.json). Their contiguous hashed spans identify
+dynamic callbacks, generated code, silent T guards, early returns and shutdown
+obligations. They carry no coverage authority and are not independent reviews.
+Reviewers must reconcile these candidates with the original source, actual
+per-context observations and equivalent counterparts before resolving the ledger.
+
 The named scope [gc-io-events](scopes/gc-io-events.json) selects events.lua,
 files.lua, gc.lua and gengc.lua, including every original anchor and subsequent
 reviewed block in those partitions, plus 77 directly exercised public API

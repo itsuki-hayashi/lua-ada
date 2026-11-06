@@ -88,11 +88,12 @@ foreach ($implementation in @('c', 'ada')) {
                 -Configuration $Configuration -RequireShutdown:($implementation -eq 'ada')
             if ($childId -ne $process.process_id) { $children += $child }
         }
-        # Both setup probes execute Lua children. The instrumented source adds
-        # its nonblocking pipe receiver. Each of two os.exit commands executes
+        # Both setup probes and both empty-command cases execute Lua children.
+        # The instrumented source adds its nonblocking pipe receiver.
+        # Each of two os.exit commands executes
         # twice (popen and execute): Ada records cleanup for all four; pinned
         # C os.exit bypasses its CLI telemetry writer, as on Windows.
-        $expectedChildren = 2
+        $expectedChildren = 4
         if ($Configuration -eq 'upstream-test') { $expectedChildren++ }
         if ($implementation -eq 'ada') { $expectedChildren += 4 }
         if ($children.Count -ne $expectedChildren) {
