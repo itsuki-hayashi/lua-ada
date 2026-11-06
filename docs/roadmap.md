@@ -5,15 +5,22 @@ M0, M1, M2a, and M2b are complete. M1 expanded infrastructure into the accepted
 not calendar promises. The [M1 validation record](validation.md) closes all five
 gates on the named Windows/Linux/macOS configurations.
 
+[M3](milestones/m3.md) is now the active umbrella milestone for complete pinned
+upstream coverage. It absorbs the remaining M2 runtime/libraries and the former
+C/binary compatibility target, including upstream native C fixture libraries.
+It is delivered through staged PRs, with reviewed Ada/platform equivalents
+where original assertions depend on C internals or unsupported native facilities.
+M3-01 is the current foundation gate; no later M3 runtime gate is complete.
+
 | Milestone | Target                                    | Completion gate                            |
 | --------- | ----------------------------------------- | ------------------------------------------ |
 | M0        | Foundation                                | Layout, policies, references, docs         |
 | M1        | Basic Lua scripting interpreter           | Core scripts, Ada API, batch CLI, GC       |
 | M2a       | Frontend and opcode definitions           | Full checking, shared lowering, format     |
 | M2b       | Core libraries and metamethods            | Three unchanged execution files and matrix |
-| M2        | Remaining language and standard libraries | Closing, coroutines, remaining libraries   |
-| M3        | Full C embedding and binary compatibility | C API/ABI, chunks, lifecycle evidence      |
-| M4        | Modules and ecosystem                     | Native loading and LuaRocks fixtures       |
+| M2        | Remaining runtime work absorbed by M3     | Tracked by M3-02 through M3-12             |
+| M3        | Complete Lua 5.5.1 upstream coverage      | All covered behavior, C ABI, full matrix   |
+| M4        | Ecosystem modules and LuaRocks            | Real-world fixture and rock acceptance     |
 | M5        | Conformance and release hardening         | Published platform acceptance matrix       |
 
 M1's five gates cover build/tests, constraints, execution substrate, language
@@ -56,5 +63,19 @@ table/math operations, and Lua-only text/module loading. Its
 
 Remaining M2 work includes closing/goto execution, coroutines, userdata,
 weak/finalized objects, remaining libraries, and debug facilities. Canonical
-code generation/execution, binary chunks, C ABI, and native ecosystem modules
-remain independent gates; M2b does not advance those claims.
+execution, binary chunks and the C ABI are also required by M3. M2b did not
+advance those claims; their dependency-ordered M3 gates now own the work.
+
+## M3 delivery order
+
+The [M3 acceptance owner](milestones/m3.md) defines thirteen bounded gates,
+M3-01 through M3-13, and their exact exit evidence. Foundation/inventory precedes
+execution contexts, allocator storage, and real C-boundary feasibility. Canonical
+execution and language lifecycle precede complete collectors, debug/chunks,
+public C APIs, remaining libraries, full CLI, internal equivalents and acceptance.
+
+Each gate gets a separate codex/m3-XX-* branch and PR against updated master.
+The next task starts after its predecessor is merged by the maintainer. No
+automatic merge is authorized. M3 remains in progress until every required
+coverage entry, default/instrumented configuration, and final review passes.
+Ecosystem fixtures remain unbuilt/unexecuted future M4 inputs.

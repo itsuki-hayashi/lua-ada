@@ -1,5 +1,10 @@
 # Documentation Index
 
+[M3](milestones/m3.md) owns the active complete-upstream-coverage target and its
+thirteen staged gates. M3-01 establishes the
+[conformance inventory and harness](../tests/conformance/README.md); it does not
+complete the later runtime, C API, canonical execution or CLI work.
+
 The completed [M2b validation](validation-m2b.md) records core-library and
 three-file upstream execution evidence across all 18 configurations.
 
@@ -29,6 +34,7 @@ The [validation record](validation.md) owns platform evidence.
 | [Embedding](embedding.md)                     | Ada session use and lifetime contracts            |
 | [Batch CLI](cli.md)                           | Execution/checking options and source handling    |
 | [Upstream inventory](upstream-tests.md)       | All upstream files and subset mappings            |
+| [M3 milestone](milestones/m3.md)              | Complete coverage contract and staged gates       |
 | [Module fixtures](../tests/modules/README.md) | Real-world consumer pins and future parity inputs |
 | [Decisions](decisions/README.md)              | Durable rationale                                 |
 | [Sessions](sessions/README.md)                | Dated evidence and handoff                        |

@@ -1,0 +1,438 @@
+{
+  "schema_version": 1,
+  "milestone": "M3",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_root": "references/lua/testes",
+  "coverage_model": "static-source-anchors-plus-mandatory-semantic-review",
+  "acceptance_contexts": [
+    "default/windows/development/static",
+    "default/windows/development/shared",
+    "default/windows/validation/static",
+    "default/windows/validation/shared",
+    "default/windows/release/static",
+    "default/windows/release/shared",
+    "upstream-test/windows/validation/static",
+    "upstream-test/windows/validation/shared",
+    "default/linux/development/static",
+    "default/linux/development/shared",
+    "default/linux/validation/static",
+    "default/linux/validation/shared",
+    "default/linux/release/static",
+    "default/linux/release/shared",
+    "upstream-test/linux/validation/static",
+    "upstream-test/linux/validation/shared",
+    "default/macos/development/static",
+    "default/macos/development/shared",
+    "default/macos/validation/static",
+    "default/macos/validation/shared",
+    "default/macos/release/static",
+    "default/macos/release/shared",
+    "upstream-test/macos/validation/static",
+    "upstream-test/macos/validation/shared",
+    "default/windows/validation/static-pic",
+    "upstream-test/windows/validation/static-pic"
+  ],
+  "configurations": [
+    {
+      "max_ccalls": 200,
+      "max_stack": 1000000,
+      "extra_space": "sizeof(void*)",
+      "id": "default",
+      "lua_rand32": false,
+      "lua_compat_mathlib": false,
+      "lua_compat_global": 1
+    },
+    {
+      "lua_compat_global": 0,
+      "lua_rand32": true,
+      "max_stack": 68000,
+      "extra_space": "sizeof(struct L_EXTRA)",
+      "lual_buffersize": 23,
+      "id": "upstream-test",
+      "lua_compat_mathlib": true,
+      "max_ccalls": 180
+    }
+  ],
+  "files": [
+    {
+      "id": "LUA-ALL",
+      "path": "all.lua",
+      "role": "orchestrator",
+      "sha256": "f1b8b8075a71e7abc40260f6b9112e8d2a1057772f26374df4bc800d10296309",
+      "completion_marker": "final OK !!!",
+      "coverage_file": "coverage/all.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "source-marker-not-alone-proof-of-coverage"
+    },
+    {
+      "id": "LUA-API",
+      "path": "api.lua",
+      "role": "primary",
+      "sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+      "completion_marker": null,
+      "coverage_file": "coverage/api.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-ATTRIB",
+      "path": "attrib.lua",
+      "role": "primary",
+      "sha256": "dd2eb13be29628ac0268cddfafdc6a816edcba6552ae15e8637afc6a79742e52",
+      "completion_marker": null,
+      "coverage_file": "coverage/attrib.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-BIG",
+      "path": "big.lua",
+      "role": "primary",
+      "sha256": "6396916f2f7c857cf1e1bfa70e5de58bbdbcf44984357c2c4d1578d33eee12e6",
+      "completion_marker": null,
+      "coverage_file": "coverage/big.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-BITWISE",
+      "path": "bitwise.lua",
+      "role": "primary",
+      "sha256": "ea36f2c261483e85a65dffe41b0674fb92869a6372ac744ed7fea8304e6a8a19",
+      "completion_marker": "OK",
+      "coverage_file": "coverage/bitwise.jsonl",
+      "m2b_execution": {
+        "status": "historical-m2b-execution-pass",
+        "revision": "52e8eb62466c5852b3995dc99b751c1d477dc9c2",
+        "configuration": "default",
+        "evidence": "https://github.com/itsuki-hayashi/lua-ada/actions/runs/42090465632",
+        "T": "absent"
+      },
+      "completion_contract": "source-marker-not-alone-proof-of-coverage"
+    },
+    {
+      "id": "LUA-BWCOERCION",
+      "path": "bwcoercion.lua",
+      "role": "helper",
+      "sha256": "e74cea2bb42125daca7f5536df31bb2684b74ffcbeb3b1198e31cc257aa659f6",
+      "completion_marker": null,
+      "coverage_file": "coverage/bwcoercion.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-CALLS",
+      "path": "calls.lua",
+      "role": "primary",
+      "sha256": "e0331ba5557c09ba844c11a54810ca7cc01998638316d5192e252a2ab0a2d407",
+      "completion_marker": null,
+      "coverage_file": "coverage/calls.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-CLOSURE",
+      "path": "closure.lua",
+      "role": "primary",
+      "sha256": "d03b641a7a7c4cb395762321200532f786e1554395e8499838e702b56d21880a",
+      "completion_marker": null,
+      "coverage_file": "coverage/closure.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-CODE",
+      "path": "code.lua",
+      "role": "primary",
+      "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663",
+      "completion_marker": null,
+      "coverage_file": "coverage/code.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-CONSTRUCTS",
+      "path": "constructs.lua",
+      "role": "primary",
+      "sha256": "fd4eeece596bf53ee3a8ed015960dd34f34abcc9991a332e3c4b83a374cb5514",
+      "completion_marker": null,
+      "coverage_file": "coverage/constructs.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-COROUTINE",
+      "path": "coroutine.lua",
+      "role": "primary",
+      "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9",
+      "completion_marker": null,
+      "coverage_file": "coverage/coroutine.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-CSTACK",
+      "path": "cstack.lua",
+      "role": "primary",
+      "sha256": "52ad964a0cf6161c58161d9dd0fcbec81bec949fb7ebd4ea1201c5c978df899c",
+      "completion_marker": null,
+      "coverage_file": "coverage/cstack.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-DB",
+      "path": "db.lua",
+      "role": "primary",
+      "sha256": "82ed710f0aa5ab23eb86fc0ad73705e6d8f8b0cd9c8a3d1b4da31623c3e40f10",
+      "completion_marker": null,
+      "coverage_file": "coverage/db.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-ERRORS",
+      "path": "errors.lua",
+      "role": "primary",
+      "sha256": "57bb9cc9e622b16646f5aec072e4f9295a2401b886e98ad4af21f4bd5b19f53d",
+      "completion_marker": null,
+      "coverage_file": "coverage/errors.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-EVENTS",
+      "path": "events.lua",
+      "role": "primary",
+      "sha256": "90449c1607a12a7c1841123a68237e0d23b7d6e109b8c445937fcd99306897c9",
+      "completion_marker": null,
+      "coverage_file": "coverage/events.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-FILES",
+      "path": "files.lua",
+      "role": "primary",
+      "sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86",
+      "completion_marker": null,
+      "coverage_file": "coverage/files.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-GC",
+      "path": "gc.lua",
+      "role": "primary",
+      "sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+      "completion_marker": null,
+      "coverage_file": "coverage/gc.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-GENGC",
+      "path": "gengc.lua",
+      "role": "primary",
+      "sha256": "5a7a6e525752c97221fbabc4ea4374692e59b3167f6f836d10ceffef16574e03",
+      "completion_marker": null,
+      "coverage_file": "coverage/gengc.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-GOTO",
+      "path": "goto.lua",
+      "role": "primary",
+      "sha256": "2e5168bba512878d4874398ba43d411741db0a68400a49818ec7b52ba62dc7cf",
+      "completion_marker": null,
+      "coverage_file": "coverage/goto.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-HEAVY",
+      "path": "heavy.lua",
+      "role": "stress",
+      "sha256": "fe806b885b962d67a1856d65c2d5cc0d0c2aa7c105b8321ced41498bdb1e2f8d",
+      "completion_marker": "OK",
+      "coverage_file": "coverage/heavy.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "source-marker-not-alone-proof-of-coverage"
+    },
+    {
+      "id": "LUA-LITERALS",
+      "path": "literals.lua",
+      "role": "primary",
+      "sha256": "ab77f2eb07f794cbb1d704000752fee994a10b6d865c5281f0050fdc149b5af3",
+      "completion_marker": null,
+      "coverage_file": "coverage/literals.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-LOCALS",
+      "path": "locals.lua",
+      "role": "primary",
+      "sha256": "56b5126c40f48bb1a701f041af28cd72a3a7d50b3db9b05da5659f2485f740c1",
+      "completion_marker": null,
+      "coverage_file": "coverage/locals.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-MAIN",
+      "path": "main.lua",
+      "role": "primary",
+      "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457",
+      "completion_marker": null,
+      "coverage_file": "coverage/main.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-MATH",
+      "path": "math.lua",
+      "role": "primary",
+      "sha256": "24b1e2a94ab2e5f70d1fca0820e0c2746deca27d7e1a6152499b033de1b463b1",
+      "completion_marker": null,
+      "coverage_file": "coverage/math.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-MEMERR",
+      "path": "memerr.lua",
+      "role": "primary",
+      "sha256": "02cc2a754e688bdfcbf507e009d899c4d367f27ced45094b68fdf208a6912491",
+      "completion_marker": null,
+      "coverage_file": "coverage/memerr.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-NEXTVAR",
+      "path": "nextvar.lua",
+      "role": "primary",
+      "sha256": "a49a917beb9e5c000d60baed697cefcdcb4ca985bba27b71d587cff8776b5029",
+      "completion_marker": null,
+      "coverage_file": "coverage/nextvar.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-PM",
+      "path": "pm.lua",
+      "role": "primary",
+      "sha256": "f1413157b8dc0979f9cda8b2551cc9a953a719e5b14d2b84f375462e56355dc5",
+      "completion_marker": null,
+      "coverage_file": "coverage/pm.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-SORT",
+      "path": "sort.lua",
+      "role": "primary",
+      "sha256": "283f72b600acda62016689c92a694f2b91c1fc49dbcba377a9a5ed78b2784dc3",
+      "completion_marker": null,
+      "coverage_file": "coverage/sort.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-STRINGS",
+      "path": "strings.lua",
+      "role": "primary",
+      "sha256": "29ae5d36a220f6afcb865e094806fa70c9a05effc35bb83ace0e0bf647097fa6",
+      "completion_marker": null,
+      "coverage_file": "coverage/strings.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-TPACK",
+      "path": "tpack.lua",
+      "role": "primary",
+      "sha256": "43984831af8269b9f9c1be90d39880863b395e835bf094e5dc5be2025674a246",
+      "completion_marker": "OK",
+      "coverage_file": "coverage/tpack.jsonl",
+      "m2b_execution": {
+        "status": "historical-m2b-execution-pass",
+        "revision": "52e8eb62466c5852b3995dc99b751c1d477dc9c2",
+        "configuration": "default",
+        "evidence": "https://github.com/itsuki-hayashi/lua-ada/actions/runs/42090465632",
+        "T": "absent"
+      },
+      "completion_contract": "source-marker-not-alone-proof-of-coverage"
+    },
+    {
+      "id": "LUA-TRACEGC",
+      "path": "tracegc.lua",
+      "role": "helper",
+      "sha256": "b064a642e2d5d22c2101ec4fe0a5d805ba633ca5b69470d20ec48b4ee5ca360b",
+      "completion_marker": null,
+      "coverage_file": "coverage/tracegc.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-UTF8",
+      "path": "utf8.lua",
+      "role": "primary",
+      "sha256": "ba41997fb956fcd4a48d07c31c0b9e404cb88f0e2ea99ddf4a5cdcf48eb09696",
+      "completion_marker": "ok",
+      "coverage_file": "coverage/utf8.jsonl",
+      "m2b_execution": {
+        "status": "historical-m2b-execution-pass",
+        "revision": "52e8eb62466c5852b3995dc99b751c1d477dc9c2",
+        "configuration": "default",
+        "evidence": "https://github.com/itsuki-hayashi/lua-ada/actions/runs/42090465632",
+        "T": "absent"
+      },
+      "completion_contract": "source-marker-not-alone-proof-of-coverage"
+    },
+    {
+      "id": "LUA-VARARG",
+      "path": "vararg.lua",
+      "role": "primary",
+      "sha256": "46405b18946c40a9c092cc63216df9a3944562ce222acfd5e63ae78f19f356be",
+      "completion_marker": null,
+      "coverage_file": "coverage/vararg.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    },
+    {
+      "id": "LUA-VERYBIG",
+      "path": "verybig.lua",
+      "role": "primary",
+      "sha256": "2b6d30c69cbe6974068881108eae297bdedd275b429be8ec614bf5f8ee89707e",
+      "completion_marker": null,
+      "coverage_file": "coverage/verybig.jsonl",
+      "m2b_execution": null,
+      "completion_contract": "pending-per-file-semantic-review"
+    }
+  ],
+  "headers": [
+    {
+      "path": "lua.h",
+      "sha256": "5e00319e803893f4310b1206394c80b82f03f42609b40ceb306d92a6740d828e"
+    },
+    {
+      "path": "lauxlib.h",
+      "sha256": "007608c5e2abd231a9f61dc6cf4080ff6d4b54c845aa87b08162b5c778960443"
+    },
+    {
+      "path": "lualib.h",
+      "sha256": "ca847f045256db26a03a654c60ca4db567fc63a54679bba4233114f0c3d532d1"
+    },
+    {
+      "path": "luaconf.h",
+      "sha256": "1e617ae6f206d701018941b64ed61851da4ffc3573a0f96b73ebe64e340bfb5d"
+    },
+    {
+      "path": "ltests.h",
+      "sha256": "6d2e3db39c58bdadc3a0aaf3ded12873e0b56ad898ce11a872717da72efb4829"
+    }
+  ]
+}

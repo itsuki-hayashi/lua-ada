@@ -1,0 +1,48 @@
+with "../../config/lua_ada_config.gpr";
+
+library project Reference is
+   type Configuration_Type is ("default", "upstream-test");
+   Configuration : Configuration_Type :=
+     external ("LUA_CONFORMANCE_CONFIGURATION", "default");
+   Common := ("-std=c99", "-O2", "-include",
+              Reference'Project_Dir & "c/conformance_exports.h");
+   --  Never auto-discover additional C translation units in a submodule.
+   --  Unknown headers are rejected by the source-tree witness before builds.
+   Sources :=
+     ("lapi.c", "lauxlib.c", "lbaselib.c", "lcode.c", "lcorolib.c",
+      "lctype.c", "ldblib.c", "ldebug.c", "ldump.c", "lfunc.c", "lgc.c",
+      "linit.c", "liolib.c", "llex.c", "lmathlib.c", "lmem.c", "loadlib.c",
+      "lobject.c", "lopcodes.c", "loslib.c", "lparser.c", "lstate.c",
+      "lstring.c", "lstrlib.c", "ltable.c", "ltablib.c", "ltm.c",
+      "lundump.c", "lutf8lib.c", "lvm.c", "lzio.c", "observed_ldo.c");
+   case Lua_Ada_Config.Alire_Host_OS is
+      when "linux" =>
+         Platform := ("-DLUA_USE_LINUX");
+         for Library_Options use ("-lm", "-ldl");
+      when "macos" =>
+         Platform := ("-DLUA_USE_MACOSX");
+         for Library_Options use ("-lm");
+      when others =>
+         Platform := ("-DLUA_BUILD_AS_DLL");
+   end case;
+   case Configuration is
+      when "default" =>
+         Mode := ();
+         for Source_Files use Sources;
+      when "upstream-test" =>
+         Mode := ("-DLUA_USER_H=<ltests.h>",
+                  "-DCONFORMANCE_UPSTREAM_TEST");
+         for Source_Files use Sources & ("bounded_ltests.c");
+   end case;
+   for Languages use ("C");
+   for Source_Dirs use ("../../references/lua", "c");
+   for Object_Dir use "../../build/conformance/" & Configuration & "/obj";
+   for Library_Dir use "../../build/conformance/" & Configuration & "/lib";
+   for Library_Name use "conformance_lua";
+   for Library_Kind use "relocatable";
+   for Create_Missing_Dirs use "True";
+   package Compiler is
+      for Default_Switches ("C") use Common & Platform & Mode &
+        ("-DCONFORMANCE_LIBRARY_EXPORTS");
+   end Compiler;
+end Reference;

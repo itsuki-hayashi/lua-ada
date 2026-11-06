@@ -1,0 +1,414 @@
+param()
+
+$ErrorActionPreference = 'Stop'
+$root = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1') -Force
+$utf8 = [Text.UTF8Encoding]::new($false)
+$source = Join-Path $root 'tests/conformance'
+$temporary = Join-Path $root ('reports/inventory-selftest/' + [Guid]::NewGuid().ToString('N'))
+[IO.Directory]::CreateDirectory($temporary) | Out-Null
+$script:Cases = 0
+
+function Assert-True {
+    param([bool] $Condition, [string] $Message)
+    if (-not $Condition) { throw $Message }
+}
+
+function Assert-Rejected {
+    param([scriptblock] $Action, [string] $Expected)
+    $message = $null
+    try { & $Action | Out-Null }
+    catch { $message = $_.Exception.Message }
+    Assert-True ($null -ne $message) 'Invalid inventory unexpectedly passed'
+    Assert-True ($message -match $Expected) "Wrong failure: $message; expected $Expected"
+}
+
+function Case {
+    param([string] $Name, [scriptblock] $Action)
+    & $Action
+    $script:Cases++
+    Write-Output "INVENTORY TEST PASS: $Name"
+}
+
+function Copy-Fixture {
+    param([string] $Name)
+    $destination = Join-Path $temporary $Name
+    [IO.Directory]::CreateDirectory($destination) | Out-Null
+    Copy-Item -LiteralPath (Join-Path $source 'suite.json') -Destination $destination
+    Copy-Item -LiteralPath (Join-Path $source 'c-api.jsonl') -Destination $destination
+    Copy-Item -LiteralPath (Join-Path $source 'coverage') -Destination $destination -Recurse
+    return $destination
+}
+
+function Read-Manifest {
+    param([string] $Directory)
+    Get-Content -LiteralPath (Join-Path $Directory 'suite.json') -Raw |
+        ConvertFrom-Json -AsHashtable -Depth 32
+}
+
+function Save-Manifest {
+    param([string] $Directory, [object] $Manifest)
+    [IO.File]::WriteAllText((Join-Path $Directory 'suite.json'),
+        (ConvertTo-Json -InputObject $Manifest -Depth 24) + "`n", $utf8)
+}
+
+function New-GitReferenceFixture {
+    param([string] $Name)
+    $fixture = Join-Path $temporary $Name
+    $reference = Join-Path $fixture 'references/lua'
+    [IO.Directory]::CreateDirectory($reference) | Out-Null
+    [IO.File]::WriteAllText((Join-Path $reference 'sample.c'), "/* original */`n", $utf8)
+    & git -c core.fsmonitor=false init --quiet $reference
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot create isolated reference fixture' }
+    & git -c core.fsmonitor=false -C $reference add sample.c
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot stage isolated reference fixture' }
+    # Hooks/signing are disabled only for this newly created disposable repo.
+    # No real reference or user Git configuration is changed by these tests.
+    & git -c core.fsmonitor=false -c commit.gpgsign=false -c core.hooksPath=$temporary `
+        -c user.name='Inventory Test' -c user.email='inventory@example.invalid' `
+        -C $reference commit --quiet -m 'Reference fixture'
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot commit isolated reference fixture' }
+    $revision = (& git -c core.fsmonitor=false -C $reference rev-parse HEAD).Trim()
+    return @{root=$fixture;reference=$reference;revision=$revision}
+}
+
+Case 'pinned foundation is structurally valid, not complete' {
+    # The baseline contains every pinned source/header but deliberately has
+    # unresolved coverage. A foundation pass must retain those pending totals.
+    $result = Test-ConformanceInventory -Root $root
+    Assert-True ($result.Files -eq 34 -and $result.PendingSourceAnchors -gt 0) 'Missing pending inventory'
+    Assert-True (-not $result.Complete) 'Foundation claimed milestone completion'
+}
+
+Case 'completion rejects pending semantic audits' {
+    # Final acceptance cannot reuse the weaker foundation mode and silently
+    # turn a successful JSON/hash check into a compatibility claim.
+    Assert-Rejected { Test-ConformanceInventory -Root $root -RequireComplete } 'Unresolved coverage'
+}
+
+Case 'JSONL serialization uses LF and UTF-8 without a BOM' {
+    # Regeneration must produce identical bytes on all supported hosts. Two
+    # records exercise the inter-record separator and final terminator; a
+    # non-ASCII value distinguishes UTF-8 from an accidental legacy encoding.
+    $path = Join-Path $temporary 'portable-lines.jsonl'
+    Write-ConformanceJsonLines $path @([ordered]@{id='café'}, [ordered]@{id='second'})
+    $bytes = [IO.File]::ReadAllBytes($path)
+    $expected = '{"id":"café"}' + "`n" + '{"id":"second"}' + "`n"
+    Assert-True ([Convert]::ToBase64String($bytes) -ceq
+        [Convert]::ToBase64String($utf8.GetBytes($expected))) 'JSONL is not exact LF/BOM-free UTF-8'
+    Assert-True (@(Read-ConformanceJsonLines $path).Count -eq 2) 'JSONL records no longer round-trip'
+}
+
+Case 'missing source file is rejected' {
+    # Removing a troublesome file from the manifest must fail even though the
+    # original source remains present in the pinned checkout.
+    $fixture = Copy-Fixture 'missing-file'
+    $manifest = Read-Manifest $fixture
+    $manifest.files = @($manifest.files | Select-Object -Skip 1)
+    Save-Manifest $fixture $manifest
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Missing suite files'
+}
+
+Case 'duplicate source file is rejected' {
+    # Repetition cannot compensate for an omitted source or create apparent
+    # aggregate coverage through a duplicated successful entry.
+    $fixture = Copy-Fixture 'duplicate-file'
+    $manifest = Read-Manifest $fixture
+    $manifest.files = @($manifest.files) + @($manifest.files[0])
+    Save-Manifest $fixture $manifest
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'duplicate suite file'
+}
+
+Case 'source checksum drift is rejected' {
+    # Deliberately corrupt only tracked inventory metadata; reference source
+    # files are never edited by negative tests.
+    $fixture = Copy-Fixture 'source-hash'
+    $manifest = Read-Manifest $fixture
+    $manifest.files[0].sha256 = '0' * 64
+    Save-Manifest $fixture $manifest
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Source hash drift'
+}
+
+Case 'orchestrator role cannot become a primary' {
+    # The 30 primaries, two helpers, orchestrator and heavy stress case are
+    # distinct acceptance roles; changing their labels must not inflate counts.
+    $fixture = Copy-Fixture 'role'
+    $manifest = Read-Manifest $fixture
+    $manifest.files[0].role = 'primary'
+    Save-Manifest $fixture $manifest
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Wrong suite role'
+}
+
+Case 'historical M2b evidence cannot be invented' {
+    # Only the three previously accepted primary files carry M2b evidence.
+    # Copying their result onto api.lua must fail, not broaden history.
+    $fixture = Copy-Fixture 'historical-pass'
+    $manifest = Read-Manifest $fixture
+    $known = @($manifest.files | Where-Object { $_.path -eq 'tpack.lua' })[0]
+    $target = @($manifest.files | Where-Object { $_.path -eq 'api.lua' })[0]
+    $target.m2b_execution = $known.m2b_execution
+    Save-Manifest $fixture $manifest
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Invented M2b pass'
+}
+
+Case 'missing lexical anchor is rejected' {
+    # Regeneration discovers omitted assertion/guard candidates independently
+    # of the ledger. Deleting one record must leave a detectable mismatch.
+    $fixture = Copy-Fixture 'missing-anchor'
+    $path = Join-Path $fixture 'coverage/all.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    Write-ConformanceJsonLines $path @($records | Select-Object -Skip 1)
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Coverage anchor set changed'
+}
+
+Case 'duplicate source unit IDs are rejected' {
+    # A duplicate cannot stand in for a different source obligation.
+    $fixture = Copy-Fixture 'duplicate-anchor'
+    $path = Join-Path $fixture 'coverage/all.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    $records[1].id = $records[0].id
+    Write-ConformanceJsonLines $path $records
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'duplicate unit ID'
+}
+
+Case 'source anchor hash drift is rejected' {
+    # Per-span hashes protect source citations as well as whole-file pins.
+    $fixture = Copy-Fixture 'anchor-hash'
+    $path = Join-Path $fixture 'coverage/all.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    $records[0].anchor_sha256 = '0' * 64
+    Write-ConformanceJsonLines $path $records
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Anchor drift'
+}
+
+Case 'bare passed status is rejected' {
+    # A successful process exit is insufficient evidence for an assertion.
+    # A forged status without reviewed disposition must fail closed.
+    $fixture = Copy-Fixture 'fake-pass'
+    $path = Join-Path $fixture 'coverage/all.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    $records[0].status = 'passed'
+    Write-ConformanceJsonLines $path $records
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Invalid pass disposition'
+}
+
+Case 'equivalent requires review evidence' {
+    # Equivalence is an independently reviewed invariant, not a test skip.
+    $record = @{id='LUA-SAMPLE-ASSERT-CALL-0001';kind='assert-call';status='passed';
+        disposition='ada-internal-equivalent';invariant='A real invariant';
+        configurations=@('default');review=$null;evidence=@()}
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'Missing independent review'
+}
+
+Case 'equivalent requires original C evidence' {
+    # A platform exception is justified by the reference implementation's
+    # observed limitation; an Ada-only failure must not be reclassified.
+    $record = @{id='LUA-SAMPLE-ASSERT-CALL-0001';kind='assert-call';status='passed';
+        disposition='native-platform-equivalent';invariant='A real invariant';
+        configurations=@('default');review=@{reviewer='reviewer';author='author';rationale='reason';artifact='review';original_c_evidence=''};
+        evidence=@()}
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'Equivalent lacks original C evidence'
+}
+
+Case 'resolved evidence must cover every required context' {
+    # One OS/link result is not a complete ABI matrix result.
+    $record = @{id='CAPI-SAMPLE';status='passed';evidence=@(@{context='default/windows/validation/static';
+        result='passed';revision=('a'*40);artifact='artifact';case_id='case'})}
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static','default/linux/validation/static') -Api -RequireComplete } 'Missing default/linux'
+}
+
+Case 'duplicate evidence contexts are rejected' {
+    # Counting the same successful job twice cannot fill matrix gaps.
+    $entry = @{context='default/windows/validation/static';result='passed';revision=('a'*40);artifact='artifact';case_id='case'}
+    $record = @{id='CAPI-SAMPLE';status='passed';evidence=@($entry,$entry)}
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -Api } 'duplicate pass evidence'
+}
+
+Case 'failed evidence cannot justify a pass' {
+    # A timeout or failure remains a failed gate, even if a record's status
+    # was manually edited to passed.
+    $record = @{id='CAPI-SAMPLE';status='passed';evidence=@(@{context='default/windows/validation/static';
+        result='timed-out';revision=('a'*40);artifact='artifact';case_id='case'})}
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -Api } 'Invalid/duplicate pass evidence'
+}
+
+Case 'exported functions cannot use preprocessor absence as pass evidence' {
+    # lua_gettop is an active exported function. A preprocessor claim cannot
+    # replace a real API call, even if it names every required matrix context.
+    $record = @{id='CAPI-LUA-H-FUNCTION-LUA_GETTOP-185';kind='function';conditions=@();
+        applicability_review=$null;status='passed';evidence=@(@{context='default/windows/validation/static';
+        result='not-applicable';kind='preprocessor';reason='not tested';revision=('a'*40);
+        artifact='artifact';case_id='case'})}
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -Api -RequireComplete } 'Invalid/duplicate pass evidence'
+}
+
+Case 'unconditional macros cannot claim an inactive branch' {
+    # Header include guards are excluded from real conditional applicability.
+    $record = @{id='CAPI-LUA-H-MACRO-LUA_TNIL-65';kind='macro';conditions=@();
+        applicability_review=$null;status='passed';evidence=@(@{context='default/windows/validation/static';
+        result='not-applicable';kind='preprocessor';reason='not tested';revision=('a'*40);
+        artifact='artifact';case_id='case'})}
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -Api } 'Invalid/duplicate pass evidence'
+}
+
+Case 'inactive macro branches require independent applicability review' {
+    # Conditional source is necessary but insufficient: a compiler-derived
+    # definition result must also receive a distinct review before acceptance.
+    $record = @{id='CAPI-CONDITIONAL';kind='macro';conditions=@('#if WINDOWS');
+        applicability_review=$null;status='passed';evidence=@(@{context='default/windows/validation/static';
+        result='not-applicable';kind='preprocessor';reason='inactive';definition_id='CAPI-CONDITIONAL';
+        active=$false;revision=('a'*40);artifact='artifact';case_id='case'})}
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -Api } 'Invalid/duplicate pass evidence'
+}
+
+Case 'comments and strings do not create executed assert sites' {
+    # Quoted assertions remain template candidates for manual inspection;
+    # neither short comments nor literals become actual call-site anchors.
+    $text = "-- assert(false)`nlocal s='assert(false)'; assert(true)"
+    $units = @(Get-ConformanceCoverageUnits sample.lua ($utf8.GetBytes($text)))
+    Assert-True (@($units | Where-Object { $_.kind -eq 'assert-call' }).Count -eq 1) 'False assertion call'
+    Assert-True (@($units | Where-Object { $_.kind -eq 'generated-template' }).Count -eq 1) 'Missing quoted candidate'
+}
+
+Case 'long delimiter levels keep nested-looking text masked' {
+    # A shorter closing delimiter must not terminate a long comment.
+    $text = '--[==[ assert(false) ]=] assert(false) ]==] assert(true)'
+    $units = @(Get-ConformanceCoverageUnits sample.lua ($utf8.GetBytes($text)))
+    Assert-True (@($units | Where-Object { $_.kind -eq 'assert-call' }).Count -eq 1) 'Premature long-comment close'
+}
+
+Case 'escaped quotes remain inside short strings' {
+    # The escaped quote cannot expose the string's apparent assert text.
+    $text = 'local s="escaped\" assert(false)"; assert(true)'
+    $units = @(Get-ConformanceCoverageUnits sample.lua ($utf8.GetBytes($text)))
+    Assert-True (@($units | Where-Object { $_.kind -eq 'assert-call' }).Count -eq 1) 'Escaped quote exposed literal'
+}
+
+Case 'Lua newline pairs count once' {
+    # LF, CR, CRLF and LFCR each represent one logical line boundary.
+    $text = "-- header`r`nassert(true)`n`rassert(false)`rassert(0)"
+    $units = @(Get-ConformanceCoverageUnits sample.lua ($utf8.GetBytes($text)))
+    $lines = @($units | Where-Object { $_.kind -eq 'assert-call' } | ForEach-Object line)
+    Assert-True (($lines -join ',') -eq '2,3,4') 'Wrong logical source lines'
+}
+
+Case 'source anchors use byte offsets for UTF-8' {
+    # Inventory offsets must index the original bytes, not UTF-16 characters.
+    $prefix = "local s='あ';"
+    $units = @(Get-ConformanceCoverageUnits sample.lua ($utf8.GetBytes($prefix + 'assert(true)')))
+    $site = @($units | Where-Object { $_.kind -eq 'assert-call' })[0]
+    Assert-True ($site.byte_offset -eq $utf8.GetByteCount($prefix)) 'UTF-8 offset was character based'
+}
+
+Case 'unterminated long strings are reported' {
+    # Malformed helper input is an inventory error, never a partial site list.
+    Assert-Rejected { Get-ConformanceTokens ($utf8.GetBytes('[=[assert(true)')) } 'Unterminated long string'
+}
+
+Case 'Lua 5.5 C signatures and layouts are inventoried' {
+    # In particular, older two-argument lua_newstate bindings and omitted
+    # external-string callbacks would miss essential 5.5 API contracts.
+    $entries = @(Get-ConformanceApiInventory -Root $root)
+    $newstate = @($entries | Where-Object { $_.name -eq 'lua_newstate' })[0]
+    Assert-True ($newstate.declaration -match 'unsigned seed') 'Missing seeded state signature'
+    Assert-True (@($entries | Where-Object { $_.name -eq 'lua_pushexternalstring' }).Count -eq 1) 'Missing external strings'
+    Assert-True (@($entries | Where-Object { $_.kind -eq 'function' }).Count -eq 156) 'Missing exported declarations'
+    Assert-True (@($entries | Where-Object { $_.name -eq 'lua_ident' -and $_.kind -eq 'data' }).Count -eq 1) 'Missing exported data'
+    Assert-True (@($entries | Where-Object { $_.name -eq 'luaL_Buffer' -and $_.declaration -match 'LUAI_MAXALIGN' }).Count -eq 1) 'Missing concrete buffer layout'
+}
+
+Case 'missing C header entry is rejected' {
+    # Header discovery independently regenerates all declarations/macros/types.
+    $fixture = Copy-Fixture 'missing-api'
+    $path = Join-Path $fixture 'c-api.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    Write-ConformanceJsonLines $path @($records | Select-Object -Skip 1)
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'C API anchor set changed'
+}
+
+Case 'C signature metadata drift is rejected' {
+    # Replacing a seeded signature with a familiar older version must fail
+    # even while the original header's whole-file hash is still correct.
+    $fixture = Copy-Fixture 'api-signature'
+    $path = Join-Path $fixture 'c-api.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    $entry = @($records | Where-Object { $_.name -eq 'lua_newstate' })[0]
+    $entry.declaration = 'lua_State *lua_newstate(lua_Alloc f, void *ud);'
+    Write-ConformanceJsonLines $path $records
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'C API anchor drift'
+}
+
+Case 'matrix contexts cannot silently be substituted' {
+    # A second Linux entry cannot replace a Windows static-PIC requirement.
+    $fixture = Copy-Fixture 'contexts'
+    $manifest = Read-Manifest $fixture
+    $manifest.acceptance_contexts[25] = 'default/linux/release/static-pic'
+    Save-Manifest $fixture $manifest
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Acceptance context set changed'
+}
+
+Case 'instrumented and default configurations stay distinct' {
+    # ltests.h intentionally changes semantics/ABI. A manifest may not relabel
+    # its zero global-compatibility setting as the production default.
+    $fixture = Copy-Fixture 'configuration'
+    $manifest = Read-Manifest $fixture
+    $manifest.configurations[0].lua_compat_global = 0
+    Save-Manifest $fixture $manifest
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Configuration drift'
+}
+
+Case 'manual source blocks retain accurate file and line citations' {
+    # Semantic review may add obligations, but a fabricated line number cannot
+    # pass merely because its byte hash points somewhere in the right file.
+    $fixture = Copy-Fixture 'manual-line'
+    $path = Join-Path $fixture 'coverage/all.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    $entry = $records[1].Clone()
+    $entry.id = 'LUA-ALL-REVIEWED-BLOCK-0001'
+    $entry.kind = 'reviewed-block'
+    $entry.line = 99999
+    Write-ConformanceJsonLines $path (@($records) + @($entry))
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Manual block source line drift'
+}
+
+Case 'manual blocks cannot borrow a different file ID' {
+    # Stable IDs identify one containing source file, not an arbitrary label.
+    $fixture = Copy-Fixture 'manual-file'
+    $path = Join-Path $fixture 'coverage/all.jsonl'
+    $records = @(Read-ConformanceJsonLines $path)
+    $entry = $records[1].Clone()
+    $entry.id = 'LUA-API-REVIEWED-BLOCK-0001'
+    $entry.kind = 'reviewed-block'
+    Write-ConformanceJsonLines $path (@($records) + @($entry))
+    Assert-Rejected { Test-ConformanceInventory -Root $root -InventoryDirectory $fixture } 'Invalid manually expanded source block'
+}
+
+Case 'unstaged reference edits invalidate the pin' {
+    # This changes a disposable miniature Git repository, never Lua's tree.
+    $fixture = New-GitReferenceFixture 'reference-unstaged'
+    Test-ConformanceReferenceTree -Root $fixture.root -ExpectedRevision $fixture.revision
+    [IO.File]::WriteAllText((Join-Path $fixture.reference 'sample.c'), "/* changed */`n", $utf8)
+    Assert-Rejected { Test-ConformanceReferenceTree -Root $fixture.root -ExpectedRevision $fixture.revision } 'Tracked reference tree differs'
+}
+
+Case 'staged reference edits also invalidate the pin' {
+    # HEAD comparison must inspect the index too; an empty unstaged diff alone
+    # does not prove that the compiler reads pinned source bytes.
+    $fixture = New-GitReferenceFixture 'reference-staged'
+    [IO.File]::WriteAllText((Join-Path $fixture.reference 'sample.c'), "/* staged */`n", $utf8)
+    & git -c core.fsmonitor=false -C $fixture.reference add sample.c
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot stage negative fixture edit' }
+    Assert-Rejected { Test-ConformanceReferenceTree -Root $fixture.root -ExpectedRevision $fixture.revision } 'Tracked reference tree differs'
+}
+
+Case 'untracked ignored reference sources are rejected' {
+    # GPR discovery must not pick up a source hidden by ignore rules. Ignore
+    # rules themselves are local metadata in this disposable repository.
+    $fixture = New-GitReferenceFixture 'reference-untracked'
+    [IO.File]::WriteAllText((Join-Path $fixture.reference '.git/info/exclude'), '*.c', $utf8)
+    [IO.File]::WriteAllText((Join-Path $fixture.reference 'injected.c'), 'void injected(void) {}', $utf8)
+    Assert-Rejected { Test-ConformanceReferenceTree -Root $fixture.root -ExpectedRevision $fixture.revision } 'Untracked reference source input'
+}
+
+Write-Output "PASS: $script:Cases focused conformance inventory tests"
+exit 0

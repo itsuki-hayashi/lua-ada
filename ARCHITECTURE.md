@@ -159,3 +159,41 @@ allocator parity needs replaceable storage and an allocation audit. Private
 representations and absence of exposed handles preserve room for that work.
 Binary chunks, C layouts/addresses, native modules, and LuaRocks have independent
 future acceptance gates.
+
+## Accepted M3 direction: not yet implemented
+
+The [M3 contract](docs/milestones/m3.md) expands the next milestone to complete
+covered upstream behavior. Its first gate adds inventory/baseline infrastructure
+only. The runtime described above remains implemented M2b behavior; the following
+changes are intent until their numbered gates provide acceptance evidence.
+
+Execution will move to canonical Lua 5.5.1 instructions and prototypes. The shared
+owned frontend remains the only grammar/resolver. Canonical code generation,
+upvalue/debug metadata and chunk import/export must pass before removing the
+private packet backend; the opcode definition table alone is insufficient.
+
+A shared universe will own allocator-controlled storage and objects, while
+coroutine contexts own activation stacks, errors, hooks, suspension and closing
+state. Stable cells and indexed tables precede full weak/finalized object support
+and real incremental/generational collectors. Centralized writes supply barriers.
+Catchable Lua allocation/stack errors remain distinct from explicit host aborts.
+
+The C facade needs a reviewed foreign-API reentry portal for synchronous C calls.
+It shares roots, contexts, allocator and counters, and never starts a new public
+session execution or resets budgets. Ordinary Ada/native libraries continue to
+request callbacks through explicit continuations. This future portal is not an
+exception available to M3-01 production code. No foreign jump may cross active
+internal Ada frames; nested errors, yields and panic need proven C-owned guards.
+
+The planned public execution policy preserves bounded Ada session defaults and
+offers deliberate Lua-compatible execution. The normal CLI and C-created states
+will adopt compatible defaults at their later gates. A test configuration/ceiling
+is not a hidden product default. Public C layouts, extra space, stable addresses,
+external strings and allocator callbacks need actual runtime evidence, not an
+adapter that fabricates reference results.
+
+All changes keep strict compiler/style flags, runtime checks, readable comments,
+focused AUnit cases and the standard-Ada dependency policy. Necessary C ABI,
+varargs, stdio, lifecycle and OS glue stays isolated from interpreter logic.
+Reference C Lua remains a separate oracle. Native upstream test fixtures enter
+M3; the pinned ecosystem module fixtures remain future consumers only.
