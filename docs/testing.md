@@ -227,6 +227,16 @@ the other first-party scripts. [Numeric formatting](number-formatting.md) owns
 the algorithm and recorded evidence; whole upstream string/math files and other
 platforms remain separate acceptance requirements.
 
+## Owned activation storage
+
+Lua.Frame_Cache_Tests registers eleven independent cases for stable reuse,
+per-context ownership, retained packet/nested capacity, continuation reset,
+cell detachment, root removal, refusal, duplicate retirement, teardown and
+active-resumer depth preservation. The teardown case inspects actual live
+managed blocks after Finalize; passing printed assertions alone cannot hide
+shutdown leaks. [Activation storage](activation-storage.md) owns the cache
+contract and the 951-case Windows/default/static checkpoint evidence.
+
 ## Optional fuzzing
 
 GNATfuzz is an AdaCore Pro tool with Linux/AFL environment requirements. It is

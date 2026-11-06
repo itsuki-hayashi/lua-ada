@@ -44,6 +44,19 @@ Focused policy-injection tests preserve these distinctions on every host.
 Exponent and 64-bit integer images use bounded scalar scratch; variable-width
 rendering never creates an input-sized unmanaged temporary.
 
+Native libraries also differ when rounded alternate general formatting crosses
+from fixed to scientific notation. The [glibc formatter source](https://github.com/bminor/glibc/blob/master/stdio-common/printf_fp.c)
+retains its earlier fractional minimum through that transition, then removes
+zeroes against that minimum. Other measured host libraries retain the requested
+significant padding. This is a spelling decision after exact Ada rounding.
+
+A small host capability probe uses an exact binary quarter to observe that
+policy; it neither formats the actual Lua value nor identifies libc by operating
+system/version. Ada applies the measured decision only when an alternate g/G
+carry crosses its notation threshold. Values already scientific retain their
+ordinary requested zeroes. Precision, exponent, sign, width and uppercase forms
+are covered independently; the original differential fixture is unchanged.
+
 ## Verification
 
 Lua.Managed_Format_Tests defines sixteen separately named and commented cases:
@@ -53,6 +66,8 @@ their rejection, actual output ownership, scratch balance, first/deep allocation
 refusal and recovery. Allocation cases query the real owner and refuse actual
 growth; copied limbs and partial output must be released before the world is
 reused. They do not substitute sampled process memory for allocator accounting.
+Four additional focused cases cover the native alternate-general carry family,
+negative/uppercase forms and the already-scientific guard.
 
 tests/lua/formatting_campaign.lua uses seed 0x13579bdf2468ace0, fifteen explicit
 rounding/boundary values, and 128 generated finite
@@ -60,6 +75,8 @@ binary64 patterns. Its 143 values each use ten format specifications. Numeric
 strings, an integer boundary and the completion marker yield 1,435 output lines.
 The differential runner compares raw same-host C/Ada output and empty stderr.
 The fixture is first-party evidence and leaves every upstream test unchanged.
+A separate formatting_rollovers.lua fixture adds 132 lines across precision
+1..12, both signs, case, width, scientific/fixed and non-alternate guards.
 
 The local Windows/default/validation/static checkpoint passed all sixteen cases
 within **916/916 AUnit tests**, plus the 1,435-line raw C/Ada differential. The
@@ -68,3 +85,13 @@ and the other nine first-party differential fixtures. Exact logs are
 reports/m3-managed-numeric-build2.log and reports/m3-managed-numeric-check1.log.
 This does not establish a whole-file strings.lua or math.lua pass, complete
 allocator parity or another platform's formatting behavior.
+
+The subsequent 940-case checkpoint passed all six macOS and Windows profile/link
+jobs, including the original formatting campaign. All six Linux jobs passed
+their focused tests but exposed the native alternate-general carry difference
+in that unchanged campaign. The generic policy repair and added regressions
+passed **968/968 AUnit cases** and the complete local Windows validation/static
+pipeline, including the unchanged 1,435-line and new 132-line comparisons.
+reports/m3-native-carry-build.log, reports/m3-native-carry-tests.log and
+reports/m3-native-carry-check.log own that evidence. A new Linux run is still
+required before the matrix can be called green.

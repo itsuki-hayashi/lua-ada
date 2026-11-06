@@ -95,3 +95,11 @@ claim belong to [ADR 0015](decisions/0015-managed-numeric-scratch.md). Final
 matrix evidence remains separate. Numeric ownership does not complete C Lua
 allocator parity, allocation-category reporting, emergency retry for all
 container growth, permanent-refusal delivery or complete upstream testing.
+
+After activation-cache integration, the shared managed parser also passed the
+separate frontend/opcode campaign: 10000 bounded byte inputs, the source-label
+allocation-pressure diagnostic, 2000 valid grammar inputs with 2000 mutations,
+85 opcode definitions and 4096 words, plus lex/parse checks for all 34 unchanged
+upstream files. The seed remains 551. Evidence is
+reports/m3-owned-numeric-frontend.log; these are compile-only comparisons and
+do not execute the upstream files.

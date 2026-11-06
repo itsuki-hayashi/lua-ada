@@ -81,6 +81,7 @@ library project Lua_Ada is
       "lua-engine-pattern_drivers.ads",
       "lua-engine-patterns.ads",
       "lua-engine-strings.ads",
+      "lua-engine-stacks.ads",
       "lua-engine-sorting.ads",
       "lua-engine-table_drivers.ads",
       "lua-engine-tables.ads",

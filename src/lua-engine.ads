@@ -4,6 +4,7 @@ with Lua.Lexers;
 with Lua.Prototypes;
 with Lua.Numbers;
 with Interfaces;
+with Interfaces.C;
 with Lua.Storage;
 with Lua.Storage.Vectors;
 with Lua.Storage.Buffers;
@@ -20,6 +21,18 @@ private package Lua.Engine is
    subtype Real_Value is Lua.Numbers.Real_Value;
 
    type Execution_Policy is (Bounded, Lua_Compatible);
+
+   Minimum_C_Stack : constant := 20;
+   Initial_Stack_Size : constant := 2 * Minimum_C_Stack;
+   Extra_Stack : constant := 5;
+   Error_Stack_Reserve : constant := 200;
+   --  Pinned lstate.h/ldo.c stack policy. Arena indices are native offsets:
+   --  the dummy base function slot zero is omitted. Stored live/reserved tops
+   --  are inclusive (native pointer minus one); an allocated semantic bound
+   --  excludes Extra_Stack and requires last inclusive offset < bound.
+   type Stack_Space_Phase is (Normal_Stack, Error_Stack);
+   type Native_Tail_Phase is
+     (No_Native_Tail, Waiting_Native_Tail, Ready_Native_Tail);
 
    type Limits is record
       Source_Bytes  : Positive := 1_000_000;
@@ -62,8 +75,9 @@ private package Lua.Engine is
 
    type Heap_Kind is
      (String_Object, Table_Object, Environment, Closure, Native_Closure,
-      Cell_Object, Thread_Object);
-   type Heap_Object (Kind : Heap_Kind);
+      Cell_Object, Thread_Object, Userdata_Object);
+   type Heap_Object
+     (Kind : Heap_Kind; Payload_Length : Lua.Storage.Byte_Count);
    type Object_Access is access Heap_Object;
    for Object_Access'Storage_Pool use Lua.Storage.Pool;
    type Prototype;
@@ -83,7 +97,7 @@ private package Lua.Engine is
      (Nil_Kind, Boolean_Kind, Integer_Kind, Real_Kind, String_Kind,
       Table_Kind, Closure_Kind, Native_Closure_Kind, Native_Kind_Value,
       Foreign_Function_Kind,
-      Thread_Kind, Light_Identity_Kind);
+      Thread_Kind, Light_Identity_Kind, Userdata_Kind);
 
    type Type_Metatable_Array is array (Value_Kind) of Object_Access;
 
@@ -94,7 +108,7 @@ private package Lua.Engine is
          when Integer_Kind => Integer_Data : Integer_Value;
          when Real_Kind => Real_Data : Real_Value;
          when String_Kind | Table_Kind | Closure_Kind | Native_Closure_Kind |
-           Thread_Kind =>
+           Thread_Kind | Userdata_Kind =>
             Reference : Object_Access;
          when Native_Kind_Value => Native_Data : Native_Kind;
          when Light_Identity_Kind | Foreign_Function_Kind =>
@@ -131,11 +145,51 @@ private package Lua.Engine is
    end record;
    package Bindings is new Lua.Storage.Vectors (Binding);
 
-   type Heap_Object (Kind : Heap_Kind) is record
+   type Payload_Alignment_Kind is
+     (Real_Payload, Integer_Payload, Pointer_Payload);
+   type Payload_Block
+     (Kind : Payload_Alignment_Kind := Real_Payload) is record
+      case Kind is
+         when Real_Payload => Real_Data : Interfaces.C.long_double;
+         when Integer_Payload => Integer_Data : Interfaces.C.long_long;
+         when Pointer_Payload => Pointer_Data : System.Address;
+      end case;
+   end record with Convention => C, Unchecked_Union;
+   Native_Payload_Alignment : constant Natural := Payload_Block'Alignment;
+   type Userdata_Bytes is array
+     (Lua.Storage.Byte_Count range <>) of
+       aliased Payload_Block;
+   --  A C union supplies native scalar alignment without a machine-specific
+   --  representation constant. The array's first block is the payload; its
+   --  extra final bytes are physical padding, never part of rawlen. Ada never
+   --  interprets arbitrary client-written bytes as one of the union fields.
+
+   type Resource_Release_Reason is
+     (Collected, Lua_State_Close, Host_Disposal);
+   type Resource_Cleanup is access procedure
+     (Memory : not null Lua.Storage.Owner_Access;
+      Payload, Data : System.Address; Reason : Resource_Release_Reason);
+   --  Optional first-party host cleanup, called at actual object release.
+   --  It must be idempotent, allocation-free, nonraising and never call Lua.
+   --  Finalization/resurrection does not release the stable payload early.
+
+   type Heap_Object
+     (Kind : Heap_Kind; Payload_Length : Lua.Storage.Byte_Count)
+   is record
       Marked : Boolean := False;
       Mark_Next : Object_Access;
       Serial : Positive := 1;
       case Kind is
+         when Userdata_Object =>
+            Userdata_Size : Lua.Storage.Byte_Count := 0;
+            Userdata_Metatable : Object_Access;
+            Uservalues : Values.Vector;
+            Resource_Data : System.Address := System.Null_Address;
+            Cleanup_Resource : Resource_Cleanup;
+            Payload : Userdata_Bytes (1 .. Payload_Length);
+            --  Physical block count is at least one for logical size zero.
+            --  The inline payload never moves before Release_Object frees
+            --  this single managed allocation. Uservalues are traced edges.
          when Thread_Object => Context_Index : Positive := 1;
          when Cell_Object => Cell_Value : Value;
          when String_Object =>
@@ -235,7 +289,7 @@ private package Lua.Engine is
    --  group. The last released wrapper destroys that owner exactly once.
 
    type Canonical_Pending_Kind is
-     (No_Canonical_Result, Store_Canonical_Results,
+     (No_Canonical_Result, Store_Canonical_Results, Store_Call_Results,
       Test_Canonical_Result, Concat_Canonical_Result);
 
    package Packets is new Lua.Storage.Vectors
@@ -257,12 +311,32 @@ private package Lua.Engine is
    type Failure_Kind is
      (No_Failure, Language_Failure, Memory_Failure, Handling_Failure,
       Syntax_Failure, Unsupported_Failure, Host_Abort);
+   type Execution_Context;
+   type Context_Access is access Execution_Context;
+   for Context_Access'Storage_Pool use Lua.Storage.Pool;
+   type Frame_Lifecycle is (Available, Active, Retiring);
    type Frame;
    type Frame_Access is access Frame;
    for Frame_Access'Storage_Pool use Lua.Storage.Pool;
    package Frames is new Lua.Storage.Vectors (Frame_Access);
 
    type Frame is record
+      Context : Context_Access;
+      Cache_Next : Frame_Access;
+      Lifecycle : Frame_Lifecycle := Active;
+      Stack_Base : Natural := 0;
+      Stack_Window_Length : Natural := 0;
+      Saved_Stack_Used : Natural := 0;
+      Call_Base : Natural := 0;
+      Has_Stack_Window : Boolean := False;
+      Hidden_Varargs : Boolean := False;
+      Vararg_Base : Natural := 0;
+      Vararg_Count : Natural := 0;
+      Stack_Live_Top : Natural := 0;
+      Saved_Foreign_Top : Natural := 0;
+      Previous_Stack_Window : Frame_Access;
+      --  Indices survive arena growth. Current real-window linkage is
+      --  borrowed metadata, never another owner or a hidden GC root.
       Memory : Lua.Storage.Owner_Access;
       Is_Native : Boolean := False;
       Native_Name : Unbounded_String;
@@ -295,6 +369,8 @@ private package Lua.Engine is
       Scope      : Object_Access;
       Scope_Depth : Natural := 0;
       Slots      : Packets.Vector;
+      Active_Registers : Natural := 0;
+      --  Retained rows above this bound are empty cached capacity.
       Canonical_Registers : Scalar_Values.Vector;
       Canonical_Cells : Cell_References.Vector;
       Canonical_Top : Natural := 0;
@@ -320,6 +396,7 @@ private package Lua.Engine is
       Blocks_Yield : Boolean := False;
       Callee : Value;
       Is_Tail_Call : Boolean := False;
+      Native_Tail_State : Native_Tail_Phase := No_Native_Tail;
       Call_Name : Unbounded_String;
       Name_Kind : Unbounded_String;
       Transfer_Count : Natural := 0;
@@ -373,15 +450,21 @@ private package Lua.Engine is
    --  Transfers are owned packets, not Ada-stack continuations. They remain
    --  roots until the scheduler hands them to the recipient activation.
 
-   type Execution_Context;
-   type Context_Access is access Execution_Context;
-   for Context_Access'Storage_Pool use Lua.Storage.Pool;
    type Execution_Context is record
+      Cache_Head : Frame_Access;
+      Cache_Count : Natural := 0;
       Memory : Lua.Storage.Owner_Access;
       Stack        : Frames.Vector;
       Arguments    : Values.Vector;
       Boundary_Results : Values.Vector;
       Foreign_Stack : Values.Vector;
+      Stack_Cells : Cell_References.Vector;
+      Stack_Used : Natural := 0;
+      Foreign_Top : Natural := 0;
+      Host_Stack_Top : Natural := 0;
+      Stack_Window : Frame_Access;
+      --  Physical scalar/cell arenas are distinct from current-frame ci.top,
+      --  logical public C top and the host prefix retained during a drive.
       Foreign_State : System.Address := System.Null_Address;
       Foreign_Block : System.Address := System.Null_Address;
       Foreign_Control : System.Address := System.Null_Address;
@@ -407,6 +490,10 @@ private package Lua.Engine is
       Host_Owned : Boolean := True;
       Non_Yieldable : Natural := 0;
       Stack_Slots : Natural := 0;
+      Stack_Error_Phase : Stack_Space_Phase := Normal_Stack;
+      Stack_Allocated_Bound : Natural := Initial_Stack_Size;
+      --  The semantic allocated bound is independent of a backing vector's
+      --  retained geometric capacity and the current real frame's ci.top.
       Native_Depth : Natural := 0;
       Hook : Value;
       Hook_Mask : Unbounded_String;
@@ -568,7 +655,31 @@ private package Lua.Engine is
                         return Value;
    --  Allocate a Lua-owned context and its unique thread object.
 
+   function New_Frame
+     (State : in out World; Context : not null Context_Access)
+      return Frame_Access;
    function New_Frame (State : in out World) return Frame_Access;
+   --  Borrow one clean activation from its context-owned intrusive cache.
+   --  A new record and every future buffer use State.Memory explicitly.
+   --  Publish on Context.Stack before any later allocation can collect.
+
+   procedure Prepare_Private_Registers
+     (Item : not null Frame_Access; Count : Natural);
+   --  Activate only Count rows of a retained private packet arena. Grow and
+   --  bind new rows explicitly; do not discard nested capacity on reuse.
+
+   procedure Return_Frame (Item : in out Frame_Access);
+   --  Retire a detached activation after the VM balances active charges.
+   --  Clear all Lua references and continuation state without dropping
+   --  reserved capacity, then cache it in Item.Context. Null is a no-op;
+   --  double retirement is internal misuse and raises Program_Error.
+
+   procedure Destroy_Frames
+     (State : in out World; Context : not null Context_Access);
+   --  Teardown only: destroy active and cached activations exactly once.
+   --  No Lua callbacks or __close handlers are invoked. The owner and the
+   --  context itself must remain live until the operation completes.
+
    function New_Program (State : in out World) return Prototype_Access;
    procedure Release_Program (Item : in out Prototype_Access);
    --  Release the wrapper and its shared canonical owner at the final edge.
@@ -582,6 +693,27 @@ private package Lua.Engine is
    --  Publish a managed builder through a borrowed view, avoiding an
    --  input-sized temporary Ada String allocation.
    function New_Table (State : in out World) return Value;
+
+   function New_Userdata
+     (State : in out World; Size : Lua.Storage.Byte_Count;
+      Uservalue_Count : Natural := 0) return Value;
+   --  Allocate one stable aligned payload and its owned Lua uservalue list.
+   --  New uservalues are nil; payload bytes are intentionally unspecified.
+   --  @param Size Logical bytes, independently of zero-size identity storage.
+   --  @param Uservalue_Count Less than the pinned C short maximum.
+   --  @exception Language_Error Invalid count; ordinary semantic Lua failure.
+   --  @exception Lua.Storage.Allocation_Error Refusal/unrepresentable size.
+
+   function Userdata_Address (Item : Value) return System.Address;
+   --  Borrow the actual payload address. Nil/non-userdata yields null; C
+   --  users retain a traced userdata value throughout their pointer borrow.
+
+   procedure Attach_Resource
+     (Item : Value; Data : System.Address;
+      Cleanup : not null Resource_Cleanup);
+   --  Attach owned first-party metadata once. Cleanup owns its release.
+   --  Generic userdata has no invented native destructor. No Lua allocation
+   --  or callback occurs here; Item must be a live full userdata value.
    procedure Reserve_Table
      (State : in out World; Table : Value;
       Sequence_Size, Hash_Size : Natural);

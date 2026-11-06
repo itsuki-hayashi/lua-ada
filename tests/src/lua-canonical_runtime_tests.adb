@@ -6,6 +6,7 @@ with Lua.Canonical_Compiler;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Canonical;
 with Lua.Engine.Machine;
+with Lua.Engine.Stacks;
 with Lua.Opcodes;
 with Lua.Prototypes;
 with Lua.Storage;
@@ -105,9 +106,18 @@ package body Lua.Canonical_Runtime_Tests is
       begin
          Drain (Driver);
          Packet := VM.Results (Driver);
-         --  Publish the returned Lua values before Finish removes the root
-         --  transfer packet. Later assertions may allocate keys or collect.
-         State.Current.Foreign_Stack := Packet;
+         --  Publish host-visible values before Finish drops the transfer
+         --  root. Replacing only Foreign_Stack would break its paired cell
+         --  arena; physical storage and logical C top are separate now.
+         Lua.Engine.Stacks.Reserve
+           (State.all, State.Current, Natural (Packet.Length));
+         Lua.Engine.Stacks.Trim (State.Current, 0);
+         for Index in Packet.First_Index .. Packet.Last_Index loop
+            Lua.Engine.Stacks.Write
+              (State.all, State.Current, Index, Packet (Index));
+         end loop;
+         State.Current.Foreign_Top := Natural (Packet.Length);
+         State.Current.Host_Stack_Top := State.Current.Foreign_Top;
          VM.Finish (Driver);
       exception
          when Language_Error => VM.Finish (Driver); raise;
@@ -479,7 +489,9 @@ package body Lua.Canonical_Runtime_Tests is
       Assert (VM.Results (Driver).First_Element = Value'(Integer_Kind, 41),
               "returned closure lost its canonical cell or graph");
       VM.Finish (Driver);
-      State.Current.Foreign_Stack.Clear;
+      State.Current.Foreign_Top := 0;
+      State.Current.Host_Stack_Top := 0;
+      Lua.Engine.Stacks.Trim (State.Current, 0);
       Packet.Clear;
       Collect (State.all);
       Assert (Natural (State.Programs.Length) = Before,

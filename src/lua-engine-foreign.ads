@@ -21,7 +21,9 @@ package Lua.Engine.Foreign is
       Raw_Get, Raw_Set, Raw_Get_Integer, Raw_Set_Integer,
       Raw_Get_Pointer, Raw_Set_Pointer, Raw_Equal, Next_Item,
       Get_Allocator, Set_Allocator, Push_C_Closure, To_C_Function,
-      Begin_Call, Complete_Callback, Raise_Error, Load_Buffer);
+      Begin_Call, Complete_Callback, Raise_Error, Load_Buffer,
+      Create_Userdata, Get_Uservalue, Set_Uservalue,
+      Get_Metatable, Set_Metatable);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
       Create_Thread => 3, Get_Top => 4, Set_Top => 5,
@@ -38,7 +40,9 @@ package Lua.Engine.Foreign is
       Raw_Equal => 34, Next_Item => 35, Get_Allocator => 36,
       Set_Allocator => 37, Push_C_Closure => 38, To_C_Function => 39,
       Begin_Call => 40, Complete_Callback => 41, Raise_Error => 42,
-      Load_Buffer => 43);
+      Load_Buffer => 43, Create_Userdata => 44,
+      Get_Uservalue => 45, Set_Uservalue => 46,
+      Get_Metatable => 47, Set_Metatable => 48);
    for Operation_Code'Size use Interfaces.C.int'Size;
    pragma Convention (C, Operation_Code);
 

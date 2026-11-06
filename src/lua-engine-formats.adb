@@ -1,14 +1,17 @@
 with Ada.Strings.Fixed;
 with Ada.Unchecked_Conversion;
 with Interfaces;
+with Interfaces.C;
 with Lua.Big_Naturals;
 with Lua.Engine.Strings;
+with Lua.Platform_Numerics;
 
 package body Lua.Engine.Formats is
    package Managed renames Lua.Storage.Buffers;
    use type Integer_Value;
    use type Real_Value;
    use type Interfaces.Unsigned_64;
+   use type Interfaces.C.int;
    package Big renames Lua.Big_Naturals;
    use type Big.Ordering;
    function Bits is new Ada.Unchecked_Conversion
@@ -173,6 +176,7 @@ package body Lua.Engine.Formats is
       Rounded_Digits : Managed.Buffer;
       Count, Leading_Zeroes : Natural := 0;
       Scientific : Boolean;
+      Carried : Boolean := False;
       Point : Integer;
 
       function Digit (Index : Positive) return Character;
@@ -225,13 +229,24 @@ package body Lua.Engine.Formats is
          --  rounded zero is omitted by reducing the view, not by reallocating.
          Count := Count - 1;
          Exponent := Exponent + 1;
+         Carried := True;
       end if;
       Leading_Zeroes :=
         (if Count < Significant then Significant - Count else 0);
       Count := Count + Leading_Zeroes;
       Scientific := Code in 'e' | 'E' or else
         Exponent < -4 or else Exponent >= Integer (Significant);
-      if Code in 'g' | 'G' and then not Alternate then
+      if Code in 'g' | 'G' and then Alternate and then Carried and then
+        Exponent = Integer (Significant) and then
+        Lua.Platform_Numerics.General_Carry_Zeroes = 0
+      then
+         --  Native libc can retain the old fixed-form fractional minimum
+         --  after rounding crosses %g's notation threshold. All digits after
+         --  this carry are zero. Keep the required alternate radix point but
+         --  omit those zeroes only for that transition, never for values that
+         --  were already scientific. The policy is measured, not OS-guessed.
+         Count := 1;
+      elsif Code in 'g' | 'G' and then not Alternate then
          while Count > 1 and then Digit (Count) = '0' loop
             Count := Count - 1;
          end loop;

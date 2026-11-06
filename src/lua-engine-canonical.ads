@@ -15,6 +15,9 @@ package Lua.Engine.Canonical is
       Arguments : Values.Vector;
       Destination : Natural := 0;
       Close_From : Natural := 0;
+      Call_Base : Natural := 0;
+      Has_Call_Window : Boolean := False;
+      --  Absolute original callee slot, distinct from relative result IDs.
    end record;
    --  Every callback packet is also retained in its owning frame before Step
    --  returns. Machine publishes it into the next explicit activation before
@@ -44,6 +47,16 @@ package Lua.Engine.Canonical is
    --  Execute one real canonical instruction, or request a scheduler action.
    --  Lua representation errors are controlled language errors; no invalid
    --  opcode/operand is passed to an unchecked enumeration conversion.
+
+   function Vararg_Length (Activation : Frame_Access) return Natural;
+   function Read_Vararg
+     (State : in out World; Activation : Frame_Access; Index : Positive)
+      return Value;
+   procedure Write_Vararg
+     (State : in out World; Activation : Frame_Access; Index : Positive;
+      Item : Value);
+   --  Debugger access to actual hidden argument slots. Named varargs reside
+   --  in their real table and do not expose negative local stack indexes.
 
    function Source_Bytes (Code : Prototype_Access) return Byte_String;
    --  Borrow the immutable model's source bytes while Code remains rooted.

@@ -1,4 +1,3 @@
-with Ada.Containers;
 with Ada.Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Unchecked_Conversion;
@@ -8,6 +7,7 @@ with Lua.Canonical_Compiler;
 with Lua.Chunks;
 with Lua.Engine.Canonical;
 with Lua.Engine.Machine;
+with Lua.Engine.Stacks;
 with Lua.Runtime_Configuration;
 with Lua.Syntax;
 with Lua.Syntax_Trees;
@@ -19,7 +19,6 @@ package body Lua.Engine.Foreign is
    package Memory renames Lua.Storage;
    package VM renames Lua.Engine.Machine;
    use System.Storage_Elements;
-   use type Ada.Containers.Count_Type;
    use type C.int;
    use type C.long_long;
    use type C.size_t;
@@ -91,7 +90,12 @@ package body Lua.Engine.Foreign is
    function Numeric
      (Arena : not null Memory.Owner_Access; Item : Value)
       return Lua.Numbers.Number;
-   procedure Push (Context : Context_Access; Item : Value);
+   procedure Publish_Top (Context : not null Context_Access; Top : Natural);
+   procedure Set_C_Top
+     (State : in out World; Context : not null Context_Access; Top : Natural);
+   procedure Pop (Context : not null Context_Access; Count : Natural := 1);
+   procedure Push
+     (State : in out World; Context : not null Context_Access; Item : Value);
    function Read_Bytes
      (Pointer : System.Address; Length : C.size_t) return String;
    function Read_Name (Pointer : System.Address; Default : String)
@@ -145,7 +149,12 @@ package body Lua.Engine.Foreign is
       end if;
       --  Ordinary pushes preserve one free error slot. Refusal therefore can
       --  publish the preallocated memory object without growing this stack.
-      Item.Foreign_Stack.Reserve_Capacity (21);
+      Stacks.Reserve
+        (State.all, Item, Natural'Max
+           (Initial_Stack_Size + Extra_Stack, Item.Stack_Used));
+      if Item.Stack.Is_Empty and then Item.Stack_Used = 0 then
+         Item.Stack_Used := Minimum_C_Stack;
+      end if;
       if Extra mod Storage_Count (Surface'Alignment) /= 0 then
          raise Foreign_Error with "unaligned configured extra space";
       end if;
@@ -241,12 +250,12 @@ package body Lua.Engine.Foreign is
       Number : constant Integer_Value :=
         (if Index > 0 then Integer_Value (Context.Foreign_Base) +
            Integer_Value (Index)
-         else Integer_Value (Context.Foreign_Stack.Length) +
+         else Integer_Value (Context.Foreign_Top) +
            Integer_Value (Index) + 1);
    begin
       if Index = 0 or else Index <= Registry_Index or else
         Number <= Integer_Value (Context.Foreign_Base)
-        or else Number > Integer_Value (Context.Foreign_Stack.Length)
+        or else Number > Integer_Value (Context.Foreign_Top)
       then
          return 0;
       end if;
@@ -295,7 +304,7 @@ package body Lua.Engine.Foreign is
       elsif Slot = 0 then
          return Nil_Value;
       end if;
-      return Context.Foreign_Stack (Slot);
+      return Stacks.Read (Context, Slot);
    end At_Index;
 
    function Type_Code (Item : Value) return C.int is
@@ -310,6 +319,7 @@ package body Lua.Engine.Foreign is
          when Closure_Kind | Native_Closure_Kind | Native_Kind_Value |
            Foreign_Function_Kind =>
             return 6;
+         when Userdata_Kind => return 7;
          when Thread_Kind => return 8;
       end case;
    end Type_Code;
@@ -329,23 +339,75 @@ package body Lua.Engine.Foreign is
       end case;
    end Numeric;
 
-   procedure Push (Context : Context_Access; Item : Value) is
+   procedure Publish_Top (Context : not null Context_Access; Top : Natural) is
    begin
-      if Natural (Context.Foreign_Stack.Length) >= Stack_Limit -
-        Natural'Min (Stack_Limit, Context.Stack_Slots)
-      then
-         raise Foreign_Error with "stack overflow";
+      Context.Foreign_Top := Top;
+      if Context.Foreign_Activation = null then
+         Context.Host_Stack_Top := Top;
+      else
+         Context.Foreign_Activation.Stack_Live_Top := Top;
       end if;
-      if Context.Foreign_Stack.Length + 1 >=
-        Context.Foreign_Stack.Capacity
-      then
-         Context.Foreign_Stack.Reserve_Capacity
-           (Ada.Containers.Count_Type'Max
-              (21, Ada.Containers.Count_Type'Min
-                 (Ada.Containers.Count_Type (Stack_Limit + 1),
-                  Context.Foreign_Stack.Capacity * 2)));
+   end Publish_Top;
+
+   procedure Set_C_Top
+     (State : in out World; Context : not null Context_Access; Top : Natural)
+   is
+      Old : constant Natural := Context.Foreign_Top;
+   begin
+      --  Reserve through a stable index before publishing a larger top. Both
+      --  scalar/cell arrays grow together; their retained initialized length
+      --  may exceed the visible C window and must never be truncated here.
+      if Top > Context.Stack_Used then
+         if not VM.Ensure_Stack (State, Context, Top) then
+            raise Program_Error with "raising stack check returned false";
+         end if;
+         if Context.Foreign_Activation /= null then
+            VM.Resize_Stack_Window
+              (State, Context.Foreign_Activation, Top - Context.Foreign_Base);
+         else
+            Context.Stack_Used := Top;
+         end if;
       end if;
-      Context.Foreign_Stack.Append (Item);
+      if Top < Old then
+         Stacks.Clear_Range (Context, Top + 1, Old);
+      else
+         for Index in Old + 1 .. Top loop
+            Stacks.Write (State, Context, Index, Nil_Value);
+         end loop;
+      end if;
+      Publish_Top (Context, Top);
+   end Set_C_Top;
+
+   procedure Pop (Context : not null Context_Access; Count : Natural := 1) is
+      Old : constant Natural := Context.Foreign_Top;
+   begin
+      if Count > Old - Context.Foreign_Base then
+         raise Foreign_Error with "C stack underflow";
+      end if;
+      Stacks.Clear_Range (Context, Old - Count + 1, Old);
+      Publish_Top (Context, Old - Count);
+   end Pop;
+
+   procedure Push
+     (State : in out World; Context : not null Context_Access; Item : Value) is
+      Top : constant Natural := Context.Foreign_Top;
+   begin
+      if Top + 1 > Context.Stack_Used then
+         if not VM.Ensure_Stack (State, Context, Top + 1) then
+            raise Program_Error with "raising stack check returned false";
+         end if;
+         if Context.Foreign_Activation /= null then
+            VM.Resize_Stack_Window
+              (State, Context.Foreign_Activation,
+               Top + 1 - Context.Foreign_Base);
+         else
+            Context.Stack_Used := Top + 1;
+         end if;
+      end if;
+      --  A completed callback publishes into a pre-reserved caller window.
+      --  There is no vector Append and no allocation when capacity suffices.
+      Stacks.Write (State, Context, Top + 1, Item);
+      Publish_Top (Context, Top + 1);
    end Push;
 
    function Read_Bytes
@@ -408,7 +470,7 @@ package body Lua.Engine.Foreign is
          --  to the C guard. Refusal while making the error cannot recurse.
          if Context /= null then
             Item := New_String (Owner.Universe.all, Text);
-            Context.Foreign_Stack.Append (Item);
+            Push (Owner.Universe.all, Context, Item);
             Output.Pointer := Item.Reference.C_Bytes;
          end if;
       exception
@@ -421,7 +483,7 @@ package body Lua.Engine.Foreign is
             --  The actual immutable error string was allocated during state
             --  initialization. Its reserved stack slot needs no provider call.
             Record_Memory_Error (Owner.Universe.all);
-            Context.Foreign_Stack.Append (Context.Failure);
+            Push (Owner.Universe.all, Context, Context.Failure);
             Output.Pointer := Context.Failure.Reference.C_Bytes;
          end if;
       exception
@@ -446,7 +508,7 @@ package body Lua.Engine.Foreign is
          --  A retrieved weak value is no longer protected by the source
          --  table's marking policy while the destination stack grows.
          Pin (Owner.Universe.all, Item);
-         Push (Context, Item);
+         Push (Owner.Universe.all, Context, Item);
          Output.Integer_Data := C.long_long (Type_Code (Item));
       end Get_Raw;
 
@@ -547,8 +609,7 @@ package body Lua.Engine.Foreign is
             VM.Clear_Frames (Owner.Universe.all);
             Caller.Non_Yieldable := Caller.Non_Yieldable - 1;
          end if;
-         Caller.Foreign_Stack.Set_Length
-           (Ada.Containers.Count_Type (Pending.Base));
+         Set_C_Top (Owner.Universe.all, Caller, Pending.Base);
          Count := (if Error_Status /= 0 then 1
                    elsif Pending.Wanted = -1 then Natural (Packet.Length)
                    else Natural (Pending.Wanted));
@@ -562,7 +623,7 @@ package body Lua.Engine.Foreign is
          begin
             Memory.Release (Owner.Universe.Memory, Address);
             for Index in 1 .. Count loop
-               Push (Caller,
+               Push (Owner.Universe.all, Caller,
                  (if Index <= Natural (Packet.Length) then Packet (Index)
                   else Nil_Value));
             end loop;
@@ -570,10 +631,10 @@ package body Lua.Engine.Foreign is
             Output.Integer_Data := C.long_long (Error_Status);
             Output.Error_Handled := Boolean'Pos (Handler_Called);
             if Error_Status /= 0 and then not Protected_Call then
-               if Caller.Foreign_Stack.Last_Element.Kind = String_Kind
+               if Stacks.Read (Caller, Caller.Foreign_Top).Kind = String_Kind
                then
                   Output.Pointer :=
-                    Caller.Foreign_Stack.Last_Element.Reference.C_Bytes;
+                    Stacks.Read (Caller, Caller.Foreign_Top).Reference.C_Bytes;
                end if;
                return (if Error_Status = 4 then Action_Memory
                        elsif Error_Status = 5 then Action_Handling
@@ -631,7 +692,7 @@ package body Lua.Engine.Foreign is
             begin
                --  The parent stack roots the new thread before a caller can
                --  collect. Its C surface is borrowed, not a permanent root.
-               Push (Context, Item);
+               Push (Owner.Universe.all, Context, Item);
                Output.Pointer := Create_Surface
                  (Owner.Universe, Context_Id (Item.Reference.Context_Index),
                   Owner.Extra, Owner.Seed,
@@ -639,13 +700,13 @@ package body Lua.Engine.Foreign is
             end;
          when Get_Top =>
             Output.Integer_Data := C.long_long
-              (Natural (Context.Foreign_Stack.Length) - Context.Foreign_Base);
+              (Context.Foreign_Top - Context.Foreign_Base);
          when Absolute_Index =>
             Output.Integer_Data :=
               (if Input.Index > 0 or Input.Index <= Registry_Index then
                   C.long_long (Input.Index)
                else C.long_long
-                 (Natural (Context.Foreign_Stack.Length) -
+                 (Context.Foreign_Top -
                   Context.Foreign_Base) +
                  C.long_long (Input.Index) + 1);
          when Set_Top =>
@@ -653,34 +714,44 @@ package body Lua.Engine.Foreign is
                Count : constant Integer_Value :=
                  (if Input.Index >= 0 then Integer_Value
                     (Context.Foreign_Base) + Integer_Value (Input.Index)
-                  else Integer_Value (Context.Foreign_Stack.Length) +
+                  else Integer_Value (Context.Foreign_Top) +
                     Integer_Value (Input.Index) + 1);
             begin
                if Count < Integer_Value (Context.Foreign_Base) or else
-                 Count > Integer_Value (Stack_Limit)
+                 Count >= Integer_Value (Context.Stack_Allocated_Bound)
                then
                   raise Foreign_Error with "invalid stack top";
                end if;
-               while Integer_Value (Context.Foreign_Stack.Length) < Count
-               loop
-                  Push (Context, Nil_Value);
-               end loop;
-               if Integer_Value (Context.Foreign_Stack.Length) > Count then
-                  Context.Foreign_Stack.Set_Length
-                    (Ada.Containers.Count_Type (Count));
-               end if;
+               Set_C_Top (Owner.Universe.all, Context, Natural (Count));
             end;
          when Check_Stack =>
-            if Input.Count >= 0 and then Integer_Value (Input.Count) <=
-              Integer_Value (Stack_Limit) -
-                Integer_Value (Context.Foreign_Stack.Length) -
-                Integer_Value (Context.Stack_Slots)
-            then
+            if Input.Count >= 0 then
                begin
-                  Context.Foreign_Stack.Reserve_Capacity
-                    (Context.Foreign_Stack.Length +
-                     Ada.Containers.Count_Type (Input.Count) + 1);
-                  Output.Integer_Data := 1;
+                  declare
+                     Last : constant Natural :=
+                       (if Natural (Input.Count) >
+                          Natural'Last - Context.Foreign_Top
+                        then Natural'Last else
+                          Context.Foreign_Top + Natural (Input.Count));
+                     Available : constant Boolean := VM.Ensure_Stack
+                       (Owner.Universe.all, Context, Last,
+                        Raise_Error => False);
+                  begin
+                     if not Available then
+                        null;
+                     elsif Context.Foreign_Activation /= null then
+                        VM.Resize_Stack_Window
+                          (Owner.Universe.all, Context.Foreign_Activation,
+                           Natural'Max
+                             (Context.Foreign_Activation.Stack_Window_Length,
+                              Last - Context.Foreign_Base));
+                     else
+                        Stacks.Reserve (Owner.Universe.all, Context, Last);
+                        Context.Stack_Used :=
+                          Natural'Max (Context.Stack_Used, Last);
+                     end if;
+                     Output.Integer_Data := Boolean'Pos (Available);
+                  end;
                exception
                   when Memory.Allocation_Error =>
                      Memory.Acknowledge_Refusal (Owner.Universe.Memory);
@@ -692,7 +763,8 @@ package body Lua.Engine.Foreign is
                      end if;
                end;
             end if;
-         when Push_Value => Push (Context, Get_Value (Input.Index));
+         when Push_Value =>
+            Push (Owner.Universe.all, Context, Get_Value (Input.Index));
          when Copy_Value =>
             declare
                Slot : constant Natural := Position (Context, Input.Count);
@@ -707,22 +779,29 @@ package body Lua.Engine.Foreign is
                elsif Slot = 0 then
                   raise Foreign_Error with "invalid C stack destination";
                else
-                  Context.Foreign_Stack.Replace_Element
-                    (Slot, Get_Value (Input.Index));
+                  Stacks.Write (Owner.Universe.all, Context,
+                                Slot, Get_Value (Input.Index));
                end if;
             end;
          when Rotate_Values =>
             declare
                First : constant Natural := Position (Context, Input.Index);
                Last : constant Natural :=
-                 Natural (Context.Foreign_Stack.Length);
+                 Context.Foreign_Top;
                procedure Reverse_Range (Left, Right : Natural);
                procedure Reverse_Range (Left, Right : Natural) is
                   Low : Natural := Left;
                   High : Natural := Right;
                begin
                   while Low < High loop
-                     Context.Foreign_Stack.Swap (Low, High);
+                     declare
+                        Saved : constant Value := Stacks.Read (Context, Low);
+                     begin
+                        Stacks.Write (Owner.Universe.all, Context, Low,
+                                      Stacks.Read (Context, High));
+                        Stacks.Write
+                          (Owner.Universe.all, Context, High, Saved);
+                     end;
                      Low := Low + 1;
                      High := High - 1;
                   end loop;
@@ -755,19 +834,19 @@ package body Lua.Engine.Foreign is
             begin
                if Target_Owner.Universe /= Owner.Universe or else Count < 0
                  or else Integer_Value (Count) >
-                   Integer_Value (Context.Foreign_Stack.Length) -
+                   Integer_Value (Context.Foreign_Top) -
                      Integer_Value (Context.Foreign_Base)
                then
                   raise Foreign_Error with "invalid cross-state move";
                end if;
                if Target /= Context and Count > 0 then
-                  for Index in Context.Foreign_Stack.Last_Index -
-                    Natural (Count) + 1 .. Context.Foreign_Stack.Last_Index
+                  for Index in Context.Foreign_Top -
+                    Natural (Count) + 1 .. Context.Foreign_Top
                   loop
-                     Push (Target, Context.Foreign_Stack (Index));
+                     Push (Owner.Universe.all, Target,
+                           Stacks.Read (Context, Index));
                   end loop;
-                  Context.Foreign_Stack.Delete_Last
-                    (Ada.Containers.Count_Type (Count));
+                  Pop (Context, Natural (Count));
                end if;
             end;
          when Get_Type =>
@@ -817,7 +896,7 @@ package body Lua.Engine.Foreign is
                   Item := New_String
                     (Owner.Universe.all, Image (Context.Memory, Item));
                   if Slot > 0 then
-                     Context.Foreign_Stack.Replace_Element (Slot, Item);
+                     Stacks.Write (Owner.Universe.all, Context, Slot, Item);
                   else
                      Context.Foreign_Activation.Native_Self.Captures
                        (Positive (C.long_long (Registry_Index) -
@@ -838,6 +917,9 @@ package body Lua.Engine.Foreign is
                     (Length (Item.Reference.Bytes));
                elsif Item.Kind = Table_Kind then
                   Output.Integer_Data := C.long_long (Table_Length (Item));
+               elsif Item.Kind = Userdata_Kind then
+                  Output.Integer_Data := C.long_long
+                    (Item.Reference.Userdata_Size);
                end if;
             end;
          when To_Pointer | To_Thread =>
@@ -854,6 +936,8 @@ package body Lua.Engine.Foreign is
                   case Item.Kind is
                      when Light_Identity_Kind | Foreign_Function_Kind =>
                         Output.Pointer := Item.Identity;
+                     when Userdata_Kind =>
+                        Output.Pointer := Userdata_Address (Item);
                      when String_Kind =>
                         Output.Pointer := Item.Reference.C_Bytes;
                      when Table_Kind | Closure_Kind |
@@ -863,16 +947,16 @@ package body Lua.Engine.Foreign is
                   end case;
                end if;
             end;
-         when Push_Nil => Push (Context, Nil_Value);
+         when Push_Nil => Push (Owner.Universe.all, Context, Nil_Value);
          when Push_Boolean =>
-            Push (Context, (Kind => Boolean_Kind,
+            Push (Owner.Universe.all, Context, (Kind => Boolean_Kind,
                             Boolean_Data => Input.Count /= 0));
          when Push_Integer =>
-            Push (Context, (Kind => Integer_Kind,
+            Push (Owner.Universe.all, Context, (Kind => Integer_Kind,
                             Integer_Data => Integer_Value
                               (Input.Integer_Data)));
          when Push_Number =>
-            Push (Context, (Kind => Real_Kind,
+            Push (Owner.Universe.all, Context, (Kind => Real_Kind,
                             Real_Data => Real_Value (Input.Number_Data)));
          when Push_String =>
             declare
@@ -880,42 +964,129 @@ package body Lua.Engine.Foreign is
                  (Owner.Universe.all,
                   Read_Bytes (Input.Pointer, Input.Length));
             begin
-               Push (Context, Item);
+               Push (Owner.Universe.all, Context, Item);
                Output.Pointer := Item.Reference.C_Bytes;
             end;
          when Push_Pointer =>
-            Push (Context, (Kind => Light_Identity_Kind,
+            Push (Owner.Universe.all, Context, (Kind => Light_Identity_Kind,
                             Identity => Input.Pointer));
          when Push_Thread =>
-            Push (Context, (Kind => Thread_Kind, Reference => Context.Thread));
+            Push (Owner.Universe.all, Context,
+                  (Kind => Thread_Kind, Reference => Context.Thread));
             Output.Integer_Data := Boolean'Pos
               (Context = Owner.Universe.Main_Context);
          when Create_Table =>
-            Push (Context, New_Table (Owner.Universe.all));
+            Push (Owner.Universe.all, Context, New_Table (Owner.Universe.all));
+         when Create_Userdata =>
+            if Input.Count < 0 or else
+              Input.Count >= C.int (C.short'Last)
+            then
+               raise Foreign_Error with "invalid userdata uservalue count";
+            elsif Input.Length > C.size_t (Memory.Byte_Count'Last) then
+               raise Memory.Allocation_Error with "userdata block too large";
+            end if;
+            declare
+               Item : constant Value := New_Userdata
+                 (Owner.Universe.all, Memory.Byte_Count (Input.Length),
+                  Natural (Input.Count));
+            begin
+               Push (Owner.Universe.all, Context, Item);
+               Output.Pointer := Userdata_Address (Item);
+            end;
+         when Get_Uservalue | Set_Uservalue =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+               Valid : Boolean;
+            begin
+               if Item.Kind /= Userdata_Kind then
+                  raise Foreign_Error with "full userdata expected";
+               end if;
+               Valid := Input.Count > 0 and then
+                 C.long_long (Input.Count) <=
+                   C.long_long (Item.Reference.Uservalues.Length);
+               if Input.Operation = Get_Uservalue then
+                  declare
+                     Uservalue : constant Value :=
+                       (if Valid then Item.Reference.Uservalues
+                          (Positive (Input.Count)) else Nil_Value);
+                  begin
+                     Pin (Owner.Universe.all, Uservalue);
+                     Push (Owner.Universe.all, Context, Uservalue);
+                     Output.Integer_Data :=
+                       (if Valid then C.long_long (Type_Code (Uservalue))
+                        else -1);
+                  end;
+               else
+                  if Context.Foreign_Top <=
+                    Context.Foreign_Base
+                  then
+                     raise Foreign_Error with "missing uservalue";
+                  end if;
+                  --  Publish the traced edge before popping its source. Even
+                  --  an invalid uservalue index consumes the supplied value.
+                  if Valid then
+                     Item.Reference.Uservalues.Replace_Element
+                       (Positive (Input.Count),
+                        Stacks.Read (Context, Context.Foreign_Top));
+                  end if;
+                  Pop (Context);
+                  Output.Integer_Data := Boolean'Pos (Valid);
+               end if;
+            end;
+         when Get_Metatable =>
+            declare
+               Meta : constant Object_Access := Raw_Metatable
+                 (Owner.Universe.all, Get_Value (Input.Index));
+            begin
+               if Meta /= null then
+                  Push (Owner.Universe.all, Context, (Table_Kind, Meta));
+                  Output.Integer_Data := 1;
+               end if;
+            end;
+         when Set_Metatable =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+               Meta : Value;
+            begin
+               if Context.Foreign_Top <=
+                 Context.Foreign_Base
+               then
+                  raise Foreign_Error with "missing metatable";
+               end if;
+               Meta := Stacks.Read (Context, Context.Foreign_Top);
+               if Meta.Kind not in Nil_Kind | Table_Kind then
+                  raise Foreign_Error with "table expected";
+               end if;
+               Set_Metatable (Owner.Universe.all, Item,
+                 (if Meta.Kind = Nil_Kind then null else Meta.Reference));
+               Pop (Context);
+               Output.Integer_Data := 1;
+            end;
          when Raw_Get =>
             declare
                Table : constant Value := Require_Table;
-               Key : constant Value := Context.Foreign_Stack.Last_Element;
+               Key : constant Value :=
+                 Stacks.Read (Context, Context.Foreign_Top);
                Item : constant Value := Get (Table, Key);
             begin
                Pin (Owner.Universe.all, Item);
-               Context.Foreign_Stack.Delete_Last;
-               Push (Context, Item);
+               Pop (Context);
+               Push (Owner.Universe.all, Context, Item);
                Output.Integer_Data := C.long_long (Type_Code (Item));
             end;
          when Raw_Set =>
             declare
                Table : constant Value := Require_Table;
                Last : constant Positive :=
-                 Context.Foreign_Stack.Last_Index;
-               Item : constant Value := Context.Foreign_Stack (Last);
-               Key : constant Value := Context.Foreign_Stack (Last - 1);
+                 Context.Foreign_Top;
+               Item : constant Value := Stacks.Read (Context, Last);
+               Key : constant Value := Stacks.Read (Context, Last - 1);
             begin
                --  Keep original operands on the traced C stack until all
                --  allocation/rehash work completes. Ada locals alone cannot
                --  protect an existing key/value across emergency collection.
                Set (Owner.Universe.all, Table, Key, Item);
-               Context.Foreign_Stack.Delete_Last (2);
+               Pop (Context, 2);
             end;
          when Raw_Get_Integer =>
             Get_Raw ((Kind => Integer_Kind,
@@ -923,7 +1094,8 @@ package body Lua.Engine.Foreign is
          when Raw_Set_Integer | Raw_Set_Pointer =>
             declare
                Table : constant Value := Require_Table;
-               Item : constant Value := Context.Foreign_Stack.Last_Element;
+               Item : constant Value :=
+                 Stacks.Read (Context, Context.Foreign_Top);
                Key : constant Value :=
                  (if Input.Operation = Raw_Set_Integer then
                     (Kind => Integer_Kind, Integer_Data => Integer_Value
@@ -932,7 +1104,7 @@ package body Lua.Engine.Foreign is
                         Identity => Input.Pointer));
             begin
                Set (Owner.Universe.all, Table, Key, Item);
-               Context.Foreign_Stack.Delete_Last;
+               Pop (Context);
             end;
          when Raw_Get_Pointer =>
             Get_Raw ((Kind => Light_Identity_Kind,
@@ -945,12 +1117,13 @@ package body Lua.Engine.Foreign is
          when Next_Item =>
             declare
                Table : constant Value := Require_Table;
-               Key : constant Value := Context.Foreign_Stack.Last_Element;
+               Key : constant Value :=
+                 Stacks.Read (Context, Context.Foreign_Top);
                Results : constant Values.Vector :=
                  Next (Owner.Universe.all, Table, Key);
             begin
                Pin (Owner.Universe.all, Results);
-               Context.Foreign_Stack.Delete_Last;
+               Pop (Context);
                --  The Lua-facing primitive returns one nil at termination.
                --  C lua_next instead pops the exhausted key, pushes nothing,
                --  and returns zero; exposing that nil as a row corrupts the
@@ -959,7 +1132,7 @@ package body Lua.Engine.Foreign is
                  Results.First_Element.Kind /= Nil_Kind
                then
                   for Item of Results loop
-                     Push (Context, Item);
+                     Push (Owner.Universe.all, Context, Item);
                   end loop;
                   Output.Integer_Data := 1;
                end if;
@@ -976,13 +1149,13 @@ package body Lua.Engine.Foreign is
          when Push_C_Closure =>
             if Input.Function_Data = null or else Input.Count not in 0 .. 255
               or else Input.Count > C.int
-                (Natural (Context.Foreign_Stack.Length) -
+                (Context.Foreign_Top -
                  Context.Foreign_Base)
             then
                raise Foreign_Error with "invalid C closure arguments";
             end if;
             if Input.Count = 0 then
-               Push (Context, (Foreign_Function_Kind,
+               Push (Owner.Universe.all, Context, (Foreign_Function_Kind,
                                Function_Address (Input.Function_Data)));
             else
                declare
@@ -990,19 +1163,18 @@ package body Lua.Engine.Foreign is
                     Owned_Values (Owner.Universe.all);
                   Item : Value;
                begin
-                  for Index in Natural (Context.Foreign_Stack.Length) -
+                  for Index in Context.Foreign_Top -
                     Natural (Input.Count) + 1 ..
-                    Natural (Context.Foreign_Stack.Length)
+                    Context.Foreign_Top
                   loop
-                     Captures.Append (Context.Foreign_Stack (Index));
+                     Captures.Append (Stacks.Read (Context, Index));
                   end loop;
                   Item := New_Native (Owner.Universe.all, "foreign.callback",
                                       Captures);
                   Item.Reference.Foreign_Handler :=
                     Function_Address (Input.Function_Data);
-                  Context.Foreign_Stack.Delete_Last
-                    (Ada.Containers.Count_Type (Input.Count));
-                  Push (Context, Item);
+                  Pop (Context, Natural (Input.Count));
+                  Push (Owner.Universe.all, Context, Item);
                end;
             end if;
          when To_C_Function =>
@@ -1021,15 +1193,15 @@ package body Lua.Engine.Foreign is
          when Begin_Call =>
             if Input.Index < 0 or else Input.Count < -1 or else
               Input.Count > C.int (Stack_Limit) or else
-              Natural (Input.Index) >= Natural (Context.Foreign_Stack.Length)
+              Natural (Input.Index) >= Context.Foreign_Top
                 - Context.Foreign_Base
             then
                raise Foreign_Error with "invalid C call arguments";
             end if;
             declare
                Slot : constant Positive :=
-                 Context.Foreign_Stack.Last_Index - Natural (Input.Index);
-               Callee : constant Value := Context.Foreign_Stack (Slot);
+                 Context.Foreign_Top - Natural (Input.Index);
+               Callee : constant Value := Stacks.Read (Context, Slot);
                Message_Handler : Value;
                Arguments : Values.Vector :=
                  Owned_Values (Owner.Universe.all);
@@ -1040,8 +1212,8 @@ package body Lua.Engine.Foreign is
                Result : Action_Status;
                Start_Error : Boolean := False;
             begin
-               for Index in Slot + 1 .. Context.Foreign_Stack.Last_Index loop
-                  Arguments.Append (Context.Foreign_Stack (Index));
+               for Index in Slot + 1 .. Context.Foreign_Top loop
+                  Arguments.Append (Stacks.Read (Context, Index));
                end loop;
                if Input.Error_Index /= 0 then
                   if Input.Error_Index < 1 or else
@@ -1088,11 +1260,13 @@ package body Lua.Engine.Foreign is
                      Context.Non_Yieldable := Context.Non_Yieldable + 1;
                      VM.Start_Foreign
                        (Main_Owner.Driver.all, Owner.Universe,
-                        Callee, Arguments, Message_Handler);
+                        Callee, Arguments, Message_Handler,
+                        Call_Base => Slot, Has_Call_Window => True);
                   else
                      VM.Start_Foreign_Boundary
                        (Main_Owner.Driver.all, Callee, Arguments,
-                        Message_Handler);
+                        Message_Handler,
+                        Call_Base => Slot, Has_Call_Window => True);
                   end if;
                exception
                   when Language_Error => Start_Error := True;
@@ -1107,8 +1281,10 @@ package body Lua.Engine.Foreign is
                         raise;
                      end if;
                end;
-               Context.Foreign_Stack.Set_Length
-                 (Ada.Containers.Count_Type (Slot - 1));
+               --  The callee/argument packet and boundary already own every
+               --  input. The suspended C caller keeps only its prefix live;
+               --  the published child owns the overlapping call window.
+               Publish_Top (Context, Slot - 1);
                Result := Pump (Start_Error);
                Leave_Context;
                return Result;
@@ -1142,13 +1318,14 @@ package body Lua.Engine.Foreign is
                return Result;
             end;
          when Raise_Error =>
-            if Natural (Context.Foreign_Stack.Length) <= Context.Foreign_Base
+            if Context.Foreign_Top <= Context.Foreign_Base
             then
                raise Foreign_Error with "missing C error object";
             end if;
-            if Context.Foreign_Stack.Last_Element.Kind = String_Kind then
+            if Stacks.Read (Context, Context.Foreign_Top).Kind = String_Kind
+            then
                Output.Pointer :=
-                 Context.Foreign_Stack.Last_Element.Reference.C_Bytes;
+                 Stacks.Read (Context, Context.Foreign_Top).Reference.C_Bytes;
             end if;
             Leave_Context;
             return Action_Raise;
@@ -1185,7 +1362,7 @@ package body Lua.Engine.Foreign is
                            Callee := Canonical.Adopt
                              (Owner.Universe.all, Decoded.Code,
                               (Table_Kind, Owner.Universe.Globals));
-                           Push (Context, Callee);
+                           Push (Owner.Universe.all, Context, Callee);
                         when Lua.Chunks.Bad_Format =>
                            Error_Result (Name & ": " &
                              Lua.Chunks.Message (Decoded.Error));
@@ -1230,7 +1407,7 @@ package body Lua.Engine.Foreign is
                                  Callee := Canonical.Adopt
                                    (Owner.Universe.all, Lowered.Code,
                                     (Table_Kind, Owner.Universe.Globals));
-                                 Push (Context, Callee);
+                                 Push (Owner.Universe.all, Context, Callee);
                               when Lua.Canonical_Compiler.Compiler_Limit =>
                                  Error_Result (Name & ": " &
                                    Lua.Canonical_Compiler.Message

@@ -1,13 +1,13 @@
 # Unified Ada/C Core Validation
 
-Date: 2026-11-06, Asia/Tokyo. Scope: local Windows validation evidence for
+Date: 2026-11-06, Asia/Tokyo. Scope: production core-image evidence for
 [ADR 0014](decisions/0014-one-core-library.md). These checks use the production
 root library, rather than the earlier reports-only observation prototype.
 
 ## Verified configurations
 
 The selected GNAT 16.1.0 and GPRbuild 26.0.1 compiled the ordinary default
-configuration with validation checks and all required strict compiler switches.
+configuration with runtime checks and all required strict compiler switches.
 
 | Configuration                               | C API consumer  | Mixed Ada/C consumer | C-only startup |
 | ------------------------------------------- | --------------- | -------------------- | -------------- |
@@ -17,12 +17,15 @@ configuration with validation checks and all required strict compiler switches.
 | Linux development/static/shared             | pass            | pass                 | pass           |
 | Linux validation/static/shared              | pass            | pass                 | pass           |
 | Linux release/static/shared                 | pass            | pass                 | pass           |
-| macOS development/validation/release static | link failure    | not run              | not run        |
-| macOS development/validation/release shared | process failure | not run              | not run        |
+| macOS development/static/shared             | pass            | pass                 | pass           |
+| macOS validation/static/shared              | pass            | pass                 | pass           |
+| macOS release/static/shared                 | pass            | pass                 | pass           |
 | Instrumented upstream-test                  | pending         | pending              | pending        |
 
-Each C API consumer passed its eighteen named cases, including the measured
-21-point cold constructor refusal sweep. The mixed consumer executes an Ada
+The initial local C API consumer passed eighteen named cases, including the
+measured 21-point cold constructor refusal sweep. Later checkpoints expand that
+consumer; its [owning guide](../c_api/README.md) records their separate scope.
+The mixed consumer executes an Ada
 session, constructs a separate real C state, reads its stack/main-thread through
 the Ada dispatcher, writes a stack value from Ada, and observes that value in C.
 Both interfaces return the same actual stored allocator callback. The actual
@@ -52,9 +55,18 @@ failure's exact diagnostic was not available from the original job artifacts.
 The repair supplies the selected compiler's tasking archive before its core
 archive and explicitly retains the real Darwin tasking-init symbol for shared
 flat lookup. The driver now prints failed-child captures and CI uploads the
-core-image report directory for every job. These are implemented repairs;
-macOS remains failed until a new run verifies them. The shared failure is not
-assumed fixed merely because its static counterpart has a known link cause.
+core-image report directory for every job. The next run exposed two remaining
+causes: the importing Ada main also needed GNARL, and the shared loader lacked a
+clean adalib path for libgnarl-16.dylib. The root propagates its runtime closure
+to importing projects. Drivers discover the actual runtime directory, preserve
+clean DYLD paths and embed its LC_RPATH for child processes.
+
+All six macOS jobs in the [940-case checkpoint matrix](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42207946868)
+then passed, and every Mac log was inspected: all three core-image consumers,
+940 AUnit cases, retained upstream/CLI/binary checks and formatting/math campaigns
+completed. Linux core consumers also passed, but that complete run failed its
+separate alternate-general formatting differential. These independent outcomes
+must not be combined into a green complete-milestone matrix.
 
 ## Commands and reports
 

@@ -1,5 +1,4 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Unchecked_Deallocation;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Formats;
@@ -13,8 +12,6 @@ with Test_Support;
 package body Lua.String_Helper_Tests is
    use type Integer_Value;
    use type Real_Value;
-   procedure Free_Frame is new Ada.Unchecked_Deallocation
-     (Frame, Frame_Access);
 
    generic
       with procedure Action (State : in out World);
@@ -317,10 +314,10 @@ package body Lua.String_Helper_Tests is
       Assert (Result.Results (1).Reference.Bytes = "-a-b-",
               "empty matches progress");
       Assert (Result.Results (2).Integer_Data = 3, "empty replacement count");
-      Free_Frame (Activation);
+      Return_Frame (Activation);
    exception
       when others =>
-         Free_Frame (Activation);
+         Return_Frame (Activation);
          raise;
    end Empty_Match_Progression;
 
@@ -345,12 +342,12 @@ package body Lua.String_Helper_Tests is
               "second iterator item");
       Result := Pattern_Drivers.Advance (State, Invocation);
       Assert (Result.Results.Is_Empty, "iterator exhaustion");
-      Free_Frame (Creation);
-      Free_Frame (Invocation);
+      Return_Frame (Creation);
+      Return_Frame (Invocation);
    exception
       when others =>
-         Free_Frame (Creation);
-         Free_Frame (Invocation);
+         Return_Frame (Creation);
+         Return_Frame (Invocation);
          raise;
    end Iterator_Persistence;
 
@@ -376,10 +373,10 @@ package body Lua.String_Helper_Tests is
       end loop;
       Assert (Result.Results (1).Reference.Bytes = "[value] 7",
               "format resumed with callback result");
-      Free_Frame (Activation);
+      Return_Frame (Activation);
    exception
       when others =>
-         Free_Frame (Activation);
+         Return_Frame (Activation);
          raise;
    end Formatting_Callback;
 
@@ -411,11 +408,11 @@ package body Lua.String_Helper_Tests is
       Assert (Result.Results (1).Reference.Bytes = "Xb",
               "replacement result survives collection");
       State.Current.Stack.Clear;
-      Free_Frame (Activation);
+      Return_Frame (Activation);
    exception
       when others =>
          State.Current.Stack.Clear;
-         Free_Frame (Activation);
+         Return_Frame (Activation);
          raise;
    end Replacement_Roots;
 
@@ -467,12 +464,12 @@ package body Lua.String_Helper_Tests is
               (3).Cell_Value.Integer_Data = 0,
                     "iterator position unchanged by failed copy");
       end;
-      Free_Frame (Creation);
-      Free_Frame (Invocation);
+      Return_Frame (Creation);
+      Return_Frame (Invocation);
    exception
       when others =>
-         Free_Frame (Creation);
-         Free_Frame (Invocation);
+         Return_Frame (Creation);
+         Return_Frame (Invocation);
          raise;
    end Iterator_Copy_Budget;
 
@@ -500,10 +497,10 @@ package body Lua.String_Helper_Tests is
             Assert (Activation.Native_Stage = 0,
                     "replacement state unchanged by failed copy");
       end;
-      Free_Frame (Activation);
+      Return_Frame (Activation);
    exception
       when others =>
-         Free_Frame (Activation);
+         Return_Frame (Activation);
          raise;
    end Replacement_Copy_Budget;
 

@@ -326,6 +326,30 @@ void *lua_touserdata(lua_State *state, int index) {
 lua_State *lua_tothread(lua_State *state, int index) {
     return (lua_State *)indexed(state, ADA_TO_THREAD, index).pointer;
 }
+void *lua_newuserdatauv(lua_State *state, size_t size, int uservalues) {
+    struct lua_ada_request input = request(ADA_CREATE_USERDATA);
+    input.length = size;
+    input.count = uservalues;
+    return dispatch(state, input).pointer;
+}
+int lua_getiuservalue(lua_State *state, int index, int number) {
+    struct lua_ada_request input = request(ADA_GET_USERVALUE);
+    input.index = index;
+    input.count = number;
+    return (int)dispatch(state, input).integer_data;
+}
+int lua_setiuservalue(lua_State *state, int index, int number) {
+    struct lua_ada_request input = request(ADA_SET_USERVALUE);
+    input.index = index;
+    input.count = number;
+    return (int)dispatch(state, input).integer_data;
+}
+int lua_getmetatable(lua_State *state, int index) {
+    return (int)indexed(state, ADA_GET_METATABLE, index).integer_data;
+}
+int lua_setmetatable(lua_State *state, int index) {
+    return (int)indexed(state, ADA_SET_METATABLE, index).integer_data;
+}
 void lua_pushnil(lua_State *state) { dispatch(state, request(ADA_PUSH_NIL)); }
 void lua_pushboolean(lua_State *state, int value) {
     struct lua_ada_request input = request(ADA_PUSH_BOOLEAN);

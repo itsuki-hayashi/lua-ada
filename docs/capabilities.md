@@ -107,7 +107,8 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 | Facility                          | Later gate / current response                            |
 | --------------------------------- | -------------------------------------------------------- |
 | Finalization                      | Deferred; no finalizer execution                         |
-| Userdata and io/os                | Deferred; unavailable facilities                         |
+| Userdata                          | Stable payload/uservalue APIs; finalization pending      |
+| io/os                             | Deferred; unavailable facilities                         |
 | table.sort/create                 | Implemented; focused local acceptance, platforms pending |
 | Reopened C-created math libraries | C-facade integration; distinct RNG captures required     |
 | Binary chunks                     | Implemented; expanded platform acceptance pending        |
@@ -147,8 +148,8 @@ activations, including explicit-thread forms, source ranges, call-site names,
 tail calls and per-thread call/return/line/count hooks. Native continuation phases
 are hidden. Count cadence now follows executed canonical words and explicit native work;
 full hook-cadence parity remains an expanded acceptance obligation.
-Userdata and finalizers remain pending. Canonical source/local/upvalue
-inspection, native binary load/dump and the added debug operations are M3
+Userdata storage is implemented; finalizers remain pending. Canonical source,
+local/upvalue inspection, native binary load/dump and the added debug operations are M3
 implementation checkpoints with their own evidence and pending platform gates.
 
 [Lifecycle acceptance](milestones/m3-language-lifecycle.md) owns unchanged
@@ -158,7 +159,8 @@ C-API, allocator, canonical execution, binary-chunk or ecosystem compatibility.
 
 Lifecycle runtime acceptance has passed the [18-job matrix](validation-m3-lifecycle.md)
 and Windows static-PIC. upvalueid exposes opaque light-userdata identities for
-actual cells; general userdata creation and C-visible pointers remain deferred.
+actual cells. [Stable userdata](userdata.md) adds real payload pointers and
+selected C creation/uservalue/metatable operations, with local component evidence.
 
 Collector controls return C Lua's integer status where applicable. A disabled
 gethook returns one nil; active hooks retain their requested signed count while

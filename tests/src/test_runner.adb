@@ -16,6 +16,7 @@ with Lua.Table_Storage_Tests;
 with Lua.Table_Reservation_Tests;
 with Table_Algorithm_Tests;
 with Lua.Storage_Tests;
+with Lua.Userdata_Tests;
 with Lua.Big_Natural_Tests;
 with Lua.Number_Storage_Tests;
 with Lua.Storage_Vector_Tests;
@@ -23,6 +24,8 @@ with Lua.Mathematics_Tests;
 with Lua.Managed_Runtime_Tests;
 with Lua.Managed_Format_Tests;
 with Lua.Runtime_Vector_Tests;
+with Lua.Frame_Cache_Tests;
+with Lua.Stack_Storage_Tests;
 with Lua.Storage_Buffer_Tests;
 with Lua.Loader_Storage_Tests;
 with Lua.Frontend_Storage_Tests;
@@ -37,6 +40,9 @@ with Lua.String_Helper_Tests;
 with Library_Runtime_Tests;
 with Native_Tests;
 with Message_Handler_Tests;
+with Shared_Window_Tests;
+with Lua.Window_Execution_Tests;
+with Lua.Stack_Policy_Tests;
 with Source_Tests;
 
 procedure Test_Runner is
@@ -62,6 +68,7 @@ procedure Test_Runner is
       Lua.Table_Reservation_Tests.Register (Result);
       Table_Algorithm_Tests.Register (Result);
       Lua.Storage_Tests.Register (Result);
+      Lua.Userdata_Tests.Register (Result);
       Lua.Big_Natural_Tests.Register (Result);
       Lua.Number_Storage_Tests.Register (Result);
       Lua.Storage_Vector_Tests.Register (Result);
@@ -69,6 +76,8 @@ procedure Test_Runner is
       Lua.Managed_Runtime_Tests.Register (Result);
       Lua.Managed_Format_Tests.Register (Result);
       Lua.Runtime_Vector_Tests.Register (Result);
+      Lua.Frame_Cache_Tests.Register (Result);
+      Lua.Stack_Storage_Tests.Register (Result);
       Lua.Storage_Buffer_Tests.Register (Result);
       Lua.Loader_Storage_Tests.Register (Result);
       Lua.Frontend_Storage_Tests.Register (Result);
@@ -83,6 +92,9 @@ procedure Test_Runner is
       Library_Runtime_Tests.Register (Result);
       Native_Tests.Register (Result);
       Message_Handler_Tests.Register (Result);
+      Shared_Window_Tests.Register (Result);
+      Lua.Window_Execution_Tests.Register (Result);
+      Lua.Stack_Policy_Tests.Register (Result);
       Source_Tests.Register (Result);
       Binary_Runtime_Tests.Register (Result);
       return Result;

@@ -6,6 +6,8 @@
 #include "lua_ada_boundary.h"
 #include <assert.h>
 #include <limits.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -651,6 +653,158 @@ static void test_reentrant_independent_universes(lua_State *state) {
     puts("C API PASS: reentrant independent universes");
 }
 
+union userdata_max_alignment {
+    long double real;
+    long long integer;
+    void *pointer;
+};
+struct userdata_alignment_probe {
+    char prefix;
+    union userdata_max_alignment value;
+};
+
+static void test_userdata_payload_alignment(lua_State *state) {
+    const size_t lengths[] = {0, 1, 3, 17, 97};
+    const size_t alignment = offsetof(struct userdata_alignment_probe, value);
+    size_t i;
+    void *empty = NULL;
+    lua_settop(state, 0);
+    /* Each pointer is the actual writable payload, never a copied address
+     * token. Keep all values rooted while comparing their zero-size identity
+     * and verifying bytes after unrelated managed allocations. */
+    for (i = 0; i < sizeof lengths / sizeof lengths[0]; ++i) {
+        unsigned char *payload = lua_newuserdatauv(state, lengths[i], 0);
+        assert(payload != NULL && (uintptr_t)payload % alignment == 0);
+        assert(lua_type(state, -1) == LUA_TUSERDATA);
+        assert(lua_isuserdata(state, -1));
+        assert(lua_rawlen(state, -1) == lengths[i]);
+        assert(lua_touserdata(state, -1) == payload);
+        assert(lua_topointer(state, -1) == payload);
+        if (lengths[i] != 0) memset(payload, (int)(i + 1), lengths[i]);
+        if (i == 0) empty = payload;
+    }
+    assert(lua_newuserdatauv(state, 0, 0) != empty);
+    for (i = 1; i < sizeof lengths / sizeof lengths[0]; ++i) {
+        size_t byte;
+        const unsigned char *payload = lua_touserdata(state, (int)i + 1);
+        for (byte = 0; byte < lengths[i]; ++byte)
+            assert(payload[byte] == (unsigned char)(i + 1));
+    }
+    lua_settop(state, 0);
+    puts("C API PASS: aligned stable userdata payloads");
+}
+
+static void test_userdata_uservalue_results(lua_State *state) {
+    int top, number;
+    lua_settop(state, 0);
+    lua_newuserdatauv(state, 1, 3);
+    for (number = 1; number <= 3; ++number) {
+        assert(lua_getiuservalue(state, 1, number) == LUA_TNIL);
+        assert(lua_isnil(state, -1));
+        lua_pop(state, 1);
+    }
+    /* A successful nil get and an invalid index both push nil, but only the
+     * latter returns LUA_TNONE. Invalid sets still pop their source value. */
+    top = lua_gettop(state);
+    assert(lua_getiuservalue(state, 1, 0) == LUA_TNONE);
+    assert(lua_isnil(state, -1) && lua_gettop(state) == top + 1);
+    lua_pop(state, 1);
+    lua_pushliteral(state, "owned uservalue");
+    assert(lua_setiuservalue(state, 1, 2) == 1);
+    assert(lua_gettop(state) == top);
+    assert(lua_getiuservalue(state, 1, 2) == LUA_TSTRING);
+    assert(strcmp(lua_tostring(state, -1), "owned uservalue") == 0);
+    lua_pop(state, 1);
+    lua_pushinteger(state, 42);
+    assert(lua_setiuservalue(state, 1, -1) == 0);
+    assert(lua_gettop(state) == top);
+    lua_pushinteger(state, 42);
+    assert(lua_setiuservalue(state, 1, 4) == 0);
+    assert(lua_gettop(state) == top);
+    lua_settop(state, 0);
+    puts("C API PASS: userdata uservalue count and pop rules");
+}
+
+static void test_userdata_metatable_identity(lua_State *state) {
+    const void *payload;
+    lua_settop(state, 0);
+    payload = lua_newuserdatauv(state, 0, 0);
+    assert(lua_getmetatable(state, 1) == 0 && lua_gettop(state) == 1);
+    lua_newtable(state);
+    lua_pushliteral(state, "__metatable");
+    lua_pushliteral(state, "protected");
+    lua_rawset(state, 2);
+    lua_pushvalue(state, 2);
+    assert(lua_setmetatable(state, 1) == 1 && lua_gettop(state) == 2);
+    /* The public C API deliberately bypasses the base library's protection
+     * string; it returns the actual metatable object with stable identity. */
+    assert(lua_getmetatable(state, 1) == 1);
+    assert(lua_rawequal(state, 2, 3));
+    lua_pop(state, 1);
+    lua_pushnil(state);
+    assert(lua_setmetatable(state, 1) == 1);
+    assert(lua_getmetatable(state, 1) == 0);
+    assert(lua_touserdata(state, 1) == payload);
+    lua_settop(state, 0);
+    puts("C API PASS: real raw userdata metatables");
+}
+
+static void test_userdata_maximum_uservalue_count(lua_State *state) {
+    lua_settop(state, 0);
+    /* Pinned lapi.c requires nuvalue < SHRT_MAX, rather than USHRT_MAX.
+     * Exercise the last valid slot without any invalid C API precondition. */
+    lua_newuserdatauv(state, 0, SHRT_MAX - 1);
+    lua_pushinteger(state, 42);
+    assert(lua_setiuservalue(state, 1, SHRT_MAX - 1));
+    assert(lua_getiuservalue(state, 1, SHRT_MAX - 1) == LUA_TNUMBER);
+    assert(lua_tointeger(state, -1) == 42);
+    lua_pop(state, 1);
+    assert(lua_getiuservalue(state, 1, SHRT_MAX) == LUA_TNONE);
+    assert(lua_isnil(state, -1));
+    lua_settop(state, 0);
+    puts("C API PASS: maximum valid userdata uservalue count");
+}
+
+/* Insert these cases into the ordinary real-C consumer after the coherent
+ * window migration. They use public API behavior, not the Ada dispatch ABI. */
+static void test_initial_free_stack_needs_no_growth(void) {
+    struct allocation_counts counts = {0};
+    lua_State *state = lua_newstate(counted_allocator, &counts, 123);
+    size_t growths;
+    int index;
+    assert(state != NULL);
+    growths = counts.growths;
+    /* A freshly constructed Lua state guarantees LUA_MINSTACK free slots.
+     * Their physical scalar/cell storage must already belong to its provider;
+     * ordinary nonallocating integer pushes cannot trigger a late arena copy. */
+    for (index = 1; index <= LUA_MINSTACK; ++index)
+        lua_pushinteger(state, index);
+    assert(lua_gettop(state) == LUA_MINSTACK && counts.growths == growths);
+    for (index = 1; index <= LUA_MINSTACK; ++index)
+        assert(lua_tointeger(state, index) == index);
+    lua_close(state);
+    assert(counts.bytes == 0 && counts.blocks == 0);
+    puts("C API PASS: initial native stack slots need no allocation");
+}
+
+static void test_failed_checkstack_keeps_state_usable(lua_State *state) {
+    lua_settop(state, 0);
+    /* The mathematical request cannot fit in either configured MAXSTACK.
+     * A false result leaves the existing prefix intact and does not become
+     * a thrown language error or restart the next protected call's budget. */
+    lua_pushinteger(state, 17);
+    assert(lua_checkstack(state, INT_MAX) == 0);
+    assert(lua_gettop(state) == 1 && lua_tointeger(state, 1) == 17);
+    assert(lua_checkstack(state, LUA_MINSTACK));
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 20); lua_pushinteger(state, 22);
+    assert(lua_pcall(state, 2, 1, 0) == LUA_OK);
+    assert(lua_gettop(state) == 2 && lua_tointeger(state, 1) == 17);
+    assert(lua_tointeger(state, 2) == 42);
+    lua_settop(state, 0);
+    puts("C API PASS: failed checkstack preserves caller and recovery");
+}
+
 int main(void) {
     lua_State *state;
     test_state_allocator_lifetime();
@@ -681,6 +835,12 @@ int main(void) {
     test_protected_callback_memory_failure();
     test_panic_after_ada_returns(state);
     test_reentrant_independent_universes(state);
+    test_userdata_payload_alignment(state);
+    test_userdata_uservalue_results(state);
+    test_userdata_metatable_identity(state);
+    test_userdata_maximum_uservalue_count(state);
+    test_initial_free_stack_needs_no_growth();
+    test_failed_checkstack_keeps_state_usable(state);
     lua_close(state);
     puts("PASS: real Ada C API bootstrap consumer");
     return 0;

@@ -22,6 +22,7 @@ with Lua.Engine.Table_Drivers;
 with Lua.Engine.Sorting;
 with Lua.Engine.Inspection;
 with Lua.Engine.Canonical;
+with Lua.Engine.Stacks;
 
 package body Lua.Engine.Machine is
    --  The VM is the only executor of compiled chunks. Registers hold result
@@ -37,8 +38,6 @@ package body Lua.Engine.Machine is
    use type Interfaces.Unsigned_64;
    use type Lua.Numbers.Number_Kind;
 
-   procedure Free_Frame is new Ada.Unchecked_Deallocation
-     (Frame, Frame_Access);
    function First (Packet : Values.Vector) return Value is
      (if Packet.Is_Empty then Nil_Value else Packet.First_Element);
 
@@ -366,6 +365,289 @@ package body Lua.Engine.Machine is
       return Nil_Value;
    end Unary_Value;
 
+   function Ensure_Stack
+     (State : in out World; Context : not null Context_Access;
+      Last : Natural; Raise_Error : Boolean := True) return Boolean
+   is
+      Maximum : constant Positive := Lua.Runtime_Configuration.Maximum_Stack;
+      Bound : Natural := Context.Stack_Allocated_Bound;
+
+      procedure Handling_Overflow;
+      procedure Handling_Overflow is
+      begin
+         --  luaD_errerr bypasses message handling. Reuse the actual stable
+         --  bootstrap error object rather than allocate a replacement string
+         --  while the error reserve itself has already been exhausted.
+         Context.Failure := State.Handling_Error_Value;
+         Context.Has_Failure_Value := True;
+         Context.Failure_Class := Handling_Failure;
+         Context.Failure_Handled := True;
+         Context.Failure_Text :=
+           To_Unbounded_String ("error in error handling");
+         raise Language_Error;
+      end Handling_Overflow;
+   begin
+      if Last < Bound then
+         --  Actual vector capacity can be greater, but it never changes this
+         --  semantic test. The five physical extras are not general Lua slots.
+         Stacks.Reserve (State, Context, Bound + Extra_Stack);
+         return True;
+      elsif Context.Stack_Error_Phase = Error_Stack then
+         if Raise_Error then Handling_Overflow; end if;
+         return False;
+      elsif Last < Maximum then
+         --  Use the pinned 1.5 growth policy and mathematical needed extent.
+         --  Maximum is configuration-derived, never adjusted for a fixture.
+         Bound := Natural'Min
+           (Maximum, Natural'Max (Bound + Bound / 2, Last + 1));
+         Stacks.Reserve (State, Context, Bound + Extra_Stack);
+         Context.Stack_Allocated_Bound := Bound;
+         return True;
+      else
+         --  Install the error reserve before raising ordinary stack overflow,
+         --  so a real handler/closer can run there. A refusal while reserving
+         --  it remains a memory error, never permission to use another owner.
+         Stacks.Reserve
+           (State, Context, Maximum + Error_Stack_Reserve + Extra_Stack);
+         Context.Stack_Allocated_Bound := Maximum + Error_Stack_Reserve;
+         Context.Stack_Error_Phase := Error_Stack;
+         if Raise_Error then Fail (State, "stack overflow"); end if;
+         return False;
+      end if;
+   exception
+      when Lua.Storage.Allocation_Error =>
+         if Raise_Error then raise; end if;
+         --  lua_checkstack is explicitly nonthrowing on allocator refusal.
+         --  Keep the old semantic bound/values and consume only the genuine
+         --  provider witness; physical Ada exhaustion remains a host abort.
+         Lua.Storage.Acknowledge_Refusal (State.Memory);
+         return False;
+      when Program_Error =>
+         if Raise_Error or else
+           not Lua.Storage.Refusal_Pending (State.Memory)
+         then
+            raise;
+         end if;
+         Lua.Storage.Acknowledge_Refusal (State.Memory);
+         return False;
+   end Ensure_Stack;
+
+   procedure Shrink_Error_Stack
+     (State : in out World; Context : not null Context_Access)
+   is
+      pragma Unreferenced (State);
+      Maximum : constant Positive := Lua.Runtime_Configuration.Maximum_Stack;
+      In_Use : Natural := Natural'Max
+        (Context.Stack_Used, Context.Foreign_Top);
+   begin
+      if Context.Stack_Error_Phase = Normal_Stack then return; end if;
+      --  Unlike ordinary return, shrinking is infrequent and must consider
+      --  ancestors' current reservations too. A smaller child ci.top cannot
+      --  hide an older live window when deciding whether overflow has ended.
+      for Activation of Context.Stack loop
+         if Activation.Has_Stack_Window then
+            In_Use := Natural'Max
+              (In_Use, Activation.Stack_Base +
+                 Activation.Stack_Window_Length);
+         end if;
+      end loop;
+      --  stackinuse counts through exclusive ci.top and one additional row;
+      --  our stored bounds are inclusive offsets, hence this explicit +2.
+      if In_Use > Maximum - 2 then return; end if;
+      In_Use := In_Use + 2;
+      Context.Stack_Allocated_Bound :=
+        (if In_Use > Maximum / 2 then Maximum else In_Use * 2);
+      Context.Stack_Error_Phase := Normal_Stack;
+   end Shrink_Error_Stack;
+
+   procedure Resize_Stack_Window
+     (State : in out World; Activation : Frame_Access; Count : Natural)
+   is
+      Context : Context_Access;
+      Last : Natural;
+      Available : Boolean;
+   begin
+      if Activation = null or else Activation.Context = null or else
+        Activation.Lifecycle /= Active
+      then
+         raise Program_Error with "invalid scalar stack window owner";
+      end if;
+      Context := Activation.Context;
+      if Count > Natural'Last - Activation.Stack_Base
+      then
+         --  A mathematical request larger than our representation follows
+         --  the same overflow path without overflowing Ada index arithmetic.
+         Last := Natural'Last;
+      else
+         Last := Activation.Stack_Base + Count;
+      end if;
+      Available := Ensure_Stack (State, Context, Last);
+      if not Available then
+         raise Program_Error with "raising stack reservation returned false";
+      end if;
+      --  No new top/link is visible until both scalar and cell storage are
+      --  initialized. A provider refusal therefore preserves the previous
+      --  current window and lets ordinary protected recovery inspect it.
+      if not Activation.Has_Stack_Window then
+         Activation.Previous_Stack_Window := Context.Stack_Window;
+         Activation.Saved_Stack_Used := Context.Stack_Used;
+         Activation.Saved_Foreign_Top := Context.Foreign_Top;
+         Activation.Has_Stack_Window := True;
+         Context.Stack_Window := Activation;
+      end if;
+      Activation.Stack_Window_Length := Count;
+      if Context.Stack_Window = Activation then
+         Context.Stack_Used := Last;
+      end if;
+      --  In particular do not clear a shrinking parent's tail here: a live
+      --  child can overlap it. Collector union tracing and actual retirement
+      --  own clearing; raw capacity is never a second set of live roots.
+   end Resize_Stack_Window;
+
+   function Reserve_Native_Results
+     (State : in out World; Activation : not null Frame_Access;
+      Count : Natural) return Boolean
+   is
+      Needed : constant Natural :=
+        (if Count > Natural'Last - Activation.Stack_Live_Top then
+            Natural'Last else Activation.Stack_Live_Top + Count);
+   begin
+      if not Activation.Is_Native or else
+        not Activation.Has_Stack_Window
+      then
+         raise Program_Error with "native results have no scalar window";
+      end if;
+      if not Ensure_Stack
+        (State, Activation.Context, Needed, Raise_Error => False)
+      then
+         return False;
+      end if;
+      Resize_Stack_Window
+        (State, Activation, Natural'Max
+           (Activation.Stack_Window_Length, Needed - Activation.Stack_Base));
+      return True;
+   end Reserve_Native_Results;
+
+   procedure Open_Stack_Window
+     (State : in out World; Activation : not null Frame_Access;
+      Function_Value : Value; Arguments : Values.Vector;
+      Call_Base : Natural; Has_Call_Window : Boolean);
+   procedure Retire_Stack_Window
+     (Activation : not null Frame_Access);
+
+   procedure Open_Stack_Window
+     (State : in out World; Activation : not null Frame_Access;
+      Function_Value : Value; Arguments : Values.Vector;
+      Call_Base : Natural; Has_Call_Window : Boolean)
+   is
+      Context : constant Context_Access := Activation.Context;
+      Caller : constant Frame_Access := Context.Stack_Window;
+      Argument_Count : constant Natural := Natural (Arguments.Length);
+      Width : Natural;
+      Physical_Last : Natural;
+      Available : Boolean;
+   begin
+      if Activation.Has_Stack_Window or else Context /= State.Current then
+         raise Program_Error with "stack window was already published";
+      end if;
+      if Has_Call_Window and then Call_Base = 0 then
+         raise Program_Error with "zero is not a physical call window";
+      elsif Has_Call_Window then
+         Activation.Stack_Base := Call_Base;
+      elsif Caller = null then
+         --  The base C context reserves its minimum free capacity but has no
+         --  visible activation. A root function is placed after its actual
+         --  host prefix, rather than after unused physical/reserved slots.
+         Activation.Stack_Base := Context.Foreign_Top + 1;
+      elsif Caller.Is_Native then
+         --  A library's explicit callback request models pushing the callee
+         --  after its live C arguments/temporaries. Hidden VM helpers instead
+         --  run above the current real ci.top, matching Protect's top reset.
+         Activation.Stack_Base := Caller.Stack_Live_Top + 1;
+      else
+         Activation.Stack_Base := Context.Stack_Used + 1;
+      end if;
+      Activation.Call_Base := Activation.Stack_Base;
+      if Activation.Is_Native then
+         Width :=
+           (if Argument_Count > Natural'Last - Minimum_C_Stack then
+               Natural'Last else Argument_Count + Minimum_C_Stack);
+      else
+         Width := Natural (Activation.Code.Canonical_Node.Max_Stack);
+      end if;
+      --  Excess Lua arguments can initially extend beyond maxstack before
+      --  VARARGPREP/discard adjustment. Physical initialization must cover
+      --  them too; their packet remains rooted until that setup completes.
+      if Natural'Max (Width, Argument_Count) >
+          Natural'Last - Activation.Stack_Base
+      then
+         Physical_Last := Natural'Last;
+      else
+         Physical_Last := Activation.Stack_Base +
+           Natural'Max (Width, Argument_Count);
+      end if;
+      Available := Ensure_Stack (State, Context, Physical_Last);
+      if not Available then
+         raise Program_Error with "raising stack reservation returned false";
+      end if;
+      Resize_Stack_Window (State, Activation, Width);
+      --  The callee and all arguments are already explicit operation/frame
+      --  roots. Slot copies perform no allocation after publication, so an
+      --  overlapping call window never needs borrowed vector references.
+      Stacks.Write (State, Context, Activation.Stack_Base, Function_Value);
+      for Index in 1 .. Argument_Count loop
+         Stacks.Write (State, Context, Activation.Stack_Base + Index,
+                       Arguments (Index));
+      end loop;
+      Activation.Stack_Live_Top := Activation.Stack_Base + Argument_Count;
+      if Has_Call_Window and then Caller /= null then
+         if Caller.Is_Native then
+            Caller.Stack_Live_Top := Activation.Stack_Base - 1;
+         else
+            Caller.Canonical_GC_Top :=
+              Activation.Stack_Base - Caller.Stack_Base;
+         end if;
+      end if;
+   end Open_Stack_Window;
+
+   procedure Retire_Stack_Window
+     (Activation : not null Frame_Access)
+   is
+      Context : constant Context_Access := Activation.Context;
+      Previous : Frame_Access;
+      Last : Natural;
+   begin
+      if not Activation.Has_Stack_Window then
+         --  Hidden protection/close/hook holders own their packets but have
+         --  no scalar reservation. In particular they cannot restore stale
+         --  saved tops after a real parent grows for open returned results.
+         return;
+      elsif Context.Stack_Window /= Activation then
+         raise Program_Error with "retiring a noncurrent real stack window";
+      end if;
+      Previous := Activation.Previous_Stack_Window;
+      Last := Natural'Max
+        (Activation.Stack_Base + Activation.Stack_Window_Length,
+         Activation.Stack_Live_Top);
+      --  The actual call interval, including a hidden-vararg prefix, belongs
+      --  to this departing frame. Outgoing values must already be rooted in
+      --  a result/error holder before this allocation-free clear occurs.
+      Stacks.Clear_Range (Context, Activation.Call_Base, Last);
+      Context.Stack_Window := Previous;
+      Context.Stack_Used :=
+        (if Previous = null then Activation.Saved_Stack_Used else
+           Previous.Stack_Base + Previous.Stack_Window_Length);
+      Context.Foreign_Top :=
+        (if Previous = null then Activation.Saved_Foreign_Top
+         elsif Previous.Is_Native then Previous.Stack_Live_Top else
+           Previous.Stack_Base + Previous.Canonical_Top);
+      Activation.Previous_Stack_Window := null;
+      Activation.Has_Stack_Window := False;
+      --  Retain physical capacity. Clearing everything above an old parent
+      --  reservation would be wrong during overlapping child execution; only
+      --  this detached interval was owned here. Union GC clears other gaps.
+   end Retire_Stack_Window;
+
    procedure Release_Frame (State : in out World; Item : in out Frame_Access);
    procedure Release_Frame (State : in out World; Item : in out Frame_Access)
    is
@@ -374,8 +656,7 @@ package body Lua.Engine.Machine is
          --  A failed foreign callback can be retired by ordinary Lua error
          --  unwinding. Restore its C-stack window exactly as normal callback
          --  completion does; never leave a dangling active-frame identity.
-         State.Current.Foreign_Stack.Set_Length
-           (Ada.Containers.Count_Type (Item.Foreign_Base));
+         State.Current.Foreign_Top := Item.Saved_Foreign_Top;
          State.Current.Foreign_Base := Item.Foreign_Previous_Base;
          State.Current.Foreign_Activation := Item.Foreign_Previous_Frame;
          Item.Foreign_Entered := False;
@@ -396,7 +677,8 @@ package body Lua.Engine.Machine is
          State.Current.Native_Depth := State.Current.Native_Depth - 1;
          State.Native_Depth := State.Native_Depth - 1;
       end if;
-      Free_Frame (Item);
+      Retire_Stack_Window (Item);
+      Return_Frame (Item);
    end Release_Frame;
 
    procedure Reserve_Frame (State : in out World; Cost : Natural);
@@ -405,12 +687,11 @@ package body Lua.Engine.Machine is
         (Lua.Runtime_Configuration.Maximum_Stack +
            (if State.Current.Cleanup_Depth > 0 then 4_096 else 0));
    begin
-      --  Semantic slots are distinct from the embedding owner's call quota.
-      --  The private backend charges its register packets with a minimum
-      --  twenty-slot frame. Canonical register allocation is a later gate.
-      --  A fixed emergency reserve lets protected overflow unwind live
-      --  closers. It is inaccessible to ordinary calls and is not a changed
-      --  language stack limit. Host quotas remain hard abort boundaries.
+      --  This cost belongs only to the retained private packet comparator.
+      --  Canonical and native frames pass zero: their exact absolute scalar
+      --  extent goes through Ensure_Stack and its typed error-stack phase.
+      --  Metadata depth remains a distinct explicit embedding quota; an
+      --  internal protection holder invents no extra Lua register window.
       if Cost > Maximum or else
         State.Current.Stack_Slots > Maximum - Cost
       then
@@ -430,14 +711,14 @@ package body Lua.Engine.Machine is
 
    procedure Clear_Frames (State : in out World) is
    begin
-      for Activation of State.Current.Stack loop
+      while not State.Current.Stack.Is_Empty loop
          declare
-            Item : Frame_Access := Activation;
+            Item : Frame_Access := State.Current.Stack.Last_Element;
          begin
+            State.Current.Stack.Delete_Last;
             Release_Frame (State, Item);
          end;
       end loop;
-      State.Current.Stack.Clear;
    end Clear_Frames;
 
    package World_Addresses is new
@@ -457,7 +738,8 @@ package body Lua.Engine.Machine is
       Destination : Natural; Tail : Boolean := False;
       Protected_Call : Natural := 0;
       Call_Name : Unbounded_String := Null_Unbounded_String;
-      Name_Kind : Unbounded_String := Null_Unbounded_String);
+      Name_Kind : Unbounded_String := Null_Unbounded_String;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
    procedure Complete (Self : Driver; Result : Values.Vector);
    procedure Recover (Self : Driver);
    function Active_Handler (Self : Driver) return Value;
@@ -487,7 +769,8 @@ package body Lua.Engine.Machine is
      (Self : Driver; Item : Value; Level : Natural := 1);
    procedure Push_Frame
      (Self : Driver; Function_Value : Value; Arguments : Values.Vector;
-      Destination, Protection : Natural);
+      Destination, Protection : Natural;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
    procedure Deliver
      (Self : Driver; Activation : Frame_Access; Destination : Natural;
       Packet : Values.Vector; Failure : Failure_Kind := No_Failure;
@@ -502,7 +785,10 @@ package body Lua.Engine.Machine is
    begin
       --  A callback resumes its owning native activation instead of
       --  writing a Lua register. This is the single return-channel bridge.
-      if Activation.Is_Native then
+      if Activation.Native_Tail_State = Waiting_Native_Tail then
+         Activation.Native_Results := Packet;
+         Activation.Native_Tail_State := Ready_Native_Tail;
+      elsif Activation.Is_Native then
          Activation.Native_Results := Packet;
          Activation.Result_Failure_Class := Failure;
          Activation.Result_Handler_Called := Handler_Called;
@@ -532,7 +818,7 @@ package body Lua.Engine.Machine is
       State : World renames Self.Universe.all;
       Activation : Frame_Access;
    begin
-      Reserve_Frame (State, 20 + Natural (Arguments.Length));
+      Reserve_Frame (State, 0);
       if Name (Name'First) /= '@' and then State.Native_Depth >=
         (if State.Current.Message_Depth > 0 then
             Lua.Runtime_Configuration.Maximum_C_Calls / 10 * 11
@@ -540,15 +826,15 @@ package body Lua.Engine.Machine is
       then
          Fail (State, "C stack overflow");
       end if;
-      Activation := New_Frame (State);
+      Activation := New_Frame (State, State.Current);
       State.Current.Stack.Append (Activation);
       --  The reserved activation stack owns partial construction before any
       --  managed argument copy can fail. Rollback uses the same release path
       --  as ordinary unwinding, balancing every slot/depth charge exactly.
       begin
-         Activation.Slot_Cost := 20 + Natural (Arguments.Length);
-         State.Current.Stack_Slots := State.Current.Stack_Slots +
-           Activation.Slot_Cost;
+         --  A visible native call receives its actual scalar window in
+         --  Dispatch. Internal holders consume no semantic Lua stack slots.
+         Activation.Slot_Cost := 0;
          Activation.Native_Charge := Name (Name'First) /= '@';
          if Activation.Native_Charge then
             State.Native_Depth := State.Native_Depth + 1;
@@ -611,6 +897,12 @@ package body Lua.Engine.Machine is
       Line : Natural;
    begin
       if State.Current.Hook_Active then
+         return False;
+      end if;
+      if not Item.Entry_Hook_Done and then not Item.Is_Native and then
+        Item.Code.Canonical_Node /= null and then Item.Code.Vararg and then
+        Item.PC = 1
+      then
          return False;
       end if;
       if not Item.Entry_Hook_Done then
@@ -972,7 +1264,8 @@ package body Lua.Engine.Machine is
 
    procedure Push_Frame
      (Self : Driver; Function_Value : Value; Arguments : Values.Vector;
-      Destination, Protection : Natural)
+      Destination, Protection : Natural;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False)
    is
       State : World renames Self.Universe.all;
       Item : Frame_Access;
@@ -983,11 +1276,14 @@ package body Lua.Engine.Machine is
       --  Publish it before parameter/vararg setup so the central cleanup
       --  path also owns partially initialized activations after failure.
       Reserve_Frame
-        (State, Natural'Max (20, Prototype.Register_Count) +
-         Natural (Arguments.Length));
-      Item := New_Frame (State);
-      Item.Slot_Cost := Natural'Max (20, Prototype.Register_Count) +
-        Natural (Arguments.Length);
+        (State, (if Prototype.Canonical_Node /= null then 0 else
+           Natural'Max (20, Prototype.Register_Count) +
+             Natural (Arguments.Length)));
+      Item := New_Frame (State, State.Current);
+      Item.Slot_Cost :=
+        (if Prototype.Canonical_Node /= null then 0 else
+           Natural'Max (20, Prototype.Register_Count) +
+             Natural (Arguments.Length));
       State.Current.Stack_Slots :=
         State.Current.Stack_Slots + Item.Slot_Cost;
       Item.Code := Prototype;
@@ -1003,13 +1299,15 @@ package body Lua.Engine.Machine is
          --  second set of packet registers is created for canonical code.
          Item.Transfer_Count := Natural
            (Prototype.Canonical_Node.Parameters);
+         Open_Stack_Window
+           (State, Item, Function_Value, Arguments,
+            Call_Base, Has_Call_Window);
          Canonical.Initialize_Frame (State, Item, Arguments);
          return;
       end if;
       Item.Scope := New_Environment
         (State, Function_Value.Reference.Capture);
-      Item.Slots.Set_Length
-        (Ada.Containers.Count_Type (Prototype.Register_Count));
+      Prepare_Private_Registers (Item, Prototype.Register_Count);
       if Prototype.Is_Main and then
         Function_Value.Reference.Capture = null
       then
@@ -1101,13 +1399,17 @@ package body Lua.Engine.Machine is
       Destination : Natural; Tail : Boolean := False;
       Protected_Call : Natural := 0;
       Call_Name : Unbounded_String := Null_Unbounded_String;
-      Name_Kind : Unbounded_String := Null_Unbounded_String)
+      Name_Kind : Unbounded_String := Null_Unbounded_String;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False)
    is
       State : World renames Self.Universe.all;
       Function_Item : Value := Function_Value;
       Args : Values.Vector := Owned_Values (State, Arguments);
       Protection : Natural := Protected_Call;
       Return_To : Natural := Destination;
+      Effective_Base : Natural := Call_Base;
+      Use_Window : Boolean := Has_Call_Window;
+      Native_Tail : Boolean := False;
       Packet : Values.Vector := Owned_Values (State);
    begin
       Pin (State, Function_Value);
@@ -1149,14 +1451,29 @@ package body Lua.Engine.Machine is
             declare
                Old : Frame_Access := State.Current.Stack.Last_Element;
             begin
-               Return_To := Old.Return_To;
-               Protection := Protection + Old.Protection;
-               State.Current.Stack.Delete_Last;
-               Release_Frame (State, Old);
+               if Function_Item.Kind = Closure_Kind then
+                  Return_To := Old.Return_To;
+                  Protection := Protection + Old.Protection;
+                  if Old.Has_Stack_Window then
+                     Effective_Base := Old.Call_Base;
+                     Use_Window := True;
+                  end if;
+                  State.Current.Stack.Delete_Last;
+                  Release_Frame (State, Old);
+               else
+                  --  Native tail calls keep the Lua caller inspectable until
+                  --  the native result/error returns. A later scheduler phase
+                  --  performs its return; no Ada executor activation recurses.
+                  Old.Native_Tail_State := Waiting_Native_Tail;
+                  Native_Tail := True;
+                  Return_To := 0;
+               end if;
             end;
          end if;
          if Function_Item.Kind = Closure_Kind then
-            Push_Frame (Self, Function_Item, Args, Return_To, Protection);
+            Push_Frame
+              (Self, Function_Item, Args, Return_To, Protection,
+               Effective_Base, Use_Window);
             State.Current.Stack.Last_Element.Is_Tail_Call := Tail;
          elsif Function_Item.Kind = Foreign_Function_Kind then
             Schedule (Self, "foreign.callback", Args, Return_To);
@@ -1195,7 +1512,12 @@ package body Lua.Engine.Machine is
             State.Current.Stack.Last_Element.Foreign_Handler :=
               Function_Item.Reference.Foreign_Handler;
          end if;
-         if not Tail then
+         if Function_Item.Kind /= Closure_Kind then
+            Open_Stack_Window
+              (State, State.Current.Stack.Last_Element,
+               Function_Item, Args, Effective_Base, Use_Window);
+         end if;
+         if not Tail or else Native_Tail then
             State.Current.Stack.Last_Element.Call_Name := Call_Name;
             State.Current.Stack.Last_Element.Name_Kind := Name_Kind;
          end if;
@@ -1426,6 +1748,11 @@ package body Lua.Engine.Machine is
             --  The source holder remains traced during publication. Native
             --  and root destinations take ownership; canonical scalar writes
             --  borrow it before retirement, including an allocation failure.
+            --  Release its departing scalar interval first: the caller's
+            --  destination overlaps this call's original function/arguments.
+            --  The still-stacked holder keeps Error_Packet rooted, but its
+            --  later metadata retirement must not erase newly returned data.
+            Retire_Stack_Window (Holder);
             Deliver_Owned (Self, Caller, Destination, Holder.Error_Packet,
                            Failure, Handler_Called);
             State.Current.Stack.Delete_Last;
@@ -1436,6 +1763,7 @@ package body Lua.Engine.Machine is
       State.Current.Has_Failure_Value := False;
       State.Current.Failure_Class := No_Failure;
       State.Current.Failure_Handled := False;
+      Shrink_Error_Stack (State, State.Current);
    end Recover;
 
    procedure Native_Step (Self : Driver) is
@@ -1480,23 +1808,18 @@ package body Lua.Engine.Machine is
             if Activation.Foreign_Handler = System.Null_Address then
                raise Program_Error with "foreign callback has no handler";
             end if;
-            Activation.Foreign_Base :=
-              Natural (State.Current.Foreign_Stack.Length);
+            Activation.Foreign_Base := Activation.Stack_Base;
             Activation.Foreign_Previous_Base := State.Current.Foreign_Base;
             Activation.Foreign_Previous_Frame :=
               State.Current.Foreign_Activation;
             Activation.Foreign_Entered := True;
-            State.Current.Foreign_Base := Activation.Foreign_Base;
+            State.Current.Foreign_Base := Activation.Stack_Base;
+            State.Current.Foreign_Top := Activation.Stack_Live_Top;
             State.Current.Foreign_Activation := Activation;
-            --  The frame owns arguments before stack growth, and enters its
-            --  window before appending. Error unwinding can therefore restore
-            --  the old base even if allocation fails partway through setup.
-            State.Current.Foreign_Stack.Reserve_Capacity
-              (State.Current.Foreign_Stack.Length +
-                 Activation.Native_Arguments.Length + 1);
-            for Argument of Activation.Native_Arguments loop
-               State.Current.Foreign_Stack.Append (Argument);
-            end loop;
+            --  Actual scalar slots now own every argument. Keeping a stale
+            --  packet would retain C arguments removed/replaced by the host
+            --  and invalidate weak observations during callback collection.
+            Activation.Native_Arguments.Clear;
             Activation.Native_Stage := 1;
             --  Returning exposes an explicit C request. Invoking its function
             --  pointer here would let longjmp cross these live Ada frames.
@@ -1525,7 +1848,10 @@ package body Lua.Engine.Machine is
                Packet.Append (Arg (Index));
             end loop;
             Activation.Native_Stage := 1;
-            Dispatch (Self, Handler, Packet, 0);
+            Dispatch (Self, Handler, Packet, 0,
+                      Call_Base => Activation.Native_Index,
+                      Has_Call_Window => Activation.Native_Aux /= 0);
+            Activation.Native_Arguments.Clear;
          else
             Complete (Self, Activation.Native_Results);
          end if;
@@ -1572,7 +1898,13 @@ package body Lua.Engine.Machine is
             Activation.Error_Packet.Reserve_Capacity (2);
             Activation.Protection := Activation.Protection + 1;
             Activation.Native_Stage := 1;
-            Dispatch (Self, Handler, Packet, 0);
+            Stacks.Write
+              (State, State.Current, Activation.Stack_Base + 1,
+               (Boolean_Kind, True));
+            Dispatch (Self, Handler, Packet, 0,
+                      Call_Base => Activation.Stack_Base + 2,
+                      Has_Call_Window => True);
+            Activation.Native_Arguments.Clear;
          else
             Complete (Self, Activation.Native_Results);
          end if;
@@ -2052,7 +2384,13 @@ package body Lua.Engine.Machine is
             Activation.Protection := Activation.Protection + 1;
             Activation.Message_Handler := Arg (2);
             Activation.Native_Stage := 1;
-            Dispatch (Self, Arg (1), Packet, 0);
+            Stacks.Write
+              (State, State.Current, Activation.Stack_Base + 3,
+               (Boolean_Kind, True));
+            Dispatch (Self, Arg (1), Packet, 0,
+                      Call_Base => Activation.Stack_Base + 4,
+                      Has_Call_Window => True);
+            Activation.Native_Arguments.Clear;
          else
             Complete (Self, Activation.Native_Results);
          end if;
@@ -2224,7 +2562,8 @@ package body Lua.Engine.Machine is
             end if;
             if Operator in Equal | Not_Equal then
                Primitive := Equal (Left, Right) or else
-                 Left.Kind /= Table_Kind or else Right.Kind /= Table_Kind;
+                 Left.Kind /= Right.Kind or else
+                 Left.Kind not in Table_Kind | Userdata_Kind;
             end if;
             if Operator in Greater | Greater_Equal then
                Handler := Left;
@@ -2685,7 +3024,11 @@ package body Lua.Engine.Machine is
                          Next.Destination, Next.Operator);
             when Canonical.Invoke_Function =>
                Dispatch (Self, Next.Function_Value, Next.Arguments,
-                         Next.Destination);
+                         Next.Destination,
+                         Call_Base => Next.Call_Base,
+                         Has_Call_Window => Next.Has_Call_Window);
+               Activation.Native_Arguments.Clear;
+               Activation.Native_Captures.Clear;
             when Canonical.Tail_Invoke =>
                if not Activation.Closers.Is_Empty then
                   --  The compiler never emits TAILCALL while a TBC slot is
@@ -2694,7 +3037,9 @@ package body Lua.Engine.Machine is
                   Fail (State, "canonical tail call has pending close values");
                end if;
                Dispatch (Self, Next.Function_Value, Next.Arguments,
-                         Next.Destination, Tail => True);
+                         Next.Destination, Tail => True,
+                         Call_Base => Next.Call_Base,
+                         Has_Call_Window => Next.Has_Call_Window);
             when Canonical.Return_Results =>
                if Activation.Closers.Is_Empty then
                   Complete (Self, Next.Arguments);
@@ -2800,7 +3145,12 @@ package body Lua.Engine.Machine is
             State.Steps := State.Steps + 1;
          end if;
          begin
-            if Before_Step (Self) then
+            if State.Current.Stack.Last_Element.Native_Tail_State =
+              Ready_Native_Tail
+            then
+               Complete
+                 (Self, State.Current.Stack.Last_Element.Native_Results);
+            elsif Before_Step (Self) then
                null;
             elsif State.Current.Stack.Last_Element.Is_Native then
                Native_Step (Self);
@@ -2979,7 +3329,8 @@ package body Lua.Engine.Machine is
    procedure Start_Foreign
      (Self : in out Driver; State : not null World_Access;
       Callee : Value; Arguments : Values.Vector;
-      Message_Handler : Value := Nil_Value)
+      Message_Handler : Value := Nil_Value;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False)
    is
       Packet : Values.Vector := Owned_Values (State.all);
       Prepared : Boolean := False;
@@ -2999,6 +3350,9 @@ package body Lua.Engine.Machine is
       --  to a non-callable value has a real protected handler boundary. No
       --  synthetic heap closure or second executor is needed for C entry.
       Schedule (Self, "@foreign.entry", Packet, 0);
+      State.Current.Stack.Last_Element.Native_Index := Call_Base;
+      State.Current.Stack.Last_Element.Native_Aux :=
+        Boolean'Pos (Has_Call_Window);
       State.Current.Stack.Last_Element.Error_Packet.Reserve_Capacity (2);
       State.Current.Stack.Last_Element.Protection := 1;
       State.Current.Stack.Last_Element.Message_Handler := Message_Handler;
@@ -3032,6 +3386,9 @@ package body Lua.Engine.Machine is
          Values.Move (State.Current.Transfer.Results, Packet);
          State.Current.Transfer.Kind := Completed;
          State.Current.Transfer.Target := 0;
+      elsif Activation.Native_Tail_State = Waiting_Native_Tail then
+         Values.Move (Activation.Native_Results, Packet);
+         Activation.Native_Tail_State := Ready_Native_Tail;
       elsif Activation.Is_Native then
          declare
             Protected_Error : constant Boolean :=
@@ -3145,7 +3502,7 @@ package body Lua.Engine.Machine is
          raise Program_Error with "invalid foreign callback completion";
       end if;
       Activation := Context.Stack.Last_Element;
-      Count := Natural (Context.Foreign_Stack.Length) - Context.Foreign_Base;
+      Count := Context.Foreign_Top - Context.Foreign_Base;
       if (Error_Status = 0 and then Result_Count > Count) or else
         (Error_Status /= 0 and then Count = 0)
       then
@@ -3156,7 +3513,7 @@ package body Lua.Engine.Machine is
          --  Callback failure has one existing C-stack object. Do not allocate
          --  a temporary packet while a permanent provider refusal is active.
          --  The preserved window and explicit context error are both roots.
-         Context.Failure := Context.Foreign_Stack.Last_Element;
+         Context.Failure := Stacks.Read (Context, Context.Foreign_Top);
          Context.Has_Failure_Value := True;
          Context.Failure_Text := To_Unbounded_String
            (Image (Context.Memory, Context.Failure));
@@ -3171,15 +3528,13 @@ package body Lua.Engine.Machine is
       Activation.Native_Results.Clear;
       Activation.Native_Results.Reserve_Capacity
         (Ada.Containers.Count_Type (Count));
-      for Index in Natural (Context.Foreign_Stack.Length) - Count + 1 ..
-        Natural (Context.Foreign_Stack.Length)
+      for Index in Context.Foreign_Top - Count + 1 .. Context.Foreign_Top
       loop
-         Activation.Native_Results.Append (Context.Foreign_Stack (Index));
+         Activation.Native_Results.Append (Stacks.Read (Context, Index));
       end loop;
       --  The live activation owns every result before the C window is
       --  truncated. No extra temporary pin or controlled copy is required.
-      Context.Foreign_Stack.Set_Length
-        (Ada.Containers.Count_Type (Activation.Foreign_Base));
+      Context.Foreign_Top := Activation.Saved_Foreign_Top;
       Context.Foreign_Base := Activation.Foreign_Previous_Base;
       Context.Foreign_Activation := Activation.Foreign_Previous_Frame;
       Activation.Foreign_Entered := False;
@@ -3192,7 +3547,8 @@ package body Lua.Engine.Machine is
 
    procedure Start_Foreign_Boundary
      (Self : Driver; Callee : Value; Arguments : Values.Vector;
-      Message_Handler : Value := Nil_Value)
+      Message_Handler : Value := Nil_Value;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False)
    is
       State : World renames Self.Universe.all;
       Original_Depth : constant Natural :=
@@ -3215,7 +3571,9 @@ package body Lua.Engine.Machine is
       State.Current.Stack.Last_Element.Retain_On_Failure := True;
       State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
       begin
-         Dispatch (Self, Callee, Arguments, 0);
+         Dispatch (Self, Callee, Arguments, 0,
+                   Call_Base => Call_Base,
+                   Has_Call_Window => Has_Call_Window);
       exception
          when Language_Error => Recover (Self);
          when Lua.Storage.Allocation_Error =>

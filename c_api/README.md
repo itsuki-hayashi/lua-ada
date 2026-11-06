@@ -14,8 +14,8 @@ the reference-only tree.
 The implemented surface covers seeded state construction, default construction,
 closure, thread surfaces, allocator selection, stack movement/indexing,
 primitive values/conversions, stable NUL-terminated byte strings, raw tables,
-registry roots, light-userdata addresses, identity and exact extra-space prefix
-access. Real C functions/closures, fixed and multiple call results, protected
+registry roots, light/full userdata addresses, identity and exact extra-space
+prefix access. Real C functions/closures, fixed and multiple call results, protected
 errors, nested C calls, and text/native-binary buffer loading now use the shared
 iterative driver. Zero-upvalue C functions retain function-pointer identity;
 other C closures retain actual mutable upvalue cells. The standard Ada universe
@@ -23,7 +23,7 @@ descriptor and still-unmigrated container or
 temporary allocations remain outside full callback-allocator coverage. Every
 managed block passed to the callback is released at state closure. Input seed
 is retained; seed-dependent hash behavior remains part of the canonical/storage
-integration audit. Table capacity arguments are hints, pending capacity wiring.
+integration audit. C table capacity arguments remain hints, pending wiring.
 Both constructors leave standard libraries closed, as C Lua does; Ada embedding
 retains its separate eager default environment.
 
@@ -62,7 +62,8 @@ Failure delivery moves owned packets or borrows them for canonical scalar writes
 the C pump uses traced context storage until its stack owns the results. Permanent
 refusal introduced inside a real callback is tested through protected return and
 subsequent host recovery. Complete Lua memory-error parity still depends on
-reusable activation metadata and shared stack capacity.
+shared stack capacity and complete allocation-path verification. Context-owned
+activation caching is implemented and tested separately.
 Automatic initialization happens through the standalone-library binder and C
 constructor entrypoints, including when a static archive is linked. The C
 consumer never calls an Ada initialization function. Concurrent first-use
@@ -104,20 +105,23 @@ are explicitly GNAT-specific test observations, not public Lua interfaces.
 scripts/check.ps1 runs this campaign for its requested profile/library kind;
 other platform/configuration combinations require separate passing evidence.
 
-The consumer has twenty-six independently named, commented behavior cases:
+The consumer has thirty independently named, commented behavior cases:
 allocator lifetime, refusal/recovery, every cold construction growth refusal,
-a protected
-live allocation failure, closed-library initialization, stack operations,
-numeric conversion, stable binary strings, raw table/pointer identity,
+a protected live allocation failure, closed-library initialization, stack
+operations, numeric conversion, stable binary strings, raw table/pointer identity,
 thread/registry/extra-space movement, and
 an actual exported-operation failure crossing only the C-owned guard, function
 pointer identity, callback stack windows/result adjustment, mutable C upvalues,
 protected table errors/recovery, nested C calls, canonical Lua calling C and the
 text-only luaL_loadstring convenience entry, Lua/C handlers, recursive handler
 errors, inherited-handler transport through a C guard, permanent callback
-allocation refusal, panic recovery and reentry into another universe.
-The Windows validation/static run passed all twenty-six cases and exited
-normally in reports/m3-message-handler-c-consumer2.log. Constructor refusal
+allocation refusal, panic recovery, reentry into another universe and four
+userdata cases. Those cover actual C alignment/stable payload bytes, uservalue
+result/pop rules, raw metatable identity/protection bypass and the last valid
+uservalue slot. See [stable userdata](../docs/userdata.md) for traced ownership
+and the still-pending finalizer/resource-lifecycle integration.
+The Windows validation/static run passed all thirty cases and exited
+normally in reports/m3-userdata-c-consumer1.log. Constructor refusal
 sweeps all 25 measured growth points in that build. The earlier COFF link failure
 and callback-phase fallthrough were repaired before that accepted run. This is
 local checkpoint evidence; shared/platform/continuation/allocator-parity gates

@@ -129,7 +129,7 @@ package body Lua.Runtime_Vector_Tests is
       Thread : constant Value := New_Thread (State, Nil_Value);
       Slot : constant Positive := Thread.Reference.Context_Index;
       Context : constant Context_Access := State.Contexts (Slot);
-      Activation : constant Frame_Access := New_Frame (State);
+      Activation : constant Frame_Access := New_Frame (State, Context);
       Held : constant Value := New_Table (State);
       Key : constant Value := New_String (State, "owned-thread");
    begin

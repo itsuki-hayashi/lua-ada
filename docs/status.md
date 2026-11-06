@@ -60,6 +60,18 @@ existing ADR 0003 floating-validity exception is unchanged.
 
 ## Current full M3 checkpoint
 
+The latest Windows/default/validation/static implementation passes 1,009
+separately named AUnit cases with zero failed assertions or unexpected errors.
+Canonical Lua and native/C activations now share one context-owned scalar
+arena, including actual captured cells, hidden varargs, overlapping call
+windows and collection of their ordered live union. Strict flags and runtime
+checks remain enabled. The complete retained pipeline passes its C32/mixed/startup consumers,
+Ada consumer, 35 CLI cases, ten binary CLI comparisons, twelve differential
+fixtures and five unchanged upstream files. This does not establish final
+platform or full-upstream acceptance. The session record owns exact commands and repairs.
+
+The earlier checkpoint sequence below retains its original evidence counts.
+
 The validation/static checkpoint passes 816 AUnit cases, the Ada consumer,
 35 CLI cases, nine byte-exact differential scripts and the five retained
 unchanged upstream files. The new mathematics campaign matches 714 same-host
@@ -90,7 +102,12 @@ A host arithmetic adapter replaces that x86-specific bit synthesis. The next
 checkpoint passes all twelve Linux/Windows jobs, including Windows static-PIC,
 but macOS stops in the new standalone-runtime link/startup checks. Follow-up
 repairs propagate the selected GNARL archive and clean embedded/runtime search
-paths. Their successful macOS rerun is still required.
+paths. All six macOS jobs at a4e5e338a27630bd077bc7f7fe294500f10162b7
+passed in run42207946868, and their logs were inspected. That run failed
+all six Linux jobs on a measured libc alternate-general formatting carry
+difference. The generic rounding/host-policy repair now passes the local
+968-case pipeline and both formatting campaigns; its Linux CI rerun remains
+required. No failure was masked or reclassified as passing.
 
 The production root is now one liblua image for Ada and C consumers. Static
 and shared C/API, mixed state/allocator/pool identity, and C-only startup checks
@@ -104,8 +121,12 @@ The later managed numeric checkpoint passes 916 cases and all retained
 checks, including 1,435 formatting records. Sorting and real table reservation
 then pass 940 cases and eleven differential files, including 465 table
 algorithm records. These are local Windows/default/validation/static results.
-Remaining metadata/output ownership, full foreign execution, collector modes,
-finalizers, userdata, libraries and the complete test adapter remain required.
+Later checkpoints add context-owned activation caching and real inline,
+C-aligned full userdata with traced uservalues. The full retained local
+pipeline passes 964 AUnit cases and 30 real C consumer cases; the formatting
+carry repair then passes 968 cases. Output ownership, full foreign execution,
+collector modes/finalizers, libraries and the complete test adapter remain
+required.
 The source-selected instrumented configuration has no full runtime/platform
 acceptance yet. All 4,490 source anchors and 473 header entries remain pending;
 no component result closes the final 26-context M3 acceptance gate.
@@ -146,7 +167,7 @@ retain their original counts and configurations. M2a's complete checking
 interface and 85 canonical opcode definitions remain independent of execution.
 Checking and execution now share executable goto/label/close constructs.
 
-This remains a documented Lua subset. Userdata, finalizers, collector modes,
+This remains a documented Lua subset. Finalizers, collector modes,
 remaining debug/io/os facilities and libraries, full C API/ABI, native modules
 and LuaRocks remain
 required work. Five selected default-configuration files do not establish the complete

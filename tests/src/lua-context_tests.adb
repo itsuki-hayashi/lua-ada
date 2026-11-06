@@ -1,12 +1,9 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Unchecked_Deallocation;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Test_Support;
 
 package body Lua.Context_Tests is
-   procedure Free_Frame is new Ada.Unchecked_Deallocation
-     (Frame, Frame_Access);
 
    generic
       with procedure Action (State : in out World);
@@ -99,7 +96,7 @@ package body Lua.Context_Tests is
    procedure Inactive_Frame_Root (State : in out World) is
       Other : constant Context_Id := Create_Context (State);
       Activation : Frame_Access :=
-        New_Frame (State);
+        New_Frame (State, State.Contexts (Positive (Other)));
       Item : constant Value := New_String (State, "capture");
    begin
       --  Pending native callbacks retain captures even on an inactive stack.
@@ -109,7 +106,7 @@ package body Lua.Context_Tests is
       Collect (State);
       Assert (State.Heap.Contains (Item.Reference), "inactive frame capture");
       State.Contexts (Positive (Other)).Stack.Clear;
-      Free_Frame (Activation);
+      Return_Frame (Activation);
       Collect (State);
       Assert (not State.Heap.Contains (Item.Reference), "released capture");
    end Inactive_Frame_Root;
@@ -155,7 +152,7 @@ package body Lua.Context_Tests is
       --  Finalize owns every inactive activation too. Calling it again must
       --  tolerate the empty registry and null borrowed selector.
       State.Contexts (Positive (Other)).Stack.Append
-        (New_Frame (State));
+        (New_Frame (State, State.Contexts (Positive (Other))));
       Finalize (State);
       Finalize (State);
       Assert (State.Contexts.Is_Empty and then State.Current = null,

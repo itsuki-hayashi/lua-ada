@@ -51,3 +51,10 @@ hexadecimal rendering and its focused allocation/refusal and differential checks
 
 [Table algorithms](table-algorithms.md) describes sorting continuations, real
 preallocation and focused allocation-refusal evidence.
+
+[Owned numeric conversion](numeric-storage.md) documents the shared exact parser,
+managed limbs and bounded scan accounting. [Activation storage](activation-storage.md)
+owns the per-context frame cache, retained capacity and retirement contract.
+
+[Stable userdata](userdata.md) owns inline C-aligned payloads, traced Lua
+uservalues, per-object metatables and the first-party resource-release boundary.

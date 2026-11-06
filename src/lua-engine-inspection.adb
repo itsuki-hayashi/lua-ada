@@ -554,15 +554,31 @@ package body Lua.Engine.Inspection is
             end if;
             if not Selected.Is_Native then
                if Index < 0 then
-                  if Index >= -Integer_Value (Selected.Varargs.Length) then
-                     Append (New_String (State, "(vararg)"));
-                     if Name = "debug.setlocal" then
-                        Selected.Varargs.Replace_Element
-                          (Positive (-Index), Arg (Base + 2));
-                     else
-                        Append (Selected.Varargs (Positive (-Index)));
+                  declare
+                     Count : constant Natural :=
+                       (if Selected.Code.Canonical_Node /= null then
+                           Canonical.Vararg_Length (Selected) else
+                           Natural (Selected.Varargs.Length));
+                  begin
+                     if Index >= -Integer_Value (Count) then
+                        Append (New_String (State, "(vararg)"));
+                        if Selected.Code.Canonical_Node /= null then
+                           if Name = "debug.setlocal" then
+                              Canonical.Write_Vararg
+                                (State, Selected, Positive (-Index),
+                                 Arg (Base + 2));
+                           else
+                              Append (Canonical.Read_Vararg
+                                (State, Selected, Positive (-Index)));
+                           end if;
+                        elsif Name = "debug.setlocal" then
+                           Selected.Varargs.Replace_Element
+                             (Positive (-Index), Arg (Base + 2));
+                        else
+                           Append (Selected.Varargs (Positive (-Index)));
+                        end if;
                      end if;
-                  end if;
+                  end;
                   if Result.Is_Empty then
                      Append (Nil_Value);
                   end if;

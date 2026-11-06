@@ -12,6 +12,14 @@ private package Lua.Platform_Numerics is
    --  The tiny host adapter performs one arithmetic operation; all Lua
    --  conversion and dispatch remain in Ada. See ADR 0011.
 
+   function General_Carry_Zeroes return Interfaces.C.int
+     with Import, Convention => C,
+          External_Name => "lua_ada_host_general_carry_zeroes";
+   --  Observe whether native alternate %g retains fractional zeroes when
+   --  rounding moves fixed notation into scientific notation. This differs
+   --  between libc implementations; no operating-system name decides it.
+   --  Only spelling is probed; actual values and rounding remain in Ada.
+
    function Remainder (Left, Right : Interfaces.C.double)
                        return Interfaces.C.double
      with Import, Convention => C, External_Name => "fmod";

@@ -294,3 +294,105 @@ a334b29c434973a41782d1a35d9bd856e288f0bc exposed the shared failure as missing
 GNARL. New selected-runtime archive propagation and clean embedded/runtime
 search paths are implemented; macOS evidence still needs a successful rerun.
 All reference and ecosystem submodule revisions remain unchanged.
+
+## Stable userdata checkpoint
+
+After the 951-case activation-cache checkpoint, the existing real C consumer
+was rebuilt and rerun: all 26 cases pass, exit zero, in
+reports/m3-cache-c-consumer-build.log and m3-cache-c-consumer.log. This verifies
+that foreign callback windows, mutable captures and protected errors survive
+frame reuse before extending their value kinds.
+
+One managed discriminated object now owns a stable inline userdata payload.
+An actual C-convention long-double/long-long/pointer union supplies alignment;
+physical block padding stays separate from logical size. There is no copied
+C private header, fabricated pointer or C interpreter link. The object owns
+traced nil-initialized uservalues and its metatable. Equality, hashing, weak
+cleanup and ordinary metamethod dispatch recognize the new full userdata kind.
+An optional first-party metadata cleanup receives a typed release reason;
+actual Lua finalizer scheduling and close/disposal reason selection remain
+the following collector/lifecycle work.
+
+The strict validation/static build passes in reports/m3-userdata-build6.log.
+Thirteen named and commented storage/GC/identity/error cases pass within
+964 total AUnit cases, zero failed assertions or unexpected errors, in
+reports/m3-userdata-aunit2.log. Initial builds exposed nonstatic private-address
+alignment attributes; replacing an explicit alignment expression with a real
+C union carrier fixes the representation without warning suppressions.
+Expected-error calls were moved from declaration initialization into handled
+statement regions, fixing two test-harness exception-boundary errors.
+
+Four valid public-C-API userdata cases pass against separately linked pinned C
+Lua and against the actual root Ada library. The expanded Ada-linked consumer
+passes all 30 named cases and exits zero in reports/m3-userdata-c-consumer1.log,
+after reports/m3-userdata-c-build1.log. Coverage includes actual aligned mutable
+bytes, nil-vs-none and set-pop rules, metatable protection bypass and the last
+valid uservalue slot. Pinned lapi.c requires a count below SHRT_MAX, hence
+32,766 with the default short width. The cold constructor sweep remains 25
+measured growth points with balanced release. See [userdata](../userdata.md).
+
+Seven separately built continuation/resume C fixtures also pass against the
+pinned C DLL; they are pending Ada regressions, not Ada continuation evidence.
+They confirm that immediate child errors in yieldable lua_pcallk abandon its
+original C body and invoke K even without an earlier yield. Public K/resume,
+shared scalar windows, finalizers, IO/OS, full allocator categories and final
+platform/coverage gates remain pending. No additional whole upstream Lua file
+is claimed by this component checkpoint.
+
+reports/m3-userdata-check1.log subsequently passes the full retained
+validation/static pipeline, exit zero: 964 AUnit cases, real C/mixed/startup
+consumers, Ada consumer, 35 CLI cases, ten binary comparisons, eleven
+differential fixtures and the five existing upstream files. The printed
+invalid-option subprocess failure is the expected CLI rejection assertion.
+All result summaries were inspected; diff whitespace validation also passes.
+
+## Shared scalar-window integration
+
+The 987-case helper checkpoint is now integrated into actual canonical and
+native/C execution. One context-owned paired scalar/cell arena replaces each
+canonical frame's accumulated register and vararg vectors. Calls use absolute
+original function slots; hidden varargs occupy the real shifted prefix and
+named varargs create their actual table before overwriting extra arguments.
+Debug negative local access reads/writes that storage. Native tail calls keep
+the logical Lua caller until the native target completes, fails or resumes.
+The collector traces the ordered union of live windows, authoritative cells
+and host prefixes; temporary component-test root bridges are removed.
+
+Native windows retain the pinned minimum of 20 slots. Initial semantic stack
+space is 40 plus five physical extras, and first semantic overflow installs
+the 200-slot error reserve. Ordinary Lua calls consume their real overlapping
+register extent. Stack limits come from the selected configuration. Protected
+failures retire departing windows before writing overlapping caller results;
+the still-stacked error packet remains a GC root throughout publication.
+
+Strict build5 and tests4 pass all 1,009 AUnit cases, zero failed assertions or
+unexpected errors. Commands: alr -n -C tests build --validation
+--profiles=lua_ada=validation, then alr -C tests exec --
+bin/static/test_runner.exe. Evidence: reports/m3-shared-windows-build5.log
+and reports/m3-shared-windows-tests4.log. Both new C cases were independently
+checked against pinned C before integration; the complete Ada-linked consumer
+and retained pipeline pass in reports/m3-shared-windows-check1.log: C32,
+mixed/startup, Ada consumer, 35 CLI cases, ten binary CLI comparisons, twelve
+differential fixtures and the five retained unchanged upstream files. The
+printed invalid-option subprocess failure is the expected rejection check.
+
+Initial integration caught protected-result clearing after overlapping return
+publication and a test helper replacing only one half of the paired arena.
+Both ownership transitions were corrected. table.unpack had two fast/handler
+paths still using summed private slots; both now reserve actual native result
+space before looping, through the common nonthrowing stack check. The retained
+overflow regression now checks pinned C's own 'too many results to unpack'
+diagnostic, dead coroutine and recovery, rather than private-backend wording.
+Both C configurations independently return that failure. A separate emergency
+GC test originally used a freed address as proof of reclamation; an arena
+allocation can legitimately reuse it. It now checks the immutable object
+serial in the actual heap, preserving reclamation and paired-growth assertions.
+
+Run42207946868 at a4e5e338a27630bd077bc7f7fe294500f10162b7 passed all six
+macOS jobs; each log was inspected. All six Linux jobs exposed the libc
+alternate-general carry difference repaired in the later 968-case local run.
+That repair and the shared-window implementation need fresh platform evidence.
+Remaining C continuations, call-origin accounting, allocation-free span
+transfers, physical cache/arena shrinking, collector modes/finalizers, IO/OS,
+full ABI/adapter/coverage and final platform gates remain open. No additional
+unchanged whole upstream file is claimed.

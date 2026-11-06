@@ -2,6 +2,8 @@ with Lua.Engine.Mathematics;
 with Ada.Containers;
 with Ada.Unchecked_Conversion;
 with Interfaces;
+with Interfaces.C;
+with Lua.Engine.Machine;
 with Lua.Integers;
 
 package body Lua.Engine.Core_Libraries is
@@ -367,11 +369,16 @@ package body Lua.Engine.Core_Libraries is
                Fail (State, "too many results to unpack");
             end if;
             Count := Last - First + 1;
-            if Name = "table.unpack" and then Count > Integer_Value
-              (1_000_000 - Natural'Min
-                 (1_000_000, State.Current.Stack_Slots))
+            if Last - First >= Integer_Value (Interfaces.C.int'Last) or else
+              State.Current.Stack_Window = null or else
+              not Lua.Engine.Machine.Reserve_Native_Results
+                (State, State.Current.Stack_Window, Natural (Count))
             then
-               Fail (State, "too many results to unpack (stack overflow)");
+               --  The plain-table fast path needs the same actual native
+               --  window reservation as the metamethod-capable driver. It
+               --  must not build a huge packet before the pinned checkstack
+               --  failure, nor consult the old summed private slot counter.
+               Fail (State, "too many results to unpack");
             end if;
             if Count > Integer_Value (State.Bounds.Table_Entries) then
                Fail (State, "result count limit exceeded", Resource => True);

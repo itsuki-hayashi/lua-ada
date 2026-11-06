@@ -114,6 +114,13 @@ values distinguish scalars from string/table/environment/closure references.
 Objects do not move. Ada finalization releases a universe but does not
 substitute for tracing cycles.
 
+[Full userdata](docs/userdata.md) owns inline C-aligned payload blocks,
+independent logical size, traced uservalues and an object metatable. C borrows
+the actual stable payload address. A reasoned first-party host cleanup
+attachment is separate from Lua finalizer scheduling; generic userdata has no
+implicit native destructor. Finalization and IO lifecycle integration remain
+independent acceptance requirements.
+
 An iterative stop-the-world mark/sweep collector traces globals, live frames,
 register packets, environments/captures, arguments, named vararg tables, error
 objects, table/type metatables, native-closure captures, native activation

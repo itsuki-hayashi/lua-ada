@@ -3,6 +3,7 @@ with AUnit.Assertions; use AUnit.Assertions;
 with Interfaces;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Formats;
+with Lua.Platform_Numerics;
 with Lua.Storage;
 with Lua.Storage.Buffers;
 with Test_Support;
@@ -62,6 +63,10 @@ package body Lua.Managed_Format_Tests is
    procedure First_Growth_Refusal (State : in out World);
    procedure Partial_Growth_Refusal (State : in out World);
    procedure Recovery_After_Refusal (State : in out World);
+   procedure Alternate_Rollover (State : in out World);
+   procedure Negative_Rollover (State : in out World);
+   procedure Uppercase_Rollover (State : in out World);
+   procedure Already_Scientific (State : in out World);
 
    procedure Nearest_Even (State : in out World) is
    begin
@@ -269,6 +274,55 @@ package body Lua.Managed_Format_Tests is
       Expect (State, "%.2f", 12.5, "12.50");
    end Recovery_After_Refusal;
 
+   function Keeps_Carry_Zeroes return Boolean is
+     (Integer (Lua.Platform_Numerics.General_Carry_Zeroes) /= 0);
+
+   procedure Alternate_Rollover (State : in out World) is
+   begin
+      --  Vary precision/exponent across the generic fixed-to-scientific
+      --  transition. The host's observed fractional-minimum policy affects
+      --  spelling only; the exact binary quarter always rounds to 10**p.
+      for Precision in 2 .. 6 loop
+         declare
+            Form : String := "%#.2g";
+            Value : constant Real_Value := 10.0 ** Precision - 0.25;
+            Zeroes : constant String :=
+              (if Keeps_Carry_Zeroes
+               then String'(1 .. Precision - 1 => '0') else "");
+         begin
+            Form (4) := Character'Val (Character'Pos ('0') + Precision);
+            Expect (State, Form, Value,
+                    "1." & Zeroes & "e+0" &
+                    Character'Val (Character'Pos ('0') + Precision));
+         end;
+      end loop;
+   end Alternate_Rollover;
+
+   procedure Negative_Rollover (State : in out World) is
+   begin
+      --  Sign is emitted outside the magnitude renderer. It must not disable
+      --  the same native carry policy or consume a significant digit.
+      Expect (State, "%#.3g", -999.75,
+              (if Keeps_Carry_Zeroes then "-1.00e+03" else "-1.e+03"));
+   end Negative_Rollover;
+
+   procedure Uppercase_Rollover (State : in out World) is
+   begin
+      --  G selects the uppercase exponent after the identical rounding and
+      --  native minimum-fraction decision; it is not an unrelated formatter.
+      Expect (State, "%#.3G", 999.75,
+              (if Keeps_Carry_Zeroes then "1.00E+03" else "1.E+03"));
+   end Uppercase_Rollover;
+
+   procedure Already_Scientific (State : in out World) is
+   begin
+      --  A value already beyond the notation threshold retains its requested
+      --  alternate zeroes even on a libc that omits them during a transition.
+      --  This protects against globally stripping scientific %g padding.
+      Expect (State, "%#.3g", 1_000.0, "1.00e+03");
+      Expect (State, "%#.3g", 9_999.75, "1.00e+04");
+   end Already_Scientific;
+
    procedure Even_Case is new Fixture (Nearest_Even);
    procedure Carry_Case is new Fixture (Decimal_Carry);
    procedure Threshold_Case is new Fixture (General_Threshold);
@@ -285,6 +339,10 @@ package body Lua.Managed_Format_Tests is
    procedure First_Case is new Fixture (First_Growth_Refusal);
    procedure Partial_Case is new Fixture (Partial_Growth_Refusal);
    procedure Recovery_Case is new Fixture (Recovery_After_Refusal);
+   procedure Rollover_Case is new Fixture (Alternate_Rollover);
+   procedure Negative_Case is new Fixture (Negative_Rollover);
+   procedure Uppercase_Case is new Fixture (Uppercase_Rollover);
+   procedure Scientific_Case is new Fixture (Already_Scientific);
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
@@ -320,5 +378,13 @@ package body Lua.Managed_Format_Tests is
                         Partial_Case'Access);
       Test_Support.Add (Suite, "managed format: refusal recovery",
                         Recovery_Case'Access);
+      Test_Support.Add (Suite, "managed format: alternate rollover family",
+                        Rollover_Case'Access);
+      Test_Support.Add (Suite, "managed format: negative alternate rollover",
+                        Negative_Case'Access);
+      Test_Support.Add (Suite, "managed format: uppercase alternate rollover",
+                        Uppercase_Case'Access);
+      Test_Support.Add (Suite, "managed format: already scientific padding",
+                        Scientific_Case'Access);
    end Register;
 end Lua.Managed_Format_Tests;

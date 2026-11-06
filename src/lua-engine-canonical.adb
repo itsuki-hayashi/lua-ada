@@ -6,12 +6,10 @@ with Lua.Integers;
 with Lua.Opcodes;
 with Lua.Engine.Tables;
 with Lua.Engine.Machine;
-with Lua.Runtime_Configuration;
+with Lua.Engine.Stacks;
 
 package body Lua.Engine.Canonical is
    use Lua.Opcodes;
-   Stack_Limit : constant Natural :=
-     Lua.Runtime_Configuration.Maximum_Stack;
    use type Interfaces.Unsigned_8;
    use type Interfaces.Integer_8;
    use type Interfaces.Unsigned_64;
@@ -141,32 +139,37 @@ package body Lua.Engine.Canonical is
       return Result.Value;
    end Part;
 
-   function Read_Register
+   function Absolute_Register
      (State : in out World; Activation : Frame_Access; Index : Natural)
-      return Value
-   is
+      return Positive;
+   function Absolute_Register
+     (State : in out World; Activation : Frame_Access; Index : Natural)
+      return Positive is
    begin
-      if Index >= Natural (Activation.Canonical_Registers.Length) then
+      if not Activation.Has_Stack_Window or else
+        Index >= Activation.Stack_Window_Length
+      then
          Fail (State, "canonical register out of range");
       end if;
-      if Activation.Canonical_Cells (Index + 1) /= null then
-         return Activation.Canonical_Cells (Index + 1).Cell_Value;
-      end if;
-      return Activation.Canonical_Registers (Index + 1);
+      return Activation.Stack_Base + Index + 1;
+   end Absolute_Register;
+
+   function Read_Register
+     (State : in out World; Activation : Frame_Access; Index : Natural)
+      return Value is
+   begin
+      return Stacks.Read
+        (State, Activation.Context,
+         Absolute_Register (State, Activation, Index));
    end Read_Register;
 
    procedure Write_Register
      (State : in out World; Activation : Frame_Access; Index : Natural;
-      Item : Value)
-   is
+      Item : Value) is
    begin
-      if Index >= Natural (Activation.Canonical_Registers.Length) then
-         Fail (State, "canonical register out of range");
-      end if;
-      Activation.Canonical_Registers.Replace_Element (Index + 1, Item);
-      if Activation.Canonical_Cells (Index + 1) /= null then
-         Activation.Canonical_Cells (Index + 1).Cell_Value := Item;
-      end if;
+      Stacks.Write
+        (State, Activation.Context,
+         Absolute_Register (State, Activation, Index), Item);
    end Write_Register;
 
    function Constant_At
@@ -182,22 +185,14 @@ package body Lua.Engine.Canonical is
 
    function Capture_Cell
      (State : in out World; Activation : Frame_Access; Index : Natural)
-      return Object_Access
-   is
-      Cell : Object_Access;
+      return Object_Access is
    begin
-      if Index >= Natural (Activation.Canonical_Cells.Length) then
-         Fail (State, "canonical capture register out of range");
-      end if;
-      Cell := Activation.Canonical_Cells (Index + 1);
-      if Cell = null then
-         --  The first capture creates an actual independently owned cell.
-         --  Register writes share it until CLOSE detaches this association;
-         --  closures created later at a reentered declaration get a new cell.
-         Cell := New_Cell (State, Read_Register (State, Activation, Index));
-         Activation.Canonical_Cells.Replace_Element (Index + 1, Cell);
-      end if;
-      return Cell;
+      --  The arena can move; its index and independently owned cell cannot.
+      --  Closing detaches that association before another lexical lifetime
+      --  reuses the slot, so earlier closures keep their original binding.
+      return Stacks.Capture
+        (State, Activation.Context,
+         Absolute_Register (State, Activation, Index));
    end Capture_Cell;
 
    function Upvalue_Cell
@@ -213,17 +208,16 @@ package body Lua.Engine.Canonical is
 
    procedure Close_Cells (Activation : Frame_Access; From : Natural) is
    begin
-      --  Copy the cell's latest value back before detaching. A debug mutation
-      --  may have changed the cell without touching its cached register.
-      for Index in From + 1 ..
-        Natural (Activation.Canonical_Cells.Length)
-      loop
-         if Activation.Canonical_Cells (Index) /= null then
-            Activation.Canonical_Registers.Replace_Element
-              (Index, Activation.Canonical_Cells (Index).Cell_Value);
-            Activation.Canonical_Cells.Replace_Element (Index, null);
-         end if;
-      end loop;
+      if Activation.Has_Stack_Window and then
+        From < Activation.Stack_Window_Length
+      then
+         --  Detach only this departing window. Ordinary calls overlap their
+         --  caller's dead temporary tail; scope/return cleanup runs after
+         --  child windows retire, never while a child owns these cells.
+         Stacks.Detach
+           (Activation.Context, Activation.Stack_Base + From + 1,
+            Activation.Stack_Base + Activation.Stack_Window_Length);
+      end if;
    end Close_Cells;
 
    procedure Prepare_Close
@@ -258,8 +252,8 @@ package body Lua.Engine.Canonical is
    is
       Result : Values.Vector := Owned_Values (State);
    begin
-      if First > Natural (Activation.Canonical_Registers.Length) or else
-        Count > Natural (Activation.Canonical_Registers.Length) - First
+      if First > Activation.Stack_Window_Length or else
+        Count > Activation.Stack_Window_Length - First
       then
          Fail (State, "canonical register range out of bounds");
       end if;
@@ -275,36 +269,18 @@ package body Lua.Engine.Canonical is
    is
       Count : constant Natural :=
         (if Wanted < 0 then Natural (Results.Length) else Wanted);
-      Old_Length : constant Natural :=
-        Natural (Activation.Canonical_Registers.Length);
       New_Length : Natural;
    begin
-      --  Open results may extend beyond maxstacksize. Charge only their real
-      --  scalar slots, reserve both parallel arrays before publishing length,
-      --  then adjust top. Fixed requests pad missing results with nil.
-      if Base > Stack_Limit or else Count > Stack_Limit - Base then
+      --  Fixed results restore the prototype reservation. Open results may
+      --  extend it, but the real overlapping arena is charged by absolute
+      --  stack top rather than by adding another per-frame register vector.
+      if Count > Natural'Last - Base then
          Fail (State, "stack overflow");
       end if;
-      New_Length := Natural'Max (Old_Length, Base + Count);
-      if New_Length > Old_Length then
-         if New_Length - Old_Length > Stack_Limit -
-           Natural'Min (Stack_Limit, State.Current.Stack_Slots)
-         then
-            Fail (State, "stack overflow");
-         end if;
-         Activation.Canonical_Registers.Reserve_Capacity
-           (Ada.Containers.Count_Type (New_Length));
-         Activation.Canonical_Cells.Reserve_Capacity
-           (Ada.Containers.Count_Type (New_Length));
-         Activation.Canonical_Registers.Set_Length
-           (Ada.Containers.Count_Type (New_Length));
-         Activation.Canonical_Cells.Set_Length
-           (Ada.Containers.Count_Type (New_Length));
-         Activation.Slot_Cost :=
-           Activation.Slot_Cost + New_Length - Old_Length;
-         State.Current.Stack_Slots :=
-           State.Current.Stack_Slots + New_Length - Old_Length;
-      end if;
+      New_Length := Natural'Max
+        (Natural (Activation.Code.Canonical_Node.Max_Stack), Base + Count);
+      Lua.Engine.Machine.Resize_Stack_Window
+        (State, Activation, New_Length);
       for Offset in 1 .. Count loop
          Write_Register (State, Activation, Base + Offset - 1,
            (if Offset <= Natural (Results.Length) then Results (Offset)
@@ -317,6 +293,12 @@ package body Lua.Engine.Canonical is
          Activation.Canonical_GC_Top :=
            Natural (Activation.Code.Canonical_Node.Max_Stack);
       end if;
+      if Activation.Context.Stack_Window = Activation then
+         Activation.Context.Foreign_Top :=
+           (if Wanted < 0 then
+               Activation.Stack_Base + Activation.Canonical_Top else
+               Activation.Context.Stack_Used);
+      end if;
    end Store_Results;
 
    procedure Initialize_Frame
@@ -325,28 +307,70 @@ package body Lua.Engine.Canonical is
    is
       Code : constant Lua.Prototypes.Prototype_Access :=
         Activation.Code.Canonical_Node;
-      Count : constant Natural := Natural (Code.Parameters);
+      Fixed : constant Natural := Natural (Code.Parameters);
+      Actual : constant Natural := Natural'Max
+        (Fixed, Natural (Arguments.Length));
+      Is_Vararg : constant Boolean := (Code.Flags and 3) /= 0;
    begin
-      Activation.Canonical_Registers.Set_Length
-        (Ada.Containers.Count_Type (Code.Max_Stack));
-      Activation.Canonical_Cells.Set_Length
-        (Ada.Containers.Count_Type (Code.Max_Stack));
-      for Index in 1 .. Count loop
+      --  Machine publishes the frame/base first. Incoming packets still root
+      --  their values during this initial migration; reserve can collect or
+      --  fail before any future window becomes visible to the collector.
+      Lua.Engine.Machine.Resize_Stack_Window
+        (State, Activation,
+         Natural'Max (Natural (Code.Max_Stack), Actual));
+      Stacks.Clear_Range
+        (Activation.Context, Activation.Stack_Base + 1,
+         Activation.Stack_Base + Activation.Stack_Window_Length);
+      if Activation.Stack_Base /= 0 then
+         Stacks.Write
+           (State, Activation.Context, Activation.Stack_Base,
+            Activation.Callee);
+      end if;
+      for Index in 1 .. (if Is_Vararg then Actual else Fixed) loop
          Write_Register (State, Activation, Index - 1,
            (if Index <= Natural (Arguments.Length) then Arguments (Index)
             else Nil_Value));
       end loop;
-      Activation.Canonical_Top := Count;
-      Activation.Canonical_GC_Top := Natural (Code.Max_Stack);
-      if (Code.Flags and 3) /= 0 then
-         for Index in Count + 1 .. Natural (Arguments.Length) loop
-            Activation.Varargs.Append (Arguments (Index));
-         end loop;
-      end if;
-      --  VARARGPREP creates a named table at its actual instruction point.
-      --  Hidden argument storage remains separate from the scalar register
-      --  top, matching Lua 5.5's distinction between PF_VAHID/PF_VATAB.
+      Activation.Canonical_Top := Actual;
+      Activation.Canonical_GC_Top :=
+        (if Is_Vararg then Activation.Stack_Window_Length else
+            Natural (Code.Max_Stack));
+      Activation.Vararg_Count := (if Is_Vararg then Actual - Fixed else 0);
+      Activation.Vararg_Base := Activation.Stack_Base + Fixed + 1;
+      Activation.Hidden_Varargs := False;
+      Activation.Context.Foreign_Top := Activation.Stack_Base + Actual;
+      --  VARARGPREP performs the real hidden-layout shift or table creation
+      --  at its instruction point. Call hooks must observe that final layout.
    end Initialize_Frame;
+
+   function Vararg_Length (Activation : Frame_Access) return Natural is
+     (if Activation.Hidden_Varargs then Activation.Vararg_Count else 0);
+
+   function Read_Vararg
+     (State : in out World; Activation : Frame_Access; Index : Positive)
+      return Value is
+   begin
+      if not Activation.Hidden_Varargs or else
+        Index > Activation.Vararg_Count
+      then
+         Fail (State, "canonical vararg index out of range");
+      end if;
+      return Stacks.Read
+        (State, Activation.Context, Activation.Vararg_Base + Index - 1);
+   end Read_Vararg;
+
+   procedure Write_Vararg
+     (State : in out World; Activation : Frame_Access; Index : Positive;
+      Item : Value) is
+   begin
+      if not Activation.Hidden_Varargs or else
+        Index > Activation.Vararg_Count
+      then
+         Fail (State, "canonical vararg index out of range");
+      end if;
+      Stacks.Write
+        (State, Activation.Context, Activation.Vararg_Base + Index - 1, Item);
+   end Write_Vararg;
 
    function Source_Line (Activation : Frame_Access; PC : Natural)
                          return Natural is
@@ -619,9 +643,31 @@ package body Lua.Engine.Canonical is
       --  packet. Clear pending callback arguments after publishing the result
       --  or deciding the branch, so a collection sees one owner throughout.
       case Activation.Canonical_Pending is
-         when Store_Canonical_Results =>
-            Store_Results (State, Activation, Activation.Canonical_Base,
-                           Activation.Canonical_Wanted, Results);
+         when Store_Canonical_Results | Store_Call_Results =>
+            declare
+               Is_Call : constant Boolean :=
+                 Activation.Canonical_Pending = Store_Call_Results;
+               Count : constant Natural :=
+                 (if Activation.Canonical_Wanted < 0 then
+                     Natural (Results.Length) else
+                     Activation.Canonical_Wanted);
+            begin
+               Store_Results
+                 (State, Activation, Activation.Canonical_Base,
+                  Activation.Canonical_Wanted, Results);
+               if Is_Call then
+                  --  Real calls move results over the function slot and
+                  --  publish their actual top. Operator helpers instead
+                  --  restore their saved/protected reservation after copying
+                  --  a scalar result into an ordinary destination register.
+                  Activation.Canonical_Top :=
+                    Activation.Canonical_Base + Count;
+                  if Activation.Context.Stack_Window = Activation then
+                     Activation.Context.Foreign_Top := Activation.Stack_Base +
+                       Activation.Canonical_Top;
+                  end if;
+               end if;
+            end;
             Activation.Canonical_Pending := No_Canonical_Result;
          when Test_Canonical_Result =>
             if Truth (Item) /= Activation.Canonical_Test then
@@ -843,7 +889,8 @@ package body Lua.Engine.Canonical is
       end if;
       Op := Lua.Opcodes.Operation (Code);
       Activation.Canonical_GC_Top :=
-        (if Uses_Top (Code) then Activation.Canonical_Top
+        (if Op = Op_VARARGPREP then Activation.Stack_Window_Length
+         elsif Uses_Top (Code) then Activation.Canonical_Top
          else Natural (Prototype.Max_Stack));
       Activation.PC := Activation.PC + 1;
       State.Current.Failure_At :=
@@ -1058,7 +1105,7 @@ package body Lua.Engine.Canonical is
               Register_List (State, Activation, Reg_A + 1, Count);
             Activation.Native_Captures.Clear;
             Activation.Native_Captures.Append (Reg (Reg_A));
-            Activation.Canonical_Pending := Store_Canonical_Results;
+            Activation.Canonical_Pending := Store_Call_Results;
             Activation.Canonical_Base := Reg_A;
             Activation.Canonical_Wanted := Integer (Reg_C) - 1;
             if Op = Op_TAILCALL then Freeze_Closing (0); end if;
@@ -1066,7 +1113,9 @@ package body Lua.Engine.Canonical is
                                 else Tail_Invoke),
                        Function_Value => Reg (Reg_A),
                        Arguments => Activation.Native_Arguments,
-                       Destination => Reg_A + 1, others => <>);
+                       Destination => Reg_A + 1,
+                       Call_Base => Activation.Stack_Base + Reg_A + 1,
+                       Has_Call_Window => True, others => <>);
          when Op_RETURN | Op_RETURN0 | Op_RETURN1 =>
             if Op = Op_RETURN and then Reg_B = 0 and then
               Activation.Canonical_Top < Reg_A
@@ -1131,18 +1180,26 @@ package body Lua.Engine.Canonical is
             declare
                Arguments : Values.Vector := Owned_Values (State);
             begin
-               Arguments.Append (Reg (Reg_A + 1));
-               Arguments.Append (Reg (Reg_A + 3));
+               --  The iterator call preserves function/state/closer in the
+               --  first three registers and copies control before replacing
+               --  its old slot with the actual call function (lvm TFORCALL).
+               Put (Reg_A + 5, Reg (Reg_A + 3));
+               Put (Reg_A + 4, Reg (Reg_A + 1));
+               Put (Reg_A + 3, Reg (Reg_A));
+               Arguments.Append (Reg (Reg_A + 4));
+               Arguments.Append (Reg (Reg_A + 5));
                Activation.Native_Arguments := Arguments;
                Activation.Native_Captures.Clear;
                Activation.Native_Captures.Append (Reg (Reg_A));
-               Activation.Canonical_Pending := Store_Canonical_Results;
+               Activation.Canonical_Pending := Store_Call_Results;
                Activation.Canonical_Base := Reg_A + 3;
                Activation.Canonical_Wanted := Reg_C;
                Result := (Kind => Invoke_Function,
                           Function_Value => Reg (Reg_A),
                           Arguments => Arguments,
-                          Destination => Reg_A + 4, others => <>);
+                          Destination => Reg_A + 4,
+                          Call_Base => Activation.Stack_Base + Reg_A + 4,
+                          Has_Call_Window => True, others => <>);
             end;
          when Op_TFORLOOP =>
             if Reg (Reg_A + 3).Kind /= Nil_Kind then
@@ -1229,21 +1286,24 @@ package body Lua.Engine.Canonical is
                   Count := (if Reg_C = 0 then Natural (Size.Integer_Data)
                             else Natural'Min
                               (Natural (Size.Integer_Data), Reg_C - 1));
-                  if Count > Stack_Limit then
+                  if Count > Natural'Last - Reg_A then
                      Fail (State, "stack overflow");
                   end if;
+                  Lua.Engine.Machine.Resize_Stack_Window
+                    (State, Activation, Natural'Max
+                       (Natural (Prototype.Max_Stack), Reg_A + Count));
                   for Index in 1 .. Count loop
                      Packet.Append
                        (Get (Table, (Integer_Kind, Integer_Value (Index))));
                   end loop;
                else
                   Count := (if Reg_C = 0 then
-                              Natural (Activation.Varargs.Length)
+                              Activation.Vararg_Count
                             else Natural'Min
-                              (Natural (Activation.Varargs.Length),
+                              (Activation.Vararg_Count,
                                Reg_C - 1));
                   for Index in 1 .. Count loop
-                     Packet.Append (Activation.Varargs (Index));
+                     Packet.Append (Read_Vararg (State, Activation, Index));
                   end loop;
                end if;
                Store_Results
@@ -1259,16 +1319,16 @@ package body Lua.Engine.Canonical is
                      else Integer_Value (Right.Real_Data));
                begin
                   if Index >= 1 and then Index <=
-                    Integer_Value (Activation.Varargs.Length)
+                    Integer_Value (Activation.Vararg_Count)
                   then
-                     Item := Activation.Varargs (Positive (Index));
+                     Item := Read_Vararg (State, Activation, Positive (Index));
                   end if;
                end;
             elsif Right.Kind = String_Kind and then
               Right.Reference.Bytes = "n"
             then
                Item := (Integer_Kind,
-                        Integer_Value (Activation.Varargs.Length));
+                        Integer_Value (Activation.Vararg_Count));
             end if;
             Put (Reg_A, Item);
          when Op_ERRNNIL =>
@@ -1281,22 +1341,72 @@ package body Lua.Engine.Canonical is
                      "' already defined");
             end if;
          when Op_VARARGPREP =>
-            if (Prototype.Flags and 2) /= 0 then
-               Item := New_Table (State);
-               Put (Natural (Prototype.Parameters), Item);
-               Activation.Vararg_Table := Item.Reference;
-               for Index in Activation.Varargs.First_Index ..
-                 Activation.Varargs.Last_Index
-               loop
-                  Set (State, Item, (Integer_Kind, Integer_Value (Index)),
-                       Activation.Varargs (Index));
-               end loop;
-               Set (State, Item, New_String (State, "n"),
-                    (Integer_Kind, Integer_Value (Activation.Varargs.Length)));
-               Activation.Varargs.Clear;
-            else
-               Put (Natural (Prototype.Parameters), Nil_Value);
-            end if;
+            declare
+               Fixed : constant Natural := Natural (Prototype.Parameters);
+               Total : constant Natural := Activation.Canonical_Top;
+               Extra : constant Natural := Activation.Vararg_Count;
+               Old_Base : constant Natural := Activation.Stack_Base;
+               New_Base : Natural;
+               Argument : Value;
+            begin
+               if (Prototype.Flags and 2) /= 0 then
+                  --  Do not overwrite the first extra argument with the new
+                  --  table until every extra has been read from its real
+                  --  source slot. Vararg_Table roots construction across the
+                  --  allocations needed by the table and its n field.
+                  Item := New_Table (State);
+                  Activation.Vararg_Table := Item.Reference;
+                  Reserve_Table (State, Item, Extra, 1);
+                  for Index in 1 .. Extra loop
+                     Argument := Stacks.Read
+                       (State, Activation.Context,
+                        Activation.Vararg_Base + Index - 1);
+                     Set (State, Item, (Integer_Kind, Integer_Value (Index)),
+                          Argument);
+                  end loop;
+                  Set (State, Item, New_String (State, "n"),
+                       (Integer_Kind, Integer_Value (Extra)));
+                  Put (Fixed, Item);
+                  Stacks.Clear_Range
+                    (Activation.Context, Old_Base + Fixed + 2,
+                     Old_Base + Total);
+                  Activation.Vararg_Count := 0;
+                  Activation.Vararg_Base := 0;
+                  Activation.Hidden_Varargs := False;
+                  Lua.Engine.Machine.Resize_Stack_Window
+                    (State, Activation, Natural (Prototype.Max_Stack));
+                  Activation.Canonical_Top := Fixed + 1;
+               else
+                  --  Match ltm.buildhiddenargs: retain extras below a copied
+                  --  function/fixed-parameter prefix. This shift is actual
+                  --  shared stack storage, not a hidden argument packet. A
+                  --  successful reserve precedes every nonallocating move.
+                  New_Base := Old_Base + Total + 1;
+                  Lua.Engine.Machine.Resize_Stack_Window
+                    (State, Activation,
+                     Total + 1 + Natural (Prototype.Max_Stack));
+                  Stacks.Write
+                    (State, Activation.Context, New_Base, Activation.Callee);
+                  for Index in 1 .. Fixed loop
+                     Argument := Stacks.Read
+                       (State, Activation.Context, Old_Base + Index);
+                     Stacks.Write
+                       (State, Activation.Context, New_Base + Index, Argument);
+                     Stacks.Clear_Range
+                       (Activation.Context, Old_Base + Index,
+                        Old_Base + Index);
+                  end loop;
+                  Activation.Stack_Base := New_Base;
+                  Activation.Stack_Window_Length :=
+                    Natural (Prototype.Max_Stack);
+                  Activation.Hidden_Varargs := True;
+                  Put (Fixed, Nil_Value);
+                  Activation.Canonical_Top := Fixed;
+               end if;
+               Activation.Canonical_GC_Top := Natural (Prototype.Max_Stack);
+               Activation.Context.Foreign_Top := Activation.Stack_Base +
+                 Activation.Canonical_Top;
+            end;
          when Op_EXTRAARG =>
             Fail (State, "orphan canonical extra argument");
       end case;

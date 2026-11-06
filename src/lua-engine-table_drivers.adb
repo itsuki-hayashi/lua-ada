@@ -1,7 +1,10 @@
 with Ada.Containers;
 with Ada.Unchecked_Conversion;
 with Interfaces;
+with Interfaces.C;
 with Lua.Engine.Core_Libraries;
+with Lua.Engine.Machine;
+with Lua.Engine.Stacks;
 with Lua.Integers;
 with Lua.Numbers;
 
@@ -274,15 +277,24 @@ package body Lua.Engine.Table_Drivers is
                if First <= 0 and then Last >= Integer_Value'Last + First then
                   Fail (State, "too many results to unpack");
                end if;
-               --  Results occupy semantic Lua stack slots even though this
-               --  backend stores them in a packet. Check before allocating;
-               --  semantic overflow remains catchable by resume or pcall.
-               if Last - First >= Integer_Value
-                 (1_000_000 - Natural'Min
-                    (1_000_000, State.Current.Stack_Slots))
-               then
-                  Fail (State, "too many results to unpack (stack overflow)");
+               if Last - First >= Integer_Value (Interfaces.C.int'Last) then
+                  Fail (State, "too many results to unpack");
                end if;
+               declare
+                  Result_Count : constant Natural :=
+                    Natural (Last - First + 1);
+               begin
+                  --  Pinned tunpack first performs a nonthrowing checkstack
+                  --  for every result above the actual C argument prefix.
+                  --  Packet lengths and summed ancestor reservations are
+                  --  not the current native stack top. Reject before looping
+                  --  or allocating captures; this stays a catchable Lua error.
+                  if not Lua.Engine.Machine.Reserve_Native_Results
+                    (State, Activation, Result_Count)
+                  then
+                     Fail (State, "too many results to unpack");
+                  end if;
+               end;
                if Last - First >= Integer_Value (State.Bounds.Table_Entries)
                then
                   Fail (State, "table unpack result limit exceeded",
@@ -355,6 +367,13 @@ package body Lua.Engine.Table_Drivers is
                end;
             else
                Activation.Native_Captures.Append (Returned);
+               --  Returned values are actual live native stack entries too.
+               --  A subsequent __index callback starts above this accumulated
+               --  prefix, not above unused future result capacity, and GC can
+               --  inspect the same scalar slots as the public C view.
+               Activation.Stack_Live_Top := Activation.Stack_Live_Top + 1;
+               Lua.Engine.Stacks.Write
+                 (State, State.Current, Activation.Stack_Live_Top, Returned);
             end if;
             if Number (3) = Number (4) then
                if Name = "table.concat" then

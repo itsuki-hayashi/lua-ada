@@ -66,7 +66,8 @@ package body Lua.Engine.Tables is
               (System.Storage_Elements.To_Integer (Item.Identity));
          when Native_Kind_Value =>
             Result := Hash_Value (Native_Kind'Pos (Item.Native_Data));
-         when Table_Kind | Closure_Kind | Native_Closure_Kind | Thread_Kind =>
+         when Table_Kind | Closure_Kind | Native_Closure_Kind | Thread_Kind |
+           Userdata_Kind =>
             Result := Hash_Value (Item.Reference.Serial);
          when Nil_Kind => Result := 0;
       end case;

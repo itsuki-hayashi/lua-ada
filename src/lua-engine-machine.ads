@@ -13,6 +13,32 @@ package Lua.Engine.Machine is
    --  helpers never dispatch metamethods; callers must select primitive
    --  applicability before bypassing a canonical metamethod instruction.
 
+   function Ensure_Stack
+     (State : in out World; Context : not null Context_Access;
+      Last : Natural; Raise_Error : Boolean := True) return Boolean;
+   --  Last is inclusive; native top pointers name Last+1. Physical storage
+   --  includes five hidden extra rows. First overflow installs the pinned
+   --  200-row error stack; another growth request there becomes ERRERR.
+
+   procedure Shrink_Error_Stack
+     (State : in out World; Context : not null Context_Access);
+   --  Reevaluate the overflow latch after protected recovery. Retained
+   --  backing-vector capacity is separate from the semantic stack bound.
+
+   procedure Resize_Stack_Window
+     (State : in out World; Activation : Frame_Access; Count : Natural);
+   --  Validate the actual absolute semantic extent, reserve paired scalar
+   --  storage, then publish this real frame's current window. Hidden holders
+   --  never call this helper and consume no invented Lua slots. A noncurrent
+   --  parent may grow its reservation without overwriting a child's ci.top.
+
+   function Reserve_Native_Results
+     (State : in out World; Activation : not null Frame_Access;
+      Count : Natural) return Boolean;
+   --  Nonthrowing semantic reservation above a real native argument/result
+   --  prefix, matching lua_checkstack before a library builds many results.
+   --  A false result lets that library issue its own pinned argument error.
+
    type Driver is limited private;
    type Driver_Access is access Driver;
    for Driver_Access'Storage_Pool use Lua.Storage.Pool;
@@ -74,7 +100,8 @@ package Lua.Engine.Machine is
    procedure Start_Foreign
      (Self : in out Driver; State : not null World_Access;
       Callee : Value; Arguments : Values.Vector;
-      Message_Handler : Value := Nil_Value);
+      Message_Handler : Value := Nil_Value;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
    --  Start a C-entry call behind an owned protected holder. Its handler runs
    --  above intact failed frames; the terminal packet has a success boolean.
 
@@ -94,7 +121,8 @@ package Lua.Engine.Machine is
 
    procedure Start_Foreign_Boundary
      (Self : Driver; Callee : Value; Arguments : Values.Vector;
-      Message_Handler : Value := Nil_Value);
+      Message_Handler : Value := Nil_Value;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
    function Has_Foreign_Result (Self : Driver) return Boolean;
    procedure Take_Foreign_Result
      (Self : Driver; Packet : in out Values.Vector; Error_Status : out Natural;
