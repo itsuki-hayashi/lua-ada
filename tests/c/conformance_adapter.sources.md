@@ -24,6 +24,14 @@ Its implementation and negative tests still require independent review of the
 invariant mapping. `T.nonblock` requires POSIX execution evidence and Windows
 counterpart coverage; its absence on Windows does not resolve the guarded
 obligation. This manifest does not close those obligations.
+The first-party `_test_failing_stream` Windows counterpart uses `_pipe` and
+`_dup2` to replace a fresh temporary file's descriptor with a pipe whose reader
+is closed. It retains the real FILE pointer, C closer and external ownership
+metadata. Buffered writes succeed, native flushes fail, and native close still
+releases the descriptor. This test-only driver is available in both launcher
+configurations; it does not create T in the default configuration. Its mapping
+to the `/dev/full` source span still requires independent review and a matching
+C-oracle driver execution.
 `T.ada_emergency_tables` is an explicitly named Ada
 counterpart for the C-specific 200-byte emergency allowance, with measured
 table storage and actual allocation refusal/recovery. Its source mapping is

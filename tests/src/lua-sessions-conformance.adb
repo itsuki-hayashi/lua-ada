@@ -22,6 +22,7 @@ package body Lua.Sessions.Conformance is
       end Install;
    begin
       Lua.Storage.Set_Ceiling (Universe.State.Memory, 2_147_483_648);
+      Lua.Conformance_Adapter.Install_Platform (Universe.State.all);
       Install (Lua.Runtime_Configuration.Name);
    end Configure;
 end Lua.Sessions.Conformance;

@@ -456,6 +456,22 @@ package body Lua.Conformance_Adapter is
          Result.Count := -2;
    end Inspect;
 
+   function Has_Failing_Stream return Boolean is (Callback (15) /= null);
+
+   procedure Install_Platform (State : in out World) is
+      Item : Value;
+   begin
+      if not Has_Failing_Stream then return; end if;
+      Begin_Operation (State);
+      Item := New_Native (State, "foreign.callback");
+      Item.Reference.Foreign_Handler := Address (Callback (15));
+      Set (State, Global_Environment (State),
+           New_String (State, "_test_failing_stream"), Item);
+      End_Operation (State);
+   exception
+      when others => End_Operation (State); raise;
+   end Install_Platform;
+
    procedure Install (State : in out World) is
       Module : Value;
       procedure Add (Name : String; Operation : C.int);

@@ -208,3 +208,25 @@ Raw observations remain diagnostic, with scoped acceptance explicitly false.
 The corrected Windows shared run also passes all of these regressions,
 including the late GC shutdown witness, in
 `reports/m3-instrumented-matrix-shared.log`.
+
+Windows instrumented static-PIC also passes the new regression command in
+`reports/m3-instrumented-matrix-pic.log`. Signed commit f11c056 publishes the
+matrix integration; remote run 42257414493 was queued when first observed.
+
+A native Windows `_pipe` probe establishes the buffered sequence needed for a
+`/dev/full` counterpart: write 4 bytes, fail flush, write 4 bytes, fail flush,
+then close successfully. The test-only driver preserves the actual FILE pointer
+and closer by replacing only its descriptor with `_dup2`. Two separately named
+Windows AUnit cases verify this sequence and reject invalid/closed arguments.
+Instrumented validation/static passes all 1,301 cases in
+`reports/m3-file-native-driver-tests.log`. The disposable files.lua diagnostic
+now reaches the shell tests at line 786, after passing native flush, iterators,
+loading and large-file behavior. Its current failure is the unavailable POSIX
+`cat` command. Source mappings and matching C evidence are still pending; no
+whole-file acceptance is claimed.
+Default validation/static also passes all 1,301 cases in
+`reports/m3-file-native-driver-default-tests.log`; its launcher still has
+T absent while exposing the explicitly named native counterpart. Replacing
+cat's byte-copy operation with the same launcher through bare lua completes
+both pipe directions. The next diagnostic failure is the Windows-absent Unix
+signal commands at line 814, not an IO byte-transfer failure.

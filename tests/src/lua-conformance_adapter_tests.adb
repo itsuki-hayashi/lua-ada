@@ -9,13 +9,14 @@ with Test_Support;
 
 package body Lua.Conformance_Adapter_Tests is
    use type Lua.Storage.Byte_Count;
-   procedure Check (Source : String);
-   procedure Check (Source : String) is
+   procedure Check (Source : String; Platform : Boolean := False);
+   procedure Check (Source : String; Platform : Boolean := False) is
       State : World;
    begin
       Initialize (State, (others => <>));
       begin
          Conformance_Adapter.Install (State);
+         if Platform then Conformance_Adapter.Install_Platform (State); end if;
          Assert (Execute (State, Source, "adapter"),
                  To_String (State.Current.Failure_Text));
       exception
@@ -55,6 +56,8 @@ package body Lua.Conformance_Adapter_Tests is
    procedure Finalizer_Stack_Refusal;
    procedure Measured_Emergency_Headroom;
    procedure Weak_String_Payloads;
+   procedure Native_Flush_Failure;
+   procedure Native_Flush_Validation;
 
    procedure Userdata is
    begin
@@ -396,6 +399,28 @@ package body Lua.Conformance_Adapter_Tests is
         "assert(collectgarbage('count')<=live-2^7) end");
    end Weak_String_Payloads;
 
+   procedure Native_Flush_Failure is
+   begin
+      --  The Windows counterpart keeps the actual FILE pointer and closer,
+      --  replacing only its descriptor with a broken pipe. Buffering succeeds;
+      --  both file/global flush fail at the OS, then explicit close succeeds.
+      Check ("local old=io.output(); local f=io.tmpfile(); " &
+        "assert(_test_failing_stream(f)==f); io.output(f); " &
+        "assert(f:write('abcd')==f); assert(not f:flush()); " &
+        "assert(f:write('abcd')==f); assert(not io.flush()); " &
+        "assert(f:close()); assert(io.type(f)=='closed file'); " &
+        "io.output(old)", Platform => True);
+   end Native_Flush_Failure;
+
+   procedure Native_Flush_Validation is
+   begin
+      --  Reject nonfiles and closed files before touching native descriptors.
+      --  The protected error must return through the existing C guard.
+      Check ("assert(not pcall(_test_failing_stream, {})); " &
+        "local f=io.tmpfile(); f:close(); " &
+        "assert(not pcall(_test_failing_stream, f))", Platform => True);
+   end Native_Flush_Validation;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "adapter: real C userdata export",
@@ -449,5 +474,11 @@ package body Lua.Conformance_Adapter_Tests is
                         Measured_Emergency_Headroom'Access);
       Test_Support.Add (Suite, "collector: weak string payload reclamation",
                         Weak_String_Payloads'Access);
+      if Conformance_Adapter.Has_Failing_Stream then
+         Test_Support.Add (Suite, "Windows IO: buffered native flush failure",
+                           Native_Flush_Failure'Access);
+         Test_Support.Add (Suite, "Windows IO: failure driver validates files",
+                           Native_Flush_Validation'Access);
+      end if;
    end Register;
 end Lua.Conformance_Adapter_Tests;
