@@ -31,6 +31,34 @@ package body Lua.Engine is
    --  Deallocation is confined to this owning world. Lua values themselves
    --  never free objects, which is essential for shared/cyclic graphs.
 
+   procedure Free_Context is new Ada.Unchecked_Deallocation
+     (Execution_Context, Context_Access);
+
+   function Create_Context (State : in out World) return Context_Id is
+      Item : Context_Access := new Execution_Context;
+   begin
+      --  Registration transfers ownership. Failed vector growth leaves the
+      --  allocation local, so release it before propagating Storage_Error.
+      begin
+         State.Contexts.Append (Item);
+      exception
+         when others =>
+            Free_Context (Item);
+            raise;
+      end;
+      return Context_Id (State.Contexts.Last_Index);
+   end Create_Context;
+
+   procedure Select_Context (State : in out World; Id : Context_Id) is
+   begin
+      if (State.Current /= null and then State.Current.Running) or else
+        Natural (Id) > State.Contexts.Last_Index
+      then
+         raise Program_Error with "invalid execution context selection";
+      end if;
+      State.Current := State.Contexts (Positive (Id));
+   end Select_Context;
+
    function Allocate (State : in out World; Kind : Heap_Kind)
                       return Object_Access;
    function Real_Image (Item : Real_Value) return String;
@@ -49,10 +77,10 @@ package body Lua.Engine is
                    Resource : Boolean := False)
    is
    begin
-      State.Failure_Text := To_Unbounded_String (Message);
-      State.Failure := Nil_Value;
-      State.Has_Failure_Value := False;
-      State.Is_Resource := Resource;
+      State.Current.Failure_Text := To_Unbounded_String (Message);
+      State.Current.Failure := Nil_Value;
+      State.Current.Has_Failure_Value := False;
+      State.Current.Is_Resource := Resource;
       raise Language_Error;
    end Fail;
 
@@ -443,6 +471,8 @@ package body Lua.Engine is
          Set (State, Table, Key, (Native_Kind_Value, Native));
       end Install;
    begin
+      --  Bootstrap needs an error root before any library allocation fails.
+      Select_Context (State, Create_Context (State));
       State.Bounds := Bounds;
       Table := New_Table (State);
       State.Globals := Table.Reference;
@@ -604,31 +634,35 @@ package body Lua.Engine is
       Mark (State.String_Metatable);
       Mark (State.Loaded_Modules);
       Mark (State.Preload_Modules);
-      Mark_Value (State.Failure);
-      for Item of State.Arguments loop
-         Mark_Value (Item);
-      end loop;
-      for Activation of State.Stack loop
-         Mark (Activation.Native_Self);
-         for Item of Activation.Native_Arguments loop
+      --  Inactive stacks still own roots. Tracing only Current would reclaim
+      --  their pending arguments, captured values and error objects too soon.
+      for Context of State.Contexts loop
+         Mark_Value (Context.Failure);
+         for Item of Context.Arguments loop
             Mark_Value (Item);
          end loop;
-         for Item of Activation.Native_Results loop
-            Mark_Value (Item);
-         end loop;
-         for Item of Activation.Native_Captures loop
-            Mark_Value (Item);
-         end loop;
-         Mark (Activation.Scope);
-         Mark_Code (Activation.Code);
-         Mark (Activation.Vararg_Table);
-         for Packet of Activation.Slots loop
-            for Item of Packet loop
+         for Activation of Context.Stack loop
+            Mark (Activation.Native_Self);
+            for Item of Activation.Native_Arguments loop
                Mark_Value (Item);
             end loop;
-         end loop;
-         for Item of Activation.Varargs loop
-            Mark_Value (Item);
+            for Item of Activation.Native_Results loop
+               Mark_Value (Item);
+            end loop;
+            for Item of Activation.Native_Captures loop
+               Mark_Value (Item);
+            end loop;
+            Mark (Activation.Scope);
+            Mark_Code (Activation.Code);
+            Mark (Activation.Vararg_Table);
+            for Packet of Activation.Slots loop
+               for Item of Packet loop
+                  Mark_Value (Item);
+               end loop;
+            end loop;
+            for Item of Activation.Varargs loop
+               Mark_Value (Item);
+            end loop;
          end loop;
       end loop;
       while not Pending.Is_Empty loop
@@ -734,14 +768,22 @@ package body Lua.Engine is
    begin
       --  A session is the unique allocator owner, so finalization can release
       --  all remaining objects without tracing or invoking user code.
-      for Activation of State.Stack loop
+      for Context of State.Contexts loop
          declare
-            Item : Frame_Access := Activation;
+            Owned : Context_Access := Context;
          begin
-            Free_Frame (Item);
+            for Activation of Owned.Stack loop
+               declare
+                  Item : Frame_Access := Activation;
+               begin
+                  Free_Frame (Item);
+               end;
+            end loop;
+            Free_Context (Owned);
          end;
       end loop;
-      State.Stack.Clear;
+      State.Contexts.Clear;
+      State.Current := null;
       for Object of State.Heap loop
          declare
             Item : Object_Access := Object;
@@ -766,40 +808,46 @@ package body Lua.Engine is
    is
       Code : Prototype_Access;
    begin
-      State.Failure := Nil_Value;
-      State.Has_Failure_Value := False;
-      State.Failure_Text := Null_Unbounded_String;
-      State.Is_Resource := False;
-      State.Is_Syntax := False;
-      State.Is_Unsupported := False;
+      State.Current.Running := True;
+      State.Current.Failure := Nil_Value;
+      State.Current.Has_Failure_Value := False;
+      State.Current.Failure_Text := Null_Unbounded_String;
+      State.Current.Is_Resource := False;
+      State.Current.Is_Syntax := False;
+      State.Current.Is_Unsupported := False;
       State.Output := Null_Unbounded_String;
       State.Steps := 0;
-      State.Failure_At := (others => 1);
+      State.Current.Failure_At := (others => 1);
       Collect (State);
       if Source'Length > State.Bounds.Source_Bytes then
          Fail (State, "source byte limit exceeded", Resource => True);
       end if;
       Code := Compiler.Compile (State, Source, Name);
       Machine.Run (State, Code);
-      State.Arguments.Clear;
+      State.Current.Arguments.Clear;
       Collect (State);
+      State.Current.Running := False;
       return True;
    exception
       when Language_Error =>
-         State.Arguments.Clear;
+         State.Current.Running := False;
+         State.Current.Arguments.Clear;
          Machine.Clear_Frames (State);
          Collect (State);
          return False;
       when Storage_Error =>
+         State.Current.Running := False;
          Machine.Clear_Frames (State);
-         State.Is_Resource := True;
-         State.Failure_Text := To_Unbounded_String ("host storage exhausted");
+         State.Current.Is_Resource := True;
+         State.Current.Failure_Text := To_Unbounded_String
+           ("host storage exhausted");
          return False;
       when Error : Constraint_Error | Program_Error =>
+         State.Current.Running := False;
          --  Keep the embedding boundary exception-safe, but make an internal
          --  check failure explicit so tests cannot mistake it for Lua parity.
          Machine.Clear_Frames (State);
-         State.Failure_Text := To_Unbounded_String
+         State.Current.Failure_Text := To_Unbounded_String
            ("internal Ada check: " & Ada.Exceptions.Exception_Message (Error));
          return False;
    end Execute;

@@ -20,15 +20,16 @@ package body Lua.Sessions is
          Result.Status := Runtime_Error;
          Result.Error.Message := To_Unbounded_String ("session is closed");
       else
-         Result.Status := (if Self.State.Is_Resource then Resource_Error
-                           elsif Self.State.Is_Syntax then Syntax_Error
-                           elsif Self.State.Is_Unsupported then
+         Result.Status := (if Self.State.Current.Is_Resource then
+           Resource_Error
+                           elsif Self.State.Current.Is_Syntax then Syntax_Error
+                           elsif Self.State.Current.Is_Unsupported then
                              Unsupported_Feature
                            else Runtime_Error);
          Result.Output := Self.State.Output;
-         Result.Error.Line := Self.State.Failure_At.Line;
-         Result.Error.Column := Self.State.Failure_At.Column;
-         Result.Error.Message := Self.State.Failure_Text;
+         Result.Error.Line := Self.State.Current.Failure_At.Line;
+         Result.Error.Column := Self.State.Current.Failure_At.Column;
+         Result.Error.Message := Self.State.Current.Failure_Text;
       end if;
       return Result;
    end Failure;
@@ -94,11 +95,11 @@ package body Lua.Sessions is
       --  Arguments are rooted before the compiler's first collection. The
       --  engine releases this root after returning; captured values remain
       --  alive through their ordinary lexical/table owners.
-      Self.State.Arguments.Clear;
+      Self.State.Current.Arguments.Clear;
       Self.State.Output := Null_Unbounded_String;
-      Self.State.Failure_At := (others => 1);
+      Self.State.Current.Failure_At := (others => 1);
       for Argument of Arguments loop
-         Self.State.Arguments.Append
+         Self.State.Current.Arguments.Append
            (Lua.Engine.New_String (Self.State.all, To_String (Argument)));
       end loop;
       if Lua.Engine.Execute (Self.State.all, Source, Name) then
@@ -138,7 +139,7 @@ package body Lua.Sessions is
       if Self.State = null then
          return Failure (Self, "(arguments)");
       end if;
-      Self.State.Is_Syntax := False;
+      Self.State.Current.Is_Syntax := False;
       Self.State.Output := Null_Unbounded_String;
       Lua.Engine.Collect (Self.State.all);
       Table := Lua.Engine.New_Table (Self.State.all);

@@ -11,8 +11,10 @@ C/binary compatibility target, including upstream native C fixture libraries.
 It is delivered through staged PRs, with reviewed Ada/platform equivalents
 where original assertions depend on C internals or unsupported native facilities.
 M3-01 is implemented and verified in
-[PR #5](https://github.com/itsuki-hayashi/lua-ada/pull/5), awaiting maintainer
-review/merge. M3-02 follows that merge; no later M3 runtime gate is complete.
+[merged PR #5](https://github.com/itsuki-hayashi/lua-ada/pull/5). M3-02A implements
+context ownership in [PR #6](https://github.com/itsuki-hayashi/lua-ada/pull/6).
+Typed transfers and error-policy changes remain open in the parent M3-02 gate;
+no later M3 runtime gate is complete.
 
 | Milestone | Target                                    | Completion gate                            |
 | --------- | ----------------------------------------- | ------------------------------------------ |

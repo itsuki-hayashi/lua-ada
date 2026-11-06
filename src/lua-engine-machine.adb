@@ -341,14 +341,14 @@ package body Lua.Engine.Machine is
 
    procedure Clear_Frames (State : in out World) is
    begin
-      for Activation of State.Stack loop
+      for Activation of State.Current.Stack loop
          declare
             Item : Frame_Access := Activation;
          begin
             Free_Frame (Item);
          end;
       end loop;
-      State.Stack.Clear;
+      State.Current.Stack.Clear;
    end Clear_Frames;
 
    procedure Run (State : in out World; Code : Prototype_Access) is
@@ -395,18 +395,20 @@ package body Lua.Engine.Machine is
       is
          Activation : Frame_Access;
       begin
-         if Natural (State.Stack.Length) >= State.Bounds.Call_Depth then
+         if Natural (State.Current.Stack.Length) >=
+           State.Bounds.Call_Depth
+         then
             Fail (State, "call depth limit exceeded", Resource => True);
          end if;
-         State.Stack.Reserve_Capacity (State.Stack.Length + 1);
+         State.Current.Stack.Reserve_Capacity (State.Current.Stack.Length + 1);
          Activation := new Frame;
          Activation.Is_Native := True;
          Activation.Native_Name := To_Unbounded_String (Name);
          Activation.Native_Arguments := Arguments;
          Activation.Native_Operator := Operator;
-         Activation.Call_Site := State.Failure_At;
+         Activation.Call_Site := State.Current.Failure_At;
          Activation.Return_To := Destination;
-         State.Stack.Append (Activation);
+         State.Current.Stack.Append (Activation);
       end Schedule;
 
       function Wrap (Result : Values.Vector; Count : Natural;
@@ -435,11 +437,11 @@ package body Lua.Engine.Machine is
             Error_Value := New_String (State, "<no error object>");
          end if;
          if Item.Kind = String_Kind and then Level in 1 ..
-           Natural (State.Stack.Length)
+           Natural (State.Current.Stack.Length)
          then
             declare
-               Activation : constant Frame_Access := State.Stack
-                 (State.Stack.Last_Index - Level + 1);
+               Activation : constant Frame_Access := State.Current.Stack
+                 (State.Current.Stack.Last_Index - Level + 1);
                Line : constant Positive :=
                  (if Activation.Is_Native then Activation.Call_Site.Line
                   else Activation.Code.Code
@@ -452,10 +454,11 @@ package body Lua.Engine.Machine is
                   ": " & Image (Item));
             end;
          end if;
-         State.Failure := Error_Value;
-         State.Has_Failure_Value := True;
-         State.Failure_Text := To_Unbounded_String (Image (Error_Value));
-         State.Is_Resource := False;
+         State.Current.Failure := Error_Value;
+         State.Current.Has_Failure_Value := True;
+         State.Current.Failure_Text := To_Unbounded_String (Image
+           (Error_Value));
+         State.Current.Is_Resource := False;
          raise Language_Error;
       end Raise_Value;
 
@@ -528,7 +531,7 @@ package body Lua.Engine.Machine is
                            Integral (State, Arg (2)) else 1);
                Raise_Value
                  (Arg (1), (if Index > 0 and then
-                   Index <= Integer_Value (State.Stack.Length)
+                   Index <= Integer_Value (State.Current.Stack.Length)
                    then Natural (Index) else 0));
             when Type_Function =>
                Require (1);
@@ -655,17 +658,19 @@ package body Lua.Engine.Machine is
          --  A frame owns its fresh lexical scope and register packets.
          --  Publish it before parameter/vararg setup so the central cleanup
          --  path also owns partially initialized activations after failure.
-         if Natural (State.Stack.Length) >= State.Bounds.Call_Depth then
+         if Natural (State.Current.Stack.Length) >=
+           State.Bounds.Call_Depth
+         then
             Fail (State, "call depth limit exceeded", Resource => True);
          end if;
          --  Reserve before allocating the frame: even a host allocation
          --  failure must leave either no frame or one owned by the stack.
-         State.Stack.Reserve_Capacity (State.Stack.Length + 1);
+         State.Current.Stack.Reserve_Capacity (State.Current.Stack.Length + 1);
          Item := new Frame;
          Item.Code := Prototype;
          Item.Return_To := Destination;
          Item.Protection := Protection;
-         State.Stack.Append (Item);
+         State.Current.Stack.Append (Item);
          Item.Scope := New_Environment
            (State, Function_Value.Reference.Capture);
          Item.Slots.Set_Length
@@ -718,7 +723,7 @@ package body Lua.Engine.Machine is
       end Push_Frame;
 
       procedure Complete (Result : Values.Vector) is
-         Activation : Frame_Access := State.Stack.Last_Element;
+         Activation : Frame_Access := State.Current.Stack.Last_Element;
          Destination : constant Natural := Activation.Return_To;
          Packet : constant Values.Vector :=
            Wrap (Result, Activation.Protection);
@@ -726,10 +731,10 @@ package body Lua.Engine.Machine is
          --  Copy the outgoing packet before releasing its activation. No
          --  collection occurs until the caller's destination owns it again.
          --  The outermost chunk has no consumer and intentionally discards it.
-         State.Stack.Delete_Last;
+         State.Current.Stack.Delete_Last;
          Free_Frame (Activation);
-         if not State.Stack.Is_Empty then
-            Deliver (State.Stack.Last_Element, Destination, Packet);
+         if not State.Current.Stack.Is_Empty then
+            Deliver (State.Current.Stack.Last_Element, Destination, Packet);
          end if;
       end Complete;
 
@@ -785,11 +790,11 @@ package body Lua.Engine.Machine is
          if Function_Item.Kind in Closure_Kind | Native_Closure_Kind then
             if Tail then
                declare
-                  Old : Frame_Access := State.Stack.Last_Element;
+                  Old : Frame_Access := State.Current.Stack.Last_Element;
                begin
                   Return_To := Old.Return_To;
                   Protection := Protection + Old.Protection;
-                  State.Stack.Delete_Last;
+                  State.Current.Stack.Delete_Last;
                   Free_Frame (Old);
                end;
             end if;
@@ -798,10 +803,11 @@ package body Lua.Engine.Machine is
             else
                Schedule (To_String (Function_Item.Reference.Native_Name),
                          Args, Return_To);
-               State.Stack.Last_Element.Protection := Protection;
-               State.Stack.Last_Element.Native_Captures :=
+               State.Current.Stack.Last_Element.Protection := Protection;
+               State.Current.Stack.Last_Element.Native_Captures :=
                  Function_Item.Reference.Captures;
-               State.Stack.Last_Element.Native_Self := Function_Item.Reference;
+               State.Current.Stack.Last_Element.Native_Self :=
+                 Function_Item.Reference;
             end if;
          else
             if Function_Item.Kind /= Native_Kind_Value then
@@ -813,28 +819,28 @@ package body Lua.Engine.Machine is
             if Tail then
                Complete (Packet);
             else
-               Deliver (State.Stack.Last_Element, Destination, Packet);
+               Deliver (State.Current.Stack.Last_Element, Destination, Packet);
             end if;
          end if;
       exception
          when Language_Error =>
-            if Protection = 0 or else State.Is_Resource then
+            if Protection = 0 or else State.Current.Is_Resource then
                raise;
             end if;
-            if not State.Has_Failure_Value then
-               State.Failure := New_String
-                 (State, To_String (State.Failure_Text));
+            if not State.Current.Has_Failure_Value then
+               State.Current.Failure := New_String
+                 (State, To_String (State.Current.Failure_Text));
             end if;
             Packet.Clear;
-            Packet.Append (State.Failure);
+            Packet.Append (State.Current.Failure);
             Packet := Wrap (Packet, Protection, Success => False);
             if Tail then
                Complete (Packet);
             else
-               Deliver (State.Stack.Last_Element, Destination, Packet);
+               Deliver (State.Current.Stack.Last_Element, Destination, Packet);
             end if;
-            State.Failure := Nil_Value;
-            State.Has_Failure_Value := False;
+            State.Current.Failure := Nil_Value;
+            State.Current.Has_Failure_Value := False;
       end Dispatch;
 
       procedure Recover is
@@ -846,13 +852,13 @@ package body Lua.Engine.Machine is
          --  Resource exhaustion is a host execution boundary: allowing Lua
          --  pcall to catch it could restart an exhausted instruction budget.
          --  Ordinary errors unwind only to the nearest protected VM frame.
-         if State.Is_Resource then
+         if State.Current.Is_Resource then
             raise Language_Error;
          end if;
-         for Index in reverse State.Stack.First_Index ..
-           State.Stack.Last_Index
+         for Index in reverse State.Current.Stack.First_Index ..
+           State.Current.Stack.Last_Index
          loop
-            if State.Stack (Index).Protection > 0 then
+            if State.Current.Stack (Index).Protection > 0 then
                Protected_Index := Index;
                exit;
             end if;
@@ -860,34 +866,35 @@ package body Lua.Engine.Machine is
          if Protected_Index = 0 then
             raise Language_Error;
          end if;
-         Destination := State.Stack (Protected_Index).Return_To;
-         Protection := State.Stack (Protected_Index).Protection;
-         if not State.Has_Failure_Value then
-            State.Failure := New_String
-              (State, To_String (State.Failure_Text));
+         Destination := State.Current.Stack (Protected_Index).Return_To;
+         Protection := State.Current.Stack (Protected_Index).Protection;
+         if not State.Current.Has_Failure_Value then
+            State.Current.Failure := New_String
+              (State, To_String (State.Current.Failure_Text));
          end if;
-         Packet.Append (State.Failure);
+         Packet.Append (State.Current.Failure);
          Packet := Wrap (Packet, Protection, Success => False);
-         while Natural (State.Stack.Length) >= Protected_Index loop
+         while Natural (State.Current.Stack.Length) >= Protected_Index loop
             declare
-               Old : Frame_Access := State.Stack.Last_Element;
+               Old : Frame_Access := State.Current.Stack.Last_Element;
             begin
-               State.Stack.Delete_Last;
+               State.Current.Stack.Delete_Last;
                Free_Frame (Old);
             end;
          end loop;
          --  A protected tail call may have replaced the outermost chunk.
          --  Its caught failure completes that chunk successfully; there is
          --  no caller packet to receive the intentionally discarded results.
-         if not State.Stack.Is_Empty then
-            Deliver (State.Stack.Last_Element, Destination, Packet);
+         if not State.Current.Stack.Is_Empty then
+            Deliver (State.Current.Stack.Last_Element, Destination, Packet);
          end if;
-         State.Failure := Nil_Value;
-         State.Has_Failure_Value := False;
+         State.Current.Failure := Nil_Value;
+         State.Current.Has_Failure_Value := False;
       end Recover;
 
       procedure Native_Step is
-         Activation : constant Frame_Access := State.Stack.Last_Element;
+         Activation : constant Frame_Access :=
+           State.Current.Stack.Last_Element;
          Name : constant String := To_String (Activation.Native_Name);
          function Arg (Index : Positive) return Value is
            (if Index <= Natural (Activation.Native_Arguments.Length)
@@ -917,7 +924,7 @@ package body Lua.Engine.Machine is
             Dispatch (Function_Value, Args, 0);
          end Invoke;
       begin
-         State.Failure_At := Activation.Call_Site;
+         State.Current.Failure_At := Activation.Call_Site;
          --  Stateful libraries own their continuation phase. Dispatch their
          --  requested callback through this same activation stack, so neither
          --  Lua nesting nor a protected error creates a second VM or budget.
@@ -1373,7 +1380,8 @@ package body Lua.Engine.Machine is
       procedure Step is
          --  Copy the instruction before dispatch: calls may replace the
          --  current activation, and a tail call may free it entirely.
-         Activation : constant Frame_Access := State.Stack.Last_Element;
+         Activation : constant Frame_Access :=
+           State.Current.Stack.Last_Element;
          Code : constant Instruction := Activation.Code.Code (Activation.PC);
          A : constant Natural := Code.A;
          B : constant Natural := Code.B;
@@ -1385,7 +1393,7 @@ package body Lua.Engine.Machine is
          Real_Control, Real_Bound, Real_Delta : Real_Value;
       begin
          Activation.PC := Activation.PC + 1;
-         State.Failure_At := Code.Location;
+         State.Current.Failure_At := Code.Location;
          case Code.Op is
             when No_Operation => null;
             when Clear_Registers =>
@@ -1587,8 +1595,8 @@ package body Lua.Engine.Machine is
          end case;
       end Step;
    begin
-      Dispatch (New_Closure (State, Code, null), State.Arguments, 0);
-      while not State.Stack.Is_Empty loop
+      Dispatch (New_Closure (State, Code, null), State.Current.Arguments, 0);
+      while not State.Current.Stack.Is_Empty loop
          --  At this boundary every live value is in a frame packet, lexical
          --  cell, closure capture, globals table, or the explicit error root.
          if Natural (State.Heap.Length) >= State.Next_GC then
@@ -1599,7 +1607,7 @@ package body Lua.Engine.Machine is
          end if;
          State.Steps := State.Steps + 1;
          begin
-            if State.Stack.Last_Element.Is_Native then
+            if State.Current.Stack.Last_Element.Is_Native then
                Native_Step;
             else
                Step;

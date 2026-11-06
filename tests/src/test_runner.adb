@@ -8,6 +8,7 @@ with Number_Tests;
 with Session_Tests;
 with Lifecycle_Tests;
 with Lua.Opcode_Tests;
+with Lua.Context_Tests;
 with Syntax_Tests;
 with Incremental_Lexer_Tests;
 with Lua.Library_Codec_Tests;
@@ -32,6 +33,7 @@ procedure Test_Runner is
       Session_Tests.Register (Result);
       Lifecycle_Tests.Register (Result);
       Lua.Opcode_Tests.Register (Result);
+      Lua.Context_Tests.Register (Result);
       Syntax_Tests.Register (Result);
       Incremental_Lexer_Tests.Register (Result);
       Lua.Library_Codec_Tests.Register (Result);
