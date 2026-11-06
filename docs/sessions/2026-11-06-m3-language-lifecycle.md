@@ -165,3 +165,32 @@ revision, including 587 AUnit cases, 35 CLI cases, eight differential fixtures
 and all five selected unchanged upstream files. Evidence is in ignored
 reports/m3-final-contract-validation.log. Final-current-head platform checks
 must validate this revision rather than inherit an earlier checkpoint.
+
+## Final implementation acceptance and publication handoff
+
+Runtime revision 830e0a1a2bad905ef34da3d553b24f8260ef35ff passed PR run
+42166013145 on all 18 Windows/Linux/macOS profile/link configurations. Every log
+was inspected for 587 successful AUnit cases (99 new), zero failed assertions or
+unexpected errors, the real Ada consumer, 35 CLI cases, eight differential
+fixtures and all five selected unchanged upstream files. Windows static-validation
+repeated that complete pipeline under static-PIC. All three OS static-validation
+logs passed ABI, opcode/frontend, 34-file parse-only, C99 layout, 1,120-library
+and 1,024-lifecycle campaigns. Seeds and exact marker counts are in the evidence
+record. All 18 lifecycle artifacts and three conformance artifacts were retained.
+
+scripts/check-documentation.ps1 passed 56 Markdown files; git diff --check passed.
+The diff against the merged baseline leaves .gitmodules, references and
+consumer-fixture pins unchanged. Stable GNAT 16.1.0, Alire 2.1.1 and AUnit 26.0.0
+remain the validated versions, with strict flags/runtime checks unchanged.
+
+The handoff commit changes only owning documentation and machine-readable
+validation evidence. Its complete publication-head matrix must pass before
+PR #7 is marked ready; the PR records that run without requiring another
+self-referential evidence commit. No merge is authorized. There are no known
+remaining blockers for this bounded delivery beyond those final-head checks.
+Broader M3 canonical/allocator/ABI/binary/userdata/finalizer/full-library and CLI
+work remains separately tracked. Coroutine evidence remains default-configuration
+execution with documented upstream omissions, not C-API conformance.
+
+Next action after handoff: maintainer review of PR #7, then select the next
+broader M3 backlog item from updated master after the maintainer merges it.

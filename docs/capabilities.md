@@ -17,7 +17,7 @@ does not establish platform acceptance or full conformance.
 | Errors     | Diagnostics, pcall/xpcall, resources, callback recovery     | Lifecycle and native continuation cases        |
 | Lifetime   | Nonmoving iterative tracing; cycles and prototypes          | Cycle/capture/repeated-chunk cases             |
 | Ada host   | Unique sessions, persistent globals, output sink            | Lifecycle Ada consumer                         |
-| CLI        | Files, snippets, stdin, arguments, usage, checking/status   | 30 process cases                               |
+| CLI        | Files, snippets, stdin, arguments, usage, checking/status   | 35 process cases                               |
 | Builds     | Static/shared, strict profiles                              | Acceptance matrix; see status                  |
 
 ## M2b export inventory
@@ -78,20 +78,19 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 
 | Facility                               | Later gate / current response                    |
 | -------------------------------------- | ------------------------------------------------ |
-
-| Finalization                           | Deferred; no finalizer execution               |
-| Userdata and io/os                     | Deferred; unavailable facilities               |
-| string.dump, table.sort/create         | Remaining library work; unavailable            |
-| Math RNG and remaining transcendentals | Remaining library work; unavailable            |
-| Binary chunks                          | M3; text-source interface only                 |
-| C exports and allocator parity         | M3; isolated feasibility probes only           |
-| Dynamic native modules / LuaRocks      | M4; no compatibility claim                     |
-| Whole upstream suite                   | M3; full coverage ledger remains incomplete    |
-| Interactive REPL                       | Future CLI work; no-input usage is intentional |
+| Finalization                           | Deferred; no finalizer execution                 |
+| Userdata and io/os                     | Deferred; unavailable facilities                 |
+| string.dump, table.sort/create         | Remaining library work; unavailable              |
+| Math RNG and remaining transcendentals | Remaining library work; unavailable              |
+| Binary chunks                          | M3; text-source interface only                   |
+| C exports and allocator parity         | M3; isolated feasibility probes only             |
+| Dynamic native modules / LuaRocks      | M4; no compatibility claim                       |
+| Whole upstream suite                   | M3; full coverage ledger remains incomplete      |
+| Interactive REPL                       | Future CLI work; no-input usage is intentional   |
 
 The runtime does not specify hash iteration order, ambiguous table borders,
-pointer text, or byte-identical diagnostic wording. Differential fixtures avoid relying on
-those implementation choices. IEEE formatting follows the matching host oracle.
+pointer text, or byte-identical diagnostic wording. Differential fixtures avoid
+relying on those implementation choices. IEEE formatting follows the matching host oracle.
 
 ## Language lifecycle implementation
 

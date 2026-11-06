@@ -1,9 +1,12 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
-  "runtime_revision": "4b71475e8a84eaf9a34787695e9ac82f1b2a9b84",
-  "run_id": 42158285078,
+  "runtime_revision": "830e0a1a2bad905ef34da3d553b24f8260ef35ff",
+  "run_id": 42166013145,
   "logs_inspected": true,
+  "cases_per_run": 587,
+  "new_lifecycle_cases": 99,
+  "cli_cases_per_run": 35,
   "expected_new_primary_files": [
     "goto.lua",
     "coroutine.lua"
@@ -14,226 +17,103 @@
     "bitwise.lua"
   ],
   "coroutine_configuration": "default T absent with documented upstream omissions",
+  "lifecycle_artifacts": [
+    {
+      "id": 13479591228,
+      "name": "lifecycle-macOS-release-relocatable",
+      "size_in_bytes": 30053
+    },
+    {
+      "id": 13479570073,
+      "name": "lifecycle-Linux-release-static",
+      "size_in_bytes": 30054
+    },
+    {
+      "id": 13479515004,
+      "name": "lifecycle-Windows-development-static",
+      "size_in_bytes": 30085
+    },
+    {
+      "id": 13479420455,
+      "name": "lifecycle-Linux-validation-relocatable",
+      "size_in_bytes": 30054
+    },
+    {
+      "id": 13479310095,
+      "name": "lifecycle-Linux-development-relocatable",
+      "size_in_bytes": 30054
+    },
+    {
+      "id": 13479290563,
+      "name": "lifecycle-Windows-validation-relocatable",
+      "size_in_bytes": 30084
+    },
+    {
+      "id": 13479191940,
+      "name": "lifecycle-macOS-development-relocatable",
+      "size_in_bytes": 30045
+    },
+    {
+      "id": 13479171810,
+      "name": "lifecycle-macOS-validation-relocatable",
+      "size_in_bytes": 30047
+    },
+    {
+      "id": 13479052702,
+      "name": "lifecycle-Windows-development-relocatable",
+      "size_in_bytes": 30083
+    },
+    {
+      "id": 13479023355,
+      "name": "lifecycle-macOS-development-static",
+      "size_in_bytes": 30056
+    },
+    {
+      "id": 13478958016,
+      "name": "lifecycle-Linux-release-relocatable",
+      "size_in_bytes": 30050
+    },
+    {
+      "id": 13478324924,
+      "name": "lifecycle-macOS-validation-static",
+      "size_in_bytes": 40998
+    },
+    {
+      "id": 13478289835,
+      "name": "lifecycle-macOS-release-static",
+      "size_in_bytes": 30055
+    },
+    {
+      "id": 13478214799,
+      "name": "lifecycle-Windows-validation-static",
+      "size_in_bytes": 69558
+    },
+    {
+      "id": 13478004578,
+      "name": "lifecycle-Windows-release-relocatable",
+      "size_in_bytes": 30084
+    },
+    {
+      "id": 13477984556,
+      "name": "lifecycle-Linux-development-static",
+      "size_in_bytes": 30052
+    },
+    {
+      "id": 13477914699,
+      "name": "lifecycle-Windows-release-static",
+      "size_in_bytes": 30084
+    },
+    {
+      "id": 13477839990,
+      "name": "lifecycle-Linux-validation-static",
+      "size_in_bytes": 41002
+    }
+  ],
   "jobs": [
     {
-      "id": 127697563624,
-      "name": "check (ubuntu-latest, relocatable, development)",
-      "tests": 1,
-      "success": 1,
-      "failedZero": 1,
-      "unexpectedZero": 1,
-      "cli": 35,
-      "adaConsumer": 1,
-      "upstream": [
-        {
-          "file": "tpack",
-          "count": 1
-        },
-        {
-          "file": "utf8",
-          "count": 1
-        },
-        {
-          "file": "bitwise",
-          "count": 1
-        },
-        {
-          "file": "goto",
-          "count": 1
-        },
-        {
-          "file": "coroutine",
-          "count": 1
-        }
-      ],
-      "campaign": 1,
-      "tool": "16.1.0",
-      "bytes": 135381,
-      "valid": true
-    },
-    {
-      "id": 127697563837,
-      "name": "check (ubuntu-latest, relocatable, validation)",
-      "tests": 1,
-      "success": 1,
-      "failedZero": 1,
-      "unexpectedZero": 1,
-      "cli": 35,
-      "adaConsumer": 1,
-      "upstream": [
-        {
-          "file": "tpack",
-          "count": 1
-        },
-        {
-          "file": "utf8",
-          "count": 1
-        },
-        {
-          "file": "bitwise",
-          "count": 1
-        },
-        {
-          "file": "goto",
-          "count": 1
-        },
-        {
-          "file": "coroutine",
-          "count": 1
-        }
-      ],
-      "campaign": 1,
-      "tool": "16.1.0",
-      "bytes": 140616,
-      "valid": true
-    },
-    {
-      "id": 127697563892,
-      "name": "check (ubuntu-latest, static, validation)",
-      "tests": 1,
-      "success": 1,
-      "failedZero": 1,
-      "unexpectedZero": 1,
-      "cli": 35,
-      "adaConsumer": 1,
-      "upstream": [
-        {
-          "file": "tpack",
-          "count": 1
-        },
-        {
-          "file": "utf8",
-          "count": 1
-        },
-        {
-          "file": "bitwise",
-          "count": 1
-        },
-        {
-          "file": "goto",
-          "count": 1
-        },
-        {
-          "file": "coroutine",
-          "count": 1
-        }
-      ],
-      "campaign": 1,
-      "tool": "16.1.0",
-      "bytes": 165178,
-      "valid": true
-    },
-    {
-      "id": 127697563898,
-      "name": "check (windows-latest, static, release)",
-      "tests": 1,
-      "success": 1,
-      "failedZero": 1,
-      "unexpectedZero": 1,
-      "cli": 35,
-      "adaConsumer": 1,
-      "upstream": [
-        {
-          "file": "tpack",
-          "count": 1
-        },
-        {
-          "file": "utf8",
-          "count": 1
-        },
-        {
-          "file": "bitwise",
-          "count": 1
-        },
-        {
-          "file": "goto",
-          "count": 1
-        },
-        {
-          "file": "coroutine",
-          "count": 1
-        }
-      ],
-      "campaign": 1,
-      "tool": "16.1.0",
-      "bytes": 178240,
-      "valid": true
-    },
-    {
-      "id": 127697563899,
-      "name": "check (ubuntu-latest, static, release)",
-      "tests": 1,
-      "success": 1,
-      "failedZero": 1,
-      "unexpectedZero": 1,
-      "cli": 35,
-      "adaConsumer": 1,
-      "upstream": [
-        {
-          "file": "tpack",
-          "count": 1
-        },
-        {
-          "file": "utf8",
-          "count": 1
-        },
-        {
-          "file": "bitwise",
-          "count": 1
-        },
-        {
-          "file": "goto",
-          "count": 1
-        },
-        {
-          "file": "coroutine",
-          "count": 1
-        }
-      ],
-      "campaign": 1,
-      "tool": "16.1.0",
-      "bytes": 140891,
-      "valid": true
-    },
-    {
-      "id": 127697563913,
-      "name": "check (windows-latest, relocatable, development)",
-      "tests": 1,
-      "success": 1,
-      "failedZero": 1,
-      "unexpectedZero": 1,
-      "cli": 35,
-      "adaConsumer": 1,
-      "upstream": [
-        {
-          "file": "tpack",
-          "count": 1
-        },
-        {
-          "file": "utf8",
-          "count": 1
-        },
-        {
-          "file": "bitwise",
-          "count": 1
-        },
-        {
-          "file": "goto",
-          "count": 1
-        },
-        {
-          "file": "coroutine",
-          "count": 1
-        }
-      ],
-      "campaign": 1,
-      "tool": "16.1.0",
-      "bytes": 178053,
-      "valid": true
-    },
-    {
-      "id": 127697563921,
+      "id": 127722553331,
       "name": "check (ubuntu-latest, static, development)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -264,12 +144,122 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 134974,
-      "valid": true
+      "bytes": 138014,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
     },
     {
-      "id": 127697563927,
+      "id": 127722553216,
+      "name": "check (ubuntu-latest, relocatable, development)",
+      "conclusion": "success",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 137722,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": 127722553307,
       "name": "check (windows-latest, relocatable, release)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -300,12 +290,49 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 178062,
-      "valid": true
+      "bytes": 180854,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
     },
     {
-      "id": 127697563953,
-      "name": "check (windows-latest, static, development)",
+      "id": 127722553452,
+      "name": "check (ubuntu-latest, static, release)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -336,12 +363,49 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 178115,
-      "valid": true
+      "bytes": 142995,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
     },
     {
-      "id": 127697563991,
+      "id": 127722553384,
       "name": "check (ubuntu-latest, relocatable, release)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -372,12 +436,424 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 140642,
-      "valid": true
+      "bytes": 143661,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
     },
     {
-      "id": 127697564036,
+      "id": 127722553556,
+      "name": "check (ubuntu-latest, relocatable, validation)",
+      "conclusion": "success",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 143686,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": 127722553411,
+      "name": "check (windows-latest, relocatable, development)",
+      "conclusion": "success",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 180979,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": 127722553356,
+      "name": "check (ubuntu-latest, static, validation)",
+      "conclusion": "success",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 167569,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "extras": {
+        "abi": true,
+        "opcodes": true,
+        "lexer": true,
+        "grammar": true,
+        "upstream_parse": 34,
+        "layout": true,
+        "libraries": true,
+        "lifecycle": true
+      },
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": 127722553354,
+      "name": "check (windows-latest, static, release)",
+      "conclusion": "success",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 180577,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": 127722553571,
+      "name": "check (windows-latest, static, development)",
+      "conclusion": "success",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 180738,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": 127722553408,
       "name": "check (windows-latest, relocatable, validation)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -408,12 +884,49 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 178327,
-      "valid": true
+      "bytes": 180995,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
     },
     {
-      "id": 127697563917,
+      "id": 127722553362,
       "name": "check (macos-latest, static, development)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -444,12 +957,49 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 136792,
-      "valid": true
+      "bytes": 139738,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
     },
     {
-      "id": 127697563944,
-      "name": "check (macos-latest, relocatable, release)",
+      "id": 127722553364,
+      "name": "check (macos-latest, relocatable, validation)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -480,12 +1030,49 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 141605,
-      "valid": true
+      "bytes": 144592,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
     },
     {
-      "id": 127697563993,
-      "name": "check (macos-latest, relocatable, development)",
+      "id": 127722553459,
+      "name": "check (macos-latest, static, release)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -516,12 +1103,132 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 136813,
-      "valid": true
+      "bytes": 144217,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
     },
     {
-      "id": 127697564009,
+      "id": 127722553376,
+      "name": "check (macos-latest, static, validation)",
+      "conclusion": "success",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 162517,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "extras": {
+        "abi": true,
+        "opcodes": true,
+        "lexer": true,
+        "grammar": true,
+        "upstream_parse": 34,
+        "layout": true,
+        "libraries": true,
+        "lifecycle": true
+      },
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": 127722553506,
       "name": "check (windows-latest, static, validation)",
+      "conclusion": "success",
       "tests": 2,
       "success": 2,
       "failedZero": 2,
@@ -552,12 +1259,59 @@
       ],
       "campaign": 2,
       "tool": "16.1.0",
-      "bytes": 307815,
-      "valid": true
+      "bytes": 311223,
+      "staticPic": true,
+      "artifact": true,
+      "valid": true,
+      "extras": {
+        "abi": true,
+        "opcodes": true,
+        "lexer": true,
+        "grammar": true,
+        "upstream_parse": 34,
+        "layout": true,
+        "libraries": true,
+        "lifecycle": true
+      },
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 2
+        },
+        {
+          "file": "core",
+          "count": 2
+        },
+        {
+          "file": "edge_semantics",
+          "count": 2
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 2
+        },
+        {
+          "file": "library_campaign",
+          "count": 2
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 2
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 2
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 2
+        }
+      ]
     },
     {
-      "id": 127697564046,
-      "name": "check (macos-latest, relocatable, validation)",
+      "id": 127722553609,
+      "name": "check (macos-latest, relocatable, development)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -588,12 +1342,49 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 142711,
-      "valid": true
+      "bytes": 139160,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
+        {
+          "file": "binary_output",
+          "count": 1
+        },
+        {
+          "file": "core",
+          "count": 1
+        },
+        {
+          "file": "edge_semantics",
+          "count": 1
+        },
+        {
+          "file": "errors_and_bytes",
+          "count": 1
+        },
+        {
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
+          "count": 1
+        }
+      ]
     },
     {
-      "id": 127697564047,
-      "name": "check (macos-latest, static, validation)",
+      "id": 127722553562,
+      "name": "check (macos-latest, relocatable, release)",
+      "conclusion": "success",
       "tests": 1,
       "success": 1,
       "failedZero": 1,
@@ -624,44 +1415,44 @@
       ],
       "campaign": 1,
       "tool": "16.1.0",
-      "bytes": 159676,
-      "valid": true
-    },
-    {
-      "id": 127697564079,
-      "name": "check (macos-latest, static, release)",
-      "tests": 1,
-      "success": 1,
-      "failedZero": 1,
-      "unexpectedZero": 1,
-      "cli": 35,
-      "adaConsumer": 1,
-      "upstream": [
+      "bytes": 144398,
+      "staticPic": null,
+      "artifact": true,
+      "valid": true,
+      "fixtures": [
         {
-          "file": "tpack",
+          "file": "binary_output",
           "count": 1
         },
         {
-          "file": "utf8",
+          "file": "core",
           "count": 1
         },
         {
-          "file": "bitwise",
+          "file": "edge_semantics",
           "count": 1
         },
         {
-          "file": "goto",
+          "file": "errors_and_bytes",
           "count": 1
         },
         {
-          "file": "coroutine",
+          "file": "library_campaign",
+          "count": 1
+        },
+        {
+          "file": "lifecycle_campaign",
+          "count": 1
+        },
+        {
+          "file": "numeric_matrix",
+          "count": 1
+        },
+        {
+          "file": "tables_and_loops",
           "count": 1
         }
-      ],
-      "campaign": 1,
-      "tool": "16.1.0",
-      "bytes": 142437,
-      "valid": true
+      ]
     }
   ]
 }

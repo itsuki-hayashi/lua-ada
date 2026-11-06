@@ -70,6 +70,6 @@ Unchanged goto.lua and coroutine.lua require independent hash-verified C/Ada
 process runs; T-absent omissions are inventoried explicitly. Final platform jobs
 and the retained M2b/frontend/opcode/ABI campaigns remain mandatory.
 
-The [validation record](../validation-m3-lifecycle.md) records 575 passing AUnit
+The [validation record](../validation-m3-lifecycle.md) records 587 passing AUnit
 cases, all five selected files, the 1,024-case campaign, all 18 inspected jobs
-and Windows static-PIC. Publication-head CI remains the final readiness gate.
+and Windows static-PIC. Final publication-head CI is recorded in PR #7 and gates readiness.

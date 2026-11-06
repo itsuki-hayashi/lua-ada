@@ -1,8 +1,8 @@
 # Project Status
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**
-**M3 remains in progress. The bounded language lifecycle delivery has verified
-runtime acceptance; publication-head checks gate PR readiness.**
+**M3 remains in progress. The bounded language lifecycle delivery has completed
+runtime acceptance; final publication checks are linked from PR #7.**
 
 ## Implemented and verified
 
@@ -50,26 +50,24 @@ reachability-based context ownership, weak tables/ephemerons, debug inspection
 and hooks, collection controls, and compatible CLI execution quotas. This
 advances portions of M3-02/06/07/08/11; their full broader gates remain open.
 
-Local Windows validation/static has passed 587 focused AUnit cases at the
-latest recorded test checkpoint. Hash-verified unchanged goto.lua and
-coroutine.lua have passed fresh independent same-host C/Ada process comparisons,
-with identical stdout, empty stderr and OK markers. The coroutine result is
-**default-configuration execution with documented upstream omissions**, not
-complete coroutine or C-API conformance. Exact omitted source anchors and the
-900-second/2 GiB sampled resident-process policy are in the acceptance owner.
+Runtime revision 830e0a1a2bad905ef34da3d553b24f8260ef35ff passes all 18
+Windows/Linux/macOS × development/validation/release × static/shared jobs, plus
+Windows static-PIC. Every job log was inspected: 587 successful AUnit cases
+(99 new), zero failed assertions/errors, the Ada consumer, 35 CLI cases, eight
+differential fixtures and five selected unchanged upstream files.
 
-The runtime revision 4b71475e8a84eaf9a34787695e9ac82f1b2a9b84 passed all
-18 Windows/Linux/macOS profile/linking jobs and Windows static-PIC; every job
-log was inspected. All three static-validation jobs passed the retained ABI,
-frontend/opcode/layout/library campaigns and the new 1,024-case seeded lifecycle
-campaign. [Validation evidence](validation-m3-lifecycle.md) records the exact
-run, job IDs, tool versions, marker counts and scope limits. The final handoff
-commit initially changed documentation and evidence retention only. A later
-C-oracle edge comparison corrected dead/closed coroutine yieldability and added
-focused cases, including abandoned close-phase cleanup and embedded-NUL weak
-mode flags. The final API audit also corrected collector/debug result packets
-and option/configuration boundaries; its current full
-matrix must pass before [PR #7](https://github.com/itsuki-hayashi/lua-ada/pull/7) is ready.
+The new goto.lua and coroutine.lua pass fresh independent same-host C/Ada
+process comparisons with identical stdout, empty stderr and OK markers.
+coroutine.lua is **default-configuration execution with documented upstream
+omissions**, not complete coroutine or C-API conformance. Exact omitted source
+anchors and the 900-second/2 GiB sampled resident-process policy are in the
+acceptance owner. The three M2b targets retain their bounded acceptance profile.
+
+All three static-validation jobs pass ABI/frontend/opcode/layout/library checks
+and the 1,024-case seeded lifecycle campaign. [Validation evidence](validation-m3-lifecycle.md)
+records exact run/job IDs, tool versions, marker counts and scope limits. Final
+publication-head checks and readiness are recorded in
+[PR #7](https://github.com/itsuki-hayashi/lua-ada/pull/7); no merge is authorized.
 Reference/module pins remain unchanged and ecosystem fixtures remain unused.
 
 ## Earlier evidence and remaining work

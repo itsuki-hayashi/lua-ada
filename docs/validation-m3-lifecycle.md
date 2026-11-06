@@ -1,8 +1,8 @@
 # Language Lifecycle Validation
 
-Recorded runtime checkpoint: 4b71475e8a84eaf9a34787695e9ac82f1b2a9b84.
+Recorded runtime checkpoint: 830e0a1a2bad905ef34da3d553b24f8260ef35ff.
 PR: [#7](https://github.com/itsuki-hayashi/lua-ada/pull/7), against master.
-Status: runtime acceptance verified; publication-head checks remain mandatory.
+Status: runtime acceptance complete; final publication checks are linked from PR #7.
 This bounded delivery does not complete the broader M3 milestone.
 
 ## Reproducible checks
@@ -10,9 +10,9 @@ This bounded delivery does not complete the broader M3 milestone.
 Run scripts/check.ps1 with each profile and library kind. It builds the strict
 Ada 2022 library, CLI and nested AUnit consumers; required flags and runtime
 checks remain enabled. The latest reviewed local Windows validation/static run
-passed 575 AUnit cases, zero failed assertions and zero unexpected errors,
+passed 587 AUnit cases, zero failed assertions and zero unexpected errors,
 public Ada syntax/session consumer, 35 process CLI cases and eight differential
-fixtures. There are 87 new focused lifecycle cases beyond the 488-case baseline.
+fixtures. There are 99 new focused lifecycle cases beyond the 488-case baseline.
 
 scripts/check-lifecycle.ps1 executes unchanged goto.lua and coroutine.lua in
 fresh independent C/Ada processes, using hash-verified disposable fixtures,
@@ -36,33 +36,33 @@ These C probes are test fixtures, not production exports.
 
 ## Platform matrix
 
-The [runtime acceptance run](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42158285078)
-passed all 18 jobs at the revision above. Every job log was inspected for 575
+The [runtime acceptance run](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42166013145)
+passed all 18 jobs at the revision above. Every job log was inspected for 587
 successful AUnit cases, zero failures/errors, the real Ada consumer, 35 CLI
 cases, the retained M2b primary files, both lifecycle files and the differential
 fixtures. The Windows static-validation job additionally repeats the entire
-pipeline under static-PIC: 575 cases, 35 CLI and all five selected files again.
+pipeline under static-PIC: 587 cases, 35 CLI and all five selected files again.
 
 | OS      | Profile     | Link   | Job ID       | AUnit | CLI | Files | Result |
 | ------- | ----------- | ------ | ------------ | ----- | --- | ----- | ------ |
-| Linux   | development | shared | 127697563624 | 575   | 35  | 5     | pass   |
-| Linux   | development | static | 127697563921 | 575   | 35  | 5     | pass   |
-| Linux   | release     | shared | 127697563991 | 575   | 35  | 5     | pass   |
-| Linux   | release     | static | 127697563899 | 575   | 35  | 5     | pass   |
-| Linux   | validation  | shared | 127697563837 | 575   | 35  | 5     | pass   |
-| Linux   | validation  | static | 127697563892 | 575   | 35  | 5     | pass   |
-| macOS   | development | shared | 127697563993 | 575   | 35  | 5     | pass   |
-| macOS   | development | static | 127697563917 | 575   | 35  | 5     | pass   |
-| macOS   | release     | shared | 127697563944 | 575   | 35  | 5     | pass   |
-| macOS   | release     | static | 127697564079 | 575   | 35  | 5     | pass   |
-| macOS   | validation  | shared | 127697564046 | 575   | 35  | 5     | pass   |
-| macOS   | validation  | static | 127697564047 | 575   | 35  | 5     | pass   |
-| Windows | development | shared | 127697563913 | 575   | 35  | 5     | pass   |
-| Windows | development | static | 127697563953 | 575   | 35  | 5     | pass   |
-| Windows | release     | shared | 127697563927 | 575   | 35  | 5     | pass   |
-| Windows | release     | static | 127697563898 | 575   | 35  | 5     | pass   |
-| Windows | validation  | shared | 127697564036 | 575   | 35  | 5     | pass   |
-| Windows | validation  | static | 127697564009 | 575   | 35  | 5     | pass   |
+| Linux   | development | shared | 127722553216 | 587   | 35  | 5     | pass   |
+| Linux   | development | static | 127722553331 | 587   | 35  | 5     | pass   |
+| Linux   | release     | shared | 127722553384 | 587   | 35  | 5     | pass   |
+| Linux   | release     | static | 127722553452 | 587   | 35  | 5     | pass   |
+| Linux   | validation  | shared | 127722553556 | 587   | 35  | 5     | pass   |
+| Linux   | validation  | static | 127722553356 | 587   | 35  | 5     | pass   |
+| macOS   | development | shared | 127722553609 | 587   | 35  | 5     | pass   |
+| macOS   | development | static | 127722553362 | 587   | 35  | 5     | pass   |
+| macOS   | release     | shared | 127722553562 | 587   | 35  | 5     | pass   |
+| macOS   | release     | static | 127722553459 | 587   | 35  | 5     | pass   |
+| macOS   | validation  | shared | 127722553364 | 587   | 35  | 5     | pass   |
+| macOS   | validation  | static | 127722553376 | 587   | 35  | 5     | pass   |
+| Windows | development | shared | 127722553411 | 587   | 35  | 5     | pass   |
+| Windows | development | static | 127722553571 | 587   | 35  | 5     | pass   |
+| Windows | release     | shared | 127722553307 | 587   | 35  | 5     | pass   |
+| Windows | release     | static | 127722553354 | 587   | 35  | 5     | pass   |
+| Windows | validation  | shared | 127722553408 | 587   | 35  | 5     | pass   |
+| Windows | validation  | static | 127722553506 | 587   | 35  | 5     | pass   |
 
 All three static-validation logs additionally contain passing ABI probes, all
 85 opcode definitions/4,096 instruction words, 10,000 arbitrary-byte lexer
@@ -81,17 +81,18 @@ x86_64-w64-mingw32), Ubuntu 24.04.5 LTS X64 (x86_64-pc-linux-gnu), and macOS
 integers/binary64, ASCII classification and LUA_COMPAT_GLOBAL=1. These probes
 and matching host configurations do not establish a production C ABI.
 
-The subsequent handoff commit changes documentation/evidence retention only;
-its complete matrix must also pass before PR #7 is marked ready. Current
-publication-head checks are linked from the PR. Lifecycle stdout/stderr,
-fixture hashes and generated mismatch sources are preserved as per-configuration
-CI artifacts, including the Windows static-PIC observations.
+The final handoff commit updates documentation and the inspected evidence only.
+PR #7 records its publication-head matrix separately; it must pass before the
+PR is marked ready. This avoids substituting an older runtime checkpoint for
+final-head checks. All 18 lifecycle artifacts and three conformance artifacts
+were uploaded successfully. Lifecycle stdout/stderr, fixture hashes, mismatch
+sources and license notices remain available for every configuration, including
+Windows static-PIC.
 
-Initial implementation 16cc35491384c345a3a2e328555eaf30ca13f5ca had a successful
-18-job push run 42156106894. Its duplicate PR run had 17 successful jobs and one
-macOS stable-GNAT archive HTTP 500 before compilation. No code/compiler-policy
-change was made to hide that infrastructure failure. The reviewed revision adds
-ten focused metadata/boundary cases and requires a fresh complete matrix.
+Earlier intermediate revisions and the initial macOS stable-GNAT download
+HTTP 500 are recorded in the dated session. No compiler-policy change or hidden
+skip was used to turn that infrastructure failure into a pass. The final runtime
+matrix above has no failed, skipped or cancelled jobs.
 
 ## Scope of the upstream result
 
@@ -109,28 +110,11 @@ userdata, finalizers, collector modes, remaining libraries/full CLI and ecosyste
 modules remain outside this delivery. No reference/module pins changed. Optional
 GNATdoc rendering, fuzzing and formal proof were not run.
 
-## Final yieldability correction
+## Reviewed compatibility boundaries
 
-A later direct C-oracle comparison added one focused regression: dead/closed
-coroutines remain yieldable according to C Lua's boundary query. Execution now
-ends the closing phase on completion and keeps that query independent of dead
-status/abandoned error frames. Local AUnit passes 576 cases (88 new), with zero
-failed assertions/errors. The 575-case table above remains the exact recorded
-checkpoint. The current publication-head matrix must validate this correction
-and is linked from PR #7; it cannot inherit the checkpoint's result.
-
-A separate closing-quota case verifies uncatchable abort, abandoned closing-phase
-cleanup and subsequent session recovery. It brings local AUnit to 577 cases
-(89 new), with no failures/errors. Final-head CI must show those 577 cases;
-this recorded 575-case checkpoint is not substituted for that requirement.
-
-The final weak-mode boundary regression follows pinned lgc.c: __mode uses
-C-string flag scanning, so bytes after NUL add no weakness. Local AUnit now
-passes 578 cases (90 new), zero failed assertions/errors. Final acceptance must
-show those 578 cases in every current-head configuration.
-
-The completed API result/configuration audit adds nine focused regressions:
-collector status/default results, disabled hook arity, empty hook normalization,
-signed count reflection and C-string option boundaries. Local AUnit and the
-complete validation/static pipeline pass 587 cases (99 new), zero failures or
-unexpected errors. Current-head CI must show 587 in every configuration.
+Focused regressions cover dead/closed coroutine yieldability, closing-phase
+cleanup after hard quota aborts, weak-mode NUL boundaries, collector result
+packets/default arguments, disabled-hook arity, empty hook configuration and
+signed count reflection. C-string option boundaries are deliberate compatibility
+behavior; ordinary Lua strings remain binary-safe. The dated session preserves
+intermediate counts; this record describes the final 587-case runtime revision.

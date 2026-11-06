@@ -187,10 +187,10 @@ fixtures are covered by M3-10 instead.
 
 The maintainer approved [M3-LC](milestones/m3-language-lifecycle.md) as one major
 PR from merged PR #6. Its sequential checkpoints M3-LC-01 through M3-LC-06 have
-explicit dependencies and exit evidence in that acceptance owner. M3-LC-01–05
-are implemented with 575 focused regressions. M3-LC-06 has verified runtime
-evidence across all 18 jobs and Windows static-PIC, with the single PR open;
-its final documentation/evidence-retention head must pass before readiness. This
+explicit dependencies and exit evidence in that acceptance owner. M3-LC-01–06
+have completed runtime acceptance: 587 passing AUnit cases (99 new), all five
+selected upstream files, all 18 inspected jobs and Windows static-PIC. The single
+PR records final publication-head checks before readiness. This
 advances selected portions of M3-02/06/07/08/11, without marking their broader
 canonical, allocator, finalizer, binary or full-CLI requirements complete.
 

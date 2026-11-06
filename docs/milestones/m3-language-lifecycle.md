@@ -2,8 +2,8 @@
 
 Approved: 2026-11-06. Branch: codex/m3-language-lifecycle.
 Baseline: merged PR #6, master bbc6e230cc1fcf4d20eb3caf02077b6bb0c0f46a.
-Status: all six runtime checkpoints have verified evidence; publication-head
-checks gate final PR readiness. The broader M3 milestone remains incomplete.
+Status: all six checkpoints have completed runtime acceptance. Final publication
+checks are linked from PR #7; the broader M3 milestone remains incomplete.
 
 ## Scope and checkpoints
 
@@ -88,8 +88,9 @@ omissions. It establishes neither complete coroutine nor C-API conformance.
 The [session record](../sessions/2026-11-06-m3-language-lifecycle.md) owns exact
 local commands and intermediate observations.
 [The validation record](../validation-m3-lifecycle.md) records runtime revision
-4b71475e8a84eaf9a34787695e9ac82f1b2a9b84, all 18 inspected jobs and Windows
-static-PIC. [PR #7](https://github.com/itsuki-hayashi/lua-ada/pull/7) owns the
-final publication-head checks; it is not ready until they pass. The broader
+830e0a1a2bad905ef34da3d553b24f8260ef35ff, 587 passing AUnit cases (99 new),
+all five selected files, all 18 inspected jobs and Windows static-PIC.
+[PR #7](https://github.com/itsuki-hayashi/lua-ada/pull/7) owns the final
+publication-head checks; it is not ready until they pass. The broader
 [M3 conformance ledger](../../tests/conformance/README.md) remains authoritative
 for pending full-suite assertions and separately reviewed C/internal equivalents.
