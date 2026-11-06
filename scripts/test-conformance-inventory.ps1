@@ -207,7 +207,40 @@ Case 'equivalent requires original C evidence' {
         disposition='native-platform-equivalent';invariant='A real invariant';
         configurations=@('default');review=@{reviewer='reviewer';author='author';rationale='reason';artifact='review';original_c_evidence=''};
         evidence=@()}
-    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'Equivalent lacks original C evidence'
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') } 'Runtime source lacks original C evidence'
+}
+
+Case 'unchanged runtime assertions require original C evidence' {
+    # Keeping source unchanged does not prove that the pinned C configuration
+    # ran its assertion. Reject an otherwise complete Ada-only evidence record.
+    $record = @{id='LUA-SAMPLE-ASSERT-CALL-0001';kind='assert-call';status='passed';
+        disposition='unchanged';invariant='The assertion succeeds';configurations=@('default');
+        review=@{reviewer='reviewer';author='author';rationale='reason';artifact='review';original_c_evidence=''};
+        evidence=@(@{context='default/windows/validation/static';result='passed';
+            revision=('a'*40);artifact='ada-result';case_id='assertion'})}
+    Assert-Rejected { Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -RequireComplete } 'Runtime source lacks original C evidence'
+}
+
+Case 'unchanged runtime assertions retain the reference result' {
+    # A legitimate unchanged obligation has both its independently reviewed
+    # original C observation and an actual passing target-context result.
+    $record = @{id='LUA-SAMPLE-ASSERT-CALL-0001';kind='assert-call';status='passed';
+        disposition='unchanged';invariant='The assertion succeeds';configurations=@('default');
+        review=@{reviewer='reviewer';author='author';rationale='reason';artifact='review';original_c_evidence='c-result'};
+        evidence=@(@{context='default/windows/validation/static';result='passed';
+            revision=('a'*40);artifact='ada-result';case_id='assertion'})}
+    Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -RequireComplete
+}
+
+Case 'inventory reviews are distinct from runtime observations' {
+    # A manual audit records the source obligations, rather than an assertion
+    # execution. It remains reviewable without fabricating an original C run.
+    $record = @{id='LUA-SAMPLE-MANUAL-AUDIT-0001';kind='manual-audit';status='passed';
+        disposition='inventory-reviewed';invariant='All source obligations are inventoried';configurations=@('default');
+        review=@{reviewer='reviewer';author='author';rationale='reason';artifact='review'};
+        evidence=@(@{context='default/windows/validation/static';result='passed';
+            revision=('a'*40);artifact='inventory-review';case_id='audit'})}
+    Test-ConformanceResolvedRecord $record @('default/windows/validation/static') -RequireComplete
 }
 
 Case 'resolved evidence must cover every required context' {
@@ -408,6 +441,28 @@ Case 'untracked ignored reference sources are rejected' {
     [IO.File]::WriteAllText((Join-Path $fixture.reference '.git/info/exclude'), '*.c', $utf8)
     [IO.File]::WriteAllText((Join-Path $fixture.reference 'injected.c'), 'void injected(void) {}', $utf8)
     Assert-Rejected { Test-ConformanceReferenceTree -Root $fixture.root -ExpectedRevision $fixture.revision } 'Untracked reference source input'
+}
+
+Case 'untracked non-source test fixtures are rejected' {
+    # Native modules and extensionless data are copied as execution inputs.
+    # Each boundary has its own clean disposable reference repository; neither
+    # can hide behind ignored files or rely on a source-code extension check.
+    foreach ($relative in @('testes/libs/extra.so', 'testes/extensionless')) {
+        $fixture = New-GitReferenceFixture ('reference-fixture-' + [Guid]::NewGuid().ToString('N'))
+        [IO.File]::WriteAllText((Join-Path $fixture.reference '.git/info/exclude'), '*.so', $utf8)
+        $path = Join-Path $fixture.reference $relative
+        [IO.Directory]::CreateDirectory((Split-Path -Parent $path)) | Out-Null
+        [IO.File]::WriteAllText($path, 'untracked fixture input', $utf8)
+        Assert-Rejected { Test-ConformanceReferenceTree -Root $fixture.root -ExpectedRevision $fixture.revision } 'Untracked reference fixture input'
+    }
+}
+
+Case 'unrelated root build artifacts do not become fixture inputs' {
+    # An ordinary non-source artifact outside the copied test subtree is not
+    # an execution input. Keep that allowance narrow while guarding fixtures.
+    $fixture = New-GitReferenceFixture 'reference-root-artifact'
+    [IO.File]::WriteAllText((Join-Path $fixture.reference 'build.log'), 'build observation', $utf8)
+    Test-ConformanceReferenceTree -Root $fixture.root -ExpectedRevision $fixture.revision
 }
 
 Write-Output "PASS: $script:Cases focused conformance inventory tests"

@@ -57,6 +57,12 @@ jobs:
           alr exec -- pwsh -NoProfile -File scripts/check-frontend.ps1
           ./scripts/check-layout.ps1 -AdaProbe "$PWD/tests/bin/static/lua-codec_layout_probe${{ runner.os == 'Windows' && '.exe' || '' }}"
           ./scripts/compare-libraries.ps1 -Interpreter "$PWD/cli/bin/static/lua_ada${{ runner.os == 'Windows' && '.exe' || '' }}"
+      - name: Install Linux C oracle readline prerequisite
+        if: matrix.os == 'ubuntu-latest' && matrix.library == 'static' && matrix.profile == 'validation'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libreadline-dev
       - name: Isolated C conformance baselines
         if: matrix.library == 'static' && matrix.profile == 'validation'
         timeout-minutes: 160

@@ -18,6 +18,14 @@ and future ecosystem fixtures are never edited or used as production inputs.
 Run from the repository root with the configured Alire toolchain. Alire builds
 must be serialized because its generated configuration is shared.
 
+On Linux, install the host's readline development/runtime package so the pinned
+default name `libreadline.so` is loadable (`libreadline-dev` on Ubuntu CI).
+The separate C oracle uses this optional system facility; the Ada production
+crate gains no dependency. Before recording executions, the runner probes
+`-E -W -i` with closed stdin and requires successful initialization and empty
+stderr. A missing default readline library is a setup failure, not a platform
+equivalent or a successful reduced upstream run.
+
 ```powershell
 pwsh -NoProfile -File scripts/run-conformance.ps1 `
   -Configuration default -BuildReference -Mode Smoke
@@ -127,6 +135,7 @@ Each invocation writes `reports/conformance/<run-id>/report.json` unless
 and `.stderr` files stay under that run directory. JSON schema version 1 records:
 
 - Requested and observed configuration, probe process, and verification state.
+- Default REPL preflight process, including raw output and prerequisite failures.
 - First-party repository revision and worktree status, including uncommitted
   tracked and untracked inputs, plus OS description, OS/process architecture,
   and PowerShell version. A dirty run is evidence for those exact input hashes,

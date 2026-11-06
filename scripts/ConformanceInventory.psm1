@@ -270,6 +270,15 @@ function Test-ConformanceReferenceTree {
     & git -c core.fsmonitor=false -C $reference diff --quiet HEAD --
     if ($LASTEXITCODE -eq 1) { throw 'Tracked reference tree differs from pinned HEAD' }
     if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect tracked reference tree' }
+    # The runner copies the complete test directory, including native modules
+    # and extensionless data. Any extra path there could affect the observed
+    # execution. Let Git select the subtree so even quoted unusual filenames
+    # are rejected; omitting --exclude-standard deliberately includes ignores.
+    $untrackedFixtures = @(& git -c core.fsmonitor=false -C $reference ls-files --others -- testes/)
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect untracked reference fixtures' }
+    if ($untrackedFixtures.Count -gt 0) {
+        throw "Untracked reference fixture input: $($untrackedFixtures -join ', ')"
+    }
     $untracked = @(& git -c core.fsmonitor=false -C $reference ls-files --others --)
     if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect untracked reference sources' }
     foreach ($path in $untracked) {
@@ -332,9 +341,13 @@ function Test-ConformanceResolvedRecord {
             [string]::IsNullOrWhiteSpace($Record.review.artifact)) {
             throw "Missing independent review: $($Record.id)"
         }
-        if ($Record.disposition -in @('ada-internal-equivalent', 'native-platform-equivalent') -and
+        # Every runtime obligation needs the original C observation, including
+        # unchanged tests. Otherwise an Ada-only pass could silently stand in
+        # for the reference result. A whole-file inventory audit reviews what
+        # must be tested; it is not itself an executed runtime obligation.
+        if ($Record.kind -ne 'manual-audit' -and
             [string]::IsNullOrWhiteSpace($Record.review.original_c_evidence)) {
-            throw "Equivalent lacks original C evidence: $($Record.id)"
+            throw "Runtime source lacks original C evidence: $($Record.id)"
         }
     }
     $evidence = @($Record.evidence)

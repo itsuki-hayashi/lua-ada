@@ -10,6 +10,12 @@ under `references/lua`; all offsets and hashes identify that checkout's bytes.
 Existing [Lua copyright notice](../../docs/licenses/lua.md) applies to declaration
 text inventoried from the upstream headers.
 
+The reference guard rejects staged and unstaged changes to tracked files, all
+untracked source inputs, and every untracked or ignored path under `testes/`.
+The last rule includes native libraries and extensionless data because the
+runner copies that entire subtree. Unrelated non-source build artifacts at the
+reference root are allowed; they are not fixture inputs.
+
 ## Files and configurations
 
 `suite.json` records all 34 Lua source files and their SHA-256 hashes:
@@ -75,7 +81,10 @@ A completed source entry must name an invariant, applicable configuration IDs,
 independent review author/reviewer, rationale, and review artifact. Its
 disposition is one of `unchanged`, `ada-internal-equivalent`, or
 `native-platform-equivalent`; whole-file inventory audits use
-`inventory-reviewed`. Equivalents also require original C evidence. Reviewers
+`inventory-reviewed`. Every completed runtime source record, including an
+unchanged assertion or block, also requires `review.original_c_evidence` for
+the original C result. Whole-file inventory reviews are exempt because they
+identify obligations rather than execute assertions. Reviewers
 must be different from the recorded author.
 
 Every pass evidence item names an acceptance context, exact 40-digit code

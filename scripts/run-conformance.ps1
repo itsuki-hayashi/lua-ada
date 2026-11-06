@@ -51,6 +51,7 @@ $evidence = [ordered]@{
     reference_tree_verified = $false
     observed_configuration = $null
     configuration_process = $null
+    repl_preflight_process = $null
     reference_source_records = @()
     harness_source_records = @()
     reference_library_records = @()
@@ -226,6 +227,18 @@ try {
         }
         $evidence.observed_configuration = $observed
         $evidence.configuration_verified = $true
+        # Lua 5.5.1's CLI tests expect its default readline facility to work.
+        # A missing host library must fail setup, rather than masquerade as a
+        # native-platform difference when main.lua enables warnings with -E.
+        # Closed stdin makes this a bounded REPL initialization/cleanup probe.
+        $repl = Invoke-ConformanceProcess -Executable $Interpreter -Arguments @('-E', '-W', '-i') `
+            -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'repl-preflight') `
+            -TimeoutSeconds 30 -Environment $environment
+        $evidence.repl_preflight_process = $repl
+        if ($repl.exit_code -ne 0 -or $repl.timed_out -or $repl.stderr_bytes -ne 0 -or
+            $repl.capture_exceeded -or $repl.pipe_drain_failed -or $repl.process_tree_kill_error) {
+            throw "Default C REPL prerequisite failed; see $($repl.stderr_path)"
+        }
         Build-Fixtures -Directory $fixtureDirectory -LibraryDirectory $libraryDirectory
     }
     elseif ($RuntimeDirectory -ne '') {
