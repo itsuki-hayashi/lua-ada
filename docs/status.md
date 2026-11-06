@@ -23,6 +23,10 @@ The C facade now exposes real IO/OS module openers with shared Ada export
 construction, stable file-metatable identity on reopen, and public FILE/closer
 consumer regressions. Both Linux instrumented jobs pass on published 915df28;
 final-revision acceptance and independent equivalent review remain outstanding.
+Real lua_gc controls now share the production collector, with C-owned finalizer
+calls and explicit state-close finalizer drainage. Seven shared public C
+contracts compare controls, steps, finalizers, warnings, allocator refusal and
+physical cleanup against the pinned oracle. Full scoped acceptance remains open.
 The paused-checkpoint statements below retain the prior delivery's evidence.
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**

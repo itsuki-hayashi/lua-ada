@@ -38,7 +38,7 @@ package Lua.Engine.Foreign is
       Create_Userdata, Get_Uservalue, Set_Uservalue,
       Get_Metatable, Set_Metatable, Close_IO_Primitive, Get_Yieldability,
       Set_Warning_Function, Issue_Warning, Complete_Warning,
-      Open_IO_Module, Open_OS_Module);
+      Open_IO_Module, Open_OS_Module, Collector_Control, Push_Collector_Drain);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
       Create_Thread => 3, Get_Top => 4, Set_Top => 5,
@@ -60,7 +60,8 @@ package Lua.Engine.Foreign is
       Get_Metatable => 47, Set_Metatable => 48, Close_IO_Primitive => 49,
       Get_Yieldability => 50, Set_Warning_Function => 51,
       Issue_Warning => 52, Complete_Warning => 53,
-      Open_IO_Module => 54, Open_OS_Module => 55);
+      Open_IO_Module => 54, Open_OS_Module => 55,
+      Collector_Control => 56, Push_Collector_Drain => 57);
    for Operation_Code'Size use Interfaces.C.int'Size;
    pragma Convention (C, Operation_Code);
 

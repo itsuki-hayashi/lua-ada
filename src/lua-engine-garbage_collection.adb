@@ -1,11 +1,76 @@
-with Interfaces.C;
+with Ada.Unchecked_Conversion;
 with Lua.Engine.Finalizers;
 with Lua.Engine.Strings;
-with Lua.Storage;
 
 package body Lua.Engine.Garbage_Collection is
    use type Integer_Value;
    use type Real_Value;
+   use type Interfaces.C.int;
+   use type Lua.Storage.Byte_Count;
+
+   function Signed_Int is new Ada.Unchecked_Conversion
+     (Interfaces.C.unsigned, Interfaces.C.int);
+
+   function Control
+     (State : in out World; Operation : Interfaces.C.int;
+      Step_Bytes : Lua.Storage.Byte_Count := 0;
+      Parameter : Interfaces.C.int := 0;
+      Setting : Interfaces.C.int := Interfaces.C.int'Pred (0);
+      Drain : out Boolean) return Interfaces.C.int
+   is
+      Result : Interfaces.C.int := 0;
+      Done : Boolean;
+      Bytes : Lua.Storage.Byte_Count;
+   begin
+      Drain := False;
+      --  Internal collection, finalizers and state closure prohibit every
+      --  public control, even an otherwise harmless count or mode query.
+      if State.Finalizer_Active or else State.Collector_Active or else
+        State.State_Close_Phase
+      then
+         return -1;
+      end if;
+      case Operation is
+         when 0 => State.GC_Running := False;
+         when 1 =>
+            State.GC_Running := True;
+            Restart_Collection (State);
+         when 2 =>
+            Collect (State);
+            Drain := True;
+         when 3 | 4 =>
+            Bytes := Lua.Storage.Statistics (State.Memory).Raw_Bytes;
+            if Operation = 3 then
+               --  The public result is C int, including its low-bit cast
+               --  when a host permits more storage than int kilobytes.
+               Result := Signed_Int (Interfaces.C.unsigned
+                 ((Bytes / 1024) mod 2 ** Interfaces.C.int'Size));
+            else
+               Result := Interfaces.C.int (Bytes mod 1024);
+            end if;
+         when 5 =>
+            Step_Collection (State, Step_Bytes, Done);
+            Result := Boolean'Pos (Done);
+            Drain := State.Finalizers_Requested;
+         when 6 => Result := Boolean'Pos (State.GC_Running);
+         when 7 | 8 =>
+            Result := (if State.GC.Mode = Incremental_Mode then 8 else 7);
+            Set_Collector_Mode
+              (State, (if Operation = 8 then Incremental_Mode
+                       else Generational_Minor_Mode));
+            Drain := Operation = 7 and then State.Finalizers_Requested;
+         when 9 =>
+            if Parameter not in 0 .. 5 then
+               Fail (State, "invalid collector parameter");
+            end if;
+            Result := Interfaces.C.int (Collector_Parameter_Value
+              (State, Collector_Parameter'Val (Parameter),
+               Integer_Value (Setting)));
+         when others => Result := -1;
+      end case;
+      Drain := Drain and then Finalizers.Has_Pending (State);
+      return Result;
+   end Control;
 
    type Option_Kind is
      (Stop_Option, Restart_Option, Collect_Option, Count_Option,
@@ -72,7 +137,8 @@ package body Lua.Engine.Garbage_Collection is
       Parameter : Collector_Parameter := Pause_Ratio;
       Argument : Integer_Value := 0;
       Returned : Value;
-      Done, Drain : Boolean := False;
+      Drain : Boolean := False;
+      Scalar : Interfaces.C.int;
       Found : Boolean := False;
 
       function Arg (Index : Positive) return Value is
@@ -149,43 +215,38 @@ package body Lua.Engine.Garbage_Collection is
                   Value'(Integer_Kind, Integer_Value'Pred (0))
                 else Nil_Value));
       else
+         --  Mode-name allocation precedes mutation, retaining the Lua
+         --  wrapper's failure ordering. Scalar C controls allocate no result.
+         if Option in Generational_Option | Incremental_Option then
+            Returned := New_String
+              (State, (if State.GC.Mode = Incremental_Mode
+                       then "incremental" else "generational"));
+            Save (Returned);
+         end if;
+         Scalar := Control
+           (State,
+            (case Option is
+                when Stop_Option => 0, when Restart_Option => 1,
+                when Collect_Option => 2, when Count_Option => 3,
+                when Step_Option => 5, when Running_Option => 6,
+                when Generational_Option => 7,
+                when Incremental_Option => 8, when Parameter_Option => 9),
+            Step_Bytes => (if Option = Step_Option and then Argument > 0
+                           then Lua.Storage.Byte_Count (Argument) else 0),
+            Parameter => Collector_Parameter'Pos (Parameter),
+            Setting => (if Option = Parameter_Option
+                        then Interfaces.C.int (Argument) else -1),
+            Drain => Drain);
          case Option is
-            when Stop_Option =>
-               State.GC_Running := False;
-               Returned := (Integer_Kind, 0);
-            when Restart_Option =>
-               State.GC_Running := True;
-               Restart_Collection (State);
-               Returned := (Integer_Kind, 0);
-            when Collect_Option =>
-               Collect (State);
-               Returned := (Integer_Kind, 0);
-               Drain := True;
+            when Stop_Option | Restart_Option | Collect_Option |
+              Parameter_Option =>
+               Returned := (Integer_Kind, Integer_Value (Scalar));
             when Count_Option =>
                Returned := (Real_Kind, Real_Value
                  (Lua.Storage.Statistics (State.Memory).Raw_Bytes) / 1024.0);
-            when Step_Option =>
-               Step_Collection
-                 (State, (if Argument <= 0 then 0
-                          else Lua.Storage.Byte_Count (Argument)), Done);
-               Returned := (Boolean_Kind, Done);
-               Drain := State.Finalizers_Requested;
-            when Running_Option =>
-               Returned := (Boolean_Kind, State.GC_Running);
-            when Generational_Option | Incremental_Option =>
-               Returned := New_String
-                 (State, (if State.GC.Mode = Incremental_Mode
-                          then "incremental" else "generational"));
-               Save (Returned);
-               Set_Collector_Mode
-                 (State, (if Option = Incremental_Option
-                          then Incremental_Mode
-                          else Generational_Minor_Mode));
-               Drain := Option = Generational_Option and then
-                 State.Finalizers_Requested;
-            when Parameter_Option =>
-               Returned := (Integer_Kind,
-                 Collector_Parameter_Value (State, Parameter, Argument));
+            when Step_Option | Running_Option =>
+               Returned := (Boolean_Kind, Scalar /= 0);
+            when Generational_Option | Incremental_Option => null;
          end case;
          Save (Returned);
       end if;

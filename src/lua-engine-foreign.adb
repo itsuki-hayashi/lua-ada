@@ -8,6 +8,7 @@ with Lua.Chunks;
 with Lua.Engine.Canonical;
 with Lua.Engine.Stacks;
 with Lua.Engine.IO_Libraries;
+with Lua.Engine.Garbage_Collection;
 with Lua.Engine.Operating_System;
 with Lua.Engine.Warnings;
 with Lua.Runtime_Configuration;
@@ -922,6 +923,22 @@ package body Lua.Engine.Foreign is
                End_Operation (Active_World.all);
                Operation_Active := False;
                Active_World := null;
+               --  Closing an idle C state borrows the same iterative close
+               --  driver as an Ada session. Invoke_Borrowed installs its C
+               --  guard above the waiting host boundary; no internal step
+               --  survives a callback and no C jump crosses these frames.
+               --  Failure to allocate optional close/finalizer storage must
+               --  still release the actual universe and allocator blocks.
+               begin
+                  VM.Close_Lua_State (Universe.all);
+               exception
+                  when Language_Error | Memory.Allocation_Error |
+                    Storage_Error => null;
+                  when Program_Error =>
+                     if not Memory.Refusal_Pending (Universe.Memory) then
+                        raise;
+                     end if;
+               end;
                Finalize (Universe.all);
                Free_World (Universe);
             end;
@@ -996,6 +1013,25 @@ package body Lua.Engine.Foreign is
                Leave_Context;
                return Result;
             end;
+         when Collector_Control =>
+            declare
+               Drain : Boolean;
+            begin
+               Output.Integer_Data := C.long_long (Garbage_Collection.Control
+                 (Owner.Universe.all, Input.Index,
+                  Step_Bytes => (if Input.Length <=
+                    C.size_t (Memory.Byte_Count'Last)
+                    then Memory.Byte_Count (Input.Length) else 0),
+                  Parameter => Input.Count, Setting => Input.Error_Index,
+                  Drain => Drain));
+               Output.Length := Boolean'Pos (Drain);
+            end;
+         when Push_Collector_Drain =>
+            --  The C-owned protected pump performs this optional allocation
+            --  only after the control operation has returned. A refusal
+            --  leaves queued finalizers intact for a later opportunity.
+            Push (Owner.Universe.all, Context,
+                  New_Native (Owner.Universe.all, "@gc.finalize"));
          when Open_IO_Module =>
             Push (Owner.Universe.all, Context,
                   IO_Libraries.Open_Module (Owner.Universe.all));

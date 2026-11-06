@@ -126,6 +126,16 @@ ownership metadata lives outside that payload. These exports use the same Ada
 library continuations as owned sessions. They do not establish completion of
 the remaining library openers, auxiliary API or complete C ABI.
 
+lua_gc operates on the actual collector and managed byte statistics. Its
+stop/restart, count, running and parameter controls do not allocate Lua storage.
+Collection and mode changes share the Lua collectgarbage implementation;
+pending finalizers execute through the guarded C call driver after the control
+operation returns from Ada. Refusal of optional call storage defers queued
+finalizers until another collection opportunity. lua_close drains finalizers
+through the shared idle-state close driver before physical allocator release;
+refused close storage still permits physical cleanup. The public GC contract
+is compiled and executed against both the Ada library and pinned C oracle.
+
 The private execution driver can call real C functions and warning handlers
 while borrowing an Ada-owned world. Their nested Lua calls use the same driver
 and budget. Explicit host aborts abandon C bodies through C-owned guards and

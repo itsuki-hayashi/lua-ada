@@ -347,3 +347,48 @@ equivalent-negative checks. PR #9 has no review comments at this observation.
 Neither these jobs nor the opener checkpoint establishes reviewed scoped
 completion. lua_gc, remaining platform evidence, scoped acceptance and
 independent review remain required; no merge has occurred.
+
+## Public collector controls and C state closure
+
+The real lua_gc export now marshals the pinned Lua 5.5 variadic types (size_t
+for steps; two int values for parameters) into the same private control
+implementation used by collectgarbage. Counts use actual managed raw storage;
+query/stop/restart/parameter operations allocate no result storage. Internal
+collector/finalizer/state-close calls return -1. Mode returns and parameter
+encoding use the production implementation, including real measured steps.
+
+The control operation queues a separate C-owned protected drain opportunity.
+Optional frame/stack refusal preserves pending objects; successful callbacks
+use the existing iterative driver, yield barrier, warning protocol and C jump
+guards. The C lua_close path previously performed physical disposal only. It
+now borrows the existing idle-state close driver before disposal, so actual
+Lua/C finalizers and warning callbacks run first. Allocation failure while
+obtaining optional close storage cannot prevent final physical release.
+
+Seven separately named public C regressions are shared in gc_contract.h by
+the real consumer and an isolated oracle consumer: allocation-free controls
+and actual byte counts; mode returns/stopped steps; reverse nonyieldable
+finalizers; refused activation and later recovery; state-close finalizers;
+refused close storage cleanup; fragmented GC/shutdown warnings. Each owning
+allocator test checks zero outstanding bytes and blocks. The first-party
+consumer allocator moved into a shared header without changing its behavior.
+No C-private layout or reference interpreter object enters the Ada library.
+
+Default comparison passes in reports/m3-gc-api-oracle.log; the subsequent
+instrumented comparison, including the warning case, passes in
+reports/m3-gc-api-instrumented-core.log. check-core-image now performs this
+same C/Ada comparison in each selected profile/configuration/link context and
+retains both executable hashes and captures. The reference library is built
+separately without requiring an interactive oracle CLI or readline gate.
+The full default control-refactor run in reports/m3-gc-api-full-default.log
+retains 1,304 AUnit cases; final close/header changes require the subsequent
+full pipeline evidence recorded below. No scoped record is closed by this
+component implementation or by an enclosing successful process.
+
+The final close/header runtime changes pass the complete instrumented static
+pipeline in reports/m3-gc-api-full-instrumented.log and the complete default
+validation/static pipeline in reports/m3-gc-api-final-default.log, each retaining
+1,304 Windows AUnit cases. The shared C contract additionally exercises INT_MAX
+parameters and an all-bits-one size_t step through the real variadic export.
+Reference library and all shared contract source hashes are retained alongside
+the selected Ada library hashes and both process captures.

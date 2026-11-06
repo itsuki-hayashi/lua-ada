@@ -14,41 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct allocation_counts {
-    size_t bytes;
-    size_t blocks;
-    size_t calls;
-    int refuse;
-    size_t growths;
-    size_t fail_after;
-};
-
-static void *counted_allocator(void *data, void *block, size_t old_size,
-                                size_t new_size) {
-    struct allocation_counts *counts = (struct allocation_counts *)data;
-    void *replacement;
-    int fresh = block == NULL;
-    counts->calls++;
-    if (new_size == 0) {
-        if (block != NULL) {
-            assert(counts->bytes >= old_size && counts->blocks > 0);
-            counts->bytes -= old_size;
-            counts->blocks--;
-            free(block);
-        }
-        return NULL;
-    }
-    if (fresh || new_size > old_size) {
-        counts->growths++;
-        if (counts->refuse || (counts->fail_after != 0 &&
-            counts->growths >= counts->fail_after)) return NULL;
-    }
-    replacement = realloc(block, new_size);
-    if (replacement == NULL) return NULL;
-    if (fresh) counts->blocks++;
-    counts->bytes = counts->bytes - (fresh ? 0 : old_size) + new_size;
-    return replacement;
-}
+#include "consumer_allocator.h"
 
 static void test_state_allocator_lifetime(void) {
     /* Setup a real allocator callback. Construction must invoke it, querying
@@ -1041,6 +1007,8 @@ static void test_file_payload_closer_callback(lua_State *state) {
     puts("C API PASS: public FILE closer callback closes actual native stream");
 }
 
+#include "gc_contract.h"
+
 int main(void) {
     lua_State *state;
     test_state_allocator_lifetime();
@@ -1087,6 +1055,13 @@ int main(void) {
     test_io_opener_and_stream_layout(state);
     test_os_opener_without_global_publication(state);
     test_file_payload_closer_callback(state);
+    test_gc_controls_without_allocation();
+    test_gc_modes_and_stopped_steps(state);
+    test_gc_finalizer_callback_order(state);
+    test_gc_finalizer_storage_refusal();
+    test_close_drains_c_finalizers();
+    test_close_refusal_releases_storage();
+    test_gc_and_close_warning_callbacks();
     lua_close(state);
     puts("PASS: real Ada C API bootstrap consumer");
     return 0;

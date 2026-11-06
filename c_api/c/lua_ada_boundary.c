@@ -6,6 +6,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include <setjmp.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -526,4 +527,37 @@ int luaopen_io(lua_State *state) {
 }
 int luaopen_os(lua_State *state) {
     return (int)dispatch(state, request(ADA_OPEN_OS_MODULE)).integer_data;
+}
+
+static int drain_collector(lua_State *state) {
+    dispatch(state, request(ADA_PUSH_COLLECTOR_DRAIN));
+    lua_call(state, 0, 0);
+    return 0;
+}
+
+int lua_gc(lua_State *state, int what, ...) {
+    struct lua_ada_request input = request(ADA_COLLECTOR_CONTROL);
+    struct lua_ada_response output;
+    va_list arguments;
+    int status;
+    input.index = what;
+    va_start(arguments, what);
+    if (what == LUA_GCSTEP) input.length = va_arg(arguments, size_t);
+    else if (what == LUA_GCPARAM) {
+        input.count = va_arg(arguments, int);
+        input.error_index = va_arg(arguments, int);
+    }
+    va_end(arguments);
+    output = dispatch(state, input);
+    /* Lua finalizers run only after the Ada control call has returned. The
+     * ordinary protected C pump owns every callback and nonlocal transfer.
+     * Failure to obtain optional frame/stack storage defers the intact queue;
+     * host-abort transfers retain their existing uncatchable boundary. */
+    if (output.length && lua_checkstack(state, 1)) {
+        lua_pushcfunction(state, drain_collector);
+        status = lua_pcall(state, 0, 0, 0);
+        if (status == LUA_ERRMEM) lua_pop(state, 1);
+        else if (status != LUA_OK) lua_error(state);
+    }
+    return (int)output.integer_data;
 }

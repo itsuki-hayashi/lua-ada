@@ -330,6 +330,19 @@ inspection, hooks, native callback yield restrictions and host-policy recovery.
 Seeded lifecycle campaigns preserve source and mismatch output as regressions;
 crashes, resource failures and timeouts never count as syntax rejection or skips.
 
+## Public collector C contract
+
+The core-image pipeline also compiles the shared public GC contract against
+the actual Ada library and the isolated pinned C library. Seven named cases
+cover nonallocating controls and measured bytes, modes and stopped steps,
+finalizer ordering, allocator refusal/retry, state-close finalizers, cleanup
+under refusal and fragmented warning callbacks. Extreme C int parameters and
+size_t steps are exercised through the actual variadic export. Each owning
+allocator fixture requires zero remaining bytes/blocks. Identical stdout,
+empty stderr, process success, executable/library hashes and shared contract
+source hashes are retained in reports/core-image. Default and instrumented
+matrix jobs run this comparison; it does not complete unrelated C API exports.
+
 ## Output delivery regression consumer
 
 The ordinary test crate builds output_consumer alongside its AUnit/API mains.
