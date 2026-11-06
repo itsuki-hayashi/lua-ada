@@ -13,10 +13,15 @@ with Runtime_Inspection_Tests;
 with Lua.Opcode_Tests;
 with Lua.Context_Tests;
 with Lua.Table_Storage_Tests;
+with Lua.Table_Reservation_Tests;
+with Table_Algorithm_Tests;
 with Lua.Storage_Tests;
+with Lua.Big_Natural_Tests;
+with Lua.Number_Storage_Tests;
 with Lua.Storage_Vector_Tests;
 with Lua.Mathematics_Tests;
 with Lua.Managed_Runtime_Tests;
+with Lua.Managed_Format_Tests;
 with Lua.Runtime_Vector_Tests;
 with Lua.Storage_Buffer_Tests;
 with Lua.Loader_Storage_Tests;
@@ -31,6 +36,7 @@ with Lua.Library_Codec_Tests;
 with Lua.String_Helper_Tests;
 with Library_Runtime_Tests;
 with Native_Tests;
+with Message_Handler_Tests;
 with Source_Tests;
 
 procedure Test_Runner is
@@ -53,10 +59,15 @@ procedure Test_Runner is
       Lua.Opcode_Tests.Register (Result);
       Lua.Context_Tests.Register (Result);
       Lua.Table_Storage_Tests.Register (Result);
+      Lua.Table_Reservation_Tests.Register (Result);
+      Table_Algorithm_Tests.Register (Result);
       Lua.Storage_Tests.Register (Result);
+      Lua.Big_Natural_Tests.Register (Result);
+      Lua.Number_Storage_Tests.Register (Result);
       Lua.Storage_Vector_Tests.Register (Result);
       Lua.Mathematics_Tests.Register (Result);
       Lua.Managed_Runtime_Tests.Register (Result);
+      Lua.Managed_Format_Tests.Register (Result);
       Lua.Runtime_Vector_Tests.Register (Result);
       Lua.Storage_Buffer_Tests.Register (Result);
       Lua.Loader_Storage_Tests.Register (Result);
@@ -71,6 +82,7 @@ procedure Test_Runner is
       Lua.String_Helper_Tests.Register (Result);
       Library_Runtime_Tests.Register (Result);
       Native_Tests.Register (Result);
+      Message_Handler_Tests.Register (Result);
       Source_Tests.Register (Result);
       Binary_Runtime_Tests.Register (Result);
       return Result;

@@ -6,6 +6,21 @@ library project Lua_Ada is
    Library_Mode : Library_Type :=
      external ("LUA_ADA_LIBRARY_TYPE", "static");
    Configuration_Subdir := Runtime_Configuration.Artifact_Subdir;
+   Tasking_Runtime_Archive :=
+     external ("LUA_ADA_TASKING_RUNTIME_ARCHIVE", "");
+   Runtime_Library_Directory :=
+     external ("LUA_ADA_RUNTIME_LIBRARY_DIR", "");
+   Runtime_Search_Options := ();
+   case Lua_Ada_Config.Alire_Host_OS is
+      when "macos" =>
+         case Runtime_Library_Directory is
+            when "" => null;
+            when others =>
+               Runtime_Search_Options :=
+                 ("-Wl,-rpath," & Runtime_Library_Directory);
+         end case;
+      when others => null;
+   end case;
    C_ABI_Defines := ();
    case Lua_Ada_Config.Alire_Host_OS is
       when "windows" =>
@@ -47,6 +62,7 @@ library project Lua_Ada is
       "lua_ada_host_numerics.c",
       "lua_ada_config.ads",
       "lua-c_api.ads",
+      "lua-big_naturals.ads",
       "lua-canonical_compiler.ads",
       "lua-chunks.ads",
       "lua-diagnostics.ads",
@@ -65,6 +81,7 @@ library project Lua_Ada is
       "lua-engine-pattern_drivers.ads",
       "lua-engine-patterns.ads",
       "lua-engine-strings.ads",
+      "lua-engine-sorting.ads",
       "lua-engine-table_drivers.ads",
       "lua-engine-tables.ads",
       "lua-engine-unicode.ads",
@@ -74,6 +91,7 @@ library project Lua_Ada is
       "lua-lexer_core.ads",
       "lua-lexers.ads",
       "lua-numbers.ads",
+      "lua-number_parsing.ads",
       "lua-opcodes.ads",
       "lua-platform_mathematics.ads",
       "lua-platform_numerics.ads",
@@ -95,6 +113,10 @@ library project Lua_Ada is
                --  C dllexport declarations disable MinGW's automatic exports.
                --  Ada clients also need real spec/data/controlled-type symbols.
                for Library_Options use ("-lm", "-Wl,--export-all-symbols");
+            when "macos" =>
+               --  Child shells can strip DYLD variables. Record the selected
+               --  compiler runtime location in the actual shared image too.
+               for Library_Options use ("-lm") & Runtime_Search_Options;
             when others =>
                for Library_Options use ("-lm");
          end case;
@@ -121,6 +143,26 @@ library project Lua_Ada is
    package Binder is
       for Switches ("Ada") use ("-Es");
    end Binder;
+
+   package Linker is
+      case Lua_Ada_Config.Alire_Host_OS is
+         when "macos" =>
+            --  A standard SAL's tasking requirement is not inferred from
+            --  its public ALIs by an importing Ada main. Propagate GNARL to
+            --  every consumer, not only the C pilot. The selected runtime
+            --  archive is discovered by the validation/development driver;
+            --  ordinary GPR users retain the compiler's -l search fallback.
+            case Tasking_Runtime_Archive is
+               when "" =>
+                  for Linker_Options use
+                    ("-lgnarl") & Runtime_Search_Options;
+               when others =>
+                  for Linker_Options use
+                    (Tasking_Runtime_Archive) & Runtime_Search_Options;
+            end case;
+         when others => null;
+      end case;
+   end Linker;
 
    case Lua_Ada_Config.Alire_Host_OS is
       when "windows" =>

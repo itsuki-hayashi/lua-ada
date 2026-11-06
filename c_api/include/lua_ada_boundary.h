@@ -25,6 +25,7 @@ struct lua_ada_request {
     enum lua_ada_operation operation;
     int index;
     int count;
+    int error_index;
     long long integer_data;
     double number_data;
     void *pointer;
@@ -34,6 +35,7 @@ struct lua_ada_request {
     lua_CFunction function_data;
     const char *name;
     const char *mode;
+    int error_handled;
 };
 
 struct lua_ada_response {
@@ -43,6 +45,7 @@ struct lua_ada_response {
     size_t length;
     lua_Alloc allocator;
     lua_CFunction function_data;
+    int error_handled;
 };
 
 enum lua_ada_action {
@@ -50,6 +53,7 @@ enum lua_ada_action {
     ADA_ACTION_CALL = LUA_YIELD,
     ADA_ACTION_RAISE = LUA_ERRRUN,
     ADA_ACTION_MEMORY = LUA_ERRMEM,
+    ADA_ACTION_HANDLING = LUA_ERRERR,
     ADA_ACTION_ABORT = 6
 };
 

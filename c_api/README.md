@@ -27,9 +27,11 @@ integration audit. Table capacity arguments are hints, pending capacity wiring.
 Both constructors leave standard libraries closed, as C Lua does; Ada embedding
 retains its separate eager default environment.
 
-The call portal currently accepts null continuations and no error-handler
-function. Other call modes return explicit unsupported errors before execution.
-Continuation/yield/resume support, C error handlers, reader-based loading,
+The call portal accepts null continuations and real Lua/C message handlers.
+Handlers run before failed frames and closing declarations unwind; recursive
+handler errors reuse the same protected boundary. Non-null continuations return
+explicit unsupported errors before execution.
+Continuation/yield/resume support, reader-based loading,
 dumping, full auxiliaries, debug APIs, warnings, builtin C trampolines and
 remaining exports are pending. In particular, `lua_tocfunction` currently exposes
 real foreign callbacks; Ada native-library functions need their own stable C
@@ -55,6 +57,12 @@ Each callback receives a base-relative stack window. A reentrant C API call
 adds an explicit protected boundary to the same driver; it never invokes a
 second executor recursively. Returned/error packets remain traced until the C
 stack owns them. See [ADR 0013](../docs/decisions/0013-c-owned-call-boundary.md).
+Protected holders reserve their two-value error packet before user code begins.
+Failure delivery moves owned packets or borrows them for canonical scalar writes;
+the C pump uses traced context storage until its stack owns the results. Permanent
+refusal introduced inside a real callback is tested through protected return and
+subsequent host recovery. Complete Lua memory-error parity still depends on
+reusable activation metadata and shared stack capacity.
 Automatic initialization happens through the standalone-library binder and C
 constructor entrypoints, including when a static archive is linked. The C
 consumer never calls an Ada initialization function. Concurrent first-use
@@ -96,19 +104,21 @@ are explicitly GNAT-specific test observations, not public Lua interfaces.
 scripts/check.ps1 runs this campaign for its requested profile/library kind;
 other platform/configuration combinations require separate passing evidence.
 
-The consumer has eighteen independently named, commented behavior cases:
-allocator
-lifetime, refusal/recovery, every cold construction growth refusal, a protected
+The consumer has twenty-six independently named, commented behavior cases:
+allocator lifetime, refusal/recovery, every cold construction growth refusal,
+a protected
 live allocation failure, closed-library initialization, stack operations,
-numeric conversion, stable binary
-strings, raw table/pointer identity, thread/registry/extra-space movement, and
+numeric conversion, stable binary strings, raw table/pointer identity,
+thread/registry/extra-space movement, and
 an actual exported-operation failure crossing only the C-owned guard, function
 pointer identity, callback stack windows/result adjustment, mutable C upvalues,
 protected table errors/recovery, nested C calls, canonical Lua calling C and the
-text-only luaL_loadstring convenience entry. The Windows validation/static
-managed-runtime rebuild passed all eighteen cases and exited normally in
-reports/m3-managed-c-api-consumer1.log. Constructor refusal sweeps all 21 measured
-growth points in that build. The earlier COFF link failure and
-callback-phase fallthrough were repaired before that accepted run. This is
+text-only luaL_loadstring convenience entry, Lua/C handlers, recursive handler
+errors, inherited-handler transport through a C guard, permanent callback
+allocation refusal, panic recovery and reentry into another universe.
+The Windows validation/static run passed all twenty-six cases and exited
+normally in reports/m3-message-handler-c-consumer2.log. Constructor refusal
+sweeps all 25 measured growth points in that build. The earlier COFF link failure
+and callback-phase fallthrough were repaired before that accepted run. This is
 local checkpoint evidence; shared/platform/continuation/allocator-parity gates
 remain required by the parent M3 acceptance contract.

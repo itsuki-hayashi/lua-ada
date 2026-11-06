@@ -1,6 +1,6 @@
 # Architecture Decision Log
 
-Latest: [ADR 0014: one core image](0014-one-core-library.md).
+Latest: [ADR 0015: managed numeric scratch](0015-managed-numeric-scratch.md).
 
 ADR 0007 records explicit native continuation frames, traced library/module
 state, shared budgets, and text loading. Its implementation passed M2b acceptance.
@@ -23,6 +23,7 @@ its runtime changes are planned, not implemented by the foundation gate.
 | 0012 | [Canonical programs and chunks](0012-canonical-program-ownership.md)   | accepted |
 | 0013 | [C-owned calls and driver phases](0013-c-owned-call-boundary.md)       | accepted |
 | 0014 | [One Ada/C core image](0014-one-core-library.md)                       | accepted |
+| 0015 | [Managed exact numeric scratch](0015-managed-numeric-scratch.md)       | accepted |
 
 ADR 0009 records the approved combined delivery order, iterative scheduler,
 stable cells, explicit cleanup, weak thread ownership and execution policies.
@@ -36,6 +37,8 @@ ADR 0013 keeps foreign callbacks and nonlocal transfers on the C side of an
 explicit scheduler boundary and retains real stack windows/upvalue cells.
 ADR 0014 makes the root library the single compiled interpreter image shared by
 Ada hosts, the C facade and native-module consumers.
+ADR 0015 gives exact numeric conversion and formatting explicit managed scratch
+ownership while preserving one parser and existing host convenience APIs.
 
 Add numbered records for consequential choices. Include date, status, context,
 decision, alternatives, consequences, and verification implications. Supersede

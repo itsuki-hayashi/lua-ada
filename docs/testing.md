@@ -216,6 +216,17 @@ library hashes and process results are retained under reports/core-image.
 scripts/check.ps1 invokes this campaign per job; a missing platform run is not
 implied by the workflow. Native module loading and full C exports remain separate.
 
+## Managed numeric formatting
+
+Lua.Managed_Format_Tests registers sixteen independent cases for exact rounding,
+exponent boundaries, numeric strings, actual output ownership and partial-growth
+refusal/recovery. The deterministic formatting_campaign.lua fixture adds 143
+binary64 values across ten formats, retaining seed 0x13579bdf2468ace0 and exact
+same-host output. Its 1,435 lines are compared by scripts/compare.ps1 alongside
+the other first-party scripts. [Numeric formatting](number-formatting.md) owns
+the algorithm and recorded evidence; whole upstream string/math files and other
+platforms remain separate acceptance requirements.
+
 ## Optional fuzzing
 
 GNATfuzz is an AdaCore Pro tool with Linux/AFL environment requirements. It is

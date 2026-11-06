@@ -48,6 +48,14 @@ options contain no -lm: Ada link pragmas and C consumers provide final-link
 dependencies. This deliberately broad shared-symbol policy is an implementation
 boundary, not a promise that private symbols are public stable APIs.
 
+Darwin C clients need the selected compiler's complete runtime closure. The
+root binder requires real tasking initialization, so C final links include
+libgnarl before libgnat and retain that entry for shared-library flat lookup.
+The [GPRbuild runtime-link construction](https://github.com/AdaCore/gprbuild/blob/master/src/gprlib.adb)
+also orders tasking support before the core runtime. Toolchain paths are queried
+at build time; no machine-specific archive path enters a project file. Failed
+consumer captures are printed and uploaded so a loader error remains observable.
+
 ## Alternatives
 
 Keeping two libraries retains duplicated ownership. Linking a thin facade SAL

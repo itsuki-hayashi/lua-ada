@@ -15,12 +15,14 @@ $savedLdPath = $env:LD_LIBRARY_PATH
 $savedDyldPath = $env:DYLD_LIBRARY_PATH
 $savedArchive = $env:LUA_ADA_ABI_RUNTIME_ARCHIVE
 $savedTaskingArchive = $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE
+$savedRuntimeDirectory = $env:LUA_ADA_RUNTIME_LIBRARY_DIR
 $configurationPart = if ($Configuration -eq 'default') { '' } else { 'upstream-test/' }
 $reportDirectory = Join-Path $projectRoot ('reports/core-image/' + [guid]::NewGuid().ToString('N'))
 $null = New-Item -ItemType Directory -Path $reportDirectory -Force
 $records = [Collections.Generic.List[object]]::new()
 $scenarios = @("-XLUA_ADA_LIBRARY_TYPE=$LibraryType",
     "-XLUA_ADA_CONFIGURATION=$Configuration")
+Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 
 function Invoke-Build {
     param([string[]] $Arguments)
@@ -73,30 +75,24 @@ function Invoke-Consumer {
 
 try {
     Set-Location $projectRoot
+    $adaRuntimeDirectory = ''
+    if ($IsMacOS) {
+        $runtime = Get-SelectedAdaRuntime
+        $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $runtime.CoreArchive
+        $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $runtime.TaskingArchive
+        $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $runtime.Directory
+        $adaRuntimeDirectory = $runtime.Directory + [IO.Path]::PathSeparator
+    }
     # Select the requested generated profile through Alire, never by editing
     # generated configuration. All subsequent projects import this same root.
     Invoke-Build (@('-n', 'build', "--$Profile", '--') + $scenarios)
-    if ($IsMacOS) {
-        $archive = & alr exec -- gcc '-print-file-name=adalib/libgnat.a'
-        if ($LASTEXITCODE -ne 0 -or
-        -not (Test-Path -LiteralPath (($archive -join '').Trim()) -PathType Leaf)) {
-            throw 'Cannot locate the selected GNAT archive for the C-only main'
-        }
-        $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = ($archive -join '').Trim()
-        $tasking = & alr exec -- gcc '-print-file-name=adalib/libgnarl.a'
-        if ($LASTEXITCODE -ne 0 -or
-            -not (Test-Path -LiteralPath (($tasking -join '').Trim()) -PathType Leaf)) {
-            throw 'Cannot locate selected GNARL archive for the C-only main'
-        }
-        $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = ($tasking -join '').Trim()
-    }
     Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/consumer.gpr', '-p') + $scenarios)
     Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/image_consumer.gpr', '-p') + $scenarios)
 
     $runtimeDirectory = Join-Path $projectRoot "lib/$configurationPart$Profile/$LibraryType"
     $env:PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $savedPath
     $env:LD_LIBRARY_PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $savedLdPath
-    $env:DYLD_LIBRARY_PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $savedDyldPath
+    $env:DYLD_LIBRARY_PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $adaRuntimeDirectory + $savedDyldPath
     $suffix = if ($IsWindows) { '.exe' } else { '' }
     Invoke-Consumer 'c-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/c_api_consumer$suffix") 'PASS: real Ada C API bootstrap consumer'
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
@@ -126,5 +122,6 @@ finally {
     $env:DYLD_LIBRARY_PATH = $savedDyldPath
     $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $savedArchive
     $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $savedTaskingArchive
+    $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $savedRuntimeDirectory
 }
 exit 0

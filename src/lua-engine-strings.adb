@@ -24,7 +24,7 @@ package body Lua.Engine.Strings is
       if Item.Kind = String_Kind then
          return To_String (Item.Reference.Bytes);
       elsif Item.Kind in Integer_Kind | Real_Kind then
-         return Image (Item);
+         return Image (State.Current.Memory, Item);
       end if;
       Fail (State, "string expected, got " & Type_Name (Item));
       return "";
@@ -59,7 +59,7 @@ package body Lua.Engine.Strings is
          when Real_Kind =>
             Number := (Lua.Numbers.Real_Number, Item.Real_Data);
          when String_Kind =>
-            Number := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+            Number := Read_Number (State, Item.Reference.Bytes);
          when others => Number := (Kind => Lua.Numbers.Invalid);
       end case;
       if Number.Kind = Lua.Numbers.Integer_Number then

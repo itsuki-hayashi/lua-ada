@@ -257,3 +257,40 @@ these were corrected without disabling diagnostics. reports/m3-runtime-inspectio
 866 AUnit cases, eighteen C API consumer cases, mixed/C-only core image checks,
 Ada consumer, 35 CLI cases, ten binary CLI comparisons, nine differential files
 and the five retained upstream files. No new whole upstream file is claimed.
+
+## Protected errors, managed numbers and table algorithms
+
+The handler checkpoint passes 877 AUnit cases and 26 real C consumer cases
+(reports/m3-message-handler-aunit2.log and c-consumer2.log). Recursive handler
+dispatch now returns to the scheduler before further calls, preserving ordinary
+recovery when C-depth checks fail. New cases cover handler timing/inspection,
+closing, GC, nil normalization, ERRERR, nested C guard application, independent
+states, panic after Ada return and one continued-refusal protected return.
+The measured constructor failure sweep has 25 growth points. This is not full
+memerr.lua acceptance or allocation-free execution in every path.
+
+The joint managed-number/format checkpoint passes 916 AUnit cases plus the
+retained full pipeline in reports/m3-managed-numeric-check1.log. Thirty-nine
+new cases cover managed limbs/parser/formatting, exact rounding, source-byte
+charging, refusal recovery and the balanced 250,012-byte hex numeral under
+64 KiB managed scratch. The 1,435-line format campaign matches C Lua. ADR 0015
+and the numeric/format guides own algorithm and remaining ownership details.
+
+Sorting and real table capacity hints add twenty public-session and four actual
+storage cases. Initial runs passed all new cases but exposed the retained
+deleted-key churn regression: a recycled dense row needed a sparse bucket, and
+its reuse must not grow an empty dense history. Both transitions were repaired
+without weakening that assertion. Strict build7 and tests3 pass all 940 cases.
+reports/m3-table-algorithms-check1.log passes the retained full pipeline and
+eleven differential fixtures, including 465 seeded table-algorithm records.
+A separate documentation check passes 72 Markdown files. No new unchanged
+whole upstream file is claimed.
+
+Published checkpoint 1e08fd81c9d416d275cc58377f09a7d84f0d9c3b was inspected in
+all twelve successful Linux/Windows jobs of run42201161223, including static-PIC.
+Its six macOS jobs stopped in new runtime linking/startup. Commit
+a334b29c434973a41782d1a35d9bd856e288f0bc exposed the shared failure as missing
+@rpath/libgnarl-16.dylib, while static advanced to a mixed-Ada link missing
+GNARL. New selected-runtime archive propagation and clean embedded/runtime
+search paths are implemented; macOS evidence still needs a successful rerun.
+All reference and ecosystem submodule revisions remain unchanged.

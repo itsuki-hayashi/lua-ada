@@ -1,3 +1,4 @@
+with Lua.Number_Parsing;
 with Ada.Characters.Latin_1;
 with Lua.Storage.Buffers; use Lua.Storage.Buffers;
 
@@ -385,7 +386,8 @@ package body Lua.Lexer_Core is
                   Spelling : String renames
                     Input (Start.Offset .. Cursor.Offset - 1);
                   Value : constant Lua.Numbers.Number :=
-                    Lua.Numbers.Read (Spelling);
+                    Lua.Number_Parsing.Read
+                      (Spelling, Lua.Frontend_Text.Owner_Of (Texts));
                begin
                   if Value.Kind = Lua.Numbers.Invalid then
                      Fail ("malformed number");

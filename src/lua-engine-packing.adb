@@ -158,7 +158,7 @@ package body Lua.Engine.Packing is
          if Item.Kind = String_Kind then
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
-            return Image (Item);
+            return Image (State.Current.Memory, Item);
          end if;
          Fail (State, "string expected");
          return "";
@@ -175,7 +175,7 @@ package body Lua.Engine.Packing is
                return (Lua.Numbers.Real_Number, Item.Real_Data);
             when String_Kind =>
                Charge (Length (Item.Reference.Bytes));
-               Parsed := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+               Parsed := Read_Number (State, Item.Reference.Bytes);
             when others => Parsed := (Kind => Lua.Numbers.Invalid);
          end case;
          if Parsed.Kind = Lua.Numbers.Invalid then

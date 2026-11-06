@@ -148,6 +148,9 @@ private package Lua.Engine is
             Array_Index : Table_Indexes.Vector;
             Hash_Index : Table_Indexes.Vector;
             Prefix_Length : Natural := 0;
+            Hash_Rows : Natural := 0;
+            --  Chained rows, including retained tombstones. Dense rows do
+            --  not consume hash capacity or trigger unrelated hash growth.
             Free_Row : Natural := 0;
             Metatable : Object_Access;
          when Environment =>
@@ -251,6 +254,9 @@ private package Lua.Engine is
    type Unwind_Reason is
      (No_Unwind, Scope_Exit, Jump_Exit, Return_Exit, Error_Exit,
       Coroutine_Exit);
+   type Failure_Kind is
+     (No_Failure, Language_Failure, Memory_Failure, Handling_Failure,
+      Syntax_Failure, Unsupported_Failure, Host_Abort);
    type Frame;
    type Frame_Access is access Frame;
    for Frame_Access'Storage_Pool use Lua.Storage.Pool;
@@ -263,6 +269,9 @@ private package Lua.Engine is
       Native_Id : Native_Kind := Print_Function;
       Native_Arguments : Values.Vector;
       Native_Results : Values.Vector;
+      Error_Packet : Values.Vector;
+      Result_Failure_Class : Failure_Kind := No_Failure;
+      Result_Handler_Called : Boolean := False;
       Native_Captures : Values.Vector;
       Native_Self : Object_Access;
       Native_Buffer : Owned_Buffer;
@@ -300,8 +309,14 @@ private package Lua.Engine is
       Vararg_Table : Object_Access;
       Return_To  : Natural := 0;
       Protection : Natural := 0;
+      Message_Handler : Value;
+      Retain_On_Failure : Boolean := False;
+      --  Protected holders own their dynamic handler. A foreign sentinel
+      --  retains its packet until C takes it; Lua holders deliver on unwind.
       Slot_Cost : Natural := 0;
       Native_Charge : Boolean := False;
+      Message_Charge : Boolean := False;
+      Unwind_Charge : Boolean := False;
       Blocks_Yield : Boolean := False;
       Callee : Value;
       Is_Tail_Call : Boolean := False;
@@ -322,6 +337,8 @@ private package Lua.Engine is
       Unwind_Live : Registers.Vector;
       Unwind_Results : Values.Vector;
       Unwind_Error : Value;
+      Unwind_Failure_Class : Failure_Kind := Language_Failure;
+      Unwind_Handler_Called : Boolean := False;
       Unwind_Has_Error : Boolean := False;
    end record;
    --  A packet preserves all results of a call/vararg expression. Scalar
@@ -334,6 +351,9 @@ private package Lua.Engine is
       Results : Values.Vector;
       Function_Value : Value;
       Arguments : Values.Vector;
+      Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
+      --  A typed primitive helper request uses ordinary VM metamethod
+      --  dispatch; it is not a hidden Lua function or another executor.
    end record;
    --  Native drivers request calls through the VM rather than recursing into
    --  the executor. All retained values must be stored in their activation.
@@ -342,10 +362,6 @@ private package Lua.Engine is
      (New_Context, Running_Context, Suspended_Context, Normal_Context,
       Dead_Context);
    type Execution_Phase is (Executing, Closing);
-   type Failure_Kind is
-     (No_Failure, Language_Failure, Memory_Failure, Syntax_Failure,
-      Unsupported_Failure,
-      Host_Abort);
    type Transfer_Kind is
      (No_Transfer, Completed, Lua_Raised, Yielded, Resume_Requested,
       Close_Requested, Host_Stopped);
@@ -364,6 +380,7 @@ private package Lua.Engine is
       Memory : Lua.Storage.Owner_Access;
       Stack        : Frames.Vector;
       Arguments    : Values.Vector;
+      Boundary_Results : Values.Vector;
       Foreign_Stack : Values.Vector;
       Foreign_State : System.Address := System.Null_Address;
       Foreign_Block : System.Address := System.Null_Address;
@@ -377,6 +394,10 @@ private package Lua.Engine is
       Failure_Text : Unbounded_String;
       Failure_At   : Lua.Lexers.Source_Location;
       Failure_Class : Failure_Kind := No_Failure;
+      Failure_Handled : Boolean := False;
+      Protected_Failure_Class : Failure_Kind := No_Failure;
+      Protected_Handler_Called : Boolean := False;
+      Message_Depth : Natural := 0;
       Status : Context_Status := New_Context;
       Phase : Execution_Phase := Executing;
       Transfer : Control_Transfer;
@@ -431,6 +452,7 @@ private package Lua.Engine is
       Globals      : Object_Access;
       Foreign_Registry : Object_Access;
       Memory_Error_Value : Value;
+      Handling_Error_Value : Value;
       Entry_Code : Prototype_Access;
       Operation_Roots : Values.Vector;
       Operation_Programs : Prototypes.Vector;
@@ -456,6 +478,21 @@ private package Lua.Engine is
       Output       : Unbounded_String;
    end record;
    type World_Access is access World;
+
+   function Read_Number
+     (Memory : not null Lua.Storage.Owner_Access; Text : String;
+      Base : Natural := 0) return Lua.Numbers.Number;
+   function Read_Number
+     (Memory : not null Lua.Storage.Owner_Access; Text : Byte_String;
+      Base : Natural := 0) return Lua.Numbers.Number;
+   function Read_Number
+     (State : in out World; Text : String; Base : Natural := 0)
+      return Lua.Numbers.Number;
+   function Read_Number
+     (State : in out World; Text : Byte_String; Base : Natural := 0)
+      return Lua.Numbers.Number;
+   --  Runtime conversions borrow source bytes and route every growable exact
+   --  conversion temporary through their explicit universe allocator.
 
    function Owned_Values
      (State : in out World; Source : Values.Vector := Values.Empty_Vector)
@@ -545,6 +582,12 @@ private package Lua.Engine is
    --  Publish a managed builder through a borrowed view, avoiding an
    --  input-sized temporary Ada String allocation.
    function New_Table (State : in out World) return Value;
+   procedure Reserve_Table
+     (State : in out World; Table : Value;
+      Sequence_Size, Hash_Size : Natural);
+   --  Reserve actual storage in an empty table through its owning provider.
+   --  Capacity publication is atomic; no keys or sequence values are added.
+
    function New_Environment
      (State : in out World; Parent : Object_Access) return Object_Access;
    function New_Closure
@@ -571,7 +614,10 @@ private package Lua.Engine is
    function Equal (Left, Right : Value) return Boolean;
    function Truth (Item : Value) return Boolean;
    function Type_Name (Item : Value) return String;
+   function Image (Memory : not null Lua.Storage.Owner_Access;
+                   Item : Value) return String;
    function Image (Item : Value) return String;
+   --  Host/test convenience wrapper; runtime callers provide Memory.
    function Get (Table : Value; Key : Value) return Value;
    procedure Set (State : in out World; Table, Key, Item : Value);
    function Table_Length (Table : Value) return Natural;

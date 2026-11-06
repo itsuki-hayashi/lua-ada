@@ -88,7 +88,9 @@ package body Lua.Engine.Foreign is
    function Valid_Index (Context : Context_Access; Index : C.int)
                          return Boolean;
    function Type_Code (Item : Value) return C.int;
-   function Numeric (Item : Value) return Lua.Numbers.Number;
+   function Numeric
+     (Arena : not null Memory.Owner_Access; Item : Value)
+      return Lua.Numbers.Number;
    procedure Push (Context : Context_Access; Item : Value);
    function Read_Bytes
      (Pointer : System.Address; Length : C.size_t) return String;
@@ -217,6 +219,7 @@ package body Lua.Engine.Foreign is
       Result := Create_Surface
         (State, Context_Id (State.Main_Thread.Context_Index),
          Storage_Count (Input.Length), Input.Seed, System.Null_Address);
+      --  Engine.Initialize owns the one actual registry for every session.
       End_Operation (State.all);
       Operation_Active := False;
       return Result;
@@ -311,7 +314,9 @@ package body Lua.Engine.Foreign is
       end case;
    end Type_Code;
 
-   function Numeric (Item : Value) return Lua.Numbers.Number is
+   function Numeric
+     (Arena : not null Memory.Owner_Access; Item : Value)
+      return Lua.Numbers.Number is
    begin
       case Item.Kind is
          when Integer_Kind =>
@@ -319,7 +324,7 @@ package body Lua.Engine.Foreign is
          when Real_Kind =>
             return (Lua.Numbers.Real_Number, Item.Real_Data);
          when String_Kind =>
-            return Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+            return Read_Number (Arena, Item.Reference.Bytes);
          when others => return (Kind => Lua.Numbers.Invalid);
       end case;
    end Numeric;
@@ -451,9 +456,9 @@ package body Lua.Engine.Foreign is
            Calls.To_Pointer (Main_Owner.Calls);
          Caller : constant Context_Access := Owner.Universe.Contexts
            (Positive (Pending.Context));
-         Packet : Values.Vector :=
-           Owned_Values (Owner.Universe.all);
+         Packet : Values.Vector renames Caller.Boundary_Results;
          Error_Status : Natural := 0;
+         Handler_Called : Boolean := False;
          Count : Natural;
          Address : System.Address;
       begin
@@ -461,13 +466,15 @@ package body Lua.Engine.Foreign is
          --  a callback action destroys this Ada activation before C invokes
          --  the foreign function or establishes a nonlocal-transfer guard.
          Keep_Scheduler := True;
+         Packet.Clear;
          if Start_Error then
             if Owner.Universe.Current.Failure_Class = Host_Abort then
                return Action_Abort;
             end if;
             Error_Status :=
               (if Owner.Universe.Current.Failure_Class = Memory_Failure then 4
-               else 2);
+               elsif Owner.Universe.Current.Failure_Class = Handling_Failure
+               then 5 else 2);
             Packet.Append
               ((if Owner.Universe.Current.Has_Failure_Value then
                    Owner.Universe.Current.Failure else
@@ -500,7 +507,9 @@ package body Lua.Engine.Foreign is
                   end if;
                   Error_Status :=
                     (if Owner.Universe.Current.Failure_Class = Memory_Failure
-                     then 4 else 2);
+                     then 4
+                     elsif Owner.Universe.Current.Failure_Class =
+                       Handling_Failure then 5 else 2);
                   Packet.Append
                     ((if Owner.Universe.Current.Has_Failure_Value then
                          Owner.Universe.Current.Failure else
@@ -514,12 +523,25 @@ package body Lua.Engine.Foreign is
                if VM.Outcome (Driver) /= Completed then
                   raise Foreign_Error with "unexpected C-call suspension";
                end if;
-               Packet := VM.Results (Driver);
+               VM.Take_Results (Driver, Packet);
+               if Packet.Is_Empty or else
+                 Packet.First_Element.Kind /= Boolean_Kind
+               then
+                  raise Program_Error with "C entry lost protection packet";
+               end if;
+               if not Packet.First_Element.Boolean_Data then
+                  Error_Status :=
+                    (if Caller.Protected_Failure_Class = Memory_Failure then 4
+                     elsif Caller.Protected_Failure_Class = Handling_Failure
+                     then 5 else 2);
+                  Handler_Called := Caller.Protected_Handler_Called;
+               end if;
+               Packet.Delete_First;
             else
-               VM.Take_Foreign_Result (Driver, Packet, Error_Status);
+               VM.Take_Foreign_Result
+                 (Driver, Packet, Error_Status, Handler_Called);
             end if;
          end if;
-         Pin (Owner.Universe.all, Packet);
          if Pending.Is_Root then
             VM.Finish (Driver);
             VM.Clear_Frames (Owner.Universe.all);
@@ -544,18 +566,25 @@ package body Lua.Engine.Foreign is
                  (if Index <= Natural (Packet.Length) then Packet (Index)
                   else Nil_Value));
             end loop;
+            Packet.Clear;
             Output.Integer_Data := C.long_long (Error_Status);
+            Output.Error_Handled := Boolean'Pos (Handler_Called);
             if Error_Status /= 0 and then not Protected_Call then
-               if not Packet.Is_Empty and then
-                 Packet.First_Element.Kind = String_Kind
+               if Caller.Foreign_Stack.Last_Element.Kind = String_Kind
                then
-                  Output.Pointer := Packet.First_Element.Reference.C_Bytes;
+                  Output.Pointer :=
+                    Caller.Foreign_Stack.Last_Element.Reference.C_Bytes;
                end if;
-               return (if Error_Status = 4 then Action_Memory else
-                         Action_Raise);
+               return (if Error_Status = 4 then Action_Memory
+                       elsif Error_Status = 5 then Action_Handling
+                       else Action_Raise);
             end if;
          end;
          return Action_Done;
+      exception
+         when others =>
+            Packet.Clear;
+            raise;
       end Pump;
 
    begin
@@ -753,7 +782,7 @@ package body Lua.Engine.Foreign is
          when To_Integer | To_Number =>
             declare
                Number : constant Lua.Numbers.Number :=
-                 Numeric (Get_Value (Input.Index));
+                 Numeric (Context.Memory, Get_Value (Input.Index));
             begin
                case Number.Kind is
                   when Lua.Numbers.Invalid => null;
@@ -785,7 +814,8 @@ package body Lua.Engine.Foreign is
                if Item.Kind in Integer_Kind | Real_Kind and then
                  Valid_Index (Context, Input.Index)
                then
-                  Item := New_String (Owner.Universe.all, Image (Item));
+                  Item := New_String
+                    (Owner.Universe.all, Image (Context.Memory, Item));
                   if Slot > 0 then
                      Context.Foreign_Stack.Replace_Element (Slot, Item);
                   else
@@ -1000,6 +1030,7 @@ package body Lua.Engine.Foreign is
                Slot : constant Positive :=
                  Context.Foreign_Stack.Last_Index - Natural (Input.Index);
                Callee : constant Value := Context.Foreign_Stack (Slot);
+               Message_Handler : Value;
                Arguments : Values.Vector :=
                  Owned_Values (Owner.Universe.all);
                Address : System.Address;
@@ -1012,8 +1043,27 @@ package body Lua.Engine.Foreign is
                for Index in Slot + 1 .. Context.Foreign_Stack.Last_Index loop
                   Arguments.Append (Context.Foreign_Stack (Index));
                end loop;
+               if Input.Error_Index /= 0 then
+                  if Input.Error_Index < 1 or else
+                    not Valid_Index (Context, Input.Error_Index)
+                  then
+                     raise Foreign_Error with "invalid error handler index";
+                  end if;
+                  Message_Handler := Get_Value (Input.Error_Index);
+                  if Message_Handler.Kind not in Closure_Kind |
+                    Native_Closure_Kind | Native_Kind_Value |
+                    Foreign_Function_Kind
+                  then
+                     raise Foreign_Error with
+                       "error handler is not a function";
+                  end if;
+               elsif Input.Integer_Data = 0 and then not Root_Call then
+                  Message_Handler :=
+                    VM.Current_Message_Handler (Main_Owner.Driver.all);
+               end if;
                Pin (Owner.Universe.all, Callee);
                Pin (Owner.Universe.all, Arguments);
+               Pin (Owner.Universe.all, Message_Handler);
                if Main_Owner.Driver = null then
                   Main_Owner.Driver := VM.New_Driver (Owner.Universe.all);
                end if;
@@ -1032,12 +1082,17 @@ package body Lua.Engine.Foreign is
                      Context.Failure := Nil_Value;
                      Context.Has_Failure_Value := False;
                      Context.Failure_Class := No_Failure;
+                     Context.Failure_Handled := False;
+                     Context.Protected_Failure_Class := No_Failure;
+                     Context.Protected_Handler_Called := False;
                      Context.Non_Yieldable := Context.Non_Yieldable + 1;
-                     VM.Start (Main_Owner.Driver.all, Owner.Universe,
-                               Callee, Arguments);
+                     VM.Start_Foreign
+                       (Main_Owner.Driver.all, Owner.Universe,
+                        Callee, Arguments, Message_Handler);
                   else
                      VM.Start_Foreign_Boundary
-                       (Main_Owner.Driver.all, Callee, Arguments);
+                       (Main_Owner.Driver.all, Callee, Arguments,
+                        Message_Handler);
                   end if;
                exception
                   when Language_Error => Start_Error := True;
@@ -1060,13 +1115,26 @@ package body Lua.Engine.Foreign is
             end;
          when Complete_Callback =>
             if Main_Owner.Driver = null or else Input.Count < 0 or else
-              Input.Index not in 0 | 2 | 4
+              Input.Index not in 0 | 2 | 4 | 5
             then
                raise Foreign_Error with "invalid callback completion";
             end if;
-            VM.Complete_Foreign_Call
-              (Main_Owner.Driver.all, Natural (Input.Count),
-               Natural (Input.Index));
+            begin
+               VM.Complete_Foreign_Call
+                 (Main_Owner.Driver.all, Natural (Input.Count),
+                  Natural (Input.Index), Input.Error_Handled /= 0);
+            exception
+               when Memory.Allocation_Error =>
+                  Memory_Result;
+                  VM.Complete_Foreign_Call (Main_Owner.Driver.all, 0, 4);
+               when Program_Error =>
+                  if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                     Memory_Result;
+                     VM.Complete_Foreign_Call (Main_Owner.Driver.all, 0, 4);
+                  else
+                     raise;
+                  end if;
+            end;
             declare
                Result : constant Action_Status := Pump;
             begin

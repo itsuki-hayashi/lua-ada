@@ -195,7 +195,7 @@ package body Lua.Engine.Core_Libraries is
             when Real_Kind =>
                return (Lua.Numbers.Real_Number, Item.Real_Data);
             when String_Kind =>
-               Parsed := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+               Parsed := Read_Number (State, Item.Reference.Bytes);
                if Parsed.Kind /= Lua.Numbers.Invalid then
                   return Parsed;
                end if;
@@ -220,7 +220,7 @@ package body Lua.Engine.Core_Libraries is
          if Item.Kind = String_Kind then
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
-            return Image (Item);
+            return Image (State.Current.Memory, Item);
          end if;
          Fail (State, "invalid value (" & Type_Name (Item) &
                ") in table for 'concat'");
@@ -288,7 +288,7 @@ package body Lua.Engine.Core_Libraries is
             Result.Append (Nil_Value);
          else
             Number := (if Item.Kind = String_Kind then
-                         Lua.Numbers.Read (To_String (Item.Reference.Bytes))
+                         Read_Number (State, Item.Reference.Bytes)
                        else Numeric (1));
             A := As_Integer (Number, Valid);
             Result.Append ((if Valid then Key (A) else Nil_Value));

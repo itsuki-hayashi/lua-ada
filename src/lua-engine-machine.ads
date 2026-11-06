@@ -50,10 +50,33 @@ package Lua.Engine.Machine is
    --  Release a completed/failed borrow. Idempotent for an idle driver; an
    --  active unfinished driver is a misuse, rather than silent abandonment.
 
+   procedure Deliver_Owned
+     (Self : Driver; Activation : Frame_Access; Destination : Natural;
+      Packet : in out Values.Vector; Failure : Failure_Kind := No_Failure;
+      Handler_Called : Boolean := False);
+   --  Transfer a packet already rooted by its source holder. A null target
+   --  publishes the current context's completed result; native targets take
+   --  ownership without copying. Canonical targets consume a borrowed view
+   --  before the caller retires the holder. Packet is consumed on success.
+   --  Scalar destination growth, when needed, remains an ordinary allocation;
+   --  protected holders reserve their bounded failure destination in advance.
+
+   procedure Take_Results (Self : Driver; Packet : in out Values.Vector);
+   --  Move the completed root result without allocation. Packet must belong
+   --  to a traced owner before any subsequent VM/allocator safe point. Foreign
+   --  publication uses Context.Boundary_Results until the C stack owns values.
+
    function New_Driver (State : in out World) return Driver_Access;
    procedure Free_Driver (Self : in out Driver_Access);
    --  Foreign control blocks retain an initialized driver allocated through
    --  their universe's provider. Free only an idle/released drive.
+
+   procedure Start_Foreign
+     (Self : in out Driver; State : not null World_Access;
+      Callee : Value; Arguments : Values.Vector;
+      Message_Handler : Value := Nil_Value);
+   --  Start a C-entry call behind an owned protected holder. Its handler runs
+   --  above intact failed frames; the terminal packet has a success boolean.
 
    function Needs_Foreign_Call (Self : Driver) return Boolean;
    function Foreign_Handler (Self : Driver) return System.Address;
@@ -63,16 +86,20 @@ package Lua.Engine.Machine is
    --  Arguments are rooted on the addressed context's base-relative C stack.
 
    procedure Complete_Foreign_Call
-     (Self : Driver; Result_Count : Natural; Error_Status : Natural := 0);
+     (Self : Driver; Result_Count : Natural; Error_Status : Natural := 0;
+      Handler_Called : Boolean := False);
    --  Publish the C callback's real result/error packet and restore its caller
    --  stack base before the next Step. Status zero completes normally; two
    --  and four propagate language/memory failure through ordinary protection.
 
    procedure Start_Foreign_Boundary
-     (Self : Driver; Callee : Value; Arguments : Values.Vector);
+     (Self : Driver; Callee : Value; Arguments : Values.Vector;
+      Message_Handler : Value := Nil_Value);
    function Has_Foreign_Result (Self : Driver) return Boolean;
    procedure Take_Foreign_Result
-     (Self : Driver; Packet : out Values.Vector; Error_Status : out Natural);
+     (Self : Driver; Packet : in out Values.Vector; Error_Status : out Natural;
+      Handler_Called : out Boolean);
+   function Current_Message_Handler (Self : Driver) return Value;
    --  Reentrant C lua_call/pcall uses a protected sentinel on this same drive.
    --  The nested C pump stops at that explicit boundary, without completing
    --  or recursively entering the outer interpreter drive.

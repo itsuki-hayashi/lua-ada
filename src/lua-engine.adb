@@ -1,3 +1,4 @@
+with Lua.Number_Parsing;
 with Ada.Exceptions;
 with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
@@ -135,6 +136,59 @@ package body Lua.Engine is
       Release_Object (Item);
    end Free_Object;
 
+   function Read_Number
+     (Memory : not null Lua.Storage.Owner_Access; Text : String;
+      Base : Natural := 0) return Lua.Numbers.Number is
+   begin
+      return Lua.Number_Parsing.Read (Text, Memory, Base);
+   end Read_Number;
+
+   function Read_Number
+     (Memory : not null Lua.Storage.Owner_Access; Text : Byte_String;
+      Base : Natural := 0) return Lua.Numbers.Number
+   is
+      View : constant String (1 .. Text.Size)
+        with Import, Address => Text.Address;
+   begin
+      --  The caller's frame, stack window or operation root retains this
+      --  immutable string object throughout conversion. The parser owns only
+      --  its limb scratch; it neither copies nor caches the borrowed payload.
+      return Lua.Number_Parsing.Read (View, Memory, Base);
+   end Read_Number;
+
+   function Read_Number
+     (State : in out World; Text : String; Base : Natural := 0)
+      return Lua.Numbers.Number is
+   begin
+      if State.Policy = Bounded then
+         if Text'Length > State.Bounds.Instructions - Natural'Min
+           (State.Steps, State.Bounds.Instructions)
+         then
+            Fail (State, "instruction limit exceeded", Resource => True);
+         end if;
+         State.Steps := State.Steps + Text'Length;
+      end if;
+      return Read_Number (Lua.Storage.Reference (State.Memory), Text, Base);
+   end Read_Number;
+
+   function Read_Number
+     (State : in out World; Text : Byte_String; Base : Natural := 0)
+      return Lua.Numbers.Number is
+   begin
+      --  Numeric strings can be much longer than their retained significant
+      --  prefix. Charge the linear scan once to the existing execution epoch;
+      --  callbacks/protection never acquire a fresh conversion allowance.
+      if State.Policy = Bounded then
+         if Text.Size > State.Bounds.Instructions - Natural'Min
+           (State.Steps, State.Bounds.Instructions)
+         then
+            Fail (State, "instruction limit exceeded", Resource => True);
+         end if;
+         State.Steps := State.Steps + Text.Size;
+      end if;
+      return Read_Number (Lua.Storage.Reference (State.Memory), Text, Base);
+   end Read_Number;
+
    function Owned_Values
      (State : in out World; Source : Values.Vector := Values.Empty_Vector)
       return Values.Vector
@@ -206,11 +260,15 @@ package body Lua.Engine is
       Item.Memory := Lua.Storage.Reference (State.Memory);
       Item.Stack.Set_Owner (Item.Memory);
       Item.Arguments.Set_Owner (Item.Memory);
+      Item.Boundary_Results.Set_Owner (Item.Memory);
       Item.Foreign_Stack.Set_Owner (Item.Memory);
       Item.Transfer.Results.Set_Owner (Item.Memory);
       --  Registration transfers ownership. Failed vector growth leaves the
       --  allocation local, so release it before propagating Storage_Error.
       begin
+         --  Error publication must work after provider refusal. Reserve its
+         --  bounded packet while context construction can still fail cleanly.
+         Item.Boundary_Results.Reserve_Capacity (2);
          --  Empty registry slots are reused without shifting live identities.
          for Index in State.Contexts.First_Index .. State.Contexts.Last_Index
          loop
@@ -242,7 +300,9 @@ package body Lua.Engine is
 
    function Allocate (State : in out World; Kind : Heap_Kind)
                       return Object_Access;
-   function Real_Image (Item : Real_Value) return String;
+   function Real_Image
+     (Memory : not null Lua.Storage.Owner_Access;
+      Item : Real_Value) return String;
    function NaN_Image (Item : Real_Value; Host : String) return String;
    --  Keep host formatting policy separate from arithmetic and test values.
 
@@ -269,6 +329,7 @@ package body Lua.Engine is
       State.Current.Failure_Text := To_Unbounded_String (Message);
       State.Current.Failure := Nil_Value;
       State.Current.Has_Failure_Value := False;
+      State.Current.Failure_Handled := False;
       State.Current.Failure_Class :=
         (if Resource then Host_Abort
          elsif State.Current.Failure_Class in Syntax_Failure |
@@ -335,6 +396,7 @@ package body Lua.Engine is
       State.Current.Has_Failure_Value := True;
       State.Current.Failure_Text := To_Unbounded_String ("not enough memory");
       State.Current.Failure_Class := Memory_Failure;
+      State.Current.Failure_Handled := False;
    end Record_Memory_Error;
 
    function Allocate (State : in out World; Kind : Heap_Kind)
@@ -442,6 +504,7 @@ package body Lua.Engine is
       Item.Native_Buffer.Set_Owner (Item.Memory);
       Item.Native_Arguments.Set_Owner (Item.Memory);
       Item.Native_Results.Set_Owner (Item.Memory);
+      Item.Error_Packet.Set_Owner (Item.Memory);
       Item.Native_Captures.Set_Owner (Item.Memory);
       Item.Slots.Set_Owner (Item.Memory);
       Item.Varargs.Set_Owner (Item.Memory);
@@ -538,6 +601,19 @@ package body Lua.Engine is
       Item.Hash_Index.Set_Owner (Memory);
       return (Table_Kind, Item);
    end New_Table;
+
+   procedure Reserve_Table
+     (State : in out World; Table : Value;
+      Sequence_Size, Hash_Size : Natural) is
+   begin
+      if Table.Kind /= Table_Kind or else
+        Table.Reference = null or else not Table.Reference.Members.Is_Empty
+      then
+         raise Program_Error with "capacity receiver must be an empty table";
+      end if;
+      Tables.Reserve (State, Table.Reference, Sequence_Size, Hash_Size);
+   end Reserve_Table;
+
 
    function New_Environment
      (State : in out World; Parent : Object_Access) return Object_Access
@@ -723,7 +799,9 @@ package body Lua.Engine is
            Foreign_Function_Kind =>
             "function");
 
-   function Real_Image (Item : Real_Value) return String is
+   function Real_Image
+     (Memory : not null Lua.Storage.Owner_Access;
+      Item : Real_Value) return String is
       package Real_IO is new Ada.Text_IO.Float_IO (Real_Value);
       Buffer : String (1 .. 64);
       Precision : Positive := 15;
@@ -745,8 +823,9 @@ package body Lua.Engine is
       loop
          Real_IO.Put (Buffer, Item, Aft => Precision - 1, Exp => 3);
          exit when Precision = 17 or else Lua.Numbers.To_Real
-           (Lua.Numbers.Read
-              (Ada.Strings.Fixed.Trim (Buffer, Ada.Strings.Both))) = Item;
+           (Read_Number
+              (Memory, Ada.Strings.Fixed.Trim
+                 (Buffer, Ada.Strings.Both))) = Item;
          Precision := 17;
       end loop;
       declare
@@ -810,7 +889,8 @@ package body Lua.Engine is
       end;
    end Real_Image;
 
-   function Image (Item : Value) return String is
+   function Image (Memory : not null Lua.Storage.Owner_Access;
+                   Item : Value) return String is
    begin
       case Item.Kind is
          when Light_Identity_Kind =>
@@ -823,7 +903,7 @@ package body Lua.Engine is
          when Integer_Kind =>
             return Ada.Strings.Fixed.Trim
               (Item.Integer_Data'Image, Ada.Strings.Both);
-         when Real_Kind => return Real_Image (Item.Real_Data);
+         when Real_Kind => return Real_Image (Memory, Item.Real_Data);
          when String_Kind => return To_String (Item.Reference.Bytes);
          when Table_Kind | Closure_Kind | Native_Closure_Kind | Thread_Kind =>
             return Type_Name (Item) & ": " &
@@ -831,6 +911,14 @@ package body Lua.Engine is
                 (Item.Reference.Serial'Image, Ada.Strings.Both);
          when Native_Kind_Value => return "function: native";
       end case;
+   end Image;
+
+   function Image (Item : Value) return String is
+      Memory : Lua.Storage.Owner;
+   begin
+      --  Host/testing inspection keeps its small interface. Runtime callers
+      --  provide the universe instead of allocating hidden numeric scratch.
+      return Image (Lua.Storage.Reference (Memory), Item);
    end Image;
 
    function Get (Table : Value; Key : Value) return Value is
@@ -1020,6 +1108,8 @@ package body Lua.Engine is
          Mathematics.Reset (State);
       end if;
       State.Memory_Error_Value := New_String (State, "not enough memory");
+      State.Handling_Error_Value :=
+        New_String (State, "error in error handling");
       Table := New_Table (State);
       State.Globals := Table.Reference;
       State.Loaded_Modules := New_Table (State).Reference;
@@ -1082,7 +1172,7 @@ package body Lua.Engine is
       Library ("string", "byte char len lower upper sub reverse rep dump " &
                "format find match gmatch gsub pack packsize unpack");
       Library ("utf8", "char len codepoint offset codes");
-      Library ("table", "concat insert remove move pack unpack");
+      Library ("table", "concat create insert remove move pack sort unpack");
       Library ("math",
         "abs ceil floor fmod max min modf tointeger type ult " &
         "acos asin atan cos deg exp frexp ldexp log rad sin sqrt tan " &
@@ -1138,7 +1228,8 @@ package body Lua.Engine is
          Set (State, Math, New_String (State, "pi"),
               (Real_Kind, Ada.Numerics.Pi));
          Set (State, Math, New_String (State, "huge"),
-              (Real_Kind, Lua.Numbers.Read ("1e999").Real_Item));
+              (Real_Kind, Read_Number
+                (Lua.Storage.Reference (State.Memory), "1e999").Real_Item));
       end;
       declare
          Strings : constant Value := Get (Table, New_String (State, "string"));
@@ -1262,6 +1353,9 @@ package body Lua.Engine is
 
       procedure Mark_Context (Context : Context_Access) is
       begin
+         for Item of Context.Boundary_Results loop
+            Mark_Value (Item);
+         end loop;
          for Item of Context.Foreign_Stack loop
             Mark_Value (Item);
          end loop;
@@ -1276,6 +1370,10 @@ package body Lua.Engine is
          end loop;
          for Activation of Context.Stack loop
             Mark_Value (Activation.Callee);
+            Mark_Value (Activation.Message_Handler);
+            for Item of Activation.Error_Packet loop
+               Mark_Value (Item);
+            end loop;
             for Closing of Activation.Closers loop
                Mark (Closing.Cell);
                if Closing.Frozen then
@@ -1335,6 +1433,7 @@ package body Lua.Engine is
       Mark (State.Globals);
       Mark (State.Foreign_Registry);
       Mark_Value (State.Memory_Error_Value);
+      Mark_Value (State.Handling_Error_Value);
       Mark_Code (State.Entry_Code);
       for Code of State.Operation_Programs loop
          Mark_Code (Code);
@@ -1679,6 +1778,7 @@ package body Lua.Engine is
       State.String_Metatable := null;
       State.Type_Metatables := [others => null];
       State.Memory_Error_Value := Nil_Value;
+      State.Handling_Error_Value := Nil_Value;
       State.Entry_Code := null;
       End_Operation (State);
       State.Operation_Roots.Release;
@@ -1696,6 +1796,9 @@ package body Lua.Engine is
       State.Current.Has_Failure_Value := False;
       State.Current.Failure_Text := Null_Unbounded_String;
       State.Current.Failure_Class := No_Failure;
+      State.Current.Failure_Handled := False;
+      State.Current.Protected_Failure_Class := No_Failure;
+      State.Current.Protected_Handler_Called := False;
       State.Output := Null_Unbounded_String;
       State.Steps := 0;
       State.Current.Failure_At := (others => 1);

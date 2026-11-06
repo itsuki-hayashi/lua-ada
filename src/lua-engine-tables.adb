@@ -20,7 +20,8 @@ package body Lua.Engine.Tables is
    function Dense_Index (Key : Value; Capacity : Natural) return Natural;
    function Bucket (Table : Object_Access; Key : Value) return Positive;
    procedure Link (Table : Object_Access; Index : Positive);
-   procedure Grow (Table : Object_Access; Key : Value);
+   procedure Grow
+     (Table : Object_Access; Key : Value; New_Row : Boolean := True);
    procedure Unlink (Table : Object_Access; Index : Positive);
    procedure Remember_Free (Table : Object_Access; Index : Positive);
 
@@ -162,6 +163,7 @@ package body Lua.Engine.Tables is
          begin
             Member.Next := Table.Hash_Index (Head);
             Table.Hash_Index.Replace_Element (Head, Index);
+            Table.Hash_Rows := Table.Hash_Rows + 1;
          end;
       end if;
       Table.Members.Replace_Element (Index, Member);
@@ -195,6 +197,7 @@ package body Lua.Engine.Tables is
                   Table.Members.Replace_Element (Prior, Previous);
                end;
             end if;
+            Table.Hash_Rows := Table.Hash_Rows - 1;
             return;
          end if;
          Prior := Cursor;
@@ -232,6 +235,7 @@ package body Lua.Engine.Tables is
          Table.Hash_Index.Replace_Element (Cursor, 0);
       end loop;
       Table.Free_Row := 0;
+      Table.Hash_Rows := 0;
       for Cursor in Table.Members.First_Index .. Table.Members.Last_Index loop
          declare
             Member : Table_Entry := Table.Members (Cursor);
@@ -256,7 +260,40 @@ package body Lua.Engine.Tables is
       end loop;
    end Rebuild;
 
-   procedure Grow (Table : Object_Access; Key : Value) is
+   procedure Reserve
+     (State : in out World; Table : Object_Access;
+      Sequence_Size, Hash_Size : Natural)
+   is
+      Total : constant Integer_Value := Integer_Value (Sequence_Size) +
+        Integer_Value (Hash_Size);
+      Buckets : Natural := (if Hash_Size = 0 then 0 else 8);
+   begin
+      if Total > Integer_Value (State.Bounds.Table_Entries) then
+         Fail (State, "table entry limit exceeded", Resource => True);
+      end if;
+      --  These are real allocations through this table's selected provider,
+      --  not a reported capacity hint. Members hold eventual keys/values;
+      --  the dense index and chained hash buckets retain their own layout.
+      while Buckets < Hash_Size loop
+         if Buckets > Natural'Last / 2 then
+            Fail (State, "table overflow");
+         end if;
+         Buckets := Buckets * 2;
+      end loop;
+      Table.Members.Reserve_Capacity (Ada.Containers.Count_Type (Total));
+      Table.Array_Index.Reserve_Capacity
+        (Ada.Containers.Count_Type (Sequence_Size));
+      Table.Hash_Index.Reserve_Capacity (Ada.Containers.Count_Type (Buckets));
+      --  Publish lengths only after every reserve succeeds. Rebuild writes
+      --  all newly live scalar index slots before any lookup can read them.
+      Table.Array_Index.Set_Length
+        (Ada.Containers.Count_Type (Sequence_Size));
+      Table.Hash_Index.Set_Length (Ada.Containers.Count_Type (Buckets));
+      Rebuild (Table);
+   end Reserve;
+
+   procedure Grow
+     (Table : Object_Access; Key : Value; New_Row : Boolean := True) is
       Count : constant Ada.Containers.Count_Type := Table.Members.Length;
       Array_Size : Natural := Natural (Table.Array_Index.Length);
       Hash_Size : Natural := Natural (Table.Hash_Index.Length);
@@ -266,26 +303,33 @@ package body Lua.Engine.Tables is
          else Natural'Max (8, Array_Size + Array_Size / 2));
       Changed : Boolean := False;
    begin
-      if Count = Table.Members.Capacity then
+      if New_Row and then Count = Table.Members.Capacity then
          Table.Members.Reserve_Capacity
            (Ada.Containers.Count_Type'Max (8, Count * 2));
       end if;
-      if Hash_Size = 0 then
-         Hash_Size := 8;
-      elsif Count >= Ada.Containers.Count_Type (Hash_Size / 2) then
-         if Hash_Size > Natural'Last / 2 then
-            raise Storage_Error with "table index capacity overflow";
-         end if;
-         Hash_Size := Hash_Size * 2;
-      end if;
       --  A sparse distant integer remains in the hash part. Only nearby
       --  positive keys justify geometric direct-index growth; a single huge
-      --  key must never request a correspondingly huge array.
-      if Target.Kind = Integer_Kind and then Target.Integer_Data > 0 and then
+      --  key must never request a correspondingly huge array. Reusing one
+      --  deleted row also cannot grow a dense history of its former keys.
+      if New_Row and then
+        Target.Kind = Integer_Kind and then Target.Integer_Data > 0 and then
         Target.Integer_Data <= Integer_Value (Next_Array) and then
         Target.Integer_Data > Integer_Value (Array_Size)
       then
          Array_Size := Next_Array;
+      end if;
+      --  Dense members occupy their direct index, not chained hash rows.
+      --  Counting all member rows here would allocate an unrelated hash while
+      --  filling a preallocated sequence, defeating table.create's promise.
+      if Dense_Index (Target, Array_Size) = 0 then
+         if Hash_Size = 0 then
+            Hash_Size := 8;
+         elsif Table.Hash_Rows >= Hash_Size then
+            if Hash_Size > Natural'Last / 2 then
+               raise Storage_Error with "table index capacity overflow";
+            end if;
+            Hash_Size := Hash_Size * 2;
+         end if;
       end if;
       --  Reserve every potentially failing allocation before changing index
       --  lengths. A failed second reserve may leave spare capacity, but the
@@ -318,6 +362,11 @@ package body Lua.Engine.Tables is
          if Item.Kind = Nil_Kind then
             return;
          end if;
+         --  Reusing a deleted dense row for a sparse key can need its first
+         --  hash bucket, even though member capacity already exists. Reserve
+         --  indexes before touching the free list: rebuilding may relink it,
+         --  and a failed allocation must not strand a candidate mid-transfer.
+         Grow (Table, Key, New_Row => False);
          while Table.Free_Row /= 0 loop
             declare
                Candidate : constant Positive := Table.Free_Row;

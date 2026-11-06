@@ -220,7 +220,7 @@ package body Lua.Engine.Mathematics is
             when Integer_Kind => return Real_Value (Item.Integer_Data);
             when Real_Kind => return Item.Real_Data;
             when String_Kind =>
-               Parsed := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+               Parsed := Read_Number (State, Item.Reference.Bytes);
                if Parsed.Kind /= Lua.Numbers.Invalid then
                   return Lua.Numbers.To_Real (Parsed);
                end if;
@@ -243,7 +243,7 @@ package body Lua.Engine.Mathematics is
          if Item.Kind = Integer_Kind then
             return Item.Integer_Data;
          elsif Item.Kind = String_Kind then
-            Parsed := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+            Parsed := Read_Number (State, Item.Reference.Bytes);
             if Parsed.Kind = Lua.Numbers.Integer_Number then
                return Parsed.Integer_Item;
             end if;

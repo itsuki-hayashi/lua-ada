@@ -60,7 +60,7 @@ package body Lua.Engine.Table_Drivers is
          elsif Item.Kind = Real_Kind then
             Real_Item := Item.Real_Data;
          elsif Item.Kind = String_Kind then
-            Parsed := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+            Parsed := Read_Number (State, Item.Reference.Bytes);
             if Parsed.Kind = Lua.Numbers.Integer_Number then
                return Parsed.Integer_Item;
             elsif Parsed.Kind = Lua.Numbers.Real_Number then
@@ -85,7 +85,7 @@ package body Lua.Engine.Table_Drivers is
          if Item.Kind = String_Kind then
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
-            return Image (Item);
+            return Image (State.Current.Memory, Item);
          end if;
          Fail (State, "invalid value in table for concat");
          return "";

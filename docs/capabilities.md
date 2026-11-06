@@ -104,21 +104,29 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 - Native binary chunks: checked load/dump and selected-function string.dump
   have focused execution/interoperability evidence in [binary chunks](binary-chunks.md).
 
-| Facility                               | Later gate / current response                        |
-| -------------------------------------- | ---------------------------------------------------- |
-| Finalization                           | Deferred; no finalizer execution                     |
-| Userdata and io/os                     | Deferred; unavailable facilities                     |
-| table.sort/create                      | Remaining library work; unavailable                  |
-| Reopened C-created math libraries      | C-facade integration; distinct RNG captures required |
-| Binary chunks                          | Implemented; expanded platform acceptance pending    |
-| C exports and allocator parity         | Partial real C surface; remaining API/allocator work |
-| Dynamic native modules / LuaRocks      | M4; no compatibility claim                           |
-| Whole upstream suite                   | M3; full coverage ledger remains incomplete          |
-| Interactive REPL                       | Future CLI work; no-input usage is intentional       |
+| Facility                          | Later gate / current response                            |
+| --------------------------------- | -------------------------------------------------------- |
+| Finalization                      | Deferred; no finalizer execution                         |
+| Userdata and io/os                | Deferred; unavailable facilities                         |
+| table.sort/create                 | Implemented; focused local acceptance, platforms pending |
+| Reopened C-created math libraries | C-facade integration; distinct RNG captures required     |
+| Binary chunks                     | Implemented; expanded platform acceptance pending        |
+| C exports and allocator parity    | Partial real C surface; remaining API/allocator work     |
+| Dynamic native modules / LuaRocks | M4; no compatibility claim                               |
+| Whole upstream suite              | M3; full coverage ledger remains incomplete              |
+| Interactive REPL                  | Future CLI work; no-input usage is intentional           |
 
 The runtime does not specify hash iteration order, ambiguous table borders,
 pointer text, or byte-identical diagnostic wording. Differential fixtures avoid
 relying on those implementation choices. IEEE formatting follows the matching host oracle.
+
+Decimal/hexadecimal numeric string formatting now uses the calling world's
+managed exact limbs and byte buffers, including parser scratch for numeric
+strings. It retains nearest-even rounding, signed zero and host-specific
+hexadecimal policies. The [formatting guide](number-formatting.md) records the
+sixteen focused owner/refusal cases and deterministic 1,435-line local C/Ada
+campaign. This allocation-path checkpoint does not establish whole-file string
+or math conformance, or complete callback-allocator coverage of the runtime.
 
 ## Language lifecycle implementation
 
@@ -156,3 +164,10 @@ Collector controls return C Lua's integer status where applicable. A disabled
 gethook returns one nil; active hooks retain their requested signed count while
 only positive intervals enable count events. Option flags honor the pinned
 C-string NUL boundary without changing ordinary Lua byte-string semantics.
+
+## M3 table algorithms
+
+The [table algorithm guide](table-algorithms.md) owns iterative resumable
+sorting, real capacity hints and 24 focused cases. Runtime exports add table.sort
+and table.create. The full upstream sort.lua and final platform gates remain
+pending; its collector/OS/test-adapter dependencies are separate work.

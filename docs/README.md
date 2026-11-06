@@ -45,3 +45,9 @@ The [validation record](validation.md) owns platform evidence.
 Update the owning document and link to it elsewhere. Current status owns
 capability claims; session records retain historical evidence. Wrap prose near
 100 columns, align tables, and use relative links for local documents.
+
+[Numeric formatting](number-formatting.md) owns exact owner-backed decimal/
+hexadecimal rendering and its focused allocation/refusal and differential checks.
+
+[Table algorithms](table-algorithms.md) describes sorting continuations, real
+preallocation and focused allocation-refusal evidence.

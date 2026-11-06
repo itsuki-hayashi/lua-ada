@@ -14,6 +14,7 @@ extern void luainit(void);
 struct lua_ada_guard {
     jmp_buf target;
     struct lua_ada_guard *previous;
+    volatile int error_handled;
 };
 
 size_t lua_ada_surface_size(void) { return sizeof(lua_State); }
@@ -53,8 +54,10 @@ static void raise_action(lua_State *state, int status,
     /* This function is reached only after ada_lua_dispatch has returned.
      * Its checkpoint belongs to C; no abandoned Ada activation is retained. */
     if (status == LUA_OK) return;
-    if (status != ADA_ACTION_ABORT && state != NULL && state->guard != NULL)
+    if (status != ADA_ACTION_ABORT && state != NULL && state->guard != NULL) {
+        state->guard->error_handled = output->error_handled;
         longjmp(state->guard->target, status);
+    }
     if (status != ADA_ACTION_ABORT && state != NULL && state->main->panic != NULL)
         state->main->panic(state);
     fputs("Lua Ada: unprotected error", stderr);
@@ -78,6 +81,7 @@ int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
     struct lua_ada_guard guard;
     int status;
     guard.previous = state->guard;
+    guard.error_handled = 0;
     state->guard = &guard;
     status = setjmp(guard.target);
     if (status == 0) body(state);
@@ -86,7 +90,7 @@ int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
 }
 
 static int drive_call(lua_State *state, int arguments, int results,
-                      int protected_call) {
+                      int protected_call, int error_function) {
     struct lua_ada_request input = request(ADA_BEGIN_CALL);
     struct lua_ada_response output;
     int action;
@@ -94,6 +98,7 @@ static int drive_call(lua_State *state, int arguments, int results,
     input.index = arguments;
     input.count = results;
     input.integer_data = protected_call;
+    input.error_index = error_function;
     action = ada_lua_dispatch(state, &input, &output);
     while (action == ADA_ACTION_CALL) {
         lua_State *callback_state = (lua_State *)output.pointer;
@@ -106,6 +111,7 @@ static int drive_call(lua_State *state, int arguments, int results,
          * work, but each such call schedules an explicit boundary on the same
          * driver. Only these live C frames are unwound by a callback error. */
         guard.previous = callback_state->guard;
+        guard.error_handled = 0;
         callback_state->guard = &guard;
         status = setjmp(guard.target);
         if (status == 0) count = callback(callback_state);
@@ -113,10 +119,12 @@ static int drive_call(lua_State *state, int arguments, int results,
         input = request(ADA_COMPLETE_CALLBACK);
         input.index = status;
         input.count = count;
+        input.error_handled = guard.error_handled;
         action = ada_lua_dispatch(callback_state, &input, &output);
     }
     if (protected_call &&
-        (action == ADA_ACTION_RAISE || action == ADA_ACTION_MEMORY)) {
+        (action == ADA_ACTION_RAISE || action == ADA_ACTION_MEMORY ||
+         action == ADA_ACTION_HANDLING)) {
         /* Setup failure may precede a scheduler boundary (for example driver
          * allocation refusal). Preserve its real error object while dropping
          * the unconsumed callee/arguments, as a protected call must do. */
@@ -152,22 +160,24 @@ void lua_callk(lua_State *state, int arguments, int results,
         lua_pushliteral(state, "continuation-aware C calls are not implemented");
         lua_error(state);
     }
-    (void)drive_call(state, arguments, results, 0);
+    (void)drive_call(state, arguments, results, 0, 0);
 }
 
 int lua_pcallk(lua_State *state, int arguments, int results, int error_function,
                lua_KContext context, lua_KFunction continuation) {
     (void)context;
-    if (continuation != NULL || error_function != 0) {
+    if (continuation != NULL) {
         /* This incremental public boundary rejects unfinished callback modes
          * explicitly before executing anything. It must not silently ignore
          * a continuation or claim an error handler was applied. */
         lua_settop(state, -(arguments + 2));
         lua_pushliteral(state,
-            "C continuations and error handlers are not implemented");
+            "C continuations are not implemented");
         return LUA_ERRRUN;
     }
-    return drive_call(state, arguments, results, 1);
+    return drive_call(state, arguments, results, 1,
+                      error_function == 0 ? 0 :
+                      lua_absindex(state, error_function));
 }
 
 int lua_error(lua_State *state) {

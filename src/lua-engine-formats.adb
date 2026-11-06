@@ -1,7 +1,7 @@
-with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings.Fixed;
 with Ada.Unchecked_Conversion;
 with Interfaces;
+with Lua.Big_Naturals;
 with Lua.Engine.Strings;
 
 package body Lua.Engine.Formats is
@@ -9,8 +9,8 @@ package body Lua.Engine.Formats is
    use type Integer_Value;
    use type Real_Value;
    use type Interfaces.Unsigned_64;
-   package Big renames Ada.Numerics.Big_Numbers.Big_Integers;
-   use type Big.Big_Integer;
+   package Big renames Lua.Big_Naturals;
+   use type Big.Ordering;
    function Bits is new Ada.Unchecked_Conversion
      (Real_Value, Interfaces.Unsigned_64);
    function Unsigned_Bits is new Ada.Unchecked_Conversion
@@ -61,10 +61,15 @@ package body Lua.Engine.Formats is
    end Unsigned_Image;
 
    type Rational is record
-      Numerator, Denominator : Big.Big_Integer;
+      Numerator, Denominator : Big.Number;
    end record;
-   function Exact (Value : Real_Value) return Rational;
-   function Exact (Value : Real_Value) return Rational is
+   function Exact
+     (Memory : not null Lua.Storage.Owner_Access;
+      Value : Real_Value) return Rational;
+   function Exact
+     (Memory : not null Lua.Storage.Owner_Access;
+      Value : Real_Value) return Rational
+   is
       Raw : constant Interfaces.Unsigned_64 := Bits (Value);
       Exponent : constant Natural := Natural
         (Interfaces.Shift_Right (Raw, 52) and 16#7FF#);
@@ -78,162 +83,212 @@ package body Lua.Engine.Formats is
          Mantissa := Mantissa + 2 ** 52;
          Power := Integer (Exponent) - 1075;
       end if;
-      Result.Numerator := Big.From_String (Trim (Mantissa'Image));
-      Result.Denominator := Big.To_Big_Integer (1);
-      if Power >= 0 then
-         Result.Numerator := Result.Numerator *
-           Big.To_Big_Integer (2) ** Natural (Power);
+      --  Decode the finite binary64 magnitude exactly. Both sides carry the
+      --  calling world's allocator, including every limb grown by a shift.
+      --  No host big-integer runtime or decimal parsing scratch is involved.
+      Big.Set_Owner (Result.Numerator, Memory);
+      Big.Set_Owner (Result.Denominator, Memory);
+      Big.Set_Value (Result.Numerator, Mantissa);
+      Big.Set_Value (Result.Denominator, 1);
+      if Mantissa = 0 then
+         --  Zero needs no enormous subnormal denominator. Its sign is kept
+         --  separately by the caller, so the exact magnitude is simply 0/1.
+         return Result;
+      elsif Power >= 0 then
+         Big.Shift_Left (Result.Numerator, Natural (Power));
       else
-         Result.Denominator := Big.To_Big_Integer (2) ** Natural (-Power);
+         Big.Shift_Left (Result.Denominator, Natural (-Power));
       end if;
       return Result;
    end Exact;
 
-   function Rounded (Value : Rational; Scale : Integer) return String;
-   function Rounded (Value : Rational; Scale : Integer) return String is
-      Numerator : Big.Big_Integer := Value.Numerator;
-      Denominator : Big.Big_Integer := Value.Denominator;
-      Quotient, Remainder : Big.Big_Integer;
-      Two : constant Big.Big_Integer := Big.To_Big_Integer (2);
+   procedure Rounded
+     (Value : Rational; Scale : Integer; Output : in out Managed.Buffer);
+   procedure Rounded
+     (Value : Rational; Scale : Integer; Output : in out Managed.Buffer)
+   is
+      Numerator : Big.Number := Value.Numerator;
+      Denominator : Big.Number := Value.Denominator;
+      Quotient, Remainder : Big.Number;
+      Comparison : Big.Ordering;
    begin
       --  Formatting uses exact rational rounding, independently of the host
       --  locale and Ada real I/O conventions. This avoids double rounding
       --  when a short requested precision lies near a decimal halfway case.
       if Scale >= 0 then
-         Numerator := Numerator * Big.To_Big_Integer (10) ** Natural (Scale);
+         Big.Multiply_Power (Numerator, 10, Natural (Scale));
       else
-         Denominator := Denominator *
-           Big.To_Big_Integer (10) ** Natural (-Scale);
+         Big.Multiply_Power (Denominator, 10, Natural (-Scale));
       end if;
-      Quotient := Numerator / Denominator;
-      Remainder := Numerator rem Denominator;
-      if Remainder * Two > Denominator or else
-        (Remainder * Two = Denominator and then Quotient rem Two /= 0)
+      --  Divide publishes both owned results together. Comparing twice the
+      --  exact remainder implements round-to-nearest, ties-to-even; a host
+      --  floating-point rounding mode cannot change this decision.
+      Big.Divide (Numerator, Denominator, Quotient, Remainder);
+      Big.Multiply (Remainder, 2);
+      Comparison := Big.Compare (Remainder, Denominator);
+      if Comparison = Big.Greater_Than or else
+        (Comparison = Big.Equal_To and then Big.Is_Odd (Quotient))
       then
-         Quotient := Quotient + 1;
+         Big.Add (Quotient, 1);
       end if;
-      return Trim (Big.To_String (Quotient));
+      Big.Decimal (Quotient, Output);
    end Rounded;
 
    function Decimal_Exponent (Value : Rational) return Integer;
    function Decimal_Exponent (Value : Rational) return Integer is
-      N : constant String := Trim (Big.To_String (Value.Numerator));
-      D : constant String := Trim (Big.To_String (Value.Denominator));
-      Result : constant Integer := N'Length - D'Length;
+      Result : Integer;
+      Scaled : Big.Number;
       Lower : Boolean;
    begin
-      if Value.Numerator = 0 then
+      if Big.Is_Zero (Value.Numerator) then
          return 0;
       end if;
+      Result := Big.Decimal_Digits (Value.Numerator) -
+        Big.Decimal_Digits (Value.Denominator);
       if Result >= 0 then
-         Lower := Value.Numerator < Value.Denominator *
-           Big.To_Big_Integer (10) ** Natural (Result);
+         Scaled := Value.Denominator;
+         Big.Multiply_Power (Scaled, 10, Natural (Result));
+         Lower := Big.Compare (Value.Numerator, Scaled) = Big.Less_Than;
       else
-         Lower := Value.Numerator * Big.To_Big_Integer (10) **
-           Natural (-Result) < Value.Denominator;
+         Scaled := Value.Numerator;
+         Big.Multiply_Power (Scaled, 10, Natural (-Result));
+         Lower := Big.Compare (Scaled, Value.Denominator) = Big.Less_Than;
       end if;
       return (if Lower then Result - 1 else Result);
    end Decimal_Exponent;
 
-   function Float_Image
-     (Item : Real_Value; Code : Character; Precision : Integer;
-      Alternate : Boolean) return String;
-   function Float_Image
-     (Item : Real_Value; Code : Character; Precision : Integer;
-      Alternate : Boolean) return String
+   procedure Float_Image
+     (State : in out World; Item : Real_Value; Code : Character;
+      Precision : Integer; Alternate : Boolean;
+      Output : in out Managed.Buffer);
+   procedure Float_Image
+     (State : in out World; Item : Real_Value; Code : Character;
+      Precision : Integer; Alternate : Boolean;
+      Output : in out Managed.Buffer)
    is
-      Value : constant Rational := Exact (Item);
+      Value : constant Rational :=
+        Exact (Lua.Storage.Reference (State.Memory), Item);
       Exponent : Integer := Decimal_Exponent (Value);
       Significant : Natural := (if Precision < 0 then 6 else Precision);
-      Text : Unbounded_String;
-      Result : Unbounded_String;
+      Rounded_Digits : Managed.Buffer;
+      Count, Leading_Zeroes : Natural := 0;
       Scientific : Boolean;
       Point : Integer;
-   begin
-      if Code in 'f' | 'F' then
-         Text := To_Unbounded_String (Rounded (Value, Significant));
-         while Length (Text) <= Significant loop
-            Insert (Text, 1, "0");
+
+      function Digit (Index : Positive) return Character;
+      function Digit (Index : Positive) return Character is
+        (if Index <= Leading_Zeroes then '0'
+         else Rounded_Digits.Element (Index - Leading_Zeroes));
+
+      procedure Append_Digits (First : Positive; Last : Natural);
+      procedure Append_Digits (First : Positive; Last : Natural) is
+      begin
+         for Index in First .. Last loop
+            Output.Append (Digit (Index));
          end loop;
-         if Significant > 0 then
-            Insert (Text, Length (Text) - Significant + 1, ".");
-         elsif Alternate then
-            Append (Text, '.');
+      end Append_Digits;
+   begin
+      Rounded_Digits.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Output.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Output.Clear;
+      if Code in 'f' | 'F' then
+         Rounded (Value, Significant, Rounded_Digits);
+         --  Treat left padding as virtual digits. Building the final managed
+         --  buffer in order avoids repeated front insertions and host String
+         --  snapshots, even when a tiny fraction needs many leading zeroes.
+         Leading_Zeroes :=
+           (if Rounded_Digits.Length <= Significant
+            then Significant + 1 - Rounded_Digits.Length else 0);
+         Count := Leading_Zeroes + Rounded_Digits.Length;
+         Output.Reserve_Capacity (Count + 1);
+         for Index in 1 .. Count loop
+            if Significant > 0 and then Index = Count - Significant + 1 then
+               Output.Append ('.');
+            end if;
+            Output.Append (Digit (Index));
+         end loop;
+         if Significant = 0 and then Alternate then
+            Output.Append ('.');
          end if;
-         return To_String (Text);
+         return;
       end if;
+
       if Code in 'e' | 'E' then
          Significant := Significant + 1;
       elsif Significant = 0 then
          Significant := 1;
       end if;
-      Text := To_Unbounded_String
-        (Rounded (Value, Integer (Significant) - 1 - Exponent));
-      if Length (Text) > Significant then
-         Delete (Text, Length (Text), Length (Text));
+      Rounded (Value, Integer (Significant) - 1 - Exponent, Rounded_Digits);
+      Count := Rounded_Digits.Length;
+      if Count > Significant then
+         --  Carry at a decimal boundary changes the exponent. The final
+         --  rounded zero is omitted by reducing the view, not by reallocating.
+         Count := Count - 1;
          Exponent := Exponent + 1;
       end if;
-      while Length (Text) < Significant loop
-         Insert (Text, 1, "0");
-      end loop;
+      Leading_Zeroes :=
+        (if Count < Significant then Significant - Count else 0);
+      Count := Count + Leading_Zeroes;
       Scientific := Code in 'e' | 'E' or else
         Exponent < -4 or else Exponent >= Integer (Significant);
       if Code in 'g' | 'G' and then not Alternate then
-         while Length (Text) > 1 and then
-           Element (Text, Length (Text)) = '0'
-         loop
-            Delete (Text, Length (Text), Length (Text));
+         while Count > 1 and then Digit (Count) = '0' loop
+            Count := Count - 1;
          end loop;
       end if;
+
+      --  Binary64 exponents and Lua's at-most-two-digit requested precision
+      --  bound this reservation. All variable-width bytes still belong to the
+      --  calling owner; refusal unwinds its exact rational and digit buffers.
+      Output.Reserve_Capacity (Count + abs Exponent + 8);
       if Scientific then
-         Append (Result, Element (Text, 1));
-         if Length (Text) > 1 or else Alternate then
-            Append (Result, '.');
+         Output.Append (Digit (1));
+         if Count > 1 or else Alternate then
+            Output.Append ('.');
          end if;
-         Append (Result, Slice (Text, 2, Length (Text)));
-         Append (Result, (if Code in 'E' | 'G' then 'E' else 'e'));
-         Append (Result, (if Exponent < 0 then '-' else '+'));
+         Append_Digits (2, Count);
+         Output.Append ((if Code in 'E' | 'G' then 'E' else 'e'));
+         Output.Append ((if Exponent < 0 then '-' else '+'));
          declare
+            --  Exponent'Image is bounded scalar scratch, not an input-sized
+            --  temporary or allocator-bypassing decimal representation.
             Power : constant String := Trim (Integer'Image (abs Exponent));
          begin
             if Power'Length < 2 then
-               Append (Result, '0');
+               Output.Append ('0');
             end if;
-            Append (Result, Power);
+            Output.Append (Power);
          end;
       else
          Point := Exponent + 1;
          if Point <= 0 then
-            Append (Result, "0.");
+            Output.Append ("0.");
             for Index in 1 .. -Point loop
-               Append (Result, '0');
+               Output.Append ('0');
             end loop;
-            Append (Result, Text);
-         elsif Point >= Length (Text) then
-            Append (Result, Text);
-            for Index in Length (Text) + 1 .. Point loop
-               Append (Result, '0');
+            Append_Digits (1, Count);
+         elsif Point >= Count then
+            Append_Digits (1, Count);
+            for Index in Count + 1 .. Point loop
+               Output.Append ('0');
             end loop;
             if Alternate then
-               Append (Result, '.');
+               Output.Append ('.');
             end if;
          else
-            Append (Result, Slice (Text, 1, Point));
-            Append (Result, '.');
-            Append (Result, Slice (Text, Point + 1, Length (Text)));
+            Append_Digits (1, Point);
+            Output.Append ('.');
+            Append_Digits (Point + 1, Count);
          end if;
       end if;
-      return To_String (Result);
    end Float_Image;
 
-   function Hex_Float
-     (Item : Real_Value; Precision : Integer; Alternate : Boolean;
-      Host : String)
-      return String;
-   function Hex_Float
-     (Item : Real_Value; Precision : Integer; Alternate : Boolean;
-      Host : String)
-      return String
+   procedure Hex_Float
+     (State : in out World; Item : Real_Value; Precision : Integer;
+      Alternate : Boolean; Host : String; Output : in out Managed.Buffer);
+   procedure Hex_Float
+     (State : in out World; Item : Real_Value; Precision : Integer;
+      Alternate : Boolean; Host : String; Output : in out Managed.Buffer)
    is
       Raw : constant Interfaces.Unsigned_64 := Bits (Item);
       Field : constant Natural := Natural
@@ -241,9 +296,12 @@ package body Lua.Engine.Formats is
       Exponent : Integer :=
         (if Field = 0 then -1022 else Integer (Field) - 1023);
       Mantissa : Interfaces.Unsigned_64 := Raw and 16#F_FFFF_FFFF_FFFF#;
-      Fraction : Unbounded_String;
+      --  Binary64 has exactly thirteen hexadecimal fraction digits. Keep
+      --  those fixed-width scalar bytes on the Ada stack; arbitrary requested
+      --  trailing zeroes are emitted directly into the owner's final buffer.
+      Fraction : String (1 .. 13);
+      Fraction_Length : Natural := 13;
       Leading : Natural := Boolean'Pos (Field /= 0);
-      Result : Unbounded_String;
       Remainder, Half : Interfaces.Unsigned_64;
    begin
       if Field = 0 and then Mantissa = 0 then
@@ -273,38 +331,40 @@ package body Lua.Engine.Formats is
          end if;
          Leading := Leading + Natural (Mantissa / 16 ** Precision);
          Mantissa := Mantissa mod 16 ** Precision;
+         Fraction_Length := Precision;
          for Index in reverse 1 .. Precision loop
-            Insert (Fraction, 1, String'(1 => Hex
-              (Natural (Mantissa mod 16) + 1)));
+            Fraction (Index) := Hex (Natural (Mantissa mod 16) + 1);
             Mantissa := Mantissa / 16;
          end loop;
       else
-         for Index in 1 .. 13 loop
-            Insert (Fraction, 1, String'(1 => Hex
-              (Natural (Mantissa mod 16) + 1)));
+         for Index in reverse Fraction'Range loop
+            Fraction (Index) := Hex (Natural (Mantissa mod 16) + 1);
             Mantissa := Mantissa / 16;
          end loop;
          if Precision < 0 then
-            while Length (Fraction) > 0 and then
-              Element (Fraction, Length (Fraction)) = '0'
+            while Fraction_Length > 0 and then
+              Fraction (Fraction_Length) = '0'
             loop
-               Delete (Fraction, Length (Fraction), Length (Fraction));
-            end loop;
-         else
-            for Index in 14 .. Precision loop
-               Append (Fraction, '0');
+               Fraction_Length := Fraction_Length - 1;
             end loop;
          end if;
       end if;
-      Append (Result, "0x" & Hex (Leading + 1));
-      if Length (Fraction) > 0 or else Alternate then
-         Append (Result, '.');
+      Output.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Output.Clear;
+      Output.Reserve_Capacity
+        (Natural'Max (Fraction_Length, Integer'Max (Precision, 0)) + 24);
+      Output.Append ("0x");
+      Output.Append (Hex (Leading + 1));
+      if Fraction_Length > 0 or else Alternate then
+         Output.Append ('.');
       end if;
-      Append (Result, Fraction);
-      Append (Result, 'p');
-      Append (Result, (if Exponent < 0 then '-' else '+'));
-      Append (Result, Trim (Integer'Image (abs Exponent)));
-      return To_String (Result);
+      Output.Append (Fraction (1 .. Fraction_Length));
+      for Index in 14 .. Precision loop
+         Output.Append ('0');
+      end loop;
+      Output.Append ('p');
+      Output.Append ((if Exponent < 0 then '-' else '+'));
+      Output.Append (Trim (Integer'Image (abs Exponent)));
    end Hex_Float;
 
    procedure Render_Into
@@ -436,12 +496,18 @@ package body Lua.Engine.Formats is
                Fail (State,
                      "modifiers for format '%a'/'%A' not implemented");
             end if;
-            Value := Lua.Numbers.Read (Strings.String_Argument (State, Item));
             if Item.Kind = Real_Kind then
                Real := Item.Real_Data;
             elsif Item.Kind = Integer_Kind then
                Real := Real_Value (Item.Integer_Data);
-            elsif Value.Kind /= Lua.Numbers.Invalid then
+            elsif Item.Kind = String_Kind then
+               --  Numeric values need no text roundtrip. A string conversion
+               --  borrows its immutable bytes and allocates parser scratch
+               --  through this same world, never through a default owner.
+               Value := Read_Number (State, Item.Reference.Bytes);
+               if Value.Kind = Lua.Numbers.Invalid then
+                  Fail (State, "number expected");
+               end if;
                Real := Lua.Numbers.To_Real (Value);
             else
                Fail (State, "number expected");
@@ -454,9 +520,9 @@ package body Lua.Engine.Formats is
                end if;
                Zero := False;
             elsif Code in 'a' | 'A' then
-               Text.Set_Value (Hex_Float (Real, Precision, Alternate, Host));
+               Hex_Float (State, Real, Precision, Alternate, Host, Text);
             else
-               Text.Set_Value (Float_Image (Real, Code, Precision, Alternate));
+               Float_Image (State, Real, Code, Precision, Alternate, Text);
             end if;
          when 's' =>
             if Item.Kind = String_Kind then
@@ -471,7 +537,8 @@ package body Lua.Engine.Formats is
                   Text.Set_Value (Source);
                end;
             else
-               Text.Set_Value (Image (Item));
+               Text.Set_Value
+                 (Image (Lua.Storage.Reference (State.Memory), Item));
             end if;
             if Form /= "%s" then
                for Index in 1 .. Text.Length loop
@@ -545,16 +612,18 @@ package body Lua.Engine.Formats is
                   Text.Set_Value
                     ((if Real < 0.0 then "-1e9999" else "1e9999"));
                else
-                  Text.Set_Value
-                    ((if (Bits (Real) and 2 ** 63) /= 0 then "-" else "") &
-                     Hex_Float (Real, -1, False, Host));
+                  Hex_Float (State, Real, -1, False, Host, Text);
+                  if (Bits (Real) and 2 ** 63) /= 0 then
+                     Text.Insert (1, "-");
+                  end if;
                end if;
             elsif Item.Kind = Integer_Kind and then
               Item.Integer_Data = Integer_Value'First
             then
                Text.Set_Value ("0x8000000000000000");
             elsif Item.Kind in Integer_Kind | Nil_Kind | Boolean_Kind then
-               Text.Set_Value (Image (Item));
+               Text.Set_Value
+                 (Image (Lua.Storage.Reference (State.Memory), Item));
             else
                Fail (State, "value has no literal form");
             end if;

@@ -85,10 +85,12 @@ The binary loading/dumping checkpoint passes the full retained pipeline with
 848 AUnit cases and ten additional C/Ada binary CLI comparisons. Platform
 evidence for that later revision remains pending.
 
-The first published checkpoint CI completed twelve Linux/Windows jobs and
-failed all six macOS jobs at the same arithmetic NaN-bit comparison. All six
-passed their 816 AUnit cases first. A host arithmetic adapter replaces the
-hardcoded x86 NaN; its cross-platform rerun remains required.
+The first published checkpoint failed a macOS arithmetic NaN-bit comparison.
+A host arithmetic adapter replaces that x86-specific bit synthesis. The next
+checkpoint passes all twelve Linux/Windows jobs, including Windows static-PIC,
+but macOS stops in the new standalone-runtime link/startup checks. Follow-up
+repairs propagate the selected GNARL archive and clean embedded/runtime search
+paths. Their successful macOS rerun is still required.
 
 The production root is now one liblua image for Ada and C consumers. Static
 and shared C/API, mixed state/allocator/pool identity, and C-only startup checks
@@ -98,8 +100,11 @@ and remaining ABI evidence are still required. Runtime inspection then passes
 The full retained validation/static pipeline also passes, including the
 eighteen-case C consumer, mixed/C-only startup checks, ten binary CLI cases,
 35 CLI cases, nine differential files and five retained upstream files.
-Remaining numeric/format scratch
-and metadata ownership, full foreign execution, collector modes,
+The later managed numeric checkpoint passes 916 cases and all retained
+checks, including 1,435 formatting records. Sorting and real table reservation
+then pass 940 cases and eleven differential files, including 465 table
+algorithm records. These are local Windows/default/validation/static results.
+Remaining metadata/output ownership, full foreign execution, collector modes,
 finalizers, userdata, libraries and the complete test adapter remain required.
 The source-selected instrumented configuration has no full runtime/platform
 acceptance yet. All 4,490 source anchors and 473 header entries remain pending;

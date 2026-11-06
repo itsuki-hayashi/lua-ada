@@ -53,18 +53,29 @@ split budgets, roots, close boundaries and suspension state. Both alternatives
 are rejected. Explicit driver phases require more state and ownership comments,
 but make transfer and cleanup reviewable without relying on abandoned stacks.
 
+Message handlers now use protected holders and explicit scheduler phases above
+the intact failed stack. A recursive handler error targets the same holder;
+the eventual transformation or error-in-handling result unwinds the failed chain
+once. Internal close protection inherits the active handler, and transformed
+errors carry handled metadata across C guards to avoid applying it twice.
+Nil is normalized after the handler, following pinned Lua 5.5.1 behavior.
+
 Continuation, yielding and C-resume phases must extend this same protocol.
-Until implemented, non-null call continuations and C error handlers fail
-explicitly before execution. This checkpoint supplies no substitute success
-stubs for missing APIs and does not establish complete C ABI, stack-accounting,
+Until implemented, non-null call continuations fail explicitly before execution.
+This checkpoint supplies no substitute success stubs for missing APIs and does
+not establish complete C ABI, stack-accounting,
 allocator or upstream-instrumentation parity. Ada builtins still need stable
 C trampolines for full `lua_tocfunction` and open-library behavior.
 
 ## Verification
 
-The Windows validation/static standalone consumer passed seventeen named cases,
+The Windows validation/static standalone consumer passed twenty-six named cases,
 including real callbacks, mutable C upvalues, table error identity, nested C
-calls and canonical Lua calling C. The strict Ada regression suite passed its
-816-case checkpoint before subsequent independently owned additions. Required
-cross-platform/static/shared acceptance remains separate evidence. Record new
-continuation, protected memory, panic and cross-state tests when implemented.
+calls, canonical Lua calling C, native/Lua handlers, recursive errors, permanent
+callback refusal, panic recovery and independent-world reentry. The strict Ada
+regression suite passed 877 cases, including eleven focused message-handler
+regressions. A reserved false/error packet and traced boundary storage avoid
+allocation during the tested C failure publication path. Full Lua memory-error
+parity still needs reusable metadata and shared stack capacity. Required
+cross-platform/static/shared acceptance remains separate evidence; continuation
+and same-world cross-thread calls still need their own real tests.

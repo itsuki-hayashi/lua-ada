@@ -46,6 +46,7 @@ package Lua.Engine.Foreign is
       Operation : Operation_Code;
       Index : Interfaces.C.int := 0;
       Count : Interfaces.C.int := 0;
+      Error_Index : Interfaces.C.int := 0;
       Integer_Data : Interfaces.C.long_long := 0;
       Number_Data : Interfaces.C.double := 0.0;
       Pointer : System.Address := System.Null_Address;
@@ -55,6 +56,7 @@ package Lua.Engine.Foreign is
       Function_Data : C_Function := null;
       Name : System.Address := System.Null_Address;
       Mode : System.Address := System.Null_Address;
+      Error_Handled : Interfaces.C.int := 0;
    end record with Convention => C;
 
    type Response is record
@@ -64,13 +66,16 @@ package Lua.Engine.Foreign is
       Length : Interfaces.C.size_t := 0;
       Allocator : Lua.Storage.Allocation_Function := null;
       Function_Data : C_Function := null;
+      Error_Handled : Interfaces.C.int := 0;
    end record with Convention => C;
 
    type Action_Status is
-     (Action_Done, Action_Call, Action_Raise, Action_Memory, Action_Abort);
+     (Action_Done, Action_Call, Action_Raise, Action_Memory,
+      Action_Handling, Action_Abort);
    for Action_Status use
      (Action_Done => 0, Action_Call => 1,
       Action_Raise => 2, Action_Memory => 4,
+      Action_Handling => 5,
       Action_Abort => 6);
    for Action_Status'Size use Interfaces.C.int'Size;
    pragma Convention (C, Action_Status);

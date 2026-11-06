@@ -79,7 +79,7 @@ package body Lua.Engine.Loaders is
          if Item.Kind = String_Kind then
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
-            return Image (Item);
+            return Image (State.Current.Memory, Item);
          end if;
          Fail (State, "string expected in " & Name);
          return "";

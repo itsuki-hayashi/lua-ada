@@ -57,7 +57,8 @@ package body Lua.Engine.Unicode is
                Number := (Lua.Numbers.Real_Number, Item.Real_Data);
             when String_Kind =>
                Charge (Length (Item.Reference.Bytes));
-               Number := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+               Number := Read_Number
+                 (State.Current.Memory, Item.Reference.Bytes);
             when others => Number := (Kind => Lua.Numbers.Invalid);
          end case;
          if Number.Kind = Lua.Numbers.Integer_Number then
@@ -94,7 +95,8 @@ package body Lua.Engine.Unicode is
                Parsed := (Lua.Numbers.Real_Number, Item.Real_Data);
             when String_Kind =>
                Charge (Length (Item.Reference.Bytes));
-               Parsed := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+               Parsed := Read_Number
+                 (State.Current.Memory, Item.Reference.Bytes);
             when others => return 0;
          end case;
          if Parsed.Kind = Lua.Numbers.Integer_Number then
@@ -124,7 +126,7 @@ package body Lua.Engine.Unicode is
             Charge (Length (Item.Reference.Bytes));
             return To_String (Item.Reference.Bytes);
          elsif Item.Kind in Integer_Kind | Real_Kind then
-            return Image (Item);
+            return Image (State.Current.Memory, Item);
          end if;
          Fail (State, "string expected");
          return "";

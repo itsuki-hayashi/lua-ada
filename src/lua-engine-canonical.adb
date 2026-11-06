@@ -515,7 +515,7 @@ package body Lua.Engine.Canonical is
             return (Lua.Numbers.Integer_Number, Item.Integer_Data);
          when Real_Kind => return (Lua.Numbers.Real_Number, Item.Real_Data);
          when String_Kind =>
-            Result := Lua.Numbers.Read (To_String (Item.Reference.Bytes));
+            Result := Read_Number (State, Item.Reference.Bytes);
             if Result.Kind /= Lua.Numbers.Invalid then
                return Result;
             end if;
@@ -753,7 +753,8 @@ package body Lua.Engine.Canonical is
                  (State, Activation.Code, Index + 1, Activation.PC - 2);
             begin
                Fail (State, "variable '" &
-                 (if Name.Kind = String_Kind then Image (Name) else "?") &
+                 (if Name.Kind = String_Kind
+                  then Image (State.Current.Memory, Name) else "?") &
                  "' got a non-closable value");
             end;
          end if;
@@ -1276,7 +1277,8 @@ package body Lua.Engine.Canonical is
                   Fail (State, "global variable already defined");
                end if;
                Left := Constant_At (State, Activation, Operand (Bx) - 1);
-               Fail (State, "global '" & Image (Left) & "' already defined");
+               Fail (State, "global '" & Image (State.Current.Memory, Left) &
+                     "' already defined");
             end if;
          when Op_VARARGPREP =>
             if (Prototype.Flags and 2) /= 0 then

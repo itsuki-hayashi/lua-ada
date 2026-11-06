@@ -18,6 +18,12 @@ private package Lua.Engine.Tables is
    --  Grow indexes before publishing a new member. Failed allocation leaves
    --  existing bindings readable and keeps the owning world's count accurate.
 
+   procedure Reserve
+     (State : in out World; Table : Object_Access;
+      Sequence_Size, Hash_Size : Natural);
+   --  Reserve actual empty table storage without publishing keys or changing
+   --  the sequence border. A failed reserve leaves a valid empty table.
+
    procedure Rebuild (Table : Object_Access);
    --  Reconstruct borrowed indexes after weak-key cleanup, without allocation.
    --  Clearing dead keys before calling this prevents stale heap references.

@@ -201,7 +201,8 @@ package body Lua.Engine.Inspection is
             Context.Hook_Mask := Null_Unbounded_String;
             for Mask of String'("crl") loop
                if Ada.Strings.Fixed.Index
-                 (C_Option (Image (Arg (Base + 1))), "" & Mask) /= 0
+                 (C_Option (Image (State.Current.Memory, Arg (Base + 1))),
+                  "" & Mask) /= 0
                then
                   Append (Context.Hook_Mask, Mask);
                end if;
@@ -363,7 +364,7 @@ package body Lua.Engine.Inspection is
          declare
             Options : constant String :=
               (if Arg (Base + 1).Kind = Nil_Kind then "flnSrtu"
-               else C_Option (Image (Arg (Base + 1))));
+               else C_Option (Image (State.Current.Memory, Arg (Base + 1))));
             Info : constant Value := New_Table (State);
             Source : constant String :=
               (if Code = null then "=[C]"
@@ -644,7 +645,8 @@ package body Lua.Engine.Inspection is
                return Result;
             end if;
             if Arg (Base).Kind /= Nil_Kind then
-               Text := To_Unbounded_String (Image (Arg (Base)) &
+               Text := To_Unbounded_String
+                 (Image (State.Current.Memory, Arg (Base)) &
                  Character'Val (10));
             end if;
             if Arg (Base + 1).Kind /= Nil_Kind then

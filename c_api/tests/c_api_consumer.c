@@ -6,6 +6,7 @@
 #include "lua_ada_boundary.h"
 #include <assert.h>
 #include <limits.h>
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -437,6 +438,219 @@ static void test_loadstring_requires_text(lua_State *state) {
     puts("C API PASS: loadstring requires text mode and recovers");
 }
 
+static int message_calls;
+
+static int integer_message_handler(lua_State *state) {
+    message_calls++;
+    assert(lua_gettop(state) == 1);
+    lua_pushinteger(state, 42);
+    return 1;
+}
+
+static int empty_message_handler(lua_State *state) {
+    (void)state;
+    return 0;
+}
+
+static int recursive_message_handler(lua_State *state) {
+    if (lua_type(state, 1) != LUA_TNUMBER) {
+        lua_pushvalue(state, 1);
+        return 1;
+    }
+    if (lua_tointeger(state, 1) == 0) {
+        lua_pushliteral(state, "END");
+        return 1;
+    }
+    lua_pushinteger(state, lua_tointeger(state, 1) - 1);
+    return lua_error(state);
+}
+
+static int failing_message_handler(lua_State *state) {
+    lua_pushliteral(state, "handler failed");
+    return lua_error(state);
+}
+
+static void test_message_handler_results(lua_State *state) {
+    /* Error handlers receive the actual arbitrary error and adjust to exactly
+     * one result. They must not run on successful calls. The handler's stack
+     * index remains valid while the callee and its arguments are consumed. */
+    lua_settop(state, 0);
+    message_calls = 0;
+    lua_pushcfunction(state, integer_message_handler);
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 20); lua_pushinteger(state, 22);
+    assert(lua_pcall(state, 2, 1, 1) == LUA_OK && message_calls == 0);
+    lua_settop(state, 1);
+    lua_pushcfunction(state, error_callback);
+    lua_newtable(state);
+    assert(lua_pcall(state, 1, LUA_MULTRET, 1) == LUA_ERRRUN);
+    assert(message_calls == 1 && lua_gettop(state) == 2);
+    assert(lua_tointeger(state, -1) == 42);
+    lua_settop(state, 0);
+    lua_pushcfunction(state, empty_message_handler);
+    lua_pushcfunction(state, error_callback);
+    lua_pushinteger(state, 7);
+    assert(lua_pcall(state, 1, 1, 1) == LUA_ERRRUN);
+    assert(strcmp(lua_tostring(state, -1), "<no error object>") == 0);
+    puts("C API PASS: message handler results and nil normalization");
+}
+
+static void test_recursive_message_handler(lua_State *state) {
+    /* A handler may raise a different error which the same handler eventually
+     * resolves. This is recursive error handling, not nested pcall success. */
+    lua_settop(state, 0);
+    lua_pushcfunction(state, recursive_message_handler);
+    lua_pushcfunction(state, error_callback);
+    lua_pushinteger(state, 170);
+    assert(lua_pcall(state, 1, 1, 1) == LUA_ERRRUN);
+    assert(strcmp(lua_tostring(state, -1), "END") == 0);
+    lua_settop(state, 1);
+    lua_pushcfunction(state, error_callback);
+    lua_pushinteger(state, 300);
+    assert(lua_pcall(state, 1, 1, 1) == LUA_ERRRUN);
+    assert(strstr(lua_tostring(state, -1), "C stack overflow") != NULL);
+    puts("C API PASS: recursively transformed message errors");
+}
+
+static void test_error_in_message_handler(lua_State *state) {
+    /* A handler that can never return exhausts the configured error reserve.
+     * The protected API returns ERRERR and a real stable error object. */
+    lua_settop(state, 0);
+    lua_pushcfunction(state, failing_message_handler);
+    lua_pushcfunction(state, error_callback);
+    lua_pushinteger(state, 1);
+    assert(lua_pcall(state, 1, 1, 1) == LUA_ERRERR);
+    assert(strcmp(lua_tostring(state, -1), "error in error handling") == 0);
+    lua_settop(state, 0);
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 1); lua_pushinteger(state, 2);
+    assert(lua_pcall(state, 2, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 3);
+    puts("C API PASS: error-handler failure status and recovery");
+}
+
+static int unprotected_nested_error(lua_State *state) {
+    lua_pushcfunction(state, error_callback);
+    lua_pushinteger(state, 7);
+    lua_call(state, 1, 0);
+    assert(!"nested error returned to its abandoned C body");
+    return 0;
+}
+
+static void test_inherited_handler_runs_once(lua_State *state) {
+    /* An unprotected nested call inherits the outer handler. The transformed
+     * error crosses a C guard afterward, carrying its handled bit; processing
+     * it again would visibly call this handler twice. */
+    lua_settop(state, 0);
+    message_calls = 0;
+    lua_pushcfunction(state, integer_message_handler);
+    lua_pushcfunction(state, unprotected_nested_error);
+    assert(lua_pcall(state, 0, 1, 1) == LUA_ERRRUN);
+    assert(message_calls == 1 && lua_tointeger(state, -1) == 42);
+    puts("C API PASS: inherited handler crosses C guard once");
+}
+
+static void test_lua_message_handler(lua_State *state) {
+    /* The handler itself may be an actual canonical Lua closure. It receives
+     * the same table object and returns a field through normal VM adjustment. */
+    lua_settop(state, 0);
+    assert(luaL_loadstring(state, "return function(e)return e.code end")
+           == LUA_OK);
+    lua_call(state, 0, 1);
+    assert(lua_isfunction(state, 1) && !lua_iscfunction(state, 1));
+    lua_pushcfunction(state, error_callback);
+    lua_newtable(state);
+    lua_pushstring(state, "code");
+    lua_pushinteger(state, 42);
+    lua_rawset(state, -3);
+    assert(lua_pcall(state, 1, 1, 1) == LUA_ERRRUN);
+    assert(lua_tointeger(state, -1) == 42);
+    puts("C API PASS: canonical Lua message handler");
+}
+
+static int memory_failure_callback(lua_State *state) {
+    void *data;
+    (void)lua_getallocf(state, &data);
+    ((struct allocation_counts *)data)->refuse = 1;
+    lua_pushliteral(state, "force a real managed callback allocation refusal");
+    return 1;
+}
+
+static void test_protected_callback_memory_failure(void) {
+    /* Refusal begins inside the callback and remains active until pcall has
+     * returned to ordinary C. Publishing false/error must allocate nothing;
+     * host-side refusal reset then permits the same state to execute again. */
+    struct allocation_counts counts = {0};
+    lua_State *state = lua_newstate(counted_allocator, &counts, 123);
+    int status;
+    assert(state != NULL);
+    lua_pushcfunction(state, memory_failure_callback);
+    status = lua_pcall(state, 0, 1, 0);
+    counts.refuse = 0;
+    assert(status == LUA_ERRMEM);
+    assert(strstr(lua_tostring(state, -1), "memory") != NULL);
+    lua_settop(state, 0);
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 20); lua_pushinteger(state, 22);
+    assert(lua_pcall(state, 2, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 42);
+    lua_close(state);
+    assert(counts.bytes == 0 && counts.blocks == 0);
+    puts("C API PASS: protected callback memory failure and recovery");
+}
+
+static jmp_buf panic_target;
+
+static int capture_panic(lua_State *state) {
+    assert(lua_type(state, -1) == LUA_TSTRING);
+    assert(strstr(lua_tostring(state, -1), "call") != NULL);
+    longjmp(panic_target, 1);
+}
+
+static void test_panic_after_ada_returns(lua_State *state) {
+    /* A host panic may jump to its own C checkpoint. The failed driver must
+     * already be released: a later protected call proves logical recovery. */
+    lua_CFunction previous = lua_atpanic(state, capture_panic);
+    lua_settop(state, 0);
+    if (setjmp(panic_target) == 0) {
+        lua_pushinteger(state, 7);
+        lua_call(state, 0, 0);
+        assert(!"non-callable unprotected call returned");
+    }
+    lua_atpanic(state, previous);
+    lua_settop(state, 0);
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 20); lua_pushinteger(state, 22);
+    assert(lua_pcall(state, 2, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 42);
+    puts("C API PASS: panic after Ada return and state recovery");
+}
+
+static int another_universe_callback(lua_State *state) {
+    lua_State *other = (lua_State *)lua_touserdata(state, lua_upvalueindex(1));
+    lua_settop(other, 0);
+    lua_pushcfunction(other, add_callback);
+    lua_pushinteger(other, 20); lua_pushinteger(other, 22);
+    assert(lua_pcall(other, 2, 1, 0) == LUA_OK);
+    lua_pushinteger(state, lua_tointeger(other, -1));
+    lua_settop(other, 0);
+    return 1;
+}
+
+static void test_reentrant_independent_universes(lua_State *state) {
+    /* Call another owned universe while the first callback is active. There
+     * must be no process-global current-world pointer or shared C stack base. */
+    lua_State *other = luaL_newstate();
+    assert(other != NULL);
+    lua_settop(state, 0);
+    lua_pushlightuserdata(state, other);
+    lua_pushcclosure(state, another_universe_callback, 1);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 42 && lua_gettop(other) == 0);
+    lua_close(other);
+    puts("C API PASS: reentrant independent universes");
+}
+
 int main(void) {
     lua_State *state;
     test_state_allocator_lifetime();
@@ -459,6 +673,14 @@ int main(void) {
     test_reentrant_c_to_c_calls(state);
     test_canonical_lua_calls_c(state);
     test_loadstring_requires_text(state);
+    test_message_handler_results(state);
+    test_recursive_message_handler(state);
+    test_error_in_message_handler(state);
+    test_inherited_handler_runs_once(state);
+    test_lua_message_handler(state);
+    test_protected_callback_memory_failure();
+    test_panic_after_ada_returns(state);
+    test_reentrant_independent_universes(state);
     lua_close(state);
     puts("PASS: real Ada C API bootstrap consumer");
     return 0;
