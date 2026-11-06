@@ -16,6 +16,14 @@ package Lua.Engine.Foreign is
      (Data, Message : System.Address; To_Continue : Interfaces.C.int)
      with Convention => C;
 
+   type IO_Close_Kind is
+     (Regular_File_Close, Pipe_File_Close, Borrowed_File_Close);
+   function IO_Close_Handler (Kind : IO_Close_Kind) return C_Function;
+   --  Return actual callable C trampolines for public luaL_Stream.closef.
+   --  The stream owns no pointer marker or fabricated native-function token.
+   --  Direct C invocation shares the current logical activation and delegates
+   --  its real result/error construction to the Ada IO library.
+
    type Operation_Code is
      (Create_State, Create_Default_State, Close_State, Create_Thread,
       Get_Top, Set_Top, Absolute_Index, Check_Stack, Push_Value,
@@ -28,7 +36,7 @@ package Lua.Engine.Foreign is
       Get_Allocator, Set_Allocator, Push_C_Closure, To_C_Function,
       Begin_Call, Complete_Callback, Raise_Error, Load_Buffer,
       Create_Userdata, Get_Uservalue, Set_Uservalue,
-      Get_Metatable, Set_Metatable, Get_Yieldability,
+      Get_Metatable, Set_Metatable, Close_IO_Primitive, Get_Yieldability,
       Set_Warning_Function, Issue_Warning, Complete_Warning);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
@@ -48,7 +56,7 @@ package Lua.Engine.Foreign is
       Begin_Call => 40, Complete_Callback => 41, Raise_Error => 42,
       Load_Buffer => 43, Create_Userdata => 44,
       Get_Uservalue => 45, Set_Uservalue => 46,
-      Get_Metatable => 47, Set_Metatable => 48,
+      Get_Metatable => 47, Set_Metatable => 48, Close_IO_Primitive => 49,
       Get_Yieldability => 50, Set_Warning_Function => 51,
       Issue_Warning => 52, Complete_Warning => 53);
    for Operation_Code'Size use Interfaces.C.int'Size;

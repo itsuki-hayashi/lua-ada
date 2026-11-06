@@ -107,8 +107,9 @@ package body Lua.Engine.Format_Drivers is
                   if Form (Cursor) = 's' then
                      --  Always use the ordinary tostring path, including for
                      --  strings: a per-type handler can override behavior.
-                     Activation.Native_Captures.Append
-                       (New_String (State, Form (First .. Cursor)));
+                     Append_Root
+                       (State, Activation.Native_Captures,
+                        New_String (State, Form (First .. Cursor)));
                      Action.Kind := Invoke;
                      Action.Function_Value :=
                        New_Native (State, "base.tostring");

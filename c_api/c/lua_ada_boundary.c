@@ -188,6 +188,25 @@ static int drive_call(lua_State *state, int arguments, int results,
     return (int)output.integer_data;
 }
 
+static int close_io_primitive(lua_State *state, int kind) {
+    struct lua_ada_request input = request(ADA_CLOSE_IO_PRIMITIVE);
+    input.count = kind;
+    return (int)dispatch(state, input).integer_data;
+}
+
+/* These addresses are real callable lua_CFunction values stored in the public
+ * luaL_Stream payload. Lua close validation/results stay Ada-owned; direct C
+ * closef invocation deliberately creates no extra interpreter/debug frame. */
+int lua_ada_io_close_regular(lua_State *state) {
+    return close_io_primitive(state, 0);
+}
+int lua_ada_io_close_pipe(lua_State *state) {
+    return close_io_primitive(state, 1);
+}
+int lua_ada_io_close_borrowed(lua_State *state) {
+    return close_io_primitive(state, 2);
+}
+
 void lua_pushcclosure(lua_State *state, lua_CFunction function, int upvalues) {
     struct lua_ada_request input = request(ADA_PUSH_C_CLOSURE);
     input.function_data = function;

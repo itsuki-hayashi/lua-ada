@@ -129,9 +129,10 @@ package body Lua.Engine.Stacks is
       --  No vector reference survives either operation. Cached scalar writes
       --  and cell writes cannot allocate; both describe one Lua binding.
       Cell := Context.Stack_Cells.Element (Index);
+      Root_Barrier (State, Item);
       Context.Foreign_Stack.Replace_Element (Index, Item);
       if Cell /= null then
-         Cell.Cell_Value := Item;
+         Store_Cell (State, Cell, Item);
       end if;
    end Write;
 
@@ -148,6 +149,11 @@ package body Lua.Engine.Stacks is
          --  trigger one emergency collection, so retain only its stable
          --  absolute index rather than borrowing either resizable vector.
          Cell := New_Cell (State, Read (State, Context, Index));
+         if Context.Thread = null then
+            Root_Barrier (State, Cell);
+         else
+            Write_Barrier (State, Context.Thread, Cell);
+         end if;
          Context.Stack_Cells.Replace_Element (Index, Cell);
       end if;
       return Cell;
@@ -195,6 +201,50 @@ package body Lua.Engine.Stacks is
          Clear_Range (Context, Last + 1, Initialized);
       end if;
    end Trim;
+
+   function Try_Shrink
+     (Context : not null Context_Access; Last : Natural) return Boolean
+   is
+      Initialized : constant Natural :=
+        Natural (Context.Foreign_Stack.Length);
+   begin
+      Check_Range (Context, 1, Initialized);
+      if Last > Initialized then
+         raise Program_Error with "physical stack shrink cannot grow";
+      elsif Last = Initialized and then
+        Natural (Context.Foreign_Stack.Capacity) = Last and then
+        Natural (Context.Stack_Cells.Capacity) = Last
+      then
+         return True;
+      end if;
+      declare
+         --  Controlled Ada buffers cannot safely use raw realloc: their
+         --  discriminants, finalization links and possibly nested elements
+         --  belong to typed objects. Exact ownerful prefix copies provide a
+         --  safe physical shrink, whose temporary peak/counts remain real.
+         New_Values : Values.Vector := Values.Copy_Prefix
+           (Context.Foreign_Stack, Ada.Containers.Count_Type (Last),
+            Ada.Containers.Count_Type (Last));
+         New_Cells : Cell_References.Vector := Cell_References.Copy_Prefix
+           (Context.Stack_Cells, Ada.Containers.Count_Type (Last),
+            Ada.Containers.Count_Type (Last));
+      begin
+         Values.Move (Context.Foreign_Stack, New_Values);
+         Cell_References.Move (Context.Stack_Cells, New_Cells);
+      end;
+      return True;
+   exception
+      when Lua.Storage.Allocation_Error =>
+         Lua.Storage.Acknowledge_Refusal (Context.Memory.all);
+         return False;
+      when Program_Error =>
+         if not Lua.Storage.Refusal_Pending (Context.Memory.all) then
+            raise;
+         end if;
+         Lua.Storage.Acknowledge_Refusal (Context.Memory.all);
+         return False;
+   end Try_Shrink;
+
 
    procedure Trace
      (Context : not null Context_Access;

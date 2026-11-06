@@ -1,6 +1,7 @@
 with Ada.Finalization;
 with Ada.Strings.Unbounded;
 with Lua.Diagnostics;
+with Interfaces.C;
 private with Lua.Engine;
 
 package Lua.Sessions is
@@ -35,10 +36,19 @@ package Lua.Sessions is
 
    type Execution_Status is
      (Succeeded, Syntax_Error, Runtime_Error, Resource_Error, Host_Error,
-      Unsupported_Feature);
+      Unsupported_Feature, Exit_Requested);
    --  Host_Error identifies a failing output sink, not a Lua language error.
    --  Unsupported_Feature identifies valid syntax awaiting runtime support;
    --  the complete chunk is checked and rejected before executing any code.
+
+   subtype Process_Exit_Code is Interfaces.C.int;
+   --  Preserve the native C status before the process applies OS narrowing.
+   type Process_Exit_Request is record
+      Code : Process_Exit_Code := 0;
+      Close_State : Boolean := False;
+   end record;
+   --  os.exit is a typed execution transfer for an Ada host. It never exits
+   --  the host process. Close_State reports whether Lua state cleanup ran.
 
    subtype Diagnostic is Lua.Diagnostics.Diagnostic;
    --  Source names and byte positions remain separate from message wording.
@@ -47,6 +57,7 @@ package Lua.Sessions is
       Status : Execution_Status := Succeeded;
       Output : Ada.Strings.Unbounded.Unbounded_String;
       Error  : Diagnostic;
+      Exit_Request : Process_Exit_Request;
    end record;
    --  Captured output preceding an error is preserved. Process output has
    --  already been written and leaves Output empty. No chunk return values
@@ -122,7 +133,9 @@ package Lua.Sessions is
    --  Return owned-allocation counts, not process memory or coverage metrics.
 
    procedure Close (Self : in out Session);
-   --  Idempotently release the universe. Execute then returns Runtime_Error.
+   --  Idempotently close the main thread and finalize Lua objects, then
+   --  release the universe. Execute then returns Runtime_Error. Host aborts
+   --  stop Lua cleanup; physical owned-resource disposal still completes.
 
    procedure Reset (Self : in out Session);
    --  Start a fresh universe with default limits and standard libraries.

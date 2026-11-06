@@ -72,6 +72,14 @@ function Invoke-Case {
 }
 
 $cases = @(
+    # A reachable finalizable object must run at explicit CLI state closure,
+    # after the chunk marker; physical Ada disposal alone cannot satisfy it.
+    @{ Title = 'state close finalizes reachable objects';
+       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("closed") end}); print("done")');
+       Output = "done${newline}closed$newline" },
+    @{ Title = 'failed snippet closes reachable objects';
+       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("closed") end}); error("expected")');
+       Fail = $true; Error = 'expected'; Output = "closed$newline" },
     # No input is deliberately batch usage, rather than an implicit REPL.
     @{ Title = 'no input displays usage'; Args = @(); Contains = 'Usage:' },
     @{ Title = 'explicit help'; Args = @('--help'); Contains = 'Usage:' },

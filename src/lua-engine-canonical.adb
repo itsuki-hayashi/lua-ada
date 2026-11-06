@@ -417,9 +417,9 @@ package body Lua.Engine.Canonical is
       return Prototype_Access
    is
       Owner : Canonical_Program_Access;
-      Start : constant Natural := State.Programs.Last_Index;
+
       Was_Compiling : constant Boolean := State.Compiling;
-      Had_References : Boolean := False;
+
       Current : Prototype_Access;
       Pending_Text : Value;
       procedure String_Value (Text : String);
@@ -444,11 +444,7 @@ package body Lua.Engine.Canonical is
       --  no opaque fake private instructions stand in for canonical metadata.
       for Index in 1 .. Lua.Prototypes.Prototype_Count (Owner.Model) loop
          Current := New_Program (State);
-         begin
-            State.Programs.Append (Current);
-         exception
-            when others => Release_Program (Current); raise;
-         end;
+
          Owner.Wrappers.Append (Current);
          Owner.References := Owner.References + 1;
          Current.Canonical_Owner := Owner;
@@ -478,6 +474,7 @@ package body Lua.Engine.Canonical is
                     (Owner.Model, Item.String_Data, String_Value'Access);
             end case;
             Current.Canonical_Constants.Append (Pending_Text);
+            Code_Barrier (State, Current);
          end loop;
       end loop;
       if Lua.Prototypes.Root (Owner.Model) = null then
@@ -494,17 +491,27 @@ package body Lua.Engine.Canonical is
          --  common program owner disappears only after the last wrapper; an
          --  allocation before the first registration is cleaned up directly.
          State.Entry_Code := null;
-         Had_References := Owner /= null and then Owner.References /= 0;
-         while State.Programs.Last_Index > Start loop
-            declare
-               Item : Prototype_Access := State.Programs.Last_Element;
-            begin
-               State.Programs.Delete_Last;
-               Release_Program (Item);
-            end;
-         end loop;
-         if Owner /= null and then not Had_References then
-            Release_Bundle (Owner);
+         if Current /= null and then Current.Canonical_Owner = null then
+            Release_Registered_Program (State, Current);
+         end if;
+         if Owner /= null then
+            if Owner.Wrappers.Is_Empty then
+               Release_Bundle (Owner);
+            else
+               --  Stable registry holes invalidate dense-index rollback.
+               --  The immutable owner records precisely this construction's
+               --  wrappers; the last release destroys Owner, so no later
+               --  iteration or cleanup may dereference that pointer.
+               for Index in reverse Owner.Wrappers.First_Index ..
+                 Owner.Wrappers.Last_Index
+               loop
+                  declare
+                     Item : Prototype_Access := Owner.Wrappers (Index);
+                  begin
+                     Release_Registered_Program (State, Item);
+                  end;
+               end loop;
+            end if;
          end if;
          State.Compiling := Was_Compiling;
          raise;
@@ -523,7 +530,8 @@ package body Lua.Engine.Canonical is
       if not Main.Reference.Upvalues.Is_Empty then
          --  Explicit nil is an actual initial environment, distinct from an
          --  omitted environment. Other initial capture cells remain nil.
-         Main.Reference.Upvalues.First_Element.Cell_Value := Environment;
+         Store_Cell
+           (State, Main.Reference.Upvalues.First_Element, Environment);
       end if;
       return Main;
    end Adopt;
@@ -759,7 +767,9 @@ package body Lua.Engine.Canonical is
          Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input)
       is
       begin
-         Activation.Native_Arguments := Arguments;
+         Copy_Roots
+           (State, Activation.Native_Arguments,
+            Arguments);
          Activation.Canonical_Pending := Store_Canonical_Results;
          Activation.Canonical_Base := Destination;
          Activation.Canonical_Wanted := Wanted;
@@ -870,7 +880,9 @@ package body Lua.Engine.Canonical is
          begin
             Arguments.Append (Reg (Activation.Canonical_Concat_Last - 1));
             Arguments.Append (Reg (Activation.Canonical_Concat_Last));
-            Activation.Native_Arguments := Arguments;
+            Copy_Roots
+              (State, Activation.Native_Arguments,
+               Arguments);
             return (Kind => Invoke_Helper,
                     Helper => To_Unbounded_String ("@binary"),
                     Operator => Lua.Lexers.Concatenate,
@@ -922,7 +934,8 @@ package body Lua.Engine.Canonical is
          when Op_GETUPVAL =>
             Put (Reg_A, Upvalue_Cell (State, Activation, Reg_B).Cell_Value);
          when Op_SETUPVAL =>
-            Upvalue_Cell (State, Activation, Reg_B).Cell_Value := Reg (Reg_A);
+            Store_Cell
+              (State, Upvalue_Cell (State, Activation, Reg_B), Reg (Reg_A));
          when Op_GETTABUP | Op_GETTABLE | Op_GETI | Op_GETFIELD | Op_SELF =>
             Left := (if Op = Op_GETTABUP then
                        Upvalue_Cell (State, Activation, Reg_B).Cell_Value
@@ -1046,7 +1059,9 @@ package body Lua.Engine.Canonical is
                begin
                   Arguments.Append (Reg (Reg_A + Reg_B - 2));
                   Arguments.Append (Reg (Reg_A + Reg_B - 1));
-                  Activation.Native_Arguments := Arguments;
+                  Copy_Roots
+                    (State, Activation.Native_Arguments,
+                     Arguments);
                   Result := (Kind => Invoke_Helper,
                     Helper => To_Unbounded_String ("@binary"),
                     Operator => Lua.Lexers.Concatenate,
@@ -1101,10 +1116,13 @@ package body Lua.Engine.Canonical is
                Activation.Canonical_Top := Reg_A + Reg_B;
             end if;
             Activation.Canonical_GC_Top := Reg_A + Count + 1;
-            Activation.Native_Arguments :=
-              Register_List (State, Activation, Reg_A + 1, Count);
+            Copy_Roots
+              (State, Activation.Native_Arguments,
+               Register_List (State, Activation, Reg_A + 1, Count));
             Activation.Native_Captures.Clear;
-            Activation.Native_Captures.Append (Reg (Reg_A));
+            Append_Root
+              (State, Activation.Native_Captures,
+               Reg (Reg_A));
             Activation.Canonical_Pending := Store_Call_Results;
             Activation.Canonical_Base := Reg_A;
             Activation.Canonical_Wanted := Integer (Reg_C) - 1;
@@ -1126,8 +1144,9 @@ package body Lua.Engine.Canonical is
                       elsif Op = Op_RETURN1 then 1
                       elsif Reg_B /= 0 then Reg_B - 1
                       else Activation.Canonical_Top - Reg_A);
-            Activation.Unwind_Results :=
-              Register_List (State, Activation, Reg_A, Count);
+            Copy_Roots
+              (State, Activation.Unwind_Results,
+               Register_List (State, Activation, Reg_A, Count));
             Freeze_Closing (0);
             Result := (Kind => Return_Results,
                        Arguments => Activation.Unwind_Results, others => <>);
@@ -1188,9 +1207,13 @@ package body Lua.Engine.Canonical is
                Put (Reg_A + 3, Reg (Reg_A));
                Arguments.Append (Reg (Reg_A + 4));
                Arguments.Append (Reg (Reg_A + 5));
-               Activation.Native_Arguments := Arguments;
+               Copy_Roots
+                 (State, Activation.Native_Arguments,
+                  Arguments);
                Activation.Native_Captures.Clear;
-               Activation.Native_Captures.Append (Reg (Reg_A));
+               Append_Root
+                 (State, Activation.Native_Captures,
+                  Reg (Reg_A));
                Activation.Canonical_Pending := Store_Call_Results;
                Activation.Canonical_Base := Reg_A + 3;
                Activation.Canonical_Wanted := Reg_C;
@@ -1255,8 +1278,9 @@ package body Lua.Engine.Canonical is
                Put (Reg_A, Closure);
                Activation.Canonical_GC_Top := Reg_A + 1;
                for Upvalue of Child.Upvalues loop
-                  Closure.Reference.Upvalues.Append
-                    ((if Upvalue.In_Stack then Capture_Cell
+                  Append_Object_Edge
+                    (State, Closure.Reference, Closure.Reference.Upvalues,
+                     (if Upvalue.In_Stack then Capture_Cell
                         (State, Activation, Natural (Upvalue.Index))
                       else Upvalue_Cell
                         (State, Activation, Natural (Upvalue.Index))));
@@ -1356,6 +1380,7 @@ package body Lua.Engine.Canonical is
                   --  allocations needed by the table and its n field.
                   Item := New_Table (State);
                   Activation.Vararg_Table := Item.Reference;
+                  Root_Barrier (State, Activation.Vararg_Table);
                   Reserve_Table (State, Item, Extra, 1);
                   for Index in 1 .. Extra loop
                      Argument := Stacks.Read

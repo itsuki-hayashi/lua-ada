@@ -13,6 +13,12 @@
 #include <sys/types.h>
 #endif
 
+size_t lua_ada_stream_pointer_text(FILE *file, char *bytes, size_t capacity) {
+    int length = snprintf(bytes, capacity, "%p", (void *)file);
+    if (length < 0 || (size_t)length >= capacity) return 0;
+    return (size_t)length;
+}
+
 #if defined(_WIN32)
 typedef long stream_offset;
 #define stream_seek fseek

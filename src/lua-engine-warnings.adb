@@ -110,6 +110,7 @@ package body Lua.Engine.Warnings is
       State.Next_Foreign_Ticket := State.Next_Foreign_Ticket + 1;
       Activation.Warning_Ticket := State.Next_Foreign_Ticket;
       Activation.Warning_Message := Text;
+      Root_Barrier (State, Root);
       Activation.Warning_Root := Root;
       Activation.Warning_To_Continue := To_Continue;
       Activation.Warning_Handler := State.Warning_Handler;

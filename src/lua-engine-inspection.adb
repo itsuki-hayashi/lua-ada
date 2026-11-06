@@ -1,5 +1,6 @@
 with Lua.Engine.Call_Names;
 with Lua.Engine.Canonical;
+with Lua.Engine.Stacks;
 with Lua.Prototypes;
 with Lua.Engine.Strings;
 with Ada.Strings.Fixed;
@@ -198,6 +199,7 @@ package body Lua.Engine.Inspection is
                Fail (State, "hook count out of range");
             end if;
             Context.Hook := Arg (Base);
+            Root_Barrier (State, Context.Hook);
             Context.Hook_Mask := Null_Unbounded_String;
             for Mask of String'("crl") loop
                if Ada.Strings.Fixed.Index
@@ -262,6 +264,7 @@ package body Lua.Engine.Inspection is
                --  table or changing the userdata's stable C payload address.
                Arg (1).Reference.Uservalues.Replace_Element
                  (Positive (Number), Arg (2));
+               Back_Barrier (State, Arg (1).Reference);
                Append (Arg (1));
             else
                Append (Arg (1).Reference.Uservalues (Positive (Number)));
@@ -311,8 +314,9 @@ package body Lua.Engine.Inspection is
             then
                Fail (State, "invalid upvalue index");
             end if;
-            Target.Reference.Upvalues.Replace_Element
-              (Positive (Target_Index),
+            Replace_Object_Edge
+              (State, Target.Reference, Target.Reference.Upvalues,
+               Positive (Target_Index),
                Source.Reference.Upvalues (Positive (Source_Index)));
          end;
       elsif Name in "debug.getupvalue" | "debug.setupvalue" | "debug.upvalueid"
@@ -362,7 +366,7 @@ package body Lua.Engine.Inspection is
                         else Code.Capture_Symbols (Positive (Index)))))));
                end if;
                if Name = "debug.setupvalue" then
-                  Cell.Cell_Value := Arg (3);
+                  Store_Cell (State, Cell, Arg (3));
                else
                   Append (Cell.Cell_Value);
                end if;
@@ -664,19 +668,41 @@ package body Lua.Engine.Inspection is
                     (State, Symbol_Text
                        (Selected.Code, Cells (Positive (Index)).Symbol)));
                   if Name = "debug.setlocal" then
-                     Cells (Positive (Index)).Cell.Cell_Value :=
-                       Arg (Base + 2);
+                     Store_Cell
+                       (State, Cells (Positive (Index)).Cell, Arg (Base + 2));
                   else
                      Append (Cells (Positive (Index)).Cell.Cell_Value);
                   end if;
                end if;
             elsif Index > 0 and then
-              Index <= Integer_Value (Selected.Native_Arguments.Length)
+              Index <= Integer_Value
+                ((if Selected.Has_Stack_Window then
+                     Selected.Stack_Live_Top - Selected.Stack_Base else
+                     Natural (Selected.Native_Arguments.Length)))
             then
                Append (New_String (State, "(C temporary)"));
                if Name = "debug.setlocal" then
-                  Selected.Native_Arguments.Replace_Element
-                    (Positive (Index), Arg (Base + 2));
+                  --  Native packets drive Ada continuations, while the real
+                  --  scalar window drives C API access and collection. Update
+                  --  both views; foreign activations may intentionally have
+                  --  no packet entry for a valid scalar C temporary.
+                  if Index <=
+                    Integer_Value (Selected.Native_Arguments.Length)
+                  then
+                     Replace_Root
+                       (State, Selected.Native_Arguments, Positive (Index),
+                        Arg (Base + 2));
+                  end if;
+                  if Selected.Has_Stack_Window then
+                     Stacks.Write
+                       (State, Selected.Context,
+                        Selected.Stack_Base + Positive (Index),
+                        Arg (Base + 2));
+                  end if;
+               elsif Selected.Has_Stack_Window then
+                  Append (Stacks.Read
+                    (State, Selected.Context,
+                     Selected.Stack_Base + Positive (Index)));
                else
                   Append (Selected.Native_Arguments (Positive (Index)));
                end if;

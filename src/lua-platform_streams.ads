@@ -84,6 +84,13 @@ private package Lua.Platform_Streams is
      with Import, Convention => C, External_Name => "lua_ada_stream_seek";
    function Position (File : Handle) return C.long_long
      with Import, Convention => C, External_Name => "lua_ada_stream_position";
+   function Pointer_Text
+     (File : Handle; Bytes : System.Address; Capacity : C.size_t)
+      return C.size_t
+     with Import, Convention => C,
+       External_Name => "lua_ada_stream_pointer_text";
+   --  Native %p spelling for the public FILE pointer. Bytes is a synchronous
+   --  writable range; callers provide enough space for a pointer token.
    --  Validate offset against Offset_Bits before seeking. This deliberately
    --  follows pinned POSIX off_t / native MinGW C-long configuration rather
    --  than silently granting MSVC's unrelated 64-bit extension on MinGW.

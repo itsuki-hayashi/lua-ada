@@ -433,5 +433,9 @@ package body Lua.Engine.Tables is
             end loop;
          end if;
       end if;
+      --  Raw stores bypass metamethod dispatch, never collector barriers.
+      --  All reserves completed before publication; this no-allocation
+      --  backward barrier makes both newly stored key and value revisitable.
+      Back_Barrier (State, Table);
    end Put;
 end Lua.Engine.Tables;

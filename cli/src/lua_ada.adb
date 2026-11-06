@@ -7,6 +7,7 @@ with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;
+with Interfaces.C;
 with Lua;
 with Lua.Sessions;
 with Lua.Sources;
@@ -24,6 +25,11 @@ procedure Lua_Ada is
    Script_Index : Natural := 0;
    Version_Requested : Boolean := False;
    Check_Requested : Boolean := False;
+
+   procedure Exit_Process (Code : Interfaces.C.int)
+     with Import, Convention => C, No_Return, External_Name => "exit";
+   --  Process mechanics run only after the Ada execution boundary returns.
+   --  os.exit(false) deliberately does not invoke Ada session finalization.
 
    procedure Usage;
    procedure Version;
@@ -65,7 +71,11 @@ procedure Lua_Ada is
             Ada.Text_IO.Put (Byte);
          end if;
       end loop;
-      if Result.Status /= Succeeded then
+      if Result.Status = Exit_Requested then
+         Ada.Text_IO.Flush;
+         Ada.Text_IO.Flush (Ada.Text_IO.Standard_Error);
+         Exit_Process (Result.Exit_Request.Code);
+      elsif Result.Status /= Succeeded then
          declare
             Message : constant String := To_String (Result.Error.Message);
             Prefix : constant String := To_String (Result.Error.Source) & ":";
@@ -266,12 +276,14 @@ begin
       Result := Universe.Set_Arguments (Args);
       if Result.Status /= Succeeded then
          Report (Result);
+         Universe.Close;
          return;
       end if;
       for Source of Snippets loop
          Result := Universe.Execute (To_String (Source), "(command line)");
          Report (Result);
          if Result.Status /= Succeeded then
+            Universe.Close;
             return;
          end if;
       end loop;
@@ -287,6 +299,9 @@ begin
             Report (Result);
          end;
       end if;
+      --  CLI completion is a Lua-state close, including reachable finalizers.
+      --  Ada controlled finalization is only the physical disposal fallback.
+      Universe.Close;
    end;
 exception
    when Error : others =>

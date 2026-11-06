@@ -151,7 +151,9 @@ package body Lua.Engine.Sorting is
 
       procedure Save (Index : Positive; Value_Item : Value) is
       begin
-         Activation.Native_Captures.Replace_Element (Index, Value_Item);
+         Replace_Root
+           (State, Activation.Native_Captures,
+            Index, Value_Item);
       end Save;
 
       procedure Save_Number (Index : Positive; Value_Item : Integer_Value) is
@@ -286,9 +288,10 @@ package body Lua.Engine.Sorting is
                if Arg (1).Kind = Table_Kind and then
                  Metafield (State, Arg (1), "__len").Kind = Nil_Kind
                then
-                  Activation.Native_Results := One_Value
-                    (State, (Integer_Kind, Integer_Value
-                       (Table_Length (Arg (1)))));
+                  Copy_Roots
+                    (State, Activation.Native_Results,
+                     One_Value (State, (Integer_Kind, Integer_Value
+                       (Table_Length (Arg (1))))));
                   Resume (Length_Ready);
                else
                   Resume (Length_Ready);

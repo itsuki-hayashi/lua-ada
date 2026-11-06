@@ -111,18 +111,18 @@ package body Lua.Engine.Pattern_Drivers is
                   Allow_Anchor => False);
                exit when not Found.Found;
                if Integer_Value (Found.After) /= Last then
-                  Closure.Captures (3).Cell_Value := (Integer_Kind,
-                    Integer_Value (Found.After));
-                  Closure.Captures (4).Cell_Value := (Integer_Kind,
-                    Integer_Value (Found.After));
+                  Store_Cell (State, Closure.Captures (3),
+                              (Integer_Kind, Integer_Value (Found.After)));
+                  Store_Cell (State, Closure.Captures (4),
+                              (Integer_Kind, Integer_Value (Found.After)));
                   Action.Results := Patterns.Capture_Values
                     (State, Subject, Found);
                   return Action;
                end if;
                Position := Position + 1;
             end loop;
-            Closure.Captures (3).Cell_Value := (Integer_Kind, Integer_Value
-              (Subject'Length) + 1);
+            Store_Cell (State, Closure.Captures (3),
+                        (Integer_Kind, Integer_Value (Subject'Length) + 1));
             return Action;
          end;
       end if;
@@ -152,7 +152,9 @@ package body Lua.Engine.Pattern_Drivers is
          if Activation.Native_Stage = 0 then
             --  Slot one is the last accepted end position. It prevents an
             --  empty match from being accepted repeatedly at the same byte.
-            Activation.Native_Captures.Append (Value'(Integer_Kind, -1));
+            Append_Root
+              (State, Activation.Native_Captures,
+               Value'(Integer_Kind, -1));
             Activation.Native_Stage := 1;
          elsif Activation.Native_Stage = 2 then
             --  A callback may have run arbitrary Lua and forced collection.
@@ -205,12 +207,16 @@ package body Lua.Engine.Pattern_Drivers is
          Activation.Native_Index := Found.After;
          Activation.Native_Aux := Activation.Native_Aux + 1;
          Activation.Native_Captures.Clear;
-         Activation.Native_Captures.Append
-           (Value'(Integer_Kind, Integer_Value (Found.After)));
-         Activation.Native_Captures.Append
-           (New_String (State, Whole));
+         Append_Root
+           (State, Activation.Native_Captures,
+            Value'(Integer_Kind, Integer_Value (Found.After)));
+         Append_Root
+           (State, Activation.Native_Captures,
+            New_String (State, Whole));
          for Item of Captures loop
-            Activation.Native_Captures.Append (Item);
+            Append_Root
+              (State, Activation.Native_Captures,
+               Item);
          end loop;
          if Replacement.Kind in String_Kind | Integer_Kind | Real_Kind then
             declare

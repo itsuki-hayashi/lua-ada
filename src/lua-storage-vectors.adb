@@ -468,6 +468,36 @@ package body Lua.Storage.Vectors is
 
    function Copy (Self : Vector) return Vector is (Self);
 
+   function Copy_Prefix
+     (Self : Vector; Length, Capacity : Count_Type) return Vector
+   is
+      Copied : constant Natural := Checked_Count (Length);
+      Reserved : constant Natural := Checked_Count (Capacity);
+   begin
+      if Copied > Self.Used or else Reserved < Copied then
+         raise Constraint_Error with "invalid exact vector prefix size";
+      elsif Reserved > 0 and then Self.Memory = null then
+         raise Program_Error with "exact vector copy requires an owner";
+      end if;
+      return Result : Vector do
+         Result.Memory := Self.Memory;
+         if Reserved > 0 then
+            --  Exact capacity is essential for physical shrinking. Reusing
+            --  Reserve_Capacity would choose a larger geometric buffer and
+            --  could merely relabel retained storage as a supposed shrink.
+            Result.Data := new (Handle (Self.Memory.all)) Buffer (Reserved);
+            for Index in 1 .. Copied loop
+               Result.Data.Items (Index) := Self.Data.Items (Index);
+               Result.Used := Index;
+            end loop;
+         end if;
+         --  On a failed controlled element copy the extended return object
+         --  owns every published slot. Existing buffer/element finalization
+         --  releases partial scratch without touching the source allocation.
+      end return;
+   end Copy_Prefix;
+
+
    procedure Move (Target, Source : in out Vector) is
    begin
       if Target'Address = Source'Address then

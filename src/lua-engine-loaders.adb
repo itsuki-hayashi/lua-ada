@@ -637,8 +637,12 @@ package body Lua.Engine.Loaders is
                return Result;
             end if;
             Activation.Native_Captures.Clear;
-            Activation.Native_Captures.Append (Package_Value);
-            Activation.Native_Captures.Append (Item);
+            Append_Root
+              (State, Activation.Native_Captures,
+               Package_Value);
+            Append_Root
+              (State, Activation.Native_Captures,
+               Item);
             Activation.Native_Buffer.Set_Value
               ("module '" & Bytes (Item) & "' not found:");
             if Length (Activation.Native_Buffer) > State.Bounds.String_Bytes
@@ -664,7 +668,9 @@ package body Lua.Engine.Loaders is
             Function_Value := Returned (1);
             if Is_Function (Function_Value) then
                Data := Returned (2);
-               Activation.Native_Captures.Append (Data);
+               Append_Root
+                 (State, Activation.Native_Captures,
+                  Data);
                Activation.Native_Stage := 3;
                declare
                   Args : Values.Vector := Owned_Values (State);

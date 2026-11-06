@@ -7,6 +7,7 @@ with Lua.Canonical_Compiler;
 with Lua.Chunks;
 with Lua.Engine.Canonical;
 with Lua.Engine.Stacks;
+with Lua.Engine.IO_Libraries;
 with Lua.Engine.Warnings;
 with Lua.Runtime_Configuration;
 with Lua.Syntax;
@@ -28,6 +29,22 @@ package body Lua.Engine.Foreign is
    use type Memory.Allocation_Function;
    use type C.unsigned_long_long;
    use type System.Address;
+
+   function Close_Regular (State : System.Address) return C.int
+     with Import, Convention => C,
+          External_Name => "lua_ada_io_close_regular";
+   function Close_Pipe (State : System.Address) return C.int
+     with Import, Convention => C,
+          External_Name => "lua_ada_io_close_pipe";
+   function Close_Borrowed (State : System.Address) return C.int
+     with Import, Convention => C,
+          External_Name => "lua_ada_io_close_borrowed";
+
+   function IO_Close_Handler (Kind : IO_Close_Kind) return C_Function is
+     (case Kind is
+         when Regular_File_Close => Close_Regular'Access,
+         when Pipe_File_Close => Close_Pipe'Access,
+         when Borrowed_File_Close => Close_Borrowed'Access);
 
    Registry_Index : constant C.int := -(C.int'Last / 2 + 1_000);
    Stack_Limit : constant Natural :=
@@ -404,6 +421,7 @@ package body Lua.Engine.Foreign is
       if Is_Warning then
          if Status /= Action_Done then
             Target.Failure := Stacks.Read (Target, Target.Foreign_Top);
+            Root_Barrier (State, Target.Failure);
             Target.Has_Failure_Value := True;
             Target.Failure_Text := To_Unbounded_String
               (Image (Target.Memory, Target.Failure));
@@ -729,8 +747,9 @@ package body Lua.Engine.Foreign is
               (if Owner.Universe.Current.Failure_Class = Memory_Failure then 4
                elsif Owner.Universe.Current.Failure_Class = Handling_Failure
                then 5 else 2);
-            Packet.Append
-              ((if Owner.Universe.Current.Has_Failure_Value then
+            Append_Root
+              (Owner.Universe.all, Packet,
+               (if Owner.Universe.Current.Has_Failure_Value then
                    Owner.Universe.Current.Failure else
                    New_String (Owner.Universe.all, To_String
                      (Owner.Universe.Current.Failure_Text))));
@@ -786,8 +805,9 @@ package body Lua.Engine.Foreign is
                      then 4
                      elsif Owner.Universe.Current.Failure_Class =
                        Handling_Failure then 5 else 2);
-                  Packet.Append
-                    ((if Owner.Universe.Current.Has_Failure_Value then
+                  Append_Root
+                    (Owner.Universe.all, Packet,
+                     (if Owner.Universe.Current.Has_Failure_Value then
                          Owner.Universe.Current.Failure else
                          New_String (Owner.Universe.all, To_String
                            (Owner.Universe.Current.Failure_Text))));
@@ -958,6 +978,7 @@ package body Lua.Engine.Foreign is
                if Input.Index /= 0 then
                   Context.Failure :=
                     Stacks.Read (Context, Context.Foreign_Top);
+                  Root_Barrier (Owner.Universe.all, Context.Failure);
                   Context.Has_Failure_Value := True;
                   Context.Failure_Text := To_Unbounded_String
                     (Image (Context.Memory, Context.Failure));
@@ -1057,10 +1078,12 @@ package body Lua.Engine.Foreign is
                if Input.Count < Registry_Index and then
                  Valid_Index (Context, Input.Count)
                then
-                  Context.Foreign_Activation.Native_Self.Captures
-                    (Positive (C.long_long (Registry_Index) -
-                      C.long_long (Input.Count))).Cell_Value :=
-                        Get_Value (Input.Index);
+                  Store_Cell
+                    (Owner.Universe.all,
+                     Context.Foreign_Activation.Native_Self.Captures
+                       (Positive (C.long_long (Registry_Index) -
+                         C.long_long (Input.Count))),
+                     Get_Value (Input.Index));
                elsif Slot = 0 then
                   raise Foreign_Error with "invalid C stack destination";
                else
@@ -1183,9 +1206,11 @@ package body Lua.Engine.Foreign is
                   if Slot > 0 then
                      Stacks.Write (Owner.Universe.all, Context, Slot, Item);
                   else
-                     Context.Foreign_Activation.Native_Self.Captures
-                       (Positive (C.long_long (Registry_Index) -
-                         C.long_long (Input.Index))).Cell_Value := Item;
+                     Store_Cell
+                       (Owner.Universe.all,
+                        Context.Foreign_Activation.Native_Self.Captures
+                          (Positive (C.long_long (Registry_Index) -
+                            C.long_long (Input.Index))), Item);
                   end if;
                end if;
                if Item.Kind = String_Kind then
@@ -1313,6 +1338,10 @@ package body Lua.Engine.Foreign is
                      Item.Reference.Uservalues.Replace_Element
                        (Positive (Input.Count),
                         Stacks.Read (Context, Context.Foreign_Top));
+                     --  Uservalues are revisited like table entries. Their
+                     --  generational mutation uses the owner's backward
+                     --  barrier, rather than promoting the child as a cell.
+                     Back_Barrier (Owner.Universe.all, Item.Reference);
                   end if;
                   Pop (Context);
                   Output.Integer_Data := Boolean'Pos (Valid);
@@ -1452,7 +1481,9 @@ package body Lua.Engine.Foreign is
                     Natural (Input.Count) + 1 ..
                     Context.Foreign_Top
                   loop
-                     Captures.Append (Stacks.Read (Context, Index));
+                     Append_Root
+                       (Owner.Universe.all, Captures,
+                        Stacks.Read (Context, Index));
                   end loop;
                   Item := New_Native (Owner.Universe.all, "foreign.callback",
                                       Captures);
@@ -1474,6 +1505,28 @@ package body Lua.Engine.Foreign is
                   Output.Function_Data :=
                     Address_Function (Item.Reference.Foreign_Handler);
                end if;
+            end;
+         when Close_IO_Primitive =>
+            if Input.Count not in 0 .. 2 then
+               raise Foreign_Error with "invalid native file close operation";
+            end if;
+            declare
+               Kind : constant IO_Close_Kind :=
+                 IO_Close_Kind'Val (Input.Count);
+               Packet : constant Values.Vector :=
+                 IO_Libraries.Close_Primitive
+                   (Owner.Universe.all, Get_Value (1), Kind);
+            begin
+               --  Calling closef directly is not lua_call: it adds neither
+               --  a visible debug activation nor another native-depth entry.
+               --  The current file/C frame owns the receiver throughout; the
+               --  The Ada library supplies the actual boolean, error, or
+               --  execution-result values.
+               Root_Barrier (Owner.Universe.all, Packet);
+               for Item of Packet loop
+                  Push (Owner.Universe.all, Context, Item);
+               end loop;
+               Output.Integer_Data := C.long_long (Packet.Length);
             end;
          when Begin_Call =>
             if not Main_Owner.Owns_Universe and then
@@ -1505,7 +1558,9 @@ package body Lua.Engine.Foreign is
                Start_Error : Boolean := False;
             begin
                for Index in Slot + 1 .. Context.Foreign_Top loop
-                  Arguments.Append (Stacks.Read (Context, Index));
+                  Append_Root
+                    (Owner.Universe.all, Arguments,
+                     Stacks.Read (Context, Index));
                end loop;
                if Input.Error_Index /= 0 then
                   if Input.Error_Index < 1 or else

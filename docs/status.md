@@ -1,5 +1,19 @@
 # Project Status
 
+## Active four-file follow-up (2026-11-07)
+
+The maintainer resumed implementation after merged PR #8 on
+codex/m3-gc-io-conformance. The target is complete events.lua, gc.lua,
+gengc.lua and files.lua coverage, including T obligations and all 26 contexts.
+The [current handoff](sessions/2026-11-07-gc-io-conformance.md) records actual
+evidence: 1,271 local Windows/default/validation/static AUnit cases pass.
+Collector/IO integration passed the retained pipeline at the preceding
+1,270-case revision. Latest coroutine teardown and CLI shutdown repairs have
+focused build/AUnit/CLI evidence and successful T-absent gc.lua execution,
+including its shutdown marker. These observations do not close any selected
+file's full coverage; T, platform equivalents and the final matrix remain open.
+The paused-checkpoint statements below retain the prior delivery's evidence.
+
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**
 **M3 is paused at a verified checkpoint. The bounded language lifecycle delivery has completed
 runtime acceptance; final publication checks are linked from PR #7.**
