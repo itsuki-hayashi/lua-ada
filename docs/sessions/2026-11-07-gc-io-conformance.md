@@ -566,3 +566,23 @@ the final-head matrix. Both CI jobs now explicitly check out the PR head SHA
 (or the triggering SHA for push/manual runs). This preserves exact revision
 reconciliation without rewriting report identities. Fresh final-head CI is
 required; previous green jobs are not promoted to final-head acceptance.
+
+macOS instrumented static job 128095028803 in run 42276786486 completed with
+1,299 passing AUnit cases and matching C/Ada events.lua, gengc.lua and gc.lua
+equivalent observations. Both native C and Ada then failed unchanged files.lua
+at line 474: opening /dev/full returned permission denied. Missing later child
+telemetry followed that early failure and is not a separate implementation pass.
+The new files-macos-platform candidate replaces that single hashed open with
+a real failing native FILE descriptor, preserving subsequent assertions and
+the original instrumented POSIX nonblocking-write tests. A separately named
+counterpart checks repeated failed flushes, public FILE identity, default-stream
+restoration and physical closure. It runs for both C and Ada through the common
+scoped runner. The Linux unchanged runner remains scheduled on Linux.
+
+Windows strict validation/static compilation and matching Windows file/native
+counterparts pass after this test-only driver extension, in
+reports/m3-macos-driver-windows-build.log and
+reports/m3-macos-driver-windows-counterparts.log. The Mac driver has not yet run
+on macOS; its candidate and review remain pending. The 17 matrix regressions
+pass in reports/m3-macos-matrix-selftests.log. Matrix equivalent review status
+now uses the existing generator's accepted vocabulary, rather than reviewed.

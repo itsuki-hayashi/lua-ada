@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "files-macos-platform",
+  "source": "references/lua/testes/files.lua",
+  "source_sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86",
+  "configuration": "default-and-upstream-test",
+  "platform": "macos",
+  "disposition": "native-platform-equivalent",
+  "review": { "status": "pending", "author": "Codex", "reviewer": null, "artifact": null },
+  "replacements": [
+    {
+      "id": "macos-buffered-flush-failure",
+      "start_byte": 12613,
+      "length_bytes": 35,
+      "start_line": 474,
+      "end_line": 474,
+      "source_sha256": "48c1e51d8186351c111dc276508073d24cb07b63914ed3bf615708157ae638f3",
+      "invariant": "Preserve buffered write, failed native flush, repeated write/flush and close using a real non-writable descriptor; macOS does not provide /dev/full.",
+      "counterpart_tests": ["tests/conformance/platform/macos-buffered-failure.lua"],
+      "replacement": "  local f = io.output(_test_failing_stream(assert(io.tmpfile())))\n"
+    }
+  ]
+}

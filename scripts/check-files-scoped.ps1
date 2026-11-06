@@ -26,6 +26,9 @@ try {
         if ($IsWindows) {
             $arguments.EquivalentManifest = Join-Path $root 'tests/conformance/equivalents/files-windows-platform.json'
             $arguments.AllowUnreviewedEquivalent = $true
+        } elseif ($IsMacOS) {
+            $arguments.EquivalentManifest = Join-Path $root 'tests/conformance/equivalents/files-macos-platform.json'
+            $arguments.AllowUnreviewedEquivalent = $true
         }
         & "$PSScriptRoot/run-conformance.ps1" @arguments
         $code = $LASTEXITCODE
@@ -39,6 +42,9 @@ try {
             throw "Scoped files observation failed: $target"
         }
         $stdout = [IO.File]::ReadAllText($observation.process.stdout_path)
+        if ($IsMacOS -and $stdout -notmatch '(?m)^native macOS buffered failure counterpart OK\r?$') {
+            throw 'Missing executed macOS native flush counterpart'
+        }
         $stderr = [IO.File]::ReadAllText($observation.process.stderr_path)
         # Date values can change between independent executions. Their exact
         # shape and final version are checked by the shared completion gate.

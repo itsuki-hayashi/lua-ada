@@ -148,11 +148,44 @@ cleanup:
 }
 #endif
 
+#if defined(__APPLE__)
+/* macOS has no usable /dev/full. A read-only native null descriptor published
+ * into a fresh writable FILE preserves the buffering/flush failure sequence
+ * without SIGPIPE or process-wide signal changes. Keep the original FILE,
+ * closer and Ada ownership metadata; close the temporary descriptor before
+ * any Lua operation can allocate or transfer control. */
+static int failing_stream(lua_State *L) {
+    luaL_Stream *stream = checked_stream(L, 1);
+    int descriptor = open("/dev/null", O_RDONLY);
+    int status, error;
+    if (descriptor < 0) {
+        lua_pushstring(L, strerror(errno));
+        return lua_error(L);
+    }
+    status = dup2(descriptor, fileno(stream->f));
+    error = errno;
+    close(descriptor);
+    if (status < 0) {
+        lua_pushstring(L, strerror(error));
+        return lua_error(L);
+    }
+    if (setvbuf(stream->f, NULL, _IOFBF, 4096) != 0) {
+        lua_pushliteral(L, "cannot buffer failure stream");
+        return lua_error(L);
+    }
+    lua_pushvalue(L, 1);
+    return 1;
+}
+#endif
+
 lua_CFunction lua_ada_test_platform_callback(int operation) {
 #if defined(_WIN32)
     if (operation == 15) return failing_stream;
     return operation == 16 ? nonblocking_pair : NULL;
 #else
+#if defined(__APPLE__)
+    if (operation == 15) return failing_stream;
+#endif
     return operation == 14 ? nonblock : NULL;
 #endif
 }
@@ -173,6 +206,10 @@ int luaopen_conformance_platform(lua_State *L) {
 #else
     lua_pushcfunction(L, nonblock);
     lua_setfield(L, -2, "nonblock");
+#if defined(__APPLE__)
+    lua_pushcfunction(L, failing_stream);
+    lua_setfield(L, -2, "failing_stream");
+#endif
 #endif
     return 1;
 }

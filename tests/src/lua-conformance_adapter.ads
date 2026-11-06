@@ -5,7 +5,7 @@ private package Lua.Conformance_Adapter is
    --  Install native counterpart drivers in the test launcher, including its
    --  T-absent configuration. No counterpart is an unchanged execution.
    function Has_Failing_Stream return Boolean;
-   --  Whether this host provides the Windows buffered failure counterpart.
+   --  Whether this host provides a native buffered failure counterpart.
    procedure Install (State : in out Lua.Engine.World);
    --  Install supported T operations into this test-owned universe. C
    --  callbacks borrow State until destruction; never install on a copy.

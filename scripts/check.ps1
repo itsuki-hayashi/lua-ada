@@ -118,7 +118,9 @@ try {
             -ReferenceInterpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `
             -ReferenceLibraryDirectory (Join-Path $projectRoot 'build/conformance/default/lib') `
             -Profile $Profile -LibraryType $LibraryType
-    } else {
+    } elseif (-not $IsMacOS) {
+        # macOS executes its named native counterpart in the scoped runner;
+        # unchanged files.lua requires Linux's /dev/full device.
         & (Join-Path $PSScriptRoot 'check-posix-files.ps1') `
             -Interpreter (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix") `
             -ReferenceInterpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `

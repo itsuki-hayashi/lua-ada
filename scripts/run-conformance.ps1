@@ -493,6 +493,30 @@ try {
                     '_test_failing_stream=p.failing_stream; _test_nonblocking_pair=p.nonblocking_pair'
             }
         }
+        if ($File -eq 'files.lua' -and $IsMacOS -and $mapping.id -ceq 'files-macos-platform') {
+            # Keep the native failure setup outside the unchanged interpreter.
+            # Both targets run the same separately named counterpart before
+            # the source-hashed equivalent, within the measured owned state.
+            if ($Target -eq 'ReferenceC') {
+                $driver = Join-Path $root 'tests/c/conformance_platform.c'
+                $module = Join-Path $fixtureDirectory 'conformance_platform.dylib'
+                Invoke-BuildProcess @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror',
+                    '-pedantic','-fPIC','-dynamiclib','-DLUA_ADA_PLATFORM_MODULE',
+                    '-I',(Join-Path $root 'c_api/include/api'),$driver,'-o',$module,
+                    '-L',$libraryDirectory,'-lconformance_lua','-Wl,-undefined,dynamic_lookup')
+                $evidence.native_fixture_records += [ordered]@{source='tests/c/conformance_platform.c';
+                    source_sha256=(Get-FileHash $driver).Hash.ToLowerInvariant(); artifact=$module;
+                    artifact_sha256=(Get-FileHash $module).Hash.ToLowerInvariant()}
+                $nativeSetup = "; local p=assert(package.loadlib('conformance_platform.dylib','luaopen_conformance_platform'))(); _test_failing_stream=p.failing_stream"
+            }
+            $counterpart = Join-Path $root 'tests/conformance/platform/macos-buffered-failure.lua'
+            $counterpartCopy = Join-Path $fixtureDirectory 'macos-buffered-failure.lua'
+            Copy-Item -LiteralPath $counterpart -Destination $counterpartCopy
+            $evidence.native_fixture_records += [ordered]@{source='tests/conformance/platform/macos-buffered-failure.lua';
+                source_sha256=(Get-FileHash $counterpart).Hash.ToLowerInvariant(); artifact=$counterpartCopy;
+                artifact_sha256=(Get-FileHash $counterpartCopy).Hash.ToLowerInvariant()}
+            $nativeSetup += "; dofile('macos-buffered-failure.lua')"
+        }
     }
     if ($Scope -ne '') {
         $setup = 'assert(_soft==nil and _port==nil); '

@@ -51,6 +51,15 @@ counterpart for the C-specific 200-byte emergency allowance, with measured
 table storage and actual allocation refusal/recovery. Its source mapping is
 pending review in `tests/conformance/equivalents/gc-ada-instrumented.json`.
 
+The macOS failing-stream driver in `conformance_platform.c` is first-party
+native test glue. It replaces the descriptor of a fresh owned FILE with a
+read-only `/dev/null` descriptor, preserving FILE/closer identity and avoiding
+SIGPIPE or global signal-handler changes. Its separately named Lua counterpart
+checks repeated buffered writes, flush errors, default stream restoration and
+closure. The one-span `files-macos-platform.json` candidate replaces only the
+unavailable `/dev/full` open; all remaining assertions and the actual POSIX
+T.nonblock block remain intact. Independent mapping review is pending.
+
 Upstream license notice (also retained in the pinned public `lua.h`):
 
 Copyright (C) 1994-2026 Lua.org, PUC-Rio.

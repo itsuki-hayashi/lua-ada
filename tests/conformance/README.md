@@ -214,7 +214,7 @@ checkout at the reports' exact revision. It never sets full-M3 acceptance.
 Without that switch the result is diagnostic, even when every artifact validates.
 
 The matrix manifest has `schema_version: 1`, `scope: "gc-io-events"`, a full
-`revision`, a `review` object (`status`, `author`, `reviewer`, `artifact`,
+`revision`, a `review` object (`status: "accepted"`, `author`, `reviewer`, `artifact`,
 `rationale`), and `operations`. Each operation identifies `file`, `context`,
 `c` and `ada` report objects (`report`, `sha256`, `artifact_root`), and an
 acceptance `contract` (`path`, `sha256`). Paths are relative to the manifest.
@@ -235,7 +235,12 @@ path in both configurations. POSIX selects the original source; Windows selects
 the explicit native-platform candidate and builds only its required native
 fixtures, recording source and artifact hashes. Parent and child allocator
 records are validated separately. Independent native-counterpart runners remain
-in the pipeline. Both runners measure parent, bare-lua and arg-child settings;
+in the pipeline. macOS uses a separate one-span native-platform candidate for its unavailable
+`/dev/full`. Its named buffered-failure counterpart runs before the equivalent
+in the same measured C/Ada state; the original POSIX nonblocking-write block
+still executes when T is present. This candidate is not reviewed acceptance.
+
+Both runners measure parent, bare-lua and arg-child settings;
 scripts/test-conformance-launcher.ps1 rejects a wrong requested configuration
 and a real C executable reached through ambient lookup from an Ada parent.
 The main runner also rejects Ada identity when a C baseline was requested.

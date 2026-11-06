@@ -467,10 +467,12 @@ package body Lua.Conformance_Adapter is
       Item.Reference.Foreign_Handler := Address (Callback (15));
       Set (State, Global_Environment (State),
            New_String (State, "_test_failing_stream"), Item);
-      Item := New_Native (State, "foreign.callback");
-      Item.Reference.Foreign_Handler := Address (Callback (16));
-      Set (State, Global_Environment (State),
-           New_String (State, "_test_nonblocking_pair"), Item);
+      if Callback (16) /= null then
+         Item := New_Native (State, "foreign.callback");
+         Item.Reference.Foreign_Handler := Address (Callback (16));
+         Set (State, Global_Environment (State),
+              New_String (State, "_test_nonblocking_pair"), Item);
+      end if;
       End_Operation (State);
    exception
       when others => End_Operation (State); raise;

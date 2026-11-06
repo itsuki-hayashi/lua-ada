@@ -94,7 +94,7 @@ function Test-ScopedMatrix {
                 throw 'Matrix requires independent reconciliation review'
             }
         }
-        if ($manifest.review.status -cne 'reviewed' -or $manifest.review.author -ceq $manifest.review.reviewer) {
+        if ($manifest.review.status -cne 'accepted' -or $manifest.review.author -ceq $manifest.review.reviewer) {
             throw 'Matrix requires completed independent review'
         }
         $head = (& git -C $Root rev-parse HEAD).Trim()
@@ -194,7 +194,7 @@ function Test-ScopedMatrix {
                     throw 'Matrix operation lacks scoped acceptance for the reviewed contract'
                 }
                 if ($report.execution_disposition -ne 'unchanged' -and
-                    ($report.equivalent.diagnostic_only -ne $false -or $report.equivalent.review_status -cne 'reviewed')) {
+                    ($report.equivalent.diagnostic_only -ne $false -or $report.equivalent.review_status -cne 'accepted')) {
                     throw 'Matrix contains an unreviewed equivalent'
                 }
                 if ($report.execution_disposition -ne 'unchanged') {
@@ -202,7 +202,7 @@ function Test-ScopedMatrix {
                     if ($id -cnotmatch '^[a-z0-9-]+$') { throw 'Invalid matrix equivalent identifier' }
                     $mapping = Read-MatrixHashedJson -Path (Join-Path $Root "tests/conformance/equivalents/$id.json") `
                         -Hash $report.equivalent.manifest_sha256
-                    if ($mapping.review.status -cne 'reviewed' -or
+                    if ($mapping.review.status -cne 'accepted' -or
                         [string]::IsNullOrWhiteSpace([string]$mapping.review.author) -or
                         [string]::IsNullOrWhiteSpace([string]$mapping.review.reviewer) -or
                         $mapping.review.author -ceq $mapping.review.reviewer -or

@@ -132,7 +132,9 @@ try {
             -Configuration upstream-test -LibraryType $LibraryType `
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua.exe" `
             -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
-    } else {
+    } elseif (-not $IsMacOS) {
+        # The scoped macOS runner below executes its native flush counterpart
+        # before the equivalent, while retaining upstream T.nonblock tests.
         & "$PSScriptRoot/check-posix-files.ps1" -Interpreter $runner `
             -Configuration upstream-test -LibraryType $LibraryType `
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua" `

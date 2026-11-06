@@ -16,8 +16,12 @@ collector inspection; independent review remains pending. Unchanged gc.lua
 still fails its C-specific fixed memory allowance. The ten-span Windows files.lua
 candidate completes in C and Ada, including a real native counterpart for the
 guarded partial-write block. Its mappings await independent review. Linux
-unchanged file observations pass in both configurations; macOS evidence remains
-queued. These observations do not close
+unchanged file observations pass in both configurations. The first macOS
+instrumented static job passes 1,299 AUnit cases and matching GC/events
+observations, then both C and Ada fail files.lua at the unavailable /dev/full.
+A one-span macOS native equivalent and explicit flush counterpart are now
+implemented; actual macOS validation and independent review remain pending.
+These observations do not close
 any selected file's full coverage; complete T inspection, reviewed equivalents,
 scoped harness acceptance and the final 26-context matrix remain open.
 The C facade now exposes real IO/OS module openers with shared Ada export
