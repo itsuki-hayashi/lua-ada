@@ -40,6 +40,63 @@ assumption on Windows/macOS require baseline investigation and reviewed native
 counterparts where unsupported. Keep the original files unchanged. A separately
 named equivalent aggregate is not reported as an unchanged all.lua pass.
 
+## Paused M3 execution status
+
+Code checkpoint 32398fa64d5e5c2ec604dee31be6b37afb44eb99 passes all 18
+retained platform/profile/link jobs in
+[run 42234588442](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42234588442).
+Every full job log was inspected. Development is paused at the maintainer's
+request; unfinished later integration is preserved locally and not accepted.
+
+| Category                  | Files / result                                                     |
+| ------------------------- | ------------------------------------------------------------------ |
+| Primary whole-file passes | tpack.lua, utf8.lua, bitwise.lua, goto.lua, coroutine.lua: 5 of 30 |
+| Executed helper           | bwcoercion.lua, loaded unchanged by bitwise.lua; not another suite |
+| Pending primary files     | 25 files listed below; no verified whole-file pass claimed         |
+| Pending aggregate/stress  | all.lua and heavy.lua                                              |
+| Pending helper            | tracegc.lua                                                        |
+
+The five passes use their documented default-configuration protocols with T
+absent. coroutine.lua's T-guarded omissions remain recorded in the lifecycle
+acceptance owner. These are whole-file process passes within that configuration,
+not completion of instrumented/private assertions or the full M3 coverage ledger.
+All 34 files have separate parse-only evidence; that is not execution evidence.
+
+The 25 pending primary files are:
+
+- api.lua
+- attrib.lua
+- big.lua
+- calls.lua
+- closure.lua
+- code.lua
+- constructs.lua
+- cstack.lua
+- db.lua
+- errors.lua
+- events.lua
+- files.lua
+- gc.lua
+- gengc.lua
+- literals.lua
+- locals.lua
+- main.lua
+- math.lua
+- memerr.lua
+- nextvar.lua
+- pm.lua
+- sort.lua
+- strings.lua
+- vararg.lua
+- verybig.lua
+
+Pending means acceptance has not been established; it does not assert that every
+file was run and failed. Remaining work includes collector modes/finalization,
+IO/OS, C continuations and remaining exports, full CLI/native loaders, the real
+T adapter, reviewed platform/internal equivalents and aggregate/heavy validation.
+The unchanged native macOS aggregate also exposes a pinned dynamic-readline
+assumption under static readline; its counterpart needs review, not a hidden skip.
+
 ## M2b execution targets
 
 | File           | Role                                      | Windows/Linux/macOS result       |

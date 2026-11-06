@@ -235,3 +235,8 @@ handlers but production enrollment/collector/state-close integration remains
 open. Published 852aff6 passes all18 retained platform jobs. See the current
 session for exact commands and limits; no original M3 gate or additional whole
 upstream file is marked complete by these checkpoints.
+
+Development is paused by maintainer request at code checkpoint32398fa. All18
+retained jobs pass in run42234588442; full M3 acceptance remains open. Later
+collector/core-callback/typed-exit/IO drafts are saved outside the PR, with
+recovery details in the current session. Resume only on a new instruction.

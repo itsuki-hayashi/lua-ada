@@ -1,10 +1,10 @@
 # Project Status
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**
-**M3 remains in progress. The bounded language lifecycle delivery has completed
+**M3 is paused at a verified checkpoint. The bounded language lifecycle delivery has completed
 runtime acceptance; final publication checks are linked from PR #7.**
 
-## Complete upstream delivery in progress
+## Complete upstream delivery paused
 
 Merged PR #7/master f7031f522006abfd9e2d3ef28975088984400faf is the baseline for
 codex/m3-upstream-conformance. The maintainer approved completion of the full
@@ -68,14 +68,28 @@ regressions, 35 CLI cases, ten binary CLI comparisons, twelve differential
 fixtures and five unchanged upstream files. Strict flags and runtime checks
 remain enabled. The session record owns exact commands and repairs.
 
-Published checkpoint 852aff6196da38fb7bf4eb5ace26efe74cd9f698 passes all 18
-jobs in [run 42221667221](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42221667221),
-including Windows static-PIC. Every required job log was inspected. That
-revision contains 1,038 focused cases; newer local changes require a new
-platform run. Native C aggregate observations still record the pinned macOS
-readline-assumption failure, not a full M3 pass.
+Code checkpoint 32398fa64d5e5c2ec604dee31be6b37afb44eb99 passes all 18
+jobs in [run 42234588442](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42234588442),
+including Windows static-PIC. Every full job log was inspected. CI tested PR
+merge 57c0be91079fa09b7f0a9634ab49b0509264a53e into master f7031f52.
+Native C aggregate observations still record the pinned macOS readline-assumption
+failure; neither those observations nor this retained matrix establish full M3.
 
-The newer local group adds allocation-free warning events and actual C warning
+At the maintainer's request, development is paused. The subsequent unfinished
+collector/core-callback/typed-exit/IO integration is preserved in a local Git
+stash and verified recovery bundle; it is excluded from the PR. Its exploratory
+run passed 1,185 of 1,187 cases, with two assertion failures, and is explicitly
+unaccepted. The session record owns recovery details and the next action.
+
+**Verified upstream execution: five of 30 primary files.** The passes are
+tpack.lua, utf8.lua, bitwise.lua, goto.lua and coroutine.lua. All use the
+recorded default configuration with T absent; coroutine omissions remain
+explicit. bwcoercion.lua executes as a helper and is not a sixth suite. The
+other 25 primary files, all.lua aggregate, heavy.lua stress and tracegc.lua
+helper remain pending whole-file acceptance. See the
+[current inventory](upstream-tests.md#paused-m3-execution-status).
+
+The verified checkpoint adds allocation-free warning events and actual C warning
 callbacks, a borrowed iterative driver for Ada-to-C-to-Lua calls, and finalizer
 queue/controller components. Default auxiliary states start with warnings on,
 matching pinned Lua 5.5.1; bare C states have no default warning handler.

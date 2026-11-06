@@ -2,7 +2,8 @@
 
 Date: 2026-11-06, Asia/Tokyo. Branch: codex/m3-upstream-conformance.
 Baseline: merged PR #7, master f7031f522006abfd9e2d3ef28975088984400faf.
-Status: implementation in progress; checkpoint results below are partial.
+Status: paused by the maintainer at verified code checkpoint 32398fa.
+Checkpoint results below retain their original partial scope.
 
 ## Authorized target and boundaries
 
@@ -505,3 +506,46 @@ five unchanged files. The expected invalid-option child exits1. Optional
 GNATdoc generation, fuzzing and proof were not run. Remaining collector, native
 continuations, IO/OS, complete ABI/test adapter, full-source coverage and final
 26-context acceptance are still open; this checkpoint is not final handoff.
+
+## Requested pause and recoverable handoff
+
+The maintainer requested a test-status check and a development pause with an
+open, CI-passing PR. Feature work stopped; all three collaborating agents froze
+live edits. Verified code checkpoint32398fa64d5e5c2ec604dee31be6b37afb44eb99
+passes all18 jobs of run42234588442, with every full log inspected. Actual PR
+merge57c0be91079fa09b7f0a9634ab49b0509264a53e combines that checkpoint with
+masterf7031f52. Each normal configuration passes1,086 AUnit cases, zero assertion
+failures/unexpected errors, the retained consumers/CLI/differentials and five
+unchanged primary files. Windows static-PIC repeats the accepted pipeline.
+
+The status owner now explicitly records five of30 primary whole-file passes,
+25 pending primary files, the pending aggregate/stress/helper and the executed
+bwcoercion helper. No additional whole-file execution is claimed. Full M3,
+T-enabled/private obligations and final26-context acceptance remain incomplete.
+
+Post-checkpoint work is deliberately excluded from this PR revision. Its first
+strict integrated build passed; the exploratory1187-case run passed1185 with
+two assertion failures: bounded object-pressure collection and the old
+unsupported-collector assertion. Later typed-exit/IO/OS changes were not built.
+Neither those drafts nor isolated collector results are accepted production
+coverage. The last source verification before parking was:
+
+- reports/m3-collector-integration-build2.log: strict build exit0.
+- reports/m3-collector-integration-tests1.log:1187 run,1185 pass,2 failed
+  assertions,0 unexpected errors.
+
+Git stash231eecf3933a3cc012496ebf073acc5ed3ad1d63 preserves all74 changed/new
+files, including core callbacks, collector modes/barriers/shrinkage, typed exit
+and IO/OS integration. The verified reports/m3-paused-integration.bundle contains
+refs/stash and its complete history, including the untracked-file parent. The
+tracked diff also exists as reports/m3-paused-integration.patch; the stash/bundle
+is the authoritative complete recovery image. Ignored reports/collector,
+reports/io-os and reports/core-callbacks retain drafts, C observations and logs.
+
+To resume, first inspect the saved stash against the then-current branch and
+apply it without dropping it. Reconcile newer upstream changes deliberately;
+do not overwrite them. Complete collector object-pressure handling and stale
+expectations, verify all root/edge barriers, finish IO/OS registration and typed
+exit, then resume the remaining C continuation/ABI/adapter/coverage work.
+Do not run parallel Alire builds. The pause authorizes no merge or automatic
+resumption. PR#8 is scoped to the verified checkpoint, not full M3 completion.
