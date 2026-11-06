@@ -521,3 +521,37 @@ appears in the instrumented log. Published 28329f8 run 42274361758 now has all
 16 Windows/Linux jobs green, including both embedded Windows static-PIC steps
 (18 applicable contexts); all eight macOS jobs remain queued. These are still
 observations, not reviewed scoped acceptance.
+
+The next acceptance checkpoint adds ConformanceMatrix.psm1 and
+check-conformance-matrix.ps1. The manifest requires all 104 file/context pairs
+and 208 C/Ada reports; verification rehashes captured output, telemetry and
+equivalent source artifacts and replays the reviewed execution contracts.
+Acceptance additionally requires the resolved scoped ledger, independent
+reconciliation review and a clean checkout at the exact execution revision.
+No real matrix is accepted yet. Seventeen explicitly synthetic regression
+cases pass in reports/m3-matrix-selftests.log, including incomplete matrices,
+changed artifacts, wrong revision/host/implementation, pending review, and
+mislabeled runtime profile, launcher profile or library type. CI retains
+generated equivalent sources for later hash verification.
+
+The test-only configuration protocol now reports the runtime's Alire build
+profile and the launcher's GPR-derived build profile and library type. The
+scoped runner validates these actual measurements before execution and records
+the normalized native host. No generated configuration, public header or
+production ABI is changed. The default local validation/static pipeline passes
+in reports/m3-matrix-full-default.log with 1,304 AUnit cases and all four matching
+C/Ada observations. Published 70a22a0 run 42276786486 has all 16 Windows/Linux
+jobs green, including both static-PIC steps; its first macOS instrumented job
+has started, with the other seven macOS jobs still queued at this observation.
+PR #9 has no review comments at this poll. Independent semantic/equivalent
+review and final-revision 26-context acceptance remain open.
+
+The instrumented local validation/static pipeline also passes in
+reports/m3-matrix-full-instrumented.log: 1,304 AUnit cases (zero failures/errors),
+all four C/Ada observations, native file counterparts, real launcher-isolation
+negatives, public GC oracle comparisons and Windows unwind checks. The AUnit
+stderr contains the expected ordinary-finalizer-failure warning fixture.
+Separately rerun scope and runner suites retain 35 and 40 passing cases in
+reports/m3-matrix-scope-tests.log and reports/m3-matrix-runner-tests.log.
+The final matrix self-test rerun passes all 17 cases after verification-flag
+checks were added. Documentation validation passes all 77 Markdown files.

@@ -40,6 +40,11 @@ parent/bare-child/arg-child settings and balanced probe/main-child telemetry.
 Full local default and instrumented validation/static pipelines retain 1,304
 AUnit cases. Shared harness regressions total 40, scope regressions 35, plus
 two actual launcher-isolation regressions in each configuration.
+The matrix reconciliation command requires all 104 file/context pairs and
+paired C/Ada reports. It rehashes captures, replays completion/acceptance checks,
+and verifies compiled runtime/launcher profiles and library type against each
+context. Seventeen synthetic matrix regressions pass; they establish harness
+behavior only. The complete reviewed real matrix remains outstanding.
 The paused-checkpoint statements below retain the prior delivery's evidence.
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**

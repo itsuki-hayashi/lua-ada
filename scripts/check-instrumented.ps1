@@ -120,6 +120,7 @@ try {
     & "$PSScriptRoot/check-conformance-equivalents.ps1"
     & "$PSScriptRoot/check-conformance-scope.ps1"
     & "$PSScriptRoot/test-conformance-scope.ps1"
+    & "$PSScriptRoot/test-conformance-matrix.ps1"
 
     Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')

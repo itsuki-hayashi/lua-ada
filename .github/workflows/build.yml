@@ -57,6 +57,7 @@ jobs:
             reports/conformance/**/*.json
             reports/conformance/**/*.stdout
             reports/conformance/**/*.stderr
+            reports/conformance/**/equivalent-*.lua
           if-no-files-found: error
   check:
     strategy:
@@ -98,6 +99,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/check-conformance-scope.ps1
           ./scripts/test-conformance-scope.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/test-conformance-matrix.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-runner.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -142,6 +145,7 @@ jobs:
             reports/conformance/**/report.json
             reports/conformance/**/*.stdout
             reports/conformance/**/*.stderr
+            reports/conformance/**/equivalent-*.lua
           if-no-files-found: error
       - name: Windows static-PIC acceptance
         if: matrix.os == 'windows-latest' && matrix.library == 'static' && matrix.profile == 'validation'
@@ -166,6 +170,7 @@ jobs:
             reports/conformance/**/*.json
             reports/conformance/**/*.stdout
             reports/conformance/**/*.stderr
+            reports/conformance/**/equivalent-*.lua
             docs/licenses/lua.md
           if-no-files-found: warn
       - name: Preserve core-image observations

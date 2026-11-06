@@ -56,6 +56,7 @@ $evidence = [ordered]@{
     repository_dirty = $null
     repository_status = @()
     host = [ordered]@{
+        platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
         os_description = [Runtime.InteropServices.RuntimeInformation]::OSDescription
         os_architecture = [Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
         process_architecture = [Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString()
@@ -235,6 +236,10 @@ try {
     if ($suite.schema_version -ne 1 -or $suite.reference_revision -cne $revision) { throw 'Invalid conformance manifest' }
     if ($Scope -ne '') {
         $evidence.coverage_validation = Test-ConformanceScope -Root $root -Scope $Scope
+        if ($Context -ne '' -and ($Context -cnotin $suite.acceptance_contexts -or
+            -not $Context.StartsWith("$Configuration/$($evidence.host.platform)/"))) {
+            throw 'Scoped context does not identify this configuration and host'
+        }
     }
     if ($acceptanceRequested) {
         # Observation mode remains useful during implementation. Final mode is
@@ -387,6 +392,9 @@ try {
         $observed = [IO.File]::ReadAllText($probe.stdout_path) | ConvertFrom-Json -AsHashtable
         [void](Test-ConformanceConfiguration -Observed $observed -Configuration $Configuration `
             -Target Ada -AllocatorLimitBytes $evidence.allocator_limit_bytes)
+        if ($Scope -ne '' -and $Context -ne '') {
+            Assert-ScopedBuildIdentity -Observed $observed -Context $Context
+        }
         $evidence.observed_configuration = $observed
         $evidence.configuration_verified = $true
         $childCode = 'local p=assert(io.popen("lua --conformance-config", "r")); ' +

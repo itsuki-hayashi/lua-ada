@@ -25,6 +25,8 @@ project Lua_Ada_Tests is
    package Compiler is
       for Default_Switches ("C") use
         ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
+         "-DLUA_ADA_TEST_BUILD_PROFILE=" & Lua_Ada_Tests_Config.Build_Profile,
+         "-DLUA_ADA_TEST_LINK_KIND=" & Lua_Ada.Library_Mode,
          "-I" & Project'Project_Dir & "../c_api/include/api");
       for Default_Switches ("Ada") use
         Lua_Ada_Tests_Config.Ada_Compiler_Switches &

@@ -1,6 +1,9 @@
 with Lua.Conformance_Adapter;
 with Ada.Text_IO;
+with Ada.Characters.Handling;
 with Interfaces.C;
+with Interfaces.C.Strings;
+with Lua_Ada_Config;
 with Lua.Engine;
 with Lua.Storage.Conformance;
 with System;
@@ -13,6 +16,16 @@ package body Lua.Sessions.Conformance is
       use type Lua.Engine.Value_Kind;
       function Extra_Space return Interfaces.C.size_t
         with Import, Convention => C, External_Name => "lua_ada_extra_space";
+      --  These test-only C strings have static lifetime. The launcher GPR
+      --  records its own profile and link mode; the runtime profile below
+      --  comes from the separately built library's generated configuration.
+      --  Keeping both measurements catches mismatched dependency builds.
+      function Build_Profile return Interfaces.C.Strings.chars_ptr
+        with Import, Convention => C,
+             External_Name => "lua_ada_test_build_profile";
+      function Link_Kind return Interfaces.C.Strings.chars_ptr
+        with Import, Convention => C,
+             External_Name => "lua_ada_test_link_kind";
       function Flag (Item : Boolean) return String is
         (if Item then "true" else "false");
    begin
@@ -29,6 +42,13 @@ package body Lua.Sessions.Conformance is
             """lua_release"":""Lua 5.5.1"",""configuration"":""" &
             Lua.Runtime_Configuration.Name & """,""test_adapter"":" &
             Flag (Adapter.Kind = Lua.Engine.Table_Kind) &
+            ",""runtime_build_profile"":""" &
+            Ada.Characters.Handling.To_Lower
+              (Lua_Ada_Config.Build_Profile'Image) &
+            """,""launcher_build_profile"":""" &
+            Interfaces.C.Strings.Value (Build_Profile) &
+            """,""launcher_library_type"":""" &
+            Interfaces.C.Strings.Value (Link_Kind) & """" &
             ",""integer_bytes"":" &
             Natural'Image (Lua.Engine.Integer_Value'Size / 8) &
             ",""number_bytes"":" &

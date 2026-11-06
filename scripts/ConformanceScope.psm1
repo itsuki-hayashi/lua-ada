@@ -4,6 +4,21 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 
+function Assert-ScopedBuildIdentity {
+    param([Parameter(Mandatory)][Collections.IDictionary] $Observed,
+          [Parameter(Mandatory)][string] $Context)
+    # Read compiled identities, never infer a build from its report filename.
+    # The runtime profile and launcher profile come from their separate crates.
+    $parts = $Context.Split('/')
+    $link = if ($Observed.launcher_library_type -ceq 'relocatable') {
+        'shared'
+    } else { $Observed.launcher_library_type }
+    if ($parts.Count -ne 4 -or $Observed.runtime_build_profile -cne $parts[2] -or
+        $Observed.launcher_build_profile -cne $parts[2] -or $link -cne $parts[3]) {
+        throw 'Scoped context differs from measured runtime/launcher build identity'
+    }
+}
+
 function Test-ScopedLauncher {
     param([Parameter(Mandatory)][string] $Executable,
           [Parameter(Mandatory)][string] $Directory,
@@ -238,4 +253,4 @@ function Test-ConformanceScope {
         StructuralInventory=$inventory; Definition=$definition }
 }
 
-Export-ModuleMember -Function Test-ConformanceScope, Assert-ScopedProcessCompletion, Test-ScopedLauncher
+Export-ModuleMember -Function Test-ConformanceScope, Assert-ScopedProcessCompletion, Test-ScopedLauncher, Assert-ScopedBuildIdentity

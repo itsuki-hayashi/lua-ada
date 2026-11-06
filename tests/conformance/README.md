@@ -206,6 +206,30 @@ sets scoped_operation_acceptance separately from gate_acceptance (full M3),
 which stays false. One accepted operation does not certify the other files or
 contexts: final batch acceptance still requires the complete matrix evidence.
 
+`scripts/check-conformance-matrix.ps1 -Manifest <matrix.json>` reconciles all
+104 file/context operations (four files times 26 contexts), with paired C and
+Ada reports. `-RequireScopedAcceptance` additionally requires the resolved
+scoped ledger, independently reviewed contracts and reconciliation, and a clean
+checkout at the reports' exact revision. It never sets full-M3 acceptance.
+Without that switch the result is diagnostic, even when every artifact validates.
+
+The matrix manifest has `schema_version: 1`, `scope: "gc-io-events"`, a full
+`revision`, a `review` object (`status`, `author`, `reviewer`, `artifact`,
+`rationale`), and `operations`. Each operation identifies `file`, `context`,
+`c` and `ada` report objects (`report`, `sha256`, `artifact_root`), and an
+acceptance `contract` (`path`, `sha256`). Paths are relative to the manifest.
+Each artifact root retains the CI `reports/` subtree. The verifier rebases
+captured paths across hosts, rehashes output, telemetry and equivalent sources,
+replays completion/acceptance checks, and rejects missing or duplicate pairs.
+The actual parent/bare-lua/arg-child configuration captures must agree. Compiled
+runtime and launcher profiles and launcher library type must match the context;
+the reported native host must also match. Recorded binary/library hashes remain
+part of the evidence reviewed for provenance.
+
+`scripts/test-conformance-matrix.ps1` uses explicitly synthetic bundles to test
+reconciliation and rejection. Those fixtures confer no execution or acceptance
+authority. No complete accepted real matrix has yet been recorded.
+
 scripts/check-files-scoped.ps1 runs files.lua through this same operation/report
 path in both configurations. POSIX selects the original source; Windows selects
 the explicit native-platform candidate and builds only its required native
