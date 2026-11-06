@@ -5,6 +5,7 @@ with Test_Support;
 
 package body Runtime_Control_Tests is
    procedure Check (Source : String; Compatible : Boolean := False);
+   procedure Debug_Iterator_Native_Frame;
    procedure Debug_Split_Function_Lines;
    procedure Hook_Implicit_Return_Line;
    procedure Debug_Tail_Frame;
@@ -1185,6 +1186,17 @@ package body Runtime_Control_Tests is
          "d})end;assert(what=='main')");
    end Close_Logical_Caller;
 
+   procedure Debug_Iterator_Native_Frame is
+      --  The exported ipairs iterator is a genuine native Lua function.
+      --  Inspect its frame while its indexing metamethod runs.
+      --  Internal indexing continuations stay hidden, the iterator stays C.
+   begin
+      Check
+        ("local t=setmetatable({},{__index=function()" &
+         "assert(debug.getinfo(2,'S').what=='C');return nil end});" &
+         "local f,s,i=ipairs(t); assert(f(s,i)==nil)");
+   end Debug_Iterator_Native_Frame;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -1445,5 +1457,8 @@ package body Runtime_Control_Tests is
       Test_Support.Add
         (Suite, "control: Close_Logical_Caller",
          Close_Logical_Caller'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Iterator_Native_Frame",
+         Debug_Iterator_Native_Frame'Access);
    end Register;
 end Runtime_Control_Tests;

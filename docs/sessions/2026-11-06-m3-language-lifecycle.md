@@ -95,3 +95,10 @@ failed before compilation because the stable GNAT archive download returned
 HTTP 500 on all three existing retries. This is missing platform evidence, not
 a runtime/test pass or a reason to change compiler versions. The reviewed
 revision requires a fresh full matrix and inspection of every final job log.
+
+A final logical-frame review found that the exported ipairs iterator still used
+an internal-helper name. It now has a genuine native activation name, so debug
+inspection, hooks, native-depth accounting and non-yieldable callback rules see
+it consistently. A focused callback regression raises the local suite to 575
+passing cases (87 new), zero failed assertions/unexpected errors. The validation
+owner is docs/validation-m3-lifecycle.md; final platform evidence remains pending.

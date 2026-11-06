@@ -28,8 +28,9 @@ It combines remaining runtime/libraries, canonical bytecode execution and the
 public C API/ABI through staged PRs. Its first gate establishes an explicit
 [conformance inventory and harness](tests/conformance/README.md). Full M3
 coverage remains in progress; reviewed C-internal/native-platform equivalents
-will be reported separately from unchanged test execution. Production behavior
-is unchanged by this foundation work.
+will be reported separately from unchanged test execution. The combined
+language lifecycle delivery now extends production behavior on the private VM;
+its final evidence remains separately tracked.
 
 ## Checkout and build
 

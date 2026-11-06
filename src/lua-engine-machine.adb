@@ -494,7 +494,7 @@ package body Lua.Engine.Machine is
          --  Native continuations preserve ownership across callbacks; that
          --  alone does not make a C-compatible library boundary yieldable.
          Activation.Blocks_Yield := Name in "string.gsub" | "string.format" |
-           "base.tostring" | "base.print" | "base.pairs" | "@ipairs.step" |
+           "base.tostring" | "base.print" | "base.pairs" | "ipairs.iterator" |
            "table.concat" | "table.insert" | "table.remove" | "table.move" |
            "table.unpack" | "base.load" | "base.loadfile" | "base.require" |
            "package.preload_searcher" | "package.lua_searcher";
@@ -1746,11 +1746,11 @@ package body Lua.Engine.Machine is
             if Activation.Native_Arguments.Is_Empty then
                Fail (State, "value expected");
             end if;
-            Packet.Append (New_Native (State, "@ipairs.step"));
+            Packet.Append (New_Native (State, "ipairs.iterator"));
             Packet.Append (Left);
             Packet.Append (Value'(Integer_Kind, 0));
             Complete (Packet);
-         elsif Name = "@ipairs.step" then
+         elsif Name = "ipairs.iterator" then
             if Activation.Native_Stage = 0 then
                Right := (Integer_Kind,
                  Lua.Integers.Add (Integral (State, Right), 1));

@@ -50,7 +50,7 @@ reachability-based context ownership, weak tables/ephemerons, debug inspection
 and hooks, collection controls, and compatible CLI execution quotas. This
 advances portions of M3-02/06/07/08/11; their full broader gates remain open.
 
-Local Windows validation/static has passed 574 focused AUnit cases at the
+Local Windows validation/static has passed 575 focused AUnit cases at the
 latest recorded test checkpoint. Hash-verified unchanged goto.lua and
 coroutine.lua have passed fresh independent same-host C/Ada process comparisons,
 with identical stdout, empty stderr and OK markers. The coroutine result is
