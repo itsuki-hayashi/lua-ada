@@ -751,7 +751,17 @@ package body Lua.Engine is
                  Member.Key.Reference.Bytes = "__mode" and then
                  Member.Item.Kind = String_Kind
                then
-                  return To_String (Member.Item.Reference.Bytes);
+                  declare
+                     Mode : constant String :=
+                       To_String (Member.Item.Reference.Bytes);
+                     Zero : constant Natural := Ada.Strings.Fixed.Index
+                       (Mode, "" & Character'Val (0));
+                  begin
+                     --  Pinned Lua uses strchr for mode flags. Match its
+                     --  C-string boundary even though Lua strings are bytes.
+                     return Mode (Mode'First ..
+                       (if Zero = 0 then Mode'Last else Zero - 1));
+                  end;
                end if;
             end loop;
          end if;

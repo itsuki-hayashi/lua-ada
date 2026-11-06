@@ -140,3 +140,10 @@ closing, confirms that pcall cannot catch/restart it, and verifies dead-thread
 queries and session recovery. The local suite passes 577 cases (89 new), zero
 failed assertions/errors. This final one-line phase cleanup and regression need
 the current-head matrix; earlier 575/576 results remain dated checkpoints.
+
+A pinned-source/C-oracle edge check also verified __mode C-string semantics:
+flags after an embedded NUL are ignored. The collector now truncates only that
+mode scan at NUL while preserving Lua byte strings everywhere else. A focused
+weak-mode regression brings local AUnit to 578 passing cases (90 new), with zero
+failed assertions/errors. Implementation changes are frozen for final acceptance
+except repairs required by an actual failing check.

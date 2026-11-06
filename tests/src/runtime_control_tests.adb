@@ -8,6 +8,7 @@ package body Runtime_Control_Tests is
    procedure Debug_Iterator_Native_Frame;
    procedure Yieldability_After_Completion;
    procedure Closing_Quota_Abort;
+   procedure Weak_Mode_Nul_Boundary;
    procedure Debug_Split_Function_Lines;
    procedure Hook_Implicit_Return_Line;
    procedure Debug_Tail_Frame;
@@ -1240,6 +1241,17 @@ package body Runtime_Control_Tests is
       Assert (Result.Status = Succeeded, "abandoned close phase recovered");
    end Closing_Quota_Abort;
 
+   procedure Weak_Mode_Nul_Boundary is
+      --  Pinned Lua scans __mode flags with C-string semantics.
+      --  Place v after a NUL, with either no prefix or a weak-key prefix.
+      --  The unreachable value stays strong; bytes after NUL add no flags.
+   begin
+      Check
+        ("local z=string.char(0);for _,mode in ipairs{z..'v','k'..z..'v'} " &
+         "do local t=setmetatable({},{__mode=mode});" &
+         "do local x={};t[1]=x end;collectgarbage();assert(t[1]~=nil)end");
+   end Weak_Mode_Nul_Boundary;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -1508,5 +1520,8 @@ package body Runtime_Control_Tests is
          Yieldability_After_Completion'Access);
       Test_Support.Add
         (Suite, "control: Closing_Quota_Abort", Closing_Quota_Abort'Access);
+      Test_Support.Add
+        (Suite, "control: Weak_Mode_Nul_Boundary",
+          Weak_Mode_Nul_Boundary'Access);
    end Register;
 end Runtime_Control_Tests;

@@ -123,3 +123,8 @@ A separate closing-quota case verifies uncatchable abort, abandoned closing-phas
 cleanup and subsequent session recovery. It brings local AUnit to 577 cases
 (89 new), with no failures/errors. Final-head CI must show those 577 cases;
 this recorded 575-case checkpoint is not substituted for that requirement.
+
+The final weak-mode boundary regression follows pinned lgc.c: __mode uses
+C-string flag scanning, so bytes after NUL add no weakness. Local AUnit now
+passes 578 cases (90 new), zero failed assertions/errors. Final acceptance must
+show those 578 cases in every current-head configuration.
