@@ -586,3 +586,19 @@ reports/m3-macos-driver-windows-counterparts.log. The Mac driver has not yet run
 on macOS; its candidate and review remain pending. The 17 matrix regressions
 pass in reports/m3-macos-matrix-selftests.log. Matrix equivalent review status
 now uses the existing generator's accepted vocabulary, rather than reviewed.
+
+The matrix review validator now has a positive accepted-vocabulary fixture and
+separate negatives for pending/unknown status, self-review and absent review
+artifacts. All 22 synthetic regressions pass in
+reports/m3-matrix-review-vocabulary.log. They do not authorize a real review.
+
+The three existing public IO/OS C tests were extracted unchanged into
+c_api/tests/io_contract.h and remain in the ordinary consumer. A new standalone
+io_api_contract.c runs those same cases against both Ada and the isolated
+pinned C oracle, also requiring zero allocator bytes/blocks after close.
+Default and instrumented Windows validation/static core-image campaigns pass
+with identical C/Ada output in reports/m3-io-oracle-default.log and
+reports/m3-io-oracle-instrumented.log, including all retained GC, startup and
+unwind consumers. Both CI configurations schedule the new comparison and
+retain its executable/library/source hashes. Final platform acceptance and
+independent semantic/equivalent review remain outstanding.

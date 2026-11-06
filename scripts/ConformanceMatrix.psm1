@@ -5,6 +5,22 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 
+function Assert-MatrixReview {
+    param([Collections.IDictionary] $Review)
+    # Use the same status vocabulary as New-ConformanceEquivalent. A valid
+    # shape does not grant review authority: the caller still verifies the
+    # source-bound artifact, execution contracts and complete scoped ledger.
+    if ($null -eq $Review) { throw 'Matrix requires completed independent review' }
+    foreach ($field in @('author','reviewer','artifact')) {
+        if ([string]::IsNullOrWhiteSpace([string]$Review[$field])) {
+            throw 'Matrix requires completed independent review'
+        }
+    }
+    if ($Review.status -cne 'accepted' -or $Review.author -ceq $Review.reviewer) {
+        throw 'Matrix requires completed independent review'
+    }
+}
+
 function Assert-ScopedMatrixIndex {
     param([Parameter(Mandatory)][Collections.IDictionary] $Manifest,
           [Parameter(Mandatory)][string[]] $Contexts)
@@ -94,9 +110,7 @@ function Test-ScopedMatrix {
                 throw 'Matrix requires independent reconciliation review'
             }
         }
-        if ($manifest.review.status -cne 'accepted' -or $manifest.review.author -ceq $manifest.review.reviewer) {
-            throw 'Matrix requires completed independent review'
-        }
+        Assert-MatrixReview -Review $manifest.review
         $head = (& git -C $Root rev-parse HEAD).Trim()
         if ($LASTEXITCODE -ne 0 -or $head -cne $manifest.revision) { throw 'Matrix is not the final checkout revision' }
         $dirty = @(& git -C $Root -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal)
@@ -202,13 +216,7 @@ function Test-ScopedMatrix {
                     if ($id -cnotmatch '^[a-z0-9-]+$') { throw 'Invalid matrix equivalent identifier' }
                     $mapping = Read-MatrixHashedJson -Path (Join-Path $Root "tests/conformance/equivalents/$id.json") `
                         -Hash $report.equivalent.manifest_sha256
-                    if ($mapping.review.status -cne 'accepted' -or
-                        [string]::IsNullOrWhiteSpace([string]$mapping.review.author) -or
-                        [string]::IsNullOrWhiteSpace([string]$mapping.review.reviewer) -or
-                        $mapping.review.author -ceq $mapping.review.reviewer -or
-                        [string]::IsNullOrWhiteSpace([string]$mapping.review.artifact)) {
-                        throw 'Matrix equivalent mapping lacks independent review'
-                    }
+                    Assert-MatrixReview -Review $mapping.review
                     if ($mapping.source -cne "references/lua/testes/$($entry.file)" -or
                         $mapping.source_sha256 -cne $original.sha256 -or
                         $mapping.configuration -cnotin @($configuration,'default-and-upstream-test') -or

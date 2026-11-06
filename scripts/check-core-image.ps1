@@ -119,6 +119,7 @@ try {
     }
     Invoke-Consumer 'c-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/c_api_consumer$suffix") 'PASS: real Ada C API bootstrap consumer'
     Invoke-Consumer 'gc-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/gc_api_contract$suffix") 'PASS: public GC contract'
+    Invoke-Consumer 'io-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/io_api_contract$suffix") 'PASS: public IO/OS contract'
     # Compile the identical public-header contract against the isolated pinned
     # C library. No reference object is linked into either Ada consumer.
     Invoke-Build @('exec', '--', 'gprbuild', '-P', 'experiments/conformance/reference.gpr', '-p', "-XLUA_CONFORMANCE_CONFIGURATION=$Configuration")
@@ -128,6 +129,11 @@ try {
         '-I', (Join-Path $projectRoot 'c_api/include/api'),
         (Join-Path $projectRoot 'c_api/tests/gc_api_contract.c'),
         '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceConsumer)
+    $referenceIOConsumer = Join-Path $reportDirectory "io-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/io_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceIOConsumer)
     $adaExecutionPath = $env:PATH
     $adaExecutionLdPath = $env:LD_LIBRARY_PATH
     $adaExecutionDyldPath = $env:DYLD_LIBRARY_PATH
@@ -136,6 +142,7 @@ try {
         $env:LD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
         $env:DYLD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:DYLD_LIBRARY_PATH
         Invoke-Consumer 'gc-oracle' $referenceConsumer 'PASS: public GC contract'
+        Invoke-Consumer 'io-oracle' $referenceIOConsumer 'PASS: public IO/OS contract'
     } finally {
         $env:PATH = $adaExecutionPath
         $env:LD_LIBRARY_PATH = $adaExecutionLdPath
@@ -146,12 +153,21 @@ try {
         throw 'C/Ada public GC contract output differs'
     }
     Write-Output 'PASS: identical public GC contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'io-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'io-oracle.stdout'))) {
+        throw 'C/Ada public IO/OS contract output differs'
+    }
+    Write-Output 'PASS: identical public IO/OS contract against C and Ada'
     $referenceLibraries = @(Get-ChildItem -LiteralPath $referenceDirectory -File |
         Where-Object { $_.Name -match '^libconformance_lua\.(dll|so(\.[0-9.]+)?|dylib)$' } |
         ForEach-Object { [ordered]@{ file=$_.Name;
             sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() } })
     if ($referenceLibraries.Count -eq 0) { throw 'Reference GC library hash is missing' }
     $contractSources = @(foreach ($name in @('gc_api_contract.c', 'gc_contract.h', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $ioContractSources = @(foreach ($name in @('io_api_contract.c', 'io_contract.h', 'consumer_allocator.h')) {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
@@ -169,6 +185,8 @@ try {
         configuration = $Configuration; consumers = $records.ToArray();
         library_files = $libraries;
         gc_contract = [ordered]@{ matching_output=$true; sources=$contractSources;
+            reference_library_files=$referenceLibraries };
+        io_contract = [ordered]@{ matching_output=$true; sources=$ioContractSources;
             reference_library_files=$referenceLibraries } } | ConvertTo-Json -Depth 6 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8
     Write-Output 'PASS: one production interpreter image; Ada/C state, pool, allocator and startup checks'

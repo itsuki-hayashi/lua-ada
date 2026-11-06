@@ -47,8 +47,12 @@ two actual launcher-isolation regressions in each configuration.
 The matrix reconciliation command requires all 104 file/context pairs and
 paired C/Ada reports. It rehashes captures, replays completion/acceptance checks,
 and verifies compiled runtime/launcher profiles and library type against each
-context. Seventeen synthetic matrix regressions pass; they establish harness
+context. Twenty-two synthetic matrix regressions pass; they establish harness
 behavior only. The complete reviewed real matrix remains outstanding.
+The same three public IO/OS consumer cases now also run in an isolated C-oracle
+executable, comparing real FILE/closer layout, module reopening and native
+closure with Ada. The shared contract requires zero allocator bytes/blocks
+after state closure; it does not establish unrelated C exports.
 The paused-checkpoint statements below retain the prior delivery's evidence.
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**

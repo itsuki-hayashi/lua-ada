@@ -362,6 +362,17 @@ empty stderr, process success, executable/library hashes and shared contract
 source hashes are retained in reports/core-image. Default and instrumented
 matrix jobs run this comparison; it does not complete unrelated C API exports.
 
+The same pipeline compiles `io_api_contract.c` against each real library and
+compares its three IO/OS cases. `io_contract.h` is shared with the retained
+ordinary C consumer: both executables test the identical FILE payload and
+closer, live metatable identity after reopening io, the unregistered os opener,
+and actual native close through the public callback. The standalone contract
+also verifies zero outstanding allocator bytes/blocks after state closure.
+Executable and source hashes, output, and unwind checks follow the GC contract's
+reporting path. Synthetic matrix regressions separately check review-status
+vocabulary and reject pending, self-authored or artifact-less review records;
+they confer no independent-review or executed-coverage authority.
+
 ## Output delivery regression consumer
 
 The ordinary test crate builds output_consumer alongside its AUnit/API mains.

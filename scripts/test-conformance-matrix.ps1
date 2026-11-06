@@ -156,4 +156,26 @@ foreach ($field in @('runtime_build_profile','launcher_build_profile','launcher_
     $script:cases++
     Write-Output "MATRIX TEST PASS: rejects mislabeled $field"
 }
+# Exercise the production review validator independently of the unresolved
+# real ledger. These names are synthetic shape fixtures, never review evidence.
+# This catches vocabulary drift between the generator and matrix verifier.
+$module = Get-Module ConformanceMatrix
+$review = @{status='accepted'; author='fixture-author'; reviewer='fixture-reviewer'; artifact='synthetic-only'}
+& $module { param($r) Assert-MatrixReview -Review $r } $review
+$script:cases++
+Write-Output 'MATRIX TEST PASS: accepted review vocabulary agrees with equivalent generator'
+foreach ($case in @(
+    @{Name='pending review'; Field='status'; Value='pending'},
+    @{Name='unknown review status'; Field='status'; Value='reviewed'},
+    @{Name='self review'; Field='reviewer'; Value='fixture-author'},
+    @{Name='absent review artifact'; Field='artifact'; Value=''})) {
+    $changed = $review.Clone()
+    $changed[$case.Field] = $case.Value
+    $failure = $null
+    try { & $module { param($r) Assert-MatrixReview -Review $r } $changed }
+    catch { $failure = $_.Exception.Message }
+    if ($failure -notmatch 'completed independent review') { throw "Review negative failed: $($case.Name)" }
+    $script:cases++
+    Write-Output "MATRIX TEST PASS: rejects $($case.Name)"
+}
 Write-Output "PASS: $script:cases matrix regressions; no executed conformance claim"
