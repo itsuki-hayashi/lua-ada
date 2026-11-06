@@ -189,3 +189,22 @@ acceptance integration, review artifacts, and the complete 26-context matrix.
 The complete retained default validation/static pipeline subsequently passed
 with 1,299 AUnit cases in `reports/m3-gc-adapter-expanded-check.log`. All eight
 equivalent-generator positive/negative checks passed again before committing.
+
+## Instrumented matrix integration
+
+Commit 40b6ca7 is signed and published. Its remote default jobs stopped at a
+documentation table-alignment error added after the local pipeline run; the
+decision index is corrected and the documentation check passes on the edited
+tree. This failure supplied no new remote runtime evidence.
+
+The instrumented regression command now builds the actual adapter in six
+OS/link validation jobs and Windows static-PIC, retaining the existing default
+matrix. Local Windows static execution passes all 1,299 cases, warning and
+equivalent-generator checks, unchanged events.lua/gengc.lua and the GC
+equivalent including state closure. Shared execution initially exposed missing
+GNAT support DLLs in the subprocess search path; the command now obtains that
+path from Alire and prepends the exact instrumented library directory.
+Raw observations remain diagnostic, with scoped acceptance explicitly false.
+The corrected Windows shared run also passes all of these regressions,
+including the late GC shutdown witness, in
+`reports/m3-instrumented-matrix-shared.log`.

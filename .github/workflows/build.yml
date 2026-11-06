@@ -9,6 +9,44 @@ permissions:
   contents: read
 
 jobs:
+  instrumented:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        library: [static, relocatable]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Preserve pinned source bytes
+        shell: pwsh
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+      - uses: alire-project/setup-alire@v6
+      - name: Record tools
+        shell: pwsh
+        run: |
+          alr --version
+          ./scripts/select-stable-toolchain.ps1
+          alr -n toolchain
+          alr exec -- gcc --version
+          alr exec -- gcc -dumpmachine
+          alr exec -- gprbuild --version
+      - name: Instrumented runtime and adapter regressions
+        shell: pwsh
+        run: ./scripts/check-instrumented.ps1 -LibraryType '${{ matrix.library }}'
+      - name: Windows instrumented static-PIC regressions
+        if: matrix.os == 'windows-latest' && matrix.library == 'static'
+        shell: pwsh
+        run: ./scripts/check-instrumented.ps1 -LibraryType static-pic
+      - name: Preserve instrumented observations
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: instrumented-${{ runner.os }}-${{ matrix.library }}
+          path: reports/instrumented/**
+          if-no-files-found: error
   check:
     strategy:
       fail-fast: false

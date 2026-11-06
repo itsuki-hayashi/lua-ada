@@ -268,6 +268,19 @@ proof normally and a clean measurement only when repeatability requires it.
 
 ## Language lifecycle acceptance
 
+The four-file follow-up also runs `scripts/check-instrumented.ps1 -LibraryType
+static` (or `relocatable` / `static-pic`). This builds the real upstream-test
+configuration, runs all AUnit cases, checks configuration and warning controls,
+and executes immutable copies of events.lua and gengc.lua plus the explicitly
+unreviewed GC equivalent candidate. Each process has a 900-second timeout;
+GC additionally requires the later state-close marker and successful shutdown.
+The launcher retains its independent 2 GiB managed-allocation ceiling. Reports
+under reports/instrumented retain raw output, source/executable hashes and
+`scope_accepted: false`; these regressions do not replace scoped acceptance,
+balanced allocator telemetry, equivalent review or the remaining files.lua
+obligations. CI runs six OS/link instrumented validation jobs plus Windows
+instrumented static-PIC alongside the existing default contexts.
+
 Run scripts/check-lifecycle.ps1 -Interpreter <normal-cli> after building the C
 oracle. The runner uses unchanged hash-verified goto.lua and coroutine.lua in
 fresh C/Ada processes, compares raw same-host output and empty stderr, requires
