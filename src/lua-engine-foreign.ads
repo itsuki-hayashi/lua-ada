@@ -1,4 +1,5 @@
 with Interfaces.C;
+with Lua.Engine.Machine;
 with Lua.Storage;
 with System;
 
@@ -9,6 +10,10 @@ package Lua.Engine.Foreign is
    --  nonlocal transfer is permitted while these Ada frames are active.
    type C_Function is access function
      (State : System.Address) return Interfaces.C.int
+     with Convention => C;
+
+   type C_Warning_Function is access procedure
+     (Data, Message : System.Address; To_Continue : Interfaces.C.int)
      with Convention => C;
 
    type Operation_Code is
@@ -23,7 +28,8 @@ package Lua.Engine.Foreign is
       Get_Allocator, Set_Allocator, Push_C_Closure, To_C_Function,
       Begin_Call, Complete_Callback, Raise_Error, Load_Buffer,
       Create_Userdata, Get_Uservalue, Set_Uservalue,
-      Get_Metatable, Set_Metatable);
+      Get_Metatable, Set_Metatable, Get_Yieldability,
+      Set_Warning_Function, Issue_Warning, Complete_Warning);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
       Create_Thread => 3, Get_Top => 4, Set_Top => 5,
@@ -42,7 +48,9 @@ package Lua.Engine.Foreign is
       Begin_Call => 40, Complete_Callback => 41, Raise_Error => 42,
       Load_Buffer => 43, Create_Userdata => 44,
       Get_Uservalue => 45, Set_Uservalue => 46,
-      Get_Metatable => 47, Set_Metatable => 48);
+      Get_Metatable => 47, Set_Metatable => 48,
+      Get_Yieldability => 50, Set_Warning_Function => 51,
+      Issue_Warning => 52, Complete_Warning => 53);
    for Operation_Code'Size use Interfaces.C.int'Size;
    pragma Convention (C, Operation_Code);
 
@@ -61,6 +69,11 @@ package Lua.Engine.Foreign is
       Name : System.Address := System.Null_Address;
       Mode : System.Address := System.Null_Address;
       Error_Handled : Interfaces.C.int := 0;
+      Callback_Token : Callback_Identity;
+      Warning_Function : C_Warning_Function := null;
+      Warning_Data : System.Address := System.Null_Address;
+      Warning_Message : System.Address := System.Null_Address;
+      Warning_Continuation : Interfaces.C.int := 0;
    end record with Convention => C;
 
    type Response is record
@@ -71,16 +84,21 @@ package Lua.Engine.Foreign is
       Allocator : Lua.Storage.Allocation_Function := null;
       Function_Data : C_Function := null;
       Error_Handled : Interfaces.C.int := 0;
+      Callback_Token : Callback_Identity;
+      Warning_Function : C_Warning_Function := null;
+      Warning_Data : System.Address := System.Null_Address;
+      Warning_Message : System.Address := System.Null_Address;
+      Warning_Continuation : Interfaces.C.int := 0;
    end record with Convention => C;
 
    type Action_Status is
      (Action_Done, Action_Call, Action_Raise, Action_Memory,
-      Action_Handling, Action_Abort);
+      Action_Handling, Action_Abort, Action_Warning);
    for Action_Status use
      (Action_Done => 0, Action_Call => 1,
       Action_Raise => 2, Action_Memory => 4,
       Action_Handling => 5,
-      Action_Abort => 6);
+      Action_Abort => 6, Action_Warning => 7);
    for Action_Status'Size use Interfaces.C.int'Size;
    pragma Convention (C, Action_Status);
 
@@ -94,6 +112,12 @@ package Lua.Engine.Foreign is
    --  @param Input One operation; indices obey the pinned public C API.
    --  @param Output Scalar results or a borrowed stable string/state pointer.
    --  @return A control action for the C boundary, never an Ada exception.
+
+   procedure Invoke_Borrowed
+     (State : in out World; Driver : in out Lua.Engine.Machine.Driver);
+   --  Invoke one requested C function/warning above a C-owned guard, borrowing
+   --  this actual Ada driver's lifetime. Host abort returns to the Ada host;
+   --  it never becomes a protected Lua error or terminates that host process.
 
    procedure Initialize_Bridge;
    --  Verify the C/Ada surface contract during library elaboration.

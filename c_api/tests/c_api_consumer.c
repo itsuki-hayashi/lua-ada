@@ -805,6 +805,167 @@ static void test_failed_checkstack_keeps_state_usable(lua_State *state) {
     puts("C API PASS: failed checkstack preserves caller and recovery");
 }
 
+/* Valid public C API expectations for the non-yieldable branch of callk.
+ * The continuation is intentionally unreachable, rather than a fake callback. */
+static int forbidden_nonyieldable_continuation(lua_State *state, int status,
+                                               lua_KContext context) {
+    (void)state; (void)status; (void)context;
+    assert(!"a non-yieldable call invoked its unused continuation");
+    return 0;
+}
+
+static void test_public_yieldability(lua_State *state) {
+    lua_State *thread;
+    lua_settop(state, 0);
+    assert(lua_isyieldable(state) == 0);
+    thread = lua_newthread(state);
+    /* A new secondary thread has no active no-yield boundary, independently
+     * from whether it is currently executing or has yet been resumed. */
+    assert(lua_isyieldable(thread) != 0);
+    assert(lua_isyieldable(state) == 0);
+    lua_pop(state, 1);
+    puts("C API PASS: real main and secondary thread yieldability");
+}
+
+static void test_nonyieldable_callk(lua_State *state) {
+    lua_settop(state, 0);
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 20); lua_pushinteger(state, 22);
+    /* Pinned lapi.c ignores K when this state cannot yield. Synchronous
+     * completion returns to this original C activation with ordinary results. */
+    lua_callk(state, 2, 1, (lua_KContext)0x123456,
+              forbidden_nonyieldable_continuation);
+    assert(lua_gettop(state) == 1 && lua_tointeger(state, -1) == 42);
+    lua_settop(state, 0);
+    puts("C API PASS: non-yieldable callk ignores continuation");
+}
+
+static void test_nonyieldable_pcallk(lua_State *state) {
+    const void *error;
+    int status;
+    lua_settop(state, 0);
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 20); lua_pushinteger(state, 22);
+    status = lua_pcallk(state, 2, 1, 0, (lua_KContext)0x654321,
+                       forbidden_nonyieldable_continuation);
+    assert(status == LUA_OK && lua_tointeger(state, -1) == 42);
+    lua_settop(state, 0);
+    lua_newtable(state); error = lua_topointer(state, -1);
+    lua_pushcfunction(state, error_callback);
+    lua_pushvalue(state, 1);
+    status = lua_pcallk(state, 1, 1, 0, (lua_KContext)0x654321,
+                       forbidden_nonyieldable_continuation);
+    assert(status == LUA_ERRRUN && lua_gettop(state) == 2);
+    assert(lua_topointer(state, -1) == error);
+    lua_settop(state, 0);
+    puts("C API PASS: non-yieldable pcallk returns result and exact error");
+}
+
+/* Real public C warning callbacks; no first-party or oracle internals. */
+struct warning_trace {
+    lua_State *state;
+    char bytes[128];
+    size_t length;
+    int calls;
+    int nesting;
+};
+static void trace_warning(void *data, const char *message, int to_continue) {
+    struct warning_trace *trace = (struct warning_trace *)data;
+    size_t length = strlen(message);
+    assert(trace->length + length + 1 < sizeof trace->bytes);
+    memcpy(trace->bytes + trace->length, message, length);
+    trace->length += length;
+    trace->bytes[trace->length++] = to_continue ? '+' : '|';
+    trace->bytes[trace->length] = '\0';
+    trace->calls++;
+}
+static void test_custom_warning_literals(lua_State *state) {
+    struct warning_trace trace = {state, {0}, 0, 0, 0};
+    lua_setwarnf(state, trace_warning, &trace);
+    /* Commands belong to the auxiliary default handler. A custom callback
+     * receives their literal spelling and the original continuation bit. */
+    lua_warning(state, "@off", 0);
+    lua_warning(state, "first", 1);
+    lua_warning(state, "second", 0);
+    assert(trace.calls == 3 && strcmp(trace.bytes, "@off|first+second|") == 0);
+    lua_setwarnf(state, NULL, NULL);
+    lua_warning(state, "ignored", 0);
+    assert(trace.calls == 3);
+    puts("C API PASS: custom warning data, controls and fragments");
+}
+static void nested_warning(void *data, const char *message, int to_continue) {
+    struct warning_trace *trace = (struct warning_trace *)data;
+    trace_warning(trace, message, to_continue);
+    if (!trace->nesting) {
+        trace->nesting = 1;
+        lua_pushinteger(trace->state, 42);
+        lua_warning(trace->state, "inner", 0);
+        /* A nested dispatch must not overwrite the outer borrowed string
+         * or its C-owned callback data while that callback remains active. */
+        assert(strcmp(message, "outer") == 0);
+        assert(lua_tointeger(trace->state, -1) == 42);
+        lua_pop(trace->state, 1);
+    }
+}
+static void test_reentrant_warning(lua_State *state) {
+    struct warning_trace trace = {state, {0}, 0, 0, 0};
+    lua_settop(state, 0);
+    lua_setwarnf(state, nested_warning, &trace);
+    lua_warning(state, "outer", 0);
+    assert(trace.calls == 2 && strcmp(trace.bytes, "outer|inner|") == 0);
+    assert(lua_gettop(state) == 0);
+    lua_setwarnf(state, NULL, NULL);
+    puts("C API PASS: warning callback reentry preserves outer message");
+}
+static void refusing_warning(void *data, const char *message, int to_continue) {
+    struct warning_trace *trace = (struct warning_trace *)data;
+    (void)message; (void)to_continue;
+    lua_pushvalue(trace->state, 1);
+    lua_error(trace->state);
+}
+static int trigger_warning(lua_State *state) {
+    lua_warning(state, "failure", 0);
+    assert(!"a throwing warning callback returned to its C body");
+    return 0;
+}
+static void test_warning_error_boundary(lua_State *state) {
+    struct warning_trace trace = {state, {0}, 0, 0, 0};
+    const void *error;
+    lua_settop(state, 0);
+    lua_newtable(state); error = lua_topointer(state, -1);
+    lua_setwarnf(state, refusing_warning, &trace);
+    lua_pushcfunction(state, trigger_warning); lua_pushvalue(state, 1);
+    assert(lua_pcall(state, 1, 1, 0) == LUA_ERRRUN);
+    assert(lua_gettop(state) == 2 && lua_topointer(state, -1) == error);
+    lua_setwarnf(state, NULL, NULL);
+    lua_settop(state, 0);
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 20); lua_pushinteger(state, 22);
+    assert(lua_pcall(state, 2, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 42);
+    lua_settop(state, 0);
+    puts("C API PASS: warning error crosses only C guard and recovers");
+}
+static void test_warning_uses_no_allocator(void) {
+    struct allocation_counts counts = {0, 0, 0, 0, 0, 0};
+    struct warning_trace trace = {0, {0}, 0, 0, 0};
+    lua_State *state = lua_newstate(counted_allocator, &counts, 1);
+    size_t before;
+    assert(state);
+    trace.state = state;
+    lua_setwarnf(state, trace_warning, &trace);
+    before = counts.calls;
+    counts.refuse = 1;
+    /* Warning delivery itself allocates nothing in pinned C Lua. A permanent
+     * allocator refusal therefore cannot prevent this literal callback. */
+    lua_warning(state, "allocation-free", 0);
+    assert(counts.calls == before && trace.calls == 1);
+    counts.refuse = 0;
+    lua_close(state);
+    assert(counts.blocks == 0 && counts.bytes == 0);
+    puts("C API PASS: warning delivery allocates no Lua storage");
+}
+
 int main(void) {
     lua_State *state;
     test_state_allocator_lifetime();
@@ -841,6 +1002,13 @@ int main(void) {
     test_userdata_maximum_uservalue_count(state);
     test_initial_free_stack_needs_no_growth();
     test_failed_checkstack_keeps_state_usable(state);
+    test_public_yieldability(state);
+    test_nonyieldable_callk(state);
+    test_nonyieldable_pcallk(state);
+    test_custom_warning_literals(state);
+    test_reentrant_warning(state);
+    test_warning_error_boundary(state);
+    test_warning_uses_no_allocator();
     lua_close(state);
     puts("PASS: real Ada C API bootstrap consumer");
     return 0;

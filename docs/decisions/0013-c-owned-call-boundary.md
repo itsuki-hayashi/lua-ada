@@ -27,6 +27,20 @@ not recursively call `Machine.Run` or `Engine.Execute`. The driver's retained
 world/context references are borrowed for a documented lifetime; managed driver
 allocation belongs to that world, with no process-wide current-world pointer.
 
+Ordinary Ada execution can lend its existing driver to the same C boundary.
+General access views express that borrow; separate pool-specific owner pointers
+identify the allocations the C facade may free. Context-owned C surfaces may
+retain their owning world's stable address, while the lent driver view is
+restored before its Ada Run activation ends. C cannot close an Ada-owned world.
+This does not add public Ada callback registration or object handles.
+
+The narrow borrowed-invoke helper establishes its C guard above the waiting
+Ada host frame. A host quota or physical host abort propagates through every
+nested C guard as a private abort action, bypassing protected Lua error returns.
+That outer helper then returns the action to Ada; it does not terminate the
+Ada host. Pending scalar C boundary records are released without Lua callbacks
+or budget resets. C-owned outer boundaries retain their panic/abort policy.
+
 Zero-upvalue C functions use actual function-pointer identity. C closures with
 upvalues own the same stable cells used by pseudo-index reads and mutations.
 Their frames do not copy old upvalue values into extra collector roots: replacing
@@ -61,7 +75,9 @@ errors carry handled metadata across C guards to avoid applying it twice.
 Nil is normalized after the handler, following pinned Lua 5.5.1 behavior.
 
 Continuation, yielding and C-resume phases must extend this same protocol.
-Until implemented, non-null call continuations fail explicitly before execution.
+Yieldable non-null call continuations still fail explicitly before execution.
+Non-yieldable calls ignore an unused continuation and return synchronously,
+matching pinned Lua.
 This checkpoint supplies no substitute success stubs for missing APIs and does
 not establish complete C ABI, stack-accounting,
 allocator or upstream-instrumentation parity. Ada builtins still need stable
@@ -79,3 +95,14 @@ allocation during the tested C failure publication path. Full Lua memory-error
 parity still needs reusable metadata and shared stack capacity. Required
 cross-platform/static/shared acceptance remains separate evidence; continuation
 and same-world cross-thread calls still need their own real tests.
+
+The later borrowed-driver checkpoint passes 1,085 AUnit cases and retains 39
+standalone C consumer cases in Windows validation/static. Six separately named
+mixed-language cases execute a real C addition callback, nested C-to-Lua calls,
+arbitrary protected errors, an uncatchable bounded quota inside C lua_pcall with
+subsequent session recovery, deferred warning reentry and a deferred warning
+error. Five semantic fixtures pass independently against pinned C Lua; the host
+quota case tests the explicitly bounded Ada policy. Reports are
+`reports/m3-borrowed-pump-tests1.log` and
+`reports/m3-borrowed-pump-c-consumer1.log`. Full continuation and platform gates
+remain pending.

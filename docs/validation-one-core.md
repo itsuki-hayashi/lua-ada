@@ -89,6 +89,16 @@ five unchanged upstream execution files; report-only C conformance observations
 and the unfinished full M3 ledger are separate from this passing retained
 matrix. Subsequent output/IO/OS changes need fresh final-revision evidence.
 
+The [1,038-case output-policy checkpoint](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42221667221)
+also passed all eighteen jobs and Windows static-PIC. Every log was inspected:
+the three core consumers and nine raw-byte output-policy subprocesses passed
+on every configuration. Windows logs additionally validate exception-directory
+and unwind-table structure in each of those three consumer executables, and
+in the shared Lua image when applicable. These checks concern actual linked
+images; eleven separate malformed/synthetic-image cases exercise the validator
+itself. IO/OS and remaining full-suite obligations still need their later
+implementation and final-revision evidence.
+
 ## Commands and reports
 
 ```powershell

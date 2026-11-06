@@ -1,4 +1,6 @@
 with Ada.Unchecked_Deallocation;
+with Interfaces.C;
+with System.Storage_Elements;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Compiler;
@@ -7,6 +9,8 @@ with Test_Support;
 
 package body Lua.Machine_Driver_Tests is
    use type Integer_Value;
+   use type Interfaces.C.unsigned_long_long;
+   use type System.Address;
    package VM renames Lua.Engine.Machine;
    procedure Free_World is new Ada.Unchecked_Deallocation
      (World, World_Access);
@@ -377,6 +381,125 @@ package body Lua.Machine_Driver_Tests is
       VM.Finish (Driver);
    end Inactive_Close_Mutation;
 
+   procedure Await_Foreign
+     (State : World_Access; Driver : in out VM.Driver);
+   procedure Exact_Callback_Identity (State : World_Access);
+   procedure Invalid_Callback_Address (State : World_Access);
+   procedure Invalid_Callback_Serial (State : World_Access);
+   procedure Reused_Callback_Identity (State : World_Access);
+
+   procedure Await_Foreign
+     (State : World_Access; Driver : in out VM.Driver)
+   is
+   begin
+      --  This private driver fixture never invokes C. A nonnull sentinel
+      --  handler creates the real requested activation; its guard protocol
+      --  can then be tested without fabricating any public C API behavior.
+      VM.Start
+        (Driver, State,
+         Value'(Foreign_Function_Kind,
+                System.Storage_Elements.To_Address (1)),
+         State.Current.Arguments);
+      for Iteration in 1 .. 100 loop
+         exit when VM.Needs_Foreign_Call (Driver);
+         VM.Step (Driver);
+      end loop;
+      Assert (VM.Needs_Foreign_Call (Driver), "callback was not requested");
+   end Await_Foreign;
+
+   procedure Exact_Callback_Identity (State : World_Access) is
+      Driver : VM.Driver;
+      Token : Callback_Identity;
+   begin
+      --  The request names the actual entered activation, not a temporary
+      --  packet or its current stack depth. Echoing it completes that call.
+      Await_Foreign (State, Driver);
+      Token := VM.Foreign_Token (Driver);
+      Assert (Token.Activation = State.Current.Stack.Last_Element.all'Address
+              and then Token.Serial /= 0, "wrong callback identity");
+      VM.Complete_Foreign_Call (Driver, 0, Token => Token);
+      Drain (Driver);
+      Assert (VM.Results (Driver).Is_Empty, "spurious callback result");
+      VM.Finish (Driver);
+   end Exact_Callback_Identity;
+
+   procedure Invalid_Callback_Address (State : World_Access) is
+      Driver : VM.Driver;
+      Token, Invalid : Callback_Identity;
+      Rejected : Boolean := False;
+   begin
+      --  A completion from another guard must fail before touching slots,
+      --  phase or ownership; the original pending request remains usable.
+      Await_Foreign (State, Driver);
+      Token := VM.Foreign_Token (Driver);
+      Invalid := Token;
+      Invalid.Activation := System.Null_Address;
+      begin
+         VM.Complete_Foreign_Call (Driver, 0, Token => Invalid);
+      exception
+         when Program_Error => Rejected := True;
+      end;
+      Assert (Rejected and then VM.Foreign_Token (Driver) = Token,
+              "invalid callback address changed the request");
+      VM.Complete_Foreign_Call (Driver, 0, Token => Token);
+      Drain (Driver);
+      VM.Finish (Driver);
+   end Invalid_Callback_Address;
+
+   procedure Invalid_Callback_Serial (State : World_Access) is
+      Driver : VM.Driver;
+      Token, Invalid : Callback_Identity;
+      Rejected : Boolean := False;
+   begin
+      --  The address alone cannot distinguish later reuse of a cached
+      --  activation. A different request serial is independently rejected.
+      Await_Foreign (State, Driver);
+      Token := VM.Foreign_Token (Driver);
+      Invalid := Token;
+      Invalid.Serial := Invalid.Serial + 1;
+      begin
+         VM.Complete_Foreign_Call (Driver, 0, Token => Invalid);
+      exception
+         when Program_Error => Rejected := True;
+      end;
+      Assert (Rejected and then VM.Foreign_Token (Driver) = Token,
+              "invalid callback serial changed the request");
+      VM.Complete_Foreign_Call (Driver, 0, Token => Token);
+      Drain (Driver);
+      VM.Finish (Driver);
+   end Invalid_Callback_Serial;
+
+   procedure Reused_Callback_Identity (State : World_Access) is
+      Driver : VM.Driver;
+      First, Second : Callback_Identity;
+      Rejected : Boolean := False;
+   begin
+      --  Retire then reuse the sole native frame. The old C guard's token
+      --  must not acknowledge a new call merely because its address matches.
+      Await_Foreign (State, Driver);
+      First := VM.Foreign_Token (Driver);
+      VM.Complete_Foreign_Call (Driver, 0, Token => First);
+      Drain (Driver);
+      VM.Finish (Driver);
+      Await_Foreign (State, Driver);
+      Second := VM.Foreign_Token (Driver);
+      Assert (First.Activation = Second.Activation and then
+                First.Serial /= Second.Serial, "frame was not reused safely");
+      begin
+         VM.Complete_Foreign_Call (Driver, 0, Token => First);
+      exception
+         when Program_Error => Rejected := True;
+      end;
+      Assert (Rejected, "stale cache identity completed a new callback");
+      VM.Complete_Foreign_Call (Driver, 0, Token => Second);
+      Drain (Driver);
+      VM.Finish (Driver);
+   end Reused_Callback_Identity;
+
+   procedure Exact_Token_Case is new Fixture (Exact_Callback_Identity);
+   procedure Address_Token_Case is new Fixture (Invalid_Callback_Address);
+   procedure Serial_Token_Case is new Fixture (Invalid_Callback_Serial);
+   procedure Reused_Token_Case is new Fixture (Reused_Callback_Identity);
    procedure Progress_Case is new Fixture (Incremental_Progress);
    procedure Root_Case is new Fixture (Terminal_Packet_Roots);
    procedure Budget_Case is new Fixture (Budget_Preservation);
@@ -394,6 +517,14 @@ package body Lua.Machine_Driver_Tests is
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
+      Test_Support.Add (Suite, "driver: exact callback identity",
+                        Exact_Token_Case'Access);
+      Test_Support.Add (Suite, "driver: invalid callback address",
+                        Address_Token_Case'Access);
+      Test_Support.Add (Suite, "driver: invalid callback serial",
+                        Serial_Token_Case'Access);
+      Test_Support.Add (Suite, "driver: reused callback identity",
+                        Reused_Token_Case'Access);
       Test_Support.Add (Suite, "driver: incremental progress",
                         Progress_Case'Access);
       Test_Support.Add (Suite, "driver: terminal packet roots",

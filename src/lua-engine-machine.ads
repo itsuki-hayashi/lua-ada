@@ -39,6 +39,18 @@ package Lua.Engine.Machine is
    --  prefix, matching lua_checkstack before a library builds many results.
    --  A false result lets that library issue its own pinned argument error.
 
+   procedure Set_Native_Top
+     (State : in out World; Activation : not null Frame_Access;
+      Count : Natural);
+   --  Apply lua_settop to a running native activation's actual shared
+   --  window and owned argument view. Removed values stop being roots.
+
+   procedure Push_Native_Value
+     (State : in out World; Activation : not null Frame_Access;
+      Item : Value);
+   --  Append one rooted scalar through the same reservation/publication
+   --  path. The native activation must be the current real stack window.
+
    type Driver is limited private;
    type Driver_Access is access Driver;
    for Driver_Access'Storage_Pool use Lua.Storage.Pool;
@@ -107,6 +119,7 @@ package Lua.Engine.Machine is
 
    function Needs_Foreign_Call (Self : Driver) return Boolean;
    function Foreign_Handler (Self : Driver) return System.Address;
+   function Foreign_Token (Self : Driver) return Callback_Identity;
    function Foreign_Context (Self : Driver) return Context_Access;
    --  Inspect a suspended C callback request after Step has returned. The
    --  C-owned pump invokes its handler; no Ada activation may span that call.
@@ -114,10 +127,13 @@ package Lua.Engine.Machine is
 
    procedure Complete_Foreign_Call
      (Self : Driver; Result_Count : Natural; Error_Status : Natural := 0;
-      Handler_Called : Boolean := False);
+      Handler_Called : Boolean := False;
+      Token : Callback_Identity);
    --  Publish the C callback's real result/error packet and restore its caller
    --  stack base before the next Step. Status zero completes normally; two
    --  and four propagate language/memory failure through ordinary protection.
+   --  Token is the exact identity returned with this callback request; a
+   --  stale/null/other activation identity is rejected before state mutation.
 
    procedure Start_Foreign_Boundary
      (Self : Driver; Callee : Value; Arguments : Values.Vector;

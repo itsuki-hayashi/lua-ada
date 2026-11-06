@@ -453,3 +453,55 @@ Documentation validation passes74 Markdown files. Finalizer queues, real
 collector modes, IO/OS, complete C continuations/ABI, actual test adapter and
 full-source/platform acceptance remain in progress; their reports-only drafts
 are not executable coverage or additional whole-file passes.
+
+## Warnings, borrowed C callbacks and finalizer components
+
+Published checkpoint6, 852aff6196da38fb7bf4eb5ace26efe74cd9f698, passes all18
+retained matrix jobs in run42221667221. Every job log was inspected, including
+Windows static-PIC, 1,038 AUnit cases, real core consumers and five retained
+whole-file executions. This is retained acceptance, not full M3 acceptance.
+
+The next group adds allocation-free warning events owned by actual activations,
+traced message roots, exact callback acknowledgements, and nested C/API warning
+handling. Pinned Lua5.5.1 auxiliary states start with warnings ON; bare states
+have no handler. Eight focused warning cases and four real C cases cover
+fragment ordering, literal control messages, nested calls, guarded failures and
+zero allocator activity during native warning publication. See warnings.md.
+
+Ada-started execution can now borrow its existing iterative driver through a
+C-owned callback guard. Six real C fixture tests exercise Ada-to-C calls,
+C-to-Lua reentry, protected error identity, nested host-budget abort/recovery and
+warning callbacks. No recursive Machine.Run/Engine.Execute or abandoned Ada
+stack is introduced. Exact frame-plus-serial tokens reject stale replies before
+mutation. Native top growth/truncation updates the shared scalar window and its
+root packet together; three focused cases exercise those ownership changes.
+
+Private finalizer components add allocation-free registration and pending queues,
+current-handler roots, protected non-yieldable Lua callbacks, hook suppression
+and five-fragment error warnings. Fourteen queue tests and ten runtime tests
+cover ordering, re-enrollment, graph liveness, callback errors, hidden scheduler
+phases, hooks and host aborts. These tests explicitly enqueue private fixtures;
+production metatable enrollment and collector integration are not selected yet.
+A userdata whose finalizer is abandoned by a host abort remains usable when
+resurrected; eventual physical release invokes its host-disposal policy once.
+
+An initial optional-finalizer retry loop could starve the interrupted script
+when native stack space was unavailable. The controller now consumes a single
+collection request, defers the queue and lets the caller progress. A named
+regression proves progress and later successful collection. Schedule also
+restores the argument packet's allocator owner before copying into a reused
+activation; assigning an empty vector had previously lost that owner.
+
+Exact latest commands:
+
+- alr -n -C tests build --validation --profiles=lua_ada=validation
+- alr -C tests exec -- bin/static/test_runner.exe
+- pwsh -NoProfile -File scripts/check.ps1 -Profile validation -LibraryType static
+
+reports/m3-finalizer-driver-build5.log and tests5.log pass1,086/1,086, zero
+assertion failures or unexpected errors. reports/m3-foreign-finalizers-check2.log
+passes the complete retained pipeline, including the 39-case C consumer and
+five unchanged files. The expected invalid-option child exits1. Optional
+GNATdoc generation, fuzzing and proof were not run. Remaining collector, native
+continuations, IO/OS, complete ABI/test adapter, full-source coverage and final
+26-context acceptance are still open; this checkpoint is not final handoff.

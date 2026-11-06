@@ -29,10 +29,13 @@ retains its separate eager default environment.
 
 The call portal accepts null continuations and real Lua/C message handlers.
 Handlers run before failed frames and closing declarations unwind; recursive
-handler errors reuse the same protected boundary. Non-null continuations return
-explicit unsupported errors before execution.
+handler errors reuse the same protected boundary. A non-yieldable call accepts
+an unused continuation and returns synchronously to its original C body, as
+pinned Lua does. Main/secondary-thread `lua_isyieldable` reports the actual
+execution barrier. Yieldable non-null continuations still return explicit
+unsupported errors before execution.
 Continuation/yield/resume support, reader-based loading,
-dumping, full auxiliaries, debug APIs, warnings, builtin C trampolines and
+dumping, full auxiliaries, debug APIs, builtin C trampolines and
 remaining exports are pending. In particular, `lua_tocfunction` currently exposes
 real foreign callbacks; Ada native-library functions need their own stable C
 trampolines before complete `luaL_openlibs`/C-function inspection parity.
@@ -57,6 +60,12 @@ Each callback receives a base-relative stack window. A reentrant C API call
 adds an explicit protected boundary to the same driver; it never invokes a
 second executor recursively. Returned/error packets remain traced until the C
 stack owns them. See [ADR 0013](../docs/decisions/0013-c-owned-call-boundary.md).
+Each C guard echoes its callback's opaque activation address and request serial.
+Completion checks both before changing state, so a nested guard or an earlier
+use of a cached frame cannot acknowledge another pending callback. Four focused
+driver cases cover valid completion, invalid addresses, invalid serials and real
+frame-cache reuse; the strict validation/static checkpoint passes 1,042 AUnit
+cases and retains all 35 C consumer cases.
 Protected holders reserve their two-value error packet before user code begins.
 Failure delivery moves owned packets or borrows them for canonical scalar writes;
 the C pump uses traced context storage until its stack owns the results. Permanent
@@ -130,3 +139,18 @@ sweeps all 25 measured growth points in that build. The earlier COFF link failur
 and callback-phase fallthrough were repaired before that accepted run. This is
 local checkpoint evidence; shared/platform/continuation/allocator-parity gates
 remain required by the parent M3 acceptance contract.
+
+`lua_setwarnf` and `lua_warning` now provide real custom callbacks, data pointers,
+literal control messages and fragments. Delivery takes place in C after the Ada
+dispatcher returns, including nested API use and protected callback errors.
+Bare construction leaves the handler absent; auxiliary construction enables the
+pinned default stderr handler. See [warning delivery](../docs/warnings.md) for
+allocation-free event ownership and the 1,067 AUnit/39 C-case local checkpoint.
+
+The later shared-window, registry and output checkpoint retains those cases and
+adds actual initial free-stack capacity and failed-checkstack recovery. The
+continuation checkpoint then passes 35 named C cases in the Windows
+validation/static consumer (reports/m3-k-nonyieldable-consumer1.log), including
+three separately oracle-checked cases for thread yieldability and the
+non-yieldable callk/pcallk branch. Yieldable continuations and public C coroutine
+resumption remain pending; these synchronous cases do not establish them.

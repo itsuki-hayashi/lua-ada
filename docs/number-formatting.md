@@ -103,3 +103,10 @@ Windows static-PIC also reran the comparisons successfully. This closes the
 reported libc carry regression for that checkpoint; later IO/OS/locale work
 requires its own final-revision matrix. The retained matrix does not establish
 whole-file strings.lua/math.lua execution or complete M3 conformance.
+
+The [1,038-case output-policy checkpoint](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42221667221)
+retained both formatting campaigns across all eighteen jobs and Windows
+static-PIC. Its nine subprocess output cases also verify high bytes, embedded
+NUL and callback ordering through the new process-stream delivery policy.
+Every job log was inspected. Runtime locale integration remains a separate
+subsequent change with its own required verification.

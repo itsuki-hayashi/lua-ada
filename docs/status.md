@@ -60,30 +60,31 @@ existing ADR 0003 floating-validity exception is unchanged.
 
 ## Current full M3 checkpoint
 
-The latest Windows/default/validation/static implementation passes 1,038
+The latest Windows/default/validation/static implementation passes 1,086
 separately named AUnit cases with zero failed assertions or unexpected errors.
-Canonical Lua and native/C activations now share one context-owned scalar
-arena, including actual captured cells, hidden varargs, overlapping call
-windows and collection of their ordered live union. Strict flags and runtime
-checks remain enabled. The complete retained pipeline passes its C32/mixed/startup consumers,
-Ada consumer, nine new raw-byte output processes, eleven PE-table structural
+The complete retained pipeline also passes its 39-case C consumer, mixed/startup
+and Ada consumers, nine raw-byte output processes, eleven PE-table structural
 regressions, 35 CLI cases, ten binary CLI comparisons, twelve differential
-fixtures and five unchanged upstream files. This does not establish final
-platform or full-upstream acceptance. The session record owns exact commands and repairs.
+fixtures and five unchanged upstream files. Strict flags and runtime checks
+remain enabled. The session record owns exact commands and repairs.
 
-The earlier 1,009-case checkpoint at
-9377f4fd00cce2900b27dc1e6cf77b13b653d8d4 passes all 18 jobs in
-[run 42217665982](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42217665982),
-including Windows static-PIC. Every job log was inspected. CI tests the actual
-PR synthetic merge, 9ec297c6, into baseline f7031f52; the workflow records the
-branch head separately. Report-only native C aggregate observations still
-record the pinned macOS readline-assumption failure, not a full M3 pass.
+Published checkpoint 852aff6196da38fb7bf4eb5ace26efe74cd9f698 passes all 18
+jobs in [run 42221667221](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42221667221),
+including Windows static-PIC. Every required job log was inspected. That
+revision contains 1,038 focused cases; newer local changes require a new
+platform run. Native C aggregate observations still record the pinned macOS
+readline-assumption failure, not a full M3 pass.
 
-The new local checkpoint adds actual userdata debug slots, registry-selected
-default environments and immediate native stdout with explicit capture policy.
-It also repairs a measured Windows BigObj partial-link unwind-table defect.
-No Ada tracebacks, warnings or runtime checks were disabled. These newer changes
-require their own complete platform rerun.
+The newer local group adds allocation-free warning events and actual C warning
+callbacks, a borrowed iterative driver for Ada-to-C-to-Lua calls, and finalizer
+queue/controller components. Default auxiliary states start with warnings on,
+matching pinned Lua 5.5.1; bare C states have no default warning handler.
+Finalizer component tests invoke actual Lua callbacks, preserve errors and roots,
+and defer work when callback stack space is unavailable. Production metatable
+enrollment, real collector modes, state-close draining and IO/OS integration
+remain open. These component tests are not a claim of public finalizer support.
+Physical disposal after an interrupted finalizer preserves resurrected resources
+until their actual release. No additional whole upstream file is claimed.
 
 The earlier checkpoint sequence below retains its original evidence counts.
 

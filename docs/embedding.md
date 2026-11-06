@@ -117,6 +117,14 @@ Ada host callback registration, exposed object handles and thread synchronizatio
 remain deferred. The separate C facade has a partial real exported surface;
 its current pilot is not complete public API/ABI acceptance. A sink is an output destination, not a Lua host-function API.
 
+The private execution driver can call real C functions and warning handlers
+while borrowing an Ada-owned world. Their nested Lua calls use the same driver
+and budget. Explicit host aborts abandon C bodies through C-owned guards and
+return controlled resource diagnostics to the Ada host, which remains usable.
+Private mixed-language tests exercise this path; public Ada host-function
+registration and native-module loading remain deferred. See
+[the callback boundary](decisions/0013-c-owned-call-boundary.md).
+
 ## Execution policy and lifecycle
 
 New and reset sessions select Execution_Policy.Bounded. Set_Execution_Policy

@@ -227,3 +227,11 @@ and real registry/type-metatable/upvalue joining. The retained pipeline passes
 do not close M3-FULL-2 through M3-FULL-8; sustained allocator refusal, complete
 foreign continuations, collector modes, remaining libraries, full T coverage
 and final platform contexts remain required. See the current session record.
+
+Current M3 component evidence: the full local validation/static pipeline passes
+1,086 focused cases and 39 real C consumer cases. Warning delivery and borrowed
+C callbacks are implemented; finalizer queue/controller tests execute real Lua
+handlers but production enrollment/collector/state-close integration remains
+open. Published 852aff6 passes all18 retained platform jobs. See the current
+session for exact commands and limits; no original M3 gate or additional whole
+upstream file is marked complete by these checkpoints.

@@ -231,6 +231,11 @@ package body Lua.Engine.Stacks is
                raise Program_Error with "scalar live window overflow";
             end if;
             Last := Activation.Stack_Base + Activation.Canonical_GC_Top;
+            if Activation.Warning_Borrow_Depth /= 0 then
+               --  A C warning callback borrows this real Lua frame without
+               --  adding a logical debug frame. Its API writes are live too.
+               Last := Natural'Max (Last, Activation.Stack_Live_Top);
+            end if;
          end if;
       end Bounds;
 

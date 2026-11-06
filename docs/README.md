@@ -58,3 +58,6 @@ owns the per-context frame cache, retained capacity and retirement contract.
 
 [Stable userdata](userdata.md) owns inline C-aligned payloads, traced Lua
 uservalues, per-object metatables and the first-party resource-release boundary.
+
+[Warning delivery](warnings.md) owns default modes, fragment controls, borrowed
+messages, nested C callbacks and the separation from captured stdout.

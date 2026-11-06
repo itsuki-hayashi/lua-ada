@@ -6,8 +6,8 @@ with Interfaces.C.Strings;
 with Lua.Canonical_Compiler;
 with Lua.Chunks;
 with Lua.Engine.Canonical;
-with Lua.Engine.Machine;
 with Lua.Engine.Stacks;
+with Lua.Engine.Warnings;
 with Lua.Runtime_Configuration;
 with Lua.Syntax;
 with Lua.Syntax_Trees;
@@ -22,11 +22,11 @@ package body Lua.Engine.Foreign is
    use type C.int;
    use type C.long_long;
    use type C.size_t;
-   use type VM.Driver_Access;
    use type Lua.Syntax.Check_Status;
    use type Integer_Value;
    use type Real_Value;
    use type Memory.Allocation_Function;
+   use type C.unsigned_long_long;
    use type System.Address;
 
    Registry_Index : constant C.int := -(C.int'Last / 2 + 1_000);
@@ -34,12 +34,21 @@ package body Lua.Engine.Foreign is
      Lua.Runtime_Configuration.Maximum_Stack;
    Foreign_Error : exception;
 
+   type World_View is access all World;
+   type Driver_View is access all VM.Driver;
+   package World_Views is new System.Address_To_Access_Conversions (World);
+   package Driver_Views is new
+     System.Address_To_Access_Conversions (VM.Driver);
    type Control is record
-      Universe : World_Access;
+      Universe : World_View;
+      Owned_Universe : World_Access;
       Context : Context_Id;
       Extra : Storage_Count;
       Seed : C.unsigned;
-      Driver : VM.Driver_Access;
+      Driver : Driver_View;
+      Owned_Driver : VM.Driver_Access;
+      Driver_Borrowed : Boolean := False;
+      Owns_Universe : Boolean := True;
       Calls : System.Address := System.Null_Address;
    end record;
    --  Raw ownership metadata has no Ada finalizers or hidden allocations.
@@ -60,6 +69,19 @@ package body Lua.Engine.Foreign is
      (C_Function, System.Address);
    function Address_Function is new Ada.Unchecked_Conversion
      (System.Address, C_Function);
+   function Warning_Address is new Ada.Unchecked_Conversion
+     (C_Warning_Function, System.Address);
+   function Address_Warning is new Ada.Unchecked_Conversion
+     (System.Address, C_Warning_Function);
+   function C_Extra_Space return C.size_t
+     with Import, Convention => C, External_Name => "lua_ada_extra_space";
+   function C_Invoke_Borrowed
+     (State : System.Address; Action : Action_Status;
+      Pending : not null access constant Response;
+      Completion : not null access Response) return C.int
+     with Import, Convention => C,
+          External_Name => "lua_ada_invoke_borrowed";
+
    function Characters is new Ada.Unchecked_Conversion
      (System.Address, Interfaces.C.Strings.chars_ptr);
 
@@ -77,8 +99,9 @@ package body Lua.Engine.Foreign is
    function Context_Of (Owner : Controls.Object_Pointer)
                         return Context_Access;
    function Create_Surface
-     (State : World_Access; Context : Context_Id; Extra : Storage_Count;
-      Seed : C.unsigned; Main : System.Address) return System.Address;
+     (State : World_View; Context : Context_Id; Extra : Storage_Count;
+      Seed : C.unsigned; Main : System.Address;
+      Owns_Universe : Boolean := True) return System.Address;
    function New_State (Input : Request) return System.Address;
    function Position
      (Context : Context_Access; Index : C.int) return Natural;
@@ -137,8 +160,9 @@ package body Lua.Engine.Foreign is
    end Context_Of;
 
    function Create_Surface
-     (State : World_Access; Context : Context_Id; Extra : Storage_Count;
-      Seed : C.unsigned; Main : System.Address) return System.Address
+     (State : World_View; Context : Context_Id; Extra : Storage_Count;
+      Seed : C.unsigned; Main : System.Address;
+      Owns_Universe : Boolean := True) return System.Address
    is
       Item : constant Context_Access := State.Contexts (Positive (Context));
       Header, Block : System.Address := System.Null_Address;
@@ -170,7 +194,12 @@ package body Lua.Engine.Foreign is
       Result := Block + Storage_Offset (Extra);
       Controls.To_Pointer (Header).all :=
         (Universe => State, Context => Context, Extra => Extra,
-         Seed => Seed, Driver => null, others => <>);
+         Seed => Seed, Driver => null,
+         Owns_Universe =>
+           (if Main = System.Null_Address then Owns_Universe else
+              Controls.To_Pointer
+                (Surfaces.To_Pointer (Main).Owner).Owns_Universe),
+         others => <>);
       Surfaces.To_Pointer (Result).all :=
         (Owner => Header, Guard => System.Null_Address,
          Main => (if Main = System.Null_Address then Result else Main),
@@ -223,14 +252,19 @@ package body Lua.Engine.Foreign is
       State.Open_Standard_Libraries := False;
       Initialize (State.all, (others => <>));
       Set_Policy (State.all, Lua_Compatible);
+      if Input.Operation = Create_State then
+         State.Warning_Mode := No_Warning_Handler;
+      end if;
       --  C-created states publish to native stdout. Ada sessions select
       --  capture by default, independently of their execution quota policy.
       State.Output_Mode := Process_Streams;
       Begin_Operation (State.all);
       Operation_Active := True;
       Result := Create_Surface
-        (State, Context_Id (State.Main_Thread.Context_Index),
+        (World_View (State), Context_Id (State.Main_Thread.Context_Index),
          Storage_Count (Input.Length), Input.Seed, System.Null_Address);
+      Controls.To_Pointer (Surfaces.To_Pointer (Result).Owner).
+        Owned_Universe := State;
       --  Engine.Initialize owns the one actual registry for every session.
       End_Operation (State.all);
       Operation_Active := False;
@@ -246,6 +280,161 @@ package body Lua.Engine.Foreign is
          end if;
          return System.Null_Address;
    end New_State;
+
+   procedure Invoke_Borrowed
+     (State : in out World; Driver : in out VM.Driver)
+   is
+      Universe : constant World_View :=
+        World_View (World_Views.To_Pointer (State'Address));
+      Main_State, Callback_State : System.Address;
+      Owner : Controls.Object_Pointer;
+      Saved_Driver : Driver_View := null;
+      Saved_Borrowed : Boolean := False;
+      Input, Output : aliased Response;
+      Token : Callback_Identity;
+      Target : Context_Access;
+      Action, Status : Action_Status;
+      Raw_Status : C.int;
+      Attached : Boolean := False;
+      Is_Warning : constant Boolean := Warnings.Pending (State);
+
+      procedure Restore;
+      procedure Allocation_Failed;
+      procedure Restore is
+      begin
+         if not Attached then return; end if;
+         --  Every nested C boundary belongs to this borrow. On a host abort,
+         --  its C activations have already unwound; release scalar ownership
+         --  metadata without running a Lua callback or restarting a budget.
+         while Owner.Calls /= System.Null_Address loop
+            declare
+               Address : System.Address := Owner.Calls;
+            begin
+               Owner.Calls := Calls.To_Pointer (Address).Previous;
+               Memory.Release (State.Memory, Address);
+            end;
+         end loop;
+         Owner.Driver := Saved_Driver;
+         Owner.Driver_Borrowed := Saved_Borrowed;
+         Attached := False;
+      end Restore;
+
+      procedure Allocation_Failed is
+      begin
+         Restore;
+         Record_Memory_Error (State);
+         if Is_Warning then
+            State.Warning_Head.Warning_Failed := True;
+            Warnings.Discard (State, State.Warning_Head);
+         else
+            --  Native windows reserve LUA_MINSTACK beyond their arguments.
+            --  This error publication therefore needs no new stack storage,
+            --  even if constructing the first opaque C surface was refused.
+            Target := VM.Foreign_Context (Driver);
+            Target.Foreign_Top := Target.Foreign_Top + 1;
+            Stacks.Write
+              (State, Target, Target.Foreign_Top, Target.Failure);
+            Target.Stack_Window.Stack_Live_Top := Target.Foreign_Top;
+            VM.Complete_Foreign_Call
+              (Driver, 0, 4, Token => VM.Foreign_Token (Driver));
+         end if;
+      end Allocation_Failed;
+   begin
+      --  Context-owned C surfaces may retain World's stable address until
+      --  that same world releases them. Their ownership flag forbids C from
+      --  freeing an Ada-owned world. The Driver view lasts only through this
+      --  synchronous borrow and is restored before the Run activation ends;
+      --  no named access-to-nested-subprogram or abandoned stack is stored.
+      Main_State := Create_Surface
+        (Universe, Context_Id (State.Main_Thread.Context_Index),
+         Storage_Count (C_Extra_Space), 0, System.Null_Address,
+         Owns_Universe => False);
+      Owner := Controls.To_Pointer (Surfaces.To_Pointer (Main_State).Owner);
+      if Owner.Calls /= System.Null_Address or else Owner.Driver_Borrowed then
+         raise Program_Error with "Ada execution already owns a C borrow";
+      end if;
+      Saved_Driver := Owner.Driver;
+      Saved_Borrowed := Owner.Driver_Borrowed;
+      Owner.Driver :=
+        Driver_View (Driver_Views.To_Pointer (Driver'Address));
+      Owner.Driver_Borrowed := True;
+      Attached := True;
+      if Is_Warning then
+         Target := State.Warning_Head.Context;
+         Input.Warning_Function :=
+           Address_Warning (State.Warning_Head.Warning_Handler);
+         Input.Warning_Data := State.Warning_Head.Warning_Data;
+         Input.Warning_Message := State.Warning_Head.Warning_Message.Address;
+         Input.Warning_Continuation :=
+           Boolean'Pos (State.Warning_Head.Warning_To_Continue);
+         Token := Warnings.Identity (State);
+         Warnings.Begin_Callback (State);
+         Action := Action_Warning;
+      else
+         Target := VM.Foreign_Context (Driver);
+         Input.Function_Data := Address_Function (VM.Foreign_Handler (Driver));
+         Token := VM.Foreign_Token (Driver);
+         Action := Action_Call;
+      end if;
+      Callback_State := Create_Surface
+        (Universe, Context_Id (Target.Thread.Context_Index),
+         Owner.Extra, Owner.Seed, Main_State, Owns_Universe => False);
+      Input.Callback_Token := Token;
+      Raw_Status := C_Invoke_Borrowed
+        (Callback_State, Action, Input'Access, Output'Access);
+      case Raw_Status is
+         when 0 => Status := Action_Done;
+         when 2 => Status := Action_Raise;
+         when 4 => Status := Action_Memory;
+         when 5 => Status := Action_Handling;
+         when 6 => Status := Action_Abort;
+         when others =>
+            raise Program_Error with "invalid borrowed C callback transfer";
+      end case;
+      if Status = Action_Abort then
+         Restore;
+         if State.Current.Failure_Class /= Host_Abort then
+            State.Current.Failure_Class := Host_Abort;
+            State.Current.Transfer.Kind := Host_Stopped;
+            State.Current.Failure_Text :=
+              To_Unbounded_String ("foreign host abort");
+         end if;
+         raise Language_Error;
+      end if;
+      if Is_Warning then
+         if Status /= Action_Done then
+            Target.Failure := Stacks.Read (Target, Target.Foreign_Top);
+            Target.Has_Failure_Value := True;
+            Target.Failure_Text := To_Unbounded_String
+              (Image (Target.Memory, Target.Failure));
+            Target.Failure_Class :=
+              (if Status = Action_Memory then Memory_Failure
+               elsif Status = Action_Handling then Handling_Failure
+               else Language_Failure);
+            Target.Failure_Handled := Output.Error_Handled /= 0;
+            State.Warning_Head.Warning_Failed := True;
+         end if;
+         Warnings.Acknowledge (State, Token);
+      else
+         VM.Complete_Foreign_Call
+           (Driver, Natural (Output.Integer_Data),
+            Action_Status'Enum_Rep (Status), Output.Error_Handled /= 0, Token);
+      end if;
+      Restore;
+   exception
+      when Memory.Allocation_Error =>
+         Allocation_Failed;
+      when Program_Error =>
+         if Memory.Refusal_Pending (State.Memory) then
+            Allocation_Failed;
+         else
+            Restore;
+            raise;
+         end if;
+      when others =>
+         Restore;
+         raise;
+   end Invoke_Borrowed;
 
    function Position
      (Context : Context_Access; Index : C.int) return Natural
@@ -439,7 +628,7 @@ package body Lua.Engine.Foreign is
    is
       Owner : Controls.Object_Pointer;
       Context : Context_Access;
-      Active_World : World_Access;
+      Active_World : World_View;
       Previous : Context_Access;
       Operation_Active : Boolean := False;
       Keep_Scheduler : Boolean := False;
@@ -549,7 +738,28 @@ package body Lua.Engine.Foreign is
          loop
             exit when Error_Status /= 0 or else VM.Is_Complete (Driver) or else
               VM.Has_Foreign_Result (Driver);
-            if VM.Needs_Foreign_Call (Driver) then
+            if Warnings.Pending (Owner.Universe.all) then
+               declare
+                  Event : constant Frame_Access :=
+                    Owner.Universe.Warning_Head;
+               begin
+                  Output.Pointer := Create_Surface
+                    (Owner.Universe, Context_Id
+                       (Event.Context.Thread.Context_Index),
+                     Main_Owner.Extra, Main_Owner.Seed,
+                     Surfaces.To_Pointer (State).Main);
+                  Output.Warning_Function :=
+                    Address_Warning (Event.Warning_Handler);
+                  Output.Warning_Data := Event.Warning_Data;
+                  Output.Warning_Message := Event.Warning_Message.Address;
+                  Output.Warning_Continuation :=
+                    Boolean'Pos (Event.Warning_To_Continue);
+                  Output.Callback_Token :=
+                    Warnings.Identity (Owner.Universe.all);
+                  Warnings.Begin_Callback (Owner.Universe.all);
+                  return Action_Warning;
+               end;
+            elsif VM.Needs_Foreign_Call (Driver) then
                declare
                   Target : constant Context_Access :=
                     VM.Foreign_Context (Driver);
@@ -560,6 +770,7 @@ package body Lua.Engine.Foreign is
                      Surfaces.To_Pointer (State).Main);
                   Output.Function_Data :=
                     Address_Function (VM.Foreign_Handler (Driver));
+                  Output.Callback_Token := VM.Foreign_Token (Driver);
                   return Action_Call;
                end;
             end if;
@@ -676,12 +887,17 @@ package body Lua.Engine.Foreign is
          when Create_State | Create_Default_State => null;
          when Close_State =>
             declare
-               Universe : World_Access := Owner.Universe;
+               Universe : World_Access := Main_Owner.Owned_Universe;
             begin
-               if Main_Owner.Calls /= System.Null_Address then
+               if not Main_Owner.Owns_Universe then
+                  raise Foreign_Error with "cannot close an Ada-owned state";
+               elsif Main_Owner.Calls /= System.Null_Address or else
+                 Main_Owner.Driver_Borrowed
+               then
                   raise Foreign_Error with "cannot close a running C drive";
                end if;
-               VM.Free_Driver (Main_Owner.Driver);
+               VM.Free_Driver (Main_Owner.Owned_Driver);
+               Main_Owner.Driver := null;
                End_Operation (Active_World.all);
                Operation_Active := False;
                Active_World := null;
@@ -701,6 +917,72 @@ package body Lua.Engine.Foreign is
                   Owner.Extra, Owner.Seed,
                   Surfaces.To_Pointer (State).Main);
             end;
+         when Set_Warning_Function =>
+            Owner.Universe.Warning_Mode :=
+              (if Input.Warning_Function = null then No_Warning_Handler
+               else Custom_Warning_Handler);
+            Owner.Universe.Warning_Handler :=
+              Warning_Address (Input.Warning_Function);
+            Owner.Universe.Warning_Data := Input.Pointer;
+         when Issue_Warning =>
+            if Owner.Universe.Warning_Mode = Custom_Warning_Handler then
+               --  The caller's C string already outlives this synchronous
+               --  wrapper invocation. Snapshot scalar callback data; no Lua
+               --  string, event allocation or Ada activation spans the call.
+               Output.Warning_Function :=
+                 Address_Warning (Owner.Universe.Warning_Handler);
+               Output.Warning_Data := Owner.Universe.Warning_Data;
+               Output.Warning_Message := Input.Pointer;
+               Output.Warning_Continuation := Input.Count;
+               Leave_Context;
+               return Action_Warning;
+            else
+               Warnings.Emit
+                 (Owner.Universe.all,
+                  Byte_String'(Input.Pointer, Natural (Input.Length)),
+                  To_Continue => Input.Count /= 0);
+            end if;
+         when Complete_Warning =>
+            declare
+               Event : constant Frame_Access := Owner.Universe.Warning_Head;
+               Result : Action_Status;
+            begin
+               if Input.Index not in 0 | 2 | 4 | 5 or else
+                 Event = null or else
+                 Event.Warning_Phase /= Warning_Callback_Active or else
+                 Event.all'Address /= Input.Callback_Token.Activation or else
+                 Event.Warning_Ticket /= Input.Callback_Token.Serial
+               then
+                  raise Foreign_Error with "invalid warning completion";
+               end if;
+               if Input.Index /= 0 then
+                  Context.Failure :=
+                    Stacks.Read (Context, Context.Foreign_Top);
+                  Context.Has_Failure_Value := True;
+                  Context.Failure_Text := To_Unbounded_String
+                    (Image (Context.Memory, Context.Failure));
+                  Context.Failure_Class :=
+                    (if Input.Index = 4 then Memory_Failure
+                     elsif Input.Index = 5 then Handling_Failure
+                     else Language_Failure);
+                  Context.Failure_Handled := Input.Error_Handled /= 0;
+                  Event.Warning_Failed := True;
+               end if;
+               Warnings.Acknowledge
+                 (Owner.Universe.all, Input.Callback_Token);
+               Result := Pump;
+               Leave_Context;
+               return Result;
+            end;
+         when Get_Yieldability =>
+            --  A new secondary thread is yieldable even outside execution.
+            --  Abandoned barriers on a dead thread cannot describe a current
+            --  C call; main-thread/closing restrictions remain explicit.
+            Output.Integer_Data := Boolean'Pos
+              (Context /= Owner.Universe.Main_Context and then
+               Context.Phase /= Closing and then
+               (Context.Status = Dead_Context or else
+                Context.Non_Yieldable = 0));
          when Get_Top =>
             Output.Integer_Data := C.long_long
               (Context.Foreign_Top - Context.Foreign_Base);
@@ -1194,6 +1476,12 @@ package body Lua.Engine.Foreign is
                end if;
             end;
          when Begin_Call =>
+            if not Main_Owner.Owns_Universe and then
+              not Main_Owner.Driver_Borrowed
+            then
+               raise Foreign_Error with
+                 "host-owned state requires its active Ada execution";
+            end if;
             if Input.Index < 0 or else Input.Count < -1 or else
               Input.Count > C.int (Stack_Limit) or else
               Natural (Input.Index) >= Context.Foreign_Top
@@ -1210,7 +1498,8 @@ package body Lua.Engine.Foreign is
                  Owned_Values (Owner.Universe.all);
                Address : System.Address;
                Root_Call : constant Boolean :=
-                 Main_Owner.Calls = System.Null_Address;
+                 Main_Owner.Calls = System.Null_Address and then
+                 not Main_Owner.Driver_Borrowed;
                Next : Calls.Object_Pointer;
                Result : Action_Status;
                Start_Error : Boolean := False;
@@ -1240,7 +1529,9 @@ package body Lua.Engine.Foreign is
                Pin (Owner.Universe.all, Arguments);
                Pin (Owner.Universe.all, Message_Handler);
                if Main_Owner.Driver = null then
-                  Main_Owner.Driver := VM.New_Driver (Owner.Universe.all);
+                  Main_Owner.Owned_Driver :=
+                    VM.New_Driver (Owner.Universe.all);
+                  Main_Owner.Driver := Driver_View (Main_Owner.Owned_Driver);
                end if;
                Address := Memory.Allocate
                  (Owner.Universe.Memory,
@@ -1262,7 +1553,7 @@ package body Lua.Engine.Foreign is
                      Context.Protected_Handler_Called := False;
                      Context.Non_Yieldable := Context.Non_Yieldable + 1;
                      VM.Start_Foreign
-                       (Main_Owner.Driver.all, Owner.Universe,
+                       (Main_Owner.Driver.all, Main_Owner.Owned_Universe,
                         Callee, Arguments, Message_Handler,
                         Call_Base => Slot, Has_Call_Window => True);
                   else
@@ -1301,15 +1592,20 @@ package body Lua.Engine.Foreign is
             begin
                VM.Complete_Foreign_Call
                  (Main_Owner.Driver.all, Natural (Input.Count),
-                  Natural (Input.Index), Input.Error_Handled /= 0);
+                  Natural (Input.Index), Input.Error_Handled /= 0,
+                  Input.Callback_Token);
             exception
                when Memory.Allocation_Error =>
                   Memory_Result;
-                  VM.Complete_Foreign_Call (Main_Owner.Driver.all, 0, 4);
+                  VM.Complete_Foreign_Call
+                    (Main_Owner.Driver.all, 0, 4,
+                     Token => Input.Callback_Token);
                when Program_Error =>
                   if Memory.Refusal_Pending (Owner.Universe.Memory) then
                      Memory_Result;
-                     VM.Complete_Foreign_Call (Main_Owner.Driver.all, 0, 4);
+                     VM.Complete_Foreign_Call
+                       (Main_Owner.Driver.all, 0, 4,
+                        Token => Input.Callback_Token);
                   else
                      raise;
                   end if;

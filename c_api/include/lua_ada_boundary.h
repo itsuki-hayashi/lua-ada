@@ -20,7 +20,16 @@ enum lua_ada_operation {
     ADA_PUSH_C_CLOSURE, ADA_TO_C_FUNCTION, ADA_BEGIN_CALL,
     ADA_COMPLETE_CALLBACK, ADA_RAISE_ERROR, ADA_LOAD_BUFFER,
     ADA_CREATE_USERDATA, ADA_GET_USERVALUE, ADA_SET_USERVALUE,
-    ADA_GET_METATABLE, ADA_SET_METATABLE
+    ADA_GET_METATABLE, ADA_SET_METATABLE,
+    ADA_GET_YIELDABILITY = 50, ADA_SET_WARNING_FUNCTION,
+    ADA_ISSUE_WARNING, ADA_COMPLETE_WARNING
+};
+
+/* Identity is opaque C-owned transport, not a C Lua frame layout. Guard
+ * completion must echo both fields unchanged, even through nested calls. */
+struct lua_ada_callback_identity {
+    void *activation;
+    unsigned long long serial;
 };
 
 struct lua_ada_request {
@@ -38,6 +47,11 @@ struct lua_ada_request {
     const char *name;
     const char *mode;
     int error_handled;
+    struct lua_ada_callback_identity callback_token;
+    lua_WarnFunction warning_function;
+    void *warning_data;
+    const char *warning_message;
+    int warning_continuation;
 };
 
 struct lua_ada_response {
@@ -48,6 +62,11 @@ struct lua_ada_response {
     lua_Alloc allocator;
     lua_CFunction function_data;
     int error_handled;
+    struct lua_ada_callback_identity callback_token;
+    lua_WarnFunction warning_function;
+    void *warning_data;
+    const char *warning_message;
+    int warning_continuation;
 };
 
 enum lua_ada_action {
@@ -56,7 +75,8 @@ enum lua_ada_action {
     ADA_ACTION_RAISE = LUA_ERRRUN,
     ADA_ACTION_MEMORY = LUA_ERRMEM,
     ADA_ACTION_HANDLING = LUA_ERRERR,
-    ADA_ACTION_ABORT = 6
+    ADA_ACTION_ABORT = 6,
+    ADA_ACTION_WARNING = 7
 };
 
 /* This is an opaque state surface, not C Lua's private lua_State layout.
@@ -78,6 +98,9 @@ size_t lua_ada_surface_size(void);
 size_t lua_ada_request_size(void);
 size_t lua_ada_response_size(void);
 size_t lua_ada_extra_space(void);
+int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
+                            const struct lua_ada_response *pending,
+                            struct lua_ada_response *completion);
 
 /* Test-only C guard probe. It demonstrates that a failing exported operation
  * returned through Ada before C unwinds. It is not a lua_pcall replacement. */

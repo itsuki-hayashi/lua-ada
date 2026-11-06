@@ -20,7 +20,20 @@ private package Lua.Engine is
    subtype Integer_Value is Lua.Numbers.Integer_Value;
    subtype Real_Value is Lua.Numbers.Real_Value;
 
+   type Callback_Identity is record
+      Activation : System.Address := System.Null_Address;
+      Serial : Interfaces.C.unsigned_long_long := 0;
+   end record with Convention => C;
+   --  A callback guard identifies its actual owning activation. The serial
+   --  distinguishes subsequent uses of a cached frame's stable address.
+
    type Execution_Policy is (Bounded, Lua_Compatible);
+
+   type Warning_Mode_Kind is
+     (No_Warning_Handler, Default_Warnings_Off, Default_Warnings_On,
+      Default_Warning_Continuation, Custom_Warning_Handler);
+   type Warning_Event_Phase is
+     (No_Pending_Warning, Warning_Requested, Warning_Callback_Active);
 
    type Output_Policy is (Captured, Process_Streams);
    --  Captured is the embedding default. Process_Streams publishes to actual
@@ -44,6 +57,11 @@ private package Lua.Engine is
    --  are inclusive (native pointer minus one); an allocated semantic bound
    --  excludes Extra_Stack and requires last inclusive offset < bound.
    type Stack_Space_Phase is (Normal_Stack, Error_Stack);
+   type Completion_Policy is (Deliver_Results, Resume_Caller);
+   type Finalizer_Drive_Phase is
+     (Choosing_Finalizer, Waiting_Finalizer_Handler, Warning_Where,
+      Warning_Open, Warning_Error, Warning_Close);
+
    type Native_Tail_Phase is
      (No_Native_Tail, Waiting_Native_Tail, Ready_Native_Tail);
 
@@ -191,12 +209,19 @@ private package Lua.Engine is
    is record
       Marked : Boolean := False;
       Mark_Next : Object_Access;
+      Finalizer_Next : Object_Access;
+      Finalizer_Registered : Boolean := False;
+      --  Finalizer ownership links are independent of collector work lists.
+      --  Registration is not reachability; pending/current targets are roots.
       Serial : Positive := 1;
       case Kind is
          when Userdata_Object =>
             Userdata_Size : Lua.Storage.Byte_Count := 0;
             Userdata_Metatable : Object_Access;
             Uservalues : Values.Vector;
+            Finalization_Aborted : Boolean := False;
+            --  A host-aborted callback leaves owned native cleanup deferred
+            --  until actual release; globally resurrected objects stay usable.
             Resource_Data : System.Address := System.Null_Address;
             Cleanup_Resource : Resource_Cleanup;
             Payload : Userdata_Bytes (1 .. Payload_Length);
@@ -367,6 +392,23 @@ private package Lua.Engine is
       Native_Aux : Natural := 0;
       Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
       Foreign_Handler : System.Address := System.Null_Address;
+      Foreign_Ticket : Interfaces.C.unsigned_long_long := 0;
+      Warning_Phase : Warning_Event_Phase := No_Pending_Warning;
+      Warning_Previous : Frame_Access;
+      Warning_Window : Frame_Access;
+      Warning_Borrow_Depth : Natural := 0;
+      Warning_Ticket : Interfaces.C.unsigned_long_long := 0;
+      Warning_Message : Byte_String;
+      Warning_Root : Value;
+      Warning_To_Continue : Boolean := False;
+      Warning_Handler : System.Address := System.Null_Address;
+      Warning_Data : System.Address := System.Null_Address;
+      Warning_Previous_Base : Natural := 0;
+      Warning_Previous_Top : Natural := 0;
+      Warning_Previous_Frame : Frame_Access;
+      Warning_Failed : Boolean := False;
+      --  A warning borrows its actual current frame. Embedded event storage
+      --  and the linked previous event retain roots across nested C callbacks.
       Foreign_Base : Natural := 0;
       Foreign_Previous_Base : Natural := 0;
       Foreign_Previous_Frame : Frame_Access;
@@ -396,6 +438,9 @@ private package Lua.Engine is
       Canonical_Concat_Last : Natural := 0;
       Varargs    : Values.Vector;
       Vararg_Table : Object_Access;
+      Completion : Completion_Policy := Deliver_Results;
+      Finalizer_Phase : Finalizer_Drive_Phase := Choosing_Finalizer;
+      Finalizer_Charge : Boolean := False;
       Return_To  : Natural := 0;
       Protection : Natural := 0;
       Message_Handler : Value;
@@ -435,7 +480,8 @@ private package Lua.Engine is
    --  consumers read its first value; parentheses explicitly collapse it.
    --  Frames are explicit so tail calls need not consume the Ada call stack.
 
-   type Native_Action_Kind is (Finished, Invoke, Continue_Step);
+   type Native_Action_Kind is
+     (Finished, Invoke, Continue_Step, Drain_Finalizers);
    type Native_Action is record
       Kind : Native_Action_Kind := Finished;
       Results : Values.Vector;
@@ -514,6 +560,7 @@ private package Lua.Engine is
       Hook_Reported_Count : Integer_Value := 0;
       Hook_Remaining : Natural := 0;
       Hook_Active : Boolean := False;
+      Finalizer_Hook_Suppression : Natural := 0;
       Hook_Frame : Frame_Access;
       Hook_Transfer : Boolean := False;
       Cleanup_Depth : Natural := 0;
@@ -560,6 +607,17 @@ private package Lua.Engine is
       Compiling : Boolean := False;
       Memory_Ready : Boolean := False;
       Collector_Active : Boolean := False;
+      Finalizable_Head : Object_Access;
+      Finalizer_Head : Object_Access;
+      Finalizer_Tail : Object_Access;
+      Finalizing_Object : Object_Access;
+      Finalizing_Handler : Value;
+      Finalizer_Active : Boolean := False;
+      Finalizers_Requested : Boolean := False;
+      --  A normal collector cycle requests one drain attempt. If minimum
+      --  stack/CI space is unavailable, wait for another cycle, not a busy
+      --  loop which prevents the blocked caller from making progress.
+      State_Close_Phase : Boolean := False;
       String_Metatable : Object_Access;
       Type_Metatables : Type_Metatable_Array := [others => null];
       --  Actual per-universe primitive-type roots. Number/function variants
@@ -568,17 +626,33 @@ private package Lua.Engine is
       Preload_Modules : Object_Access;
       Next_Symbol  : Positive := 1;
       Next_Object  : Positive := 1;
+      Next_Foreign_Ticket : Interfaces.C.unsigned_long_long := 0;
       Entry_Count  : Natural := 0;
       Collections  : Natural := 0;
       GC_Running : Boolean := True;
       Next_GC      : Positive := 256;
       Steps        : Natural := 0;
       Native_Depth : Natural := 0;
+      Warning_Mode : Warning_Mode_Kind := Default_Warnings_On;
+      Warning_Handler : System.Address := System.Null_Address;
+      Warning_Data : System.Address := System.Null_Address;
+      Warning_Head : Frame_Access;
       Output_Mode : Output_Policy := Captured;
       Output_Used : Natural := 0;
       Output       : Unbounded_String;
    end record;
    type World_Access is access World;
+
+   procedure Emit_Warning
+     (State : in out World; Message : Value;
+      To_Continue : Boolean := False);
+   procedure Emit_Warning
+     (State : in out World; Message : Byte_String;
+      Root : Value := Nil_Value; To_Continue : Boolean := False);
+   --  Borrow a NUL-terminated message without a forced allocation. Root
+   --  retains an owned Lua string until a custom C callback acknowledges it;
+   --  static fragments may use Nil_Value. Call only from a live VM frame
+   --  when the custom handler requires deferred C-owned delivery.
 
    function Emit_Output
      (State : in out World; Bytes : String) return Output_Result;
@@ -671,7 +745,12 @@ private package Lua.Engine is
    --  Both blocks are trivially finalizable and owned by State.Memory.
 
    procedure Initialize (State : in out World; Bounds : Limits);
-   procedure Finalize (State : in out World);
+   procedure Finalize
+     (State : in out World;
+      Reason : Resource_Release_Reason := Host_Disposal);
+   --  Release physical ownership without executing Lua. Explicit Lua-state
+   --  closing first drains its callbacks, then selects Lua_State_Close; host
+   --  disposal can additionally reclaim first-party native resources.
    procedure Collect
      (State : in out World; Emergency : Boolean := False);
    --  Mark/sweep sees globals, frames, packets, captures, and current failure.

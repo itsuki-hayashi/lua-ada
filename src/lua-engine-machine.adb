@@ -1,3 +1,4 @@
+with Lua.Engine.Finalizers;
 with Ada.Characters.Latin_1;
 with Ada.Containers;
 with Ada.Exceptions;
@@ -23,8 +24,36 @@ with Lua.Engine.Sorting;
 with Lua.Engine.Inspection;
 with Lua.Engine.Canonical;
 with Lua.Engine.Stacks;
+with Lua.Engine.Foreign;
+with Lua.Engine.Warnings;
 
 package body Lua.Engine.Machine is
+   GC_Warning_Start_Text : aliased constant String :=
+     "error in " & ASCII.NUL;
+   GC_Warning_Start : constant Byte_String :=
+     (GC_Warning_Start_Text'Address,
+      GC_Warning_Start_Text'Length - 1);
+   GC_Warning_Where_Text : aliased constant String :=
+     "__gc" & ASCII.NUL;
+   GC_Warning_Where : constant Byte_String :=
+     (GC_Warning_Where_Text'Address,
+      GC_Warning_Where_Text'Length - 1);
+   GC_Warning_Open_Text : aliased constant String :=
+     " (" & ASCII.NUL;
+   GC_Warning_Open : constant Byte_String :=
+     (GC_Warning_Open_Text'Address,
+      GC_Warning_Open_Text'Length - 1);
+   GC_Warning_Close_Text : aliased constant String :=
+     ")" & ASCII.NUL;
+   GC_Warning_Close : constant Byte_String :=
+     (GC_Warning_Close_Text'Address,
+      GC_Warning_Close_Text'Length - 1);
+   GC_Warning_Nonstring_Text : aliased constant String :=
+     "error object is not a string" & ASCII.NUL;
+   GC_Warning_Nonstring : constant Byte_String :=
+     (GC_Warning_Nonstring_Text'Address,
+      GC_Warning_Nonstring_Text'Length - 1);
+
    --  The VM is the only executor of compiled chunks. Registers hold result
    --  packets rather than plain values; every primitive explicitly chooses
    --  scalar or expanding consumption. Lua calls use the owned frame vector,
@@ -34,6 +63,7 @@ package body Lua.Engine.Machine is
    use type Integer_Value;
    use type Lua.Prototypes.Prototype_Access;
    use type System.Address;
+   use type Interfaces.C.unsigned_long_long;
    use type Real_Value;
    use type Interfaces.Unsigned_64;
    use type Lua.Numbers.Number_Kind;
@@ -648,10 +678,73 @@ package body Lua.Engine.Machine is
       --  this detached interval was owned here. Union GC clears other gaps.
    end Retire_Stack_Window;
 
+   procedure Set_Native_Top
+     (State : in out World; Activation : not null Frame_Access;
+      Count : Natural)
+   is
+      Context : constant Context_Access := Activation.Context;
+      Old_Top : constant Natural := Activation.Stack_Live_Top;
+      New_Top : Natural;
+   begin
+      if not Activation.Is_Native or else Context /= State.Current or else
+        Context.Stack_Window /= Activation
+      then
+         raise Program_Error with "native top requires its current window";
+      end if;
+      if Count > Natural'Last - Activation.Stack_Base then
+         Fail (State, "stack overflow");
+      end if;
+      New_Top := Activation.Stack_Base + Count;
+      Resize_Stack_Window
+        (State, Activation,
+         Natural'Max (Activation.Stack_Window_Length, Count));
+      --  Preserve both views until all potentially allocating growth has
+      --  succeeded. Shrinking the owned packet removes stale argument roots;
+      --  clearing actual slots then detaches any cells above the new top.
+      if Activation.Foreign_Handler = System.Null_Address then
+         Activation.Native_Arguments.Set_Length
+           (Ada.Containers.Count_Type (Count));
+      end if;
+      if New_Top < Old_Top then
+         Stacks.Clear_Range (Context, New_Top + 1, Old_Top);
+      else
+         for Index in Old_Top + 1 .. New_Top loop
+            Stacks.Write (State, Context, Index, Nil_Value);
+         end loop;
+      end if;
+      Activation.Stack_Live_Top := New_Top;
+      Context.Foreign_Top := New_Top;
+   end Set_Native_Top;
+
+   procedure Push_Native_Value
+     (State : in out World; Activation : not null Frame_Access;
+      Item : Value)
+   is
+      Count : constant Natural :=
+        Activation.Stack_Live_Top - Activation.Stack_Base;
+   begin
+      --  Reservation can trigger emergency collection. Retain an existing
+      --  value before it becomes part of the actual activation's root range.
+      Pin (State, Item);
+      Set_Native_Top (State, Activation, Count + 1);
+      Activation.Native_Arguments.Replace_Element (Count + 1, Item);
+      Stacks.Write
+        (State, Activation.Context, Activation.Stack_Live_Top, Item);
+   end Push_Native_Value;
+
    procedure Release_Frame (State : in out World; Item : in out Frame_Access);
    procedure Release_Frame (State : in out World; Item : in out Frame_Access)
    is
    begin
+      Warnings.Discard (State, Item);
+      if Item.Finalizer_Charge then
+         --  Host aborts abandon callbacks without executing cleanup. Restore
+         --  the precise owner policy before releasing its current roots.
+         Item.Context.Finalizer_Hook_Suppression :=
+           Item.Context.Finalizer_Hook_Suppression - 1;
+         Item.Finalizer_Charge := False;
+         Finalizers.Abandon_Current (State);
+      end if;
       if Item.Foreign_Entered then
          --  A failed foreign callback can be retired by ordinary Lua error
          --  unwinding. Restore its C-stack window exactly as normal callback
@@ -853,7 +946,13 @@ package body Lua.Engine.Machine is
          end if;
          Activation.Is_Native := True;
          Activation.Native_Name := To_Unbounded_String (Name);
-         Activation.Native_Arguments := Arguments;
+         --  Empty default packets have no allocator owner. Copy their values
+         --  into this frame's existing owned buffer rather than assigning the
+         --  vector and discarding its owner/cached capacity. A later internal
+         --  phase may reserve arguments even when this initial list is empty.
+         Activation.Native_Arguments.Clear;
+         Activation.Native_Arguments.Set_Owner (Activation.Memory);
+         Activation.Native_Arguments.Append (Arguments);
          Activation.Transfer_Count := Natural (Arguments.Length);
          Activation.Native_Operator := Operator;
          Activation.Call_Site := State.Current.Failure_At;
@@ -896,7 +995,9 @@ package body Lua.Engine.Machine is
            (To_String (State.Current.Hook_Mask), "" & Mask) /= 0);
       Line : Natural;
    begin
-      if State.Current.Hook_Active then
+      if State.Current.Hook_Active or else
+        State.Current.Finalizer_Hook_Suppression /= 0
+      then
          return False;
       end if;
       if not Item.Entry_Hook_Done and then not Item.Is_Native and then
@@ -1349,12 +1450,14 @@ package body Lua.Engine.Machine is
       State : World renames Self.Universe.all;
       Activation : Frame_Access := State.Current.Stack.Last_Element;
       Destination : constant Natural := Activation.Return_To;
+      Policy : constant Completion_Policy := Activation.Completion;
       Packet : constant Values.Vector :=
         Wrap (State, Result, Activation.Protection);
    begin
       Pin (State, Result);
       Pin (State, Packet);
       if not State.Current.Hook_Active and then
+        State.Current.Finalizer_Hook_Suppression = 0 and then
         not Activation.Return_Hook_Done and then
         State.Current.Hook.Kind /= Nil_Kind and then
         Ada.Strings.Fixed.Index
@@ -1377,7 +1480,10 @@ package body Lua.Engine.Machine is
       State.Current.Stack.Delete_Last;
       Release_Frame (State, Activation);
       if not State.Current.Stack.Is_Empty then
-         Deliver (Self, State.Current.Stack.Last_Element, Destination, Packet);
+         if Policy = Deliver_Results then
+            Deliver
+              (Self, State.Current.Stack.Last_Element, Destination, Packet);
+         end if;
       else
          State.Current.Transfer.Kind := Completed;
          State.Current.Transfer.Results := Packet;
@@ -1756,6 +1862,182 @@ package body Lua.Engine.Machine is
       Shrink_Error_Stack (State, State.Current);
    end Recover;
 
+   function Try_Push_Finalizers
+     (Self : Driver; Silent : Boolean := False) return Boolean;
+   function Try_Start_Finalizer
+     (Self : Driver; Activation : Frame_Access) return Boolean;
+   procedure Advance_Finalizers (Self : Driver);
+
+   function Try_Push_Finalizers
+     (Self : Driver; Silent : Boolean := False) return Boolean
+   is
+      State : World renames Self.Universe.all;
+      Before : constant Natural := Natural (State.Current.Stack.Length);
+   begin
+      if State.Finalizer_Active then return False; end if;
+      --  A failed minimum-stack/CI check ends this drain opportunity, just
+      --  as pinned GCScallfin enters pause. Retrying before the caller's
+      --  next instruction would starve the code needed to release space.
+      State.Finalizers_Requested := False;
+      if not Finalizers.Has_Pending (State) then return False; end if;
+      --  This is an internal activation, not an allocated Lua closure. A
+      --  failed optional CI allocation leaves every target queued. Explicit
+      --  embedding quotas and physical host failures still abort execution.
+      Schedule (Self, "@gc.finalize", Values.Empty_Vector, 0);
+      State.Current.Stack.Last_Element.Completion :=
+        (if Silent then Resume_Caller else Deliver_Results);
+      return True;
+   exception
+      when Error : Lua.Storage.Allocation_Error | Program_Error =>
+         if Ada.Exceptions.Exception_Identity (Error) =
+           Program_Error'Identity and then
+           not Lua.Storage.Refusal_Pending (State.Memory)
+         then
+            raise;
+         end if;
+         while Natural (State.Current.Stack.Length) > Before loop
+            declare
+               Old : Frame_Access := State.Current.Stack.Last_Element;
+            begin
+               State.Current.Stack.Delete_Last;
+               Release_Frame (State, Old);
+            end;
+         end loop;
+         Lua.Storage.Acknowledge_Refusal (State.Memory);
+         return False;
+   end Try_Push_Finalizers;
+
+   function Try_Start_Finalizer
+     (Self : Driver; Activation : Frame_Access) return Boolean
+   is
+      State : World renames Self.Universe.all;
+      Before : constant Natural := Natural (State.Current.Stack.Length);
+      Holder : Frame_Access;
+   begin
+      if State.Native_Depth >=
+        Lua.Runtime_Configuration.Maximum_C_Calls - 2 or else
+        State.Current.Foreign_Top > Natural'Last - Initial_Stack_Size
+      then
+         return False;
+      end if;
+      if not Ensure_Stack
+        (State, State.Current,
+         State.Current.Foreign_Top + Initial_Stack_Size,
+         Raise_Error => False)
+      then
+         return False;
+      end if;
+      --  Reserve every helper-owned packet before consuming the pending
+      --  obligation. This is the Ada CI equivalent of checkminstack: a
+      --  persistent refusal defers callbacks rather than losing an object or
+      --  trying to report a Lua allocation error from an unprotected phase.
+      Schedule (Self, "@finalizer.invoke", Values.Empty_Vector, 0);
+      Holder := State.Current.Stack.Last_Element;
+      Holder.Native_Arguments.Reserve_Capacity (2);
+      Holder.Error_Packet.Reserve_Capacity (2);
+      Finalizers.Begin_Next (State);
+      if Finalizers.Current_Handler (State).Kind = Nil_Kind then
+         --  Enrollment survives removal, but a removed handler is skipped.
+         Finalizers.Finish_Current (State);
+         State.Current.Stack.Delete_Last;
+         Release_Frame (State, Holder);
+         return True;
+      end if;
+      Holder.Native_Arguments.Append (Finalizers.Current_Handler (State));
+      Holder.Native_Arguments.Append (Finalizers.Current_Target (State));
+      Holder.Protection := 1;
+      Holder.Blocks_Yield := True;
+      State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
+      --  Only the actual handler is non-yieldable/hook-suppressed. Pinned
+      --  GCTM restores both policies before invoking a warning callback.
+      Activation.Finalizer_Charge := True;
+      Activation.Finalizer_Phase := Waiting_Finalizer_Handler;
+      State.Current.Finalizer_Hook_Suppression :=
+        State.Current.Finalizer_Hook_Suppression + 1;
+      State.Finalizer_Active := True;
+      return True;
+   exception
+      when Error : Lua.Storage.Allocation_Error | Program_Error =>
+         if Ada.Exceptions.Exception_Identity (Error) =
+           Program_Error'Identity and then
+           not Lua.Storage.Refusal_Pending (State.Memory)
+         then
+            raise;
+         end if;
+         while Natural (State.Current.Stack.Length) > Before loop
+            declare
+               Old : Frame_Access := State.Current.Stack.Last_Element;
+            begin
+               State.Current.Stack.Delete_Last;
+               Release_Frame (State, Old);
+            end;
+         end loop;
+         Lua.Storage.Acknowledge_Refusal (State.Memory);
+         return False;
+   end Try_Start_Finalizer;
+
+   procedure Advance_Finalizers (Self : Driver) is
+      State : World renames Self.Universe.all;
+      Activation : constant Frame_Access := State.Current.Stack.Last_Element;
+      Error_Value : Value;
+      procedure Fragment (Bytes : Byte_String; More : Boolean);
+      procedure Fragment (Bytes : Byte_String; More : Boolean) is
+      begin
+         --  The caller passes package-level NUL-terminated constants. Their
+         --  storage outlives any asynchronous warning acknowledgment; no
+         --  transient concatenated Ada String is retained by a C callback.
+         Emit_Warning
+           (State, Bytes, To_Continue => More);
+      end Fragment;
+   begin
+      case Activation.Finalizer_Phase is
+         when Choosing_Finalizer =>
+            if not Finalizers.Has_Pending (State) or else
+              not Try_Start_Finalizer (Self, Activation)
+            then
+               State.Finalizers_Requested := False;
+               Complete (Self, Values.Empty_Vector);
+            end if;
+         when Waiting_Finalizer_Handler =>
+            State.Current.Finalizer_Hook_Suppression :=
+              State.Current.Finalizer_Hook_Suppression - 1;
+            Activation.Finalizer_Charge := False;
+            Finalizers.Finish_Current (State);
+            if Activation.Native_Results.Is_Empty or else
+              Truth (Activation.Native_Results.First_Element)
+            then
+               Activation.Native_Results.Clear;
+               Activation.Finalizer_Phase := Choosing_Finalizer;
+            else
+               --  Match luaE_warnerror's five observable fragments. The
+               --  failed packet roots its original error through every C
+               --  warning callback, including nested Lua/GC reentry.
+               Fragment (GC_Warning_Start, True);
+               Activation.Finalizer_Phase := Warning_Where;
+            end if;
+         when Warning_Where =>
+            Fragment (GC_Warning_Where, True);
+            Activation.Finalizer_Phase := Warning_Open;
+         when Warning_Open =>
+            Fragment (GC_Warning_Open, True);
+            Activation.Finalizer_Phase := Warning_Error;
+         when Warning_Error =>
+            Error_Value :=
+              (if Activation.Native_Results.Length >= 2 then
+                  Activation.Native_Results (2) else Nil_Value);
+            if Error_Value.Kind = String_Kind then
+               Emit_Warning (State, Error_Value, To_Continue => True);
+            else
+               Fragment (GC_Warning_Nonstring, True);
+            end if;
+            Activation.Finalizer_Phase := Warning_Close;
+         when Warning_Close =>
+            Fragment (GC_Warning_Close, False);
+            Activation.Native_Results.Clear;
+            Activation.Finalizer_Phase := Choosing_Finalizer;
+      end case;
+   end Advance_Finalizers;
+
    procedure Native_Step (Self : Driver) is
       State : World renames Self.Universe.all;
       Activation : constant Frame_Access :=
@@ -1793,11 +2075,23 @@ package body Lua.Engine.Machine is
       --  Stateful libraries own their continuation phase. Dispatch their
       --  requested callback through this same activation stack, so neither
       --  Lua nesting nor a protected error creates a second VM or budget.
+      if Activation.Warning_Failed then
+         Activation.Warning_Failed := False;
+         raise Language_Error;
+      end if;
       if Name = "foreign.callback" then
          if Activation.Native_Stage = 0 then
             if Activation.Foreign_Handler = System.Null_Address then
                raise Program_Error with "foreign callback has no handler";
             end if;
+            if State.Next_Foreign_Ticket =
+              Interfaces.C.unsigned_long_long'Last
+            then
+               Fail (State, "foreign callback identity exhausted",
+                     Resource => True);
+            end if;
+            State.Next_Foreign_Ticket := State.Next_Foreign_Ticket + 1;
+            Activation.Foreign_Ticket := State.Next_Foreign_Ticket;
             Activation.Foreign_Base := Activation.Stack_Base;
             Activation.Foreign_Previous_Base := State.Current.Foreign_Base;
             Activation.Foreign_Previous_Frame :=
@@ -1829,7 +2123,12 @@ package body Lua.Engine.Machine is
            Wrap (State, Activation.Native_Results, 1);
          Activation.Native_Stage := 1;
          return;
-      elsif Name = "@foreign.entry" or else Name = "@close.invoke" then
+      elsif Name = "@gc.finalize" then
+         Advance_Finalizers (Self);
+         return;
+      elsif Name in "@foreign.entry" | "@close.invoke" |
+        "@finalizer.invoke"
+      then
          if Activation.Native_Stage = 0 then
             Handler := Arg (1);
             for Index in 2 ..
@@ -2252,7 +2551,9 @@ package body Lua.Engine.Machine is
          Complete (Self, Inspection.Inspect (State, Activation));
          return;
       end if;
-      if Name = "table.create" then
+      if Name = "base.warn" then
+         Action := Warnings.Advance (State, Activation);
+      elsif Name = "table.create" then
          Complete (Self, Sorting.Create (State, Activation.Native_Arguments));
          return;
       elsif Name = "table.sort" then
@@ -2276,6 +2577,11 @@ package body Lua.Engine.Machine is
       end if;
       if Action.Kind = Finished then
          Complete (Self, Action.Results);
+         return;
+      elsif Action.Kind = Drain_Finalizers then
+         --  The requesting library already saved its result/resume phase.
+         --  Optional inability to run a finalizer leaves that queue intact.
+         if Try_Push_Finalizers (Self) then null; end if;
          return;
       elsif Action.Kind = Invoke then
          if Action.Operator /= End_Of_Input then
@@ -3123,6 +3429,13 @@ package body Lua.Engine.Machine is
          then
             Collect (State);
          end if;
+         if State.Finalizers_Requested and then
+           not State.Finalizer_Active and then
+           State.Current.Stack.Last_Element.Native_Name /= "@gc.finalize"
+           and then Try_Push_Finalizers (Self, Silent => True)
+         then
+            return;
+         end if;
          if State.Steps >= State.Bounds.Instructions then
             Fail (State, "instruction limit exceeded", Resource => True);
          end if;
@@ -3464,6 +3777,17 @@ package body Lua.Engine.Machine is
       return Self.Universe.Current.Stack.Last_Element.Foreign_Handler;
    end Foreign_Handler;
 
+   function Foreign_Token (Self : Driver) return Callback_Identity is
+      Activation : Frame_Access;
+   begin
+      if not Needs_Foreign_Call (Self) then
+         raise Program_Error with "no pending foreign callback identity";
+      end if;
+      Activation := Self.Universe.Current.Stack.Last_Element;
+      return (Activation => Activation.all'Address,
+              Serial => Activation.Foreign_Ticket);
+   end Foreign_Token;
+
    function Foreign_Context (Self : Driver) return Context_Access is
    begin
       if not Needs_Foreign_Call (Self) then
@@ -3474,7 +3798,8 @@ package body Lua.Engine.Machine is
 
    procedure Complete_Foreign_Call
      (Self : Driver; Result_Count : Natural; Error_Status : Natural := 0;
-      Handler_Called : Boolean := False)
+      Handler_Called : Boolean := False;
+      Token : Callback_Identity)
    is
       State : World renames Self.Universe.all;
       Context : constant Context_Access := State.Current;
@@ -3487,6 +3812,14 @@ package body Lua.Engine.Machine is
          raise Program_Error with "invalid foreign callback completion";
       end if;
       Activation := Context.Stack.Last_Element;
+      --  A nested C pump can return through several live guards. Each one
+      --  acknowledges its own activation, never whichever frame happens to
+      --  be deepest after a child transfer. Serial also rejects cache reuse.
+      if Token.Activation /= Activation.all'Address or else
+        Token.Serial /= Activation.Foreign_Ticket
+      then
+         raise Program_Error with "stale foreign callback identity";
+      end if;
       Count := Context.Foreign_Top - Context.Foreign_Base;
       if (Error_Status = 0 and then Result_Count > Count) or else
         (Error_Status /= 0 and then Count = 0)
@@ -3539,7 +3872,10 @@ package body Lua.Engine.Machine is
       Original_Depth : constant Natural :=
         Natural (State.Current.Stack.Length);
    begin
-      if not Needs_Foreign_Call (Self) then
+      if not Needs_Foreign_Call (Self) and then
+        (State.Warning_Head = null or else
+         State.Warning_Head.Warning_Phase /= Warning_Callback_Active)
+      then
          raise Program_Error with "foreign boundary has no C caller";
       end if;
       Pin (State, Callee);
@@ -3690,7 +4026,14 @@ package body Lua.Engine.Machine is
         (Self, World_View (World_Addresses.To_Pointer (State'Address)),
          Code, Nil_Value, State.Current.Arguments);
       while not Is_Complete (Self) loop
-         Step (Self);
+         if Needs_Foreign_Call (Self) or else Warnings.Pending (State) then
+            --  The helper installs its C guard above this waiting host
+            --  activation. No internal Ada step spans the foreign callback;
+            --  nested C API work continues on this same explicit driver.
+            Lua.Engine.Foreign.Invoke_Borrowed (State, Self);
+         else
+            Step (Self);
+         end if;
       end loop;
       Finish (Self);
    exception

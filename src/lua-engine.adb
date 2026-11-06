@@ -1,4 +1,6 @@
 with Lua.Engine.Canonical;
+with Lua.Engine.Finalizers;
+with Lua.Engine.Warnings;
 with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
 with Lua.Number_Parsing;
@@ -150,7 +152,9 @@ package body Lua.Engine is
             Item.Cleanup_Resource := null;
             Item.Resource_Data := System.Null_Address;
             Cleanup (Lua.Storage.Reference (State.Memory),
-                     Item.Payload'Address, Data, Reason);
+                     Item.Payload'Address, Data,
+                     (if Item.Finalization_Aborted then Host_Disposal
+                      else Reason));
          end;
       end if;
       --  C observes this immutable view only while the Lua string is live.
@@ -579,6 +583,21 @@ package body Lua.Engine is
       Item.Native_Aux := 0;
       Item.Native_Operator := Lua.Lexers.End_Of_Input;
       Item.Foreign_Handler := System.Null_Address;
+      Item.Foreign_Ticket := 0;
+      Item.Warning_Phase := No_Pending_Warning;
+      Item.Warning_Previous := null;
+      Item.Warning_Window := null;
+      Item.Warning_Borrow_Depth := 0;
+      Item.Warning_Ticket := 0;
+      Item.Warning_Message := (others => <>);
+      Item.Warning_Root := Nil_Value;
+      Item.Warning_To_Continue := False;
+      Item.Warning_Handler := System.Null_Address;
+      Item.Warning_Data := System.Null_Address;
+      Item.Warning_Previous_Base := 0;
+      Item.Warning_Previous_Top := 0;
+      Item.Warning_Previous_Frame := null;
+      Item.Warning_Failed := False;
       Item.Foreign_Base := 0;
       Item.Foreign_Previous_Base := 0;
       Item.Foreign_Previous_Frame := null;
@@ -607,6 +626,9 @@ package body Lua.Engine is
       Item.Saved_Foreign_Top := 0;
       Item.Previous_Stack_Window := null;
       Item.Vararg_Table := null;
+      Item.Completion := Deliver_Results;
+      Item.Finalizer_Phase := Choosing_Finalizer;
+      Item.Finalizer_Charge := False;
       Item.Return_To := 0;
       Item.Protection := 0;
       Item.Message_Handler := Nil_Value;
@@ -1373,6 +1395,20 @@ package body Lua.Engine is
       end if;
    end Set_Policy;
 
+   procedure Emit_Warning
+     (State : in out World; Message : Value;
+      To_Continue : Boolean := False) is
+   begin
+      Lua.Engine.Warnings.Emit (State, Message, To_Continue);
+   end Emit_Warning;
+
+   procedure Emit_Warning
+     (State : in out World; Message : Byte_String;
+      Root : Value := Nil_Value; To_Continue : Boolean := False) is
+   begin
+      Lua.Engine.Warnings.Emit (State, Message, Root, To_Continue);
+   end Emit_Warning;
+
    function Emit_Output
      (State : in out World; Bytes : String) return Output_Result
    is
@@ -1490,6 +1526,10 @@ package body Lua.Engine is
       State.Main_Thread := Allocate (State, Thread_Object);
       State.Current.Thread := State.Main_Thread;
       State.Bounds := Bounds;
+      State.Warning_Mode := Default_Warnings_On;
+      State.Warning_Handler := System.Null_Address;
+      State.Warning_Data := System.Null_Address;
+      State.Warning_Head := null;
       State.Saved_Bounds := Bounds;
       if State.Open_Standard_Libraries then
          Mathematics.Reset (State);
@@ -1601,6 +1641,8 @@ package body Lua.Engine is
               New_Native (State, "base.require", Captures));
          Set (State, Table, New_String (State, "load"),
               New_Native (State, "base.load"));
+         Set (State, Table, New_String (State, "warn"),
+              New_Native (State, "base.warn"));
          Set (State, Table, New_String (State, "xpcall"),
               New_Native (State, "base.xpcall"));
          Set (State, Table, New_String (State, "loadfile"),
@@ -1759,6 +1801,7 @@ package body Lua.Engine is
          for Activation of Context.Stack loop
             Mark_Value (Activation.Callee);
             Mark_Value (Activation.Message_Handler);
+            Mark_Value (Activation.Warning_Root);
             for Item of Activation.Error_Packet loop
                Mark_Value (Item);
             end loop;
@@ -1801,6 +1844,7 @@ package body Lua.Engine is
       State.Collector_Active := True;
       --  Intrusive worklists avoid both allocation and Ada-stack traversal
       --  of user graphs. Their links are private scratch, cleared on removal.
+      Finalizers.Trace_Roots (State, Mark'Access);
       Mark (State.Main_Thread);
       Mark (State.Foreign_Registry);
       Mark_Value (State.Memory_Error_Value);
@@ -2052,6 +2096,9 @@ package body Lua.Engine is
            (if Natural (State.Heap.Length) >= (Positive'Last - 1) / 2 then
               Positive'Last
             else Natural (State.Heap.Length) * 2 + 1)));
+      if not Emergency then
+         State.Finalizers_Requested := Finalizers.Has_Pending (State);
+      end if;
       State.Collector_Active := False;
    exception
       when others =>
@@ -2103,7 +2150,9 @@ package body Lua.Engine is
          raise;
    end Collect;
 
-   procedure Finalize (State : in out World) is
+   procedure Finalize
+     (State : in out World;
+      Reason : Resource_Release_Reason := Host_Disposal) is
    begin
       --  A session is the unique allocator owner, so finalization can release
       --  all remaining objects without tracing or invoking user code.
@@ -2127,10 +2176,17 @@ package body Lua.Engine is
          declare
             Item : Object_Access := Object;
          begin
-            Free_Object (State, Item);
+            Free_Object (State, Item, Reason);
          end;
       end loop;
       State.Heap.Release;
+      State.Finalizable_Head := null;
+      State.Finalizer_Head := null;
+      State.Finalizer_Tail := null;
+      State.Finalizing_Object := null;
+      State.Finalizing_Handler := Nil_Value;
+      State.Finalizer_Active := False;
+      State.Finalizers_Requested := False;
       for Program of State.Programs loop
          declare
             Item : Prototype_Access := Program;

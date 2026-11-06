@@ -15,6 +15,7 @@ struct lua_ada_guard {
     jmp_buf target;
     struct lua_ada_guard *previous;
     volatile int error_handled;
+    struct lua_ada_callback_identity callback_token;
 };
 
 size_t lua_ada_surface_size(void) { return sizeof(lua_State); }
@@ -54,14 +55,14 @@ static void raise_action(lua_State *state, int status,
     /* This function is reached only after ada_lua_dispatch has returned.
      * Its checkpoint belongs to C; no abandoned Ada activation is retained. */
     if (status == LUA_OK) return;
-    if (status != ADA_ACTION_ABORT && state != NULL && state->guard != NULL) {
+    if (state != NULL && state->guard != NULL) {
         state->guard->error_handled = output->error_handled;
         longjmp(state->guard->target, status);
     }
     if (status != ADA_ACTION_ABORT && state != NULL && state->main->panic != NULL)
         state->main->panic(state);
     fputs("Lua Ada: unprotected error", stderr);
-    if (output->pointer != NULL) {
+    if (status != ADA_ACTION_ABORT && output->pointer != NULL) {
         fputs(": ", stderr);
         fputs((const char *)output->pointer, stderr);
     }
@@ -86,6 +87,39 @@ int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
     status = setjmp(guard.target);
     if (status == 0) body(state);
     state->guard = guard.previous;
+    if (status == ADA_ACTION_ABORT) {
+        struct lua_ada_response output;
+        memset(&output, 0, sizeof output);
+        raise_action(state, status, &output);
+    }
+    return status;
+}
+
+int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
+                            const struct lua_ada_response *pending,
+                            struct lua_ada_response *completion) {
+    struct lua_ada_guard guard;
+    int status;
+    volatile int count = 0;
+    memset(completion, 0, sizeof *completion);
+    guard.previous = state->guard;
+    guard.error_handled = 0;
+    guard.callback_token = pending->callback_token;
+    state->guard = &guard;
+    /* The waiting Ada host frame is below this live C checkpoint. Every
+     * longjmp targets C frames above that host; none crosses an active Ada
+     * dispatcher, scheduler step or value operation. */
+    status = setjmp(guard.target);
+    if (status == 0) {
+        if (action == ADA_ACTION_WARNING)
+            pending->warning_function(pending->warning_data,
+                pending->warning_message, pending->warning_continuation);
+        else count = pending->function_data(state);
+    }
+    state->guard = guard.previous;
+    completion->integer_data = count;
+    completion->error_handled = guard.error_handled;
+    completion->callback_token = guard.callback_token;
     return status;
 }
 
@@ -100,9 +134,14 @@ static int drive_call(lua_State *state, int arguments, int results,
     input.integer_data = protected_call;
     input.error_index = error_function;
     action = ada_lua_dispatch(state, &input, &output);
-    while (action == ADA_ACTION_CALL) {
+    while (action == ADA_ACTION_CALL || action == ADA_ACTION_WARNING) {
         lua_State *callback_state = (lua_State *)output.pointer;
         lua_CFunction callback = output.function_data;
+        lua_WarnFunction warning = output.warning_function;
+        int is_warning = action == ADA_ACTION_WARNING;
+        void *warning_data = output.warning_data;
+        const char *warning_message = output.warning_message;
+        int warning_continuation = output.warning_continuation;
         struct lua_ada_guard guard;
         int status;
         volatile int count = 0;
@@ -112,14 +151,27 @@ static int drive_call(lua_State *state, int arguments, int results,
          * driver. Only these live C frames are unwound by a callback error. */
         guard.previous = callback_state->guard;
         guard.error_handled = 0;
+        guard.callback_token = output.callback_token;
         callback_state->guard = &guard;
         status = setjmp(guard.target);
-        if (status == 0) count = callback(callback_state);
+        if (status == 0) {
+            if (is_warning)
+                warning(warning_data, warning_message, warning_continuation);
+            else count = callback(callback_state);
+        }
         callback_state->guard = guard.previous;
-        input = request(ADA_COMPLETE_CALLBACK);
+        if (status == ADA_ACTION_ABORT) {
+            /* Host abort is not a protected Lua error. Abandon each live C
+             * body until the outer borrowed invoke returns it to Ada; a
+             * C-owned outer boundary retains its ordinary abort behavior. */
+            raise_action(callback_state, status, &output);
+        }
+        input = request(is_warning ? ADA_COMPLETE_WARNING
+                                   : ADA_COMPLETE_CALLBACK);
         input.index = status;
         input.count = count;
         input.error_handled = guard.error_handled;
+        input.callback_token = guard.callback_token;
         action = ada_lua_dispatch(callback_state, &input, &output);
     }
     if (protected_call &&
@@ -156,7 +208,7 @@ int lua_iscfunction(lua_State *state, int index) {
 void lua_callk(lua_State *state, int arguments, int results,
                lua_KContext context, lua_KFunction continuation) {
     (void)context;
-    if (continuation != NULL) {
+    if (continuation != NULL && lua_isyieldable(state)) {
         lua_pushliteral(state, "continuation-aware C calls are not implemented");
         lua_error(state);
     }
@@ -166,10 +218,10 @@ void lua_callk(lua_State *state, int arguments, int results,
 int lua_pcallk(lua_State *state, int arguments, int results, int error_function,
                lua_KContext context, lua_KFunction continuation) {
     (void)context;
-    if (continuation != NULL) {
-        /* This incremental public boundary rejects unfinished callback modes
-         * explicitly before executing anything. It must not silently ignore
-         * a continuation or claim an error handler was applied. */
+    if (continuation != NULL && lua_isyieldable(state)) {
+        /* Yieldable K still requires its explicit scheduler phase. A real
+         * non-yieldable boundary instead ignores K, exactly as C Lua does;
+         * it executes the ordinary protected call and returns to this body. */
         lua_settop(state, -(arguments + 2));
         lua_pushliteral(state,
             "C continuations are not implemented");
@@ -271,6 +323,30 @@ void lua_xmove(lua_State *from, lua_State *to, int count) {
     struct lua_ada_request input = request(ADA_MOVE_VALUES);
     input.pointer = to; input.count = count;
     dispatch(from, input);
+}
+void lua_setwarnf(lua_State *state, lua_WarnFunction warning, void *data) {
+    struct lua_ada_request input = request(ADA_SET_WARNING_FUNCTION);
+    input.warning_function = warning;
+    input.pointer = data;
+    dispatch(state, input);
+}
+void lua_warning(lua_State *state, const char *message, int to_continue) {
+    struct lua_ada_request input = request(ADA_ISSUE_WARNING);
+    struct lua_ada_response output;
+    int action;
+    input.pointer = (void *)message;
+    input.length = strlen(message);
+    input.count = to_continue;
+    action = ada_lua_dispatch(state, &input, &output);
+    /* The caller retains its C string, including through nested warnings.
+     * No new Lua allocation or logical debug frame is introduced here. */
+    if (action == ADA_ACTION_WARNING)
+        output.warning_function(output.warning_data, output.warning_message,
+                                output.warning_continuation);
+    else raise_action(state, action, &output);
+}
+int lua_isyieldable(lua_State *state) {
+    return (int)dispatch(state, request(ADA_GET_YIELDABILITY)).integer_data;
 }
 int lua_type(lua_State *state, int index) {
     return (int)indexed(state, ADA_GET_TYPE, index).integer_data;

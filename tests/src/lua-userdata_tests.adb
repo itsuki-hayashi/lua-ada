@@ -2,6 +2,7 @@ with Ada.Containers;
 with AUnit.Assertions; use AUnit.Assertions;
 with Interfaces.C;
 with Lua.Engine; use Lua.Engine;
+with Lua.Engine.Finalizers;
 with Lua.Storage; use Lua.Storage;
 with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
@@ -73,6 +74,9 @@ package body Lua.Userdata_Tests is
    procedure Table_Key_Identity (State : in out World);
    procedure Equality_Handler (State : in out World);
    procedure Resource_Release (State : in out World);
+   procedure Aborted_Resource_Release (State : in out World);
+   procedure Host_Release_Reason (State : in out World);
+   procedure Lua_Release_Reason (State : in out World);
    procedure Invalid_Count (State : in out World);
    procedure Oversized_Payload (State : in out World);
    procedure Duplicate_Resource (State : in out World);
@@ -284,6 +288,76 @@ package body Lua.Userdata_Tests is
       Assert (Counter.Calls = 1, "cleanup was repeated by later collection");
    end Resource_Release;
 
+   procedure Aborted_Resource_Release (State : in out World) is
+      Counter : Cleanup_Record renames Cleanup_Counter;
+      Item : constant Value := New_Userdata (State, 1);
+      function Selected (Node : Object_Access) return Boolean;
+      function Selected (Node : Object_Access) return Boolean is
+        (Node = Item.Reference);
+   begin
+      --  The real Lua callback resurrects this owned resource, then exhausts
+      --  an explicit host quota. Abandoning that callback must not dispose an
+      --  object which remains reachable and usable by its owning session.
+      Counter := (others => <>);
+      Attach_Resource (Item, Counter'Address, Record_Cleanup'Access);
+      Keep (State, "resource", Item);
+      Assert (Execute (State,
+        "debug.setmetatable(resource,{__gc=function(self)" &
+        "resource=self;while true do end end})", "owned-resource-setup"),
+        "owned resource handler setup");
+      Lua.Engine.Finalizers.Register (State, Item);
+      Lua.Engine.Finalizers.Queue_Unreachable (State, Selected'Access);
+      Keep (State, "resource", Nil_Value);
+      State.Bounds.Instructions := 2_000;
+      State.Saved_Bounds.Instructions := 2_000;
+      Assert (not Execute (State, "error('unreached')", "owned-abort")
+                and then State.Current.Failure_Class = Host_Abort,
+              "owned finalizer quota became a catchable Lua failure");
+      Assert (Item.Reference.Finalization_Aborted and then Counter.Calls = 0,
+              "abandonment disposed a resurrected resource");
+      Assert (Execute (State, "assert(type(resource)=='userdata')", "alive"),
+              "resurrected resource lost its session owner");
+      Collect (State);
+      Assert (Counter.Calls = 0, "collection disposed the live alias");
+      --  Removing the last actual root finally permits native disposal.
+      --  The deferred host reason must survive until that real release and
+      --  must not turn an ordinary removed/raising __gc into a destructor.
+      Keep (State, "resource", Nil_Value);
+      Collect (State);
+      Assert (Counter.Calls = 1 and then Counter.Reason = Host_Disposal,
+              "aborted finalization lost its deferred native disposal");
+   end Aborted_Resource_Release;
+
+   procedure Host_Release_Reason (State : in out World) is
+      Counter : Cleanup_Record renames Cleanup_Counter;
+      Item : constant Value := New_Userdata (State, 1);
+   begin
+      --  Physical host disposal is distinct from normal Lua collection.
+      --  Keep this object reachable and release its entire owning universe.
+      --  The hook receives the explicit disposition exactly once.
+      Counter := (others => <>);
+      Attach_Resource (Item, Counter'Address, Record_Cleanup'Access);
+      Keep (State, "resource", Item);
+      Finalize (State);
+      Assert (Counter.Calls = 1 and then Counter.Reason = Host_Disposal,
+              "host finalization used ordinary collected semantics");
+   end Host_Release_Reason;
+
+   procedure Lua_Release_Reason (State : in out World) is
+      Counter : Cleanup_Record renames Cleanup_Counter;
+      Item : constant Value := New_Userdata (State, 1);
+   begin
+      --  This is the physical-release half of explicit Lua-state closing;
+      --  scheduling its Lua callbacks has separate lifecycle tests. Unlike
+      --  host disposal, it cannot invent fallback cleanup for removed __gc.
+      Counter := (others => <>);
+      Attach_Resource (Item, Counter'Address, Record_Cleanup'Access);
+      Keep (State, "resource", Item);
+      Finalize (State, Lua_State_Close);
+      Assert (Counter.Calls = 1 and then Counter.Reason = Lua_State_Close,
+              "explicit Lua release lost its distinct native disposition");
+   end Lua_Release_Reason;
+
    procedure Invalid_Count (State : in out World) is
       Before : constant Byte_Count :=
         Statistics (State.Memory).Growth_Attempts;
@@ -351,6 +425,9 @@ package body Lua.Userdata_Tests is
    procedure Case_Keys is new Fixture (Table_Key_Identity);
    procedure Case_Equality is new Fixture (Equality_Handler);
    procedure Case_Resource is new Fixture (Resource_Release);
+   procedure Case_Aborted is new Fixture (Aborted_Resource_Release);
+   procedure Case_Host_Reason is new Fixture (Host_Release_Reason);
+   procedure Case_Lua_Reason is new Fixture (Lua_Release_Reason);
    procedure Case_Count is new Fixture (Invalid_Count);
    procedure Case_Oversized is new Fixture (Oversized_Payload);
    procedure Case_Duplicate is new Fixture (Duplicate_Resource);
@@ -383,5 +460,11 @@ package body Lua.Userdata_Tests is
                         Case_Oversized'Access);
       Test_Support.Add (Suite, "userdata: rejects duplicate resource owner",
                         Case_Duplicate'Access);
+      Test_Support.Add (Suite, "userdata: aborted resource survives alias",
+                        Case_Aborted'Access);
+      Test_Support.Add (Suite, "userdata: distinct host release reason",
+                        Case_Host_Reason'Access);
+      Test_Support.Add (Suite, "userdata: distinct Lua release reason",
+                        Case_Lua_Reason'Access);
    end Register;
 end Lua.Userdata_Tests;
