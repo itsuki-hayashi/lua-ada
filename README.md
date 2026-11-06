@@ -23,13 +23,21 @@ suite. All three pass on Windows, Linux, and macOS; the
 [M2b validation record](docs/validation-m2b.md) documents exact evidence and
 does not establish full standard-suite conformance.
 
+[M3](docs/milestones/m3.md) is the active complete-upstream-coverage milestone.
+It combines remaining runtime/libraries, canonical bytecode execution and the
+public C API/ABI through staged PRs. Its first gate establishes an explicit
+[conformance inventory and harness](tests/conformance/README.md). Full M3
+coverage remains in progress; reviewed C-internal/native-platform equivalents
+will be reported separately from unchanged test execution. Production behavior
+is unchanged by this foundation work.
+
 ## Checkout and build
 
 Install [Alire](https://alire.ada.dev/) and use the latest stable native GNAT
 available through Alire. Run these commands from a PowerShell or POSIX shell:
 
 ```text
-git clone --recurse-submodules https://github.com/itsuki-hayashi/lua-ada.git
+git -c core.autocrlf=false clone --recurse-submodules https://github.com/itsuki-hayashi/lua-ada.git
 cd lua-ada
 alr build --development
 alr -C cli build

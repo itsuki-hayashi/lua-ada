@@ -18,7 +18,7 @@ recorded 171 cases and 19 CLI processes; M2a recorded 347 cases and 30 CLI
 processes, with later merged regression additions. M2b adds individually named
 library, codec, continuation, metamethod, loading, and recovery cases. Use the
 actual final runner result rather than an intermediate build count. The check
-driver also exercises static/shared consumers and six raw-byte differential
+driver also exercises static/shared consumers and seven raw-byte differential
 fixtures, including 2,366 arithmetic combinations. See [status](status.md) for
 actual platform evidence; coverage percentages and full conformance are not
 claimed.
@@ -31,8 +31,9 @@ Keep their sources separate from development references and runtime dependencies
 
 ## M2b library and unchanged-file acceptance
 
-The completed [M2b validation](validation-m2b.md) records the 475-case suite,
-three unchanged execution files, and all 18 configurations. The commands below
+The completed [M2b validation](validation-m2b.md) records the initial 475-case suite
+and the later 480-case final revision, three unchanged execution files, and all
+18 configurations. The commands below
 remain the reproducible protocol for later changes.
 
 The [M2b milestone](milestones/m2b.md) owns exact exports and acceptance. Focused
@@ -74,6 +75,22 @@ checks; Windows retains static-PIC. A local three-file success cannot substitute
 for missing matrix evidence or justify a complete standard-suite claim.
 
 ## Test layers
+
+M3 adds a separate [conformance foundation](../tests/conformance/README.md).
+Its foundation validation permits pending coverage; final acceptance does not.
+Read the [M3 contract](milestones/m3.md) before interpreting a C baseline,
+lexical inventory, test-mode result, or successful process exit as Ada coverage.
+An unchanged default all.lua run with T absent skips internal/API tests.
+Those skips remain unresolved until corresponding real tests or reviewed
+equivalents pass. The current Ada runtime is not expected to pass that suite yet.
+
+Every existing matrix job validates the inventory and runs focused harness
+self-tests. Each OS's static-validation job also builds both isolated C
+configurations, requires their smoke checks, and collects aggregate/heavy
+observations as raw CI artifacts. Report-only collection preserves ordinary
+native test failures and skips; setup, timeout, resource, crash-like, capture,
+and fixture-integrity failures still fail the job. This foundation evidence
+does not certify complete C or Ada suite execution.
 
 | Layer          | Expected evidence                                         |
 | -------------- | --------------------------------------------------------- |

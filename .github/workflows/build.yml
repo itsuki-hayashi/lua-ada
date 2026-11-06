@@ -18,6 +18,9 @@ jobs:
         profile: [development, validation, release]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Preserve pinned source bytes
+        shell: pwsh
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@v5
         with:
           submodules: recursive
@@ -37,6 +40,15 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/check.ps1 -LibraryType '${{ matrix.library }}' -Profile '${{ matrix.profile }}'
+      - name: Conformance inventory and harness regressions
+        shell: pwsh
+        run: |
+          ./scripts/check-conformance-inventory.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/test-conformance-inventory.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/test-conformance-runner.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Reference fixtures and ABI experiments
         if: matrix.library == 'static' && matrix.profile == 'validation'
         shell: pwsh
@@ -45,6 +57,39 @@ jobs:
           alr exec -- pwsh -NoProfile -File scripts/check-frontend.ps1
           ./scripts/check-layout.ps1 -AdaProbe "$PWD/tests/bin/static/lua-codec_layout_probe${{ runner.os == 'Windows' && '.exe' || '' }}"
           ./scripts/compare-libraries.ps1 -Interpreter "$PWD/cli/bin/static/lua_ada${{ runner.os == 'Windows' && '.exe' || '' }}"
+      - name: Install Linux C oracle readline prerequisite
+        if: matrix.os == 'ubuntu-latest' && matrix.library == 'static' && matrix.profile == 'validation'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libreadline-dev
+      - name: Isolated C conformance baselines
+        if: matrix.library == 'static' && matrix.profile == 'validation'
+        timeout-minutes: 160
+        shell: pwsh
+        run: |
+          foreach ($configuration in @('default', 'upstream-test')) {
+            ./scripts/run-conformance.ps1 -Configuration $configuration -Mode Smoke -BuildReference
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            ./scripts/test-conformance-runner.ps1 -ReferenceInterpreter "$PWD/build/conformance/$configuration/bin/lua${{ runner.os == 'Windows' && '.exe' || '' }}"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            # Collect native upstream failures/skips without calling them passes.
+            # Setup/capture failures remain failures even in report-only mode.
+            ./scripts/run-conformance.ps1 -Configuration $configuration -Mode Aggregate -ReportOnly
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            ./scripts/run-conformance.ps1 -Configuration $configuration -Mode Heavy -ReportOnly
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+      - name: Preserve raw conformance observations
+        if: always() && matrix.library == 'static' && matrix.profile == 'validation'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: conformance-${{ runner.os }}
+          path: |
+            reports/conformance/**/report.json
+            reports/conformance/**/*.stdout
+            reports/conformance/**/*.stderr
+          if-no-files-found: error
       - name: Windows static-PIC acceptance
         if: matrix.os == 'windows-latest' && matrix.library == 'static' && matrix.profile == 'validation'
         shell: pwsh

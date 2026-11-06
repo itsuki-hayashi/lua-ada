@@ -1,11 +1,11 @@
 # Architecture Decision Log
 
-Latest: [ADR 0007: Native continuations](0007-native-libraries.md).
+Latest: [ADR 0008: M3 conformance](0008-m3-conformance.md).
 
 ADR 0007 records explicit native continuation frames, traced library/module
-state, shared budgets, and text loading. Its design is accepted; M2b platform
-acceptance remains open. ADR 0006's shared frontend and independent canonical
-opcode layer remain in force.
+state, shared budgets, and text loading. Its implementation passed M2b acceptance.
+ADR 0008 defines the staged M3 target and its separately verified configurations;
+its runtime changes are planned, not implemented by the foundation gate.
 
 | ID   | Decision                                                       | State    |
 | ---- | -------------------------------------------------------------- | -------- |
@@ -16,6 +16,7 @@ opcode layer remain in force.
 | 0005 | [Host exponentiation primitive](0005-host-power.md)            | accepted |
 | 0006 | [Shared frontend and opcodes](0006-shared-frontend.md)         | accepted |
 | 0007 | [Native continuations and libraries](0007-native-libraries.md) | accepted |
+| 0008 | [M3 conformance and boundaries](0008-m3-conformance.md)        | accepted |
 
 Add numbered records for consequential choices. Include date, status, context,
 decision, alternatives, consequences, and verification implications. Supersede

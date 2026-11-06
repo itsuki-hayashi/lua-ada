@@ -5,9 +5,40 @@ All 34 `references/lua/testes/*.lua` files are preserved unchanged.
 
 M1 had no whole-file upstream execution passes. The historical inventory below
 records its prerequisites and reviewed first-party subset mappings. M2a added
-compile-only evidence; M2b targets the first three unchanged execution files.
+compile-only evidence; M2b passed the first three unchanged execution files.
 These distinct evidence levels must not be conflated. Complete upstream
-conformance remains later work.
+coverage is now the [M3 target](milestones/m3.md), in progress.
+
+## M3 inventory and coverage ownership
+
+The 34-file inventory consists of all.lua, 30 scheduled primary files,
+bwcoercion.lua and tracegc.lua helpers, and separate heavy.lua stress. all.lua
+does not invoke heavy.lua. Only the latter's active toomanyidx test is part of
+its present execution; its commented-out functions are not claimed as run.
+
+The [conformance catalog](../tests/conformance/README.md) owns machine-readable
+source hashes, source anchors, configuration records, API inventory, coverage
+dispositions and validation rules. M3-01 establishes that infrastructure, with
+pending coverage rather than invented pass/equivalence results. Generated source
+anchors are review candidates, not proof of semantic completeness.
+
+M3 completion requires each active assertion/guarded block to pass as unchanged
+Ada execution, a reviewed Ada internal equivalent, or a reviewed native-platform
+equivalent backed by the matching C baseline. Record source/span/hash, invariant,
+configuration, original C outcome, equivalent case and review evidence. An
+Ada-only failure, timeout or unexpected safety abort is not an exception.
+
+Default and upstream-instrumented configurations are separate evidence. The
+ltests.h profile changes global declarations, compatibility math, RNG mode,
+extra space, semantic stack limits and small buffers/caches. Unchanged ltests.c
+depends on C internals and is built only into the separate C oracle. An Ada T
+adapter must use real Ada exports and invariants; it may not manufacture C
+layouts, counts, opcode lists, or success.
+
+Native Windows main.lua shell/signal assumptions and files.lua's /dev/full
+assumption on Windows/macOS require baseline investigation and reviewed native
+counterparts where unsupported. Keep the original files unchanged. A separately
+named equivalent aggregate is not reported as an unchanged all.lua pass.
 
 ## M2b execution targets
 
@@ -28,8 +59,9 @@ exhaustion justifies the explicit documented test profile. M2b required no
 larger profile. See [M2b validation](validation-m2b.md), [status](status.md), and the
 [current session](sessions/2026-11-06-m2b-core-libraries.md).
 
-All other files below remain outside M2b whole-file acceptance. Do not invoke
-all.lua or infer their execution coverage from these three targets.
+All other files below remain outside M2b whole-file acceptance. M3 may now run
+them through its explicit conformance harness; the three M2b passes alone do not
+establish their execution coverage.
 
 ## Historical M1 mappings
 
@@ -92,6 +124,7 @@ instruction-verification mappings remain open for the later conformance gate.
 `ltests.c`, T-based memory failure injection, and public C API assertions
 require later C facade work. The isolated C/Ada probe establishes boundary
 feasibility only. Do not count it as the Ada implementation passing api.lua.
+M3-09 and M3-12 own the real C API/test-adapter and reviewed-equivalent work.
 
 ## Execution policy
 
@@ -99,3 +132,14 @@ Unchanged-suite runs must use a disposable working copy because tests
 write files. Record mode flags (`_U`, `_soft`, `_port`, `_nomsg`), T availability,
 OS, numeric ABI, and exclusions. A reduced suite or omitted T is not a full
 upstream pass. Add actual per-file evidence when its prerequisites are delivered.
+
+M3 aggregate acceptance requires successful exit, the correct final marker,
+expected-warning behavior, and no unexplained skip messages. Preserve raw logs,
+seeds and subprocess results. Whole-output equality/empty stderr is not the
+aggregate protocol: upstream prints nondeterministic timing/memory/seed data and
+deliberate warnings. Targeted deterministic differential checks remain separate.
+
+The accepted M3 resource and configuration policy lives in
+[the milestone](milestones/m3.md). Heavy stress must catch a deterministic Lua
+allocator refusal rather than exhaust the host. Existing Ada host quotas remain
+distinct hard-abort behavior; M3-01 does not change production defaults.

@@ -97,3 +97,9 @@ initial environment, and module registries remain distinct from replaceable
 public package fields. Follow [ADR 0007](docs/decisions/0007-native-libraries.md).
 Read current status for platform evidence and deferred facilities. A passing
 subset never establishes full upstream, C ABI, or LuaRocks compatibility.
+
+M3 follows the ordered gates in [its acceptance contract](docs/milestones/m3.md).
+Each gate is a separate task and PR; start the next gate from updated master
+after the maintainer merges its predecessor. Preserve pending obligations in
+the conformance ledger. Native C observations, lexical inventory anchors, and
+successful harness collection are not passing Ada conformance evidence.

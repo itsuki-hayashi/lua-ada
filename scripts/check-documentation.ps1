@@ -9,6 +9,7 @@ $files = @('README.md', 'AGENTS.md', 'ARCHITECTURE.md', 'CONTRIBUTING.md') +
         ForEach-Object { [IO.Path]::GetRelativePath($projectRoot, $_.FullName) }) +
     @('tests/README.md', 'references/README.md',
       'experiments/abi/README.md', 'experiments/frontend/README.md',
+      'experiments/conformance/README.md', 'tests/conformance/README.md',
       'tests/modules/README.md')
 $checked = 0
 

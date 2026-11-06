@@ -69,7 +69,7 @@ introduced. Evidence: [fixture catalog](../tests/modules/README.md) and
 [setup session](sessions/2026-11-06-ecosystem-fixtures.md).
 
 Future module execution remains MOD-001 work; fixture checkout is not parity
-evidence and does complete; verified PR #4 is open, unmerged that gate.
+evidence and does not complete that gate.
 
 ## M2a frontend parity
 
@@ -108,14 +108,64 @@ protocol. **All eight items are done**, with immutable
 | M2B-BIN-001    | Packing and UTF-8            | M2B-FND-001                | Width/endian/alignment/overflow, virtual sizes, strict/lax UTF-8 and two offsets; focused codec, layout and matrix gates passed                               |
 | M2B-LOAD-001   | Text and Lua modules         | M2B-VM-001, M2B-META-001   | Readers/modes/environments, protected load failures, registry caching, searchers/data; all-platform acceptance passed                                         |
 | M2B-LIB-001    | Table/math/default state     | M2B-META-001, M2B-LOAD-001 | Declared exports, metamethod-aware operations, boundaries, reset isolation; all-platform acceptance passed                                                    |
-| M2B-ACCEPT-001 | Complete M2b acceptance      | All M2B items above        | Final 18 jobs, ABI/static-PIC/layout/differential evidence, three unchanged files, documentation and open PR; complete; verified PR #4 is open, unmerged      |
+| M2B-ACCEPT-001 | Complete M2b acceptance      | All M2B items above        | Final 18 jobs, ABI/static-PIC/layout/differential evidence, three unchanged files and documentation; complete, PR #4 merged into master                       |
 
 All 18 configurations passed the three unchanged primary files at the default
 instruction limit. Each OS passed ABI/layout/expanded differential checks;
 Windows static-PIC also passed. The acceptance record owns exact counts,
 configuration details, implementation revision, and job links.
 
+The final M2b revision 52e8eb6 passed 480 AUnit cases per configuration in
+[run 42090465632](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42090465632).
+Merged PR #4 is the baseline for the current M3 work. Earlier dated records
+retain their original counts rather than being rewritten as newer evidence.
+
+## M3 complete upstream coverage
+
+The [accepted M3 contract](milestones/m3.md) owns configuration, resource,
+coverage and delivery rules. The machine-readable
+[conformance inventory](../tests/conformance/README.md) owns source hashes,
+anchors, dispositions and completion validation. Foundation validity is distinct
+from completed coverage: pending cases are expected now and forbidden at M3-13.
+
+| ID    | Work                           | State       | Depends on     | Acceptance                                                                                                                      |
+| ----- | ------------------------------ | ----------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| M3-01 | Contracts and baseline harness | in review   | M2B-ACCEPT-001 | Full inventory, isolated C configurations, disposable runners, native baselines, focused validation and truthful pending ledger |
+| M3-02 | Execution contexts and errors  | planned     | M3-01          | Per-coroutine state, transfer types, semantic errors versus hard quotas, preserved session/recovery cases                       |
+| M3-03 | Storage foundation             | planned     | M3-02          | Allocator-aware storage, tables/cells/strings/userdata/thread handles, barriers, failure and cleanup evidence                   |
+| M3-04 | Real C-boundary feasibility    | planned     | M3-03          | Actual Ada exports, callbacks/errors/panic/yields, stable layouts/addresses, automatic initialization and cleanup counters      |
+| M3-05 | Canonical compiler and VM      | planned     | M3-04          | Canonical prototypes/opcodes/registers/top/upvalues/metadata and migration comparisons                                          |
+| M3-06 | Language lifecycle             | planned     | M3-05          | goto/close/coroutines/userdata, canonical semantics and regression acceptance before removing private packet VM                 |
+| M3-07 | Complete collector behavior    | planned     | M3-06          | Weak/ephemeron/finalized/resurrected objects, real modes, memory reports and allocation-pressure invariants                     |
+| M3-08 | Debug and binary chunks        | planned     | M3-07          | Frames/hooks/locals/upvalues/tracebacks, dump/load, interoperability and malformed chunks                                       |
+| M3-09 | Complete public C API          | planned     | M3-08          | Header APIs, concrete layouts/symbols, auxiliaries, registry/stacks/buffers and real static/shared clients                      |
+| M3-10 | Remaining libraries/modules    | planned     | M3-09          | Full declared libraries/package behavior and native upstream C fixture modules using actual Ada exports                         |
+| M3-11 | Full CLI                       | planned     | M3-10          | Pinned options, REPL/environment, signals/TTY/subprocesses, paths and readline behavior                                         |
+| M3-12 | Internal coverage equivalents  | planned     | M3-11          | Real test adapter and reviewed source-cited internal/platform cases; no unresolved omitted blocks                               |
+| M3-13 | Complete M3 acceptance         | planned     | M3-12          | Full matrices/coverage/evidence, all final logs inspected, documented scope and open unmerged acceptance PR                     |
+
+Each ID is a separate implementation task and PR. Continue from updated master
+after the predecessor is merged by the maintainer; do not merge automatically.
+M3-01's [evidence](sessions/2026-11-06-m3-01-contracts.md) and
+[open PR #5](https://github.com/itsuki-hayashi/lua-ada/pull/5) record its verified
+implementation. Every M3 coverage obligation remains pending.
+M3-01 introduces infrastructure only. It does not change runtime semantics,
+allocator behavior, execution quotas, or the production C/CLI interface.
+
 ## Later runtime work
+
+These earlier IDs remain stable aliases to the M3 delivery work below. Their
+old dependency rows are historical scope, not permission to bypass the ordered
+M3 gates. MOD-001 retains ecosystem/LuaRocks work after M3; native upstream test
+fixtures are covered by M3-10 instead.
+
+| Earlier ID | M3 owner                          |
+| ---------- | --------------------------------- |
+| LANG-002   | M3-02, M3-03, M3-05, M3-06, M3-07 |
+| LIB-002    | M3-10, M3-11                      |
+| ABI-002    | M3-03, M3-04, M3-09               |
+| CHUNK-001  | M3-05, M3-08                      |
+| CONF-001   | M3-01, M3-12, M3-13               |
 
 | ID        | Work                              | Dependency                     | Acceptance                                                   |
 | --------- | --------------------------------- | ------------------------------ | ------------------------------------------------------------ |

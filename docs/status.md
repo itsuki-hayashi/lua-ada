@@ -1,6 +1,7 @@
 # Project Status
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**
+**M3 is in progress; M3-01 is implemented and in PR review.**
 
 ## Implemented and verified
 
@@ -17,9 +18,10 @@ module registries, output, and budgets remain isolated per session.
 See [embedding](embedding.md), [CLI](cli.md), and
 [ADR 0007](decisions/0007-native-libraries.md).
 
-The [M2b implementation matrix](validation-m2b.md) passed all 18
+The final [M2b matrix](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42090465632)
+at revision 52e8eb62466c5852b3995dc99b751c1d477dc9c2 passed all 18
 Windows/Linux/macOS × development/validation/release × static/shared jobs.
-Every job passed 475 individually named AUnit cases, zero failed assertions or
+Every job passed 480 individually named AUnit cases, zero failed assertions or
 unexpected errors, the public Ada consumer, 30 CLI cases, and seven differential
 fixtures. Each executed three unchanged upstream primary files: tpack.lua,
 utf8.lua, and bitwise.lua, with raw same-host C/Ada stdout equality, empty stderr,
@@ -30,14 +32,43 @@ All three OS static-validation jobs passed native C99/Ada layout comparisons,
 the 1,120-case seeded library campaign, retained frontend/opcode campaigns, and
 isolated ABI probes. Windows validation/static-PIC also passed the full pipeline.
 The [validation record](validation-m2b.md) owns exact code revision, job logs,
-tool versions, host layouts, and scope limits. Further review and loaded-_ENV
-regressions bring the current suite to 480 cases. Final PR
-checks must repeat the full matrix with those repairs before handoff; the PR
-description records the final run and verified totals.
+tool versions, host layouts, and scope limits, including earlier intermediate
+counts. PR #4 is merged; master f30be387720f3ddb7ef3e799b13658e9b6bce515 is
+the M3-01 starting point. Historical session records retain their dated results.
 
 Tools: Alire 2.1.1, stable native GNAT 16.1.0, AUnit 26.0.0, GPRbuild package
 26.0.1 (banner 26.0.0). Strict flags and runtime checks remain enabled; the
 existing ADR 0003 floating-validity exception is unchanged.
+
+## Current M3 foundation work
+
+[M3](milestones/m3.md) targets complete covered upstream behavior, including
+language/runtime, libraries, CLI, canonical execution and the public C API/ABI.
+It uses staged PRs and reviewed Ada/native-platform equivalents for assertions
+tied to C internals or unsupported native facilities. This is not a promise to
+run every unchanged T-enabled assertion on Ada.
+
+M3-01 establishes the [conformance inventory](../tests/conformance/README.md),
+default/instrumented C baseline builds, disposable runners, coverage validation,
+and focused harness checks. Baseline C outcomes and infrastructure checks are
+not Ada conformance passes. Pending coverage remains pending until actual
+execution or a reviewed equivalent supplies evidence. No later M3 runtime,
+collector, canonical VM, C facade or CLI-default gate is complete.
+
+The [M3-01 implementation matrix](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42141255975)
+passed all 18 jobs at 4d52d44127f1dedc6cafbf2c7ab3cb7695a9415e, including
+Windows static-PIC. Every job retained the 480-case Ada baseline and passed
+41 inventory/16 runner cases; real C consumers add the seventeenth runner case.
+Both C profiles pass smoke, child-configuration, REPL, and bounded heavy checks
+on every OS. Linux aggregates finish with explicit T/locale omissions; native
+Windows/macOS aggregate failures remain pending platform obligations. Exact
+results and limits are in the [session record](sessions/2026-11-06-m3-01-contracts.md).
+PR [#5](https://github.com/itsuki-hayashi/lua-ada/pull/5) remains open and unmerged.
+
+The current production interpreter remains the accepted M2b implementation.
+Its quotas, private packet VM, and deferred facilities are unchanged in this
+foundation gate. The [backlog](backlog.md) owns M3-01 through M3-13 and the
+[current session index](sessions/README.md) owns new execution evidence.
 
 ## Earlier evidence and remaining work
 
@@ -58,4 +89,4 @@ generation, fuzz campaigns, and formal proof were not run.
 
 See [upstream coverage](upstream-tests.md), [roadmap](roadmap.md),
 [backlog](backlog.md), and the
-[current session](sessions/2026-11-06-m2b-core-libraries.md).
+[current session](sessions/2026-11-06-m3-01-contracts.md).

@@ -1,0 +1,32 @@
+with "reference";
+with "../../config/lua_ada_config.gpr";
+
+project Oracle is
+   for Languages use ("C");
+   for Source_Dirs use ("c");
+   for Source_Files use ("conformance_cli.c");
+   for Object_Dir use
+     "../../build/conformance/" & Reference.Configuration &
+     "/cli-obj";
+   for Exec_Dir use
+     "../../build/conformance/" & Reference.Configuration & "/bin";
+   for Main use ("conformance_cli.c");
+   for Create_Missing_Dirs use "True";
+   package Builder is
+      for Executable ("conformance_cli.c") use "lua";
+   end Builder;
+   package Compiler is
+      for Default_Switches ("C") use
+        Reference.Common & Reference.Platform &
+        Reference.Mode & ("-Wall", "-Wextra", "-Werror");
+   end Compiler;
+   package Linker is
+      case Lua_Ada_Config.Alire_Host_OS is
+         when "linux" =>
+            for Default_Switches ("C") use ("-lm", "-ldl", "-Wl,-E");
+         when "macos" =>
+            for Default_Switches ("C") use ("-lm", "-lreadline");
+         when others => null;
+      end case;
+   end Linker;
+end Oracle;
