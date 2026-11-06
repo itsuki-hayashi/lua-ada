@@ -117,6 +117,15 @@ Ada host callback registration, exposed object handles and thread synchronizatio
 remain deferred. The separate C facade has a partial real exported surface;
 its current pilot is not complete public API/ABI acceptance. A sink is an output destination, not a Lua host-function API.
 
+The real C surface includes luaopen_io and luaopen_os. Each pushes a fresh
+module table without publishing a global or loaded-module entry. IO opening
+initializes registry-owned defaults and retains the existing FILE* metatable
+when reopened, so earlier live file objects remain valid. The public userdata
+payload is the actual luaL_Stream (FILE pointer and callable C closer); private
+ownership metadata lives outside that payload. These exports use the same Ada
+library continuations as owned sessions. They do not establish completion of
+the remaining library openers, auxiliary API or complete C ABI.
+
 The private execution driver can call real C functions and warning handlers
 while borrowing an Ada-owned world. Their nested Lua calls use the same driver
 and budget. Explicit host aborts abandon C bodies through C-owned guards and

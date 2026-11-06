@@ -316,3 +316,34 @@ comparison expression is corrected. Raw artifacts under reports/ci-linux-5df87e8
 have matching output except the final timestamp and matching expected shell
 stderr. A fresh complete job/report is still required; these archived captures
 alone are not accepted whole-file evidence. macOS jobs remain queued.
+
+## Real C IO/OS openers and native closer consumer
+
+The C boundary now exports luaopen_io and luaopen_os through the real Ada
+module constructors. Owned sessions share those constructors. As specified by
+pinned liolib.c:797-841 and loslib.c's syslib/luaopen_os, openers return a new
+table without publishing globals or loaded entries; IO resets registry default
+streams and preserves an existing FILE* metatable. Reopening formerly replaced
+that identity, invalidating earlier files against registry-based type checks.
+
+Three separately named C consumer regressions check actual public FILE layout
+and reopening, callable OS exports without global publication, and invocation
+of the public luaL_Stream.closef pointer after clearing it as aux_close does.
+The closer test writes through the actual FILE pointer, calls the C trampoline
+under a protected boundary and observes the closed file afterward. No pinned
+header or reference source changes are needed.
+
+Local GNAT 16.1.0 / Alire 2.1.1 validation/static verification retains 1,304
+AUnit cases in reports/m3-openers-full-default.log and completes the instrumented
+pipeline in reports/m3-openers-full-instrumented.log. The added closer consumer
+passes in reports/m3-openers-closer-core.log. Instrumented jobs now also run
+the real C/Ada image consumers, preserving their reports as CI artifacts;
+these builds remain serialized with AUnit and oracle builds.
+
+Published 915df28 has successful Linux static/shared instrumented jobs in run
+42264272904. The inspected static job 128051959836 records unchanged events,
+gengc and POSIX files observations, GC equivalent shutdown, and telemetry and
+equivalent-negative checks. PR #9 has no review comments at this observation.
+Neither these jobs nor the opener checkpoint establishes reviewed scoped
+completion. lua_gc, remaining platform evidence, scoped acceptance and
+independent review remain required; no merge has occurred.

@@ -160,6 +160,11 @@ try {
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua" `
             -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     }
+    # Exercise the real public C consumers in this configuration too. Keep
+    # Alire invocations serialized with the test and oracle builds above.
+    & "$PSScriptRoot/check-core-image.ps1" -Profile validation `
+        -LibraryType $LibraryType -Configuration upstream-test
+    if ($LASTEXITCODE -ne 0) { throw 'Instrumented C consumer checks failed' }
     Write-Output "PASS: instrumented validation/$LibraryType regressions; scope acceptance remains pending"
 } finally {
     [ordered]@{ schema_version=1; configuration='upstream-test'; library=$LibraryType;

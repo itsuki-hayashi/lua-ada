@@ -4,6 +4,7 @@
  * C raises it. No reference interpreter object is linked into this library. */
 #include "lua_ada_boundary.h"
 #include "lauxlib.h"
+#include "lualib.h"
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -518,4 +519,11 @@ lua_Alloc lua_getallocf(lua_State *state, void **userdata) {
 void lua_setallocf(lua_State *state, lua_Alloc allocator, void *userdata) {
     struct lua_ada_request input = request(ADA_SET_ALLOCATOR);
     input.allocator = allocator; input.pointer = userdata; dispatch(state, input);
+}
+
+int luaopen_io(lua_State *state) {
+    return (int)dispatch(state, request(ADA_OPEN_IO_MODULE)).integer_data;
+}
+int luaopen_os(lua_State *state) {
+    return (int)dispatch(state, request(ADA_OPEN_OS_MODULE)).integer_data;
 }

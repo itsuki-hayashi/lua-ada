@@ -100,7 +100,7 @@ package body Lua.Engine.IO_Libraries is
       end if;
    end Close_Primitive;
 
-   procedure Install (State : in out World) is
+   function Open_Module (State : in out World) return Value is
       Module, Metatable, Methods : Value;
       procedure Field (Table : Value; Key : String; Item : Value);
       procedure Exports (Table : Value; Prefix, Names : String);
@@ -149,12 +149,15 @@ package body Lua.Engine.IO_Libraries is
       --  streams are borrowed, while defaults and metatable are per-world.
       Module := New_Table (State);
       Pin (State, Module);
-      Metatable := New_Table (State);
+      --  Like luaL_newmetatable, reopening preserves existing file identity.
+      --  Old file objects must still satisfy checks against registry FILE*.
+      Metatable := Tables.Raw_Field (State.Foreign_Registry, "FILE*");
+      if Metatable.Kind = Nil_Kind then
+         Metatable := New_Table (State);
+      end if;
       Pin (State, Metatable);
       Methods := New_Table (State);
       Pin (State, Methods);
-      Field (Global_Environment (State), "io", Module);
-      Field ((Table_Kind, State.Loaded_Modules), "io", Module);
       Field ((Table_Kind, State.Foreign_Registry), "FILE*", Metatable);
       Field (Metatable, "__name", New_String (State, "FILE*"));
       Field (Metatable, "__index", Methods);
@@ -169,6 +172,16 @@ package body Lua.Engine.IO_Libraries is
       Standard (Streams.Standard_Input, "stdin", "_IO_input");
       Standard (Streams.Standard_Output, "stdout", "_IO_output");
       Standard (Streams.Standard_Error, "stderr");
+      return Module;
+   end Open_Module;
+
+   procedure Install (State : in out World) is
+      Module : constant Value := Open_Module (State);
+   begin
+      Set (State, Global_Environment (State), New_String (State, "io"),
+           Module);
+      Set (State, (Table_Kind, State.Loaded_Modules),
+           New_String (State, "io"), Module);
    end Install;
 
    function Advance

@@ -8,6 +8,7 @@ with Lua.Chunks;
 with Lua.Engine.Canonical;
 with Lua.Engine.Stacks;
 with Lua.Engine.IO_Libraries;
+with Lua.Engine.Operating_System;
 with Lua.Engine.Warnings;
 with Lua.Runtime_Configuration;
 with Lua.Syntax;
@@ -995,6 +996,14 @@ package body Lua.Engine.Foreign is
                Leave_Context;
                return Result;
             end;
+         when Open_IO_Module =>
+            Push (Owner.Universe.all, Context,
+                  IO_Libraries.Open_Module (Owner.Universe.all));
+            Output.Integer_Data := 1;
+         when Open_OS_Module =>
+            Push (Owner.Universe.all, Context,
+                  Operating_System.Open_Module (Owner.Universe.all));
+            Output.Integer_Data := 1;
          when Get_Yieldability =>
             --  A new secondary thread is yieldable even outside execution.
             --  Abandoned barriers on a dead thread cannot describe a current

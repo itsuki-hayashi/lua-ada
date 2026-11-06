@@ -19,6 +19,10 @@ guarded partial-write block. Its mappings await independent review; POSIX file
 execution and remaining platform behavior are being exercised in CI. These observations do not close
 any selected file's full coverage; complete T inspection, reviewed equivalents,
 scoped harness acceptance and the final 26-context matrix remain open.
+The C facade now exposes real IO/OS module openers with shared Ada export
+construction, stable file-metatable identity on reopen, and public FILE/closer
+consumer regressions. Both Linux instrumented jobs pass on published 915df28;
+final-revision acceptance and independent equivalent review remain outstanding.
 The paused-checkpoint statements below retain the prior delivery's evidence.
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**

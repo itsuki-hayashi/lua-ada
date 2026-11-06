@@ -1,6 +1,11 @@
 with Lua.Engine.Foreign;
 
 package Lua.Engine.IO_Libraries is
+   function Open_Module (State : in out World) return Value;
+   --  Construct the public module and registry-owned streams. Reopening
+   --  preserves FILE* metatable identity. The caller publishes the returned
+   --  pinned table; this operation does not install a global or loaded entry.
+
    procedure Install (State : in out World);
    --  Install the real FILE* metatable, per-world input/output registry
    --  values, standard borrowed streams, and the complete Lua IO exports.

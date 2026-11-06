@@ -1,6 +1,7 @@
 with Lua.Engine.Canonical;
 with Lua.Engine.Finalizers;
 with Lua.Engine.IO_Libraries;
+with Lua.Engine.Operating_System;
 with Lua.Engine.Warnings;
 with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
@@ -2187,8 +2188,13 @@ package body Lua.Engine is
       --  Install native streams only after the registry owns globals and
       --  library tables. Their userdata retain real per-world finalizers.
       IO_Libraries.Install (State);
-      Library ("os", "clock date difftime execute exit getenv remove rename " &
-               "setlocale time tmpname");
+      declare
+         Module : constant Value := Operating_System.Open_Module (State);
+      begin
+         Set (State, Table, New_String (State, "os"), Module);
+         Set (State, (Table_Kind, State.Loaded_Modules),
+              New_String (State, "os"), Module);
+      end;
       declare
          Math : constant Value := Get (Table, New_String (State, "math"));
          Package_Value : constant Value := New_Table (State);

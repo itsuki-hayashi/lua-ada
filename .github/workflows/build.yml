@@ -50,6 +50,7 @@ jobs:
             reports/windows-buffered-failure/**
             reports/posix-files/**
             reports/managed-telemetry/**
+            reports/core-image/**
           if-no-files-found: error
   check:
     strategy:

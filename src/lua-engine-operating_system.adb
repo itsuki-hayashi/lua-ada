@@ -24,6 +24,32 @@ package body Lua.Engine.Operating_System is
      (Host : String := Lua_Ada_Config.Alire_Host_OS) return Boolean is
      (Host = "windows");
 
+   function Open_Module (State : in out World) return Value is
+      Names : constant String :=
+        "clock date difftime execute exit getenv remove rename " &
+        "setlocale time tmpname";
+      Module : constant Value := New_Table (State);
+      First : Positive := Names'First;
+      Last : Natural;
+      Item : Value;
+   begin
+      --  Keep each export rooted before allocating its key. Both embedding
+      --  and the C opener use these same Ada native continuations.
+      Pin (State, Module);
+      while First <= Names'Last loop
+         Last := First;
+         while Last < Names'Last and then Names (Last + 1) /= ' ' loop
+            Last := Last + 1;
+         end loop;
+         Item := New_Native (State, "os." & Names (First .. Last));
+         Pin (State, Item);
+         Set (State, Module, New_String (State, Names (First .. Last)),
+              Item);
+         First := Last + 2;
+      end loop;
+      return Module;
+   end Open_Module;
+
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action
    is

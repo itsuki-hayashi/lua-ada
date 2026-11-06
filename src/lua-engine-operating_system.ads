@@ -1,4 +1,8 @@
 package Lua.Engine.Operating_System is
+   function Open_Module (State : in out World) return Value;
+   --  Return a pinned, freshly created os export table. Publication into
+   --  globals or the loaded-module registry belongs to the caller.
+
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action;
    --  Execute the standard os exports. os.time table gets/sets use explicit
