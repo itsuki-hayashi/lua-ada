@@ -159,6 +159,45 @@ Header guards do not qualify. A reason string alone cannot waive a public API.
 
 ## Checks
 
+The named scope [gc-io-events](scopes/gc-io-events.json) selects events.lua,
+files.lua, gc.lua and gengc.lua, including every original anchor and subsequent
+reviewed block in those partitions, plus 77 directly exercised public API
+entries. Its selection review remains pending. Scope validation first runs
+the full structural inventory check; unrelated missing or corrupt entries
+cannot be hidden by choosing this scope. The scope requires subprocess, stdio,
+temporary-file and platform-counterpart facilities. Unrelated interactive CLI
+and native-module prerequisites remain full-M3 gates.
+
+```text
+pwsh -NoProfile -File scripts/check-conformance-scope.ps1
+pwsh -NoProfile -File scripts/test-conformance-scope.ps1
+pwsh -NoProfile -File scripts/check-conformance-scope.ps1 -RequireScopedComplete
+```
+
+The last command requires independent selection review and resolved coverage
+through all applicable contexts. It currently rejects incomplete coverage.
+It never sets full M3 completion. The 25 scoped inventory/process regressions
+also check out-of-scope corruption, missing files/APIs, self-review, unresolved
+runtime obligations, early returns, GC closure ordering, final files output,
+physical shutdown, leaked blocks and wrong configurations.
+
+run-conformance.ps1 accepts -Scope gc-io-events in File mode. The actual
+conformance launcher supports --conformance-config; both bare lua and the
+executable selected through arg must reproduce that measured handshake. Scoped
+runs retain the 900-second/2 GiB policy, upstream source hashes and balanced
+shutdown telemetry. -RequireScopedAcceptance requires an independently reviewed
+-AcceptanceContract and -Context, plus the complete scoped ledger. Its report
+sets scoped_operation_acceptance separately from gate_acceptance (full M3),
+which stays false. One accepted operation does not certify the other files or
+contexts: final batch acceptance still requires the complete matrix evidence.
+
+-EquivalentManifest identifies a source-hashed replacement execution and its
+disposition. -AllowUnreviewedEquivalent permits diagnostic observations only;
+it cannot be combined with acceptance. Accepted equivalent executions must
+identify their exact manifest and executed-source hashes in the review contract.
+Default T omissions remain explicit and require resolved instrumented coverage
+links before acceptance; matching observed omissions alone do not close them.
+
 Run from the repository root in PowerShell 7:
 
 ```text

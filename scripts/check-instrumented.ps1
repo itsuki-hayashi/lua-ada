@@ -116,39 +116,14 @@ try {
     & "$PSScriptRoot/check-conformance-adapter.ps1" -Interpreter $runner
     & "$PSScriptRoot/check-conformance-telemetry.ps1" -Interpreter $runner -Configuration upstream-test
     & "$PSScriptRoot/check-conformance-equivalents.ps1"
+    & "$PSScriptRoot/check-conformance-scope.ps1"
+    & "$PSScriptRoot/test-conformance-scope.ps1"
 
-    # Keep diagnostic equivalent execution visibly separate from acceptance.
-    # Each file gets a fresh disposable working directory and a byte-identical
-    # executable called lua, so subprocess lookup cannot select a C oracle.
-    foreach ($file in @('events', 'gengc', 'gc')) {
-        $directory = Join-Path $reportDirectory ($file + '-' + [Guid]::NewGuid().ToString('N'))
-        [void][IO.Directory]::CreateDirectory($directory)
-        $child = Join-Path $directory "lua$suffix"
-        Copy-Item -LiteralPath $runner -Destination $child
-        $env:PATH = $directory + [IO.Path]::PathSeparator + $library + [IO.Path]::PathSeparator + $selectedPath
-        $source = Join-Path $root "references/lua/testes/$file.lua"
-        $target = Join-Path $directory "$file.lua"
-        $sourceHash = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash
-        if ($file -eq 'gc') {
-            & "$PSScriptRoot/New-ConformanceEquivalent.ps1" `
-                -Manifest "$root/tests/conformance/equivalents/gc-ada-instrumented.json" `
-                -Output $target -AllowUnreviewedDiagnostics |
-                Set-Content -LiteralPath (Join-Path $reportDirectory 'gc-equivalent.json')
-        } else { Copy-Item -LiteralPath $source -Destination $target }
-        $code = "assert(T and T.checkmemory and T.alloccount); assert(_soft==nil and _port==nil)"
-        $null = Invoke-ObservedProcess -Name $file -Executable $child `
-            -Arguments @('-e', $code, $target) -Directory $directory `
-            -Witness '(?m)^OK\r?$' -Shutdown:($file -eq 'gc') -Telemetry
-        if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -cne $sourceHash) {
-            throw "Upstream source changed: $file"
-        }
-        $observations.Add([ordered]@{ name="$file-artifacts"; source_sha256=$sourceHash;
-            executed_sha256=(Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash;
-            executable_sha256=(Get-FileHash -LiteralPath $child -Algorithm SHA256).Hash;
-            disposition=$(if ($file -eq 'gc') { 'unreviewed-equivalent' } else { 'unchanged' }) })
-    }
     Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')
+    & "$PSScriptRoot/check-gc-events.ps1" -Interpreter $runner `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -RuntimeDirectory $library -Configuration upstream-test -LibraryType $LibraryType
     if ($IsWindows) {
         & "$PSScriptRoot/check-windows-buffered-failure.ps1" -Interpreter $runner `
             -Configuration upstream-test `

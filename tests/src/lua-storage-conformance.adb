@@ -1,6 +1,8 @@
 with System.Address_To_Access_Conversions;
 
 package body Lua.Storage.Conformance is
+   function Allocation_Ceiling (Self : Owner) return Byte_Count is
+     (Self.Ceiling);
    use System.Storage_Elements;
    use type System.Address;
    package Headers is new System.Address_To_Access_Conversions (Header);

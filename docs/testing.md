@@ -332,6 +332,16 @@ crashes, resource failures and timeouts never count as syntax rejection or skips
 
 ## Public collector C contract
 
+scripts/check-gc-events.ps1 runs events.lua, gengc.lua and gc.lua against the
+isolated C oracle and the actual Ada conformance launcher in both configurations.
+Default and instrumented matrices invoke it, alongside their platform files.lua
+runner. Each process gets immutable source copies, the same launcher named lua,
+parent/bare-child/arg-child configuration checks, and balanced allocator evidence.
+GC uses the explicitly labelled, pending-review Ada equivalent; C uses the
+unchanged original. Default T omissions must match exact pinned messages and
+remain unresolved coverage links. No successful diagnostic batch sets scoped
+or full-M3 acceptance. See the [scope contract](../tests/conformance/README.md).
+
 The core-image pipeline also compiles the shared public GC contract against
 the actual Ada library and the isolated pinned C library. Seven named cases
 cover nonallocating controls and measured bytes, modes and stopped steps,

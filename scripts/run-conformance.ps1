@@ -11,19 +11,38 @@ param(
     [string] $Context = '',
     [switch] $BuildReference,
     [switch] $ReportOnly,
-    [switch] $RequireAcceptance
+    [switch] $RequireAcceptance,
+    [ValidateSet('', 'gc-io-events')][string] $Scope = '',
+    [switch] $RequireScopedAcceptance,
+    [string] $EquivalentManifest = '',
+    [switch] $AllowUnreviewedEquivalent
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1') -Force
 $root = Split-Path -Parent $PSScriptRoot
 $original = Get-Location
 $revision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
 $suffix = if ($IsWindows) { '.exe' } else { '' }
 if ($Mode -eq 'Suite') { $Mode = 'Aggregate' }
 if ($BuildReference -and $Target -ne 'ReferenceC') { throw 'BuildReference requires ReferenceC target' }
+if ($RequireAcceptance -and ($Scope -ne '' -or $RequireScopedAcceptance)) {
+    throw 'Full M3 acceptance and scoped acceptance are separate commands'
+}
+if ($RequireScopedAcceptance -and ($Scope -eq '' -or $Target -ne 'Ada')) {
+    throw 'Scoped acceptance requires the named scope and actual Ada target'
+}
+if ($Scope -ne '' -and ($Mode -ne 'File' -or $File -notin @('events.lua','files.lua','gc.lua','gengc.lua'))) {
+    throw 'gc-io-events requires File mode and one of its four selected files'
+}
+$acceptanceRequested = $RequireAcceptance -or $RequireScopedAcceptance
+if (($EquivalentManifest -ne '' -and $Scope -eq '') -or
+    ($AllowUnreviewedEquivalent -and ($EquivalentManifest -eq '' -or $acceptanceRequested))) {
+    throw 'Unreviewed equivalents are scoped observations only, never acceptance'
+}
 $runId = [Guid]::NewGuid().ToString('N')
 $runRoot = Join-Path $root ('reports/conformance/' + $runId)
 [void][IO.Directory]::CreateDirectory($runRoot)
@@ -47,6 +66,10 @@ $evidence = [ordered]@{
     mode = $Mode.ToLowerInvariant()
     status = 'setup-failed'
     gate_acceptance = $false
+    coverage_scope = $Scope
+    scoped_acceptance_requested = [bool]$RequireScopedAcceptance
+    scoped_operation_acceptance = $false
+    scope_complete = $false
     foundation_smoke_passed = $false
     report_only = [bool]$ReportOnly
     acceptance_requested = [bool]$RequireAcceptance
@@ -61,6 +84,10 @@ $evidence = [ordered]@{
     observed_configuration = $null
     configuration_process = $null
     child_configuration_process = $null
+    arg_child_configuration_process = $null
+    launcher_identity = $null
+    execution_disposition = 'unchanged'
+    equivalent = $null
     repl_preflight_process = $null
     reference_source_records = @()
     harness_source_records = @()
@@ -170,7 +197,8 @@ try {
         }
     }
     foreach ($relative in @('scripts/run-conformance.ps1', 'scripts/ConformanceRunner.psm1',
-        'scripts/ConformanceInventory.psm1', 'tests/conformance/suite.json')) {
+        'scripts/ConformanceInventory.psm1', 'scripts/ConformanceScope.psm1',
+        'scripts/ManagedTelemetry.psm1', 'tests/conformance/suite.json')) {
         $evidence.harness_source_records += [ordered]@{
             path = $relative
             sha256 = (Get-FileHash -LiteralPath (Join-Path $root $relative) -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -178,7 +206,10 @@ try {
     }
     $suite = Get-Content -LiteralPath (Join-Path $root 'tests/conformance/suite.json') -Raw | ConvertFrom-Json
     if ($suite.schema_version -ne 1 -or $suite.reference_revision -cne $revision) { throw 'Invalid conformance manifest' }
-    if ($RequireAcceptance) {
+    if ($Scope -ne '') {
+        $evidence.coverage_validation = Test-ConformanceScope -Root $root -Scope $Scope
+    }
+    if ($acceptanceRequested) {
         # Observation mode remains useful during implementation. Final mode is
         # deliberately opt-in and cannot be softened by ReportOnly or an absent
         # per-operation review contract.
@@ -217,6 +248,19 @@ try {
         if ((Get-FileHash -LiteralPath (Join-Path $fixtureDirectory $item.path) -Algorithm SHA256).Hash.ToLowerInvariant() -cne $item.sha256) {
             throw "Manifest source hash mismatch: $($item.path)"
         }
+    }
+    if ($Scope -ne '') {
+        # Both bare lua and arg-selected children use this exact immutable
+        # launcher. The source fixture tree remains unchanged and hash-checked.
+        $selectedInterpreter = $Interpreter
+        $Interpreter = Join-Path $fixtureDirectory "lua$suffix"
+        Copy-Item -LiteralPath $selectedInterpreter -Destination $Interpreter
+        if ((Get-FileHash -LiteralPath $selectedInterpreter -Algorithm SHA256).Hash -cne
+            (Get-FileHash -LiteralPath $Interpreter -Algorithm SHA256).Hash) {
+            throw 'Scoped child executable copy changed bytes'
+        }
+        $evidence.launcher_identity = [ordered]@{ original=$selectedInterpreter; copy=$Interpreter;
+            sha256=(Get-FileHash -LiteralPath $Interpreter -Algorithm SHA256).Hash.ToLowerInvariant() }
     }
     $environment = @{
         LUA_ADA_CONFORMANCE_ALLOCATOR = [string]$evidence.allocator_limit_bytes
@@ -268,6 +312,7 @@ try {
         # A missing host library must fail setup, rather than masquerade as a
         # native-platform difference when main.lua enables warnings with -E.
         # Closed stdin makes this a bounded REPL initialization/cleanup probe.
+        if ($Scope -eq '') {
         $repl = Invoke-ConformanceProcess -Executable $Interpreter -Arguments @('-E', '-W', '-i') `
             -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'repl-preflight') `
             -TimeoutSeconds 30 -Environment $environment
@@ -277,6 +322,7 @@ try {
             throw "Default C REPL prerequisite failed; see $($repl.stderr_path)"
         }
         Build-Fixtures -Directory $fixtureDirectory -LibraryDirectory $libraryDirectory
+        }
     }
     else {
         # The Ada conformance launcher is a test-only executable over the real
@@ -328,6 +374,7 @@ try {
                 [IO.File]::ReadAllText($probe.stdout_path).Trim()) {
             throw 'Bare lua child does not retain the selected Ada configuration/allocator ceiling'
         }
+        if ($Scope -eq '') {
         $repl = Invoke-ConformanceProcess -Executable $Interpreter -Arguments @('-E', '-W', '-i') `
             -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'repl-preflight') `
             -TimeoutSeconds 30 -Environment $environment
@@ -342,6 +389,26 @@ try {
         }
         elseif ($RequireAcceptance) {
             throw 'Ada acceptance needs NativeLibraryDirectory for actual upstream C fixture modules'
+        }
+        }
+    }
+    if ($Scope -ne '') {
+        $argCode = 'local i=0; while arg[i] do i=i-1 end; local exe=arg[i+1]; '
+        $argCode += if ($IsWindows) {
+            'local command=''""''..exe..''" --conformance-config"''; '
+        } else {
+            'local command="''"..exe:gsub("''", "''\"''\"''").."'' --conformance-config"; '
+        }
+        $argCode += 'local p=assert(io.popen(command,"r")); local s=p:read("a"); assert(p:close()); io.write(s)'
+        $argChild = Invoke-ConformanceProcess -Executable $Interpreter -Arguments @('-e', $argCode) `
+            -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'arg-child-configuration') `
+            -TimeoutSeconds 30 -Environment $environment
+        $evidence.arg_child_configuration_process = $argChild
+        if ($argChild.exit_code -ne 0 -or $argChild.timed_out -or $argChild.stderr_bytes -ne 0 -or
+            $argChild.capture_exceeded -or $argChild.pipe_drain_failed -or $argChild.process_tree_kill_error -or
+            [IO.File]::ReadAllText($argChild.stdout_path).Trim() -cne
+                [IO.File]::ReadAllText($probe.stdout_path).Trim()) {
+            throw 'Arg-selected child does not retain the selected configuration/allocator ceiling'
         }
     }
     $marker = ''
@@ -366,7 +433,33 @@ try {
         if ($File -eq 'utf8.lua') { $marker = 'ok' }
         elseif ($File -in @('tpack.lua', 'bitwise.lua')) { $marker = 'OK' }
     }
-    if ($RequireAcceptance) {
+    if ($EquivalentManifest -ne '') {
+        $mapping = Get-Content -LiteralPath $EquivalentManifest -Raw | ConvertFrom-Json
+        if ($mapping.source -cne "references/lua/testes/$File" -or
+            $mapping.configuration -notin @($Configuration, 'default-and-upstream-test')) {
+            throw 'Equivalent identifies a different source/configuration'
+        }
+        $hostName = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
+        if ($mapping.PSObject.Properties['platform'] -and $mapping.platform -cne $hostName) {
+            throw 'Equivalent identifies a different native platform'
+        }
+        $generated = Join-Path $runRoot "equivalent-$File"
+        $equivalent = & "$PSScriptRoot/New-ConformanceEquivalent.ps1" -Manifest $EquivalentManifest `
+            -Output $generated -AllowUnreviewedDiagnostics:$AllowUnreviewedEquivalent | ConvertFrom-Json -AsHashtable
+        $equivalent['manifest_sha256'] = (Get-FileHash -LiteralPath $EquivalentManifest -Algorithm SHA256).Hash.ToLowerInvariant()
+        $evidence.equivalent = $equivalent
+        $evidence.execution_disposition = $equivalent.disposition
+        $arguments = @($generated)
+    }
+    if ($Scope -ne '') {
+        $setup = 'assert(_soft==nil and _port==nil); '
+        $setup += if ($Configuration -eq 'upstream-test') {
+            "assert(type(T)=='table' and type(T.checkmemory)=='function'); T.checkmemory()"
+        } else { 'assert(T==nil)' }
+        $arguments = @('-e', $setup) + $arguments
+        if ($File -ne 'files.lua') { $marker = 'OK' }
+    }
+    if ($acceptanceRequested -or $Scope -ne '') {
         $environment.LUA_ADA_CONFORMANCE_RUN_ID = $runId
         $environment.LUA_ADA_CONFORMANCE_TELEMETRY = Join-Path $runRoot 'allocator'
     }
@@ -376,19 +469,33 @@ try {
     $evidence.outcome = Get-ConformanceOutcome -Process $evidence.process -Marker $marker
     $evidence.fixture_changes = Test-ConformanceFixtureHashes -Directory $fixtureDirectory -Records $evidence.fixture_records
     $evidence.status = if ($evidence.fixture_changes.Count -gt 0) { 'fixture-source-changed' } else { $evidence.outcome.status }
+    if ($Scope -ne '') {
+        $telemetryPath = $environment.LUA_ADA_CONFORMANCE_TELEMETRY + '.' + $evidence.process.process_id + '.json'
+        $telemetry = Get-Content -LiteralPath $telemetryPath -Raw | ConvertFrom-Json -AsHashtable
+        Assert-ScopedProcessCompletion -File $File -Process $evidence.process `
+            -Telemetry $telemetry -RunId $runId -Configuration $Configuration -NativeOracle:($Target -eq 'ReferenceC')
+        $evidence.allocator_telemetry = [ordered]@{ path=$telemetryPath;
+            sha256=(Get-FileHash -LiteralPath $telemetryPath -Algorithm SHA256).Hash.ToLowerInvariant(); data=$telemetry }
+    }
     $evidence.foundation_smoke_passed = $Target -eq 'ReferenceC' -and $Mode -eq 'Smoke' -and
         $evidence.status -eq 'passed' -and $evidence.configuration_verified -and
         $evidence.process.stderr_bytes -eq 0
     if ($Mode -eq 'Smoke' -and $evidence.status -eq 'passed' -and $evidence.process.stderr_bytes -ne 0) {
         $evidence.status = 'unexpected-smoke-stderr'
     }
-    if ($RequireAcceptance) {
+    if ($acceptanceRequested) {
         try {
             if ($evidence.repository_dirty -or -not $evidence.configuration_verified -or
                 $evidence.fixture_changes.Count -gt 0) {
                 throw 'Acceptance requires committed, configuration-verified, unchanged inputs'
             }
             $contract = Get-Content -LiteralPath $AcceptanceContract -Raw | ConvertFrom-Json -AsHashtable
+            if ($EquivalentManifest -ne '' -and
+                ($contract.equivalent_manifest_sha256 -cne $evidence.equivalent.manifest_sha256 -or
+                 $contract.executed_sha256 -cne $evidence.equivalent.output_sha256 -or
+                 $contract.disposition -cne $evidence.execution_disposition)) {
+                throw 'Execution contract does not identify the reviewed equivalent'
+            }
             $telemetryPath = $environment.LUA_ADA_CONFORMANCE_TELEMETRY +
                 '.' + $evidence.process.process_id + '.json'
             if (-not (Test-Path -LiteralPath $telemetryPath -PathType Leaf)) {
@@ -400,9 +507,21 @@ try {
                 sha256=(Get-FileHash -LiteralPath $telemetryPath -Algorithm SHA256).Hash.ToLowerInvariant()
                 data=$telemetry
             }
-            $evidence.coverage_validation = Test-ConformanceInventory -Root $root -RequireComplete
+            if ($RequireScopedAcceptance) {
+                if ($evidence.runtime_library_records.Count -eq 0 -or
+                    $evidence.process.executable_sha256 -cne $evidence.launcher_identity.sha256) {
+                    throw 'Scoped execution requires actual executable/library identities'
+                }
+                $evidence.coverage_validation = Test-ConformanceScope -Root $root -Scope $Scope -RequireScopedComplete
+                $evidence.scope_complete = $evidence.coverage_validation.ScopeComplete
+                Assert-ScopedProcessCompletion -File $File -Process $evidence.process `
+                    -Telemetry $telemetry -RunId $runId -Configuration $Configuration
+            } else {
+                $evidence.coverage_validation = Test-ConformanceInventory -Root $root -RequireComplete
+            }
             $coverageRecords = @{}
             foreach ($source in $suite.files) {
+                if ($RequireScopedAcceptance -and $source.path -notin @('events.lua','files.lua','gc.lua','gengc.lua')) { continue }
                 $coveragePath = Join-Path $root ('tests/conformance/' + $source.coverage_file)
                 foreach ($record in (Read-ConformanceJsonLines -Path $coveragePath)) {
                     $coverageRecords[$record.id] = $record
@@ -413,9 +532,11 @@ try {
                 -Contract $contract -Operation $operation -Context $Context `
                 -SourceRecords $evidence.fixture_records -RunId $runId -Configuration $Configuration `
                 -AllocatorLimitBytes $evidence.allocator_limit_bytes `
-                -CoverageComplete $evidence.coverage_validation.Complete `
+                -CoverageComplete $(if ($RequireScopedAcceptance) { $evidence.scope_complete } else { $evidence.coverage_validation.Complete }) `
                 -CoverageRecords $coverageRecords -Telemetry $telemetry
-            $evidence.gate_acceptance = $accepted.gate_acceptance
+            if ($RequireScopedAcceptance) {
+                $evidence.scoped_operation_acceptance = $accepted.gate_acceptance
+            } else { $evidence.gate_acceptance = $accepted.gate_acceptance }
         }
         catch {
             $evidence.acceptance_error = $_.Exception.Message
@@ -423,7 +544,10 @@ try {
         }
     }
 }
-catch { $evidence.setup_error = $_.Exception.Message }
+catch {
+    $evidence.setup_error = $_.Exception.Message
+    if ($evidence.status -eq 'passed') { $evidence.status = 'verification-failed' }
+}
 finally {
     Set-Location $original
     [void][IO.Directory]::CreateDirectory((Split-Path -Parent $Report))
@@ -433,6 +557,11 @@ finally {
 Write-Output "CONFORMANCE OBSERVATION: $($evidence.status); report=$Report; M3 acceptance=$($evidence.gate_acceptance.ToString().ToLowerInvariant())"
 if ($evidence.setup_error) { Write-Output "SETUP FAILURE: $($evidence.setup_error)" }
 if ($evidence.acceptance_error) { Write-Output "ACCEPTANCE BLOCKED: $($evidence.acceptance_error)" }
+if ($RequireScopedAcceptance) {
+    Write-Output "SCOPED OPERATION ACCEPTANCE: $($evidence.scoped_operation_acceptance); full M3 acceptance=False"
+    if ($evidence.scoped_operation_acceptance) { exit 0 }
+    exit 1
+}
 if ($RequireAcceptance) {
     if ($evidence.gate_acceptance) { exit 0 }
     exit 1

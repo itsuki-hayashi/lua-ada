@@ -27,6 +27,12 @@ Real lua_gc controls now share the production collector, with C-owned finalizer
 calls and explicit state-close finalizer drainage. Seven shared public C
 contracts compare controls, steps, finalizers, warnings, allocator refusal and
 physical cleanup against the pinned oracle. Full scoped acceptance remains open.
+The gc-io-events scope now selects all four partitions (762 original anchors)
+and 77 direct API entries while preserving full-inventory validation. Its
+completion and per-operation acceptance commands remain fail-closed on pending
+reviews/coverage. The actual launcher supplies measured configuration reports
+for parent, bare-lua and arg-selected child checks. Both matrices now schedule
+all four selected files; this does not replace final-revision evidence or review.
 The paused-checkpoint statements below retain the prior delivery's evidence.
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**

@@ -37,6 +37,14 @@ injection. Packets owned by a retiring frame still receive an independent copy.
 
 The `gc-ada-instrumented` equivalent candidate replaces only source-hashed spans:
 
+Its applicability now includes default and upstream-test configurations: the
+weak-string residual-storage assertion is unconditional in the original file.
+The capture-color and fault-injection replacements remain inside their original
+T guards. Default execution records the exact T-absent omission and cannot
+certify those guarded obligations. The candidate name is retained for continuity;
+the manifest configuration field owns applicability. Independent review remains
+pending for both configurations.
+
 - Measure live storage before collecting the weak long-string graph and require
   both original 4 MiB payloads to be reclaimed. Empty Ada table capacity is not
   constrained to the C one-KiB residual allowance.

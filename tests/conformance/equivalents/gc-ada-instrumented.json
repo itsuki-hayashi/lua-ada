@@ -3,7 +3,7 @@
   "id": "gc-ada-instrumented",
   "source": "references/lua/testes/gc.lua",
   "source_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
-  "configuration": "upstream-test",
+  "configuration": "default-and-upstream-test",
   "review": {
     "status": "pending",
     "author": "Codex",

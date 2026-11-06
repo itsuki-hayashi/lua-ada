@@ -392,3 +392,56 @@ validation/static pipeline in reports/m3-gc-api-final-default.log, each retainin
 parameters and an all-bits-one size_t step through the real variadic export.
 Reference library and all shared contract source hashes are retained alongside
 the selected Ada library hashes and both process captures.
+
+## Scoped completion, launcher identity and all-file matrix scheduling
+
+The new gc-io-events scope selects the four complete source partitions (762
+original anchors) and 77 directly exercised public API entries. Scope selection
+and every actual coverage record remain pending review. Structural checking
+still regenerates all 4,490 original source anchors and 473 header entries.
+check-conformance-scope.ps1 -RequireScopedComplete rejects pending coverage;
+the original full-M3 -RequireComplete behavior is preserved. Twenty-five scoped
+inventory/process regressions test missing/duplicate files and APIs, corrupted
+unrelated inventory, self-review, unresolved runtime records, early returns,
+GC closure ordering (including a spoofed embedded OK), final file date/version
+output, physical shutdown, leaks and wrong configuration. The existing runner's
+38 acceptance/process regressions also pass.
+
+run-conformance.ps1 has a separate -Scope gc-io-events -RequireScopedAcceptance
+path for individual file/context operations. It requires a complete reviewed
+scoped ledger and execution contract, preserves gate_acceptance=false for full
+M3, and reports scoped_operation_acceptance separately. Equivalent executions
+retain their explicit disposition, manifest hash and executed-source hash;
+unreviewed diagnostic equivalents cannot request acceptance. GC closure and
+files final witnesses supplement process success and balanced telemetry. This
+per-operation gate does not itself reconcile the complete 104-operation matrix.
+
+Actual scoped execution exposed that conformance_runner lacked the requested
+--conformance-config option. The test-only launcher now constructs/configures a
+real session and reports selected behavior, installed T, numeric/pointer sizes,
+the actual public C extra-space prefix and independent storage ceiling. This
+reports Ada's retained public header prefix; it does not pretend to install the
+C-private ltests L_EXTRA lock structure. Both the bare lua child and the
+arg-selected child reproduce the parent's measured report. The ordinary CLI
+remains on the shared execution path. Scoped runs omit only unrelated REPL and
+native-module setup gates, which remain required by the full-M3 command.
+
+The default and instrumented pipelines now schedule all four selected files.
+The shared GC/events runner executes independent C/Ada processes in disposable
+directories, compares exact stdout and empty stderr, and checks parent cleanup.
+Default T omissions must match their individual pinned messages and remain
+unresolved links to instrumented coverage. The memory-layout GC candidate now
+declares both configurations; only its unconditional weak-string span executes
+in default mode. Windows file equivalents and POSIX unchanged file runners are
+scheduled in both configurations, retaining their existing native contracts.
+
+Local full default validation/static passes in reports/m3-scope-full-default.log
+and full instrumented static passes in reports/m3-scope-full-instrumented.log,
+retaining 1,304 AUnit cases each. Final default GC/events comparison passes in
+reports/m3-scope-final-default-batch.log with explicit context identities. Final
+scope-negative evidence is reports/m3-scope-final-tests.log. The instrumented
+scoped GC and C/Ada events observations also pass independently. Review records
+remain pending; no selected source/API record has been promoted on lexical or
+process evidence alone. Published 31bc086's Windows/Linux jobs are green;
+macOS jobs remain queued. Independent review-agent authorization was requested
+because current session instructions prohibit unrequested delegation.

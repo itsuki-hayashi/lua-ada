@@ -51,6 +51,10 @@ jobs:
             reports/posix-files/**
             reports/managed-telemetry/**
             reports/core-image/**
+            reports/gc-events/**
+            reports/conformance/**/*.json
+            reports/conformance/**/*.stdout
+            reports/conformance/**/*.stderr
           if-no-files-found: error
   check:
     strategy:
@@ -89,6 +93,9 @@ jobs:
           ./scripts/check-conformance-inventory.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-inventory.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/check-conformance-scope.ps1
+          ./scripts/test-conformance-scope.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-runner.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -150,6 +157,11 @@ jobs:
             reports/managed-telemetry/**
             reports/windows-buffered-failure/**
             LICENSE
+            reports/posix-files/**
+            reports/gc-events/**
+            reports/conformance/**/*.json
+            reports/conformance/**/*.stdout
+            reports/conformance/**/*.stderr
             docs/licenses/lua.md
           if-no-files-found: warn
       - name: Preserve core-image observations
