@@ -128,6 +128,12 @@ budget. Allocator refusal remains an ordinary catchable C Lua memory error;
 it does not prove a heavy test completed. Heavy execution is a separate future
 acceptance observation, not part of the quick self-tests.
 
+The child PATH begins with the selected interpreter's binary directory and its
+library directory. A Lua `io.popen` probe executes bare `lua` and requires its
+configuration record to match the selected parent, including the allocation
+ceiling. This protects upstream subprocess tests from an absent or unrelated
+system Lua and keeps default/instrumented children in the intended profile.
+
 ## Reports and process safety
 
 Each invocation writes `reports/conformance/<run-id>/report.json` unless
@@ -135,6 +141,7 @@ Each invocation writes `reports/conformance/<run-id>/report.json` unless
 and `.stderr` files stay under that run directory. JSON schema version 1 records:
 
 - Requested and observed configuration, probe process, and verification state.
+- Bare-Lua subprocess configuration probe and its exact raw captures.
 - Default REPL preflight process, including raw output and prerequisite failures.
 - First-party repository revision and worktree status, including uncommitted
   tracked and untracked inputs, plus OS description, OS/process architecture,
@@ -155,6 +162,7 @@ and `.stderr` files stay under that run directory. JSON schema version 1 records
 
 Raw byte streams are authoritative. Text is decoded separately to classify
 markers and messages, preserving invalid UTF-8 and embedded NUL in the files.
+Unavailable locale messages are omissions even when they do not say skipping.
 The collector does not compare nondeterministic full-suite output byte for
 byte. Warnings and skips stay visible; successful exit and a marker cannot
 establish branch-level coverage. `foundation_smoke_passed` applies only to a

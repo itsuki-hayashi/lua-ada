@@ -51,6 +51,7 @@ $evidence = [ordered]@{
     reference_tree_verified = $false
     observed_configuration = $null
     configuration_process = $null
+    child_configuration_process = $null
     repl_preflight_process = $null
     reference_source_records = @()
     harness_source_records = @()
@@ -200,7 +201,12 @@ try {
                 sha256 = (Get-FileHash -LiteralPath $library.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
             }
         }
-        $environment.PATH = $libraryDirectory + [IO.Path]::PathSeparator + $env:PATH
+        # Some unchanged tests launch bare 'lua' through io.popen. Select this
+        # profile's executable before any ambient installation, and retain its
+        # shared-library directory for Windows loader resolution as well.
+        $interpreterDirectory = Split-Path -Parent $Interpreter
+        $environment.PATH = $interpreterDirectory + [IO.Path]::PathSeparator +
+            $libraryDirectory + [IO.Path]::PathSeparator + $env:PATH
         $environment.LD_LIBRARY_PATH = $libraryDirectory + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
         $environment.DYLD_LIBRARY_PATH = $libraryDirectory + [IO.Path]::PathSeparator + $env:DYLD_LIBRARY_PATH
         $probe = Invoke-ConformanceProcess -Executable $Interpreter -Arguments @('--conformance-config') `
@@ -227,6 +233,22 @@ try {
         }
         $evidence.observed_configuration = $observed
         $evidence.configuration_verified = $true
+        # Exercise shell PATH lookup from inside C Lua itself. Merely checking
+        # the parent process would miss a missing or wrong-profile bare 'lua'
+        # in files.lua's subprocesses. Identical probe records also verify the
+        # allocator ceiling inherited by that independently initialized child.
+        $childCode = 'local p=assert(io.popen("lua --conformance-config", "r")); ' +
+            'local s=p:read("a"); assert(p:close()); io.write(s)'
+        $child = Invoke-ConformanceProcess -Executable $Interpreter -Arguments @('-e', $childCode) `
+            -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'child-configuration') `
+            -TimeoutSeconds 30 -Environment $environment
+        $evidence.child_configuration_process = $child
+        if ($child.exit_code -ne 0 -or $child.timed_out -or $child.stderr_bytes -ne 0 -or
+            $child.capture_exceeded -or $child.pipe_drain_failed -or $child.process_tree_kill_error -or
+            [IO.File]::ReadAllText($child.stdout_path).Trim() -cne
+                [IO.File]::ReadAllText($probe.stdout_path).Trim()) {
+            throw "Bare lua child configuration differs from selected C profile; see $($child.stderr_path)"
+        }
         # Lua 5.5.1's CLI tests expect its default readline facility to work.
         # A missing host library must fail setup, rather than masquerade as a
         # native-platform difference when main.lua enables warnings with -E.

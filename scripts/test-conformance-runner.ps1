@@ -86,6 +86,15 @@ Case 'T-only skip is recorded separately from a pass' {
     Assert-True ($outcome.status -eq 'completed-with-skips' -and $outcome.skip_messages.Count -eq 1) 'skip hidden'
     Assert-True (-not $outcome.gate_acceptance) 'skip promoted to acceptance'
 }
+Case 'unavailable locale messages remain coverage omissions' {
+    # Pinned strings.lua reports unavailable collation/character locales
+    # without the word 'skipping'. Keep both omissions visible even when the
+    # file exits successfully and prints its required completion marker.
+    $p = Run-Helper 'locales' 'Write-Output "collate locale not found"; Write-Output "ctype locale not found"; Write-Output "DONE"'
+    $outcome = Get-ConformanceOutcome -Process $p -Marker 'DONE'
+    Assert-True ($outcome.status -eq 'completed-with-skips') 'locale omission hidden'
+    Assert-True ($outcome.skip_messages.Count -eq 2) 'locale omission count lost'
+}
 Case 'Ada resource abort is not a syntax rejection' {
     # A controlled host quota remains a failed execution observation, even
     # when the tested language source would otherwise be valid.

@@ -5,6 +5,8 @@
 /bin/
 /lib/
 /build/
+# setup-alire's disposable CI tool installation is not project source.
+/alire_install/
 /tests/alire/
 /tests/config/
 /tests/obj/

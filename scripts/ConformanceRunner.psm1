@@ -131,7 +131,7 @@ function Get-ConformanceOutcome {
     $stdout = [IO.File]::ReadAllText($Process.stdout_path)
     $stderr = [IO.File]::ReadAllText($Process.stderr_path)
     $messages = @([regex]::Matches($stdout + "`n" + $stderr,
-        '(?im)^.*(?:skipp?ing|tests? not performed|cannot test|not active).*$') |
+        '(?im)^.*(?:skipp?ing|tests? not performed|cannot test|not active|locale.*not (?:found|available)).*$') |
         ForEach-Object { $_.Value.Trim() })
     $warnings = @([regex]::Matches($stderr, '(?im)^.*(?:Lua warning:|warning:).*$') |
         ForEach-Object { $_.Value.Trim() })
