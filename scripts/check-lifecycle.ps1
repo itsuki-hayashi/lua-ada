@@ -105,8 +105,14 @@ try {
     if ($LASTEXITCODE -ne 0 -or $revision -ne $pin) {
         throw 'Upstream acceptance requires the pinned Lua 5.5.1 checkout'
     }
-    & git -C references/lua diff --exit-code -- @($fixtures | ForEach-Object { "testes/$_" })
+    & git -C references/lua diff HEAD --exit-code -- @($fixtures | ForEach-Object { "testes/$_" })
     if ($LASTEXITCODE -ne 0) { throw 'Selected upstream files have local changes' }
+    $inventory = Get-Content -LiteralPath (
+        Join-Path $projectRoot 'tests/conformance/suite.json') -Raw |
+        ConvertFrom-Json
+    if ($inventory.reference_revision -ne $pin) {
+        throw 'Fixture hash inventory revision does not match the oracle'
+    }
     $Interpreter = (Resolve-Path -LiteralPath $Interpreter).Path
     if ($Oracle -eq '') {
         & alr exec -- gprbuild -P experiments/abi/oracle.gpr
@@ -125,6 +131,12 @@ try {
         foreach ($fixture in $fixtures) {
             $source = Join-Path $projectRoot "references/lua/testes/$fixture"
             $destination = Join-Path $directory $fixture
+            $entry = @($inventory.files | Where-Object { $_.path -ceq $fixture })
+            if ($entry.Count -ne 1 -or
+                (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant() -cne
+                $entry[0].sha256) {
+                throw "Fixture does not match its pinned source hash: $fixture"
+            }
             [IO.File]::Copy($source, $destination)
             if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -cne
                 (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash) {

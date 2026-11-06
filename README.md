@@ -83,3 +83,9 @@ their own licenses and copyright notices; they are not runtime dependencies.
 Canonical opcode definitions preserve the [Lua notice](docs/licenses/lua.md).
 The [consumer module fixtures](tests/modules/README.md) likewise retain their
 upstream notices and serve only as future test inputs.
+
+The [combined M3 language lifecycle delivery](docs/milestones/m3-language-lifecycle.md)
+adds goto/labels, closing, coroutines, weak/ephemeron collection, runtime
+inspection/hooks and compatible CLI execution quotas. Its final platform
+acceptance is tracked separately in [status](docs/status.md). Selected unchanged
+upstream passes do not establish complete Lua/C-API conformance.

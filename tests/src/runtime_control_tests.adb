@@ -5,6 +5,16 @@ with Test_Support;
 
 package body Runtime_Control_Tests is
    procedure Check (Source : String; Compatible : Boolean := False);
+   procedure Debug_Split_Function_Lines;
+   procedure Hook_Implicit_Return_Line;
+   procedure Debug_Tail_Frame;
+   procedure Close_Logical_Caller;
+   procedure Debug_Literal_Source;
+   procedure Debug_File_Source;
+   procedure Debug_Snippet_Source;
+   procedure Debug_Minimum_Vararg_Index;
+   procedure Debug_Hook_Count_Range;
+   procedure Debug_Traceback_Level_Range;
    procedure Policy_Restores_Bounds;
    procedure Set_Limits_Selects_Bounded;
    procedure Reset_Selects_Bounded;
@@ -1060,6 +1070,121 @@ package body Runtime_Control_Tests is
       Assert (Result.Status = Succeeded, "first identity retained");
    end Independent_Thread_Universes;
 
+   procedure Debug_Literal_Source is
+      --  A literal chunk name starts with an equals sign.
+      --  Inspect the source identifier of a dynamically loaded closure.
+      --  The source is retained and short_src omits the marker.
+   begin
+      Check
+        ("local f=assert(load('return 1','=literal'));local " &
+         "i=debug.getinfo(f,'S');assert(i.source=='=literal'" &
+         " and i.short_src=='literal')");
+   end Debug_Literal_Source;
+
+   procedure Debug_File_Source is
+      --  A file chunk name retains its file identity.
+      --  Inspect a long file identifier beyond the debug buffer width.
+      --  short_src preserves the final 56 bytes with an ellipsis.
+   begin
+      Check
+        ("local name='@'..string.rep('x',80)..'tail.lua';loc" &
+         "al f=assert(load('return 1',name));local i=debug.g" &
+         "etinfo(f,'S');assert(i.source==name and i.short_sr" &
+         "c=='...'..name:sub(-56))");
+   end Debug_File_Source;
+
+   procedure Debug_Snippet_Source is
+      --  Raw chunk names render as quoted source snippets.
+      --  Inspect a short raw name and a name containing a newline.
+      --  The first line is kept and truncated content has an ellipsis.
+   begin
+      Check
+        ("local f=assert(load('return 1','raw'));assert(debu" &
+         "g.getinfo(f,'S').short_src=='[string ""raw""]');f=as" &
+         "sert(load('return 1','first\nsecond'));assert(debu" &
+         "g.getinfo(f,'S').short_src=='[string ""first...""]')");
+   end Debug_Snippet_Source;
+
+   procedure Debug_Minimum_Vararg_Index is
+      --  The smallest integer is a valid out-of-range local index.
+      --  Read a negative vararg index without negating that minimum.
+      --  The query returns nil rather than an internal overflow.
+   begin
+      Check
+        ("local function f(...)assert(debug.getlocal(1,math." &
+         "mininteger)==nil)end;f(1)");
+   end Debug_Minimum_Vararg_Index;
+
+   procedure Debug_Hook_Count_Range is
+      --  Oversized hook counts cannot fit the private counter.
+      --  Attempt installation under pcall and inspect the hook state.
+      --  A controlled range error leaves the previous registration intact.
+   begin
+      Check
+        ("local h=function()end;local ok,e=pcall(debug.setho" &
+         "ok,h,'',math.maxinteger);assert(not ok and e:find(" &
+         "'range') and not e:find('internal Ada'));assert(de" &
+         "bug.gethook()==nil)");
+   end Debug_Hook_Count_Range;
+
+   procedure Debug_Traceback_Level_Range is
+      --  Oversized traceback levels cannot be represented safely.
+      --  Request an extreme level under pcall.
+      --  A controlled diagnostic replaces any Ada range exception.
+   begin
+      Check
+        ("local ok,e=pcall(debug.traceback,'message',math.ma" &
+         "xinteger);assert(not ok and e:find('range') and no" &
+         "t e:find('internal Ada'))");
+   end Debug_Traceback_Level_Range;
+
+   procedure Debug_Split_Function_Lines is
+      --  Function names and parentheses can start on later lines.
+      --  Compile a split declaration and query its definition range.
+      --  The function keyword line and closing end line are retained.
+   begin
+      Check
+        ("local f=assert(load('return function\n(x)\nreturn " &
+         "x\nend'))();local i=debug.getinfo(f,'S');assert(i." &
+         "linedefined==1 and i.lastlinedefined==4)");
+   end Debug_Split_Function_Lines;
+
+   procedure Hook_Implicit_Return_Line is
+      --  A function without an explicit return ends at its end token.
+      --  Record line events in a two-line body.
+      --  The implicit return reports the closing end line.
+   begin
+      Check
+        ("local t={};local co=coroutine.create(assert(load('" &
+         "return function()\nlocal x=1\nend'))());debug.seth" &
+         "ook(co,function(e,l)if e=='line'then t[#t+1]=l end" &
+         " end,'l');assert(coroutine.resume(co));assert(t[1]" &
+         "==2 and t[2]==3 and #t==2)");
+   end Hook_Implicit_Return_Line;
+
+   procedure Debug_Tail_Frame is
+      --  Tail replacement is retained as real frame metadata.
+      --  Inspect the leaf of a tail call from a coroutine.
+      --  The active leaf reports istailcall instead of a fabricated caller.
+   begin
+      Check
+        ("local function leaf()return debug.getinfo(1,'t').i" &
+         "stailcall end;local co=coroutine.create(function()" &
+         "return leaf()end);local a,b=coroutine.resume(co);a" &
+         "ssert(a and b)");
+   end Debug_Tail_Frame;
+
+   procedure Close_Logical_Caller is
+      --  Normal cleanup continues the owning Lua activation.
+      --  Inspect the caller from an ordinary __close handler.
+      --  Internal protection and scheduler phases are hidden.
+   begin
+      Check
+        ("local what;do local x <close> = setmetatable({},{_" &
+         "_close=function()what=debug.getinfo(2,'S').what en" &
+         "d})end;assert(what=='main')");
+   end Close_Logical_Caller;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -1290,5 +1415,35 @@ package body Runtime_Control_Tests is
       Test_Support.Add
         (Suite, "control: Independent_Thread_Universes",
          Independent_Thread_Universes'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Literal_Source",
+         Debug_Literal_Source'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_File_Source",
+         Debug_File_Source'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Snippet_Source",
+         Debug_Snippet_Source'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Minimum_Vararg_Index",
+         Debug_Minimum_Vararg_Index'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Hook_Count_Range",
+         Debug_Hook_Count_Range'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Traceback_Level_Range",
+         Debug_Traceback_Level_Range'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Split_Function_Lines",
+         Debug_Split_Function_Lines'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Implicit_Return_Line",
+         Hook_Implicit_Return_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Tail_Frame",
+         Debug_Tail_Frame'Access);
+      Test_Support.Add
+        (Suite, "control: Close_Logical_Caller",
+         Close_Logical_Caller'Access);
    end Register;
 end Runtime_Control_Tests;

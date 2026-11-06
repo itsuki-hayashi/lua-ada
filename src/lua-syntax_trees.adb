@@ -57,13 +57,15 @@ package body Lua.Syntax_Trees is
       function Expression (Minimum : Natural := 0) return Node_Id;
       function Prefix return Node_Id;
       function Constructor return Node_Id;
-      function Function_Body (Method : Boolean := False) return Node_Id;
+      function Function_Body
+        (Definition : Source_Location; Method : Boolean := False)
+         return Node_Id;
       function Expression_List return Node_Id;
       function Block (Own_Scope : Boolean := True) return Node_Id;
       function Statement return Node_Id;
       function Declaration
-        (Global : Boolean := False; Recursive : Boolean := False)
-         return Node_Id;
+        (Global : Boolean := False; Recursive : Boolean := False;
+         Definition : Source_Location := (others => 1)) return Node_Id;
       function Get_Attribute (Default : Attribute := Regular) return Attribute;
       procedure Finish_Scope
         (Block : Natural; Parent : Natural; Base : Symbol_Lists.Vector);
@@ -363,7 +365,9 @@ package body Lua.Syntax_Trees is
          return Result;
       end Constructor;
 
-      function Function_Body (Method : Boolean := False) return Node_Id is
+      function Function_Body
+        (Definition : Source_Location; Method : Boolean := False)
+         return Node_Id is
          Result : constant Node_Id := Make (Function_Expression);
          Saved_Function : constant Node_Id := Function_Node;
          Saved_Varargs : constant Boolean := Varargs;
@@ -379,6 +383,7 @@ package body Lua.Syntax_Trees is
          --  failures discard the entire owned compilation unit.
          Enter;
          Function_Node := Result;
+         Item.Site := Definition;
          Item.Target := Saved_Function;
          Save (Result, Item);
          Varargs := False;
@@ -542,8 +547,10 @@ package body Lua.Syntax_Trees is
             Result := Add ((Kind => Literal, Site => Here,
                             Value => Current, others => <>));
             Advance;
-         elsif Take (Function_Word) then
-            Result := Function_Body;
+         elsif Kind = Function_Word then
+            Site := Here;
+            Advance;
+            Result := Function_Body (Site);
          elsif Kind = Left_Brace then
             Result := Constructor;
          else
@@ -674,8 +681,8 @@ package body Lua.Syntax_Trees is
       end Block;
 
       function Declaration
-        (Global : Boolean := False; Recursive : Boolean := False)
-         return Node_Id
+        (Global : Boolean := False; Recursive : Boolean := False;
+         Definition : Source_Location := (others => 1)) return Node_Id
       is
          Result : constant Node_Id := Make (Syntax_Trees.Declaration);
          Item : Node := Fetch (Result);
@@ -693,7 +700,7 @@ package body Lua.Syntax_Trees is
             Item.Symbols.Append (Id);
             Active.Append (Id);
             Save (Result, Item);
-            Child (Result, Function_Body);
+            Child (Result, Function_Body (Definition));
             return Result;
          end if;
          Default := Get_Attribute;
@@ -749,6 +756,7 @@ package body Lua.Syntax_Trees is
          Id : Symbol_Id;
          Value : Node;
          Method : Boolean := False;
+         Function_Site : Source_Location;
       begin
          if Take (Semicolon) then
             return Make (Empty_Statement);
@@ -756,11 +764,18 @@ package body Lua.Syntax_Trees is
             Result := Block;
             Expect (End_Word);
          elsif Take (Local_Word) then
-            return Declaration (Recursive => Take (Function_Word));
+            declare
+               Function_Site : constant Source_Location := Here;
+            begin
+               return Declaration
+                 (Recursive => Take (Function_Word),
+                  Definition => Function_Site);
+            end;
          elsif Kind = Identifier and then Text = "global" and then
            Peek in Identifier | Less | Star | Function_Word
          then
             Advance;
+            Function_Site := Here;
             if not Take (Function_Word) then
                return Declaration (Global => True);
             end if;
@@ -771,7 +786,7 @@ package body Lua.Syntax_Trees is
             Id := New_Name (Current.Text, Kind => Global_Name);
             Active.Append (Id);
             Target := Resolve (Read_Name);
-            Item := Function_Body;
+            Item := Function_Body (Function_Site);
             Child (Result, Target);
             Child (Result, Item);
          elsif Take (Function_Word) then
@@ -792,7 +807,7 @@ package body Lua.Syntax_Trees is
             end loop;
             Writable (Target);
             Child (Result, Target);
-            Child (Result, Function_Body (Method));
+            Child (Result, Function_Body (Site, Method));
          elsif Kind in While_Word | Repeat_Word then
             declare
                Repeat : constant Boolean := Kind = Repeat_Word;

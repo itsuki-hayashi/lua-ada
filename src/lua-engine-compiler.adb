@@ -179,6 +179,7 @@ package body Lua.Engine.Compiler is
          Outer : constant Prototype_Access := Current;
          Saved_Register : constant Positive := Next_Register;
          Saved_Depth : constant Natural := Scope_Depth;
+         Saved_Site : constant Source_Location := Site;
          Saved_Loops : constant Loops.Vector := Loop_Stack;
          Child : constant Prototype_Access := new Prototype;
          Result : Positive;
@@ -206,12 +207,14 @@ package body Lua.Engine.Compiler is
          Scope_Depth := 0;
          Loop_Stack.Clear;
          Block (Item.Children (1), Own_Scope => False);
+         Site.Line := Child.Last_Line;
          Put ((Op => Return_Values, others => <>));
          --  Resolution already propagates captures through each parent.
          Current := Outer;
          Next_Register := Saved_Register;
          Scope_Depth := Saved_Depth;
          Loop_Stack := Saved_Loops;
+         Site := Saved_Site;
          Result := New_Register;
          Put ((Op => Make_Closure, A => Result,
                Nested => Child, others => <>));

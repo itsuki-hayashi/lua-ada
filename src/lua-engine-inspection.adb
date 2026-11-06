@@ -4,6 +4,36 @@ with Ada.Strings.Fixed;
 package body Lua.Engine.Inspection is
    use type Integer_Value;
 
+   function Short_Source (Source : String) return String;
+   function Short_Source (Source : String) return String is
+      Newline : constant Natural :=
+        Ada.Strings.Fixed.Index (Source, "" & Character'Val (10));
+      Size : Natural := Source'Length;
+      Truncated : Boolean := False;
+   begin
+      --  A default debug identifier has 59 payload bytes plus its C NUL.
+      --  File identifiers retain the tail; snippets retain the first
+      --  line with a quoted prefix/suffix. No native record layout is
+      --  involved.
+      if Source'Length > 0 and then Source (Source'First) in '=' | '@' then
+         if Source'Length <= 60 or else Source (Source'First) = '=' then
+            return Source (Source'First + 1 ..
+              Natural'Min (Source'Last, Source'First + 59));
+         end if;
+         return "..." & Source (Source'Last - 55 .. Source'Last);
+      end if;
+      if Newline /= 0 then
+         Size := Newline - Source'First;
+         Truncated := True;
+      end if;
+      if Source'Length >= 45 then
+         Truncated := True;
+      end if;
+      Size := Natural'Min (45, Size);
+      return "[string """ & Source (Source'First .. Source'First + Size - 1) &
+        (if Truncated then "..." else "") & """]";
+   end Short_Source;
+
    function Inspect
      (State : in out World; Activation : Frame_Access) return Values.Vector
    is
@@ -23,7 +53,18 @@ package body Lua.Engine.Inspection is
       function Symbol_Text
         (Prototype : Prototype_Access; Symbol : Positive) return String;
       procedure Append (Item : Value);
+      procedure Work;
       procedure Field (Table : Value; Key : String; Item : Value);
+
+      procedure Work is
+      begin
+         if State.Steps >= State.Bounds.Instructions then
+            Fail (State, "instruction limit exceeded", Resource => True);
+         end if;
+         if State.Policy = Bounded then
+            State.Steps := State.Steps + 1;
+         end if;
+      end Work;
 
       function Integer_Arg (Index : Positive) return Integer_Value is
       begin
@@ -51,6 +92,7 @@ package body Lua.Engine.Inspection is
          --  Scheduler helper activations are implementation phases, not Lua
          --  stack frames. Public native closures retain their logical frame.
          for Item of reverse Context.Stack loop
+            Work;
             if not Failed_Owner (Item) and then
               (not Item.Is_Native or else
                (Length (Item.Native_Name) > 0 and then
@@ -71,6 +113,7 @@ package body Lua.Engine.Inspection is
       begin
          if Prototype /= null then
             for Item of Prototype.Names loop
+               Work;
                if Item.Symbol = Symbol then
                   return To_String (Item.Name);
                end if;
@@ -106,6 +149,11 @@ package body Lua.Engine.Inspection is
             end if;
             if Arg (Base + 1).Kind /= String_Kind then
                Fail (State, "string expected");
+            end if;
+            if Arg (Base + 2).Kind /= Nil_Kind and then
+              Integer_Arg (Base + 2) > Integer_Value (Natural'Last)
+            then
+               Fail (State, "hook count out of range");
             end if;
             Context.Hook := Arg (Base);
             Context.Hook_Mask := Null_Unbounded_String;
@@ -236,8 +284,7 @@ package body Lua.Engine.Inspection is
             if Wants ('S') then
                Field (Info, "source", New_String (State, Source));
                Field (Info, "short_src", New_String
-                 (State, (if Source'Length > 0 and then Source (1) = '@' then
-                    Source (2 .. Source'Last) else Source)));
+                 (State, Short_Source (Source)));
                Field (Info, "linedefined", (Integer_Kind,
                  (if Code = null then -1 else
                     Integer_Value (Code.First_Line))));
@@ -351,7 +398,7 @@ package body Lua.Engine.Inspection is
             end if;
             if not Selected.Is_Native then
                if Index < 0 then
-                  if -Index <= Integer_Value (Selected.Varargs.Length) then
+                  if Index >= -Integer_Value (Selected.Varargs.Length) then
                      Append (New_String (State, "(vararg)"));
                      if Name = "debug.setlocal" then
                         Selected.Varargs.Replace_Element
@@ -419,6 +466,9 @@ package body Lua.Engine.Inspection is
                  Character'Val (10));
             end if;
             if Arg (Base + 1).Kind /= Nil_Kind then
+               if Integer_Arg (Base + 1) > Integer_Value (Natural'Last) then
+                  Fail (State, "level out of range");
+               end if;
                Level := Natural (Integer_Value'Max
                  (0, Integer_Arg (Base + 1)));
             end if;
@@ -431,7 +481,8 @@ package body Lua.Engine.Inspection is
                   Append (Text, "[C]: in function '" &
                     To_String (Item.Native_Name) & "'");
                else
-                  Append (Text, To_String (Item.Code.Name) & ":" &
+                  Append (Text, Short_Source (To_String (Item.Code.Name)) &
+                    ":" &
                     Ada.Strings.Fixed.Trim
                       (Natural'Image
                         (Item.Code.Code

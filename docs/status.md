@@ -50,7 +50,7 @@ reachability-based context ownership, weak tables/ephemerons, debug inspection
 and hooks, collection controls, and compatible CLI execution quotas. This
 advances portions of M3-02/06/07/08/11; their full broader gates remain open.
 
-Local Windows validation/static has passed 564 focused AUnit cases at the
+Local Windows validation/static has passed 574 focused AUnit cases at the
 latest recorded test checkpoint. Hash-verified unchanged goto.lua and
 coroutine.lua have passed fresh independent same-host C/Ada process comparisons,
 with identical stdout, empty stderr and OK markers. The coroutine result is
@@ -60,7 +60,9 @@ complete coroutine or C-API conformance. Exact omitted source anchors and the
 
 Final source review, expanded differential campaigns, retained regressions,
 all 18 final platform configurations, Windows static-PIC and the open PR are
-still required. These local observations do not establish those platform gates.
+still required. [PR #7](https://github.com/itsuki-hayashi/lua-ada/pull/7) is
+open as a draft while those gates run. These local observations do not
+establish the final platform gates.
 The [current session](sessions/2026-11-06-m3-language-lifecycle.md) owns commands
 and intermediate evidence. Reference and ecosystem module pins are unchanged.
 

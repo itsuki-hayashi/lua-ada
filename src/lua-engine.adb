@@ -95,6 +95,9 @@ package body Lua.Engine is
          elsif State.Current.Failure_Class in Syntax_Failure |
            Unsupported_Failure then State.Current.Failure_Class
          else Language_Failure);
+      if Resource then
+         State.Current.Transfer := (Kind => Host_Stopped, others => <>);
+      end if;
       raise Language_Error;
    end Fail;
 
@@ -1078,6 +1081,7 @@ package body Lua.Engine is
          State.Current.Status := Suspended_Context;
          Machine.Clear_Frames (State);
          State.Current.Failure_Class := Host_Abort;
+         State.Current.Transfer := (Kind => Host_Stopped, others => <>);
          State.Current.Failure_Text := To_Unbounded_String
            ("host storage exhausted");
          return False;

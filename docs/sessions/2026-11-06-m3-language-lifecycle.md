@@ -65,3 +65,33 @@ Reference/module pins remain unchanged and ecosystem fixtures remain unread,
 unbuilt and unexecuted. Optional GNATdoc rendering, fuzzing and proof were not run.
 Python is unavailable; local editing helpers use installed Node, not a project
 dependency. No new runtime dependency was introduced.
+
+## Reviewed implementation refinement
+
+The initial implementation tree 697eb42c0b351fa9d7b26d599dac5a31e9302749
+was published through the GitHub connector as commit
+16cc35491384c345a3a2e328555eaf30ca13f5ca. Native SSH push stalled; its identified
+processes were stopped. The connector tree was compared byte-for-byte by Git
+tree SHA before synchronizing the local branch. PR #7 is open as draft and
+remains the single delivery PR.
+
+Source review added Lua-compatible short-source formatting, correct function
+keyword/implicit-return line metadata, controlled extreme debug-index/count
+checks, explicit typed language/host states, and pinned-inventory fixture hashes
+including staged-edit rejection. Ten further focused cases bring the suite to
+574 passing tests (86 new cases versus the merged baseline), zero failed
+assertions or unexpected errors. scripts/check.ps1 -Profile validation
+-LibraryType static passed again in reports/m3-reviewed-full-validation.log,
+including all five selected upstream files, 35 CLI cases and eight differential
+fixtures. The added lifecycle campaign is one of those fixtures.
+
+Intermediate local Windows validation/shared and validation/static-PIC pipelines
+also passed their complete 564-case checkpoint. Retained local ABI, frontend/
+opcode, C99 layout and 1,120-case library campaigns passed. The separate lifecycle
+campaign passed 1,024 cases, seed 872641.
+
+The initial remote PR run 42156155188 passed 17 of 18 jobs; macOS static-validation
+failed before compilation because the stable GNAT archive download returned
+HTTP 500 on all three existing retries. This is missing platform evidence, not
+a runtime/test pass or a reason to change compiler versions. The reviewed
+revision requires a fresh full matrix and inspection of every final job log.

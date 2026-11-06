@@ -663,7 +663,7 @@ package body Lua.Engine.Machine is
          State.Current.Has_Failure_Value := True;
          State.Current.Failure_Text := To_Unbounded_String (Image
            (Error_Value));
-         State.Current.Failure_Class := No_Failure;
+         State.Current.Failure_Class := Language_Failure;
          raise Language_Error;
       end Raise_Value;
 
@@ -1067,6 +1067,7 @@ package body Lua.Engine.Machine is
             end if;
             State.Current.Failure := Nil_Value;
             State.Current.Has_Failure_Value := False;
+            State.Current.Failure_Class := No_Failure;
       end Dispatch;
 
       procedure Recover is
@@ -1170,6 +1171,7 @@ package body Lua.Engine.Machine is
          end if;
          State.Current.Failure := Nil_Value;
          State.Current.Has_Failure_Value := False;
+         State.Current.Failure_Class := No_Failure;
       end Recover;
 
       procedure Native_Step is
