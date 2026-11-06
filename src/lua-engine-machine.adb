@@ -2438,6 +2438,7 @@ package body Lua.Engine.Machine is
             begin
                Clear_Frames (State);
                Child.Status := Dead_Context;
+               Child.Phase := Executing;
                Child.Resumer := null;
                State.Current := Parent;
             end;

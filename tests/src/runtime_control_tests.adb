@@ -7,6 +7,7 @@ package body Runtime_Control_Tests is
    procedure Check (Source : String; Compatible : Boolean := False);
    procedure Debug_Iterator_Native_Frame;
    procedure Yieldability_After_Completion;
+   procedure Closing_Quota_Abort;
    procedure Debug_Split_Function_Lines;
    procedure Hook_Implicit_Return_Line;
    procedure Debug_Tail_Frame;
@@ -1217,6 +1218,28 @@ package body Runtime_Control_Tests is
          "assert(not coroutine.close(co));assert(coroutine.isyieldable(co))");
    end Yieldability_After_Completion;
 
+   procedure Closing_Quota_Abort is
+      --  A host quota abort abandons cleanup without restarting callbacks.
+      --  Exhaust the budget in an explicit close handler, then inspect it.
+      --  The child is dead, its closing phase is gone, and the host recovers.
+      Universe : Session;
+      Bounds : Execution_Limits;
+      Result : Execution_Result;
+   begin
+      Bounds.Instructions := 1_000;
+      Universe.Set_Limits (Bounds);
+      Result := Universe.Execute
+        ("co=coroutine.create(function()local x <close> = " &
+         "setmetatable({},{__close=function()while true do end end});" &
+         "coroutine.yield()end);assert(coroutine.resume(co));" &
+         "pcall(coroutine.close,co)");
+      Assert (Result.Status = Resource_Error, "closing quota abort");
+      Result := Universe.Execute
+        ("assert(coroutine.status(co)=='dead');" &
+         "assert(coroutine.isyieldable(co));assert(coroutine.close(co))");
+      Assert (Result.Status = Succeeded, "abandoned close phase recovered");
+   end Closing_Quota_Abort;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -1483,5 +1506,7 @@ package body Runtime_Control_Tests is
       Test_Support.Add
         (Suite, "control: Yieldability_After_Completion",
          Yieldability_After_Completion'Access);
+      Test_Support.Add
+        (Suite, "control: Closing_Quota_Abort", Closing_Quota_Abort'Access);
    end Register;
 end Runtime_Control_Tests;

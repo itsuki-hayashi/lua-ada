@@ -118,3 +118,8 @@ status/abandoned error frames. Local AUnit passes 576 cases (88 new), with zero
 failed assertions/errors. The 575-case table above remains the exact recorded
 checkpoint. The current publication-head matrix must validate this correction
 and is linked from PR #7; it cannot inherit the checkpoint's result.
+
+A separate closing-quota case verifies uncatchable abort, abandoned closing-phase
+cleanup and subsequent session recovery. It brings local AUnit to 577 cases
+(89 new), with no failures/errors. Final-head CI must show those 577 cases;
+this recorded 575-case checkpoint is not substituted for that requirement.

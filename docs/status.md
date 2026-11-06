@@ -50,7 +50,7 @@ reachability-based context ownership, weak tables/ephemerons, debug inspection
 and hooks, collection controls, and compatible CLI execution quotas. This
 advances portions of M3-02/06/07/08/11; their full broader gates remain open.
 
-Local Windows validation/static has passed 576 focused AUnit cases at the
+Local Windows validation/static has passed 577 focused AUnit cases at the
 latest recorded test checkpoint. Hash-verified unchanged goto.lua and
 coroutine.lua have passed fresh independent same-host C/Ada process comparisons,
 with identical stdout, empty stderr and OK markers. The coroutine result is
@@ -66,7 +66,8 @@ campaign. [Validation evidence](validation-m3-lifecycle.md) records the exact
 run, job IDs, tool versions, marker counts and scope limits. The final handoff
 commit initially changed documentation and evidence retention only. A later
 C-oracle edge comparison corrected dead/closed coroutine yieldability and added
-one case; its current full matrix must pass before [PR #7](https://github.com/itsuki-hayashi/lua-ada/pull/7) is ready.
+focused cases, including abandoned close-phase cleanup; its current full
+matrix must pass before [PR #7](https://github.com/itsuki-hayashi/lua-ada/pull/7) is ready.
 Reference/module pins remain unchanged and ecosystem fixtures remain unused.
 
 ## Earlier evidence and remaining work

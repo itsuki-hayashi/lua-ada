@@ -133,3 +133,10 @@ repeated close. The local suite passes 576 cases, zero failed assertions/errors.
 This is 88 new cases beyond the merged baseline. Final-head CI must rerun; the
 575-case runtime snapshot remains exact historical evidence, not evidence for
 the new edge-case correction.
+
+The same inactive-phase invariant now applies when a hard quota abort abandons
+an explicit close handler. A separate named case exhausts the budget while
+closing, confirms that pcall cannot catch/restart it, and verifies dead-thread
+queries and session recovery. The local suite passes 577 cases (89 new), zero
+failed assertions/errors. This final one-line phase cleanup and regression need
+the current-head matrix; earlier 575/576 results remain dated checkpoints.
