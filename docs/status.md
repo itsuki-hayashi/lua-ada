@@ -15,8 +15,9 @@ candidate completes its state-close assertions, with actual allocator and
 collector inspection; independent review remains pending. Unchanged gc.lua
 still fails its C-specific fixed memory allowance. The ten-span Windows files.lua
 candidate completes in C and Ada, including a real native counterpart for the
-guarded partial-write block. Its mappings await independent review; POSIX file
-execution and remaining platform behavior are being exercised in CI. These observations do not close
+guarded partial-write block. Its mappings await independent review. Linux
+unchanged file observations pass in both configurations; macOS evidence remains
+queued. These observations do not close
 any selected file's full coverage; complete T inspection, reviewed equivalents,
 scoped harness acceptance and the final 26-context matrix remain open.
 The C facade now exposes real IO/OS module openers with shared Ada export
@@ -33,6 +34,12 @@ completion and per-operation acceptance commands remain fail-closed on pending
 reviews/coverage. The actual launcher supplies measured configuration reports
 for parent, bare-lua and arg-selected child checks. Both matrices now schedule
 all four selected files; this does not replace final-revision evidence or review.
+File equivalents now use the same scoped operation/report path, with native
+counterpart tests retained separately. Platform launchers verify measured
+parent/bare-child/arg-child settings and balanced probe/main-child telemetry.
+Full local default and instrumented validation/static pipelines retain 1,304
+AUnit cases. Shared harness regressions total 40, scope regressions 35, plus
+two actual launcher-isolation regressions in each configuration.
 The paused-checkpoint statements below retain the prior delivery's evidence.
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**

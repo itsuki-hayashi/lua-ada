@@ -2,6 +2,79 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+
+function Test-ScopedLauncher {
+    param([Parameter(Mandatory)][string] $Executable,
+          [Parameter(Mandatory)][string] $Directory,
+          [Parameter(Mandatory)][string] $OutputPrefix,
+          [Parameter(Mandatory)][Collections.IDictionary] $Environment,
+          [Parameter(Mandatory)][string] $Configuration,
+          [Parameter(Mandatory)][ValidateSet('Ada','ReferenceC')][string] $Target)
+    # The same measured protocol is used by platform equivalents and unchanged
+    # executions. A T-presence test alone cannot identify the inherited limits,
+    # numeric configuration or executable selected through PATH and arg.
+    $probeEnvironment = @{}
+    foreach ($key in $Environment.Keys) { $probeEnvironment[$key] = $Environment[$key] }
+    # Preflight sessions have their own lifetime. Do not contaminate the file
+    # execution's precise parent/child telemetry cardinality with these probes.
+    $telemetryPrefix = "$OutputPrefix-allocator"
+    $probeRunId = [Guid]::NewGuid().ToString('N')
+    $probeEnvironment.LUA_ADA_CONFORMANCE_TELEMETRY = $telemetryPrefix
+    $probeEnvironment.LUA_ADA_CONFORMANCE_RUN_ID = $probeRunId
+    $bare = 'local p=assert(io.popen("lua --conformance-config","r")); ' +
+        'local s=p:read("a"); assert(p:close()); io.write(s)'
+    $arg = 'local i=0; while arg[i] do i=i-1 end; local exe=arg[i+1]; '
+    $arg += if ($IsWindows) {
+        'local command=''""''..exe..''" --conformance-config"''; '
+    } else {
+        'local command="''"..exe:gsub("''", "''\"''\"''").."'' --conformance-config"; '
+    }
+    $arg += 'local p=assert(io.popen(command,"r")); local s=p:read("a"); assert(p:close()); io.write(s)'
+    $records = @{}
+    $expected = $null
+    $observed = $null
+    foreach ($name in @('parent','bare','arg')) {
+        $arguments = switch ($name) {
+            'parent' { @('--conformance-config') }
+            'bare' { @('-e', $bare) }
+            'arg' { @('-e', $arg) }
+        }
+        $process = Invoke-ConformanceProcess -Executable $Executable -Arguments $arguments `
+            -Directory $Directory -OutputPrefix "$OutputPrefix-$name" -TimeoutSeconds 30 `
+            -Environment $probeEnvironment
+        $records[$name] = $process
+        if ($process.exit_code -ne 0 -or $process.timed_out -or $process.stderr_bytes -ne 0 -or
+            $process.capture_exceeded -or $process.pipe_drain_failed -or $process.process_tree_kill_error) {
+            throw "Scoped launcher $name configuration probe failed"
+        }
+        $actual = [IO.File]::ReadAllText($process.stdout_path).Trim()
+        if ($name -eq 'parent') {
+            $expected = $actual
+            $observed = $actual | ConvertFrom-Json -AsHashtable
+            [void](Test-ConformanceConfiguration -Observed $observed -Configuration $Configuration `
+                -Target $Target -AllocatorLimitBytes 2147483648)
+        } elseif ($actual -cne $expected) {
+            throw "Scoped launcher $name child configuration differs"
+        }
+    }
+    $telemetry = @()
+    foreach ($sidecar in Get-ChildItem -LiteralPath (Split-Path -Parent $telemetryPrefix) `
+        -Filter ((Split-Path -Leaf $telemetryPrefix) + '.*.json')) {
+        $measured = Get-Content -LiteralPath $sidecar.FullName -Raw | ConvertFrom-Json -AsHashtable
+        $pidValue = [int]($sidecar.BaseName.Split('.')[-1])
+        Assert-ManagedTelemetry -Telemetry $measured -RunId $probeRunId -ProcessId $pidValue `
+            -Configuration $Configuration -RequireShutdown:($Target -eq 'Ada')
+        $telemetry += $measured
+    }
+    # C's --conformance-config returns before constructing a state; only its
+    # two Lua probe parents have allocator records. Ada's measured protocol
+    # constructs/disposes a real session in all five participating processes.
+    $expectedCount = if ($Target -eq 'Ada') { 5 } else { 2 }
+    if ($telemetry.Count -ne $expectedCount) { throw 'Scoped launcher probe telemetry missing' }
+    return [ordered]@{ verified=$true; observed=$observed; processes=$records; telemetry=$telemetry;
+        executable_sha256=(Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant() }
+}
 
 function Assert-ScopedProcessCompletion {
     param([ValidateSet('events.lua','files.lua','gc.lua','gengc.lua')][string] $File,
@@ -21,11 +94,29 @@ function Assert-ScopedProcessCompletion {
         if ($stdout -notmatch '(?m)^test done on \d{2}/\d{2}/\d+, at \d{2}:\d{2}:\d{2}\r?\nLua 5\.5\r?\n\z') {
             throw 'File date/version completion witness missing'
         }
+        # The original file continues into date tests even when os.tmpname
+        # cannot be opened. Its final date is not evidence for that skipped
+        # block. Require each branch witness with the full scope's facilities.
+        if ($stdout -match '(?i)skipping|omitted|not implemented') {
+            throw 'File execution omitted required IO obligations'
+        }
+        $markers = @('testing i/o', 'testing flush', 'testing large files (> BUFSIZ)',
+            'testing popen/pclose and execute', 'testing date/time')
+        if ($Configuration -eq 'upstream-test') { $markers += 'testing failed write' }
+        foreach ($marker in $markers) {
+            if ($stdout -notmatch ('(?m)^' + [regex]::Escape($marker) + '\r?$')) {
+                throw "File IO completion witness missing: $marker"
+            }
+        }
     } elseif ($stdout -notmatch '(?m)^OK\r?$') {
         throw 'Scoped final OK witness missing'
     }
     if ($File -eq 'gc.lua' -and $stdout -notmatch '(?ms)^OK\r?\n.*^>>> closing state <<<\r?$') {
         throw 'GC state-close completion witness missing'
+    }
+    if ($File -eq 'gengc.lua' -and $Configuration -eq 'upstream-test' -and
+        $stdout -notmatch '(?m)^testing stop-the-world collection\r?$') {
+        throw 'Generational instrumented tail witness missing'
     }
 }
 
@@ -147,4 +238,4 @@ function Test-ConformanceScope {
         StructuralInventory=$inventory; Definition=$definition }
 }
 
-Export-ModuleMember -Function Test-ConformanceScope, Assert-ScopedProcessCompletion
+Export-ModuleMember -Function Test-ConformanceScope, Assert-ScopedProcessCompletion, Test-ScopedLauncher

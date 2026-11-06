@@ -248,6 +248,25 @@ Case 'instrumented configuration cannot omit its test adapter' {
         -Target Ada -AllocatorLimitBytes 67108864L) } catch { $caught = $true }
     Assert-True $caught 'missing adapter accepted'
 }
+Case 'Ada cannot masquerade as the C baseline' {
+    $record = New-Configuration
+    $failure = $null
+    try { [void](Test-ConformanceConfiguration -Observed $record -Configuration default `
+        -Target ReferenceC -AllocatorLimitBytes 67108864L) }
+    catch { $failure = $_.Exception.Message }
+    Assert-True ($failure -ceq 'C configuration probe does not identify the pinned oracle/test adapter') `
+        'Ada identity accepted as C baseline'
+}
+Case 'C instrumented baseline requires its real adapter' {
+    $record = New-Configuration 'upstream-test'
+    $record.implementation='C Lua'; $record.test_adapter=$false
+    $failure = $null
+    try { [void](Test-ConformanceConfiguration -Observed $record -Configuration upstream-test `
+        -Target ReferenceC -AllocatorLimitBytes 67108864L) }
+    catch { $failure = $_.Exception.Message }
+    Assert-True ($failure -ceq 'C configuration probe does not identify the pinned oracle/test adapter') `
+        'C baseline without T accepted as instrumented'
+}
 Case 'profile stack-limit drift fails configuration validation' {
     # An enlarged semantic stack must not be silently introduced just to make a
     # stress assertion pass. Check against the pinned profile's actual limit.

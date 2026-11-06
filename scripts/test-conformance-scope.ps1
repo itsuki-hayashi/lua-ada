@@ -114,7 +114,16 @@ Test-ProcessWitness 'GC rejects early return' gc.lua "testing collector`n" -Expe
 Test-ProcessWitness 'files rejects OK without final date' files.lua "OK`n" -Expected 'date/version'
 Test-ProcessWitness 'files requires final version' files.lua "test done on 01/01/2026, at 00:00:00`n" -Expected 'date/version'
 Test-ProcessWitness 'balanced GC shutdown witness' gc.lua "OK`n>>> closing state <<<`n"
-Test-ProcessWitness 'final files date witness' files.lua "test done on 01/01/2026, at 00:00:00`nLua 5.5`n"
+$dateWitness = "test done on 01/01/2026, at 00:00:00`nLua 5.5`n"
+$ioWitness = "testing i/o`ntesting flush`ntesting failed write`ntesting large files (> BUFSIZ)`ntesting popen/pclose and execute`ntesting date/time`n"
+Test-ProcessWitness 'date alone does not certify IO' files.lua $dateWitness -Expected 'IO completion witness'
+Test-ProcessWitness 'instrumented files require partial-write witness' files.lua `
+    ($ioWitness.Replace("testing failed write`n", '') + $dateWitness) -Expected 'testing failed write'
+Test-ProcessWitness 'temporary-file omission cannot certify IO' files.lua `
+    ("skipping file tests`n" + $ioWitness + $dateWitness) -Expected 'omitted required IO'
+Test-ProcessWitness 'final files date and IO witnesses' files.lua ($ioWitness + $dateWitness)
+Test-ProcessWitness 'instrumented generational early return fails' gengc.lua "OK`n" -Expected 'instrumented tail'
+Test-ProcessWitness 'instrumented generational tail witness' gengc.lua "testing stop-the-world collection`nOK`n"
 Test-ProcessWitness 'successful output cannot hide timeout' events.lua "OK`n" { param($p,$t) $p.timed_out=$true } 'complete cleanly'
 Test-ProcessWitness 'missing physical shutdown fails' events.lua "OK`n" { param($p,$t) $t.shutdown_complete=$false } 'shutdown'
 Test-ProcessWitness 'leaked blocks fail scoped completion' events.lua "OK`n" { param($p,$t) $t.outstanding_blocks=1 } 'unbalanced'

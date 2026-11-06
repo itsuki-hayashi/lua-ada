@@ -12,6 +12,7 @@ $ErrorActionPreference = 'Stop'
 if (-not $IsWindows) { throw 'This counterpart requires Windows native pipes' }
 $root = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1') -Force
 $ada = (Resolve-Path -LiteralPath $Interpreter).Path
 $oracle = (Resolve-Path -LiteralPath $ReferenceInterpreter).Path
 $referenceLibrary = (Resolve-Path -LiteralPath $ReferenceLibraryDirectory).Path
@@ -78,6 +79,15 @@ foreach ($implementation in @('c', 'ada')) {
         $start.Environment['PATH'] = $working + [IO.Path]::PathSeparator + $referenceLibrary + [IO.Path]::PathSeparator + $executionPath
         $setup += "local p=assert(package.loadlib('conformance_platform.dll','luaopen_conformance_platform'))(); _test_failing_stream=p.failing_stream; _test_nonblocking_pair=p.nonblocking_pair"
     }
+    if ((Get-FileHash -LiteralPath $executable).Hash -cne (Get-FileHash -LiteralPath $child).Hash) {
+        throw 'Disposable Windows launcher differs from selected executable'
+    }
+    $target = if ($implementation -eq 'c') { 'ReferenceC' } else { 'Ada' }
+    $probeEnvironment = @{}
+    foreach ($entry in $start.Environment.GetEnumerator()) { $probeEnvironment[$entry.Key] = $entry.Value }
+    $launcher = Test-ScopedLauncher -Executable $child -Directory $working `
+        -OutputPrefix (Join-Path $directory "$implementation-$($fixtureCase.File)-configuration") `
+        -Environment $probeEnvironment -Configuration $Configuration -Target $target
     $start.ArgumentList.Add('-e')
     $start.ArgumentList.Add($setup)
     $start.ArgumentList.Add($fixture)
@@ -134,6 +144,7 @@ foreach ($implementation in @('c', 'ada')) {
             throw "Missing or unexpected child allocator telemetry: $implementation/$($fixtureCase.File)"
         }
         $records += [ordered]@{ implementation=$implementation; exit_code=$process.ExitCode;
+            launcher=$launcher;
             allocator_telemetry=$measured; child_allocator_telemetry=$childTelemetry;
             fixture=$fixtureCase.File;
             fixture_sha256=(Get-FileHash -LiteralPath $fixture -Algorithm SHA256).Hash;
@@ -146,6 +157,6 @@ foreach ($implementation in @('c', 'ada')) {
     driver_sha256=(Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash;
     module_sha256=(Get-FileHash -LiteralPath $module -Algorithm SHA256).Hash;
     terminator_sha256=(Get-FileHash -LiteralPath $terminator -Algorithm SHA256).Hash;
-    executions=$records } | ConvertTo-Json -Depth 5 |
+    executions=$records } | ConvertTo-Json -Depth 12 |
     Set-Content -LiteralPath (Join-Path $directory 'report.json')
 Write-Output 'PASS: matching C/Ada Windows file equivalents and counterparts; mapping review pending'

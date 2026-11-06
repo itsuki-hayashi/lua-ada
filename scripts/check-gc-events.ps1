@@ -31,6 +31,7 @@ try {
             $code = $LASTEXITCODE
             $observation = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json -Depth 32
             $records += [ordered]@{file=$file; target=$target; report=$report;
+                report_sha256=(Get-FileHash -LiteralPath $report -Algorithm SHA256).Hash.ToLowerInvariant();
                 disposition=$observation.execution_disposition; status=$observation.status; context=$context;
                 exit_code=$code; scope_accepted=$false}
             if ($code -ne 0 -or $observation.status -notin @('passed','completed-with-skips')) {

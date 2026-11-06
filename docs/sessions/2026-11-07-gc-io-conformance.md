@@ -481,3 +481,43 @@ execution progressed beyond the repaired libgnat lookup into completed file
 execution; the next revision must still rerun the corrected gate. The existing
 IO: actual libc buffering modes AUnit case checks successful writes in all
 three buffering modes separately from the unchanged upstream sequence.
+
+## Shared file acceptance path and measured platform launchers
+
+The scope completion witness now rejects files.lua's temporary-file omission
+even if date/version output appears, requires its IO branch markers and the
+instrumented failed-write marker, and requires gengc's instrumented tail.
+All 35 scope regressions pass in reports/m3-scope-branch-witness-tests.log.
+The shared configuration validator now checks both implementation directions:
+an Ada binary cannot serve as a C baseline. All 40 runner regressions pass in
+reports/m3-file-launcher-runner-tests.log.
+
+Platform file runners now measure parent, bare-lua and arg-child configuration,
+including actual adapter and allocation limits. Each probe group has a separate
+telemetry prefix: five Ada session disposals, or two C Lua probe-parent records
+(the C configuration printer does not construct a state). The default and
+instrumented Windows native/file counterparts pass these checks in
+reports/m3-file-launcher-default.log and reports/m3-file-launcher-instrumented.log.
+Two actual launcher-isolation regressions pass in each configuration, recorded
+in reports/m3-launcher-negative-default.log and
+reports/m3-launcher-negative-instrumented.log.
+
+files.lua can now use run-conformance.ps1's shared scoped operation/acceptance
+path, including the Windows candidate's narrow native module/process fixtures
+and complete child telemetry. check-files-scoped.ps1 compares independent C/Ada
+output outside final date values, preserving all expected native stderr.
+Instrumented Windows shared-path observations pass in
+reports/m3-scoped-files-instrumented.log. These diagnostics retain pending
+semantic/equivalent reviews and do not set scoped acceptance. Existing native
+counterpart tests remain scheduled in addition to this common path.
+
+Full local Windows validation/static pipelines pass after integration in
+reports/m3-unified-file-full-default.log and
+reports/m3-unified-file-full-instrumented.log, retaining 1,304 AUnit cases each,
+all retained consumers, GC/API oracle comparisons and both native and shared
+file paths. The default log's only error-status line is the required invalid-CLI
+option test; its finalizer-warning fixture is expected. No unexpected diagnostic
+appears in the instrumented log. Published 28329f8 run 42274361758 now has all
+16 Windows/Linux jobs green, including both embedded Windows static-PIC steps
+(18 applicable contexts); all eight macOS jobs remain queued. These are still
+observations, not reviewed scoped acceptance.

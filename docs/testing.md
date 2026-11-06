@@ -342,6 +342,15 @@ unchanged original. Default T omissions must match exact pinned messages and
 remain unresolved coverage links. No successful diagnostic batch sets scoped
 or full-M3 acceptance. See the [scope contract](../tests/conformance/README.md).
 
+scripts/check-files-scoped.ps1 adds files.lua to that same scoped execution
+path, including the required Windows native fixtures and explicit equivalent
+disposition. The platform counterpart runners remain separate regressions.
+Their measured launcher preflights retain independently balanced telemetry
+without adding probe processes to the main file run's child count. Two real
+launcher isolation regressions reject the wrong configuration and an ambient
+C executable substituted for an Ada child. The shared runner has 40 negative
+and process checks; the scoped inventory/witness suite has 35 cases.
+
 The core-image pipeline also compiles the shared public GC contract against
 the actual Ada library and the isolated pinned C library. Seven named cases
 cover nonallocating controls and measured bytes, modes and stopped steps,

@@ -23,6 +23,7 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 $root = Split-Path -Parent $PSScriptRoot
 $original = Get-Location
 $revision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
@@ -64,6 +65,7 @@ $evidence = [ordered]@{
     target = $Target
     requested_configuration = $Configuration
     mode = $Mode.ToLowerInvariant()
+    operation = if ($Mode -eq 'File') { 'file:' + $File } else { $Mode.ToLowerInvariant() }
     status = 'setup-failed'
     gate_acceptance = $false
     coverage_scope = $Scope
@@ -77,6 +79,7 @@ $evidence = [ordered]@{
     execution_contract = $null
     coverage_validation = $null
     allocator_telemetry = $null
+    child_allocator_telemetry = @()
     acceptance_error = $null
     started_utc = [DateTime]::UtcNow.ToString('o')
     configuration_verified = $false
@@ -161,6 +164,30 @@ function Build-Fixtures {
             artifact = $artifact
             artifact_sha256 = (Get-FileHash -LiteralPath $artifact -Algorithm SHA256).Hash.ToLowerInvariant()
         }
+    }
+}
+
+function Build-WindowsFileFixtures {
+    param([string] $Directory, [string] $LibraryDirectory)
+    # These narrow native drivers implement the reviewed platform replacement,
+    # not the unrelated upstream loadlib fixture suite. Ada already contains
+    # the private native file helpers; only C needs the oracle module opener.
+    $cases = @(@{ Source='tests/conformance/platform/windows_process.c';
+        Output='native-terminate.exe'; Options=@() })
+    if ($Target -eq 'ReferenceC') {
+        $cases += @{ Source='tests/c/conformance_platform.c'; Output='conformance_platform.dll';
+            Options=@('-shared', '-DLUA_ADA_PLATFORM_MODULE', '-I', (Join-Path $root 'c_api/include/api'),
+                '-L', $LibraryDirectory, '-lconformance_lua') }
+    }
+    foreach ($case in $cases) {
+        $source = Join-Path $root $case.Source
+        $artifact = Join-Path $Directory $case.Output
+        Invoke-BuildProcess (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+            $source, '-o', $artifact) + $case.Options)
+        $evidence.native_fixture_records += [ordered]@{ source=$case.Source;
+            source_sha256=(Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant();
+            artifact=$artifact;
+            artifact_sha256=(Get-FileHash -LiteralPath $artifact -Algorithm SHA256).Hash.ToLowerInvariant() }
     }
 }
 
@@ -433,6 +460,7 @@ try {
         if ($File -eq 'utf8.lua') { $marker = 'ok' }
         elseif ($File -in @('tpack.lua', 'bitwise.lua')) { $marker = 'OK' }
     }
+    $nativeSetup = ''
     if ($EquivalentManifest -ne '') {
         $mapping = Get-Content -LiteralPath $EquivalentManifest -Raw | ConvertFrom-Json
         if ($mapping.source -cne "references/lua/testes/$File" -or
@@ -450,13 +478,23 @@ try {
         $evidence.equivalent = $equivalent
         $evidence.execution_disposition = $equivalent.disposition
         $arguments = @($generated)
+        if ($File -eq 'files.lua' -and $IsWindows -and $mapping.id -ceq 'files-windows-platform') {
+            Build-WindowsFileFixtures -Directory $fixtureDirectory -LibraryDirectory $libraryDirectory
+            if ($Target -eq 'ReferenceC') {
+                $nativeSetup = "; local p=assert(package.loadlib('conformance_platform.dll','luaopen_conformance_platform'))(); " +
+                    '_test_failing_stream=p.failing_stream; _test_nonblocking_pair=p.nonblocking_pair'
+            }
+        }
     }
     if ($Scope -ne '') {
         $setup = 'assert(_soft==nil and _port==nil); '
         $setup += if ($Configuration -eq 'upstream-test') {
             "assert(type(T)=='table' and type(T.checkmemory)=='function'); T.checkmemory()"
         } else { 'assert(T==nil)' }
-        $arguments = @('-e', $setup) + $arguments
+        if ($File -eq 'files.lua' -and $Configuration -eq 'upstream-test' -and -not $IsWindows) {
+            $setup += "; assert(type(T.nonblock)=='function')"
+        }
+        $arguments = @('-e', ($setup + $nativeSetup)) + $arguments
         if ($File -ne 'files.lua') { $marker = 'OK' }
     }
     if ($acceptanceRequested -or $Scope -ne '') {
@@ -476,6 +514,28 @@ try {
             -Telemetry $telemetry -RunId $runId -Configuration $Configuration -NativeOracle:($Target -eq 'ReferenceC')
         $evidence.allocator_telemetry = [ordered]@{ path=$telemetryPath;
             sha256=(Get-FileHash -LiteralPath $telemetryPath -Algorithm SHA256).Hash.ToLowerInvariant(); data=$telemetry }
+        if ($File -eq 'files.lua') {
+            foreach ($sidecar in Get-ChildItem -LiteralPath $runRoot -Filter 'allocator.*.json') {
+                $childId = [int]($sidecar.BaseName.Split('.')[-1])
+                if ($childId -eq $evidence.process.process_id) { continue }
+                $childTelemetry = Get-Content -LiteralPath $sidecar.FullName -Raw | ConvertFrom-Json -AsHashtable
+                Assert-ManagedTelemetry -Telemetry $childTelemetry -RunId $runId -ProcessId $childId `
+                    -Configuration $Configuration -RequireShutdown:($Target -eq 'Ada')
+                $evidence.child_allocator_telemetry += [ordered]@{ path=$sidecar.FullName;
+                    sha256=(Get-FileHash -LiteralPath $sidecar.FullName -Algorithm SHA256).Hash.ToLowerInvariant();
+                    data=$childTelemetry }
+            }
+            # No setup Lua children share this execution's telemetry prefix.
+            # POSIX has two empty commands, four exits, and (with T) a pipe
+            # receiver. Windows substitutes two Lua cat counterparts instead.
+            # C exits bypass its writer; Ada typed exits always dispose/record.
+            $expectedChildren = if ($IsWindows) { 4 } else { 2 }
+            if (-not $IsWindows -and $Configuration -eq 'upstream-test') { $expectedChildren++ }
+            if ($Target -eq 'Ada') { $expectedChildren += 4 }
+            if ($evidence.child_allocator_telemetry.Count -ne $expectedChildren) {
+                throw 'Scoped file child allocator telemetry is incomplete'
+            }
+        }
     }
     $evidence.foundation_smoke_passed = $Target -eq 'ReferenceC' -and $Mode -eq 'Smoke' -and
         $evidence.status -eq 'passed' -and $evidence.configuration_verified -and

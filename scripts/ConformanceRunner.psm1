@@ -224,6 +224,14 @@ function Test-ConformanceConfiguration {
          $Observed.test_adapter -cne ($Configuration -eq 'upstream-test'))) {
         throw 'Ada configuration probe does not identify the actual runtime/test adapter'
     }
+      if ($Target -eq 'ReferenceC' -and
+          (-not $Observed.Contains('implementation') -or
+           $Observed.implementation -cne 'C Lua' -or
+           -not $Observed.Contains('test_adapter') -or
+           $Observed.test_adapter -isnot [bool] -or
+           $Observed.test_adapter -cne ($Configuration -eq 'upstream-test'))) {
+          throw 'C configuration probe does not identify the pinned oracle/test adapter'
+      }
     return $true
 }
 

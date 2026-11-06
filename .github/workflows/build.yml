@@ -50,8 +50,10 @@ jobs:
             reports/windows-buffered-failure/**
             reports/posix-files/**
             reports/managed-telemetry/**
+            reports/launcher-selftest/**
             reports/core-image/**
             reports/gc-events/**
+            reports/scoped-files/**
             reports/conformance/**/*.json
             reports/conformance/**/*.stdout
             reports/conformance/**/*.stderr
@@ -155,10 +157,12 @@ jobs:
             reports/lifecycle/**
             reports/m3-lifecycle-campaign*
             reports/managed-telemetry/**
+            reports/launcher-selftest/**
             reports/windows-buffered-failure/**
             LICENSE
             reports/posix-files/**
             reports/gc-events/**
+            reports/scoped-files/**
             reports/conformance/**/*.json
             reports/conformance/**/*.stdout
             reports/conformance/**/*.stderr

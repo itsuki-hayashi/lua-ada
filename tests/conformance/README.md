@@ -187,10 +187,14 @@ pwsh -NoProfile -File scripts/check-conformance-scope.ps1 -RequireScopedComplete
 
 The last command requires independent selection review and resolved coverage
 through all applicable contexts. It currently rejects incomplete coverage.
-It never sets full M3 completion. The 30 scoped inventory/process regressions
+It never sets full M3 completion. The 35 scoped inventory/process regressions
 also check out-of-scope corruption, missing files/APIs, self-review, unresolved
 runtime obligations, early returns, GC closure ordering, final files output,
 physical shutdown, leaked blocks and wrong configurations.
+The file completion gate requires IO, flush, large-file, subprocess and date
+witnesses in addition to the final date/version, rejects temporary-file skips,
+and requires the instrumented partial-write witness. Instrumented gengc must
+reach the stop-the-world tests after its default early-return boundary.
 
 run-conformance.ps1 accepts -Scope gc-io-events in File mode. The actual
 conformance launcher supports --conformance-config; both bare lua and the
@@ -201,6 +205,16 @@ shutdown telemetry. -RequireScopedAcceptance requires an independently reviewed
 sets scoped_operation_acceptance separately from gate_acceptance (full M3),
 which stays false. One accepted operation does not certify the other files or
 contexts: final batch acceptance still requires the complete matrix evidence.
+
+scripts/check-files-scoped.ps1 runs files.lua through this same operation/report
+path in both configurations. POSIX selects the original source; Windows selects
+the explicit native-platform candidate and builds only its required native
+fixtures, recording source and artifact hashes. Parent and child allocator
+records are validated separately. Independent native-counterpart runners remain
+in the pipeline. Both runners measure parent, bare-lua and arg-child settings;
+scripts/test-conformance-launcher.ps1 rejects a wrong requested configuration
+and a real C executable reached through ambient lookup from an Ada parent.
+The main runner also rejects Ada identity when a C baseline was requested.
 
 -EquivalentManifest identifies a source-hashed replacement execution and its
 disposition. -AllowUnreviewedEquivalent permits diagnostic observations only;

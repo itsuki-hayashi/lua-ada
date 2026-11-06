@@ -12,6 +12,7 @@ $ErrorActionPreference = 'Stop'
 if ($IsWindows) { throw 'Use the named Windows platform equivalent on Windows' }
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1') -Force
 $root = Split-Path -Parent $PSScriptRoot
 $source = Join-Path $root 'references/lua/testes/files.lua'
 $sourceHash = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash
@@ -43,6 +44,13 @@ foreach ($implementation in @('c', 'ada')) {
         $environment.LD_LIBRARY_PATH = $referenceLibrary + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
         $environment.DYLD_LIBRARY_PATH = $referenceLibrary + [IO.Path]::PathSeparator + $env:DYLD_LIBRARY_PATH
     }
+    if ((Get-FileHash -LiteralPath $original).Hash -cne (Get-FileHash -LiteralPath $executable).Hash) {
+        throw 'Disposable POSIX launcher differs from selected executable'
+    }
+    $target = if ($implementation -eq 'c') { 'ReferenceC' } else { 'Ada' }
+    $launcher = Test-ScopedLauncher -Executable $executable -Directory $working `
+        -OutputPrefix (Join-Path $directory "$implementation-configuration") `
+        -Environment $environment -Configuration $Configuration -Target $target
     $setup = if ($Configuration -eq 'upstream-test') {
         "assert(T and T.checkmemory and T.nonblock); "
     } else { 'assert(T==nil); ' }
@@ -55,6 +63,7 @@ foreach ($implementation in @('c', 'ada')) {
         -OutputPrefix (Join-Path $directory $implementation) -TimeoutSeconds 900 `
         -Environment $environment
     $records += [ordered]@{ implementation=$implementation; process=$process;
+        launcher=$launcher;
         executable_sha256=(Get-FileHash -LiteralPath $executable -Algorithm SHA256).Hash;
         executed_source_sha256=(Get-FileHash -LiteralPath $fixture -Algorithm SHA256).Hash }
     $stdout = [IO.File]::ReadAllText($process.stdout_path)

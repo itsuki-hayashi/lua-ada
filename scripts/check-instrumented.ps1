@@ -137,6 +137,13 @@ try {
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua" `
             -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     }
+    & "$PSScriptRoot/check-files-scoped.ps1" -Interpreter $runner `
+        -Configuration upstream-test -LibraryType $LibraryType -RuntimeDirectory $library `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix"
+    & "$PSScriptRoot/test-conformance-launcher.ps1" -Interpreter $runner `
+        -Configuration upstream-test `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     # Exercise the real public C consumers in this configuration too. Keep
     # Alire invocations serialized with the test and oracle builds above.
     & "$PSScriptRoot/check-core-image.ps1" -Profile validation `
