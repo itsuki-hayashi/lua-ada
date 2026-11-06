@@ -22,6 +22,8 @@ jobs:
         run: git config --global core.autocrlf false
       - uses: actions/checkout@v5
         with:
+          # Scoped matrix evidence must name the published implementation head.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
       - uses: alire-project/setup-alire@v6
       - name: Record tools
@@ -73,6 +75,8 @@ jobs:
         run: git config --global core.autocrlf false
       - uses: actions/checkout@v5
         with:
+          # Keep all 26 contexts on the same reviewable source revision.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
       - uses: alire-project/setup-alire@v6
       - name: Record tools

@@ -555,3 +555,14 @@ Separately rerun scope and runner suites retain 35 and 40 passing cases in
 reports/m3-matrix-scope-tests.log and reports/m3-matrix-runner-tests.log.
 The final matrix self-test rerun passes all 17 cases after verification-flag
 checks were added. Documentation validation passes all 77 Markdown files.
+
+Artifact reconciliation found a CI provenance mismatch: run 42276786486's
+instrumented-Linux-relocatable artifact (13532679957, ZIP SHA-256
+1c2757e5a8568995a36a2a99669b5f6351ab51243ca22f272015dd707509ae78)
+records GitHub's synthetic PR merge commit
+087847446bd50dc751be26a1c21df0a5c728cd66 rather than published head 70a22a0.
+Those observations remain valid for their recorded revision but cannot satisfy
+the final-head matrix. Both CI jobs now explicitly check out the PR head SHA
+(or the triggering SHA for push/manual runs). This preserves exact revision
+reconciliation without rewriting report identities. Fresh final-head CI is
+required; previous green jobs are not promoted to final-head acceptance.
