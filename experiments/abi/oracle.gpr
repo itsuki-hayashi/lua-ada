@@ -22,7 +22,7 @@ project Oracle is
       case Lua_Ada_Config.Alire_Host_OS is
          when "linux" =>
             for Default_Switches ("C") use ("-lm", "-ldl");
-         when "macos" =>
+         when "macos" | "windows" =>
             for Default_Switches ("C") use ("-lm");
          when others => null;
       end case;

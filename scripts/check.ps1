@@ -27,6 +27,9 @@ try {
     Set-Location $projectRoot
     & (Join-Path $PSScriptRoot 'check-documentation.ps1')
     Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario)
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-core-image.ps1'),
+        '-LibraryType', $LibraryType, '-Profile', $Profile)
     foreach ($crateName in @('cli', 'tests')) {
         Set-Location (Join-Path $projectRoot $crateName)
         Invoke-Alire -Arguments @('-n', 'build', $profileArgument,
@@ -56,6 +59,17 @@ try {
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-lifecycle.ps1'),
         '-Interpreter', $absoluteCli)
+    Set-Location $projectRoot
+    Invoke-Alire -Arguments @('exec', '--', 'gprbuild', '-P',
+        'experiments/conformance/oracle.gpr',
+        '-XLUA_CONFORMANCE_CONFIGURATION=default')
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-binary-cli.ps1'),
+        '-Interpreter', $absoluteCli,
+        '-ReferenceInterpreter',
+        (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-RuntimeDirectory', $runtimePath)
+    Set-Location (Join-Path $projectRoot 'cli')
     $versionOutput = & alr exec -- $cliExecutable --version
     if ($LASTEXITCODE -ne 0 -or
         ($versionOutput -join "`n") -ne 'Lua Ada 0.1.0-dev (target 5.5.1)') {

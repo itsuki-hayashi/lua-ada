@@ -1,3 +1,4 @@
+with Lua.Engine.Call_Names;
 with Lua.Engine.Canonical;
 with Lua.Prototypes;
 with Lua.Engine.Strings;
@@ -5,6 +6,7 @@ with Ada.Strings.Fixed;
 
 package body Lua.Engine.Inspection is
    use type Integer_Value;
+   use type Ada.Containers.Count_Type;
    use type Lua.Prototypes.Prototype_Access;
 
    function Short_Source (Source : String) return String;
@@ -44,7 +46,7 @@ package body Lua.Engine.Inspection is
       Args : constant Values.Vector := Activation.Native_Arguments;
       Context : Context_Access := State.Current;
       Base : Positive := 1;
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       Selected : Frame_Access;
       Function_Value : Value;
       Code : Prototype_Access;
@@ -53,6 +55,7 @@ package body Lua.Engine.Inspection is
         (if Index <= Natural (Args.Length) then Args (Index) else Nil_Value);
       function Integer_Arg (Index : Positive) return Integer_Value;
       function Logical_Frame (Level : Natural) return Frame_Access;
+      function Caller_Of (Callee : Frame_Access) return Frame_Access;
       function Symbol_Text
         (Prototype : Prototype_Access; Symbol : Positive) return String;
       procedure Append (Item : Value);
@@ -124,6 +127,26 @@ package body Lua.Engine.Inspection is
          return null;
       end Logical_Frame;
 
+      function Caller_Of (Callee : Frame_Access) return Frame_Access is
+         Found : Boolean := False;
+      begin
+         --  Name inference is deliberately lazy: ordinary function calls never
+         --  scan preceding code. Skip explicit scheduler phases when finding
+         --  the logical caller, and preserve real native library boundaries.
+         for Item of reverse Context.Stack loop
+            if Item = Callee then
+               Found := True;
+            elsif Found and then
+              (not Item.Is_Native or else
+               (Length (Item.Native_Name) > 0 and then
+                Element (Item.Native_Name, 1) /= '@'))
+            then
+               return Item;
+            end if;
+         end loop;
+         return null;
+      end Caller_Of;
+
       function Symbol_Text
         (Prototype : Prototype_Access; Symbol : Positive) return String
       is
@@ -161,7 +184,7 @@ package body Lua.Engine.Inspection is
             Context.Hook_Reported_Count := 0;
          else
             if Arg (Base).Kind not in Closure_Kind | Native_Closure_Kind |
-              Native_Kind_Value
+              Native_Kind_Value | Foreign_Function_Kind
             then
                Fail (State, "function expected");
             end if;
@@ -207,26 +230,77 @@ package body Lua.Engine.Inspection is
          end if;
          Append (New_String (State, To_String (Context.Hook_Mask)));
          Append ((Integer_Kind, Context.Hook_Reported_Count));
+      elsif Name = "debug.getregistry" then
+         Append ((Table_Kind, State.Foreign_Registry));
+      elsif Name = "debug.getmetatable" then
+         if Args.Is_Empty then
+            Fail (State, "value expected");
+         end if;
+         declare
+            Meta : constant Object_Access := Raw_Metatable (State, Arg (1));
+         begin
+            Append ((if Meta = null then Nil_Value else
+                       (Table_Kind, Meta)));
+         end;
+      elsif Name = "debug.setmetatable" then
+         if Args.Length < 2 or else
+           Arg (2).Kind not in Nil_Kind | Table_Kind
+         then
+            Fail (State, "nil or table expected");
+         end if;
+         Set_Metatable
+           (State, Arg (1), (if Arg (2).Kind = Nil_Kind then null else
+                              Arg (2).Reference));
+         Append (Arg (1));
+      elsif Name = "debug.upvaluejoin" then
+         declare
+            Target : constant Value := Arg (1);
+            Source : constant Value := Arg (3);
+            Target_Index : constant Integer_Value := Integer_Arg (2);
+            Source_Index : constant Integer_Value := Integer_Arg (4);
+         begin
+            --  This operation redirects one closure's actual cell reference;
+            --  copying the cell value would break future shared mutations,
+            --  upvalueid identity and collection after the source disappears.
+            if Target.Kind /= Closure_Kind or else
+              Source.Kind /= Closure_Kind
+            then
+               Fail (State, "Lua function expected");
+            elsif Target_Index < 1 or else Target_Index > Integer_Value
+              (Target.Reference.Upvalues.Length) or else
+              Source_Index < 1 or else Source_Index > Integer_Value
+                (Source.Reference.Upvalues.Length)
+            then
+               Fail (State, "invalid upvalue index");
+            end if;
+            Target.Reference.Upvalues.Replace_Element
+              (Positive (Target_Index),
+               Source.Reference.Upvalues (Positive (Source_Index)));
+         end;
       elsif Name in "debug.getupvalue" | "debug.setupvalue" | "debug.upvalueid"
       then
+         if Name = "debug.setupvalue" and then Args.Length < 3 then
+            Fail (State, "value expected");
+         end if;
          Function_Value := Arg (1);
          declare
             Index : constant Integer_Value := Integer_Arg (2);
             Cell : Object_Access;
          begin
             if Function_Value.Kind not in Closure_Kind | Native_Closure_Kind |
-              Native_Kind_Value
+              Native_Kind_Value | Foreign_Function_Kind
             then
                Fail (State, "function expected");
             end if;
-            if Function_Value.Kind = Native_Kind_Value or else
+            if Function_Value.Kind in Native_Kind_Value | Foreign_Function_Kind
+              or else
               Index < 1 or else Index > Integer_Value
                 ((if Function_Value.Kind = Closure_Kind then
                     Function_Value.Reference.Upvalues.Length else
                     Function_Value.Reference.Captures.Length))
             then
                if Name = "debug.upvalueid" then
-                  Fail (State, "invalid upvalue index");
+                  Append (Nil_Value);
                end if;
                return Result;
             end if;
@@ -279,7 +353,7 @@ package body Lua.Engine.Inspection is
                Function_Value := (Native_Closure_Kind, Selected.Native_Self);
             end if;
          elsif Function_Value.Kind not in Closure_Kind | Native_Closure_Kind |
-           Native_Kind_Value
+           Native_Kind_Value | Foreign_Function_Kind
          then
             Fail (State, "function or level expected");
          end if;
@@ -325,7 +399,9 @@ package body Lua.Engine.Inspection is
                     Integer_Value (Code.Last_Line))));
                Field (Info, "what", New_String
                  (State, (if Code = null then "C"
-                  elsif Code.Is_Main then "main" else "Lua")));
+                  elsif (if Code.Canonical_Node /= null then
+                           Code.Canonical_Node.First_Line = 0
+                         else Code.Is_Main) then "main" else "Lua")));
             end if;
             if Wants ('u') then
                Field (Info, "nups", (Integer_Kind,
@@ -342,14 +418,38 @@ package body Lua.Engine.Inspection is
                  Code = null or else Code.Vararg));
             end if;
             if Wants ('n') then
-               Field (Info, "namewhat", New_String
-                 (State, (if Selected = null then "" else
-                    To_String (Selected.Name_Kind))));
-               if Selected /= null and then Length (Selected.Call_Name) > 0
-               then
-                  Field (Info, "name", New_String
-                    (State, To_String (Selected.Call_Name)));
-               end if;
+               declare
+                  Caller : Frame_Access;
+                  Inferred : Call_Names.Identity;
+                  use type Call_Names.Name_Kind;
+               begin
+                  if Selected /= null and then
+                    Length (Selected.Name_Kind) = 0 and then
+                    not Selected.Is_Tail_Call
+                  then
+                     Caller := Caller_Of (Selected);
+                     if Caller /= null and then not Caller.Is_Native and then
+                       Caller.Code.Canonical_Node /= null
+                     then
+                        Inferred := Call_Names.From_Caller (State, Caller);
+                     end if;
+                  end if;
+                  if Inferred.Kind /= Call_Names.Unknown then
+                     Field (Info, "namewhat", New_String
+                       (State, Call_Names.Kind_Image (Inferred.Kind)));
+                     Field (Info, "name", Inferred.Item);
+                  else
+                     Field (Info, "namewhat", New_String
+                       (State, (if Selected = null then "" else
+                          To_String (Selected.Name_Kind))));
+                     if Selected /= null and then
+                       Length (Selected.Call_Name) > 0
+                     then
+                        Field (Info, "name", New_String
+                          (State, To_String (Selected.Call_Name)));
+                     end if;
+                  end if;
+               end;
             end if;
             if Wants ('t') then
                Field (Info, "istailcall",
@@ -401,7 +501,8 @@ package body Lua.Engine.Inspection is
          end;
       elsif Name in "debug.getlocal" | "debug.setlocal" then
          if Name = "debug.getlocal" and then Arg (Base).Kind in
-           Closure_Kind | Native_Closure_Kind | Native_Kind_Value
+           Closure_Kind | Native_Closure_Kind | Native_Kind_Value |
+           Foreign_Function_Kind
          then
             declare
                Index : constant Integer_Value := Integer_Arg (Base + 1);
@@ -442,6 +543,7 @@ package body Lua.Engine.Inspection is
             Cells : Bindings.Vector;
             Scope : Object_Access;
          begin
+            Cells.Set_Owner (Lua.Storage.Reference (State.Memory));
             if Level < 0 or else Level > Integer_Value (Natural'Last) then
                Fail (State, "level out of range");
             end if;
@@ -570,7 +672,9 @@ package body Lua.Engine.Inspection is
                       (Natural'Image
                         (Line_At (Item, Current_PC (Item) + 1)),
                        Ada.Strings.Both) & ": in " &
-                    (if Item.Code.Is_Main then "main chunk"
+                    (if (if Item.Code.Canonical_Node /= null then
+                           Item.Code.Canonical_Node.First_Line = 0
+                         else Item.Code.Is_Main) then "main chunk"
                      else "function"));
                end if;
                Level := Level + 1;

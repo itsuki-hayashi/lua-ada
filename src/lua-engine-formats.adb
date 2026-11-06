@@ -655,7 +655,7 @@ package body Lua.Engine.Formats is
    function Run
      (State : in out World; Arguments : Values.Vector) return Values.Vector
    is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       Output : Managed.Buffer;
       Cursor : Positive := 1;
       First : Positive;

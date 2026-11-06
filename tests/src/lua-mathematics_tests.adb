@@ -3,6 +3,10 @@ with AUnit.Assertions; use AUnit.Assertions;
 with Interfaces;
 with Lua.Engine; use Lua.Engine;
 with Lua.Engine.Mathematics;
+with Lua.Engine.Machine;
+with Lua.Lexers;
+with Lua.Platform_Numerics;
+with Interfaces.C;
 with Test_Support;
 
 package body Lua.Mathematics_Tests is
@@ -15,16 +19,18 @@ package body Lua.Mathematics_Tests is
    function Integer_Bits is new Ada.Unchecked_Conversion (Integer_Value, Word);
    package Math renames Lua.Engine.Mathematics;
 
-   function Args (First : Value) return Values.Vector;
-   function Args (First : Value) return Values.Vector is
-      Result : Values.Vector;
+   function Args (State : in out World; First : Value) return Values.Vector;
+   function Args (State : in out World; First : Value) return Values.Vector is
+      Result : Values.Vector := Owned_Values (State);
    begin
       Result.Append (First);
       return Result;
    end Args;
-   function Args (First, Second : Value) return Values.Vector;
-   function Args (First, Second : Value) return Values.Vector is
-      Result : Values.Vector := Args (First);
+   function Args (State : in out World; First, Second : Value) return
+     Values.Vector;
+   function Args (State : in out World; First, Second : Value) return
+     Values.Vector is
+      Result : Values.Vector := Args (State, First);
    begin
       Result.Append (Second);
       return Result;
@@ -40,7 +46,8 @@ package body Lua.Mathematics_Tests is
       Second : Integer_Value := 0)
    is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.randomseed", Args (Int (First), Int (Second)));
+        Math.Run (State, "math.randomseed", Args (State, Int (First), Int
+          (Second)));
    begin
       Assert (Natural (Result.Length) = 2 and then
               Result (1).Integer_Data = First and then
@@ -54,7 +61,7 @@ package body Lua.Mathematics_Tests is
      (State : in out World; Name : String; Arguments : Values.Vector)
       return Boolean
    is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       pragma Unreferenced (Result);
    begin
       --  Execute inside the handled sequence. A declaration initializer can
@@ -123,7 +130,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Sine_Signed_Zero (State : in out World) is
       Result : constant Values.Vector := Math.Run
-        (State, "math.sin", Args (Real (Real_From (2 ** 63))));
+        (State, "math.sin", Args (State, Real (Real_From (2 ** 63))));
    begin
       --  A numeric zero comparison hides its sign. Check the binary64 result
       --  of the host primitive, protecting Lua's signed-zero contract.
@@ -132,7 +139,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Cosine_Origin (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.cos", Args (Int (0)));
+        Math.Run (State, "math.cos", Args (State, Int (0)));
    begin
       --  Integer inputs must still produce a floating result, even when the
       --  mathematical answer is an exactly representable integer.
@@ -142,7 +149,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Tangent_Signed_Zero (State : in out World) is
       Result : constant Values.Vector := Math.Run
-        (State, "math.tan", Args (Real (Real_From (2 ** 63))));
+        (State, "math.tan", Args (State, Real (Real_From (2 ** 63))));
    begin
       --  Tangent has its own imported primitive; verify it does not lose the
       --  sign through an integer conversion or a sine/cosine quotient.
@@ -151,7 +158,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Arc_Sine_Domain (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.asin", Args (Int (2)));
+        Math.Run (State, "math.asin", Args (State, Int (2)));
       X : constant Real_Value := Result (1).Real_Data;
    begin
       --  Lua exposes a NaN outside asin's real domain. An Ada elementary
@@ -161,7 +168,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Arc_Cosine_Domain (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.acos", Args (Int (-2)));
+        Math.Run (State, "math.acos", Args (State, Int (-2)));
       X : constant Real_Value := Result (1).Real_Data;
    begin
       --  Check acos separately: its domain and endpoint implementation are
@@ -171,11 +178,12 @@ package body Lua.Mathematics_Tests is
 
    procedure Atan_Quadrants (State : in out World) is
       One : constant Values.Vector :=
-        Math.Run (State, "math.atan", Args (Int (1)));
+        Math.Run (State, "math.atan", Args (State, Int (1)));
       Explicit_One : constant Values.Vector :=
-        Math.Run (State, "math.atan", Args (Int (1), Int (1)));
+        Math.Run (State, "math.atan", Args (State, Int (1), Int (1)));
       Negative_Zero : constant Values.Vector := Math.Run
-        (State, "math.atan", Args (Real (Real_From (2 ** 63)), Int (-1)));
+        (State, "math.atan", Args (State, Real (Real_From (2 ** 63)), Int
+          (-1)));
    begin
       --  Lua's atan is atan2 with an optional x=1. The negative-zero case
       --  protects quadrant selection, which atan(y/x) would get wrong.
@@ -186,9 +194,9 @@ package body Lua.Mathematics_Tests is
 
    procedure Exponential_Limits (State : in out World) is
       Large : constant Values.Vector :=
-        Math.Run (State, "math.exp", Args (Int (1000)));
+        Math.Run (State, "math.exp", Args (State, Int (1000)));
       Small : constant Values.Vector :=
-        Math.Run (State, "math.exp", Args (Int (-1000)));
+        Math.Run (State, "math.exp", Args (State, Int (-1000)));
    begin
       --  Host overflow/underflow are ordinary IEEE results in Lua. Preserve
       --  infinity and zero rather than turning either into a runtime error.
@@ -199,7 +207,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Square_Root_Domain (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.sqrt", Args (Int (-1)));
+        Math.Run (State, "math.sqrt", Args (State, Int (-1)));
       X : constant Real_Value := Result (1).Real_Data;
    begin
       --  A negative argument is a NaN result, not an Ada exception or a
@@ -209,7 +217,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Square_Root_Zero (State : in out World) is
       Result : constant Values.Vector := Math.Run
-        (State, "math.sqrt", Args (Real (Real_From (2 ** 63))));
+        (State, "math.sqrt", Args (State, Real (Real_From (2 ** 63))));
    begin
       --  IEEE sqrt preserves the sign of negative zero, independently from
       --  the negative-domain NaN case above.
@@ -218,9 +226,9 @@ package body Lua.Mathematics_Tests is
 
    procedure Logarithm_Bases (State : in out World) is
       Binary : constant Values.Vector :=
-        Math.Run (State, "math.log", Args (Int (8), Int (2)));
+        Math.Run (State, "math.log", Args (State, Int (8), Int (2)));
       Decimal : constant Values.Vector :=
-        Math.Run (State, "math.log", Args (Int (100), Int (10)));
+        Math.Run (State, "math.log", Args (State, Int (100), Int (10)));
    begin
       --  Lua selects host log2/log10 for these bases. A quotient of rounded
       --  natural logarithms can differ even at these exact powers.
@@ -230,9 +238,9 @@ package body Lua.Mathematics_Tests is
 
    procedure Logarithm_Unit_Base (State : in out World) is
       Infinite : constant Values.Vector :=
-        Math.Run (State, "math.log", Args (Int (2), Int (1)));
+        Math.Run (State, "math.log", Args (State, Int (2), Int (1)));
       Invalid : constant Values.Vector :=
-        Math.Run (State, "math.log", Args (Int (1), Int (1)));
+        Math.Run (State, "math.log", Args (State, Int (1), Int (1)));
       X : constant Real_Value := Invalid (1).Real_Data;
    begin
       --  Division by log(1)=0 must use IEEE semantics, not Ada's checked
@@ -244,9 +252,10 @@ package body Lua.Mathematics_Tests is
 
    procedure Angular_Conversions (State : in out World) is
       Radians : constant Values.Vector :=
-        Math.Run (State, "math.rad", Args (Int (180)));
+        Math.Run (State, "math.rad", Args (State, Int (180)));
       Degrees : constant Values.Vector :=
-        Math.Run (State, "math.deg", Args (Real (Radians (1).Real_Data)));
+        Math.Run (State, "math.deg", Args (State, Real (Radians
+          (1).Real_Data)));
    begin
       --  Keep the pinned multiplication order and binary64 pi constant.
       --  Reassociating the conversion can change endpoint rounding.
@@ -257,7 +266,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Frexp_Subnormal (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.frexp", Args (Real (Real_From (1))));
+        Math.Run (State, "math.frexp", Args (State, Real (Real_From (1))));
    begin
       --  The smallest binary64 subnormal is 0.5 * 2**(-1073). Check both
       --  return positions and their Lua number kinds.
@@ -268,7 +277,8 @@ package body Lua.Mathematics_Tests is
 
    procedure Frexp_Signed_Zero (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.frexp", Args (Real (Real_From (2 ** 63))));
+        Math.Run (State, "math.frexp", Args (State, Real (Real_From (2 **
+          63))));
    begin
       --  Decomposition preserves a zero's sign and writes the exponent through
       --  a real borrowed C int, not a fabricated second Lua result.
@@ -278,7 +288,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Ldexp_C_Int_Cast (State : in out World) is
       Result : constant Values.Vector := Math.Run
-        (State, "math.ldexp", Args (Real (0.75), Int (2 ** 32 + 1)));
+        (State, "math.ldexp", Args (State, Real (0.75), Int (2 ** 32 + 1)));
    begin
       --  Pinned Lua casts the integer exponent to the host C int. On the
       --  supported ABIs its low 32 bits select exponent one; no Ada range
@@ -288,7 +298,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Numeric_Strings (State : in out World) is
       Result : constant Values.Vector := Math.Run
-        (State, "math.cos", Args (New_String (State, " 0x0p0 ")));
+        (State, "math.cos", Args (State, New_String (State, " 0x0p0 ")));
    begin
       --  Auxiliary math argument checks accept numeric byte strings. Keep
       --  this conversion separate from primitive bitwise coercion policy.
@@ -309,7 +319,7 @@ package body Lua.Mathematics_Tests is
    begin
       --  A boolean cannot become a numeric zero. Reject it through the same
       --  controlled Lua path used by the public native dispatcher.
-      Assert (Fails (State, "math.exp", Args ((Boolean_Kind, True))),
+      Assert (Fails (State, "math.exp", Args (State, (Boolean_Kind, True))),
               "boolean mathematical argument");
    end Invalid_Argument;
 
@@ -327,7 +337,7 @@ package body Lua.Mathematics_Tests is
       for Expected_Word of Expected loop
          declare
             Result : constant Values.Vector :=
-              Math.Run (State, "math.random", Args (Int (0)));
+              Math.Run (State, "math.random", Args (State, Int (0)));
          begin
             Assert (Integer_Bits (Result (1).Integer_Data) = Expected_Word,
                     "pinned full-width random word");
@@ -366,7 +376,8 @@ package body Lua.Mathematics_Tests is
       for Item of Expected loop
          declare
             Result : constant Values.Vector :=
-              Math.Run (State, "math.random", Args (Int (-17), Int (25)));
+              Math.Run (State, "math.random", Args (State, Int (-17), Int
+                (25)));
          begin
             Assert (Result (1).Integer_Data = Item, "rejection sequence");
          end;
@@ -374,60 +385,61 @@ package body Lua.Mathematics_Tests is
    end Rejection_Sequence;
 
    procedure Full_Integer_Interval (State : in out World) is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
    begin
       --  The signed interval spans 2**64 possibilities. Its width and offset
       --  use modular arithmetic instead of overflowing signed subtraction.
       Seed (State);
       Result := Math.Run (State, "math.random",
-        Args (Int (Integer_Value'First), Int (Integer_Value'Last)));
+        Args (State, Int (Integer_Value'First), Int (Integer_Value'Last)));
       Assert (Integer_Bits (Result (1).Integer_Data) =
               16#BF35_9D4E_37B4_33C1#, "full signed interval");
    end Full_Integer_Interval;
 
    procedure Power_Of_Two_Projection (State : in out World) is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
    begin
       --  A 256-value interval needs no retries. Its low eight bits must match
       --  the full-width generator and leave the second word ready next.
       Seed (State);
-      Result := Math.Run (State, "math.random", Args (Int (0), Int (255)));
+      Result := Math.Run (State, "math.random", Args (State, Int (0), Int
+        (255)));
       Assert (Result (1).Integer_Data = 16#C1#, "power-of-two projection");
-      Result := Math.Run (State, "math.random", Args (Int (0)));
+      Result := Math.Run (State, "math.random", Args (State, Int (0)));
       Assert (Integer_Bits (Result (1).Integer_Data) =
               16#3C1D_C586_F35D_E208#, "projection consumes one word");
    end Power_Of_Two_Projection;
 
    procedure Invalid_Call_Advances (State : in out World) is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
    begin
       --  Pinned Lua draws before type validation. Catching a bad argument
       --  must not roll back the RNG stream to the first word.
       Seed (State);
-      Assert (Fails (State, "math.random", Args (Nil_Value)),
+      Assert (Fails (State, "math.random", Args (State, Nil_Value)),
               "nil random limit rejected");
-      Result := Math.Run (State, "math.random", Args (Int (0)));
+      Result := Math.Run (State, "math.random", Args (State, Int (0)));
       Assert (Integer_Bits (Result (1).Integer_Data) =
               16#3C1D_C586_F35D_E208#, "invalid call consumes one word");
    end Invalid_Call_Advances;
 
    procedure Invalid_Count_Advances (State : in out World) is
-      Arguments : Values.Vector := Args (Int (1), Int (2));
-      Result : Values.Vector;
+      Arguments : Values.Vector := Args (State, Int (1), Int (2));
+      Result : Values.Vector := Owned_Values (State);
    begin
       --  Wrong arity has the same advance-before-validation behavior as bad
       --  types. Extra arguments to random are errors, not silently ignored.
       Seed (State);
       Arguments.Append (Int (3));
       Assert (Fails (State, "math.random", Arguments), "random arity");
-      Result := Math.Run (State, "math.random", Args (Int (0)));
+      Result := Math.Run (State, "math.random", Args (State, Int (0)));
       Assert (Integer_Bits (Result (1).Integer_Data) =
               16#3C1D_C586_F35D_E208#, "invalid arity consumes one word");
    end Invalid_Count_Advances;
 
    procedure Seed_Optional_Argument (State : in out World) is
       Result : constant Values.Vector := Math.Run
-        (State, "math.randomseed", Args (Int (-17), Nil_Value));
+        (State, "math.randomseed", Args (State, Int (-17), Nil_Value));
    begin
       --  A missing or nil second seed means integer zero. Signed seed bits
       --  and the two-result packet must survive without float conversion.
@@ -440,28 +452,33 @@ package body Lua.Mathematics_Tests is
    begin
       --  An omitted first seed requests automatic entropy; an explicit nil
       --  is a type error. They cannot be collapsed by an Arg helper.
-      Assert (Fails (State, "math.randomseed", Args (Nil_Value)),
+      Assert (Fails (State, "math.randomseed", Args (State, Nil_Value)),
               "explicit nil first seed");
    end Seed_Nil_Rejected;
 
    procedure Independent_Generators (State : in out World) is
       Other : World;
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
    begin
       --  Seed and advance another universe between this universe's draws.
       --  Global libc RNG state would make the pinned second word disappear.
       Initialize (Other, (others => <>));
       begin
          Seed (State);
-         Result := Math.Run (State, "math.random", Args (Int (0)));
+         Result := Math.Run (State, "math.random", Args (State, Int (0)));
          Seed (Other, 99, 101);
-         Result := Math.Run (Other, "math.random", Args (Int (0)));
-         Result := Math.Run (State, "math.random", Args (Int (0)));
+         Result := Math.Run (Other, "math.random", Args (Other, Int (0)));
+         Result := Math.Run (State, "math.random", Args (State, Int (0)));
          Assert (Integer_Bits (Result (1).Integer_Data) =
                  16#3C1D_C586_F35D_E208#, "independent RNG ownership");
       exception
-         when others => Finalize (Other); raise;
+         when others =>
+            Result := Values.Empty_Vector;
+            Finalize (Other);
+            raise;
       end;
+      --  Release the cross-world result before closing its borrowed owner.
+      Result := Values.Empty_Vector;
       Finalize (Other);
    end Independent_Generators;
 
@@ -478,19 +495,24 @@ package body Lua.Mathematics_Tests is
          Seed (State, -1, Integer_Value'Last);
          Seed (Other, -1, Integer_Value'Last);
          for Index in 1 .. 1_024 loop
-            Left := Math.Run (State, "math.random", Args (Int (0)));
-            Right := Math.Run (Other, "math.random", Args (Int (0)));
+            Left := Math.Run (State, "math.random", Args (State, Int (0)));
+            Right := Math.Run (Other, "math.random", Args (Other, Int (0)));
             Assert (Left (1).Integer_Data = Right (1).Integer_Data,
                     "32/64-bit generator equivalence");
          end loop;
       exception
-         when others => Finalize (Other); raise;
+         when others =>
+            Right := Values.Empty_Vector;
+            Finalize (Other);
+            raise;
       end;
+      --  Release the cross-world result before closing its borrowed owner.
+      Right := Values.Empty_Vector;
       Finalize (Other);
    end Split_Generator;
 
    procedure Reset_Precedes_Budget (State : in out World) is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
    begin
       --  Standard-library initialization precedes execution. A one-instruction
       --  session must still seed successfully and retain that instruction.
@@ -510,7 +532,7 @@ package body Lua.Mathematics_Tests is
       Seed (State);
       State.Bounds.Instructions := 1;
       State.Steps := 0;
-      Assert (Fails (State, "math.random", Args (Int (0), Int (128))),
+      Assert (Fails (State, "math.random", Args (State, Int (0), Int (128))),
               "rejection retry charged");
       Assert (State.Current.Failure_Class = Host_Abort,
               "native retry preserves host abort classification");
@@ -520,11 +542,11 @@ package body Lua.Mathematics_Tests is
       Seeds : constant Values.Vector :=
         Math.Run (State, "math.randomseed", Values.Empty_Vector);
       First : constant Values.Vector :=
-        Math.Run (State, "math.random", Args (Int (0)));
+        Math.Run (State, "math.random", Args (State, Int (0)));
       Reseed : constant Values.Vector :=
         Math.Run (State, "math.randomseed", Seeds);
       Again : constant Values.Vector :=
-        Math.Run (State, "math.random", Args (Int (0)));
+        Math.Run (State, "math.random", Args (State, Int (0)));
    begin
       --  Automatic seeding is unspecified entropy, but its two returned seeds
       --  are a reproducible description of the resulting generator state.
@@ -535,7 +557,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Compatibility_Cosh (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.cosh", Args (Int (0)));
+        Math.Run (State, "math.cosh", Args (State, Int (0)));
    begin
       --  Compatibility registration is a profile decision. The actual
       --  hyperbolic cosine primitive still has a distinct floating result.
@@ -544,7 +566,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Compatibility_Sinh (State : in out World) is
       Result : constant Values.Vector := Math.Run
-        (State, "math.sinh", Args (Real (Real_From (2 ** 63))));
+        (State, "math.sinh", Args (State, Real (Real_From (2 ** 63))));
    begin
       --  Hyperbolic sine preserves negative zero. Check its bits directly;
       --  comparing it with integer zero would hide a wrong host adapter.
@@ -553,7 +575,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Compatibility_Tanh (State : in out World) is
       Result : constant Values.Vector := Math.Run
-        (State, "math.tanh", Args (Real (Real_From (2 ** 63))));
+        (State, "math.tanh", Args (State, Real (Real_From (2 ** 63))));
    begin
       --  Hyperbolic tangent uses its own libm operation and must also retain
       --  the sign of negative zero independently from sinh.
@@ -562,7 +584,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Compatibility_Power (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.pow", Args (Int (-2), Int (3)));
+        Math.Run (State, "math.pow", Args (State, Int (-2), Int (3)));
    begin
       --  A negative base with an integral exponent is valid in Lua's host
       --  power operation, despite Ada elementary logarithm-domain rules.
@@ -571,7 +593,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Compatibility_Log10 (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.log10", Args (Int (100)));
+        Math.Run (State, "math.log10", Args (State, Int (100)));
    begin
       --  This compatibility export calls the host decimal logarithm directly.
       --  Preserve its exact result at an integral power of ten.
@@ -580,7 +602,7 @@ package body Lua.Mathematics_Tests is
 
    procedure Compatibility_Atan2 (State : in out World) is
       Result : constant Values.Vector :=
-        Math.Run (State, "math.atan2", Args (Int (0), Int (-1)));
+        Math.Run (State, "math.atan2", Args (State, Int (0), Int (-1)));
    begin
       --  The compatibility name shares atan's two-argument quadrant behavior.
       --  A positive zero ordinate over negative x must select positive pi.
@@ -652,8 +674,81 @@ package body Lua.Mathematics_Tests is
    procedure Log10_Case is new Fixture (Compatibility_Log10);
    procedure Atan2_Case is new Fixture (Compatibility_Atan2);
 
+   procedure Native_Zero_Quotient;
+   procedure Native_Zero_Quotient is
+      State : World;
+      Actual : Value;
+      Expected : Real_Value;
+      type Inputs is array (Positive range <>) of Real_Value;
+      Zeros : constant Inputs := [0.0, Real_From (2 ** 63)];
+   begin
+      --  Zero/zero is a value, not an Ada exception. Check all sign pairs
+      --  against this host's arithmetic: AArch64 and x86 choose different
+      --  quiet-NaN signs, which string.pack makes visible to Lua scripts.
+      for Left of Zeros loop
+         for Right of Zeros loop
+            Actual := Lua.Engine.Machine.Binary_Value
+              (State, Lua.Lexers.Slash, Real (Left), Real (Right));
+            Expected := Real_Value (Lua.Platform_Numerics.Divide
+              (Interfaces.C.double (Left), Interfaces.C.double (Right)));
+            Assert (Actual.Kind = Real_Kind and then
+                      Bits (Actual.Real_Data) = Bits (Expected),
+                    "zero quotient preserves native NaN bits");
+         end loop;
+      end loop;
+   end Native_Zero_Quotient;
+
+   procedure Native_NaN_Propagation;
+   procedure Native_NaN_Propagation is
+      State : World;
+      Actual : Value;
+      Expected : Real_Value;
+      Payload : constant Real_Value := Real_From (16#FFF8_0000_0000_1234#);
+   begin
+      --  A pre-existing NaN is not equivalent to synthesizing a new domain
+      --  NaN. Dividing it by zero must preserve the host's payload behavior.
+      Actual := Lua.Engine.Machine.Binary_Value
+        (State, Lua.Lexers.Slash, Real (Payload), Real (0.0));
+      Expected := Real_Value (Lua.Platform_Numerics.Divide
+        (Interfaces.C.double (Payload), 0.0));
+      Assert (Bits (Actual.Real_Data) = Bits (Expected),
+              "division retains host NaN propagation");
+   end Native_NaN_Propagation;
+
+   procedure Native_Modulo_Domain;
+   procedure Native_Modulo_Domain is
+      State : World;
+      Actual : Value;
+      Expected : Real_Value;
+   begin
+      --  Both zero divisors and infinite dividends are fmod domain errors.
+      --  The earlier fixed negative NaN hid native ARM behavior. Protect
+      --  those bits independently of the quotient regression above.
+      Actual := Lua.Engine.Machine.Binary_Value
+        (State, Lua.Lexers.Percent, Real (1.0), Real (0.0));
+      Expected := Real_Value (Lua.Platform_Numerics.Remainder (1.0, 0.0));
+      Assert (Bits (Actual.Real_Data) = Bits (Expected),
+              "modulo zero divisor retains host NaN bits");
+      Actual := Lua.Engine.Machine.Binary_Value
+        (State, Lua.Lexers.Percent,
+         Real (Real_From (16#7FF0_0000_0000_0000#)), Real (1.0));
+      Expected := Real_Value (Lua.Platform_Numerics.Remainder
+        (Interfaces.C.double (Real_From (16#7FF0_0000_0000_0000#)), 1.0));
+      Assert (Bits (Actual.Real_Data) = Bits (Expected),
+              "infinite dividend retains host NaN bits");
+   end Native_Modulo_Domain;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
+      Test_Support.Add
+        (Suite, "arithmetic: native zero quotient",
+         Native_Zero_Quotient'Access);
+      Test_Support.Add
+        (Suite, "arithmetic: native NaN payload",
+         Native_NaN_Propagation'Access);
+      Test_Support.Add
+        (Suite, "arithmetic: native modulo domain",
+         Native_Modulo_Domain'Access);
       Test_Support.Add (Suite, "math: script zero-argument random",
                         Script_Random_Case'Access);
       Test_Support.Add (Suite, "math: script automatic randomseed",

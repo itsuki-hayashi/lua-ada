@@ -1,3 +1,5 @@
+with Lua.Prototypes;
+with Lua.Chunks;
 with Lua.Storage.Buffers;
 with Ada.Characters.Handling;
 with Ada.Containers;
@@ -11,6 +13,7 @@ package body Lua.Engine.Strings is
    use type Integer_Value;
    use type Real_Value;
    use type Lua.Numbers.Number_Kind;
+   use type Lua.Prototypes.Prototype_Access;
    use type Ada.Containers.Count_Type;
    use type Interfaces.Unsigned_64;
 
@@ -89,7 +92,7 @@ package body Lua.Engine.Strings is
      (State : in out World; Name : String; Arguments : Values.Vector)
       return Values.Vector
    is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Arguments.Length) then Arguments (Index)
          else Nil_Value);
@@ -170,7 +173,31 @@ package body Lua.Engine.Strings is
          Result.Append (New_String (State, Text));
       end Return_String;
    begin
-      if Name = "format" then
+      if Name = "dump" then
+         if Arg (1).Kind not in Closure_Kind | Native_Closure_Kind |
+           Native_Kind_Value | Foreign_Function_Kind
+         then
+            Fail (State, "bad argument #1 to 'dump' (function expected)");
+         elsif Arg (1).Kind /= Closure_Kind or else
+           Arg (1).Reference.Code.Canonical_Node = null
+         then
+            Fail (State, "unable to dump given function");
+         end if;
+         declare
+            Code : constant Prototype_Access := Arg (1).Reference.Code;
+            Bytes : Managed.Buffer := Lua.Chunks.Encode
+              (Code.Canonical_Owner.Model, Strip => Truth (Arg (2)),
+               Maximum_Depth => State.Bounds.Syntax_Depth,
+               Root_Node => Code.Canonical_Node);
+         begin
+            --  Serialize the actual function subtree, without source reparse,
+            --  upvalue-value snapshots or mutation of the shared program root.
+            --  Returned bytes become one managed, NUL-safe Lua string.
+            Work (Bytes.Length);
+            Result.Append (New_String (State, Bytes));
+         end;
+         return Result;
+      elsif Name = "format" then
          return Formats.Run (State, Arguments);
       elsif Name = "char" then
          if Arguments.Length > Ada.Containers.Count_Type

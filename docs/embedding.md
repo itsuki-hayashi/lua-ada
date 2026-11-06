@@ -87,14 +87,18 @@ mutable objects.
 Lua code may load text through `load`, `loadfile`, `dofile`, and Lua-only
 `require`. Loaded closures retain their initial `_ENV`, including an explicitly
 nil environment. Compilation errors from `load` return nil/message; resource
-failures retain the execution-abort policy. Binary sources are unsupported.
-File preambles are handled as file input; source passed to `Execute` or `load`
-is raw text. Default package lookup is local (`./?.lua;./?/init.lua`), without
+failures retain the execution-abort policy. Native Lua 5.5.1 binary chunks are
+validated and executed through the canonical backend; string.dump serializes a
+real selected function subtree. The codec checks native widths/byte order.
+File preambles are handled as file input; bytes passed to Execute or load are
+raw text or native chunks. See [binary chunks](binary-chunks.md) for current
+verification and explicit limits. Default package lookup is local (`./?.lua;./?/init.lua`), without
 native modules or environment-driven path initialization. The library does not
 promise a filesystem sandbox.
 
-Host callbacks, exposed object handles, C exports, and thread synchronization
-are deferred. A sink is an output destination, not a Lua host-function API.
+Ada host callback registration, exposed object handles and thread synchronization
+remain deferred. The separate C facade has a partial real exported surface;
+its current pilot is not complete public API/ABI acceptance. A sink is an output destination, not a Lua host-function API.
 
 ## Execution policy and lifecycle
 
@@ -109,9 +113,9 @@ Lua semantic stack overflow (1,000,000 slots) and native-call depth overflow
 (200 active native calls across the scheduler chain) are catchable runtime
 errors. Explicit host limits and physical Ada allocation failure abort the active
 scheduler chain without running cleanup callbacks or permitting pcall to restart
-work. A later Execute remains usable. Private register packets, argument storage
-and a minimum twenty slots per activation determine this backend's slot charges;
-exact canonical register-allocation overflow boundaries remain deferred. Error
+work. A later Execute remains usable. Canonical register storage and a retained minimum activation charge currently
+determine semantic slot accounting; exact C shared-stack overlap boundaries
+remain a required M3 migration obligation. Error
 cleanup has a fixed emergency reserve rather than a larger ordinary stack limit.
 
 Suspended Lua coroutines belong to reachable thread values; the host session

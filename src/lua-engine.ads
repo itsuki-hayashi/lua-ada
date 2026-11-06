@@ -1,4 +1,4 @@
-with Ada.Containers.Vectors;
+with Ada.Containers;
 with Ada.Strings.Unbounded;
 with Lua.Lexers;
 with Lua.Prototypes;
@@ -82,7 +82,10 @@ private package Lua.Engine is
    type Value_Kind is
      (Nil_Kind, Boolean_Kind, Integer_Kind, Real_Kind, String_Kind,
       Table_Kind, Closure_Kind, Native_Closure_Kind, Native_Kind_Value,
+      Foreign_Function_Kind,
       Thread_Kind, Light_Identity_Kind);
+
+   type Type_Metatable_Array is array (Value_Kind) of Object_Access;
 
    type Value (Kind : Value_Kind := Nil_Kind) is record
       case Kind is
@@ -94,21 +97,21 @@ private package Lua.Engine is
            Thread_Kind =>
             Reference : Object_Access;
          when Native_Kind_Value => Native_Data : Native_Kind;
-         when Light_Identity_Kind => Identity : System.Address;
+         when Light_Identity_Kind | Foreign_Function_Kind =>
+            Identity : System.Address;
       end case;
    end record;
    Nil_Value : constant Value := (Kind => Nil_Kind);
 
-   package Values is new Ada.Containers.Vectors (Positive, Value);
-   package Objects is new Ada.Containers.Vectors (Positive, Object_Access);
-   package Prototypes is new Ada.Containers.Vectors
-     (Positive, Prototype_Access);
+   package Values is new Lua.Storage.Vectors (Value);
+   package Objects is new Lua.Storage.Vectors (Object_Access);
+   package Prototypes is new Lua.Storage.Vectors (Prototype_Access);
    package Scalar_Values is new Lua.Storage.Vectors (Value);
    package Cell_References is new Lua.Storage.Vectors (Object_Access);
    package Canonical_Prototypes is new
      Lua.Storage.Vectors (Prototype_Access);
-   package Registers is new Ada.Containers.Vectors (Positive, Positive);
-   package Symbols is new Ada.Containers.Vectors (Positive, Positive);
+   package Registers is new Lua.Storage.Vectors (Positive);
+   package Symbols is new Lua.Storage.Vectors (Positive);
 
    type Table_Entry is record
       Key  : Value;
@@ -126,10 +129,11 @@ private package Lua.Engine is
       Symbol : Positive;
       Cell   : Object_Access;
    end record;
-   package Bindings is new Ada.Containers.Vectors (Positive, Binding);
+   package Bindings is new Lua.Storage.Vectors (Binding);
 
    type Heap_Object (Kind : Heap_Kind) is record
       Marked : Boolean := False;
+      Mark_Next : Object_Access;
       Serial : Positive := 1;
       case Kind is
          when Thread_Object => Context_Index : Positive := 1;
@@ -156,6 +160,9 @@ private package Lua.Engine is
          when Native_Closure =>
             Native_Name : Unbounded_String;
             Captures : Objects.Vector;
+            Foreign_Handler : System.Address := System.Null_Address;
+            --  Non-null only for a real C closure. Zero-upvalue C functions
+            --  use scalar pointer identity instead of a fresh heap object.
       end case;
    end record;
    --  Objects never move. Pointer exposure to a future C API still requires
@@ -185,20 +192,20 @@ private package Lua.Engine is
    end record;
    --  Each opcode owns the meaning of its register operands. Inputs is an
    --  expression list: only its last packet expands, exactly as in Lua.
-   package Instructions is new Ada.Containers.Vectors
-     (Positive, Instruction);
+   package Instructions is new Lua.Storage.Vectors (Instruction);
 
    type Symbol_Name is record
       Symbol : Positive;
       Name : Unbounded_String;
    end record;
-   package Symbol_Names is new Ada.Containers.Vectors (Positive, Symbol_Name);
+   package Symbol_Names is new Lua.Storage.Vectors (Symbol_Name);
 
    type Prototype is record
       Canonical_Node : Lua.Prototypes.Prototype_Access;
       Canonical_Owner : Canonical_Program_Access;
       Canonical_Constants : Scalar_Values.Vector;
       Marked       : Boolean := False;
+      Mark_Next : Prototype_Access;
       Name         : Unbounded_String;
       Code         : Instructions.Vector;
       Parameters   : Symbols.Vector;
@@ -228,8 +235,8 @@ private package Lua.Engine is
      (No_Canonical_Result, Store_Canonical_Results,
       Test_Canonical_Result, Concat_Canonical_Result);
 
-   package Packets is new Ada.Containers.Vectors
-     (Positive, Values.Vector, "=" => Values."=");
+   package Packets is new Lua.Storage.Vectors
+     (Values.Vector, "=" => Values."=");
    type Close_Entry is record
       Cell : Object_Access;
       Symbol : Natural := 0;
@@ -240,16 +247,17 @@ private package Lua.Engine is
       --  A close handler may mutate the shared upvalue cell, but that must
       --  not replace a later handler's already departing stack-slot value.
    end record;
-   package Close_Lists is new Ada.Containers.Vectors (Positive, Close_Entry);
+   package Close_Lists is new Lua.Storage.Vectors (Close_Entry);
    type Unwind_Reason is
      (No_Unwind, Scope_Exit, Jump_Exit, Return_Exit, Error_Exit,
       Coroutine_Exit);
    type Frame;
    type Frame_Access is access Frame;
    for Frame_Access'Storage_Pool use Lua.Storage.Pool;
-   package Frames is new Ada.Containers.Vectors (Positive, Frame_Access);
+   package Frames is new Lua.Storage.Vectors (Frame_Access);
 
    type Frame is record
+      Memory : Lua.Storage.Owner_Access;
       Is_Native : Boolean := False;
       Native_Name : Unbounded_String;
       Native_Id : Native_Kind := Print_Function;
@@ -262,6 +270,14 @@ private package Lua.Engine is
       Native_Index : Natural := 0;
       Native_Aux : Natural := 0;
       Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
+      Foreign_Handler : System.Address := System.Null_Address;
+      Foreign_Base : Natural := 0;
+      Foreign_Previous_Base : Natural := 0;
+      Foreign_Previous_Frame : Frame_Access;
+      Foreign_Entered : Boolean := False;
+      --  A C callback has a base-relative public stack window. The previous
+      --  window is explicit frame data so reentrant calls and error unwinding
+      --  never depend on an abandoned Ada or C activation.
       Call_Site : Lua.Lexers.Source_Location;
       --  Native continuation storage is owned by the activation. Pending
       --  arguments/results/captures remain traced while Lua callbacks run.
@@ -345,12 +361,15 @@ private package Lua.Engine is
    type Context_Access is access Execution_Context;
    for Context_Access'Storage_Pool use Lua.Storage.Pool;
    type Execution_Context is record
+      Memory : Lua.Storage.Owner_Access;
       Stack        : Frames.Vector;
       Arguments    : Values.Vector;
       Foreign_Stack : Values.Vector;
       Foreign_State : System.Address := System.Null_Address;
       Foreign_Block : System.Address := System.Null_Address;
       Foreign_Control : System.Address := System.Null_Address;
+      Foreign_Base : Natural := 0;
+      Foreign_Activation : Frame_Access;
       --  The public C stack is rooted independently of initial Lua arguments.
       --  A synchronous foreign call borrows it without changing ownership.
       Failure      : Value;
@@ -380,8 +399,7 @@ private package Lua.Engine is
    end record;
    --  Contexts own frames and transient argument/error roots. Referenced
    --  heap objects belong to their world and can be shared across contexts.
-   package Context_Lists is new Ada.Containers.Vectors
-     (Positive, Context_Access);
+   package Context_Lists is new Lua.Storage.Vectors (Context_Access);
    type Context_Id is new Positive;
    --  IDs are relative to one owning world, not transferable object handles.
 
@@ -401,6 +419,8 @@ private package Lua.Engine is
       Math_Compatibility : Boolean :=
         Lua.Runtime_Configuration.Compatibility_Math;
       Open_Standard_Libraries : Boolean := True;
+      Canonical_Compilation : Boolean := True;
+      --  The old lowerer remains available only during migration checks.
       Contexts     : Context_Lists.Vector;
       Current      : Context_Access;
       Main_Context : Context_Access;
@@ -420,6 +440,9 @@ private package Lua.Engine is
       Memory_Ready : Boolean := False;
       Collector_Active : Boolean := False;
       String_Metatable : Object_Access;
+      Type_Metatables : Type_Metatable_Array := [others => null];
+      --  Actual per-universe primitive-type roots. Number/function variants
+      --  are canonicalized by Raw_Metatable rather than owning extra tables.
       Loaded_Modules : Object_Access;
       Preload_Modules : Object_Access;
       Next_Symbol  : Positive := 1;
@@ -433,6 +456,24 @@ private package Lua.Engine is
       Output       : Unbounded_String;
    end record;
    type World_Access is access World;
+
+   function Owned_Values
+     (State : in out World; Source : Values.Vector := Values.Empty_Vector)
+      return Values.Vector;
+   function Owned_Values
+     (Memory : not null Lua.Storage.Owner_Access;
+      Source : Values.Vector := Values.Empty_Vector) return Values.Vector;
+   --  Frame-only helpers use their explicitly seeded owner, never a fallback.
+   function One_Value
+     (State : in out World; Item : Value;
+      Count : Ada.Containers.Count_Type := 1) return Values.Vector;
+   function One_Value
+     (Memory : not null Lua.Storage.Owner_Access; Item : Value;
+      Count : Ada.Containers.Count_Type := 1) return Values.Vector;
+   --  Runtime packets always select their universe explicitly. The empty
+   --  default is an input value, never an implicit global allocation policy.
+   function New_Action (State : in out World) return Native_Action;
+   --  Bind both growable packets before a driver starts constructing output.
 
    function C_Option (Text : String) return String;
    --  Return the prefix before NUL for pinned Lua's C-string option fields.
@@ -513,6 +554,16 @@ private package Lua.Engine is
      (State : in out World; Name : String;
       Captures : Values.Vector := Values.Empty_Vector) return Value;
    --  Allocate a stateful native callable; captures are collector roots.
+   function Raw_Metatable (State : World; Item : Value)
+                           return Object_Access;
+   --  Borrow the actual metatable without consulting __metatable. Primitive
+   --  number/function representations share one Lua type entry per universe.
+
+   procedure Set_Metatable
+     (State : in out World; Item : Value; Meta : Object_Access);
+   --  Change the actual object/type association. Meta is null or a table;
+   --  the caller applies public protection rules before choosing this bypass.
+
    function Metafield
      (State : in out World; Item : Value; Name : String) return Value;
    --  Raw event lookup; it never invokes Lua or follows __index.

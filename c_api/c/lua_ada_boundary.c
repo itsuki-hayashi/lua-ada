@@ -85,6 +85,110 @@ int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
     return status;
 }
 
+static int drive_call(lua_State *state, int arguments, int results,
+                      int protected_call) {
+    struct lua_ada_request input = request(ADA_BEGIN_CALL);
+    struct lua_ada_response output;
+    int action;
+    int function_slot = lua_gettop(state) - arguments;
+    input.index = arguments;
+    input.count = results;
+    input.integer_data = protected_call;
+    action = ada_lua_dispatch(state, &input, &output);
+    while (action == ADA_ACTION_CALL) {
+        lua_State *callback_state = (lua_State *)output.pointer;
+        lua_CFunction callback = output.function_data;
+        struct lua_ada_guard guard;
+        int status;
+        volatile int count = 0;
+        /* Every Ada scheduler activation has returned before this checkpoint
+         * is installed. A callback may reenter the API and request nested Lua
+         * work, but each such call schedules an explicit boundary on the same
+         * driver. Only these live C frames are unwound by a callback error. */
+        guard.previous = callback_state->guard;
+        callback_state->guard = &guard;
+        status = setjmp(guard.target);
+        if (status == 0) count = callback(callback_state);
+        callback_state->guard = guard.previous;
+        input = request(ADA_COMPLETE_CALLBACK);
+        input.index = status;
+        input.count = count;
+        action = ada_lua_dispatch(callback_state, &input, &output);
+    }
+    if (protected_call &&
+        (action == ADA_ACTION_RAISE || action == ADA_ACTION_MEMORY)) {
+        /* Setup failure may precede a scheduler boundary (for example driver
+         * allocation refusal). Preserve its real error object while dropping
+         * the unconsumed callee/arguments, as a protected call must do. */
+        lua_copy(state, -1, function_slot);
+        lua_settop(state, function_slot);
+        return action;
+    }
+    raise_action(state, action, &output);
+    return (int)output.integer_data;
+}
+
+void lua_pushcclosure(lua_State *state, lua_CFunction function, int upvalues) {
+    struct lua_ada_request input = request(ADA_PUSH_C_CLOSURE);
+    input.function_data = function;
+    input.count = upvalues;
+    dispatch(state, input);
+}
+
+lua_CFunction lua_tocfunction(lua_State *state, int index) {
+    struct lua_ada_request input = request(ADA_TO_C_FUNCTION);
+    input.index = index;
+    return dispatch(state, input).function_data;
+}
+
+int lua_iscfunction(lua_State *state, int index) {
+    return lua_tocfunction(state, index) != NULL;
+}
+
+void lua_callk(lua_State *state, int arguments, int results,
+               lua_KContext context, lua_KFunction continuation) {
+    (void)context;
+    if (continuation != NULL) {
+        lua_pushliteral(state, "continuation-aware C calls are not implemented");
+        lua_error(state);
+    }
+    (void)drive_call(state, arguments, results, 0);
+}
+
+int lua_pcallk(lua_State *state, int arguments, int results, int error_function,
+               lua_KContext context, lua_KFunction continuation) {
+    (void)context;
+    if (continuation != NULL || error_function != 0) {
+        /* This incremental public boundary rejects unfinished callback modes
+         * explicitly before executing anything. It must not silently ignore
+         * a continuation or claim an error handler was applied. */
+        lua_settop(state, -(arguments + 2));
+        lua_pushliteral(state,
+            "C continuations and error handlers are not implemented");
+        return LUA_ERRRUN;
+    }
+    return drive_call(state, arguments, results, 1);
+}
+
+int lua_error(lua_State *state) {
+    dispatch(state, request(ADA_RAISE_ERROR));
+    abort(); /* A raise action cannot return through the C guard. */
+}
+
+int luaL_loadbufferx(lua_State *state, const char *buffer, size_t size,
+                     const char *name, const char *mode) {
+    struct lua_ada_request input = request(ADA_LOAD_BUFFER);
+    input.pointer = (void *)buffer;
+    input.length = size;
+    input.name = name;
+    input.mode = mode;
+    return (int)dispatch(state, input).integer_data;
+}
+
+int luaL_loadstring(lua_State *state, const char *source) {
+    return luaL_loadbufferx(state, source, strlen(source), source, "t");
+}
+
 lua_State *lua_newstate(lua_Alloc allocator, void *userdata, unsigned seed) {
     struct lua_ada_request input = request(ADA_CREATE_STATE);
     struct lua_ada_response output;

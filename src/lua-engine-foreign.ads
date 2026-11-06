@@ -20,7 +20,8 @@ package Lua.Engine.Foreign is
       Push_String, Push_Pointer, Push_Thread, Create_Table,
       Raw_Get, Raw_Set, Raw_Get_Integer, Raw_Set_Integer,
       Raw_Get_Pointer, Raw_Set_Pointer, Raw_Equal, Next_Item,
-      Get_Allocator, Set_Allocator);
+      Get_Allocator, Set_Allocator, Push_C_Closure, To_C_Function,
+      Begin_Call, Complete_Callback, Raise_Error, Load_Buffer);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
       Create_Thread => 3, Get_Top => 4, Set_Top => 5,
@@ -35,7 +36,9 @@ package Lua.Engine.Foreign is
       Raw_Get_Integer => 30, Raw_Set_Integer => 31,
       Raw_Get_Pointer => 32, Raw_Set_Pointer => 33,
       Raw_Equal => 34, Next_Item => 35, Get_Allocator => 36,
-      Set_Allocator => 37);
+      Set_Allocator => 37, Push_C_Closure => 38, To_C_Function => 39,
+      Begin_Call => 40, Complete_Callback => 41, Raise_Error => 42,
+      Load_Buffer => 43);
    for Operation_Code'Size use Interfaces.C.int'Size;
    pragma Convention (C, Operation_Code);
 
@@ -49,6 +52,9 @@ package Lua.Engine.Foreign is
       Length : Interfaces.C.size_t := 0;
       Allocator : Lua.Storage.Allocation_Function := null;
       Seed : Interfaces.C.unsigned := 0;
+      Function_Data : C_Function := null;
+      Name : System.Address := System.Null_Address;
+      Mode : System.Address := System.Null_Address;
    end record with Convention => C;
 
    type Response is record
@@ -57,12 +63,14 @@ package Lua.Engine.Foreign is
       Pointer : System.Address := System.Null_Address;
       Length : Interfaces.C.size_t := 0;
       Allocator : Lua.Storage.Allocation_Function := null;
+      Function_Data : C_Function := null;
    end record with Convention => C;
 
    type Action_Status is
-     (Action_Done, Action_Raise, Action_Memory, Action_Abort);
+     (Action_Done, Action_Call, Action_Raise, Action_Memory, Action_Abort);
    for Action_Status use
-     (Action_Done => 0, Action_Raise => 2, Action_Memory => 4,
+     (Action_Done => 0, Action_Call => 1,
+      Action_Raise => 2, Action_Memory => 4,
       Action_Abort => 6);
    for Action_Status'Size use Interfaces.C.int'Size;
    pragma Convention (C, Action_Status);

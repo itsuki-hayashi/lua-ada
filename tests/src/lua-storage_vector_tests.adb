@@ -68,6 +68,10 @@ package body Lua.Storage_Vector_Tests is
    procedure Move_Borrowed_Target_Rejected;
    procedure Move_Self_Preserves_Storage;
    procedure Move_Controlled_Elements;
+   procedure Release_Preserves_Binding;
+   procedure Concatenation_Carries_Owner;
+   procedure Concatenation_Refusal_Preserves_Inputs;
+   procedure Prepend_And_Swap;
 
    procedure Binding_Required is
       Data : Integers.Vector;
@@ -580,6 +584,98 @@ package body Lua.Storage_Vector_Tests is
               "transferred controlled element finalized exactly once");
    end Move_Controlled_Elements;
 
+   procedure Release_Preserves_Binding is
+      Memory : Owner;
+      Data : Integers.Vector;
+   begin
+      --  Session shutdown needs to release registry capacity before closing
+      --  its owner. The reusable container must retain its explicit binding.
+      Data.Set_Owner (Reference (Memory));
+      Data.Append (7);
+      Data.Release;
+      Assert (Data.Is_Empty and Data.Capacity = 0 and
+              Data.Owner_Of = Reference (Memory),
+              "release retained only the allocation policy");
+      Assert (Statistics (Memory).Live_Blocks = 0,
+              "release freed reserved vector capacity");
+      Data.Append (8);
+      Assert (Data (1) = 8, "released vector reused explicit owner");
+   end Release_Preserves_Binding;
+
+   procedure Concatenation_Carries_Owner is
+      Memory : Owner;
+      Left, Right, Joined : Integers.Vector;
+   begin
+      --  An unbound empty left operand contributes no policy. The right
+      --  operand's real owner must fund the result, with independent contents.
+      Joined := Left & Right;
+      Assert (Joined.Is_Empty and Joined.Owner_Of = null,
+              "two unbound empty inputs need no allocation policy");
+      Right.Set_Owner (Reference (Memory));
+      Right.Append (2);
+      Joined := Left & Right;
+      Assert (Joined.Owner_Of = Reference (Memory) and Joined (1) = 2,
+              "concatenation inherited the nonempty source owner");
+      Left.Set_Owner (Reference (Memory));
+      Left.Append (1);
+      Joined := Left & Right;
+      Joined (1) := 9;
+      Assert (Joined.Length = 2 and Joined (2) = 2 and Left (1) = 1,
+              "concatenation copied ordered independent values");
+   end Concatenation_Carries_Owner;
+
+   procedure Concatenation_Refusal_Preserves_Inputs is
+      Memory : Owner;
+      Left, Right : Integers.Vector;
+      Failed : Boolean := False;
+   begin
+      --  A failed result allocation cannot consume either source. Cleanup
+      --  must release the partial result and preserve the owner's refusal.
+      Left.Set_Owner (Reference (Memory));
+      Right.Set_Owner (Reference (Memory));
+      Left.Append (1);
+      Right.Append (2);
+      Set_Failure_Countdown (Memory, 0);
+      begin
+         declare
+            Joined : constant Integers.Vector := Left & Right;
+         begin
+            Assert (Joined.Length = 2, "unexpected concatenation shape");
+         end;
+      exception
+         when Allocation_Error | Program_Error => Failed := True;
+      end;
+      Assert (Failed and Refusal_Pending (Memory),
+              "concatenation retained allocator refusal");
+      Assert (Left (1) = 1 and Right (1) = 2 and
+              Statistics (Memory).Live_Blocks = 2,
+              "refused concatenation left both sources alive");
+   end Concatenation_Refusal_Preserves_Inputs;
+
+   procedure Prepend_And_Swap is
+      Memory : Owner;
+      Data : aliased Integers.Vector;
+   begin
+      --  Callable dispatch prepends its receiver and the C stack rotates by
+      --  swaps. Both must preserve order and actual slot addresses;
+      --  a nonstructural swap remains valid while a slot reference is live.
+      Data.Set_Owner (Reference (Memory));
+      Data.Append (1);
+      Data.Append (3);
+      Data.Prepend (0);
+      Data.Swap (1, 3);
+      Assert (Data (1) = 3 and Data (2) = 1 and Data (3) = 0,
+              "prepend and swap ordered live elements");
+      Set_Failure_Countdown (Memory, 0);
+      declare
+         Held : constant Integers.Reference_Type := Data.Reference (1);
+      begin
+         Data.Swap (1, 2);
+         Assert (Held.Element.all = 1, "swap retained referenced slot");
+      end;
+      Assert (not Refusal_Pending (Memory), "scalar swap did not allocate");
+   end Prepend_And_Swap;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "managed vector: owner required",
@@ -628,5 +724,13 @@ package body Lua.Storage_Vector_Tests is
                         Move_Self_Preserves_Storage'Access);
       Test_Support.Add (Suite, "managed vector: controlled move lifecycle",
                         Move_Controlled_Elements'Access);
+      Test_Support.Add (Suite, "managed vector: release capacity",
+                        Release_Preserves_Binding'Access);
+      Test_Support.Add (Suite, "managed vector: owner-carrying concatenate",
+                        Concatenation_Carries_Owner'Access);
+      Test_Support.Add (Suite, "managed vector: refused concatenate",
+                        Concatenation_Refusal_Preserves_Inputs'Access);
+      Test_Support.Add (Suite, "managed vector: prepend and slot swap",
+                        Prepend_And_Swap'Access);
    end Register;
 end Lua.Storage_Vector_Tests;

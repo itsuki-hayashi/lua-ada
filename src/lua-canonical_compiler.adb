@@ -590,16 +590,34 @@ package body Lua.Canonical_Compiler is
                         if Receiver = 0 then
                            Expression (Fn, Item.Children (1), Destination);
                         else
-                           --  SELF is an optimization for short constant
-                           --  keys. General GETTABLE plus a retained receiver
-                           --  has the same call semantics for every byte key.
                            Reserve (Fn, Destination + 2);
                            Expression (Fn, Callee.Children (1),
                                        Destination + 1);
-                           Left := Temporary (Fn);
-                           Expression (Fn, Callee.Children (2), Left);
-                           Put (Fn, ABC (Op_GETTABLE, Destination,
-                                         Destination + 1, Left));
+                           if Fetch (Callee.Children (2)).Kind = Literal and
+                             then Fetch (Callee.Children (2)).Value.Kind =
+                               String_Literal and then
+                             Text_Length (Fetch
+                               (Callee.Children (2)).Value.Text) <= 40 and
+                             then Fn.Code.Constants.Length < 256
+                           then
+                              --  SELF records an actual method call shape,
+                              --  including the implicit receiver. Debug name
+                              --  discovery can inspect this real instruction
+                              --  rather than storing fabricated call metadata.
+                              Index := Constant_Index (Fn, Constant_Value'
+                                (String_Constant, Intern_Text (Fetch
+                                  (Callee.Children (2)).Value.Text), False));
+                              Put (Fn, ABC (Op_SELF, Destination,
+                                            Destination + 1, Index));
+                           else
+                              --  The canonical C field is only eight bits;
+                              --  long keys or a full small-constant window use
+                              --  a register key, retaining the same receiver.
+                              Left := Temporary (Fn);
+                              Expression (Fn, Callee.Children (2), Left);
+                              Put (Fn, ABC (Op_GETTABLE, Destination,
+                                            Destination + 1, Left));
+                           end if;
                         end if;
                         Fn.Next := Destination + Receiver + 1;
                         Values (Fn, Item.Children (2),
@@ -1293,12 +1311,16 @@ package body Lua.Canonical_Compiler is
             Result.Outcome := Succeeded;
          exception
             when Abandon => Close (Result.Code);
-            when Lua.Storage.Allocation_Error | Storage_Error =>
+            when Lua.Storage.Allocation_Error =>
                Result.Outcome := Memory_Failure;
                Result.Error := Allocation_Refused;
                Result.Location := Site;
                Close (Result.Code);
-            when Program_Error =>
+            when Storage_Error | Program_Error =>
+               --  GNAT can wrap a refused controlled allocation in another
+               --  exception. Only the owner's refusal witness identifies Lua
+               --  memory failure; physical Ada stack exhaustion and ordinary
+               --  programming errors must retain their host-abort path.
                if Lua.Storage.Refusal_Pending (Memory.all) then
                   Result.Outcome := Memory_Failure;
                   Result.Error := Allocation_Refused;

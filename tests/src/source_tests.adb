@@ -23,6 +23,9 @@ package body Source_Tests is
    procedure Inspection_Composition;
    procedure Inspection_Raw_Prefixes;
    procedure Inspection_Upper_Bounds;
+   procedure Binary_Interpreter_Line;
+   procedure Binary_BOM_CRLF;
+   procedure Binary_LFCR_Not_Skipped;
 
    procedure Empty is
       --  An empty file has no first byte. It must stay empty rather than
@@ -172,8 +175,48 @@ package body Source_Tests is
               "upper-bound BOM-only inspection");
    end Inspection_Upper_Bounds;
 
-   procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
+   procedure Binary_Interpreter_Line is
+      Bytes : constant String := Character'Val (27) & "Lua" &
+        Character'Val (0) & Character'Val (255);
    begin
+      --  A native chunk must start at its signature for absolute alignment.
+      --  Remove the interpreter line and LF rather than inserting whitespace.
+      Assert (File_Preamble ("#lua" & LF & Bytes) = Bytes,
+              "binary interpreter prefix retained alignment bytes");
+   end Binary_Interpreter_Line;
+
+   procedure Binary_BOM_CRLF is
+      Bytes : constant String := Character'Val (27) & "Lua" &
+        Character'Val (0);
+      Info : constant File_Preamble_Info :=
+        Inspect_File_Preamble (BOM & "#lua" & CR & LF & Bytes);
+   begin
+      --  Compose BOM removal with the binary reopen's LF-based line skip.
+      --  Every byte after the signature, including NUL, remains unchanged.
+      Assert (Info.Skipped_Bytes = 9 and then Info.Blanked_Bytes = 0,
+              "binary preamble inspection");
+      Assert (File_Preamble (BOM & "#lua" & CR & LF & Bytes) = Bytes,
+              "binary BOM/CRLF composition");
+   end Binary_BOM_CRLF;
+
+   procedure Binary_LFCR_Not_Skipped is
+      Bytes : constant String := Character'Val (27) & "Lua";
+   begin
+      --  Pinned skipcomment consumes through LF. A CR after that byte is the
+      --  first text input; a later signature must not be promoted to binary.
+      Assert (File_Preamble ("#lua" & LF & CR & Bytes) =
+                "    " & LF & CR & Bytes,
+              "nonleading binary signature incorrectly promoted");
+   end Binary_LFCR_Not_Skipped;
+
+   procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
+   begin      Test_Support.Add (Suite, "source binary interpreter prefix",
+                        Binary_Interpreter_Line'Access);
+      Test_Support.Add (Suite, "source binary BOM/CRLF prefix",
+                        Binary_BOM_CRLF'Access);
+      Test_Support.Add (Suite, "source binary LFCR boundary",
+                        Binary_LFCR_Not_Skipped'Access);
+
       Test_Support.Add (Suite, "source empty", Empty'Access);
       Test_Support.Add (Suite, "source null zero bounds",
                         Empty_Zero_Bound'Access);

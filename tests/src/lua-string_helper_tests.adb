@@ -68,7 +68,7 @@ package body Lua.String_Helper_Tests is
 
    procedure Captured_Backreference (State : in out World) is
       Found : Patterns.Match_Result;
-      Captures : Values.Vector;
+      Captures : Values.Vector := Owned_Values (State);
    begin
       --  The second occurrence must equal the captured bytes, rather than
       --  merely matching the same character class independently.
@@ -100,7 +100,7 @@ package body Lua.String_Helper_Tests is
 
    procedure Capture_Rollback (State : in out World) is
       Found : Patterns.Match_Result;
-      Captures : Values.Vector;
+      Captures : Values.Vector := Owned_Values (State);
    begin
       --  Greedy expansion initially consumes too much. Failed alternatives
       --  must restore capture boundaries before trying the successful split.
@@ -122,7 +122,7 @@ package body Lua.String_Helper_Tests is
 
    procedure Position_Captures (State : in out World) is
       Found : Patterns.Match_Result;
-      Captures : Values.Vector;
+      Captures : Values.Vector := Owned_Values (State);
    begin
       --  Empty parentheses yield one-based positions, not empty strings.
       --  The last position may legitimately be one byte beyond the subject.
@@ -164,7 +164,7 @@ package body Lua.String_Helper_Tests is
    end Pattern_Budget;
 
    procedure Empty_Plain_Search (State : in out World) is
-      Args, Result : Values.Vector;
+      Args, Result : Values.Vector := Owned_Values (State);
    begin
       --  Searching after the last byte is legal. Nonempty plain text misses,
       --  while the empty pattern denotes the terminal zero-width match.
@@ -180,7 +180,7 @@ package body Lua.String_Helper_Tests is
    end Empty_Plain_Search;
 
    procedure Negative_Substring (State : in out World) is
-      Args, Result : Values.Vector;
+      Args, Result : Values.Vector := Owned_Values (State);
    begin
       --  Negative positions count from the end without negating mininteger.
       --  Extreme negative bounds clip at the start instead of overflowing.
@@ -192,7 +192,7 @@ package body Lua.String_Helper_Tests is
    end Negative_Substring;
 
    procedure Huge_Empty_Repetition (State : in out World) is
-      Args, Result : Values.Vector;
+      Args, Result : Values.Vector := Owned_Values (State);
    begin
       --  The mathematical output is empty even with maxinteger repetitions.
       --  This must finish immediately, with no gigantic loop or allocation.

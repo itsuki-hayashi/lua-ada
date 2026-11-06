@@ -161,3 +161,99 @@ containers to the owner, migrate normal compilation, and continue the remaining
 M3 gates. The unified Ada/C runtime image, full C surface, T adapter, additional
 libraries/collector behavior and final 26-context coverage remain open. Keep one
 major PR and do not present this checkpoint as complete M3 acceptance.
+
+## Normal canonical execution and runtime ownership
+
+Normal CLI/session compilation now emits canonical words. The first full AUnit
+migration run passed 814 of 817; three assertions required real call-site name
+inference and closing-variable names. Lazy inspection now reads the actual
+saved caller word and reaching definitions only when requested. Short method
+keys emit real SELF instructions. The repaired normal-backend pipeline passes
+818 cases and all retained API/CLI/five-file/nine-differential checks in
+reports/m3-canonical-default-check1.log.
+
+All twelve remaining Engine vector families and three legacy compiler worklists
+now select explicit universe owners. Constructors bind contexts, frames,
+objects/prototypes and packets; no implicit global allocator fallback exists.
+The collector uses intrusive object/prototype queues without scratch allocation,
+including emergency collection after refusal. Interrupted marking clears colors
+and links safely. Finalization releases retained registry capacities before
+closing storage. Six new runtime and four generic cases protect these changes;
+existing leak assertions were preserved. reports/m3-managed-runtime-vectors-check1.log
+passes the complete retained pipeline with 829 AUnit cases and 65 Markdown
+checks, again Windows/default/validation/static only.
+
+The actual C-boundary pilot passed seventeen named cases before that managed
+migration: real C callbacks, mutable upvalues, table error objects, nested C
+calls and canonical Lua-to-C dispatch. Windows standalone-library partial linking
+exceeded normal COFF's section count; its configured BigObj partial-link output
+fixed the format limit without disabling any Ada compiler/runtime check.
+reports/m3-foreign-portal-c-consumer3.log is the earlier seventeen-case result.
+The current managed-container revision is being rebuilt/retested separately.
+
+Implemented Lua-facing string.dump over the selected actual prototype subtree,
+native binary recognition in ordinary compilation and mode-filtered load,
+initial capture environments and correct nested-function debug classification.
+Binary interpreter prefixes drop their LF so native alignment starts at the
+signature. Sixteen named public-session cases and three source cases pass within
+848 total AUnit cases, with zero assertions/errors and normal exit in
+reports/m3-binary-runtime-aunit2.log. Its full API/CLI/upstream pipeline remains
+pending; no new whole upstream file is claimed from these component results.
+
+Remaining allocator obligations include numeric/format Big_Numbers scratch,
+some large temporary String views/snapshots, unbounded error/output metadata,
+bootstrap storage and allocation-free reserved error packet transfers under
+sustained refusal. Owner coverage does not establish full memerr.lua parity.
+C message handlers/continuations, unified runtime image, additional runtime and
+library features, full instrumented coverage and final platforms remain open.
+
+The verified first checkpoint was published as commit
+16bc2aac953642f44a6505eabe0b3537f13581b8 in
+[draft PR #8](https://github.com/itsuki-hayashi/lua-ada/pull/8). It is deliberately
+not ready for review. The configured local 1Password signing helper failed with
+"failed to fill whole buffer"; the authorized GitHub connector created the
+commit instead. The remote tree was checked byte-for-byte against the staged
+tree b80d4947a5e271ca428dff4db6bb5d9eaf1677c6 before the local branch was
+aligned, preserving all subsequent working changes. No signing configuration
+was changed and no merge is authorized. Further changes remain on this branch.
+
+## Binary pipeline and first checkpoint CI
+
+reports/m3-binary-runtime-check1.log passes the full retained validation/static
+pipeline with 848 AUnit cases, Ada consumer, 35 CLI cases, nine differential
+scripts, five upstream files and 65 Markdown checks.
+reports/m3-binary-cli1.log adds ten same-host C/Ada native binary comparisons:
+plain/BOM/interpreter prefixes, named varargs, initial environments, and Ada
+dumps consumed by both interpreters. These results add no whole upstream file.
+
+Published commit 16bc2aac953642f44a6505eabe0b3537f13581b8, CI run42190300713,
+completed twelve Linux/Windows jobs. All six macOS jobs passed 816 AUnit cases
+and then failed the same mathematics_campaign.lua comparison at byte13748:
+C sin(0/0) retained positive NaN, while Ada had synthesized x86 negative NaN.
+No exception was accepted and no expected bits were masked. The source repair
+uses a tiny native arithmetic quotient plus host fmod; focused regressions and
+a complete matrix rerun remain required. The static-validation job also lacked
+its later conformance artifact because the earlier failing command stopped it.
+
+## One runtime image and real debug ownership
+
+The unified production root liblua passes static/shared real C, mixed Ada/C
+state/pool/callback identity and C-only startup consumers. The tested GNAT
+elaboration counter is one. See ADR0014 and reports/m3-one-core-production-
+static-check3.log, reports/m3-one-core-production-shared-check2.log. The three
+new native-arithmetic regressions pass within 851 cases in
+reports/m3-one-core-aunit.log. Legacy c_api/lua_c_api.gpr forwards to the root.
+
+Common initialization now owns the actual registry for both Ada and C states;
+the C constructor no longer replaces it. Primitive type metatables share real
+number/function families and are traced per universe. Debug metatable bypasses,
+getregistry and upvaluejoin operate on those tables/cell references. Missing
+setupvalue arguments fail distinctly from explicit nil; invalid upvalueid
+indexes return one nil as in pinned C Lua. Fifteen independently named public
+session cases pass within 866 AUnit cases, zero assertions/errors, in
+reports/m3-runtime-inspection-aunit1.log after strict build3. Build1/2 exposed
+only Count_Type visibility, Ada2022 aggregate syntax and line/comment style;
+these were corrected without disabling diagnostics. reports/m3-runtime-inspection-check1.log passes the full retained pipeline:
+866 AUnit cases, eighteen C API consumer cases, mixed/C-only core image checks,
+Ada consumer, 35 CLI cases, ten binary CLI comparisons, nine differential files
+and the five retained upstream files. No new whole upstream file is claimed.

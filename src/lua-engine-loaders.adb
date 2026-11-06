@@ -22,7 +22,7 @@ package body Lua.Engine.Loaders is
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
       Name : constant String := To_String (Activation.Native_Name);
-      Result : Native_Action;
+      Result : Native_Action := New_Action (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Activation.Native_Arguments.Length)
          then Activation.Native_Arguments (Index) else Nil_Value);
@@ -30,7 +30,8 @@ package body Lua.Engine.Loaders is
         (if Index <= Natural (Activation.Native_Results.Length)
          then Activation.Native_Results (Index) else Nil_Value);
       function Is_Function (Item : Value) return Boolean is
-        (Item.Kind in Closure_Kind | Native_Closure_Kind | Native_Kind_Value);
+        (Item.Kind in Closure_Kind | Native_Closure_Kind | Native_Kind_Value |
+           Foreign_Function_Kind);
       function Bytes (Item : Value) return String;
       function Field (Table : Value; Key : String) return Value;
       function Package_Table return Value;
@@ -303,7 +304,7 @@ package body Lua.Engine.Loaders is
         (Source, Chunk_Name, Mode : String; Environment : Value)
          return Values.Vector
       is
-         Results : Values.Vector;
+         Results : Values.Vector := Owned_Values (State);
          Code : Prototype_Access;
          Scope : Object_Access;
          Saved_Text : constant Unbounded_String := State.Current.Failure_Text;
@@ -322,22 +323,24 @@ package body Lua.Engine.Loaders is
             State.Current.Failure_Class := Saved_Class;
          end Restore;
       begin
-         --  Mode filtering precedes compilation. A binary-capable mode does
-         --  not establish binary chunk support; report that boundary plainly.
-         if Source'Length > 0 and then Source (Source'First) =
-           Character'Val (27)
-         then
-            Results.Append (Nil_Value);
-            Results.Append
-              (New_String (State, "binary chunks are unsupported"));
-            return Results;
-         elsif Ada.Strings.Fixed.Index (Mode, "t") = 0 then
-            Results.Append (Nil_Value);
-            Results.Append (New_String
-              (State, "attempt to load a text chunk (mode is '" & Mode &
-               "')"));
-            return Results;
-         end if;
+         --  The signature selects binary versus text before parsing. Mode
+         --  filtering applies to that selection even for a malformed chunk;
+         --  allowed binary input then uses the same owned codec as C loading.
+         declare
+            Binary : constant Boolean := Source'Length > 0 and then
+              Source (Source'First) = Character'Val (27);
+            Accepted : constant Boolean := Ada.Strings.Fixed.Index
+              (Mode, (if Binary then "b" else "t")) /= 0;
+         begin
+            if not Accepted then
+               Results.Append (Nil_Value);
+               Results.Append (New_String
+                 (State, "attempt to load a " &
+                  (if Binary then "binary" else "text") &
+                  " chunk (mode is '" & Mode & "')"));
+               return Results;
+            end if;
+         end;
          --  Dynamic compilation belongs to this execution's work budget.
          --  Per-source limits alone allow a reader/loop to repeatedly scan
          --  a large retained string at effectively constant VM cost.
@@ -388,7 +391,7 @@ package body Lua.Engine.Loaders is
          Environment : Value; Source_Name : Boolean := False)
          return Values.Vector
       is
-         Results : Values.Vector;
+         Results : Values.Vector := Owned_Values (State);
          procedure Compile (Text : String);
          procedure Compile (Text : String) is
          begin
@@ -408,7 +411,7 @@ package body Lua.Engine.Loaders is
          Environment : Value; Source_Name : Boolean := False)
          return Values.Vector
       is
-         Results : Values.Vector;
+         Results : Values.Vector := Owned_Values (State);
          procedure Compile_Text (Text : String);
          procedure Compile_Text (Text : String) is
             procedure With_Name (Name : String);
@@ -462,7 +465,7 @@ package body Lua.Engine.Loaders is
                --  the VM's protected-call continuation to preserve that
                --  boundary without entering the executor recursively.
                return Call ((Native_Kind_Value, Pcall_Function),
-                            Values.To_Vector (Arg (1), 1));
+                            One_Value (State, Arg (1), 1));
             end if;
             Copy_Bytes (Arg (1), Activation.Native_Buffer, False);
          elsif Activation.Native_Stage = 1 then
@@ -497,7 +500,7 @@ package body Lua.Engine.Loaders is
                   if Size > 0 then
                      Copy_Bytes (Item, Activation.Native_Buffer, True);
                      return Call ((Native_Kind_Value, Pcall_Function),
-                                  Values.To_Vector (Arg (1), 1));
+                                  One_Value (State, Arg (1), 1));
                   end if;
                end;
             end if;
@@ -656,7 +659,7 @@ package body Lua.Engine.Loaders is
                Fail (State, To_String (Activation.Native_Buffer));
             end if;
             Activation.Native_Stage := 2;
-            return Call (Function_Value, Values.To_Vector (Item, 1));
+            return Call (Function_Value, One_Value (State, Item, 1));
          elsif Activation.Native_Stage = 2 then
             Function_Value := Returned (1);
             if Is_Function (Function_Value) then
@@ -664,7 +667,7 @@ package body Lua.Engine.Loaders is
                Activation.Native_Captures.Append (Data);
                Activation.Native_Stage := 3;
                declare
-                  Args : Values.Vector;
+                  Args : Values.Vector := Owned_Values (State);
                begin
                   Args.Append (Item);
                   Args.Append (Data);

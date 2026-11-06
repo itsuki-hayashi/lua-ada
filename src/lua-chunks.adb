@@ -163,6 +163,24 @@ package body Lua.Chunks is
          end loop;
          Require (Markers = Natural (Item.Absolute_Lines.Length));
       end;
+      declare
+         Line : Long_Long_Integer := Long_Long_Integer (Item.First_Line);
+         Absolute_Index : Natural := 0;
+      begin
+         --  PC/marker agreement alone does not make debug data safe. Bound
+         --  each reconstructed line before runtime lookup uses an Integer;
+         --  malicious deltas must not overflow or produce negative locations.
+         for Line_Delta of Item.Lines loop
+            if Line_Delta = -128 then
+               Absolute_Index := Absolute_Index + 1;
+               Line := Long_Long_Integer
+                 (Item.Absolute_Lines (Absolute_Index).Line);
+            else
+               Line := Line + Long_Long_Integer (Line_Delta);
+            end if;
+            Require (Line in 0 .. Long_Long_Integer (Interfaces.C.int'Last));
+         end loop;
+      end;
       for PC in 1 .. Count loop
          declare
             Instruction : constant Lua.Opcodes.Word := Item.Code (PC);
@@ -722,14 +740,18 @@ package body Lua.Chunks is
 
    function Encode
      (Code : in out Program; Strip : Boolean := False;
-      Maximum_Depth : Positive := 200) return Lua.Storage.Buffers.Buffer
+      Maximum_Depth : Positive := 200;
+      Root_Node : Prototype_Access := null)
+      return Lua.Storage.Buffers.Buffer
    is
       Memory : constant Lua.Storage.Owner_Access := Owner_Of (Code);
       Seen : Flags.Vector;
       Saved : Id_Lists.Vector;
       Serial : String_Id := 0;
+      Selected : constant Prototype_Access :=
+        (if Root_Node = null then Root (Code) else Root_Node);
    begin
-      if Memory = null or else Root (Code) = null then
+      if Memory = null or else Selected = null then
          raise Invalid_Program;
       end if;
       Seen.Set_Owner (Memory);
@@ -738,7 +760,7 @@ package body Lua.Chunks is
       --  Validate before allocating output. Invalid input never exposes a
       --  partially emitted chunk; allocator refusal likewise destroys Output
       --  through its normal controlled-buffer finalization.
-      Validate (Code, Root (Code), null, 1, Maximum_Depth, Seen);
+      Validate (Code, Selected, null, 1, Maximum_Depth, Seen);
       Saved.Append (No_String, Ada.Containers.Count_Type (String_Count
         (Code)));
       return Output : Lua.Storage.Buffers.Buffer do
@@ -886,8 +908,8 @@ package body Lua.Chunks is
             Write_Byte (4); Fixed (16#1234_5678#, 4);
             Write_Byte (8); Fixed (0 - Word'(16#5678#), 8);
             Write_Byte (8); Fixed (Number_Bits (-370.5), 8);
-            Write_Byte (Byte (Root (Code).Upvalues.Length));
-            Dump (Root (Code));
+            Write_Byte (Byte (Selected.Upvalues.Length));
+            Dump (Selected);
          end;
       end return;
    end Encode;

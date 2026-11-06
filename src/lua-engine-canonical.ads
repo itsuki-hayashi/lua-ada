@@ -20,6 +20,12 @@ package Lua.Engine.Canonical is
    --  returns. Machine publishes it into the next explicit activation before
    --  ending the current operation. Destination is register index + 1.
 
+   function Adopt_Program
+     (State : in out World; Program : in out Lua.Prototypes.Program)
+      return Prototype_Access;
+   --  Transfer a checked graph and retain its initial compilation bridge.
+   --  The caller publishes a closure/frame before clearing Entry_Code.
+
    function Adopt
      (State : in out World; Program : in out Lua.Prototypes.Program;
       Environment : Value) return Value;

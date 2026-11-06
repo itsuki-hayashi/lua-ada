@@ -256,7 +256,7 @@ package body Lua.Engine.Canonical is
      (State : in out World; Activation : Frame_Access;
       First, Count : Natural) return Values.Vector
    is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
    begin
       if First > Natural (Activation.Canonical_Registers.Length) or else
         Count > Natural (Activation.Canonical_Registers.Length) - First
@@ -388,14 +388,13 @@ package body Lua.Engine.Canonical is
       return Natural'Max (0, Line);
    end Source_Line;
 
-   function Adopt
-     (State : in out World; Program : in out Lua.Prototypes.Program;
-      Environment : Value) return Value
+   function Adopt_Program
+     (State : in out World; Program : in out Lua.Prototypes.Program)
+      return Prototype_Access
    is
       Owner : Canonical_Program_Access;
       Start : constant Natural := State.Programs.Last_Index;
       Was_Compiling : constant Boolean := State.Compiling;
-      Main : Value;
       Had_References : Boolean := False;
       Current : Prototype_Access;
       Pending_Text : Value;
@@ -410,7 +409,6 @@ package body Lua.Engine.Canonical is
       then
          raise Program_Error with "canonical program belongs to another owner";
       end if;
-      Pin (State, Environment);
       State.Compiling := True;
       Owner := new (Lua.Storage.Handle (State.Memory)) Canonical_Program;
       Owner.Wrappers.Set_Owner (Lua.Storage.Reference (State.Memory));
@@ -435,6 +433,9 @@ package body Lua.Engine.Canonical is
          Current.First_Line := Current.Canonical_Node.First_Line;
          Current.Last_Line := Current.Canonical_Node.Last_Line;
          Current.Register_Count := Natural (Current.Canonical_Node.Max_Stack);
+         if Current.Register_Count > State.Bounds.Registers then
+            Fail (State, "register limit exceeded", Resource => True);
+         end if;
          Current.Vararg := (Current.Canonical_Node.Flags and 3) /= 0;
          Current.Is_Main := Current.Canonical_Node =
            Lua.Prototypes.Root (Owner.Model);
@@ -461,22 +462,14 @@ package body Lua.Engine.Canonical is
       Current := Owner.Wrappers
         (Lua.Prototypes.Root (Owner.Model).Node_Index);
       State.Entry_Code := Current;
-      Main := New_Closure (State, Current, null);
-      for Index in 1 .. Natural (Current.Canonical_Node.Upvalues.Length) loop
-         Main.Reference.Upvalues.Append (New_Cell
-           (State, (if Index = 1 then Environment else Nil_Value)));
-      end loop;
       State.Compiling := Was_Compiling;
-      return Main;
+      return Current;
    exception
       when others =>
          --  Release registered wrappers in reverse construction order. Their
          --  common program owner disappears only after the last wrapper; an
          --  allocation before the first registration is cleaned up directly.
          State.Entry_Code := null;
-         if Main.Kind = Closure_Kind then
-            Main.Reference.Code := null;
-         end if;
          Had_References := Owner /= null and then Owner.References /= 0;
          while State.Programs.Last_Index > Start loop
             declare
@@ -491,6 +484,24 @@ package body Lua.Engine.Canonical is
          end if;
          State.Compiling := Was_Compiling;
          raise;
+   end Adopt_Program;
+
+   function Adopt
+     (State : in out World; Program : in out Lua.Prototypes.Program;
+      Environment : Value) return Value
+   is
+      Code : Prototype_Access;
+      Main : Value;
+   begin
+      Pin (State, Environment);
+      Code := Adopt_Program (State, Program);
+      Main := New_Closure (State, Code, null);
+      if not Main.Reference.Upvalues.Is_Empty then
+         --  Explicit nil is an actual initial environment, distinct from an
+         --  omitted environment. Other initial capture cells remain nil.
+         Main.Reference.Upvalues.First_Element.Cell_Value := Environment;
+      end if;
+      return Main;
    end Adopt;
 
    function Number
@@ -716,7 +727,7 @@ package body Lua.Engine.Canonical is
         (Operator : Lua.Lexers.Token_Kind; A, B : Value; Destination : Natural;
          Test : Boolean := False)
       is
-         Arguments : Values.Vector;
+         Arguments : Values.Vector := Owned_Values (State);
       begin
          Arguments.Append (A);
          Arguments.Append (B);
@@ -737,7 +748,14 @@ package body Lua.Engine.Canonical is
          end if;
          if Metafield (State, Closing, "__close").Kind = Nil_Kind
          then
-            Fail (State, "variable got a non-closable value");
+            declare
+               Name : constant Value := Local_Name
+                 (State, Activation.Code, Index + 1, Activation.PC - 2);
+            begin
+               Fail (State, "variable '" &
+                 (if Name.Kind = String_Kind then Image (Name) else "?") &
+                 "' got a non-closable value");
+            end;
          end if;
          --  Register numbers are used only for canonical lifetime ordering.
          --  Scope depth in a private frame remains its separate old meaning.
@@ -801,7 +819,7 @@ package body Lua.Engine.Canonical is
          --  Right-associated concatenation resumes at a real register pair,
          --  retaining every later operand while the handler calls Lua.
          declare
-            Arguments : Values.Vector;
+            Arguments : Values.Vector := Owned_Values (State);
          begin
             Arguments.Append (Reg (Activation.Canonical_Concat_Last - 1));
             Arguments.Append (Reg (Activation.Canonical_Concat_Last));
@@ -867,7 +885,7 @@ package body Lua.Engine.Canonical is
                       else Constant_At (State, Activation, Reg_C));
             if Op = Op_SELF then Put (Reg_A + 1, Left); end if;
             declare
-               Arguments : Values.Vector;
+               Arguments : Values.Vector := Owned_Values (State);
             begin
                Arguments.Append (Left);
                Arguments.Append (Right);
@@ -885,7 +903,7 @@ package body Lua.Engine.Canonical is
                        Constant_At (State, Activation, Reg_C)
                      else Reg (Reg_C));
             declare
-               Arguments : Values.Vector;
+               Arguments : Values.Vector := Owned_Values (State);
             begin
                Arguments.Append (Left);
                Arguments.Append (Right);
@@ -957,7 +975,7 @@ package body Lua.Engine.Canonical is
             end;
          when Op_UNM | Op_BNOT | Op_NOT | Op_LEN =>
             declare
-               Arguments : Values.Vector;
+               Arguments : Values.Vector := Owned_Values (State);
             begin
                Arguments.Append (Reg (Reg_B));
                Request ("@unary", Arguments, Reg_A, Operator =>
@@ -976,7 +994,7 @@ package body Lua.Engine.Canonical is
                Activation.Canonical_Pending := Concat_Canonical_Result;
                --  Start the first pair without recursively executing Step.
                declare
-                  Arguments : Values.Vector;
+                  Arguments : Values.Vector := Owned_Values (State);
                begin
                   Arguments.Append (Reg (Reg_A + Reg_B - 2));
                   Arguments.Append (Reg (Reg_A + Reg_B - 1));
@@ -1110,7 +1128,7 @@ package body Lua.Engine.Canonical is
             Branch (Operand (Bx));
          when Op_TFORCALL =>
             declare
-               Arguments : Values.Vector;
+               Arguments : Values.Vector := Owned_Values (State);
             begin
                Arguments.Append (Reg (Reg_A + 1));
                Arguments.Append (Reg (Reg_A + 3));
@@ -1188,7 +1206,7 @@ package body Lua.Engine.Canonical is
             end;
          when Op_VARARG =>
             declare
-               Packet : Values.Vector;
+               Packet : Values.Vector := Owned_Values (State);
                Table : Value;
                Size : Value;
             begin

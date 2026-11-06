@@ -73,13 +73,21 @@ package Lua.Storage.Vectors is
    procedure Insert
      (Self : in out Vector; Before : Positive;
       New_Item : Element_Type; Count : Count_Type := 1);
+   procedure Prepend
+     (Self : in out Vector; New_Item : Element_Type; Count : Count_Type := 1);
    procedure Delete
      (Self : in out Vector; Index : Positive; Count : Count_Type := 1);
+   procedure Delete_First (Self : in out Vector; Count : Count_Type := 1);
    procedure Delete_Last (Self : in out Vector; Count : Count_Type := 1);
    procedure Clear (Self : in out Vector);
    --  Clear destroys live elements and retains capacity and owner binding.
+   procedure Release (Self : in out Vector);
+   --  Destroy elements and capacity while preserving the explicit owner.
+   --  All borrowers must be gone before release, just as for structural edits.
    procedure Replace_Element
      (Self : in out Vector; Index : Positive; New_Item : Element_Type);
+   procedure Swap (Self : in out Vector; First, Second : Positive);
+   --  Exchange values without changing length/capacity or reference addresses.
    procedure Update_Element
      (Self : in out Vector; Index : Positive;
       Process : not null access procedure (Item : in out Element_Type));
@@ -94,6 +102,9 @@ package Lua.Storage.Vectors is
    --  and unbound. Both buffers must be unborrowed; self-move has no effect.
    --  If Target cleanup raises, Source remains unchanged and owns its buffer.
    function "=" (Left, Right : Vector) return Boolean;
+   function "&" (Left, Right : Vector) return Vector;
+   --  Concatenate through Left's owner, or Right's when Left is unbound.
+   --  Two unbound empty operands produce an unbound empty result.
    function To_Vector
      (Memory : not null Owner_Access; New_Item : Element_Type;
       Length : Count_Type) return Vector;

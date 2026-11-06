@@ -3,6 +3,7 @@ with Ada.Strings.Fixed;
 with Ada.Unchecked_Conversion;
 with Interfaces.C;
 with Lua.Platform_Mathematics;
+with Lua.Platform_Numerics;
 with Lua_Ada_Config;
 with System.Storage_Elements;
 
@@ -19,15 +20,11 @@ package body Lua.Engine.Mathematics is
 
    function To_Word is new Ada.Unchecked_Conversion (Integer_Value, Word);
    function To_Integer is new Ada.Unchecked_Conversion (Word, Integer_Value);
-   function Real_Bits is new Ada.Unchecked_Conversion (Real_Value, Word);
-   function From_Bits is new Ada.Unchecked_Conversion (Word, Real_Value);
    function Signed_C_Int is new Ada.Unchecked_Conversion
      (Interfaces.C.unsigned, Interfaces.C.int);
 
    Pi : constant Real_Value := 3.141592653589793238462643383279502884;
    Half_Mask : constant Word := 16#FFFF_FFFF#;
-   Sign : constant Word := 2 ** 63;
-   Infinity : constant Word := 16#7FF0_0000_0000_0000#;
 
    function C99_Logarithms (Host_Name : String) return Boolean is
      (Host_Name /= "windows");
@@ -191,25 +188,18 @@ package body Lua.Engine.Mathematics is
    function Quotient (Numerator, Denominator : Real_Value) return Real_Value;
    function Quotient (Numerator, Denominator : Real_Value) return Real_Value is
    begin
-      --  Ada's checked zero divisor is a language exception; C Lua expects
-      --  IEEE results for log(x)/log(base), including a base of one.
-      if Denominator = 0.0 then
-         if Numerator /= Numerator then
-            return Numerator;
-         elsif Numerator = 0.0 then
-            return From_Bits (16#FFF8_0000_0000_0000#);
-         end if;
-         return From_Bits (Infinity or
-           ((Real_Bits (Numerator) xor Real_Bits (Denominator)) and Sign));
-      end if;
-      return Numerator / Denominator;
+      --  Domain NaNs are observable through string.pack. Use the same host
+      --  quotient as ordinary Lua division, including architecture-specific
+      --  zero/zero signs, rather than synthesizing an x86 bit pattern.
+      return Real_Value (Lua.Platform_Numerics.Divide
+        (C_Real (Numerator), C_Real (Denominator)));
    end Quotient;
 
    function Run
      (State : in out World; Name : String; Arguments : Values.Vector)
       return Values.Vector
    is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Arguments.Length) then Arguments (Index)
          else Nil_Value);

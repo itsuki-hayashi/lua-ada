@@ -66,6 +66,11 @@ for index,source in ipairs(sources) do
     local file=assert(io.open(name,'wb'));file:write(string.dump(f,strip));file:close()
     list:write(name,'\n')
   end
+  if index==2 then
+    local child=f()
+    local file=assert(io.open('selected-child-c.luac','wb'))
+    file:write(string.dump(child));file:close()
+  end
 end
 list:close()
 print('CHUNK FIXTURES OK')
@@ -92,8 +97,27 @@ if arg[2] then
 else assert(first()==42) end
 print('CHUNK CROSSLOAD OK')
 '@
+$selectedVerifier = @'
+global <const> *
+for _,path in ipairs({arg[1],arg[2]}) do
+  local f=assert(loadfile(path,'b'))
+  for index=1,255 do
+    local name=debug.getupvalue(f,index)
+    if name==nil then break end
+    if name=='x' then debug.setupvalue(f,index,5)
+    elseif name=='_ENV' then debug.setupvalue(f,index,_ENV)
+    else error('unexpected selected capture') end
+  end
+  local value,count=f(9,4,5)
+  assert(value==14 and count==2)
+  local info=debug.getinfo(f,'S')
+  assert(info.what=='Lua' and info.linedefined>0)
+end
+print('SELECTED CHUNK OK')
+'@
 [IO.File]::WriteAllText((Join-Path $temporary 'generate.lua'),$generator,$encoding)
 [IO.File]::WriteAllText((Join-Path $temporary 'verify.lua'),$verifier,$encoding)
+[IO.File]::WriteAllText((Join-Path $temporary 'verify-selected.lua'),$selectedVerifier,$encoding)
 $records = [Collections.Generic.List[object]]::new()
 try {
     # The same native binary can have materially different compile-time
@@ -139,7 +163,14 @@ try {
     }
     [void](Invoke-Fixture $Probe @('emit','ada-built.luac') 'emit')
     [void](Invoke-Fixture $ReferenceInterpreter @('verify.lua','ada-built.luac') 'emit-crossload')
-    Write-Output 'PASS: chunk codec; 16 exact roundtrips, 8 stripped crossloads, Ada-built C execution'
+    [void](Invoke-Fixture $Probe @('extract','case-02-full.luac','2','selected-child-ada.luac') 'selected-extract')
+    [void](Invoke-Fixture $ReferenceInterpreter @('verify-selected.lua','selected-child-c.luac','selected-child-ada.luac') 'selected-crossload')
+    $selectedOriginal = (Get-FileHash -LiteralPath (Join-Path $temporary 'selected-child-c.luac') -Algorithm SHA256).Hash
+    $selectedCopy = (Get-FileHash -LiteralPath (Join-Path $temporary 'selected-child-ada.luac') -Algorithm SHA256).Hash
+    if ($selectedOriginal -cne $selectedCopy) { throw 'Selected subtree dump differs from C string.dump' }
+    $records.Add([ordered]@{source='selected-child-c.luac';source_sha256=$selectedOriginal;
+        copy='selected-child-ada.luac';copy_sha256=$selectedCopy;mode='selected-root';result='passed'})
+    Write-Output 'PASS: chunk codec; 16 exact roundtrips, 8 stripped crossloads, selected subtree, Ada-built C execution'
 }
 finally {
     $report=[ordered]@{schema_version=1;reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';

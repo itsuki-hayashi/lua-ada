@@ -1,4 +1,3 @@
-with Ada.Containers;
 with Ada.Exceptions;
 with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
@@ -136,6 +135,48 @@ package body Lua.Engine is
       Release_Object (Item);
    end Free_Object;
 
+   function Owned_Values
+     (State : in out World; Source : Values.Vector := Values.Empty_Vector)
+      return Values.Vector
+   is
+   begin
+      return Owned_Values (Lua.Storage.Reference (State.Memory), Source);
+   end Owned_Values;
+
+   function Owned_Values
+     (Memory : not null Lua.Storage.Owner_Access;
+      Source : Values.Vector := Values.Empty_Vector) return Values.Vector
+   is
+   begin
+      return Result : Values.Vector do
+         Result.Set_Owner (Memory);
+         Result.Append (Source);
+      end return;
+   end Owned_Values;
+
+   function One_Value
+     (State : in out World; Item : Value;
+      Count : Ada.Containers.Count_Type := 1) return Values.Vector is
+   begin
+      return One_Value (Lua.Storage.Reference (State.Memory), Item, Count);
+   end One_Value;
+
+   function One_Value
+     (Memory : not null Lua.Storage.Owner_Access; Item : Value;
+      Count : Ada.Containers.Count_Type := 1) return Values.Vector is
+   begin
+      return Values.To_Vector
+        (Memory, Item, Count);
+   end One_Value;
+
+   function New_Action (State : in out World) return Native_Action is
+   begin
+      return Result : Native_Action do
+         Result.Results.Set_Owner (Lua.Storage.Reference (State.Memory));
+         Result.Arguments.Set_Owner (Lua.Storage.Reference (State.Memory));
+      end return;
+   end New_Action;
+
    procedure Release_Foreign_Context
      (State : in out World; Context : Context_Access)
    is
@@ -162,6 +203,11 @@ package body Lua.Engine is
                end if;
          end;
       end loop;
+      Item.Memory := Lua.Storage.Reference (State.Memory);
+      Item.Stack.Set_Owner (Item.Memory);
+      Item.Arguments.Set_Owner (Item.Memory);
+      Item.Foreign_Stack.Set_Owner (Item.Memory);
+      Item.Transfer.Results.Set_Owner (Item.Memory);
       --  Registration transfers ownership. Failed vector growth leaves the
       --  allocation local, so release it before propagating Storage_Error.
       begin
@@ -315,6 +361,21 @@ package body Lua.Engine is
                end if;
          end;
       end loop;
+      --  Bind variant storage before publishing the object. Even an empty
+      --  environment/closure owns its future growth policy from this point.
+      case Kind is
+         when Table_Object =>
+            Item.Members.Set_Owner (Lua.Storage.Reference (State.Memory));
+            Item.Array_Index.Set_Owner (Lua.Storage.Reference (State.Memory));
+            Item.Hash_Index.Set_Owner (Lua.Storage.Reference (State.Memory));
+         when Environment =>
+            Item.Locals.Set_Owner (Lua.Storage.Reference (State.Memory));
+         when Closure =>
+            Item.Upvalues.Set_Owner (Lua.Storage.Reference (State.Memory));
+         when Native_Closure =>
+            Item.Captures.Set_Owner (Lua.Storage.Reference (State.Memory));
+         when Cell_Object | String_Object | Thread_Object => null;
+      end case;
       Item.Serial := State.Next_Object;
       State.Next_Object := State.Next_Object + 1;
       begin
@@ -377,7 +438,16 @@ package body Lua.Engine is
                end if;
          end;
       end loop;
-      Item.Native_Buffer.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Item.Memory := Lua.Storage.Reference (State.Memory);
+      Item.Native_Buffer.Set_Owner (Item.Memory);
+      Item.Native_Arguments.Set_Owner (Item.Memory);
+      Item.Native_Results.Set_Owner (Item.Memory);
+      Item.Native_Captures.Set_Owner (Item.Memory);
+      Item.Slots.Set_Owner (Item.Memory);
+      Item.Varargs.Set_Owner (Item.Memory);
+      Item.Closers.Set_Owner (Item.Memory);
+      Item.Unwind_Live.Set_Owner (Item.Memory);
+      Item.Unwind_Results.Set_Owner (Item.Memory);
       Item.Canonical_Registers.Set_Owner
         (Lua.Storage.Reference (State.Memory));
       Item.Canonical_Cells.Set_Owner (Lua.Storage.Reference (State.Memory));
@@ -391,6 +461,11 @@ package body Lua.Engine is
       loop
          begin
             Item := new (Lua.Storage.Handle (State.Memory)) Prototype;
+            Item.Code.Set_Owner (Lua.Storage.Reference (State.Memory));
+            Item.Parameters.Set_Owner (Lua.Storage.Reference (State.Memory));
+            Item.Capture_Symbols.Set_Owner
+              (Lua.Storage.Reference (State.Memory));
+            Item.Names.Set_Owner (Lua.Storage.Reference (State.Memory));
             Item.Canonical_Constants.Set_Owner
               (Lua.Storage.Reference (State.Memory));
             return Item;
@@ -487,8 +562,21 @@ package body Lua.Engine is
          State.Entry_Code := null;
       end if;
       if Code.Canonical_Node /= null then
-         --  Canonical closures receive their actual ordered upvalues from
-         --  descriptor resolution, not the private backend environment map.
+         --  Nested canonical closures receive descriptor-resolved cells from
+         --  CLOSURE. A newly loaded main closure creates closed initial
+         --  captures: the first is its actual _ENV binding, with any other
+         --  imported capture cells initialized to nil.
+         if Code.Is_Main then
+            for Index in 1 .. Natural (Code.Canonical_Node.Upvalues.Length)
+            loop
+               Item.Upvalues.Append
+                 ((if Index = 1 and then Capture /= null then
+                     Find_Cell (Capture, Code.Environment_Symbol)
+                   else New_Cell (State,
+                     (if Index = 1 then (Table_Kind, State.Globals)
+                      else Nil_Value))));
+            end loop;
+         end if;
          return (Closure_Kind, Item);
       elsif Capture = null and then Code.Is_Main then
          --  A chunk's _ENV is an actual ordered upvalue, including host
@@ -542,16 +630,48 @@ package body Lua.Engine is
       return (Native_Closure_Kind, Item);
    end New_Native;
 
+   function Metatable_Kind (Kind : Value_Kind) return Value_Kind;
+   function Metatable_Kind (Kind : Value_Kind) return Value_Kind is
+     (case Kind is
+         when Real_Kind => Integer_Kind,
+         when Native_Closure_Kind | Native_Kind_Value |
+           Foreign_Function_Kind =>
+            Closure_Kind,
+         when others => Kind);
+   --  Lua numbers and functions each have one type metatable, although the
+   --  VM has several representations for fast operations and foreign calls.
+
+   function Raw_Metatable (State : World; Item : Value)
+                           return Object_Access is
+   begin
+      if Item.Kind = Table_Kind then
+         return Item.Reference.Metatable;
+      elsif Item.Kind = String_Kind then
+         return State.String_Metatable;
+      end if;
+      return State.Type_Metatables (Metatable_Kind (Item.Kind));
+   end Raw_Metatable;
+
+   procedure Set_Metatable
+     (State : in out World; Item : Value; Meta : Object_Access) is
+   begin
+      --  No allocation or callback is possible while publishing this root.
+      --  Debug/C callers deliberately bypass protection; base.setmetatable
+      --  checks __metatable before reaching the same ownership transition.
+      if Item.Kind = Table_Kind then
+         Item.Reference.Metatable := Meta;
+      elsif Item.Kind = String_Kind then
+         State.String_Metatable := Meta;
+      else
+         State.Type_Metatables (Metatable_Kind (Item.Kind)) := Meta;
+      end if;
+   end Set_Metatable;
+
    function Metafield
      (State : in out World; Item : Value; Name : String) return Value
    is
-      Table : Object_Access;
+      Table : constant Object_Access := Raw_Metatable (State, Item);
    begin
-      if Item.Kind = Table_Kind then
-         Table := Item.Reference.Metatable;
-      elsif Item.Kind = String_Kind then
-         Table := State.String_Metatable;
-      end if;
       if Table = null then
          return Nil_Value;
       end if;
@@ -573,7 +693,8 @@ package body Lua.Engine is
       end if;
       case Left.Kind is
          when Nil_Kind => return True;
-         when Light_Identity_Kind => return Left.Identity = Right.Identity;
+         when Light_Identity_Kind | Foreign_Function_Kind =>
+            return Left.Identity = Right.Identity;
          when Boolean_Kind => return Left.Boolean_Data = Right.Boolean_Data;
          when Integer_Kind => return Left.Integer_Data = Right.Integer_Data;
          when Real_Kind => return Left.Real_Data = Right.Real_Data;
@@ -598,7 +719,8 @@ package body Lua.Engine is
          when Integer_Kind | Real_Kind => "number",
          when String_Kind => "string",
          when Table_Kind => "table",
-         when Closure_Kind | Native_Closure_Kind | Native_Kind_Value =>
+         when Closure_Kind | Native_Closure_Kind | Native_Kind_Value |
+           Foreign_Function_Kind =>
             "function");
 
    function Real_Image (Item : Real_Value) return String is
@@ -693,6 +815,8 @@ package body Lua.Engine is
       case Item.Kind is
          when Light_Identity_Kind =>
             return "userdata: " & Item.Identity'Image;
+         when Foreign_Function_Kind =>
+            return "function: " & Item.Identity'Image;
          when Nil_Kind => return "nil";
          when Boolean_Kind =>
             return (if Item.Boolean_Data then "true" else "false");
@@ -759,7 +883,7 @@ package body Lua.Engine is
                   return Values.Vector
    is
       Index : Natural := 0;
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
    begin
       if Table.Kind /= Table_Kind then
          Fail (State, "table expected by next");
@@ -877,6 +1001,14 @@ package body Lua.Engine is
          Set (State, Table, Key, (Native_Kind_Value, Native));
       end Install;
    begin
+      --  Ownership indexes and temporary roots exist before bootstrap can
+      --  allocate a context or heap object. No registry grows implicitly.
+      State.Contexts.Set_Owner (Lua.Storage.Reference (State.Memory));
+      State.Heap.Set_Owner (Lua.Storage.Reference (State.Memory));
+      State.Programs.Set_Owner (Lua.Storage.Reference (State.Memory));
+      State.Operation_Roots.Set_Owner (Lua.Storage.Reference (State.Memory));
+      State.Operation_Programs.Set_Owner
+        (Lua.Storage.Reference (State.Memory));
       --  Bootstrap needs an error root before any library allocation fails.
       Select_Context (State, Create_Context (State));
       State.Main_Context := State.Current;
@@ -892,6 +1024,22 @@ package body Lua.Engine is
       State.Globals := Table.Reference;
       State.Loaded_Modules := New_Table (State).Reference;
       State.Preload_Modules := New_Table (State).Reference;
+      --  Ada and C consumers see one real registry, not debug-only mirrors.
+      --  Publish it before adding its roots; bootstrap collection is disabled
+      --  until initialization completes. Public package fields can later be
+      --  replaced without retargeting these internal module tables.
+      State.Foreign_Registry := New_Table (State).Reference;
+      Set (State, (Table_Kind, State.Foreign_Registry),
+           (Integer_Kind, 2), (Table_Kind, State.Globals));
+      Set (State, (Table_Kind, State.Foreign_Registry),
+           (Integer_Kind, 3), (Thread_Kind, State.Main_Thread));
+      Set (State, (Table_Kind, State.Foreign_Registry),
+           New_String (State, "_LOADED"),
+           (Table_Kind, State.Loaded_Modules));
+      Set (State, (Table_Kind, State.Foreign_Registry),
+           New_String (State, "_PRELOAD"),
+           (Table_Kind, State.Preload_Modules));
+
       if not State.Open_Standard_Libraries then
          State.Memory_Ready := True;
          --  C-created states start with an empty global table. Opening base
@@ -926,10 +1074,12 @@ package body Lua.Engine is
       Set (State, Table, New_String (State, "collectgarbage"),
            New_Native (State, "base.collectgarbage"));
       Library ("debug", "getinfo getlocal setlocal getupvalue setupvalue " &
-                 "upvalueid sethook gethook traceback");
+                 "upvalueid upvaluejoin getregistry " &
+                 "getmetatable setmetatable " &
+                 "sethook gethook traceback");
       Library ("coroutine",
                "create resume yield wrap status running isyieldable close");
-      Library ("string", "byte char len lower upper sub reverse rep " &
+      Library ("string", "byte char len lower upper sub reverse rep dump " &
                "format find match gmatch gsub pack packsize unpack");
       Library ("utf8", "char len codepoint offset codes");
       Library ("table", "concat insert remove move pack unpack");
@@ -944,7 +1094,7 @@ package body Lua.Engine is
          Package_Value : constant Value := New_Table (State);
          Searchers : constant Value := New_Table (State);
          Captures : constant Values.Vector :=
-           Values.To_Vector (Package_Value, 1);
+           One_Value (State, Package_Value);
       begin
          --  Capture the original package object. Public field replacement
          --  must not retarget the registry roots used by require/preload.
@@ -1031,8 +1181,8 @@ package body Lua.Engine is
    procedure Collect
      (State : in out World; Emergency : Boolean := False)
    is
-      Pending : Objects.Vector;
-      Code_Pending : Prototypes.Vector;
+      Pending : Object_Access;
+      Code_Pending : Prototype_Access;
       procedure Mark (Item : Object_Access);
       procedure Mark_Value (Item : Value);
       procedure Mark_Code (Item : Prototype_Access);
@@ -1047,7 +1197,11 @@ package body Lua.Engine is
       begin
          if Item /= null and then not Item.Marked then
             Item.Marked := True;
-            Pending.Append (Item);
+            --  The mark bit prevents duplicate links and terminates cycles.
+            --  Intrusive worklists need no growth when the allocator has
+            --  already refused the allocation which triggered emergency GC.
+            Item.Mark_Next := Pending;
+            Pending := Item;
          end if;
       end Mark;
 
@@ -1064,7 +1218,8 @@ package body Lua.Engine is
       begin
          if Item /= null and then not Item.Marked then
             Item.Marked := True;
-            Code_Pending.Append (Item);
+            Item.Mark_Next := Code_Pending;
+            Code_Pending := Item;
             for Constant_Value of Item.Canonical_Constants loop
                Mark_Value (Constant_Value);
             end loop;
@@ -1174,8 +1329,8 @@ package body Lua.Engine is
       end Mark_Context;
    begin
       State.Collector_Active := True;
-      --  Explicit worklists avoid using the Ada stack to traverse arbitrary
-      --  user graphs. Marking before enqueueing also terminates on cycles.
+      --  Intrusive worklists avoid both allocation and Ada-stack traversal
+      --  of user graphs. Their links are private scratch, cleared on removal.
       Mark (State.Main_Thread);
       Mark (State.Globals);
       Mark (State.Foreign_Registry);
@@ -1206,6 +1361,9 @@ package body Lua.Engine is
          end loop;
       end if;
       Mark (State.String_Metatable);
+      for Meta of State.Type_Metatables loop
+         Mark (Meta);
+      end loop;
       Mark (State.Loaded_Modules);
       Mark (State.Preload_Modules);
       for Context of State.Contexts loop
@@ -1221,11 +1379,12 @@ package body Lua.Engine is
          end if;
       end loop;
       loop
-         while not Pending.Is_Empty loop
+         while Pending /= null loop
             declare
-               Item : constant Object_Access := Pending.Last_Element;
+               Item : constant Object_Access := Pending;
             begin
-               Pending.Delete_Last;
+               Pending := Item.Mark_Next;
+               Item.Mark_Next := null;
                case Item.Kind is
                   when Thread_Object =>
                      Mark_Context (State.Contexts (Item.Context_Index));
@@ -1293,13 +1452,14 @@ package body Lua.Engine is
                end;
             end if;
          end loop;
-         exit when Pending.Is_Empty;
+         exit when Pending = null;
       end loop;
-      while not Code_Pending.Is_Empty loop
+      while Code_Pending /= null loop
          declare
-            Item : constant Prototype_Access := Code_Pending.Last_Element;
+            Item : constant Prototype_Access := Code_Pending;
          begin
-            Code_Pending.Delete_Last;
+            Code_Pending := Item.Mark_Next;
+            Item.Mark_Next := null;
             for Code of Item.Code loop
                Mark_Code (Code.Nested);
             end loop;
@@ -1355,9 +1515,9 @@ package body Lua.Engine is
                      Free_Frame (Owned);
                   end;
                end loop;
+               State.Contexts.Replace_Element (Index, null);
                Release_Foreign_Context (State, Context);
                Free_Context (Context);
-               State.Contexts.Replace_Element (Index, null);
             end if;
          end;
       end loop;
@@ -1371,6 +1531,10 @@ package body Lua.Engine is
             declare
                Item : Object_Access := State.Heap (Index);
             begin
+               --  Remove the old slot before releasing an object. If cleanup
+               --  raises, the registry cannot retain its deallocated address;
+               --  the handler compacts only surviving, non-null entries.
+               State.Heap.Replace_Element (Index, null);
                if Item.Marked then
                   Item.Marked := False;
                   Kept := Kept + 1;
@@ -1394,6 +1558,7 @@ package body Lua.Engine is
             declare
                Item : Prototype_Access := State.Programs (Index);
             begin
+               State.Programs.Replace_Element (Index, null);
                if Item.Marked then
                   Item.Marked := False;
                   if Item.Canonical_Owner /= null then
@@ -1420,18 +1585,50 @@ package body Lua.Engine is
       State.Collector_Active := False;
    exception
       when others =>
-         --  A failed marking workspace must not leave colors which make a
-         --  later collection skip reachable objects. Sweeping itself performs
-         --  no growth and starts only after the complete mark fixed point.
-         for Item of State.Heap loop
-            Item.Marked := False;
-         end loop;
-         for Item of State.Programs loop
-            Item.Marked := False;
-            if Item.Canonical_Owner /= null then
-               Item.Canonical_Owner.Marked := False;
-            end if;
-         end loop;
+         --  Discard partial queues and colors without allocating. Null slots
+         --  identify objects already released by an interrupted sweep; live
+         --  prefixes were moved, never duplicated, before cleanup could raise.
+         Pending := null;
+         Code_Pending := null;
+         declare
+            Kept : Natural := 0;
+         begin
+            for Index in State.Heap.First_Index .. State.Heap.Last_Index loop
+               declare
+                  Item : constant Object_Access := State.Heap (Index);
+               begin
+                  if Item /= null then
+                     Item.Marked := False;
+                     Item.Mark_Next := null;
+                     Kept := Kept + 1;
+                     State.Heap.Replace_Element (Kept, Item);
+                  end if;
+               end;
+            end loop;
+            State.Heap.Set_Length (Ada.Containers.Count_Type (Kept));
+         end;
+         declare
+            Kept : Natural := 0;
+         begin
+            for Index in State.Programs.First_Index ..
+              State.Programs.Last_Index
+            loop
+               declare
+                  Item : constant Prototype_Access := State.Programs (Index);
+               begin
+                  if Item /= null then
+                     Item.Marked := False;
+                     Item.Mark_Next := null;
+                     if Item.Canonical_Owner /= null then
+                        Item.Canonical_Owner.Marked := False;
+                     end if;
+                     Kept := Kept + 1;
+                     State.Programs.Replace_Element (Kept, Item);
+                  end if;
+               end;
+            end loop;
+            State.Programs.Set_Length (Ada.Containers.Count_Type (Kept));
+         end;
          State.Collector_Active := False;
          raise;
    end Collect;
@@ -1457,7 +1654,7 @@ package body Lua.Engine is
             end if;
          end;
       end loop;
-      State.Contexts.Clear;
+      State.Contexts.Release;
       State.Current := null;
       State.Main_Context := null;
       State.Main_Thread := null;
@@ -1468,7 +1665,7 @@ package body Lua.Engine is
             Free_Object (State, Item);
          end;
       end loop;
-      State.Heap.Clear;
+      State.Heap.Release;
       for Program of State.Programs loop
          declare
             Item : Prototype_Access := Program;
@@ -1476,12 +1673,16 @@ package body Lua.Engine is
             Release_Program (Item);
          end;
       end loop;
-      State.Programs.Clear;
+      State.Programs.Release;
       State.Globals := null;
       State.Foreign_Registry := null;
+      State.String_Metatable := null;
+      State.Type_Metatables := [others => null];
       State.Memory_Error_Value := Nil_Value;
       State.Entry_Code := null;
       End_Operation (State);
+      State.Operation_Roots.Release;
+      State.Operation_Programs.Release;
       State.Memory_Ready := False;
    end Finalize;
 

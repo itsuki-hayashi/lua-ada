@@ -36,6 +36,15 @@ luaconf enables LUA_USE_C89 on Windows; its base-two logarithm uses the natural
 logarithm quotient, while C99 configurations select host log2. Preserve that
 configuration distinction, including rounding and exceptional-value bits. The ldexp
 adapter preserves the supported C ABI's integer-cast behavior before the call.
+The first published checkpoint exposed an additional arithmetic issue on
+macOS AArch64: synthesizing x86 negative NaN for 0/0 changed the bytes later
+returned by sin. A narrow first-party C function now performs native binary64
+division, and host fmod supplies remainder domain results. Neither helper owns
+Lua state or interpreter behavior. Ada keeps conversions, dispatch, floor and
+modulo correction, with runtime checks enabled. Exceptional NaNs are not masked
+in comparisons. The new focused cases and the same-host differential must
+verify this change on every platform.
+
 No cross-operating-system bit-identical transcendental promise follows: each
 build must match its own native C oracle.
 

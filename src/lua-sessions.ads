@@ -73,9 +73,9 @@ package Lua.Sessions is
       Name : String := "(source)";
       Arguments : Argument_Array := No_Arguments;
       Sink : access Output_Sink'Class := null) return Execution_Result;
-   --  Execute a named text chunk, retaining globals across calls.
+   --  Execute named text or a checked native binary chunk, retaining globals.
    --  @param Self Unique owner of the heap and global environment.
-   --  @param Source Lua source bytes, not a serialized binary chunk.
+   --  @param Source Lua source bytes or a native Lua 5.5.1 binary chunk.
    --  @param Name Source label used by diagnostics and Lua error prefixes.
    --  @param Arguments Values supplied to the chunk's vararg parameter.
    --  @param Sink Optional borrowed output destination; never retained.

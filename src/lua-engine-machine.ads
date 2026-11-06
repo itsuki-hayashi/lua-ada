@@ -1,4 +1,6 @@
 with Lua.Lexers;
+with Lua.Storage;
+with System;
 
 package Lua.Engine.Machine is
    function Binary_Value
@@ -12,6 +14,8 @@ package Lua.Engine.Machine is
    --  applicability before bypassing a canonical metamethod instruction.
 
    type Driver is limited private;
+   type Driver_Access is access Driver;
+   for Driver_Access'Storage_Pool use Lua.Storage.Pool;
    --  A driver borrows one stable universe and its root context. It contains
    --  no access-to-nested-subprogram closure or saved Ada activation. The
    --  universe must outlive Start through Finish; serialize its operations.
@@ -45,6 +49,33 @@ package Lua.Engine.Machine is
    procedure Finish (Self : in out Driver);
    --  Release a completed/failed borrow. Idempotent for an idle driver; an
    --  active unfinished driver is a misuse, rather than silent abandonment.
+
+   function New_Driver (State : in out World) return Driver_Access;
+   procedure Free_Driver (Self : in out Driver_Access);
+   --  Foreign control blocks retain an initialized driver allocated through
+   --  their universe's provider. Free only an idle/released drive.
+
+   function Needs_Foreign_Call (Self : Driver) return Boolean;
+   function Foreign_Handler (Self : Driver) return System.Address;
+   function Foreign_Context (Self : Driver) return Context_Access;
+   --  Inspect a suspended C callback request after Step has returned. The
+   --  C-owned pump invokes its handler; no Ada activation may span that call.
+   --  Arguments are rooted on the addressed context's base-relative C stack.
+
+   procedure Complete_Foreign_Call
+     (Self : Driver; Result_Count : Natural; Error_Status : Natural := 0);
+   --  Publish the C callback's real result/error packet and restore its caller
+   --  stack base before the next Step. Status zero completes normally; two
+   --  and four propagate language/memory failure through ordinary protection.
+
+   procedure Start_Foreign_Boundary
+     (Self : Driver; Callee : Value; Arguments : Values.Vector);
+   function Has_Foreign_Result (Self : Driver) return Boolean;
+   procedure Take_Foreign_Result
+     (Self : Driver; Packet : out Values.Vector; Error_Status : out Natural);
+   --  Reentrant C lua_call/pcall uses a protected sentinel on this same drive.
+   --  The nested C pump stops at that explicit boundary, without completing
+   --  or recursively entering the outer interpreter drive.
 
    procedure Run (State : in out World; Code : Prototype_Access);
    --  Synchronous Ada convenience wrapper over Start, Step and Finish.

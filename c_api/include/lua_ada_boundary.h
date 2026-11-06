@@ -16,7 +16,9 @@ enum lua_ada_operation {
     ADA_PUSH_NUMBER, ADA_PUSH_STRING, ADA_PUSH_POINTER, ADA_PUSH_THREAD,
     ADA_CREATE_TABLE, ADA_RAW_GET, ADA_RAW_SET, ADA_RAW_GET_INTEGER,
     ADA_RAW_SET_INTEGER, ADA_RAW_GET_POINTER, ADA_RAW_SET_POINTER,
-    ADA_RAW_EQUAL, ADA_NEXT_ITEM, ADA_GET_ALLOCATOR, ADA_SET_ALLOCATOR
+    ADA_RAW_EQUAL, ADA_NEXT_ITEM, ADA_GET_ALLOCATOR, ADA_SET_ALLOCATOR,
+    ADA_PUSH_C_CLOSURE, ADA_TO_C_FUNCTION, ADA_BEGIN_CALL,
+    ADA_COMPLETE_CALLBACK, ADA_RAISE_ERROR, ADA_LOAD_BUFFER
 };
 
 struct lua_ada_request {
@@ -29,6 +31,9 @@ struct lua_ada_request {
     size_t length;
     lua_Alloc allocator;
     unsigned seed;
+    lua_CFunction function_data;
+    const char *name;
+    const char *mode;
 };
 
 struct lua_ada_response {
@@ -37,10 +42,12 @@ struct lua_ada_response {
     void *pointer;
     size_t length;
     lua_Alloc allocator;
+    lua_CFunction function_data;
 };
 
 enum lua_ada_action {
     ADA_ACTION_DONE = LUA_OK,
+    ADA_ACTION_CALL = LUA_YIELD,
     ADA_ACTION_RAISE = LUA_ERRRUN,
     ADA_ACTION_MEMORY = LUA_ERRMEM,
     ADA_ACTION_ABORT = 6

@@ -60,6 +60,7 @@ package body Lua.Canonical_Compiler_Tests is
    procedure Goto_Lifetimes;
    procedure Named_Varargs;
    procedure Debug_Metadata;
+   procedure Method_Instruction;
    procedure Allocation_Transactions;
 
    procedure Main_Environment is
@@ -357,6 +358,17 @@ package body Lua.Canonical_Compiler_Tests is
               "active local debug lifetime");
    end Debug_Metadata;
 
+   procedure Method_Instruction is
+      Memory : Lua.Storage.Owner;
+      Result : constant Compilation_Result := Lower ("return t:f()", Memory);
+      Node : constant Prototype_Access := Root (Result.Code);
+   begin
+      --  Short method names with a small constant index carry the pinned SELF
+      --  instruction. Runtime debug lookup can derive namewhat="method" from
+      --  real code, while SELF itself preserves the implicit receiver value.
+      Assert (Has (Node, Op_SELF), "method call lost its SELF instruction");
+   end Method_Instruction;
+
    procedure Allocation_Transactions is
       Memory : Lua.Storage.Owner;
       Completed : Boolean := False;
@@ -422,6 +434,8 @@ package body Lua.Canonical_Compiler_Tests is
         Named_Varargs'Access);
       Test_Support.Add (Suite, "canonical compiler: debug metadata",
         Debug_Metadata'Access);
+      Test_Support.Add (Suite, "canonical compiler: method instruction",
+        Method_Instruction'Access);
       Test_Support.Add (Suite, "canonical compiler: allocation transactions",
         Allocation_Transactions'Access);
    end Register;

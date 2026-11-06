@@ -219,3 +219,11 @@ Evidence: [current session](sessions/2026-11-06-m3-upstream-conformance.md),
 [ADR 0010](decisions/0010-full-upstream-delivery.md) and the
 [inventory contract](../tests/conformance/README.md). No fixture pin or source
 obligation is removed to make a completion check pass.
+
+The current single-PR runtime checkpoint includes normal canonical execution,
+native binary load/dump, one mixed Ada/C liblua image, managed runtime vectors,
+and real registry/type-metatable/upvalue joining. The retained pipeline passes
+866 AUnit cases with its API/CLI/five-file regressions. These component results
+do not close M3-FULL-2 through M3-FULL-8; sustained allocator refusal, complete
+foreign continuations, collector modes, remaining libraries, full T coverage
+and final platform contexts remain required. See the current session record.

@@ -10,7 +10,7 @@ package body Lua.Engine.Pattern_Drivers is
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
       Name : constant String := To_String (Activation.Native_Name);
-      Action : Native_Action;
+      Action : Native_Action := New_Action (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Activation.Native_Arguments.Length) then
            Activation.Native_Arguments (Index) else Nil_Value);
@@ -72,7 +72,7 @@ package body Lua.Engine.Pattern_Drivers is
    begin
       if Name in "gmatch" | "string.gmatch" then
          declare
-            Captures : Values.Vector;
+            Captures : Values.Vector := Owned_Values (State);
             Subject : constant String := Copy_Argument (Arg (1));
             Initial : Integer_Value := 1;
          begin
@@ -134,7 +134,7 @@ package body Lua.Engine.Pattern_Drivers is
          Anchored : constant Boolean := Pattern'Length > 0 and then
            Pattern (Pattern'First) = '^';
          Found : Patterns.Match_Result;
-         Captures : Values.Vector;
+         Captures : Values.Vector := Owned_Values (State);
          Whole : Managed.Buffer;
          Last : Integer_Value;
          Changed : Value;
@@ -144,7 +144,8 @@ package body Lua.Engine.Pattern_Drivers is
             Limit := Strings.Integer_Argument (State, Arg (4));
          end if;
          if Replacement.Kind not in String_Kind | Integer_Kind | Real_Kind |
-           Table_Kind | Closure_Kind | Native_Kind_Value | Native_Closure_Kind
+           Table_Kind | Closure_Kind | Native_Kind_Value |
+           Native_Closure_Kind | Foreign_Function_Kind
          then
             Fail (State, "string/function/table expected");
          end if;
@@ -254,7 +255,7 @@ package body Lua.Engine.Pattern_Drivers is
             Action.Arguments.Append (Captures.First_Element);
             Activation.Native_Stage := 2;
          elsif Replacement.Kind in Closure_Kind | Native_Kind_Value |
-           Native_Closure_Kind
+           Native_Closure_Kind | Foreign_Function_Kind
          then
             Action.Kind := Invoke;
             Action.Function_Value := Replacement;

@@ -129,7 +129,7 @@ package body Lua.Engine.Packing is
          Size : U64 := 0;
          Alignment : U64 := 0;
       end record;
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       Buffer : Managed.Buffer;
       Format_Position : Positive := 1;
       Little : Boolean := Character'Pos (Bytes (1) (1)) = 1;

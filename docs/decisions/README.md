@@ -1,6 +1,6 @@
 # Architecture Decision Log
 
-Latest: [ADR 0012: canonical programs](0012-canonical-program-ownership.md).
+Latest: [ADR 0014: one core image](0014-one-core-library.md).
 
 ADR 0007 records explicit native continuation frames, traced library/module
 state, shared budgets, and text loading. Its implementation passed M2b acceptance.
@@ -21,6 +21,8 @@ its runtime changes are planned, not implemented by the foundation gate.
 | 0010 | [Complete upstream delivery in one PR](0010-full-upstream-delivery.md) | accepted |
 | 0011 | [Host mathematics and owned RNG](0011-host-mathematics.md)             | accepted |
 | 0012 | [Canonical programs and chunks](0012-canonical-program-ownership.md)   | accepted |
+| 0013 | [C-owned calls and driver phases](0013-c-owned-call-boundary.md)       | accepted |
+| 0014 | [One Ada/C core image](0014-one-core-library.md)                       | accepted |
 
 ADR 0009 records the approved combined delivery order, iterative scheduler,
 stable cells, explicit cleanup, weak thread ownership and execution policies.
@@ -30,6 +32,10 @@ ADR 0011 extends the host-math compatibility boundary and keeps reproducible
 random generation in owned Ada state.
 ADR 0012 separates canonical program ownership and native binary encoding
 from the still independently verified execution backend.
+ADR 0013 keeps foreign callbacks and nonlocal transfers on the C side of an
+explicit scheduler boundary and retains real stack windows/upvalue cells.
+ADR 0014 makes the root library the single compiled interpreter image shared by
+Ada hosts, the C facade and native-module consumers.
 
 Add numbered records for consequential choices. Include date, status, context,
 decision, alternatives, consequences, and verification implications. Supersede

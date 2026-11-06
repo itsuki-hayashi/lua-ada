@@ -1,24 +1,38 @@
 with Ada.Containers;
 with Ada.Exceptions;
+with Ada.Strings.Fixed;
+with Ada.Unchecked_Conversion;
 with Ada.Unchecked_Deallocation;
+with Interfaces.C.Strings;
+with Lua.Canonical_Compiler;
+with Lua.Chunks;
+with Lua.Engine.Canonical;
+with Lua.Engine.Machine;
+with Lua.Runtime_Configuration;
+with Lua.Syntax;
+with Lua.Syntax_Trees;
 with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
 
 package body Lua.Engine.Foreign is
    package C renames Interfaces.C;
    package Memory renames Lua.Storage;
+   package VM renames Lua.Engine.Machine;
    use System.Storage_Elements;
    use type Ada.Containers.Count_Type;
    use type C.int;
    use type C.long_long;
    use type C.size_t;
+   use type VM.Driver_Access;
+   use type Lua.Syntax.Check_Status;
    use type Integer_Value;
    use type Real_Value;
    use type Memory.Allocation_Function;
    use type System.Address;
 
    Registry_Index : constant C.int := -(C.int'Last / 2 + 1_000);
-   Stack_Limit : constant Natural := 1_000_000;
+   Stack_Limit : constant Natural :=
+     Lua.Runtime_Configuration.Maximum_Stack;
    Foreign_Error : exception;
 
    type Control is record
@@ -26,11 +40,29 @@ package body Lua.Engine.Foreign is
       Context : Context_Id;
       Extra : Storage_Count;
       Seed : C.unsigned;
+      Driver : VM.Driver_Access;
+      Calls : System.Address := System.Null_Address;
    end record;
    --  Raw ownership metadata has no Ada finalizers or hidden allocations.
    --  Engine context cleanup releases both it and the separate state block.
    package Controls is new System.Address_To_Access_Conversions (Control);
    use type Controls.Object_Pointer;
+
+   type Call_Record is record
+      Previous : System.Address := System.Null_Address;
+      Base : Natural := 0;
+      Wanted : C.int := 0;
+      Protected_Call : Boolean := False;
+      Is_Root : Boolean := False;
+      Context : Context_Id := 1;
+   end record;
+   package Calls is new System.Address_To_Access_Conversions (Call_Record);
+   function Function_Address is new Ada.Unchecked_Conversion
+     (C_Function, System.Address);
+   function Address_Function is new Ada.Unchecked_Conversion
+     (System.Address, C_Function);
+   function Characters is new Ada.Unchecked_Conversion
+     (System.Address, Interfaces.C.Strings.chars_ptr);
 
    type Surface is record
       Owner : System.Address;
@@ -53,11 +85,20 @@ package body Lua.Engine.Foreign is
      (Context : Context_Access; Index : C.int) return Natural;
    function At_Index
      (State : World; Context : Context_Access; Index : C.int) return Value;
+   function Valid_Index (Context : Context_Access; Index : C.int)
+                         return Boolean;
    function Type_Code (Item : Value) return C.int;
    function Numeric (Item : Value) return Lua.Numbers.Number;
    procedure Push (Context : Context_Access; Item : Value);
    function Read_Bytes
      (Pointer : System.Address; Length : C.size_t) return String;
+   function Read_Name (Pointer : System.Address; Default : String)
+                       return String;
+
+   function Read_Name (Pointer : System.Address; Default : String)
+                       return String is
+     (if Pointer = System.Null_Address then Default else
+         Interfaces.C.Strings.Value (Characters (Pointer)));
 
    function Contract_Size (Part : C.int) return C.size_t is
    begin
@@ -80,6 +121,7 @@ package body Lua.Engine.Foreign is
       pragma Assert (C.long_long'Size = 64);
       pragma Assert (C.double'Size = 64);
       pragma Assert (Operation_Code'Size = C.int'Size);
+      pragma Assert (C_Function'Size = System.Address'Size);
    end Initialize_Bridge;
 
    function Context_Of (Owner : Controls.Object_Pointer)
@@ -117,7 +159,7 @@ package body Lua.Engine.Foreign is
       Result := Block + Storage_Offset (Extra);
       Controls.To_Pointer (Header).all :=
         (Universe => State, Context => Context, Extra => Extra,
-         Seed => Seed);
+         Seed => Seed, Driver => null, others => <>);
       Surfaces.To_Pointer (Result).all :=
         (Owner => Header, Guard => System.Null_Address,
          Main => (if Main = System.Null_Address then Result else Main),
@@ -156,7 +198,6 @@ package body Lua.Engine.Foreign is
    function New_State (Input : Request) return System.Address is
       State : World_Access;
       Result : System.Address;
-      Registry : Value;
       Operation_Active : Boolean := False;
    begin
       State := new World;
@@ -176,18 +217,6 @@ package body Lua.Engine.Foreign is
       Result := Create_Surface
         (State, Context_Id (State.Main_Thread.Context_Index),
          Storage_Count (Input.Length), Input.Seed, System.Null_Address);
-      Registry := New_Table (State.all);
-      State.Foreign_Registry := Registry.Reference;
-      Set (State.all, Registry,
-           (Kind => Integer_Kind, Integer_Data => 2),
-           (Kind => Table_Kind, Reference => State.Globals));
-      Set (State.all, Registry,
-           (Kind => Integer_Kind, Integer_Data => 3),
-           (Kind => Thread_Kind, Reference => State.Main_Thread));
-      Set (State.all, Registry, New_String (State.all, "_LOADED"),
-           (Kind => Table_Kind, Reference => State.Loaded_Modules));
-      Set (State.all, Registry, New_String (State.all, "_PRELOAD"),
-           (Kind => Table_Kind, Reference => State.Preload_Modules));
       End_Operation (State.all);
       Operation_Active := False;
       return Result;
@@ -207,17 +236,36 @@ package body Lua.Engine.Foreign is
      (Context : Context_Access; Index : C.int) return Natural
    is
       Number : constant Integer_Value :=
-        (if Index > 0 then Integer_Value (Index)
+        (if Index > 0 then Integer_Value (Context.Foreign_Base) +
+           Integer_Value (Index)
          else Integer_Value (Context.Foreign_Stack.Length) +
            Integer_Value (Index) + 1);
    begin
-      if Index = 0 or else Index <= Registry_Index or else Number <= 0
+      if Index = 0 or else Index <= Registry_Index or else
+        Number <= Integer_Value (Context.Foreign_Base)
         or else Number > Integer_Value (Context.Foreign_Stack.Length)
       then
          return 0;
       end if;
       return Natural (Number);
    end Position;
+
+   function Valid_Index (Context : Context_Access; Index : C.int)
+                         return Boolean
+   is
+      Activation : constant Frame_Access := Context.Foreign_Activation;
+      Upvalue : constant C.long_long :=
+        C.long_long (Registry_Index) - C.long_long (Index);
+   begin
+      if Index = Registry_Index then
+         return True;
+      elsif Index < Registry_Index then
+         return Activation /= null and then Activation.Native_Self /= null
+           and then Upvalue in 1 .. C.long_long
+             (Activation.Native_Self.Captures.Length);
+      end if;
+      return Position (Context, Index) /= 0;
+   end Valid_Index;
 
    function At_Index
      (State : World; Context : Context_Access; Index : C.int) return Value
@@ -226,6 +274,21 @@ package body Lua.Engine.Foreign is
    begin
       if Index = Registry_Index then
          return (Kind => Table_Kind, Reference => State.Foreign_Registry);
+      elsif Index < Registry_Index then
+         declare
+            Upvalue : constant C.long_long :=
+              C.long_long (Registry_Index) - C.long_long (Index);
+            Activation : constant Frame_Access := Context.Foreign_Activation;
+         begin
+            if Activation /= null and then Activation.Native_Self /= null
+              and then Upvalue in 1 .. C.long_long
+                (Activation.Native_Self.Captures.Length)
+            then
+               return Activation.Native_Self.Captures
+                 (Positive (Upvalue)).Cell_Value;
+            end if;
+            return Nil_Value;
+         end;
       elsif Slot = 0 then
          return Nil_Value;
       end if;
@@ -241,7 +304,8 @@ package body Lua.Engine.Foreign is
          when Integer_Kind | Real_Kind => return 3;
          when String_Kind => return 4;
          when Table_Kind => return 5;
-         when Closure_Kind | Native_Closure_Kind | Native_Kind_Value =>
+         when Closure_Kind | Native_Closure_Kind | Native_Kind_Value |
+           Foreign_Function_Kind =>
             return 6;
          when Thread_Kind => return 8;
       end case;
@@ -308,12 +372,15 @@ package body Lua.Engine.Foreign is
       Active_World : World_Access;
       Previous : Context_Access;
       Operation_Active : Boolean := False;
+      Keep_Scheduler : Boolean := False;
+      Main_Owner : Controls.Object_Pointer;
 
       procedure Leave_Context;
       procedure Error_Result (Text : String);
       procedure Memory_Result;
       function Require_Table return Value;
       procedure Get_Raw (Key : Value);
+      function Pump (Start_Error : Boolean := False) return Action_Status;
 
       procedure Leave_Context is
       begin
@@ -322,7 +389,9 @@ package body Lua.Engine.Foreign is
                End_Operation (Active_World.all);
                Operation_Active := False;
             end if;
-            Active_World.Current := Previous;
+            if not Keep_Scheduler then
+               Active_World.Current := Previous;
+            end if;
             Active_World := null;
          end if;
       end Leave_Context;
@@ -376,6 +445,119 @@ package body Lua.Engine.Foreign is
          Output.Integer_Data := C.long_long (Type_Code (Item));
       end Get_Raw;
 
+      function Pump (Start_Error : Boolean := False) return Action_Status is
+         Driver : VM.Driver renames Main_Owner.Driver.all;
+         Pending : constant Calls.Object_Pointer :=
+           Calls.To_Pointer (Main_Owner.Calls);
+         Caller : constant Context_Access := Owner.Universe.Contexts
+           (Positive (Pending.Context));
+         Packet : Values.Vector :=
+           Owned_Values (Owner.Universe.all);
+         Error_Status : Natural := 0;
+         Count : Natural;
+         Address : System.Address;
+      begin
+         --  Every iteration executes one explicit scheduler phase. Returning
+         --  a callback action destroys this Ada activation before C invokes
+         --  the foreign function or establishes a nonlocal-transfer guard.
+         Keep_Scheduler := True;
+         if Start_Error then
+            if Owner.Universe.Current.Failure_Class = Host_Abort then
+               return Action_Abort;
+            end if;
+            Error_Status :=
+              (if Owner.Universe.Current.Failure_Class = Memory_Failure then 4
+               else 2);
+            Packet.Append
+              ((if Owner.Universe.Current.Has_Failure_Value then
+                   Owner.Universe.Current.Failure else
+                   New_String (Owner.Universe.all, To_String
+                     (Owner.Universe.Current.Failure_Text))));
+         end if;
+         loop
+            exit when Error_Status /= 0 or else VM.Is_Complete (Driver) or else
+              VM.Has_Foreign_Result (Driver);
+            if VM.Needs_Foreign_Call (Driver) then
+               declare
+                  Target : constant Context_Access :=
+                    VM.Foreign_Context (Driver);
+               begin
+                  Output.Pointer := Create_Surface
+                    (Owner.Universe, Context_Id (Target.Thread.Context_Index),
+                     Main_Owner.Extra, Main_Owner.Seed,
+                     Surfaces.To_Pointer (State).Main);
+                  Output.Function_Data :=
+                    Address_Function (VM.Foreign_Handler (Driver));
+                  return Action_Call;
+               end;
+            end if;
+            begin
+               VM.Step (Driver);
+            exception
+               when Language_Error =>
+                  if Owner.Universe.Current.Failure_Class = Host_Abort then
+                     return Action_Abort;
+                  end if;
+                  Error_Status :=
+                    (if Owner.Universe.Current.Failure_Class = Memory_Failure
+                     then 4 else 2);
+                  Packet.Append
+                    ((if Owner.Universe.Current.Has_Failure_Value then
+                         Owner.Universe.Current.Failure else
+                         New_String (Owner.Universe.all, To_String
+                           (Owner.Universe.Current.Failure_Text))));
+                  exit;
+            end;
+         end loop;
+         if Error_Status = 0 then
+            if Pending.Is_Root then
+               if VM.Outcome (Driver) /= Completed then
+                  raise Foreign_Error with "unexpected C-call suspension";
+               end if;
+               Packet := VM.Results (Driver);
+            else
+               VM.Take_Foreign_Result (Driver, Packet, Error_Status);
+            end if;
+         end if;
+         Pin (Owner.Universe.all, Packet);
+         if Pending.Is_Root then
+            VM.Finish (Driver);
+            VM.Clear_Frames (Owner.Universe.all);
+            Caller.Non_Yieldable := Caller.Non_Yieldable - 1;
+         end if;
+         Caller.Foreign_Stack.Set_Length
+           (Ada.Containers.Count_Type (Pending.Base));
+         Count := (if Error_Status /= 0 then 1
+                   elsif Pending.Wanted = -1 then Natural (Packet.Length)
+                   else Natural (Pending.Wanted));
+         --  The Call_Record contains only scalar ownership metadata; pop it
+         --  before publishing results so allocation refusal cannot leave a
+         --  finished operation registered as an active nested drive.
+         Address := Main_Owner.Calls;
+         Main_Owner.Calls := Pending.Previous;
+         declare
+            Protected_Call : constant Boolean := Pending.Protected_Call;
+         begin
+            Memory.Release (Owner.Universe.Memory, Address);
+            for Index in 1 .. Count loop
+               Push (Caller,
+                 (if Index <= Natural (Packet.Length) then Packet (Index)
+                  else Nil_Value));
+            end loop;
+            Output.Integer_Data := C.long_long (Error_Status);
+            if Error_Status /= 0 and then not Protected_Call then
+               if not Packet.Is_Empty and then
+                 Packet.First_Element.Kind = String_Kind
+               then
+                  Output.Pointer := Packet.First_Element.Reference.C_Bytes;
+               end if;
+               return (if Error_Status = 4 then Action_Memory else
+                         Action_Raise);
+            end if;
+         end;
+         return Action_Done;
+      end Pump;
+
    begin
       Output.all := (others => <>);
       if Input.Operation in Create_State | Create_Default_State then
@@ -386,6 +568,8 @@ package body Lua.Engine.Foreign is
          raise Foreign_Error with "null C state";
       end if;
       Owner := Controls.To_Pointer (Surfaces.To_Pointer (State).Owner);
+      Main_Owner := Controls.To_Pointer
+        (Surfaces.To_Pointer (Surfaces.To_Pointer (State).Main).Owner);
       Context := Context_Of (Owner);
       Active_World := Owner.Universe;
       Previous := Active_World.Current;
@@ -401,6 +585,10 @@ package body Lua.Engine.Foreign is
             declare
                Universe : World_Access := Owner.Universe;
             begin
+               if Main_Owner.Calls /= System.Null_Address then
+                  raise Foreign_Error with "cannot close a running C drive";
+               end if;
+               VM.Free_Driver (Main_Owner.Driver);
                End_Operation (Active_World.all);
                Operation_Active := False;
                Active_World := null;
@@ -422,21 +610,26 @@ package body Lua.Engine.Foreign is
             end;
          when Get_Top =>
             Output.Integer_Data := C.long_long
-              (Context.Foreign_Stack.Length);
+              (Natural (Context.Foreign_Stack.Length) - Context.Foreign_Base);
          when Absolute_Index =>
             Output.Integer_Data :=
               (if Input.Index > 0 or Input.Index <= Registry_Index then
                   C.long_long (Input.Index)
-               else C.long_long (Context.Foreign_Stack.Length) +
+               else C.long_long
+                 (Natural (Context.Foreign_Stack.Length) -
+                  Context.Foreign_Base) +
                  C.long_long (Input.Index) + 1);
          when Set_Top =>
             declare
                Count : constant Integer_Value :=
-                 (if Input.Index >= 0 then Integer_Value (Input.Index)
+                 (if Input.Index >= 0 then Integer_Value
+                    (Context.Foreign_Base) + Integer_Value (Input.Index)
                   else Integer_Value (Context.Foreign_Stack.Length) +
                     Integer_Value (Input.Index) + 1);
             begin
-               if Count < 0 or Count > Integer_Value (Stack_Limit) then
+               if Count < Integer_Value (Context.Foreign_Base) or else
+                 Count > Integer_Value (Stack_Limit)
+               then
                   raise Foreign_Error with "invalid stack top";
                end if;
                while Integer_Value (Context.Foreign_Stack.Length) < Count
@@ -475,11 +668,19 @@ package body Lua.Engine.Foreign is
             declare
                Slot : constant Natural := Position (Context, Input.Count);
             begin
-               if Slot = 0 then
+               if Input.Count < Registry_Index and then
+                 Valid_Index (Context, Input.Count)
+               then
+                  Context.Foreign_Activation.Native_Self.Captures
+                    (Positive (C.long_long (Registry_Index) -
+                      C.long_long (Input.Count))).Cell_Value :=
+                        Get_Value (Input.Index);
+               elsif Slot = 0 then
                   raise Foreign_Error with "invalid C stack destination";
+               else
+                  Context.Foreign_Stack.Replace_Element
+                    (Slot, Get_Value (Input.Index));
                end if;
-               Context.Foreign_Stack.Replace_Element
-                 (Slot, Get_Value (Input.Index));
             end;
          when Rotate_Values =>
             declare
@@ -525,7 +726,8 @@ package body Lua.Engine.Foreign is
             begin
                if Target_Owner.Universe /= Owner.Universe or else Count < 0
                  or else Integer_Value (Count) >
-                   Integer_Value (Context.Foreign_Stack.Length)
+                   Integer_Value (Context.Foreign_Stack.Length) -
+                     Integer_Value (Context.Foreign_Base)
                then
                   raise Foreign_Error with "invalid cross-state move";
                end if;
@@ -541,8 +743,7 @@ package body Lua.Engine.Foreign is
             end;
          when Get_Type =>
             Output.Integer_Data :=
-              (if Input.Index /= Registry_Index and
-                   Position (Context, Input.Index) = 0 then -1
+              (if not Valid_Index (Context, Input.Index) then -1
                else C.long_long (Type_Code (Get_Value (Input.Index))));
             Output.Length := Boolean'Pos
               (Get_Value (Input.Index).Kind = Integer_Kind);
@@ -581,9 +782,17 @@ package body Lua.Engine.Foreign is
                Item : Value := Get_Value (Input.Index);
                Slot : constant Natural := Position (Context, Input.Index);
             begin
-               if Item.Kind in Integer_Kind | Real_Kind and Slot > 0 then
+               if Item.Kind in Integer_Kind | Real_Kind and then
+                 Valid_Index (Context, Input.Index)
+               then
                   Item := New_String (Owner.Universe.all, Image (Item));
-                  Context.Foreign_Stack.Replace_Element (Slot, Item);
+                  if Slot > 0 then
+                     Context.Foreign_Stack.Replace_Element (Slot, Item);
+                  else
+                     Context.Foreign_Activation.Native_Self.Captures
+                       (Positive (C.long_long (Registry_Index) -
+                         C.long_long (Input.Index))).Cell_Value := Item;
+                  end if;
                end if;
                if Item.Kind = String_Kind then
                   Output.Pointer := Item.Reference.C_Bytes;
@@ -613,7 +822,7 @@ package body Lua.Engine.Foreign is
                      Surfaces.To_Pointer (State).Main);
                elsif Input.Operation = To_Pointer then
                   case Item.Kind is
-                     when Light_Identity_Kind =>
+                     when Light_Identity_Kind | Foreign_Function_Kind =>
                         Output.Pointer := Item.Identity;
                      when String_Kind =>
                         Output.Pointer := Item.Reference.C_Bytes;
@@ -700,10 +909,8 @@ package body Lua.Engine.Foreign is
                       Identity => Input.Pointer));
          when Raw_Equal =>
             Output.Integer_Data := Boolean'Pos
-              ((Position (Context, Input.Index) > 0 or
-                Input.Index = Registry_Index) and then
-               (Position (Context, Input.Count) > 0 or
-                Input.Count = Registry_Index) and then
+              (Valid_Index (Context, Input.Index) and then
+               Valid_Index (Context, Input.Count) and then
                Equal (Get_Value (Input.Index), Get_Value (Input.Count)));
          when Next_Item =>
             declare
@@ -736,6 +943,254 @@ package body Lua.Engine.Foreign is
             end if;
             Memory.Set_Allocator
               (Owner.Universe.Memory, Input.Allocator, Input.Pointer);
+         when Push_C_Closure =>
+            if Input.Function_Data = null or else Input.Count not in 0 .. 255
+              or else Input.Count > C.int
+                (Natural (Context.Foreign_Stack.Length) -
+                 Context.Foreign_Base)
+            then
+               raise Foreign_Error with "invalid C closure arguments";
+            end if;
+            if Input.Count = 0 then
+               Push (Context, (Foreign_Function_Kind,
+                               Function_Address (Input.Function_Data)));
+            else
+               declare
+                  Captures : Values.Vector :=
+                    Owned_Values (Owner.Universe.all);
+                  Item : Value;
+               begin
+                  for Index in Natural (Context.Foreign_Stack.Length) -
+                    Natural (Input.Count) + 1 ..
+                    Natural (Context.Foreign_Stack.Length)
+                  loop
+                     Captures.Append (Context.Foreign_Stack (Index));
+                  end loop;
+                  Item := New_Native (Owner.Universe.all, "foreign.callback",
+                                      Captures);
+                  Item.Reference.Foreign_Handler :=
+                    Function_Address (Input.Function_Data);
+                  Context.Foreign_Stack.Delete_Last
+                    (Ada.Containers.Count_Type (Input.Count));
+                  Push (Context, Item);
+               end;
+            end if;
+         when To_C_Function =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+            begin
+               if Item.Kind = Foreign_Function_Kind then
+                  Output.Function_Data := Address_Function (Item.Identity);
+               elsif Item.Kind = Native_Closure_Kind and then
+                 Item.Reference.Foreign_Handler /= System.Null_Address
+               then
+                  Output.Function_Data :=
+                    Address_Function (Item.Reference.Foreign_Handler);
+               end if;
+            end;
+         when Begin_Call =>
+            if Input.Index < 0 or else Input.Count < -1 or else
+              Input.Count > C.int (Stack_Limit) or else
+              Natural (Input.Index) >= Natural (Context.Foreign_Stack.Length)
+                - Context.Foreign_Base
+            then
+               raise Foreign_Error with "invalid C call arguments";
+            end if;
+            declare
+               Slot : constant Positive :=
+                 Context.Foreign_Stack.Last_Index - Natural (Input.Index);
+               Callee : constant Value := Context.Foreign_Stack (Slot);
+               Arguments : Values.Vector :=
+                 Owned_Values (Owner.Universe.all);
+               Address : System.Address;
+               Root_Call : constant Boolean :=
+                 Main_Owner.Calls = System.Null_Address;
+               Next : Calls.Object_Pointer;
+               Result : Action_Status;
+               Start_Error : Boolean := False;
+            begin
+               for Index in Slot + 1 .. Context.Foreign_Stack.Last_Index loop
+                  Arguments.Append (Context.Foreign_Stack (Index));
+               end loop;
+               Pin (Owner.Universe.all, Callee);
+               Pin (Owner.Universe.all, Arguments);
+               if Main_Owner.Driver = null then
+                  Main_Owner.Driver := VM.New_Driver (Owner.Universe.all);
+               end if;
+               Address := Memory.Allocate
+                 (Owner.Universe.Memory,
+                  Call_Record'Object_Size / System.Storage_Unit,
+                  Call_Record'Alignment);
+               Next := Calls.To_Pointer (Address);
+               Next.all := (Previous => Main_Owner.Calls, Base => Slot - 1,
+                 Wanted => Input.Count,
+                 Protected_Call => Input.Integer_Data /= 0,
+                 Is_Root => Root_Call, Context => Owner.Context);
+               Main_Owner.Calls := Address;
+               begin
+                  if Root_Call then
+                     Context.Failure := Nil_Value;
+                     Context.Has_Failure_Value := False;
+                     Context.Failure_Class := No_Failure;
+                     Context.Non_Yieldable := Context.Non_Yieldable + 1;
+                     VM.Start (Main_Owner.Driver.all, Owner.Universe,
+                               Callee, Arguments);
+                  else
+                     VM.Start_Foreign_Boundary
+                       (Main_Owner.Driver.all, Callee, Arguments);
+                  end if;
+               exception
+                  when Language_Error => Start_Error := True;
+                  when Memory.Allocation_Error =>
+                     Record_Memory_Error (Owner.Universe.all);
+                     Start_Error := True;
+                  when Program_Error =>
+                     if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                        Record_Memory_Error (Owner.Universe.all);
+                        Start_Error := True;
+                     else
+                        raise;
+                     end if;
+               end;
+               Context.Foreign_Stack.Set_Length
+                 (Ada.Containers.Count_Type (Slot - 1));
+               Result := Pump (Start_Error);
+               Leave_Context;
+               return Result;
+            end;
+         when Complete_Callback =>
+            if Main_Owner.Driver = null or else Input.Count < 0 or else
+              Input.Index not in 0 | 2 | 4
+            then
+               raise Foreign_Error with "invalid callback completion";
+            end if;
+            VM.Complete_Foreign_Call
+              (Main_Owner.Driver.all, Natural (Input.Count),
+               Natural (Input.Index));
+            declare
+               Result : constant Action_Status := Pump;
+            begin
+               Leave_Context;
+               return Result;
+            end;
+         when Raise_Error =>
+            if Natural (Context.Foreign_Stack.Length) <= Context.Foreign_Base
+            then
+               raise Foreign_Error with "missing C error object";
+            end if;
+            if Context.Foreign_Stack.Last_Element.Kind = String_Kind then
+               Output.Pointer :=
+                 Context.Foreign_Stack.Last_Element.Reference.C_Bytes;
+            end if;
+            Leave_Context;
+            return Action_Raise;
+         when Load_Buffer =>
+            declare
+               Source : constant String := Read_Bytes
+                 (Input.Pointer, Input.Length);
+               Name : constant String := Read_Name (Input.Name, "?");
+               Mode : constant String := Read_Name (Input.Mode, "bt");
+               Binary : constant Boolean := Source'Length > 0 and then
+                 Source (Source'First) = Character'Val (27);
+               Callee : Value;
+            begin
+               --  Loading validates and owns code but never executes it.
+               --  The binary decoder and text frontend both produce the real
+               --  canonical graph, adopted into this session's actual heap.
+               if Ada.Strings.Fixed.Index
+                 (Mode, (if Binary then "b" else "t")) = 0
+               then
+                  Error_Result ("attempt to load a " &
+                    (if Binary then "binary" else "text") &
+                    " chunk (mode is '" & Mode & "')");
+                  Output.Integer_Data := 3;
+               elsif Binary then
+                  declare
+                     Decoded : Lua.Chunks.Decode_Result := Lua.Chunks.Decode
+                       (Source, Memory.Reference (Owner.Universe.Memory),
+                        (Input_Bytes => Owner.Universe.Bounds.Source_Bytes,
+                         Depth => Owner.Universe.Bounds.Syntax_Depth,
+                         others => <>));
+                  begin
+                     case Decoded.Outcome is
+                        when Lua.Chunks.Succeeded =>
+                           Callee := Canonical.Adopt
+                             (Owner.Universe.all, Decoded.Code,
+                              (Table_Kind, Owner.Universe.Globals));
+                           Push (Context, Callee);
+                        when Lua.Chunks.Bad_Format =>
+                           Error_Result (Name & ": " &
+                             Lua.Chunks.Message (Decoded.Error));
+                           Output.Integer_Data := 3;
+                        when Lua.Chunks.Resource_Limit =>
+                           Fail (Owner.Universe.all,
+                             "binary loading resource limit", True);
+                        when Lua.Chunks.Memory_Failure =>
+                           Memory_Result;
+                           Output.Integer_Data := 4;
+                     end case;
+                  end;
+               else
+                  declare
+                     Unit : Lua.Syntax_Trees.Compilation_Unit;
+                  begin
+                     Lua.Syntax_Trees.Parse
+                       (Unit, Source, Name,
+                        (Owner.Universe.Bounds.Source_Bytes,
+                         Owner.Universe.Bounds.Tokens,
+                         Owner.Universe.Bounds.Syntax_Nodes,
+                         Owner.Universe.Bounds.Syntax_Depth),
+                        Memory.Reference (Owner.Universe.Memory));
+                     if Unit.Result.Status = Lua.Syntax.Resource_Error then
+                        Fail (Owner.Universe.all,
+                              "source loading resource limit", True);
+                     elsif Unit.Result.Status /= Lua.Syntax.Success then
+                        Error_Result (Name & ":" & Ada.Strings.Fixed.Trim
+                          (Unit.Result.Error.Line'Image, Ada.Strings.Both) &
+                          ": " & Lua.Syntax_Trees.Text
+                            (Unit, Unit.Result.Error.Message));
+                        Output.Integer_Data := 3;
+                     else
+                        declare
+                           Lowered : Lua.Canonical_Compiler.Compilation_Result
+                             := Lua.Canonical_Compiler.Compile
+                               (Unit, Memory.Reference
+                                  (Owner.Universe.Memory), Name);
+                        begin
+                           case Lowered.Outcome is
+                              when Lua.Canonical_Compiler.Succeeded =>
+                                 Callee := Canonical.Adopt
+                                   (Owner.Universe.all, Lowered.Code,
+                                    (Table_Kind, Owner.Universe.Globals));
+                                 Push (Context, Callee);
+                              when Lua.Canonical_Compiler.Compiler_Limit =>
+                                 Error_Result (Name & ": " &
+                                   Lua.Canonical_Compiler.Message
+                                     (Lowered.Error));
+                                 Output.Integer_Data := 3;
+                              when Lua.Canonical_Compiler.Resource_Limit =>
+                                 Fail (Owner.Universe.all,
+                                   "compiler resource limit", True);
+                              when Lua.Canonical_Compiler.Memory_Failure =>
+                                 Memory_Result;
+                                 Output.Integer_Data := 4;
+                           end case;
+                        end;
+                     end if;
+                  end;
+               end if;
+            exception
+               when Memory.Allocation_Error =>
+                  Memory_Result;
+                  Output.Integer_Data := 4;
+               when Program_Error =>
+                  if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                     Memory_Result;
+                     Output.Integer_Data := 4;
+                  else
+                     raise;
+                  end if;
+            end;
       end case;
       Leave_Context;
       return Action_Done;
@@ -746,6 +1201,10 @@ package body Lua.Engine.Foreign is
          return Action_Memory;
       when Language_Error =>
          begin
+            if Context.Failure_Class = Host_Abort then
+               Leave_Context;
+               return Action_Abort;
+            end if;
             if Context.Failure_Class = Memory_Failure then
                Memory_Result;
                Leave_Context;

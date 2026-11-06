@@ -356,7 +356,7 @@ package body Lua.Engine.Patterns is
       Whole_If_None : Boolean := True) return Values.Vector
    is
       S : constant String (1 .. Subject'Length) := Subject;
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
    begin
       if not Item.Found then
          return Result;

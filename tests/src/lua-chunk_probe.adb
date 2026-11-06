@@ -89,7 +89,9 @@ begin
          Data := Lua.Chunks.Encode (Code);
          Write_File (Argument (2), Data);
       end;
-   elsif Argument_Count in 3 .. 4 and then Argument (1) = "roundtrip" then
+   elsif (Argument_Count in 3 .. 4 and then Argument (1) = "roundtrip") or else
+     (Argument_Count = 4 and then Argument (1) = "extract")
+   then
       declare
          Source : constant String := Read_File (Argument (2));
          Result : Lua.Chunks.Decode_Result :=
@@ -104,13 +106,18 @@ begin
             return;
          end if;
          Data := Lua.Chunks.Encode
-           (Result.Code, Strip => Argument_Count = 4 and then
-              Argument (4) = "strip");
-         Write_File (Argument (3), Data);
+           (Result.Code, Strip => Argument (1) = "roundtrip" and then
+              Argument_Count = 4 and then Argument (4) = "strip",
+            Root_Node => (if Argument (1) = "extract" then
+              Lua.Prototypes.Prototype_At
+                (Result.Code, Positive'Value (Argument (3))) else null));
+         Write_File
+           (Argument (if Argument (1) = "extract" then 4 else 3), Data);
       end;
    else
       Ada.Text_IO.Put_Line (Ada.Text_IO.Standard_Error,
-        "Usage: chunk_probe emit OUTPUT | roundtrip INPUT OUTPUT [strip]");
+        "Usage: chunk_probe emit OUTPUT | roundtrip INPUT OUTPUT [strip]" &
+        " | extract INPUT NODE OUTPUT");
       Set_Exit_Status (Failure);
       return;
    end if;

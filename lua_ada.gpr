@@ -1,45 +1,138 @@
 with "config/lua_ada_config.gpr";
 with "runtime_configuration";
-library project Lua_Ada is
 
+library project Lua_Ada is
    type Library_Type is ("static", "static-pic", "relocatable");
    Library_Mode : Library_Type :=
      external ("LUA_ADA_LIBRARY_TYPE", "static");
-
    Configuration_Subdir := Runtime_Configuration.Artifact_Subdir;
-   for Source_Dirs use
-     ("src/", "config/", Runtime_Configuration.Source_Directory);
-   for Object_Dir use
-     "obj/" & Configuration_Subdir &
-     Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
-   for Create_Missing_Dirs use "True";
-   for Library_Name use "lua_ada";
-   for Library_Kind use Library_Mode;
-   for Library_Dir use
-     "lib/" & Configuration_Subdir &
-     Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
-   case Library_Mode is
-      when "relocatable" =>
-         case Lua_Ada_Config.Alire_Host_OS is
-            when "linux" | "macos" =>
-               for Library_Options use ("-lm");
+   C_ABI_Defines := ();
+   case Lua_Ada_Config.Alire_Host_OS is
+      when "windows" =>
+         case Library_Mode is
+            when "relocatable" =>
+               C_ABI_Defines :=
+                 ("-DLUA_BUILD_AS_DLL", "-DLUA_CORE", "-DLUA_LIB");
             when others => null;
          end case;
       when others => null;
    end case;
 
+   --  Ada hosts, C hosts and their native modules import this same image.
+   --  A second facade SAL would duplicate world/pool/elaboration ownership.
+   for Languages use ("Ada", "C");
+   for Source_Dirs use
+     ("src/", "src/platform", "config/", "c_api/ada", "c_api/c",
+      Runtime_Configuration.Source_Directory);
+   for Object_Dir use
+     "obj/" & Configuration_Subdir &
+     Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
+   for Library_Dir use
+     "lib/" & Configuration_Subdir &
+     Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
+   for Library_Name use "lua";
+   for Library_Kind use Library_Mode;
+   for Library_Standalone use "standard";
+   for Library_Auto_Init use "true";
+   for Library_Symbol_Policy use "unrestricted";
+   for Create_Missing_Dirs use "True";
+
+   --  Standard SAL interfaces describe the complete imported Ada closure.
+   --  Child AUnit packages inspect private units; listing them here preserves
+   --  that test access without changing any Ada visibility declaration.
+   --  New first-party specs used by consumers belong in this reviewed list.
+   for Interfaces use
+     (
+      "lua_ada_boundary.c",
+      "lua_ada_host_numerics.c",
+      "lua_ada_config.ads",
+      "lua-c_api.ads",
+      "lua-canonical_compiler.ads",
+      "lua-chunks.ads",
+      "lua-diagnostics.ads",
+      "lua-engine-call_names.ads",
+      "lua-engine-canonical.ads",
+      "lua-engine-compiler.ads",
+      "lua-engine-core_libraries.ads",
+      "lua-engine-foreign.ads",
+      "lua-engine-format_drivers.ads",
+      "lua-engine-formats.ads",
+      "lua-engine-inspection.ads",
+      "lua-engine-loaders.ads",
+      "lua-engine-machine.ads",
+      "lua-engine-mathematics.ads",
+      "lua-engine-packing.ads",
+      "lua-engine-pattern_drivers.ads",
+      "lua-engine-patterns.ads",
+      "lua-engine-strings.ads",
+      "lua-engine-table_drivers.ads",
+      "lua-engine-tables.ads",
+      "lua-engine-unicode.ads",
+      "lua-engine.ads",
+      "lua-frontend_text.ads",
+      "lua-integers.ads",
+      "lua-lexer_core.ads",
+      "lua-lexers.ads",
+      "lua-numbers.ads",
+      "lua-opcodes.ads",
+      "lua-platform_mathematics.ads",
+      "lua-platform_numerics.ads",
+      "lua-prototypes.ads",
+      "lua-runtime_configuration.ads",
+      "lua-sessions.ads",
+      "lua-sources.ads",
+      "lua-storage-buffers.ads",
+      "lua-storage-vectors.ads",
+      "lua-storage.ads",
+      "lua-syntax_trees.ads",
+      "lua-syntax.ads",
+      "lua.ads");
+
+   case Library_Mode is
+      when "relocatable" =>
+         case Lua_Ada_Config.Alire_Host_OS is
+            when "windows" =>
+               --  C dllexport declarations disable MinGW's automatic exports.
+               --  Ada clients also need real spec/data/controlled-type symbols.
+               for Library_Options use ("-lm", "-Wl,--export-all-symbols");
+            when others =>
+               for Library_Options use ("-lm");
+         end case;
+      when others =>
+         --  Static Library_Options are archive members, not final-link flags.
+         --  Ada pragmas and each C consumer provide their required -lm link.
+         null;
+   end case;
+
    package Compiler is
-      --  Apply the project baseline after Alire's profile switches.
       for Default_Switches ("Ada") use
         Lua_Ada_Config.Ada_Compiler_Switches &
         ("-gnat2022", "-gnatwa", "-gnatwe", "-gnatv", "-gnaty",
          "-gnatVF");
       --  IEEE NaNs/infinities are Lua values: see ADR 0003. Ordinary Ada
       --  runtime checks and all other profile validity checks stay enabled.
+      for Default_Switches ("C") use
+        ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
+         "-I" & Project'Project_Dir & "c_api/include",
+         "-I" & Project'Project_Dir & "c_api/include/api") &
+        C_ABI_Defines;
    end Compiler;
 
    package Binder is
-      for Switches ("Ada") use ("-Es");  --  Symbolic traceback
+      for Switches ("Ada") use ("-Es");
    end Binder;
 
+   case Lua_Ada_Config.Alire_Host_OS is
+      when "windows" =>
+         case Lua_Ada_Config.Alire_Host_Arch is
+            when "x86_64" =>
+               --  The SAL's complete Ada closure exceeds ordinary COFF's
+               --  section limit. Only its intermediate partial link is BigObj.
+               for Library_Partial_Linker use
+                 (Compiler'Driver ("Ada"), "-nostdlib", "-no-pie",
+                  "-Wl,-r,--oformat,pe-bigobj-x86-64", "-o");
+            when others => null;
+         end case;
+      when others => null;
+   end case;
 end Lua_Ada;

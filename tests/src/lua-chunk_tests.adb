@@ -60,6 +60,7 @@ package body Lua.Chunk_Tests is
    procedure Shared_Strings;
    procedure Strip_Metadata;
    procedure Debug_Alignment;
+   procedure Debug_Line_Range;
    procedure Truncation_Cleanup;
    procedure Signature_Error;
    procedure Version_Error;
@@ -78,6 +79,7 @@ package body Lua.Chunk_Tests is
    procedure Foreign_Root_Rejected;
    procedure Program_Ownership_Move;
    procedure Program_Self_Move;
+   procedure Selected_Nested_Root;
 
    procedure Basic_Roundtrip is
       Memory : Lua.Storage.Owner;
@@ -301,6 +303,27 @@ package body Lua.Chunk_Tests is
       Root (Code).Locals.Append (Local'(Intern (Code, "value"), 0, 2));
       Emit_Borrowed (Code, Check'Access);
    end Debug_Alignment;
+
+   procedure Debug_Line_Range is
+      Memory : Lua.Storage.Owner;
+      Code : Program;
+      Output : Lua.Storage.Buffers.Buffer;
+      Rejected : Boolean := False;
+   begin
+      --  The array shape is valid, but a negative delta from source line zero
+      --  would produce an invalid runtime location. Reject before publishing
+      --  the chunk rather than relying on a later checked Ada conversion.
+      Tiny (Code, Memory);
+      Root (Code).Lines.Append (-1);
+      Root (Code).Lines.Append (0);
+      begin
+         Output := Lua.Chunks.Encode (Code);
+      exception
+         when Lua.Chunks.Invalid_Program => Rejected := True;
+      end;
+      Assert (Rejected and then Output.Is_Empty,
+              "invalid reconstructed debug line accepted");
+   end Debug_Line_Range;
 
    procedure Truncation_Cleanup is
       Memory : Lua.Storage.Owner;
@@ -681,6 +704,46 @@ package body Lua.Chunk_Tests is
               "self move changed program ownership");
    end Program_Self_Move;
 
+   procedure Selected_Nested_Root is
+      Memory : Lua.Storage.Owner;
+      Code : Program;
+      Parent, Child : Prototype_Access;
+      Bytes : Lua.Storage.Buffers.Buffer;
+      procedure Check (Text : String);
+      procedure Check (Text : String) is
+         Decoded : constant Lua.Chunks.Decode_Result :=
+           Lua.Chunks.Decode (Text, Lua.Storage.Reference (Memory));
+         Node : constant Prototype_Access := Root (Decoded.Code);
+      begin
+         Assert (Decoded.Outcome = Lua.Chunks.Succeeded and then
+                 Node.First_Line = 7 and then
+                 Natural (Node.Upvalues.Length) = 1,
+                 "selected function header/debug metadata");
+         Assert (Node.Constants (1).Integer_Data = 99,
+                 "dump selected the containing main function");
+      end Check;
+   begin
+      --  string.dump may select a nested closure while the containing graph
+      --  remains shared by live frames. Encode that actual subtree without
+      --  temporarily replacing its immutable program root or capture metadata.
+      Tiny (Code, Memory);
+      Parent := Root (Code);
+      Child := New_Prototype (Code);
+      Child.First_Line := 7;
+      Child.Last_Line := 7;
+      Child.Constants.Append (Constant_Value'(Integer_Constant, 99));
+      Child.Code.Append (Lua.Opcodes.Create (Lua.Opcodes.Op_LOADK));
+      Child.Code.Append (Lua.Opcodes.Create (Lua.Opcodes.Op_RETURN1));
+      Child.Upvalues.Append (Upvalue'
+        (True, 0, 1, Intern (Code, "captured")));
+      Parent.Children.Append (Child);
+      Bytes := Lua.Chunks.Encode (Code, Root_Node => Child);
+      Bytes.Query (Check'Access);
+      Assert (Root (Code) = Parent and then
+              Parent.Constants (1).Integer_Data = 42,
+              "subtree dump mutated its shared containing graph");
+   end Selected_Nested_Root;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "chunk: basic roundtrip",
@@ -701,6 +764,8 @@ package body Lua.Chunk_Tests is
         Strip_Metadata'Access);
       Test_Support.Add (Suite, "chunk: debug alignment",
         Debug_Alignment'Access);
+      Test_Support.Add (Suite, "chunk: reconstructed line range",
+        Debug_Line_Range'Access);
       Test_Support.Add (Suite, "chunk: truncated graph cleanup",
         Truncation_Cleanup'Access);
       Test_Support.Add (Suite, "chunk: invalid signature",
@@ -732,5 +797,7 @@ package body Lua.Chunk_Tests is
         Program_Ownership_Move'Access);
       Test_Support.Add (Suite, "chunk: self ownership transfer",
         Program_Self_Move'Access);
+      Test_Support.Add (Suite, "chunk: selected nested root",
+        Selected_Nested_Root'Access);
    end Register;
 end Lua.Chunk_Tests;

@@ -5,7 +5,7 @@ package body Lua.Engine.Format_Drivers is
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
-      Action : Native_Action;
+      Action : Native_Action := New_Action (State);
       First : Positive;
       Cursor : Positive;
       procedure Work (Count : Natural := 1);

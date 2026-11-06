@@ -60,7 +60,7 @@ package body Lua.Engine.Tables is
          when Real_Kind => Result := Float_Bits (Item.Real_Data);
          when String_Kind => Result := Item.Reference.String_Hash;
          when Boolean_Kind => Result := Boolean'Pos (Item.Boolean_Data);
-         when Light_Identity_Kind =>
+         when Light_Identity_Kind | Foreign_Function_Kind =>
             Result := Hash_Value
               (System.Storage_Elements.To_Integer (Item.Identity));
          when Native_Kind_Value =>

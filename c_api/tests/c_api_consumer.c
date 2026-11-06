@@ -291,6 +291,152 @@ static void test_c_owned_guard_and_recovery(lua_State *state) {
     puts("C API PASS: C-owned guard and recovery");
 }
 
+static int add_callback(lua_State *state) {
+    /* Positive/negative indices address this callback's arguments, not the
+     * retained caller prefix. The callback returns only its newly pushed sum. */
+    assert(lua_gettop(state) == 2);
+    assert(lua_absindex(state, -1) == 2);
+    lua_pushinteger(state, lua_tointeger(state, 1) + lua_tointeger(state, 2));
+    return 1;
+}
+
+static int captured_counter(lua_State *state) {
+    lua_Integer next = lua_tointeger(state, lua_upvalueindex(1)) + 1;
+    assert(lua_gettop(state) == 0);
+    lua_pushinteger(state, next);
+    lua_copy(state, -1, lua_upvalueindex(1));
+    return 1;
+}
+
+static int error_callback(lua_State *state) {
+    lua_pushvalue(state, 1);
+    return lua_error(state);
+}
+
+static int nested_callback(lua_State *state) {
+    assert(lua_gettop(state) == 1 && lua_tointeger(state, 1) == 40);
+    lua_pushcfunction(state, add_callback);
+    lua_pushvalue(state, 1);
+    lua_pushinteger(state, 1);
+    lua_call(state, 2, 1);
+    assert(lua_gettop(state) == 2 && lua_tointeger(state, 1) == 40);
+    lua_pushinteger(state, lua_tointeger(state, -1) + 1);
+    return 1;
+}
+
+static void test_light_c_function_identity(lua_State *state) {
+    /* Zero-upvalue C functions have pointer identity without allocating a
+     * distinct native closure for each push. A different pointer differs. */
+    lua_settop(state, 0);
+    lua_pushcfunction(state, add_callback);
+    lua_pushcfunction(state, add_callback);
+    lua_pushcfunction(state, error_callback);
+    assert(lua_type(state, 1) == LUA_TFUNCTION && lua_iscfunction(state, 1));
+    assert(lua_tocfunction(state, 1) == add_callback);
+    assert(lua_rawequal(state, 1, 2) && !lua_rawequal(state, 1, 3));
+    puts("C API PASS: light C function identity");
+}
+
+static void test_callback_stack_window(lua_State *state) {
+    /* Keep a sentinel below the callee/arguments. The real C callback must
+     * see only its two arguments, and fixed-result adjustment appends nil. */
+    int status;
+    lua_settop(state, 0);
+    lua_pushstring(state, "caller");
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 20);
+    lua_pushinteger(state, 22);
+    status = lua_pcall(state, 2, 2, 0);
+    if (status != LUA_OK)
+        fprintf(stderr, "callback status=%d error=%s\n", status,
+                lua_tostring(state, -1));
+    assert(status == LUA_OK);
+    assert(lua_gettop(state) == 3);
+    assert(strcmp(lua_tostring(state, 1), "caller") == 0);
+    assert(lua_tointeger(state, 2) == 42 && lua_isnil(state, 3));
+    puts("C API PASS: callback stack window and results");
+}
+
+static void test_c_closure_cells(lua_State *state) {
+    /* A nonzero-upvalue C closure owns real mutable cells. Updating through
+     * a pseudo-index must persist across independent calls to that closure. */
+    lua_settop(state, 0);
+    lua_pushinteger(state, 40);
+    lua_pushcclosure(state, captured_counter, 1);
+    assert(lua_tocfunction(state, 1) == captured_counter);
+    lua_pushvalue(state, 1);
+    lua_call(state, 0, 1);
+    assert(lua_tointeger(state, -1) == 41);
+    lua_pop(state, 1);
+    lua_pushvalue(state, 1);
+    lua_call(state, 0, 1);
+    assert(lua_tointeger(state, -1) == 42);
+    puts("C API PASS: C closure mutable cells");
+}
+
+static void test_protected_c_error_identity(lua_State *state) {
+    /* lua_error longjmps only over the C callback, after its failing Ada API
+     * entry returned. lua_pcall receives the same table object and recovers. */
+    const void *identity;
+    lua_settop(state, 0);
+    lua_newtable(state);
+    identity = lua_topointer(state, 1);
+    lua_pushcfunction(state, error_callback);
+    lua_pushvalue(state, 1);
+    assert(lua_pcall(state, 1, LUA_MULTRET, 0) == LUA_ERRRUN);
+    assert(lua_gettop(state) == 2 && lua_topointer(state, 2) == identity);
+    lua_settop(state, 0);
+    lua_pushcfunction(state, add_callback);
+    lua_pushinteger(state, 1); lua_pushinteger(state, 2);
+    assert(lua_pcall(state, 2, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 3);
+    puts("C API PASS: protected C error identity and recovery");
+}
+
+static void test_reentrant_c_to_c_calls(lua_State *state) {
+    /* The outer C callback requests a nested call while its own C guard is
+     * active. Both pumps must use one iterative scheduler and distinct bases. */
+    lua_settop(state, 0);
+    lua_pushcfunction(state, nested_callback);
+    lua_pushinteger(state, 40);
+    assert(lua_pcall(state, 1, 1, 0) == LUA_OK);
+    assert(lua_gettop(state) == 1 && lua_tointeger(state, 1) == 42);
+    puts("C API PASS: reentrant C calls on one scheduler");
+}
+
+static void test_canonical_lua_calls_c(lua_State *state) {
+    /* Load real canonical Lua, then pass it a real C function. This is code
+     * execution through the Ada compiler/VM, never a linked C interpreter. */
+    const char *source = "local f=...;return f(20,22),f(1,2)";
+    lua_settop(state, 0);
+    assert(luaL_loadbufferx(state, source, strlen(source), "=c-callback", "t")
+           == LUA_OK);
+    lua_pushcfunction(state, add_callback);
+    assert(lua_pcall(state, 1, LUA_MULTRET, 0) == LUA_OK);
+    assert(lua_gettop(state) == 2);
+    assert(lua_tointeger(state, 1) == 42 && lua_tointeger(state, 2) == 3);
+    lua_settop(state, 0);
+    assert(luaL_loadbufferx(state, "return )", 8, "=bad-source", "t")
+           == LUA_ERRSYNTAX);
+    assert(lua_type(state, -1) == LUA_TSTRING);
+    puts("C API PASS: canonical Lua calls C and load errors");
+}
+
+static void test_loadstring_requires_text(lua_State *state) {
+    /* The auxiliary convenience entry uses text mode even though loadbufferx
+     * accepts either format by default. Reject a binary signature before the
+     * decoder inspects its truncated header, then prove recovery with text. */
+    lua_settop(state, 0);
+    assert(luaL_loadstring(state, LUA_SIGNATURE) == LUA_ERRSYNTAX);
+    assert(strstr(lua_tostring(state, -1), "mode") != NULL);
+    assert(strstr(lua_tostring(state, -1), "'t'") != NULL);
+    lua_settop(state, 0);
+    assert(luaL_loadstring(state, "return 42") == LUA_OK);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 42);
+    puts("C API PASS: loadstring requires text mode and recovers");
+}
+
 int main(void) {
     lua_State *state;
     test_state_allocator_lifetime();
@@ -306,6 +452,13 @@ int main(void) {
     test_raw_tables_and_pointer_identity(state);
     test_threads_registry_extra_space_and_moves(state);
     test_c_owned_guard_and_recovery(state);
+    test_light_c_function_identity(state);
+    test_callback_stack_window(state);
+    test_c_closure_cells(state);
+    test_protected_c_error_identity(state);
+    test_reentrant_c_to_c_calls(state);
+    test_canonical_lua_calls_c(state);
+    test_loadstring_requires_text(state);
     lua_close(state);
     puts("PASS: real Ada C API bootstrap consumer");
     return 0;

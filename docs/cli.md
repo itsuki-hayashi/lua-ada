@@ -23,14 +23,19 @@ or version was requested. Stop at the first failed chunk. A valid construct may
 check successfully without being executed. Goto, labels and closing declarations
 now execute through the lifecycle runtime. See [frontend checking](frontend.md).
 
-File/stdin loading preserves bytes and handles the file preamble, including BOM
-and initial interpreter line. Raw `-e` snippets are not file loading. Runtime
+File loading preserves bytes and handles the file preamble, including BOM
+and initial interpreter line. The current stdin path uses Text_IO and normalizes
+line terminators; binary-safe stdin remains an open CLI requirement.
+Raw `-e` snippets are not file loading. Runtime
 `loadfile`/`dofile` use the shared file handling; raw `load` source is distinct.
 
 Output already produced before a failure remains visible. Diagnostics go to
-stderr and failures return a failing process status. Binary chunks, native
-modules, a REPL, and the complete C Lua flag surface remain deferred. Library
-text loading and Lua-only require are M2b features; their local default path is
+stderr and failures return a failing process status. Script files now accept
+native Lua 5.5.1 binary chunks for the matching host configuration, including
+the shared BOM/interpreter-line handling. Runtime load/loadfile mode filters
+select text or binary input, and string.dump serializes actual prototypes.
+CLI --check remains text-only. Native modules, a REPL, and the complete C Lua
+flag surface remain deferred. Lua-only require is an M2b feature; their local default path is
 `./?.lua;./?/init.lua` and does not read Lua path environment variables.
 
 The dedicated upstream test runner is separate from the product CLI. Its

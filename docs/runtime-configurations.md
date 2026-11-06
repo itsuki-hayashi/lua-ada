@@ -52,7 +52,10 @@ separately implemented and verified adapter obligations. C test-only extra-space
 layout belongs to the foreign-state implementation. Matching selected constants
 alone never makes the upstream instrumented configuration accepted.
 
-The C facade currently builds its own configured core in a standalone library.
-Its consumer imports that library alone. Combining it with a separately built
-liblua_ada image still requires an explicit shared-core/runtime ownership design;
-artifact isolation is not a solution to duplicate runtime images.
+The root Lua_Ada project builds one configured standalone library named lua.
+Ada and C consumers import that same image; the legacy C-facade project only
+forwards its build. The [one-core decision](decisions/0014-one-core-library.md)
+owns this distinction: artifact separation between configurations must not create
+two interpreter images within a consumer. The permanent core-image checks use
+the selected production library and verify actual state, pool, allocator and
+elaboration identity. Each configuration/platform still needs its own evidence.

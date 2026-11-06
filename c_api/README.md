@@ -1,7 +1,9 @@
 # C ABI Implementation Checkpoint
 
-This directory builds a real standalone Ada library named liblua and a plain C
-consumer against the pinned public Lua 5.5.1 headers. It links no reference
+The root Lua_Ada project builds one real standalone library named liblua for
+both Ada hosts and this directory's plain C consumers against the pinned public
+Lua 5.5.1 headers. The legacy lua_c_api.gpr only forwards its build to that root;
+it compiles no independent copy of the interpreter. It links no reference
 interpreter object. This is an implementation checkpoint, not a complete public
 C API/ABI or full upstream acceptance claim.
 
@@ -13,7 +15,11 @@ The implemented surface covers seeded state construction, default construction,
 closure, thread surfaces, allocator selection, stack movement/indexing,
 primitive values/conversions, stable NUL-terminated byte strings, raw tables,
 registry roots, light-userdata addresses, identity and exact extra-space prefix
-access. The standard Ada universe descriptor and still-unmigrated container or
+access. Real C functions/closures, fixed and multiple call results, protected
+errors, nested C calls, and text/native-binary buffer loading now use the shared
+iterative driver. Zero-upvalue C functions retain function-pointer identity;
+other C closures retain actual mutable upvalue cells. The standard Ada universe
+descriptor and still-unmigrated container or
 temporary allocations remain outside full callback-allocator coverage. Every
 managed block passed to the callback is released at state closure. Input seed
 is retained; seed-dependent hash behavior remains part of the canonical/storage
@@ -21,11 +27,16 @@ integration audit. Table capacity arguments are hints, pending capacity wiring.
 Both constructors leave standard libraries closed, as C Lua does; Ada embedding
 retains its separate eager default environment.
 
-The public C callback execution portal, callable C closures, continuations,
-load/dump, full auxiliaries, debug APIs, warnings and remaining exports are not
-implemented by this checkpoint. Missing APIs are missing symbols, never stub
-functions that report success. lua_ada_guard_probe is a separately named test
-fixture for the C-owned error boundary; it does not stand in for lua_pcall.
+The call portal currently accepts null continuations and no error-handler
+function. Other call modes return explicit unsupported errors before execution.
+Continuation/yield/resume support, C error handlers, reader-based loading,
+dumping, full auxiliaries, debug APIs, warnings, builtin C trampolines and
+remaining exports are pending. In particular, `lua_tocfunction` currently exposes
+real foreign callbacks; Ada native-library functions need their own stable C
+trampolines before complete `luaL_openlibs`/C-function inspection parity.
+Missing APIs are missing symbols, never successful stubs. The separately named
+lua_ada_guard_probe remains a bootstrap boundary fixture; real lua_pcall is
+exercised independently by the consumer.
 
 ## Ownership and errors
 
@@ -40,6 +51,10 @@ The C wrapper receives an action after the Ada dispatcher returns. It then
 returns normally, raises through a live C guard, or invokes the C panic path.
 No C longjmp crosses active internal Ada frames. Physical Ada failures remain
 host aborts; callback allocation refusal is a semantic Lua memory failure.
+Each callback receives a base-relative stack window. A reentrant C API call
+adds an explicit protected boundary to the same driver; it never invokes a
+second executor recursively. Returned/error packets remain traced until the C
+stack owns them. See [ADR 0013](../docs/decisions/0013-c-owned-call-boundary.md).
 Automatic initialization happens through the standalone-library binder and C
 constructor entrypoints, including when a static archive is linked. The C
 consumer never calls an Ada initialization function. Concurrent first-use
@@ -52,20 +67,46 @@ Use the already selected Alire toolchain and serialize profile configuration:
 ```text
 alr exec -- gprbuild -P c_api/consumer.gpr -XLUA_ADA_LIBRARY_TYPE=static
 alr exec -- gprbuild -P c_api/consumer.gpr -XLUA_ADA_LIBRARY_TYPE=relocatable
+pwsh -File scripts/check-core-image.ps1 -Profile validation -LibraryType static
+pwsh -File scripts/check-core-image.ps1 -Profile validation -LibraryType relocatable
 ```
 
-Build paths are under ignored build/c-api. Select the root Alire profile first;
+Consumer build paths are under ignored build/c-api. The sole library lives under
+lib/PROFILE/KIND, with the existing upstream-test configuration subdirectory.
+Select the root Alire profile first;
 the project reuses its generated compiler configuration without editing it.
 Static, shared and Windows static-PIC verification must be recorded separately.
 macOS may require the selected GNAT runtime archive path through
 LUA_ADA_ABI_RUNTIME_ARCHIVE, following the existing ABI probe convention.
+Windows x86-64 standalone-library partial links select BigObj for the merged
+intermediate object because the full Ada closure exceeds ordinary COFF's section
+limit. The final executable/DLL format and strict compiler checks stay enabled.
+The [one-core decision](../docs/decisions/0014-one-core-library.md) explains
+Windows shared exports and why static archive options contain no final-link
+math option. Both C and Ada consumers import the root project.
 
-The consumer has eleven independently named, commented behavior cases: allocator
+The core-image campaign additionally runs a mixed Ada/C client and a C-only
+startup client against the actual production library. They verify the same
+C-created state and main thread through the Ada dispatcher, opposite-language
+stack mutation, default allocator-function identity, actual Storage.Pool address
+and one elaboration across repeated construction. Pool/counter symbol assertions
+are explicitly GNAT-specific test observations, not public Lua interfaces.
+scripts/check.ps1 runs this campaign for its requested profile/library kind;
+other platform/configuration combinations require separate passing evidence.
+
+The consumer has eighteen independently named, commented behavior cases:
+allocator
 lifetime, refusal/recovery, every cold construction growth refusal, a protected
 live allocation failure, closed-library initialization, stack operations,
 numeric conversion, stable binary
 strings, raw table/pointer identity, thread/registry/extra-space movement, and
-an actual exported-operation failure crossing only the C-owned guard. Builds
-and results must be inspected before any target is called passing. Full callback
-unwinding, allocator failure sweeps and instrumented ABI tests remain required
-by the parent M3 acceptance contract.
+an actual exported-operation failure crossing only the C-owned guard, function
+pointer identity, callback stack windows/result adjustment, mutable C upvalues,
+protected table errors/recovery, nested C calls, canonical Lua calling C and the
+text-only luaL_loadstring convenience entry. The Windows validation/static
+managed-runtime rebuild passed all eighteen cases and exited normally in
+reports/m3-managed-c-api-consumer1.log. Constructor refusal sweeps all 21 measured
+growth points in that build. The earlier COFF link failure and
+callback-phase fallthrough were repaired before that accepted run. This is
+local checkpoint evidence; shared/platform/continuation/allocator-parity gates
+remain required by the parent M3 acceptance contract.

@@ -1,3 +1,4 @@
+with Binary_Runtime_Tests;
 with Ada.Command_Line;
 with AUnit.Reporter.Text;
 with AUnit.Run;
@@ -8,6 +9,7 @@ with Number_Tests;
 with Session_Tests;
 with Lifecycle_Tests;
 with Runtime_Control_Tests;
+with Runtime_Inspection_Tests;
 with Lua.Opcode_Tests;
 with Lua.Context_Tests;
 with Lua.Table_Storage_Tests;
@@ -15,6 +17,7 @@ with Lua.Storage_Tests;
 with Lua.Storage_Vector_Tests;
 with Lua.Mathematics_Tests;
 with Lua.Managed_Runtime_Tests;
+with Lua.Runtime_Vector_Tests;
 with Lua.Storage_Buffer_Tests;
 with Lua.Loader_Storage_Tests;
 with Lua.Frontend_Storage_Tests;
@@ -46,6 +49,7 @@ procedure Test_Runner is
       Session_Tests.Register (Result);
       Lifecycle_Tests.Register (Result);
       Runtime_Control_Tests.Register (Result);
+      Runtime_Inspection_Tests.Register (Result);
       Lua.Opcode_Tests.Register (Result);
       Lua.Context_Tests.Register (Result);
       Lua.Table_Storage_Tests.Register (Result);
@@ -53,6 +57,7 @@ procedure Test_Runner is
       Lua.Storage_Vector_Tests.Register (Result);
       Lua.Mathematics_Tests.Register (Result);
       Lua.Managed_Runtime_Tests.Register (Result);
+      Lua.Runtime_Vector_Tests.Register (Result);
       Lua.Storage_Buffer_Tests.Register (Result);
       Lua.Loader_Storage_Tests.Register (Result);
       Lua.Frontend_Storage_Tests.Register (Result);
@@ -67,6 +72,7 @@ procedure Test_Runner is
       Library_Runtime_Tests.Register (Result);
       Native_Tests.Register (Result);
       Source_Tests.Register (Result);
+      Binary_Runtime_Tests.Register (Result);
       return Result;
    end Suite;
 

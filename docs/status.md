@@ -77,12 +77,29 @@ Canonical compilation, native binary chunks and real scalar-register execution
 are implemented internally. Thirty-six four-way cases compare C source, C
 execution of Ada-produced chunks and Ada execution of both producers' chunks.
 Focused cases cover captures, live stack roots, closing, coroutines, callbacks,
-locals/upvalues and source metadata. Ordinary CLI/session compilation still uses
-the earlier backend while migration/regression integration continues.
+locals/upvalues and source metadata. Ordinary CLI/session compilation now uses canonical instructions. Its first
+complete retained pipeline passes 818 AUnit cases, five upstream targets,
+35 CLI cases, nine differential files and the Ada consumer. The later explicit
+runtime-container ownership checkpoint passes that same pipeline with 829 cases.
+The binary loading/dumping checkpoint passes the full retained pipeline with
+848 AUnit cases and ten additional C/Ada binary CLI comparisons. Platform
+evidence for that later revision remains pending.
 
-The eleven-case real C static consumer remains an earlier pilot checkpoint,
-not complete callback/continuation, allocator or ABI evidence. Remaining runtime
-vectors, full foreign execution, canonical default migration, collector modes,
+The first published checkpoint CI completed twelve Linux/Windows jobs and
+failed all six macOS jobs at the same arithmetic NaN-bit comparison. All six
+passed their 816 AUnit cases first. A host arithmetic adapter replaces the
+hardcoded x86 NaN; its cross-platform rerun remains required.
+
+The production root is now one liblua image for Ada and C consumers. Static
+and shared C/API, mixed state/allocator/pool identity, and C-only startup checks
+pass locally. The real C consumer passes eighteen cases; full continuations
+and remaining ABI evidence are still required. Runtime inspection then passes
+866 AUnit cases, including fifteen new metatable/registry/cell-joining cases.
+The full retained validation/static pipeline also passes, including the
+eighteen-case C consumer, mixed/C-only startup checks, ten binary CLI cases,
+35 CLI cases, nine differential files and five retained upstream files.
+Remaining numeric/format scratch
+and metadata ownership, full foreign execution, collector modes,
 finalizers, userdata, libraries and the complete test adapter remain required.
 The source-selected instrumented configuration has no full runtime/platform
 acceptance yet. All 4,490 source anchors and 473 header entries remain pending;
@@ -125,8 +142,8 @@ interface and 85 canonical opcode definitions remain independent of execution.
 Checking and execution now share executable goto/label/close constructs.
 
 This remains a documented Lua subset. Userdata, finalizers, collector modes,
-remaining debug/io/os facilities and libraries, production binary loading,
-canonical default migration, full C API/ABI, native modules and LuaRocks remain
+remaining debug/io/os facilities and libraries, full C API/ABI, native modules
+and LuaRocks remain
 required work. Five selected default-configuration files do not establish the complete
 standard suite or T-enabled C-API conformance.
 

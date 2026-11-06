@@ -2,7 +2,6 @@ with Ada.Characters.Latin_1;
 with Ada.Containers;
 with Ada.Exceptions;
 with Ada.Strings.Fixed;
-with Ada.Unchecked_Conversion;
 with Ada.Unchecked_Deallocation;
 with System.Address_To_Access_Conversions;
 with Interfaces;
@@ -11,6 +10,7 @@ with Lua.Integers;
 with Lua.Lexers; use Lua.Lexers;
 with Lua.Platform_Numerics;
 with Lua.Prototypes;
+with Lua.Runtime_Configuration;
 with Lua.Engine.Strings;
 with Lua.Engine.Packing;
 with Lua.Engine.Unicode;
@@ -31,18 +31,13 @@ package body Lua.Engine.Machine is
    use type Ada.Exceptions.Exception_Id;
    use type Integer_Value;
    use type Lua.Prototypes.Prototype_Access;
+   use type System.Address;
    use type Real_Value;
    use type Interfaces.Unsigned_64;
    use type Lua.Numbers.Number_Kind;
 
    procedure Free_Frame is new Ada.Unchecked_Deallocation
      (Frame, Frame_Access);
-   function From_Bits is new Ada.Unchecked_Conversion
-     (Interfaces.Unsigned_64, Real_Value);
-   function To_Bits is new Ada.Unchecked_Conversion
-     (Real_Value, Interfaces.Unsigned_64);
-   --  These bit operations are isolated to IEEE signs/special values. They
-   --  never reinterpret heap pointers or turn off arithmetic runtime checks.
 
    function First (Packet : Values.Vector) return Value is
      (if Packet.Is_Empty then Nil_Value else Packet.First_Element);
@@ -97,7 +92,9 @@ package body Lua.Engine.Machine is
          --  packets charge their additional live slots, including duplicates
          --  retained by separate registers in this private backend.
          if Delta_Slots > 0 and then Delta_Slots >
-           1_000_000 - Natural'Min (1_000_000, State.Current.Stack_Slots)
+           Lua.Runtime_Configuration.Maximum_Stack - Natural'Min
+             (Lua.Runtime_Configuration.Maximum_Stack,
+              State.Current.Stack_Slots)
          then
             Fail (State, "stack overflow");
          end if;
@@ -112,7 +109,7 @@ package body Lua.Engine.Machine is
      (State : in out World; Activation : Frame_Access; Register_Id :
        Positive; Item : Value)
    is
-      Packet : Values.Vector;
+      Packet : Values.Vector := Owned_Values (State);
    begin
       Packet.Append (Item);
       Put_Packet (State, Activation, Register_Id, Packet);
@@ -122,7 +119,7 @@ package body Lua.Engine.Machine is
      (Activation : Frame_Access; Inputs : Registers.Vector;
       Expand_Last : Boolean := True) return Values.Vector
    is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (Activation.Memory);
    begin
       --  Nonfinal expressions contribute one value, including nil for zero
       --  results. Only the final unparenthesized call/vararg packet expands.
@@ -292,33 +289,23 @@ package body Lua.Engine.Machine is
          when Star => Result := FL * FR;
          when Slash | Floor_Divide | Percent =>
             if Operator = Percent then
-               --  Quotient-based x-floor(x/y)*y loses signed zero and fails
-               --  when the quotient overflows. Ada's IEEE remainder gives
-               --  a bounded residue; adjusting its sign yields Lua modulo.
-               if FR = 0.0 or else FL /= FL or else FR /= FR or else
-                 abs FL > Real_Value'Last
-               then
-                  Result := From_Bits (16#FFF8_0000_0000_0000#);
-               elsif abs FR > Real_Value'Last then
-                  Result := FL;
-               else
-                  Result := Real_Value'Remainder (FL, FR);
-               end if;
+               --  Host fmod supplies its native domain NaNs and preserves
+               --  signed zero. Lua then adjusts a nonzero residue toward the
+               --  divisor's sign. A quotient/product formula loses precision
+               --  and can overflow even when the remainder is small.
+               Result := Real_Value (Lua.Platform_Numerics.Remainder
+                 (Interfaces.C.double (FL), Interfaces.C.double (FR)));
                if (Result > 0.0 and then FR < 0.0) or else
                  (Result < 0.0 and then FR > 0.0)
                then
                   Result := Result + FR;
                end if;
-            elsif FR = 0.0 then
-               if FL = 0.0 then
-                  Result := From_Bits (16#FFF8_0000_0000_0000#);
-               else
-                  Result := From_Bits
-                    (16#7FF0_0000_0000_0000# or
-                     ((To_Bits (FL) xor To_Bits (FR)) and 2 ** 63));
-               end if;
             else
-               Result := FL / FR;
+               --  Ada's checked division cannot expose zero divisors as Lua
+               --  values. The narrow host adapter retains target NaN signs
+               --  and payloads; every ordinary Ada check stays enabled.
+               Result := Real_Value (Lua.Platform_Numerics.Divide
+                 (Interfaces.C.double (FL), Interfaces.C.double (FR)));
             end if;
             if Operator = Floor_Divide and then Result = Result
               and then abs Result <= Real_Value'Last
@@ -378,6 +365,16 @@ package body Lua.Engine.Machine is
    procedure Release_Frame (State : in out World; Item : in out Frame_Access)
    is
    begin
+      if Item.Foreign_Entered then
+         --  A failed foreign callback can be retired by ordinary Lua error
+         --  unwinding. Restore its C-stack window exactly as normal callback
+         --  completion does; never leave a dangling active-frame identity.
+         State.Current.Foreign_Stack.Set_Length
+           (Ada.Containers.Count_Type (Item.Foreign_Base));
+         State.Current.Foreign_Base := Item.Foreign_Previous_Base;
+         State.Current.Foreign_Activation := Item.Foreign_Previous_Frame;
+         Item.Foreign_Entered := False;
+      end if;
       if Item.Is_Native and then Item.Native_Name = "@hook" then
          State.Current.Hook_Active := False;
          State.Current.Hook_Frame := null;
@@ -398,7 +395,8 @@ package body Lua.Engine.Machine is
    procedure Reserve_Frame (State : in out World; Cost : Natural);
    procedure Reserve_Frame (State : in out World; Cost : Natural) is
       Maximum : constant Positive :=
-        (if State.Current.Cleanup_Depth > 0 then 1_004_096 else 1_000_000);
+        (Lua.Runtime_Configuration.Maximum_Stack +
+           (if State.Current.Cleanup_Depth > 0 then 4_096 else 0));
    begin
       --  Semantic slots are distinct from the embedding owner's call quota.
       --  The private backend charges its register packets with a minimum
@@ -473,8 +471,9 @@ package body Lua.Engine.Machine is
    function Native
      (Self : Driver; Function_Id : Native_Kind; Arguments : Values.Vector)
       return Values.Vector;
-   function Wrap (Result : Values.Vector; Count : Natural;
-                  Success : Boolean := True) return Values.Vector;
+   function Wrap
+     (State : in out World; Result : Values.Vector; Count : Natural;
+      Success : Boolean := True) return Values.Vector;
    procedure Raise_Value
      (Self : Driver; Item : Value; Level : Natural := 1);
    procedure Push_Frame
@@ -494,6 +493,13 @@ package body Lua.Engine.Machine is
       --  writing a Lua register. This is the single return-channel bridge.
       if Activation.Is_Native then
          Activation.Native_Results := Packet;
+         if Activation.Native_Name = "@foreign.boundary" and then
+           not Packet.Is_Empty and then Packet.First_Element.Kind =
+             Boolean_Kind and then not Packet.First_Element.Boolean_Data
+         then
+            Activation.Native_Aux :=
+              (if State.Current.Failure_Class = Memory_Failure then 4 else 2);
+         end if;
       elsif Activation.Code.Canonical_Node /= null then
          --  Scalar canonical registers have their own fixed/open-result and
          --  conditional continuations. Never insert private packet registers
@@ -513,7 +519,9 @@ package body Lua.Engine.Machine is
       Activation : Frame_Access;
    begin
       Reserve_Frame (State, 20 + Natural (Arguments.Length));
-      if Name (Name'First) /= '@' and then State.Native_Depth >= 200 then
+      if Name (Name'First) /= '@' and then State.Native_Depth >=
+        Lua.Runtime_Configuration.Maximum_C_Calls
+      then
          Fail (State, "C stack overflow");
       end if;
       Activation := New_Frame (State);
@@ -548,7 +556,7 @@ package body Lua.Engine.Machine is
    procedure Hook_Event
      (Self : Driver; Event : String; Line : Natural := 0) is
       State : World renames Self.Universe.all;
-      Args : Values.Vector;
+      Args : Values.Vector := Owned_Values (State);
    begin
       --  The continuation suppresses hooks until the entire callback
       --  returns. Its owned arguments and function remain collector roots.
@@ -688,10 +696,11 @@ package body Lua.Engine.Machine is
       end if;
    end Start_Unwind;
 
-   function Wrap (Result : Values.Vector; Count : Natural;
-                  Success : Boolean := True) return Values.Vector
+   function Wrap
+     (State : in out World; Result : Values.Vector; Count : Natural;
+      Success : Boolean := True) return Values.Vector
    is
-      Packet : Values.Vector;
+      Packet : Values.Vector := Owned_Values (State);
    begin
       --  Flatten chains such as pcall(pcall, f) without recursive Ada
       --  calls. Each successful outer protection contributes one true.
@@ -729,6 +738,8 @@ package body Lua.Engine.Machine is
          begin
             Error_Value := New_String
               (State, (if Activation.Is_Native then "(native)"
+                       elsif Activation.Code.Canonical_Node /= null then
+                          To_String (Canonical.Source_Bytes (Activation.Code))
                        else To_String (Activation.Code.Name)) & ":" &
                Ada.Strings.Fixed.Trim (Line'Image, Ada.Strings.Both) &
                ": " & Image (Item));
@@ -747,7 +758,7 @@ package body Lua.Engine.Machine is
       return Values.Vector
    is
       State : World renames Self.Universe.all;
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Arguments.Length) then Arguments (Index)
          else Nil_Value);
@@ -1020,7 +1031,7 @@ package body Lua.Engine.Machine is
       Activation : Frame_Access := State.Current.Stack.Last_Element;
       Destination : constant Natural := Activation.Return_To;
       Packet : constant Values.Vector :=
-        Wrap (Result, Activation.Protection);
+        Wrap (State, Result, Activation.Protection);
    begin
       Pin (State, Result);
       Pin (State, Packet);
@@ -1063,10 +1074,10 @@ package body Lua.Engine.Machine is
    is
       State : World renames Self.Universe.all;
       Function_Item : Value := Function_Value;
-      Args : Values.Vector := Arguments;
+      Args : Values.Vector := Owned_Values (State, Arguments);
       Protection : Natural := Protected_Call;
       Return_To : Natural := Destination;
-      Packet : Values.Vector;
+      Packet : Values.Vector := Owned_Values (State);
    begin
       Pin (State, Function_Value);
       Pin (State, Arguments);
@@ -1079,7 +1090,7 @@ package body Lua.Engine.Machine is
       begin
          loop
             if Function_Item.Kind in Closure_Kind |
-              Native_Closure_Kind | Native_Kind_Value
+              Native_Closure_Kind | Native_Kind_Value | Foreign_Function_Kind
             then
                exit;
             else
@@ -1099,7 +1110,7 @@ package body Lua.Engine.Machine is
          end loop;
       end;
       if Function_Item.Kind in Closure_Kind | Native_Closure_Kind |
-        Native_Kind_Value
+        Native_Kind_Value | Foreign_Function_Kind
       then
          Pin (State, Function_Item);
          Pin (State, Args);
@@ -1116,6 +1127,12 @@ package body Lua.Engine.Machine is
          if Function_Item.Kind = Closure_Kind then
             Push_Frame (Self, Function_Item, Args, Return_To, Protection);
             State.Current.Stack.Last_Element.Is_Tail_Call := Tail;
+         elsif Function_Item.Kind = Foreign_Function_Kind then
+            Schedule (Self, "foreign.callback", Args, Return_To);
+            State.Current.Stack.Last_Element.Protection := Protection;
+            State.Current.Stack.Last_Element.Callee := Function_Item;
+            State.Current.Stack.Last_Element.Foreign_Handler :=
+              Function_Item.Identity;
          elsif Function_Item.Kind = Native_Kind_Value then
             Schedule
               (Self, (if Function_Item.Native_Data = Pcall_Function then
@@ -1125,16 +1142,27 @@ package body Lua.Engine.Machine is
               Function_Item.Native_Data;
             State.Current.Stack.Last_Element.Callee := Function_Item;
          else
-            Schedule (Self, To_String (Function_Item.Reference.Native_Name),
-                      Args, Return_To);
+            Schedule
+              (Self, (if Function_Item.Reference.Foreign_Handler /=
+                        System.Null_Address then "foreign.callback" else
+                        To_String (Function_Item.Reference.Native_Name)),
+               Args, Return_To);
             State.Current.Stack.Last_Element.Protection := Protection;
-            for Cell of Function_Item.Reference.Captures loop
-               State.Current.Stack.Last_Element.Native_Captures.Append
-                 (Cell.Cell_Value);
-            end loop;
+            if Function_Item.Reference.Foreign_Handler = System.Null_Address
+            then
+               for Cell of Function_Item.Reference.Captures loop
+                  State.Current.Stack.Last_Element.Native_Captures.Append
+                    (Cell.Cell_Value);
+               end loop;
+            end if;
+            --  Foreign callbacks read real mutable upvalue cells. Copying
+            --  their old values into another root packet would keep replaced
+            --  weak values alive until the C callback returns.
             State.Current.Stack.Last_Element.Callee := Function_Item;
             State.Current.Stack.Last_Element.Native_Self :=
               Function_Item.Reference;
+            State.Current.Stack.Last_Element.Foreign_Handler :=
+              Function_Item.Reference.Foreign_Handler;
          end if;
          if not Tail then
             State.Current.Stack.Last_Element.Call_Name := Call_Name;
@@ -1157,7 +1185,7 @@ package body Lua.Engine.Machine is
          end if;
          Packet.Clear;
          Packet.Append (State.Current.Failure);
-         Packet := Wrap (Packet, Protection, Success => False);
+         Packet := Wrap (State, Packet, Protection, Success => False);
          if Tail then
             Complete (Self, Packet);
          else
@@ -1174,7 +1202,7 @@ package body Lua.Engine.Machine is
       Protected_Index : Natural := 0;
       Destination : Natural;
       Protection : Natural;
-      Packet : Values.Vector;
+      Packet : Values.Vector := Owned_Values (State);
    begin
       --  Resource exhaustion is a host execution boundary: allowing Lua
       --  pcall to catch it could restart an exhausted instruction budget.
@@ -1251,7 +1279,7 @@ package body Lua.Engine.Machine is
            (State, To_String (State.Current.Failure_Text));
       end if;
       Packet.Append (State.Current.Failure);
-      Packet := Wrap (Packet, Protection, Success => False);
+      Packet := Wrap (State, Packet, Protection, Success => False);
       while Natural (State.Current.Stack.Length) >= Protected_Index loop
          declare
             Old : Frame_Access := State.Current.Stack.Last_Element;
@@ -1282,19 +1310,19 @@ package body Lua.Engine.Machine is
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Activation.Native_Arguments.Length)
          then Activation.Native_Arguments (Index) else Nil_Value);
-      Packet : Values.Vector;
+      Packet : Values.Vector := Owned_Values (State);
       Left : Value := Arg (1);
       Right : Value := Arg (2);
       Handler : Value;
       Event : Unbounded_String;
       Operator : Token_Kind := Activation.Native_Operator;
       Primitive : Boolean := False;
-      Action : Native_Action;
+      Action : Native_Action := New_Action (State);
       Library_Step : Boolean := True;
       procedure Return_Native (Item : Value);
       procedure Invoke (Function_Value : Value; Args : Values.Vector);
       procedure Return_Native (Item : Value) is
-         Result : Values.Vector;
+         Result : Values.Vector := Owned_Values (State);
       begin
          Result.Append (Item);
          Complete (Self, Result);
@@ -1311,7 +1339,46 @@ package body Lua.Engine.Machine is
       --  Stateful libraries own their continuation phase. Dispatch their
       --  requested callback through this same activation stack, so neither
       --  Lua nesting nor a protected error creates a second VM or budget.
-      if Name = "base.primitive" then
+      if Name = "foreign.callback" then
+         if Activation.Native_Stage = 0 then
+            if Activation.Foreign_Handler = System.Null_Address then
+               raise Program_Error with "foreign callback has no handler";
+            end if;
+            Activation.Foreign_Base :=
+              Natural (State.Current.Foreign_Stack.Length);
+            Activation.Foreign_Previous_Base := State.Current.Foreign_Base;
+            Activation.Foreign_Previous_Frame :=
+              State.Current.Foreign_Activation;
+            Activation.Foreign_Entered := True;
+            State.Current.Foreign_Base := Activation.Foreign_Base;
+            State.Current.Foreign_Activation := Activation;
+            --  The frame owns arguments before stack growth, and enters its
+            --  window before appending. Error unwinding can therefore restore
+            --  the old base even if allocation fails partway through setup.
+            State.Current.Foreign_Stack.Reserve_Capacity
+              (State.Current.Foreign_Stack.Length +
+                 Activation.Native_Arguments.Length + 1);
+            for Argument of Activation.Native_Arguments loop
+               State.Current.Foreign_Stack.Append (Argument);
+            end loop;
+            Activation.Native_Stage := 1;
+            --  Returning exposes an explicit C request. Invoking its function
+            --  pointer here would let longjmp cross these live Ada frames.
+         elsif Activation.Native_Stage = 2 then
+            Complete (Self, Activation.Native_Results);
+         elsif Activation.Native_Stage = 3 then
+            raise Language_Error;
+         else
+            raise Program_Error with "foreign callback awaits its C pump";
+         end if;
+         return;
+      elsif Name = "@foreign.boundary" then
+         --  A protected child has delivered one wrapped packet. Leave it in
+         --  this sentinel until the nested C pump publishes the results onto
+         --  the caller's C stack, then explicitly removes the sentinel.
+         Activation.Native_Stage := 1;
+         return;
+      elsif Name = "base.primitive" then
          Complete (Self, Native
            (Self, Activation.Native_Id, Activation.Native_Arguments));
          return;
@@ -1378,7 +1445,7 @@ package body Lua.Engine.Machine is
               (Kind => (if State.Current.Has_Failure_Value then Lua_Raised
                         else Completed),
                Results => (if State.Current.Has_Failure_Value then
-                 Values.To_Vector (State.Current.Failure, 1)
+                 One_Value (State.Current.Memory, State.Current.Failure, 1)
                  else Values.Empty_Vector), Target => 0);
             State.Current.Failure := Nil_Value;
             State.Current.Has_Failure_Value := False;
@@ -1511,15 +1578,15 @@ package body Lua.Engine.Machine is
       then
          if Name in "coroutine.create" | "coroutine.wrap" then
             if Left.Kind not in Closure_Kind | Native_Closure_Kind |
-              Native_Kind_Value
+              Native_Kind_Value | Foreign_Function_Kind
             then
                Fail (State, "function expected");
             end if;
             Handler := New_Thread (State, Left);
             if Name = "coroutine.wrap" then
                Handler := New_Native
-                 (State, "coroutine.wrapped", Values.To_Vector
-                   (Handler, 1));
+                 (State, "coroutine.wrapped", One_Value
+                   (State, Handler, 1));
             end if;
             Return_Native (Handler);
          elsif Name = "coroutine.running" then
@@ -1548,7 +1615,8 @@ package body Lua.Engine.Machine is
             declare
                Thread : Value := Left;
                Context : Context_Access;
-               Args : Values.Vector := Activation.Native_Arguments;
+               Args : Values.Vector :=
+                 Owned_Values (State, Activation.Native_Arguments);
             begin
                if Name = "coroutine.wrapped" then
                   Thread := Activation.Native_Captures (1);
@@ -1723,7 +1791,7 @@ package body Lua.Engine.Machine is
             if Activation.Native_Arguments.Is_Empty then
                Fail (State, "value expected");
             end if;
-            Activation.Native_Captures := Values.To_Vector (Left, 1);
+            Activation.Native_Captures := One_Value (State, Left, 1);
             Activation.Native_Index := 2;
          elsif Truth (First (Activation.Native_Results)) then
             Activation.Native_Captures.Replace_Element
@@ -1753,7 +1821,7 @@ package body Lua.Engine.Machine is
                Fail (State, "xpcall needs a function and error handler");
             end if;
             if Arg (2).Kind not in Closure_Kind | Native_Closure_Kind |
-              Native_Kind_Value
+              Native_Kind_Value | Foreign_Function_Kind
             then
                Fail (State, "error handler must be a function");
             end if;
@@ -1864,7 +1932,7 @@ package body Lua.Engine.Machine is
          if Activation.Native_Stage = 0 then
             Right := (Integer_Kind,
               Lua.Integers.Add (Integral (State, Right), 1));
-            Activation.Native_Captures := Values.To_Vector (Right, 1);
+            Activation.Native_Captures := One_Value (State, Right, 1);
             Packet.Append (Left);
             Packet.Append (Right);
             Activation.Native_Stage := 1;
@@ -1909,7 +1977,7 @@ package body Lua.Engine.Machine is
                end if;
                return;
             elsif Handler.Kind in Closure_Kind | Native_Closure_Kind |
-              Native_Kind_Value
+              Native_Kind_Value | Foreign_Function_Kind
             then
                Activation.Native_Arguments.Replace_Element (1, Left);
                Invoke (Handler, Activation.Native_Arguments);
@@ -2006,16 +2074,13 @@ package body Lua.Engine.Machine is
          Handler := Metafield (State, Left, "__metatable");
          if Handler.Kind /= Nil_Kind then
             Return_Native (Handler);
-         elsif Left.Kind = Table_Kind and then
-           Left.Reference.Metatable /= null
-         then
-            Return_Native ((Table_Kind, Left.Reference.Metatable));
-         elsif Left.Kind = String_Kind and then
-           State.String_Metatable /= null
-         then
-            Return_Native ((Table_Kind, State.String_Metatable));
          else
-            Return_Native (Nil_Value);
+            declare
+               Meta : constant Object_Access := Raw_Metatable (State, Left);
+            begin
+               Return_Native ((if Meta = null then Nil_Value else
+                                  (Table_Kind, Meta)));
+            end;
          end if;
       elsif Name = "base.setmetatable" then
          if Left.Kind /= Table_Kind then
@@ -2025,8 +2090,9 @@ package body Lua.Engine.Machine is
          elsif Metafield (State, Left, "__metatable").Kind /= Nil_Kind then
             Fail (State, "cannot change a protected metatable");
          end if;
-         Left.Reference.Metatable :=
-           (if Right.Kind = Nil_Kind then null else Right.Reference);
+         Set_Metatable
+           (State, Left, (if Right.Kind = Nil_Kind then null else
+                            Right.Reference));
          Return_Native (Left);
       elsif Name'Length > 6 and then Name (1 .. 6) = "arith." then
          Event := To_Unbounded_String (Name (7 .. Name'Last));
@@ -2094,7 +2160,7 @@ package body Lua.Engine.Machine is
       elsif Name'Length > 5 and then Name (1 .. 5) = "utf8." then
          if Name = "utf8.codes" then
             Packet.Append (New_Native
-              (State, "utf8.step", Values.To_Vector (Arg (2), 1)));
+              (State, "utf8.step", One_Value (State, Arg (2), 1)));
             for Item of Unicode.Run
               (State, "codes", Activation.Native_Arguments)
             loop
@@ -2124,7 +2190,7 @@ package body Lua.Engine.Machine is
       A : constant Natural := Code.A;
       B : constant Natural := Code.B;
       C : constant Natural := Code.C;
-      Packet : Values.Vector;
+      Packet : Values.Vector := Owned_Values (State);
       Left, Right, Item : Value;
       L, R, S : Lua.Numbers.Number;
       Control, Bound, Stride : Integer_Value;
@@ -2457,7 +2523,9 @@ package body Lua.Engine.Machine is
          begin
             Pin (State, Request.Results);
             Caller.Transfer := (others => <>);
-            if State.Native_Depth + Target.Native_Depth >= 200 then
+            if State.Native_Depth + Target.Native_Depth >=
+              Lua.Runtime_Configuration.Maximum_C_Calls
+            then
                Fail (State, "C stack overflow");
             end if;
             Caller.Status := Normal_Context;
@@ -2485,7 +2553,7 @@ package body Lua.Engine.Machine is
             Child : constant Context_Access := State.Current;
             Transfer : constant Control_Transfer := Child.Transfer;
             Parent : constant Context_Access := Child.Resumer;
-            Packet : Values.Vector;
+            Packet : Values.Vector := Owned_Values (State);
          begin
             Pin (State, Transfer.Results);
             if Parent /= null then
@@ -2570,8 +2638,9 @@ package body Lua.Engine.Machine is
                      end if;
                      State.Current.Transfer :=
                        (Kind => Lua_Raised,
-                        Results => Values.To_Vector
-                          (State.Current.Failure, 1), Target => 0);
+                        Results => One_Value
+                          (State.Current.Memory, State.Current.Failure, 1),
+                        Target => 0);
                end;
          end;
       end if;
@@ -2604,8 +2673,9 @@ package body Lua.Engine.Machine is
                end if;
                State.Current.Transfer :=
                  (Kind => Lua_Raised,
-                  Results => Values.To_Vector
-                    (State.Current.Failure, 1), Target => 0);
+                  Results => One_Value
+                    (State.Current.Memory, State.Current.Failure, 1),
+                  Target => 0);
          end;
    end Scheduler_Step;
 
@@ -2702,11 +2772,172 @@ package body Lua.Engine.Machine is
         (Self, World_View (State), null, Function_Value, Arguments);
    end Start;
 
+   function New_Driver (State : in out World) return Driver_Access is
+   begin
+      return new (Lua.Storage.Handle (State.Memory)) Driver;
+   end New_Driver;
+
+   procedure Free_Driver (Self : in out Driver_Access) is
+      procedure Destroy is new Ada.Unchecked_Deallocation
+        (Driver, Driver_Access);
+   begin
+      if Self /= null and then Self.Universe /= null then
+         raise Program_Error with "foreign driver still owns a drive";
+      end if;
+      Destroy (Self);
+   end Free_Driver;
+
+   function Needs_Foreign_Call (Self : Driver) return Boolean is
+     (Self.Universe /= null and then not Self.Done and then not Self.Failed
+      and then not Self.Universe.Current.Stack.Is_Empty and then
+      Self.Universe.Current.Stack.Last_Element.Is_Native and then
+      Self.Universe.Current.Stack.Last_Element.Native_Name =
+        "foreign.callback" and then
+      Self.Universe.Current.Stack.Last_Element.Native_Stage = 1);
+
+   function Foreign_Handler (Self : Driver) return System.Address is
+   begin
+      if not Needs_Foreign_Call (Self) then
+         raise Program_Error with "no pending foreign callback";
+      end if;
+      return Self.Universe.Current.Stack.Last_Element.Foreign_Handler;
+   end Foreign_Handler;
+
+   function Foreign_Context (Self : Driver) return Context_Access is
+   begin
+      if not Needs_Foreign_Call (Self) then
+         raise Program_Error with "no pending foreign context";
+      end if;
+      return Self.Universe.Current;
+   end Foreign_Context;
+
+   procedure Complete_Foreign_Call
+     (Self : Driver; Result_Count : Natural; Error_Status : Natural := 0)
+   is
+      State : World renames Self.Universe.all;
+      Context : constant Context_Access := State.Current;
+      Activation : Frame_Access;
+      Packet : Values.Vector := Owned_Values (State);
+      Count : Natural;
+   begin
+      if not Needs_Foreign_Call (Self) or else
+        Error_Status not in 0 | 2 | 4
+      then
+         raise Program_Error with "invalid foreign callback completion";
+      end if;
+      Activation := Context.Stack.Last_Element;
+      Count := Natural (Context.Foreign_Stack.Length) - Context.Foreign_Base;
+      if (Error_Status = 0 and then Result_Count > Count) or else
+        (Error_Status /= 0 and then Count = 0)
+      then
+         Fail (State, "invalid number of C callback results");
+      end if;
+      Count := (if Error_Status = 0 then Result_Count else 1);
+      for Index in Natural (Context.Foreign_Stack.Length) - Count + 1 ..
+        Natural (Context.Foreign_Stack.Length)
+      loop
+         Packet.Append (Context.Foreign_Stack (Index));
+      end loop;
+      Pin (State, Packet);
+      Activation.Native_Results := Packet;
+      Context.Foreign_Stack.Set_Length
+        (Ada.Containers.Count_Type (Activation.Foreign_Base));
+      Context.Foreign_Base := Activation.Foreign_Previous_Base;
+      Context.Foreign_Activation := Activation.Foreign_Previous_Frame;
+      Activation.Foreign_Entered := False;
+      if Error_Status = 0 then
+         Context.Failure := Nil_Value;
+         Context.Has_Failure_Value := False;
+         Context.Failure_Class := No_Failure;
+         Activation.Native_Stage := 2;
+      else
+         Context.Failure := Packet.First_Element;
+         Context.Has_Failure_Value := True;
+         Context.Failure_Text := To_Unbounded_String (Image (Context.Failure));
+         Context.Failure_Class :=
+           (if Error_Status = 4 then Memory_Failure else Language_Failure);
+         Activation.Native_Stage := 3;
+      end if;
+   end Complete_Foreign_Call;
+
+   procedure Start_Foreign_Boundary
+     (Self : Driver; Callee : Value; Arguments : Values.Vector)
+   is
+      State : World renames Self.Universe.all;
+      Original_Depth : constant Natural :=
+        Natural (State.Current.Stack.Length);
+   begin
+      if not Needs_Foreign_Call (Self) then
+         raise Program_Error with "foreign boundary has no C caller";
+      end if;
+      Pin (State, Callee);
+      Pin (State, Arguments);
+      Schedule (Self, "@foreign.boundary", Values.Empty_Vector, 0);
+      --  lua_call without a continuation cannot suspend its C activation.
+      --  A future continuation-aware boundary must make that choice explicit,
+      --  rather than treating every scheduler continuation as yieldable.
+      State.Current.Stack.Last_Element.Blocks_Yield := True;
+      State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
+      Dispatch (Self, Callee, Arguments, 0, Protected_Call => 1);
+   exception
+      when others =>
+         --  A setup failure precedes execution of the protected child. Remove
+         --  only this boundary's partial activations; the outer C callback
+         --  and its live C guard still own the interrupted driver.
+         while Natural (State.Current.Stack.Length) > Original_Depth loop
+            declare
+               Item : Frame_Access := State.Current.Stack.Last_Element;
+            begin
+               State.Current.Stack.Delete_Last;
+               Release_Frame (State, Item);
+            end;
+         end loop;
+         raise;
+   end Start_Foreign_Boundary;
+
+   function Has_Foreign_Result (Self : Driver) return Boolean is
+     (Self.Universe /= null and then not Self.Done and then not Self.Failed
+      and then not Self.Universe.Current.Stack.Is_Empty and then
+      Self.Universe.Current.Stack.Last_Element.Is_Native and then
+      Self.Universe.Current.Stack.Last_Element.Native_Name =
+        "@foreign.boundary" and then
+      Self.Universe.Current.Stack.Last_Element.Native_Stage = 1);
+
+   procedure Take_Foreign_Result
+     (Self : Driver; Packet : out Values.Vector; Error_Status : out Natural)
+   is
+      State : World renames Self.Universe.all;
+      Activation : Frame_Access;
+   begin
+      if not Has_Foreign_Result (Self) then
+         raise Program_Error with "no completed foreign boundary";
+      end if;
+      Activation := State.Current.Stack.Last_Element;
+      if Activation.Native_Results.Is_Empty or else
+        Activation.Native_Results.First_Element.Kind /= Boolean_Kind
+      then
+         raise Program_Error with "foreign boundary lost protection packet";
+      end if;
+      Error_Status :=
+        (if Activation.Native_Results.First_Element.Boolean_Data then 0
+         else Natural'Max (2, Activation.Native_Aux));
+      Packet.Clear;
+      for Index in 2 .. Natural (Activation.Native_Results.Length) loop
+         Packet.Append (Activation.Native_Results (Index));
+      end loop;
+      Pin (State, Packet);
+      State.Current.Stack.Delete_Last;
+      Release_Frame (State, Activation);
+   end Take_Foreign_Result;
+
    procedure Step (Self : in out Driver) is
       Validated : Boolean := False;
    begin
       if Self.Universe = null or else Self.Done or else Self.Failed then
          raise Program_Error with "inactive VM driver step";
+      end if;
+      if Needs_Foreign_Call (Self) or else Has_Foreign_Result (Self) then
+         raise Program_Error with "foreign drive requires its C-owned pump";
       end if;
       Validated := True;
       Begin_Operation (Self.Universe.all);

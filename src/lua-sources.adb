@@ -19,6 +19,20 @@ package body Lua.Sources is
       if Result.Skipped_Bytes < Source'Length and then
         Source (Source'First + Result.Skipped_Bytes) = '#'
       then
+         --  Binary files discard the interpreter line and its LF entirely.
+         --  A prefixed newline would shift every native-chunk alignment field.
+         --  Pinned loadfile's binary reopen scans through LF (including CRLF).
+         for Offset in Result.Skipped_Bytes .. Source'Length - 1 loop
+            if Source (Source'First + Offset) = Character'Val (10) then
+               if Offset + 1 < Source'Length and then
+                 Source (Source'First + Offset + 1) = Character'Val (27)
+               then
+                  Result.Skipped_Bytes := Offset + 1;
+                  return Result;
+               end if;
+               exit;
+            end if;
+         end loop;
          for Offset in Result.Skipped_Bytes .. Source'Length - 1 loop
             exit when Source (Source'First + Offset) in
               Character'Val (10) | Character'Val (13);

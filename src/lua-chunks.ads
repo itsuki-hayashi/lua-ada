@@ -45,9 +45,13 @@ private package Lua.Chunks is
    Invalid_Program : exception;
    function Encode
      (Code : in out Lua.Prototypes.Program; Strip : Boolean := False;
-      Maximum_Depth : Positive := 200) return Lua.Storage.Buffers.Buffer;
+      Maximum_Depth : Positive := 200;
+      Root_Node : Lua.Prototypes.Prototype_Access := null)
+      return Lua.Storage.Buffers.Buffer;
    --  Encode the real canonical graph using pinned alignment, varints, tags
    --  and chunk-global string reuse. Strip omits source/debug fields.
+   --  Root_Node selects an owned subtree; null selects the program root.
+   --  Selection never mutates the graph, including an adopted runtime model.
    --  @exception Invalid_Program Invalid ownership, graph or operand metadata.
    --  @exception Lua.Storage.Allocation_Error Managed output/work refusal.
    --  The returned buffer borrows Code's owner and must die before that owner.

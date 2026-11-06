@@ -41,7 +41,7 @@ procedure Lua_Ada is
       Ada.Text_IO.Put_Line
         ("--check validates complete Lua syntax without executing source.");
       Ada.Text_IO.Put_Line
-        ("Lua 5.5 scripting subset; REPL and binary chunks are deferred.");
+        ("Lua 5.5 subset; native binary files supported; REPL deferred.");
    end Usage;
 
    procedure Version is

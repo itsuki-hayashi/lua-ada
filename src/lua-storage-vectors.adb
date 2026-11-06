@@ -358,6 +358,13 @@ package body Lua.Storage.Vectors is
       end;
    end Insert;
 
+   procedure Prepend
+     (Self : in out Vector; New_Item : Element_Type; Count : Count_Type := 1)
+   is
+   begin
+      Insert (Self, 1, New_Item, Count);
+   end Prepend;
+
    procedure Delete
      (Self : in out Vector; Index : Positive; Count : Count_Type := 1)
    is
@@ -381,6 +388,11 @@ package body Lua.Storage.Vectors is
       Self.Used := Self.Used - Removed;
    end Delete;
 
+   procedure Delete_First (Self : in out Vector; Count : Count_Type := 1) is
+   begin
+      Delete (Self, 1, Count);
+   end Delete_First;
+
    procedure Delete_Last (Self : in out Vector; Count : Count_Type := 1) is
       Removed : constant Natural := Natural
         (Count_Type'Min (Count, Count_Type (Self.Used)));
@@ -395,6 +407,11 @@ package body Lua.Storage.Vectors is
       Delete_Last (Self, Count_Type (Self.Used));
    end Clear;
 
+   procedure Release (Self : in out Vector) is
+   begin
+      Finalize (Self);
+   end Release;
+
    procedure Replace_Element
      (Self : in out Vector; Index : Positive; New_Item : Element_Type)
    is
@@ -402,6 +419,24 @@ package body Lua.Storage.Vectors is
       Check_Index (Self, Index);
       Self.Data.Items (Index).Item := New_Item;
    end Replace_Element;
+
+   procedure Swap (Self : in out Vector; First, Second : Positive) is
+   begin
+      Check_Index (Self, First);
+      Check_Index (Self, Second);
+      if First = Second then
+         return;
+      end if;
+      --  Keep discriminants and element addresses unchanged. As with ordinary
+      --  replacement, an element's controlled assignment can raise; managed
+      --  elements retain their own owner and failed-copy cleanup guarantees.
+      declare
+         Saved : constant Element_Type := Self.Data.Items (First).Item;
+      begin
+         Self.Data.Items (First).Item := Self.Data.Items (Second).Item;
+         Self.Data.Items (Second).Item := Saved;
+      end;
+   end Swap;
 
    procedure Update_Element
      (Self : in out Vector; Index : Positive;
@@ -466,6 +501,18 @@ package body Lua.Storage.Vectors is
       end loop;
       return True;
    end "=";
+
+   function "&" (Left, Right : Vector) return Vector is
+   begin
+      return Result : Vector do
+         --  The source vectors carry the allocation policy. Never invent a
+         --  default/global owner when constructing an intermediate result.
+         Result.Memory :=
+           (if Left.Memory /= null then Left.Memory else Right.Memory);
+         Append (Result, Left);
+         Append (Result, Right);
+      end return;
+   end "&";
 
    function To_Vector
      (Memory : not null Owner_Access; New_Item : Element_Type;

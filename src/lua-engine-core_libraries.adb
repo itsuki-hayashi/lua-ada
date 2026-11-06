@@ -148,7 +148,7 @@ package body Lua.Engine.Core_Libraries is
      (State : in out World; Name : String; Arguments : Values.Vector)
       return Values.Vector
    is
-      Result : Values.Vector;
+      Result : Values.Vector := Owned_Values (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Arguments.Length) then Arguments (Index)
          else Nil_Value);

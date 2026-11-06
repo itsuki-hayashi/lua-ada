@@ -18,7 +18,7 @@ package body Lua.Engine.Table_Drivers is
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
       Name : constant String := To_String (Activation.Native_Name);
-      Result : Native_Action;
+      Result : Native_Action := New_Action (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Activation.Native_Arguments.Length)
          then Activation.Native_Arguments (Index) else Nil_Value);
@@ -122,7 +122,7 @@ package body Lua.Engine.Table_Drivers is
       function Read (Table : Value; Index : Integer_Value)
                      return Native_Action
       is
-         Args : Values.Vector;
+         Args : Values.Vector := Owned_Values (State);
       begin
          Args.Append (Table);
          Args.Append (Key (Index));
@@ -132,7 +132,7 @@ package body Lua.Engine.Table_Drivers is
       function Write (Table : Value; Index : Integer_Value; Item : Value)
                       return Native_Action
       is
-         Args : Values.Vector;
+         Args : Values.Vector := Owned_Values (State);
       begin
          Args.Append (Table);
          Args.Append (Key (Index));
@@ -210,7 +210,7 @@ package body Lua.Engine.Table_Drivers is
                   Start_Move (True);
                elsif Arg (5).Kind /= Nil_Kind then
                   declare
-                     Args : Values.Vector;
+                     Args : Values.Vector := Owned_Values (State);
                   begin
                      Args.Append (Item);
                      Args.Append (Destination);
@@ -232,14 +232,14 @@ package body Lua.Engine.Table_Drivers is
                First := (if Arg (2).Kind = Nil_Kind then 1
                          else Integral (Arg (2)));
                if Arg (3).Kind /= Nil_Kind then
-                  Activation.Native_Results := Values.To_Vector (Arg (3), 1);
+                  Activation.Native_Results := One_Value (State, Arg (3), 1);
                else
-                  return Request ("@length", Values.To_Vector (Item, 1));
+                  return Request ("@length", One_Value (State, Item, 1));
                end if;
             else
                Check_Table (Item, True,
                             Name in "table.insert" | "table.remove", True);
-               return Request ("@length", Values.To_Vector (Item, 1));
+               return Request ("@length", One_Value (State, Item, 1));
             end if;
          end if;
       end if;

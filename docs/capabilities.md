@@ -98,17 +98,20 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 - Runtime behavior: M1/M2b plus the implemented lifecycle delivery below;
   verified runtime matrix and final publication checks are recorded separately.
 - Opcode format: all 85 canonical definitions and six encodings.
-- Canonical code generation: deferred; compiler lowers to private operations.
-- Canonical code execution: deferred; no binary chunk compatibility claim.
+- Canonical code generation: normal text compilation emits real pinned words.
+- Canonical code execution: normal sessions/CLI use scalar canonical registers;
+  the earlier backend remains only during migration/platform verification.
+- Native binary chunks: checked load/dump and selected-function string.dump
+  have focused execution/interoperability evidence in [binary chunks](binary-chunks.md).
 
 | Facility                               | Later gate / current response                        |
 | -------------------------------------- | ---------------------------------------------------- |
 | Finalization                           | Deferred; no finalizer execution                     |
 | Userdata and io/os                     | Deferred; unavailable facilities                     |
-| string.dump, table.sort/create         | Remaining library work; unavailable                  |
+| table.sort/create                      | Remaining library work; unavailable                  |
 | Reopened C-created math libraries      | C-facade integration; distinct RNG captures required |
-| Binary chunks                          | M3; text-source interface only                       |
-| C exports and allocator parity         | M3; isolated feasibility probes only                 |
+| Binary chunks                          | Implemented; expanded platform acceptance pending    |
+| C exports and allocator parity         | Partial real C surface; remaining API/allocator work |
 | Dynamic native modules / LuaRocks      | M4; no compatibility claim                           |
 | Whole upstream suite                   | M3; full coverage ledger remains incomplete          |
 | Interactive REPL                       | Future CLI work; no-input usage is intentional       |
@@ -120,7 +123,7 @@ relying on those implementation choices. IEEE formatting follows the matching ho
 ## Language lifecycle implementation
 
 Goto/labels, <close>, the fourth generic-for closing value and weak-key/value
-tables are executable on the private VM. Threads have real identity and
+tables execute on the canonical backend. Threads have real identity and
 reachability-based ownership. Ephemerons use fixed-point stop-the-world tracing.
 Lua-facing coroutine exports are create, resume, yield, wrap, status, running,
 isyieldable and close. Base collectgarbage supports no argument, collect, stop,
@@ -128,12 +131,17 @@ restart and isrunning. Other options explicitly fail; no byte counts or collecto
 modes are fabricated.
 
 The debug subset is getinfo, getlocal, setlocal, getupvalue, setupvalue, upvalueid,
-sethook, gethook and traceback. It inspects actual cells and logical Lua/native
+sethook, gethook and traceback. The full-M3 implementation additionally provides
+getregistry, getmetatable, setmetatable and upvaluejoin, with shared primitive
+type metatables. Fifteen focused session cases exercise actual registry roots,
+cell identities, mutation and collection. It inspects actual cells and logical Lua/native
 activations, including explicit-thread forms, source ranges, call-site names,
 tail calls and per-thread call/return/line/count hooks. Native continuation phases
-are hidden. Count cadence reflects private instructions, not canonical opcodes.
-Userdata, finalizers, debug registry/metatable mutation, upvaluejoin and binary
-inspection remain outside this delivery.
+are hidden. Count cadence now follows executed canonical words and explicit native work;
+full hook-cadence parity remains an expanded acceptance obligation.
+Userdata and finalizers remain pending. Canonical source/local/upvalue
+inspection, native binary load/dump and the added debug operations are M3
+implementation checkpoints with their own evidence and pending platform gates.
 
 [Lifecycle acceptance](milestones/m3-language-lifecycle.md) owns unchanged
 goto.lua/coroutine.lua execution, precise T-absent omissions and platform evidence.

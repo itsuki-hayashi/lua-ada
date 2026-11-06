@@ -80,7 +80,7 @@ package body Lua.Machine_Driver_Tests is
       Code : constant Prototype_Access := Compiler.Compile
         (State.all, "return {answer=42},false,nil", "packet-roots");
       Driver : VM.Driver;
-      Packet : Values.Vector;
+      Packet : Values.Vector := Owned_Values (State.all);
       Table : Object_Access;
    begin
       --  The completed packet alone retains the table across collection.
@@ -131,7 +131,7 @@ package body Lua.Machine_Driver_Tests is
         (State.all, "return pcall(function()error({code=17})end)",
          "driver-protection");
       Driver : VM.Driver;
-      Packet : Values.Vector;
+      Packet : Values.Vector := Owned_Values (State.all);
    begin
       --  Protected failure must survive repeated returns to the driver host
       --  as false plus the same arbitrary Lua object, with a usable session.
@@ -248,7 +248,7 @@ package body Lua.Machine_Driver_Tests is
         (State.all, "return 7", "premature-outcome");
       Driver : VM.Driver;
       Kind : Transfer_Kind := No_Transfer;
-      Packet : Values.Vector;
+      Packet : Values.Vector := Owned_Values (State.all);
       Outcome_Rejected, Packet_Rejected : Boolean := False;
    begin
       --  Inspecting an active drive must not masquerade as an empty successful
@@ -294,7 +294,7 @@ package body Lua.Machine_Driver_Tests is
 
    procedure Native_Call_Arguments (State : World_Access) is
       Driver : VM.Driver;
-      Arguments : Values.Vector;
+      Arguments : Values.Vector := Owned_Values (State.all);
    begin
       --  The function-value entry accepts a real native callable without a
       --  source wrapper. Its frame must root arguments after the host drops
