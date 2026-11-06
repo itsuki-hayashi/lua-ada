@@ -130,7 +130,7 @@ static int inspect(lua_State *L) {
 lua_CFunction lua_ada_test_adapter_callback(int operation) {
     if (operation == 0) return userdata;
     if (operation == 11) return install_warning;
-    if (operation == 14 || operation == 15)
+    if (operation >= 14 && operation <= 16)
         return lua_ada_test_platform_callback(operation);
     return inspect;
 }

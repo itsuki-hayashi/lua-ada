@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "id": "files-windows-platform",
+  "source": "references/lua/testes/files.lua",
+  "source_sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86",
+  "disposition": "native-platform-equivalent",
+  "platform": "windows",
+  "configuration": "default-and-upstream-test",
+  "review": {
+    "status": "pending",
+    "author": "Codex",
+    "reviewer": null,
+    "artifact": null
+  },
+  "replacements": [
+    {
+      "id": "windows-span-01",
+      "start_byte": 1241,
+      "length_bytes": 26,
+      "start_line": 51,
+      "end_line": 51,
+      "source_sha256": "8bc250c152e4ab0ef4dbe1921f696a1863c74121920c32eb5da070c17ed25dc2",
+      "invariant": "Retain unique native temporary names and complete create/read/remove lifecycle in the disposable directory.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-files-contract.lua#temporary-name lifecycle"
+      ],
+      "replacement": "local file = (os.tmpname():gsub(\"^[/\\\\]+\", \"\"))\n"
+    },
+    {
+      "id": "windows-span-02",
+      "start_byte": 1467,
+      "length_bytes": 31,
+      "start_line": 61,
+      "end_line": 61,
+      "source_sha256": "3f15acf6236e4b7008168be6d0125f0ada0622dba223ade674a14128d8497dc3",
+      "invariant": "Retain unique native temporary names and complete create/read/remove lifecycle in the disposable directory.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-files-contract.lua#temporary-name lifecycle"
+      ],
+      "replacement": "local otherfile = (os.tmpname():gsub(\"^[/\\\\]+\", \"\"))\n"
+    },
+    {
+      "id": "windows-span-03",
+      "start_byte": 2291,
+      "length_bytes": 74,
+      "start_line": 88,
+      "end_line": 88,
+      "source_sha256": "b93243fa9e870f3f2ee5284a089051424360b19e9ee51333f62fa9c339906169",
+      "invariant": "Check observed Windows stdin seek and retain real failing seek/error tuple with a negative regular-file offset.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-files-contract.lua#native stdin and invalid seek"
+      ],
+      "replacement": "  assert(status == 1000 and msg == nil and code == nil)\n  local f = assert(io.tmpfile())\n  status, msg, code = f:seek(\"set\", -1)\n  assert(not status and type(msg) == \"string\" and type(code) == \"number\")\n  assert(f:close())\n"
+    },
+    {
+      "id": "windows-span-04",
+      "start_byte": 12369,
+      "length_bytes": 35,
+      "start_line": 467,
+      "end_line": 467,
+      "source_sha256": "075fa744187ce9a70b9985517a12fd23982c9f5e047af225c9e0e2ac22a87dbd",
+      "invariant": "Use the Windows null device and directory command with successful flush and close.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-files-contract.lua#native null device"
+      ],
+      "replacement": "  local f = io.output(\"NUL\")\n"
+    },
+    {
+      "id": "windows-span-05",
+      "start_byte": 12613,
+      "length_bytes": 35,
+      "start_line": 474,
+      "end_line": 474,
+      "source_sha256": "48c1e51d8186351c111dc276508073d24cb07b63914ed3bf615708157ae638f3",
+      "invariant": "Retain buffered write, native flush refusal, second write/refusal and successful close through real handles.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-buffered-failure.lua"
+      ],
+      "replacement": "  local f = io.output(_test_failing_stream(assert(io.tmpfile())))\n"
+    },
+    {
+      "id": "windows-span-06",
+      "start_byte": 18862,
+      "length_bytes": 893,
+      "start_line": 718,
+      "end_line": 745,
+      "source_sha256": "3ff8558724db19fb5015aa14e1d77810717ab49e7b65446c80dce2f5784c3c95",
+      "invariant": "Execute the guarded Windows T obligation using actual zero-byte refusal and measured multiargument partial write through a nonblocking pipe, reader byte verification, EOF and endpoint cleanup. Windows CRT refuses an oversized single argument atomically; no count or errno is fabricated.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-partial-write.lua"
+      ],
+      "replacement": "if T and not _port then\n  print(\"testing failed write\")\n  -- First-party counterpart for the Windows-absent T.nonblock block.\n  -- The CRT refuses oversized nonblocking writes atomically. Earlier arguments\n  -- still count as actual partial progress in Lua's multiargument file:write.\n  local f = _test_failing_stream(assert(io.tmpfile()))\n  assert(f:setvbuf('no'))\n  local ok, message, err, count = f:write('abcd')\n  assert(ok == nil and type(message) == 'string' and err > 0 and count == 0)\n  assert(f:close())\n  \n  local writer, reader = assert(io.tmpfile()), assert(io.tmpfile())\n  local a, b = _test_nonblocking_pair(writer, reader)\n  assert(a == writer and b == reader)\n  assert(writer:setvbuf('no'))\n  assert(reader:setvbuf('no'))\n  assert(writer:write(string.rep('a', 100)))\n  ok, message, err, count = writer:write(string.rep('b', 10000), string.rep('c', 2^17))\n  assert(ok == nil and type(message) == 'string' and err > 0 and count == 10000)\n  assert(reader:read(10100) == string.rep('a', 100) .. string.rep('b', 10000))\n  assert(writer:close())\n  assert(reader:read(1) == nil)\n  assert(reader:close())\n"
+    },
+    {
+      "id": "windows-span-07",
+      "start_byte": 20771,
+      "length_bytes": 186,
+      "start_line": 783,
+      "end_line": 787,
+      "source_sha256": "240a259576242b2e970d04fddc25d5a94b6d4e8ab4186d77da60622241b71e38",
+      "invariant": "Retain unique native temporary names and complete create/read/remove lifecycle in the disposable directory. Preserve both pipe directions, exact copied bytes, subprocess status and cleanup using the same implementation selected as bare lua.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-files-contract.lua#temporary-name lifecycle",
+        "tests/conformance/platform/windows-files-contract.lua#same implementation pipe copy"
+      ],
+      "replacement": "    local file = (os.tmpname():gsub(\"^[/\\\\]+\", \"\"))\n    local f = assert(io.popen([[lua -e \"io.write(io.read('a'))\" > ]] .. file, \"w\"))\n    f:write(\"a line\")\n    assert(f:close())\n    local f = assert(io.popen([[lua -e \"io.write(io.read('a'))\" < ]] .. file, \"r\"))\n"
+    },
+    {
+      "id": "windows-span-08",
+      "start_byte": 21098,
+      "length_bytes": 386,
+      "start_line": 795,
+      "end_line": 804,
+      "source_sha256": "050ac54d392a4dbe4e38d24bd74a31f8438adab5eed5ef7d49e0b1e014b1938c",
+      "invariant": "Use the Windows null device and directory command with successful flush and close. Replace POSIX signals with real Windows TerminateProcess and compare native exit status through popen/system, including nested shell execution. Quote the actual arg-selected executable for cmd.exe while retaining normal and close-state exit statuses.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-files-contract.lua#native null device",
+        "tests/conformance/platform/windows-files-contract.lua#forced termination and shell status",
+        "tests/conformance/platform/windows-files-contract.lua#quoted executable and typed exit"
+      ],
+      "replacement": "    {\"dir > NUL\", \"ok\"},\n    {\"not-to-be-found-command\", \"exit\"},\n    {\"exit 3\", \"exit\", 3},\n    {\"exit 129\", \"exit\", 129},\n    {\"native-terminate 129\", \"exit\", 129},\n    {\"native-terminate 137\", \"exit\", 137},\n    {\"cmd /c native-terminate 129\", \"exit\", 129},\n    {'\"' .. progname .. ' -e \" \"' .. '\"', \"ok\"},\n    {'\"' .. progname .. ' -e \"os.exit(0, true)\"' .. '\"', \"ok\"},\n    {'\"' .. progname .. ' -e \"os.exit(20, true)\"' .. '\"', \"exit\", 20},\n"
+    },
+    {
+      "id": "windows-span-09",
+      "start_byte": 24080,
+      "length_bytes": 428,
+      "start_line": 896,
+      "end_line": 904,
+      "source_sha256": "74c6683b2f4c7c4abe084b408baf5479bfcfef7c5dc9fdab98122d6e565a8e4a",
+      "invariant": "Verify native rejection of unsupported POSIX date modifiers, matching the pinned Windows C oracle. Retain exact signed 32-bit second normalization and difference assertions within the Windows representable range.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-files-contract.lua#unsupported native date modifiers",
+        "tests/conformance/platform/windows-files-contract.lua#large signed date normalization"
+      ],
+      "replacement": "  checkerr(\"invalid conversion specifier\", os.date, \"%Ex\")\n  checkerr(\"invalid conversion specifier\", os.date, \"%Oy\")\n\n  -- test large dates (assume at least 4-byte ints and time_t)\n  local t0 = os.time{year = 2100, month = 1, day = 0}\n  local t1 = os.time{year = 2100, month = 1, day = 0, sec = (1 << 31) - 1}\n  assert(t1 - t0 == (1 << 31) - 1)\n  t0 = os.time{year = 2100, month = 1, day = 1}\n  t1 = os.time{year = 2100, month = 1, day = 1, sec = -(1 << 31)}\n"
+    },
+    {
+      "id": "windows-span-10",
+      "start_byte": 25302,
+      "length_bytes": 79,
+      "start_line": 923,
+      "end_line": 923,
+      "source_sha256": "d6833dfb481387b31ea99684470206df11b055ce0fb2f5b5062c2e5499643acb",
+      "invariant": "Exercise a representable Windows year 3000 and reject the C-int maximum year that the native CRT cannot represent.",
+      "counterpart_tests": [
+        "tests/conformance/platform/windows-files-contract.lua#native year representability"
+      ],
+      "replacement": "          {year=3000, month=12, day=31, hour=12, min=0, sec=0}))\n        checkerr(\"represented\", os.time,\n          {year=(1 << 31) + 1899, month=12, day=31, hour=23, min=59, sec=59})\n"
+    }
+  ]
+}

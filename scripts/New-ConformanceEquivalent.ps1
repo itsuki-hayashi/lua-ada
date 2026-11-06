@@ -9,6 +9,11 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $spec = Get-Content -LiteralPath $Manifest -Raw | ConvertFrom-Json
 if ($spec.schema_version -ne 1) { throw 'Unsupported equivalent manifest' }
+$disposition = if ($spec.PSObject.Properties['disposition']) { $spec.disposition }
+    else { 'ada-internal-equivalent' }
+if ($disposition -notin @('ada-internal-equivalent', 'native-platform-equivalent')) {
+    throw 'Unsupported equivalent disposition'
+}
 if ($spec.review.status -ne 'accepted') {
     if (-not $AllowUnreviewedDiagnostics) { throw 'Equivalent lacks independent review' }
 } elseif ([string]::IsNullOrWhiteSpace($spec.review.author) -or
@@ -57,7 +62,7 @@ try {
     [IO.File]::WriteAllBytes($target, $result)
     [ordered]@{
         id=$spec.id
-        disposition='ada-internal-equivalent'
+        disposition=$disposition
         review_status=$spec.review.status
         diagnostic_only=($spec.review.status -ne 'accepted')
         source_sha256=$spec.source_sha256

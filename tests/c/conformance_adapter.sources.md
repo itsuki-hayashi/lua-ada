@@ -36,6 +36,16 @@ configurations; it does not create T in the default configuration. Its mapping
 to the `/dev/full` source span still requires independent review. The shared
 windows-buffered-failure.lua fixture supplies matching C/Ada driver assertions;
 check-windows-buffered-failure.ps1 retains executable, module and source hashes.
+The first-party `_test_nonblocking_pair` driver creates a native Windows
+PIPE_NOWAIT byte pipe and installs both descriptors into caller-owned files.
+Windows CRT refuses an oversized single write without progress. The named
+counterpart therefore checks zero-byte refusal and actual multiargument partial
+progress, including exact bytes received, EOF and both endpoint closes. It does
+not fabricate POSIX partial counts or register T.nonblock on Windows.
+The files-windows-platform.json manifest replaces the guarded source block
+explicitly and executes it whenever T is present. Ten exact source-hashed spans
+also map paths/devices, shell quoting/termination and native date ranges. Each
+span links to an executed named counterpart, with independent review pending.
 `T.ada_emergency_tables` is an explicitly named Ada
 counterpart for the C-specific 200-byte emergency allowance, with measured
 table storage and actual allocation refusal/recovery. Its source mapping is

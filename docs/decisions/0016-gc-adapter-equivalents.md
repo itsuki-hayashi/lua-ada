@@ -61,6 +61,23 @@ architecture without improving the tested lifetime guarantee. Each proposed
 equivalent instead has a named focused regression and retains its ordering and
 cleanup obligations. Native-platform differences require their own mappings.
 
+The Windows files.lua candidate has a separate native-platform manifest.
+Native descriptor drivers are compiled independently against both runtimes.
+A closed-reader pipe supplies real buffered flush refusal; a PIPE_NOWAIT pair
+supplies real unbuffered refusal and multiargument partial progress. Windows
+CRT does not transfer part of an oversized individual write, so its equivalent
+checks earlier arguments delivered before a later refusal and verifies the
+reader's exact bytes. FILE pointers, C closers and external ownership metadata
+are retained by replacing only descriptors. All temporary native handles are
+owned or closed before any potentially raising Lua API call.
+
+Other Windows mappings use native temporary basenames, NUL, actual forced
+TerminateProcess statuses, cmd.exe quoting and representable calendar ranges.
+No broad port/soft flag is set. The guarded Windows partial-write block is
+explicitly replaced and executed with T; default omission remains linked to
+that instrumented counterpart. Original file bytes remain pinned. These
+mappings are candidates, not independent acceptance decisions.
+
 ## Verification implications
 
 Require default and instrumented regressions, negative inspector/generator tests,

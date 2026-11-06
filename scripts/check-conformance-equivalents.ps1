@@ -21,6 +21,7 @@ function Reject([string] $Name, [scriptblock] $Action, [string] $Message) {
 }
 Reject 'pending review' { & $generator -Manifest $manifest -Output $output } 'independent review'
 $cases = @(
+    @{Name='unknown disposition'; Mutate={param($s) $s | Add-Member -NotePropertyName disposition -NotePropertyValue 'unchanged' -Force}; Error='equivalent disposition'},
     @{Name='source drift'; Mutate={param($s) $s.source_sha256='0'*64}; Error='source hash'},
     @{Name='span drift'; Mutate={param($s) $s.replacements[0].source_sha256='0'*64}; Error='span hash'},
     @{Name='overlap'; Mutate={param($s) $s.replacements[1].start_byte=$s.replacements[0].start_byte}; Error='overlapping'},

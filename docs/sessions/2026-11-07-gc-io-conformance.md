@@ -253,3 +253,37 @@ C evidence is under reports/files-c-oracle/31b8997038b248bf92082bdf860c9e16.
 This diagnostic still omits the guarded Windows nonblocking-write block and
 has not become a reviewed equivalent manifest. That obligation needs a real
 native partial-write counterpart before any selected-file coverage is closed.
+
+## Native partial writes and complete Windows file candidate
+
+The next implementation uses a real PIPE_NOWAIT byte pipe, preserving both
+FILE pointers/closers through descriptor replacement. A native probe showed
+that Windows CRT refuses an oversized single write atomically. The target
+target invariant is therefore represented by real earlier-argument delivery
+before later-argument refusal, exact returned counts, received bytes and EOF.
+Three separately named Windows AUnit cases add zero-byte refusal, partial
+progress and endpoint validation. Instrumented validation/static passes 1,304
+cases in `reports/m3-partial-write-tests.log`.
+
+The same C driver and Lua assertions pass against both actual runtimes.
+Ten source-hashed spans in files-windows-platform.json now replace only explicit
+native assumptions; the original checkerr helper is restored, and the formerly
+omitted T block executes on Windows. The runner requires its execution marker,
+all major file-phase markers, the final date/version witness, successful process
+shutdown and exact expected shell stderr. Both instrumented executions pass in
+`reports/m3-windows-files-equivalent.log`, with separate named counterparts in
+`reports/m3-windows-contracts.log`. The complete default pipeline passes in
+`reports/m3-files-equivalent-default-check.log`. Mappings remain pending review.
+
+Remote eb6f6d0 Windows shared default jobs exposed missing GNAT support DLLs in
+direct counterpart children; the runner now obtains the selected support path
+from Alire while preserving the caller's exact interpreter library precedence.
+The POSIX instrumented jobs now execute unchanged files.lua through both C and
+Ada with raw captures and completion witnesses, so remaining native assumptions
+and runtime failures become explicit CI failures rather than absent evidence.
+The complete updated instrumented command passes in
+`reports/m3-files-equivalent-instrumented-check.log`. Explicit bare-lua and
+arg-selected child configuration assertions pass against C and Ada in
+`reports/m3-files-child-configuration.log`. The default shared counterpart run
+now passes in `reports/m3-files-shared-counterparts.log`, verifying the support
+DLL search-path fix that the earlier remote shared failures required.

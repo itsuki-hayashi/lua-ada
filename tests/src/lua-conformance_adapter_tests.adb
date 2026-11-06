@@ -58,6 +58,9 @@ package body Lua.Conformance_Adapter_Tests is
    procedure Weak_String_Payloads;
    procedure Native_Flush_Failure;
    procedure Native_Flush_Validation;
+   procedure Native_Write_Refusal;
+   procedure Native_Partial_Write;
+   procedure Native_Pipe_Validation;
 
    procedure Userdata is
    begin
@@ -421,6 +424,44 @@ package body Lua.Conformance_Adapter_Tests is
         "assert(not pcall(_test_failing_stream, f))", Platform => True);
    end Native_Flush_Validation;
 
+   procedure Native_Write_Refusal is
+   begin
+      --  Unbuffered output must report the actual native refusal and zero
+      --  transferred bytes, then release the real pipe endpoint on close.
+      Check ("local f=_test_failing_stream(assert(io.tmpfile())); " &
+        "assert(f:setvbuf('no')); local ok,msg,err,n=f:write('abcd'); " &
+        "assert(ok==nil and type(msg)=='string' and err>0 and n==0); " &
+        "assert(f:close())", Platform => True);
+   end Native_Write_Refusal;
+
+   procedure Native_Partial_Write is
+   begin
+      --  Windows rejects a single oversized pipe write without progress.
+      --  Preserve the multiargument write invariant: earlier bytes really
+      --  reach the reader and are counted when a later argument is refused.
+      Check ("local w,r=io.tmpfile(),io.tmpfile(); " &
+        "local a,b=_test_nonblocking_pair(w,r); assert(a==w and b==r); " &
+        "assert(w:setvbuf('no')); assert(r:setvbuf('no')); " &
+        "assert(w:write(string.rep('a',100))); " &
+        "local ok,msg,err,n=w:write(string.rep('b',10000), " &
+        "string.rep('c',2^17)); " &
+        "assert(ok==nil and type(msg)=='string' and err>0 and n==10000); " &
+        "assert(r:read(10100)==string.rep('a',100)..string.rep('b',10000)); " &
+        "assert(w:close()); assert(r:read(1)==nil); assert(r:close())",
+        Platform => True);
+   end Native_Partial_Write;
+
+   procedure Native_Pipe_Validation is
+   begin
+      --  No descriptor is replaced when either input is invalid or the two
+      --  endpoints alias. The surviving file remains usable afterward.
+      Check ("local f=io.tmpfile(); " &
+        "assert(not pcall(_test_nonblocking_pair,f,f)); " &
+        "assert(not pcall(_test_nonblocking_pair,f,{})); " &
+        "assert(f:write('ok')); assert(f:seek('set')==0); " &
+        "assert(f:read('a')=='ok'); assert(f:close())", Platform => True);
+   end Native_Pipe_Validation;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "adapter: real C userdata export",
@@ -479,6 +520,15 @@ package body Lua.Conformance_Adapter_Tests is
                            Native_Flush_Failure'Access);
          Test_Support.Add (Suite, "Windows IO: failure driver validates files",
                            Native_Flush_Validation'Access);
+         Test_Support.Add
+           (Suite, "Windows IO: refused write counts zero bytes",
+            Native_Write_Refusal'Access);
+         Test_Support.Add
+           (Suite, "Windows IO: nonblocking partial write count",
+            Native_Partial_Write'Access);
+         Test_Support.Add
+           (Suite, "Windows IO: pipe driver validates endpoints",
+            Native_Pipe_Validation'Access);
       end if;
    end Register;
 end Lua.Conformance_Adapter_Tests;

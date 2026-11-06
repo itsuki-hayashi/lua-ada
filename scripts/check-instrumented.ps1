@@ -131,11 +131,17 @@ try {
             executable_sha256=(Get-FileHash -LiteralPath $child -Algorithm SHA256).Hash;
             disposition=$(if ($file -eq 'gc') { 'unreviewed-equivalent' } else { 'unchanged' }) })
     }
+    Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
+        'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')
     if ($IsWindows) {
-        Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
-            'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')
         & "$PSScriptRoot/check-windows-buffered-failure.ps1" -Interpreter $runner `
+            -Configuration upstream-test `
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua.exe" `
+            -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
+    } else {
+        & "$PSScriptRoot/check-posix-files.ps1" -Interpreter $runner `
+            -Configuration upstream-test `
+            -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua" `
             -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     }
     Write-Output "PASS: instrumented validation/$LibraryType regressions; scope acceptance remains pending"

@@ -48,6 +48,7 @@ jobs:
           path: |
             reports/instrumented/**
             reports/windows-buffered-failure/**
+            reports/posix-files/**
           if-no-files-found: error
   check:
     strategy:

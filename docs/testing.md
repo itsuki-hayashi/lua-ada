@@ -287,7 +287,15 @@ public-API native driver to the oracle and executes the same buffered-write,
 failed-flush and close assertions against both implementations. Both pipelines
 run this counterpart and retain hashes/output in reports/windows-buffered-failure.
 This evidence supports a pending platform mapping; it is not an unchanged
-files.lua execution or an independent approval of that mapping.
+files.lua execution or an independent approval of that mapping. The command
+also executes named native file-contract and partial-write counterparts plus
+the ten-span files-windows-platform candidate, requiring the final date/version
+witness and the failed-write block in upstream-test configuration. Its
+Configuration argument must match both executables; ordinary runs require T
+absent and instrumented runs require the real adapter. Only the two expected
+missing-command diagnostics are permitted on stderr. The instrumented POSIX
+jobs separately run check-posix-files.ps1 over unchanged copies, retaining both
+C and Ada failures and requiring matching output outside the final timestamp.
 
 Run scripts/check-lifecycle.ps1 -Interpreter <normal-cli> after building the C
 oracle. The runner uses unchanged hash-verified goto.lua and coroutine.lua in

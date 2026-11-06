@@ -9,12 +9,14 @@ The [current handoff](sessions/2026-11-07-gc-io-conformance.md) records actual
 evidence: the integration checkpoint `1cd294e` is signed and published. The
 subsequent real test adapter and shared CLI launcher have passing local
 Windows validation/static AUnit runs in both configurations. The retained
-default pipeline passes at the 1,299-case checkpoint. Instrumented events.lua
+default pipeline passes at the 1,304-case Windows checkpoint. Instrumented events.lua
 and gengc.lua reach OK in exploratory runs. The source-hashed gc.lua equivalent
 candidate completes its state-close assertions, with actual allocator and
 collector inspection; independent review remains pending. Unchanged gc.lua
-still fails its C-specific fixed memory allowance. files.lua still requires native
-platform equivalents and remaining behavior. These observations do not close
+still fails its C-specific fixed memory allowance. The ten-span Windows files.lua
+candidate completes in C and Ada, including a real native counterpart for the
+guarded partial-write block. Its mappings await independent review; POSIX file
+execution and remaining platform behavior are being exercised in CI. These observations do not close
 any selected file's full coverage; complete T inspection, reviewed equivalents,
 scoped harness acceptance and the final 26-context matrix remain open.
 The paused-checkpoint statements below retain the prior delivery's evidence.
