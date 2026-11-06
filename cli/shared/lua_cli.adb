@@ -25,11 +25,14 @@ procedure Lua_CLI is
    Script_Index : Natural := 0;
    Version_Requested : Boolean := False;
    Check_Requested : Boolean := False;
+   Process_Exit_Requested : Boolean := False;
+   Process_Exit_Status : Interfaces.C.int := 0;
 
    procedure Exit_Process (Code : Interfaces.C.int)
      with Import, Convention => C, No_Return, External_Name => "exit";
    --  Process mechanics run only after the Ada execution boundary returns.
-   --  os.exit(false) deliberately does not invoke Ada session finalization.
+   --  Physical disposal precedes process exit. os.exit(false) never requests
+   --  Lua state closure or Lua close handlers during that disposal.
 
    procedure Usage;
    procedure Version;
@@ -72,9 +75,8 @@ procedure Lua_CLI is
          end if;
       end loop;
       if Result.Status = Exit_Requested then
-         Ada.Text_IO.Flush;
-         Ada.Text_IO.Flush (Ada.Text_IO.Standard_Error);
-         Exit_Process (Result.Exit_Request.Code);
+         Process_Exit_Requested := True;
+         Process_Exit_Status := Result.Exit_Request.Code;
       elsif Result.Status /= Succeeded then
          declare
             Message : constant String := To_String (Result.Error.Message);
@@ -255,57 +257,72 @@ begin
       return;
    end if;
    declare
-      Universe : Session;
-      Args : Argument_Array
-        (-Integer (Script_Index) .. Argument_Count - Script_Index);
-      Result : Execution_Result;
-   begin
-      --  Index zero names the script. Negative indices preserve executable
-      --  and interpreter options, as in the reference interpreter.
-      for Index in Args'Range loop
-         Args (Index) := To_Unbounded_String
-           (if Index + Script_Index = 0 then Command_Name
-            else Argument (Index + Script_Index));
-      end loop;
-      Universe.Set_Execution_Policy (Lua_Compatible);
-      --  Flush earlier Ada help/version text before C stdio starts writing.
-      --  Runtime bytes are then published immediately, in Lua program order,
-      --  and are not printed a second time from captured result packets.
-      Ada.Text_IO.Flush;
-      Universe.Set_Output_Policy (Process_Streams);
-      Configure (Universe);
-      Result := Universe.Set_Arguments (Args);
-      if Result.Status /= Succeeded then
-         Report (Result);
-         Universe.Close;
-         return;
-      end if;
-      for Source of Snippets loop
-         Result := Universe.Execute (To_String (Source), "(command line)");
-         Report (Result);
+      procedure Execute_Main;
+      procedure Execute_Main is
+         Universe : Session;
+         Args : Argument_Array
+           (-Integer (Script_Index) .. Argument_Count - Script_Index);
+         Result : Execution_Result;
+      begin
+         --  Index zero names the script. Negative indices preserve executable
+         --  and interpreter options, as in the reference interpreter.
+         for Index in Args'Range loop
+            Args (Index) := To_Unbounded_String
+              (if Index + Script_Index = 0 then Command_Name
+               else Argument (Index + Script_Index));
+         end loop;
+         Universe.Set_Execution_Policy (Lua_Compatible);
+         --  Flush earlier Ada help/version text before C stdio starts writing.
+         --  Runtime bytes are published immediately, in Lua program order,
+         --  and are not printed a second time from captured result packets.
+         Ada.Text_IO.Flush;
+         Universe.Set_Output_Policy (Process_Streams);
+         Configure (Universe);
+         Result := Universe.Set_Arguments (Args);
          if Result.Status /= Succeeded then
+            Report (Result);
             Universe.Close;
             return;
          end if;
-      end loop;
-      if Script_Index /= 0 then
-         declare
-            Path : constant String := Argument (Script_Index);
-            Source : constant String := Lua.Sources.File_Preamble
-              (if Path = "-" then Read_Stdin else Read_Source (Path));
-         begin
-            Result := Universe.Execute
-              (Source, (if Path = "-" then "stdin" else Path),
-               Arguments => Arguments_After (Script_Index));
+         for Source of Snippets loop
+            Result := Universe.Execute (To_String (Source), "(command line)");
             Report (Result);
-         end;
+            if Result.Status /= Succeeded then
+               if not Process_Exit_Requested then Universe.Close; end if;
+               return;
+            end if;
+         end loop;
+         if Script_Index /= 0 then
+            declare
+               Path : constant String := Argument (Script_Index);
+               Source : constant String := Lua.Sources.File_Preamble
+                 (if Path = "-" then Read_Stdin else Read_Source (Path));
+            begin
+               Result := Universe.Execute
+                 (Source, (if Path = "-" then "stdin" else Path),
+                  Arguments => Arguments_After (Script_Index));
+               Report (Result);
+            end;
+         end if;
+         --  CLI completion closes the state, including reachable finalizers.
+         --  Controlled finalization is only the physical disposal fallback.
+         if not Process_Exit_Requested then Universe.Close; end if;
+      end Execute_Main;
+   begin
+      --  Returning from Execute_Main disposes the owned Ada session even for
+      --  a typed exit. Its Close call above is deliberately omitted for the
+      --  exit(false) path, so only physical host cleanup runs in that case.
+      Execute_Main;
+      Finish;
+      if Process_Exit_Requested then
+         Ada.Text_IO.Flush;
+         Ada.Text_IO.Flush (Ada.Text_IO.Standard_Error);
+         Exit_Process (Process_Exit_Status);
       end if;
-      --  CLI completion is a Lua-state close, including reachable finalizers.
-      --  Ada controlled finalization is only the physical disposal fallback.
-      Universe.Close;
    end;
 exception
    when Error : others =>
+      Finish;
       Ada.Text_IO.Put_Line
         (Ada.Text_IO.Standard_Error,
          "lua_ada: " & Ada.Exceptions.Exception_Message (Error));

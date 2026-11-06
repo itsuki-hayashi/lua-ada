@@ -9,6 +9,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 if (-not $IsWindows) { throw 'This counterpart requires Windows native pipes' }
 $root = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1') -Force
 $ada = (Resolve-Path -LiteralPath $Interpreter).Path
 $oracle = (Resolve-Path -LiteralPath $ReferenceInterpreter).Path
 $referenceLibrary = (Resolve-Path -LiteralPath $ReferenceLibraryDirectory).Path
@@ -61,6 +62,10 @@ foreach ($implementation in @('c', 'ada')) {
     $start.Environment['PATH'] = $working + [IO.Path]::PathSeparator + $executionPath
     $start.RedirectStandardOutput = $true
     $start.RedirectStandardError = $true
+    $runId = [Guid]::NewGuid().ToString('N')
+    $telemetryPrefix = Join-Path $working 'allocator'
+    $start.Environment['LUA_ADA_CONFORMANCE_TELEMETRY'] = $telemetryPrefix
+    $start.Environment['LUA_ADA_CONFORMANCE_RUN_ID'] = $runId
     $setup = if ($Configuration -eq 'upstream-test') { "assert(type(T)=='table' and type(T.checkmemory)=='function'); " }
         else { 'assert(T==nil); ' }
     $setup += 'assert(_soft==nil and _port==nil); '
@@ -102,7 +107,29 @@ foreach ($implementation in @('c', 'ada')) {
         if ($process.ExitCode -ne 0 -or $stderr -cne $expectedError -or -not $matched) {
             throw "Native counterpart failed: $implementation (see $directory)"
         }
+        $measured = Get-Content -LiteralPath "$telemetryPrefix.$($process.Id).json" -Raw |
+            ConvertFrom-Json -AsHashtable
+        Assert-ManagedTelemetry -Telemetry $measured -RunId $runId -ProcessId $process.Id `
+            -Configuration $Configuration -RequireShutdown:($implementation -eq 'ada')
+        $childTelemetry = @()
+        foreach ($sidecar in Get-ChildItem -LiteralPath $working -Filter 'allocator.*.json') {
+            $child = Get-Content -LiteralPath $sidecar.FullName -Raw | ConvertFrom-Json -AsHashtable
+            $childId = [int]($sidecar.BaseName.Split('.')[-1])
+            Assert-ManagedTelemetry -Telemetry $child -RunId $runId -ProcessId $childId `
+                -Configuration $Configuration -RequireShutdown:($implementation -eq 'ada')
+            if ($childId -ne $process.Id) { $childTelemetry += $child }
+        }
+        # The pinned C os.exit children bypass its CLI telemetry writer. The
+        # Ada launcher disposes and records all eight Lua children, including
+        # typed exits. Normal C children still supply their four sidecars.
+        $expectedChildren = if ($fixtureCase.File -in @('windows-files-contract.lua', 'files-windows-equivalent.lua')) {
+            if ($implementation -eq 'ada') { 8 } else { 4 }
+        } else { 0 }
+        if ($childTelemetry.Count -ne $expectedChildren) {
+            throw "Missing or unexpected child allocator telemetry: $implementation/$($fixtureCase.File)"
+        }
         $records += [ordered]@{ implementation=$implementation; exit_code=$process.ExitCode;
+            allocator_telemetry=$measured; child_allocator_telemetry=$childTelemetry;
             fixture=$fixtureCase.File;
             fixture_sha256=(Get-FileHash -LiteralPath $fixture -Algorithm SHA256).Hash;
             executable_sha256=(Get-FileHash -LiteralPath $executable -Algorithm SHA256).Hash }

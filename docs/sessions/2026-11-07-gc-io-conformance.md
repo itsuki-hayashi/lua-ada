@@ -287,3 +287,32 @@ arg-selected child configuration assertions pass against C and Ada in
 `reports/m3-files-child-configuration.log`. The default shared counterpart run
 now passes in `reports/m3-files-shared-counterparts.log`, verifying the support
 DLL search-path fix that the earlier remote shared failures required.
+
+## Shutdown allocator evidence and typed process exits
+
+The test launcher now delegates actual managed allocation requests through a
+test-only provider observer, counting existing bootstrap blocks and later
+successful allocations/releases. It retains actual owner refusal counts before
+the owner disappears. A shared CLI Finish hook runs after physical disposal;
+typed process exits are honored afterward. Exit(false) performs no Lua close
+handlers, whereas exit(true) completes their ordered execution first.
+
+Normal closure, runtime error, both typed exit modes and real instrumented
+refusal recovery produce balanced sidecars. Ten negative cases reject leaked
+bytes/blocks, wrong process/run/configuration/ceiling, missing shutdown, observer
+fault and invalid/missing counters in `reports/m3-telemetry-tests.log`.
+The production CLI also has explicit exit-code/handler-order regressions.
+The complete default pipeline passes in `reports/m3-telemetry-full-default.log`;
+the instrumented pipeline passes in `reports/m3-telemetry-full-instrumented.log`.
+Both retain the 1,304-case Windows AUnit suite. Windows file candidates verify
+balanced parent and eight Ada Lua-child sidecars, including typed-exit children.
+Pinned C normal-return children supply four separate sidecars; its os.exit
+children bypass the oracle main-return writer, an explicitly retained limit.
+
+Linux run 42261663287 reached the final unchanged files.lua witness in both
+instrumented C and Ada, including the failed-write block. Its job then failed
+in a PowerShell -replace expression, not the captured runtime assertions. The
+comparison expression is corrected. Raw artifacts under reports/ci-linux-5df87e8
+have matching output except the final timestamp and matching expected shell
+stderr. A fresh complete job/report is still required; these archived captures
+alone are not accepted whole-file evidence. macOS jobs remain queued.

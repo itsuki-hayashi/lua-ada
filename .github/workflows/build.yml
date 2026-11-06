@@ -49,6 +49,7 @@ jobs:
             reports/instrumented/**
             reports/windows-buffered-failure/**
             reports/posix-files/**
+            reports/managed-telemetry/**
           if-no-files-found: error
   check:
     strategy:
@@ -145,6 +146,7 @@ jobs:
           path: |
             reports/lifecycle/**
             reports/m3-lifecycle-campaign*
+            reports/managed-telemetry/**
             reports/windows-buffered-failure/**
             LICENSE
             docs/licenses/lua.md

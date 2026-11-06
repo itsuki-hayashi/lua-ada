@@ -51,7 +51,12 @@ function Invoke-Case {
         }
         $output = $stdout.GetAwaiter().GetResult()
         $errorOutput = $stderr.GetAwaiter().GetResult()
-        if ($Case.Fail) {
+        if ($Case.ContainsKey('ExitCode')) {
+            if ($process.ExitCode -ne $Case.ExitCode -or $errorOutput -ne '') {
+                throw "CLI typed exit mismatch: $($Case.Title): $errorOutput"
+            }
+        }
+        elseif ($Case.Fail) {
             if ($process.ExitCode -eq 0 -or
                 -not $errorOutput.Contains($Case.Error)) {
                 throw "Expected CLI failure: $($Case.Title): $errorOutput"
@@ -72,6 +77,12 @@ function Invoke-Case {
 }
 
 $cases = @(
+    @{ Title = 'typed exit without Lua close handlers'; ExitCode = 42;
+       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("finalized") end}); local x <close> = setmetatable({}, {__close=function() print("closed") end}); os.exit(42,false)', '-e', 'error("unreachable")');
+       Output = '' },
+    @{ Title = 'typed exit completes Lua close handlers'; ExitCode = 43;
+       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("finalized") end}); local x <close> = setmetatable({}, {__close=function() print("closed") end}); os.exit(43,true)', '-e', 'error("unreachable")');
+       Output = "closed${newline}finalized$newline" },
     # A reachable finalizable object must run at explicit CLI state closure,
     # after the chunk marker; physical Ada disposal alone cannot satisfy it.
     @{ Title = 'state close finalizes reachable objects';

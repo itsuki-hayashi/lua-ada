@@ -103,6 +103,10 @@ try {
     Set-Location $projectRoot
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli)
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-conformance-telemetry.ps1'),
+        '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
+        '-Configuration', 'default')
     if ($IsWindows) {
         Set-Location $projectRoot
         & (Join-Path $PSScriptRoot 'check-windows-buffered-failure.ps1') `

@@ -6,6 +6,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1') -Force
 $savedLocation = Get-Location
 $variables = @('LUA_ADA_CONFIGURATION', 'PATH', 'LD_LIBRARY_PATH',
     'DYLD_LIBRARY_PATH', 'LUA_ADA_ABI_RUNTIME_ARCHIVE',
@@ -25,12 +26,18 @@ function Invoke-CheckedAlire([string[]] $Arguments) {
 function Invoke-ObservedProcess {
     param([string] $Name, [string] $Executable, [string[]] $Arguments,
         [string] $Directory, [string] $Witness, [switch] $Shutdown,
-        [string] $ExpectedError = '')
+        [string] $ExpectedError = '', [switch] $Telemetry)
     $start = [Diagnostics.ProcessStartInfo]::new($Executable)
     $start.UseShellExecute = $false
     $start.WorkingDirectory = $Directory
     $start.RedirectStandardOutput = $true
     $start.RedirectStandardError = $true
+    $runId = [Guid]::NewGuid().ToString('N')
+    $telemetryPrefix = Join-Path $reportDirectory "$Name-$runId"
+    if ($Telemetry) {
+        $start.Environment['LUA_ADA_CONFORMANCE_TELEMETRY'] = $telemetryPrefix
+        $start.Environment['LUA_ADA_CONFORMANCE_RUN_ID'] = $runId
+    }
     foreach ($argument in $Arguments) { $start.ArgumentList.Add($argument) }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $start
@@ -53,6 +60,14 @@ function Invoke-ObservedProcess {
         $observations.Add([ordered]@{ name=$Name; exit_code=$process.ExitCode;
             completed=$finished; passed=$passed; shutdown_witness_required=[bool]$Shutdown })
         if (-not $passed) { throw "Instrumented regression failed: $Name (see $reportDirectory)" }
+        if ($Telemetry) {
+            $measured = Get-Content -LiteralPath "$telemetryPrefix.$($process.Id).json" -Raw |
+                ConvertFrom-Json -AsHashtable
+            Assert-ManagedTelemetry -Telemetry $measured -RunId $runId `
+                -ProcessId $process.Id -Configuration upstream-test -RequireShutdown
+            $observations.Add([ordered]@{ name="$Name-allocator"; telemetry=$measured;
+                allocator_telemetry_verified=$true })
+        }
         Write-Host "PASS: instrumented regression $Name"
         return $stdout
     } finally { $process.Dispose() }
@@ -99,6 +114,7 @@ try {
         -Directory $root -Witness '"configuration":"upstream-test"'
     $runner = "$bin/conformance_runner$suffix"
     & "$PSScriptRoot/check-conformance-adapter.ps1" -Interpreter $runner
+    & "$PSScriptRoot/check-conformance-telemetry.ps1" -Interpreter $runner -Configuration upstream-test
     & "$PSScriptRoot/check-conformance-equivalents.ps1"
 
     # Keep diagnostic equivalent execution visibly separate from acceptance.
@@ -122,7 +138,7 @@ try {
         $code = "assert(T and T.checkmemory and T.alloccount); assert(_soft==nil and _port==nil)"
         $null = Invoke-ObservedProcess -Name $file -Executable $child `
             -Arguments @('-e', $code, $target) -Directory $directory `
-            -Witness '(?m)^OK\r?$' -Shutdown:($file -eq 'gc')
+            -Witness '(?m)^OK\r?$' -Shutdown:($file -eq 'gc') -Telemetry
         if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -cne $sourceHash) {
             throw "Upstream source changed: $file"
         }

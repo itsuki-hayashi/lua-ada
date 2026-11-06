@@ -78,6 +78,20 @@ explicitly replaced and executed with T; default omission remains linked to
 that instrumented counterpart. Original file bytes remain pinned. These
 mappings are candidates, not independent acceptance decisions.
 
+The test launcher interposes on the actual universe allocator provider after
+counting existing managed blocks. It delegates every request to that provider,
+tracks successful allocation/release results, and snapshots owner-side refusal
+counts during live callbacks. The observer is linked only into test executables.
+Shutdown never dereferences the destroyed owner: the sidecar uses retained
+counters and fails on any nonzero balance or observer fault.
+
+The shared CLI records typed exits until its owned execution scope has returned.
+Normal completion and exit(true) perform Lua state closure; exit(false) performs
+only physical host disposal, with no Lua close handlers. The test Finish hook
+then verifies balance before the C process exit is honored. Production supplies
+no observer hook. This ordering preserves typed exit codes and prevents a C
+exit from bypassing the Ada process driver's physical cleanup evidence.
+
 ## Verification implications
 
 Require default and instrumented regressions, negative inspector/generator tests,

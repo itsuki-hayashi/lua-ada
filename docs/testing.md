@@ -297,6 +297,22 @@ missing-command diagnostics are permitted on stderr. The instrumented POSIX
 jobs separately run check-posix-files.ps1 over unchanged copies, retaining both
 C and Ada failures and requiring matching output outside the final timestamp.
 
+The test launcher writes PID-specific managed-allocation sidecars when
+LUA_ADA_CONFORMANCE_TELEMETRY and LUA_ADA_CONFORMANCE_RUN_ID are supplied.
+The former is a filename prefix; the latter is a lowercase hex/hyphen run ID.
+An actual allocator-provider observer counts existing bootstrap storage and
+subsequent allocations/releases. The Finish hook runs after physical disposal,
+including typed exits. check-conformance-telemetry.ps1 exercises normal closure,
+both exit modes, runtime failure and instrumented refusal recovery, then rejects
+ten mutations of actual sidecar evidence. It never substitutes process RSS for
+managed bytes. Both pipelines retain these process regressions.
+
+Selected instrumented executions require balanced parent telemetry. Windows
+file candidates additionally require all eight Ada Lua-child sidecars for their
+subprocess blocks. Four ordinary C-child sidecars are checked separately: the
+pinned C os.exit children bypass its main-return telemetry writer. That C
+observation is not treated as missing Ada cleanup or fabricated zero counters.
+
 Run scripts/check-lifecycle.ps1 -Interpreter <normal-cli> after building the C
 oracle. The runner uses unchanged hash-verified goto.lua and coroutine.lua in
 fresh C/Ada processes, compares raw same-host output and empty stderr, requires

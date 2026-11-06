@@ -9,6 +9,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 if ($IsWindows) { throw 'Use the named Windows platform equivalent on Windows' }
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1') -Force
 $root = Split-Path -Parent $PSScriptRoot
 $source = Join-Path $root 'references/lua/testes/files.lua'
 $sourceHash = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash
@@ -29,6 +30,10 @@ foreach ($implementation in @('c', 'ada')) {
     Copy-Item -LiteralPath $original -Destination $executable
     Copy-Item -LiteralPath $source -Destination $fixture
     $environment = @{ PATH=$working + [IO.Path]::PathSeparator + $env:PATH }
+    $runId = [Guid]::NewGuid().ToString('N')
+    $telemetryPrefix = Join-Path $working 'allocator'
+    $environment.LUA_ADA_CONFORMANCE_TELEMETRY = $telemetryPrefix
+    $environment.LUA_ADA_CONFORMANCE_RUN_ID = $runId
     if ($implementation -eq 'c') {
         $environment.LD_LIBRARY_PATH = $referenceLibrary + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
         $environment.DYLD_LIBRARY_PATH = $referenceLibrary + [IO.Path]::PathSeparator + $env:DYLD_LIBRARY_PATH
@@ -63,6 +68,14 @@ foreach ($implementation in @('c', 'ada')) {
     $complete = $complete -and $stdout -notmatch 'skipping|omitted|not implemented' -and
         $stdout -match '(?m)^test done on \d{2}/\d{2}/\d+, at \d{2}:\d{2}:\d{2}\nLua 5\.5\n\z'
     if (-not $complete) { $failures += "$implementation did not complete files.lua" }
+    try {
+        $measured = Get-Content -LiteralPath "$telemetryPrefix.$($process.process_id).json" -Raw |
+            ConvertFrom-Json -AsHashtable
+        Assert-ManagedTelemetry -Telemetry $measured -RunId $runId `
+            -ProcessId $process.process_id -Configuration $Configuration `
+            -RequireShutdown:($implementation -eq 'ada')
+        $records[-1].allocator_telemetry = $measured
+    } catch { $failures += "$implementation allocator telemetry: $($_.Exception.Message)" }
     foreach ($line in $stderr.Split("`n", [StringSplitOptions]::RemoveEmptyEntries)) {
         if ($line -notmatch '^(?:.*not-to-be-found-command.*|Hangup.*|Killed.*)$') {
             $failures += "$implementation unexpected stderr: $line"
@@ -71,8 +84,8 @@ foreach ($implementation in @('c', 'ada')) {
 }
 if ($outputs.c.stderr -cne $outputs.ada.stderr) { $failures += 'C/Ada stderr differs' }
 $dateLine = '(?m)^test done on .*\n'
-if (($outputs.c.stdout -replace $dateLine, '[date witness]' + "`n") -cne
-    ($outputs.ada.stdout -replace $dateLine, '[date witness]' + "`n")) {
+if (($outputs.c.stdout -replace $dateLine, ('[date witness]' + "`n")) -cne
+    ($outputs.ada.stdout -replace $dateLine, ('[date witness]' + "`n"))) {
     $failures += 'C/Ada output differs outside final date witness'
 }
 if ((Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -cne $sourceHash) {
