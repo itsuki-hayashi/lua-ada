@@ -1466,11 +1466,14 @@ package body Lua.Engine.Machine is
                             when Normal_Context => "normal",
                             when Dead_Context => "dead")));
                   elsif Name = "coroutine.isyieldable" then
+                     --  This queries yield barriers, not resume validity.
+                     --  A dead context retains error frames for inspection
+                     --  and close, but their abandoned barriers do not count.
                      Finish ((Boolean_Kind,
                               Context /= State.Main_Context and then
-                              Context.Status /= Dead_Context and then
                               Context.Phase /= Closing and then
-                              Context.Non_Yieldable = 0));
+                              (Context.Status = Dead_Context or else
+                               Context.Non_Yieldable = 0)));
                   elsif Name in "coroutine.resume" | "coroutine.wrapped" then
                      if Activation.Native_Stage = 2 then
                         --  wrap closes a failed body before raising. A close
@@ -2324,6 +2327,11 @@ package body Lua.Engine.Machine is
                   Child.Status :=
                     (if Transfer.Kind = Yielded then Suspended_Context
                      else Dead_Context);
+                  if Transfer.Kind /= Yielded then
+                     --  Closing is an execution phase, not a permanent dead
+                     --  thread attribute observed by later boundary queries.
+                     Child.Phase := Executing;
+                  end if;
                   if Parent = null then
                      exit;
                   end if;

@@ -120,3 +120,16 @@ adds per-configuration lifecycle artifact retention; runtime/test source is
 unchanged. Its full matrix must pass before PR #7 is marked ready. Do not merge.
 This completes the approved bounded runtime features, not the broader original
 M3 gates, canonical execution, C ABI/allocator parity or the complete suite.
+
+## Yieldability edge comparison
+
+A direct pinned C-oracle comparison after the evidence checkpoint found that
+coroutine.isyieldable reports the yield boundary independently of dead lifecycle
+status. C returns true for completed/closed threads and raw failed threads after
+native callbacks. Ada incorrectly returned false. The query now treats inactive
+dead frames as abandoned boundaries, and completion ends the explicit closing
+phase. A focused named regression covers normal completion, native failure and
+repeated close. The local suite passes 576 cases, zero failed assertions/errors.
+This is 88 new cases beyond the merged baseline. Final-head CI must rerun; the
+575-case runtime snapshot remains exact historical evidence, not evidence for
+the new edge-case correction.

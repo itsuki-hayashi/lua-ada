@@ -6,6 +6,7 @@ with Test_Support;
 package body Runtime_Control_Tests is
    procedure Check (Source : String; Compatible : Boolean := False);
    procedure Debug_Iterator_Native_Frame;
+   procedure Yieldability_After_Completion;
    procedure Debug_Split_Function_Lines;
    procedure Hook_Implicit_Return_Line;
    procedure Debug_Tail_Frame;
@@ -1197,6 +1198,25 @@ package body Runtime_Control_Tests is
          "local f,s,i=ipairs(t); assert(f(s,i)==nil)");
    end Debug_Iterator_Native_Frame;
 
+   procedure Yieldability_After_Completion is
+      --  C Lua queries the yield boundary, independently of dead status.
+      --  Compare normal completion, failed native callbacks and repeated
+      --  close.
+      --  Retained error frames and a finished closing phase cannot force
+      --  false.
+   begin
+      Check
+        ("local co=coroutine.create(function()end);" &
+         "assert(coroutine.isyieldable(co));assert(coroutine.resume(co));" &
+         "assert(coroutine.status(co)=='dead' and " &
+         "coroutine.isyieldable(co));" &
+         "assert(coroutine.close(co));assert(coroutine.isyieldable(co));" &
+         "co=coroutine.create(function()string.gsub('a','.'," &
+         "function()error(7)end)end);assert(not coroutine.resume(co));" &
+         "assert(coroutine.isyieldable(co));" &
+         "assert(not coroutine.close(co));assert(coroutine.isyieldable(co))");
+   end Yieldability_After_Completion;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -1460,5 +1480,8 @@ package body Runtime_Control_Tests is
       Test_Support.Add
         (Suite, "control: Debug_Iterator_Native_Frame",
          Debug_Iterator_Native_Frame'Access);
+      Test_Support.Add
+        (Suite, "control: Yieldability_After_Completion",
+         Yieldability_After_Completion'Access);
    end Register;
 end Runtime_Control_Tests;

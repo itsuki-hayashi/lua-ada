@@ -1,6 +1,6 @@
 # Language Lifecycle Validation
 
-Runtime/test revision: 4b71475e8a84eaf9a34787695e9ac82f1b2a9b84.
+Recorded runtime checkpoint: 4b71475e8a84eaf9a34787695e9ac82f1b2a9b84.
 PR: [#7](https://github.com/itsuki-hayashi/lua-ada/pull/7), against master.
 Status: runtime acceptance verified; publication-head checks remain mandatory.
 This bounded delivery does not complete the broader M3 milestone.
@@ -108,3 +108,13 @@ allocator-callback/physical-allocation parity, public C ABI, binary chunks,
 userdata, finalizers, collector modes, remaining libraries/full CLI and ecosystem
 modules remain outside this delivery. No reference/module pins changed. Optional
 GNATdoc rendering, fuzzing and formal proof were not run.
+
+## Final yieldability correction
+
+A later direct C-oracle comparison added one focused regression: dead/closed
+coroutines remain yieldable according to C Lua's boundary query. Execution now
+ends the closing phase on completion and keeps that query independent of dead
+status/abandoned error frames. Local AUnit passes 576 cases (88 new), with zero
+failed assertions/errors. The 575-case table above remains the exact recorded
+checkpoint. The current publication-head matrix must validate this correction
+and is linked from PR #7; it cannot inherit the checkpoint's result.
