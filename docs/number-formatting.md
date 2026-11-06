@@ -93,5 +93,13 @@ in that unchanged campaign. The generic policy repair and added regressions
 passed **968/968 AUnit cases** and the complete local Windows validation/static
 pipeline, including the unchanged 1,435-line and new 132-line comparisons.
 reports/m3-native-carry-build.log, reports/m3-native-carry-tests.log and
-reports/m3-native-carry-check.log own that evidence. A new Linux run is still
-required before the matrix can be called green.
+reports/m3-native-carry-check.log own that evidence.
+
+The [1,009-case checkpoint matrix](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42217665982)
+then passed all eighteen Windows/Linux/macOS profile/link jobs. Every job log
+was inspected: the unchanged 1,435-line campaign and the 132-line rollover
+campaign matched native C output, including all six Linux configurations.
+Windows static-PIC also reran the comparisons successfully. This closes the
+reported libc carry regression for that checkpoint; later IO/OS/locale work
+requires its own final-revision matrix. The retained matrix does not establish
+whole-file strings.lua/math.lua execution or complete M3 conformance.

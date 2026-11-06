@@ -20,6 +20,19 @@ package Lua.Sessions is
    --  @param Self Owning session; calls must be serialized by its owner.
    --  @param Policy Bounded restores the last explicitly configured limits.
 
+   type Output_Policy is (Captured, Process_Streams);
+   --  Captured returns stdout bytes through Execute.Output and its optional
+   --  borrowed sink. Process_Streams writes actual C stdout immediately and
+   --  leaves Output empty; explicit file/stderr streams remain separate.
+   --  @enum Captured Retain stdout for the result and post-execution sink.
+   --  @enum Process_Streams Publish byte strings directly to native stdout.
+   procedure Set_Output_Policy
+     (Self : in out Session; Policy : Output_Policy);
+   --  Select output delivery without discarding globals or changing quotas.
+   --  @param Self Owning session; serialize all operations on it.
+   --  @param Policy Sessions initialize/reset to Captured. The batch CLI and
+   --  C-created states explicitly select Process_Streams.
+
    type Execution_Status is
      (Succeeded, Syntax_Error, Runtime_Error, Resource_Error, Host_Error,
       Unsupported_Feature);
@@ -35,8 +48,9 @@ package Lua.Sessions is
       Output : Ada.Strings.Unbounded.Unbounded_String;
       Error  : Diagnostic;
    end record;
-   --  Output preceding an error is preserved. No chunk return values or
-   --  internal object references escape through this initial embedding API.
+   --  Captured output preceding an error is preserved. Process output has
+   --  already been written and leaves Output empty. No chunk return values
+   --  or internal object references escape through this embedding API.
 
    type Execution_Limits is record
       Source_Bytes  : Positive := 1_000_000;
@@ -66,7 +80,8 @@ package Lua.Sessions is
    type Output_Sink is limited interface;
    procedure Write (Sink : in out Output_Sink; Bytes : String) is abstract;
    --  Receive captured bytes synchronously after execution. The session does
-   --  not retain Sink. Sink exceptions become Host_Error results.
+   --  not retain Sink. Sink exceptions become Host_Error results. Under
+   --  Process_Streams there are no captured stdout bytes to deliver.
 
    function Execute
      (Self : in out Session; Source : String;
@@ -84,7 +99,8 @@ package Lua.Sessions is
    function Set_Arguments
      (Self : in out Session; Arguments : Argument_Array)
       return Execution_Result;
-   --  Replace the Lua arg table without exposing a general object API.
+   --  Replace arg in the actual current registry global table, without
+   --  exposing a general object API or retargeting existing _ENV cells.
    --  @param Self Session whose global arg table is replaced.
    --  @param Arguments Index-preserving strings, including zero/negative keys.
    --  @return Structured success/resource failure; never an engine exception.
@@ -110,8 +126,8 @@ package Lua.Sessions is
 
    procedure Reset (Self : in out Session);
    --  Start a fresh universe with default limits and standard libraries.
-   --  Reset selects Bounded and discards globals, module caches, hooks,
-   --  coroutine contexts, collector controls and metatable mutations.
+   --  Reset selects Bounded/Captured and discards globals, module caches,
+   --  hooks, coroutine contexts, collector controls and metatable mutations.
 
 private
    type Session is new Ada.Finalization.Limited_Controlled with record

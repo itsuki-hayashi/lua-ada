@@ -98,7 +98,7 @@ package body Lua.Managed_Runtime_Tests is
       --  Interleave live and dead strings, retaining only even entries in a
       --  global table. One compaction pass must release exactly the unrooted
       --  half while preserving all object addresses and surviving contents.
-      Set (State, (Table_Kind, State.Globals),
+      Set (State, Global_Environment (State),
            New_String (State, "keepers"), Held);
       for Index in 1 .. 1_000 loop
          declare

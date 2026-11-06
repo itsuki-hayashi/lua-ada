@@ -35,7 +35,7 @@ package body Lua.Loader_Storage_Tests is
    begin
       Initialize (State, (others => <>));
       begin
-         Set (State, (Table_Kind, State.Globals), New_String (State, "source"),
+         Set (State, Global_Environment (State), New_String (State, "source"),
               New_String (State, "return '" & String'(1 .. 64_000 => 'x') &
                                   "'"));
          Action (State);

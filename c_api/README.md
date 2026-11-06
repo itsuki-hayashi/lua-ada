@@ -92,6 +92,10 @@ GNARL before GNAT; standalone C builds must provide the same runtime closure.
 Windows x86-64 standalone-library partial links select BigObj for the merged
 intermediate object because the full Ada closure exceeds ordinary COFF's section
 limit. The final executable/DLL format and strict compiler checks stay enabled.
+Windows x64 C compilation uses unique function sections to preserve unwind
+relocations through that partial link. The core-image driver checks final PE
+exception ranges for overlap before executing consumers and shared callbacks;
+it retains the actual exception tracebacks and protected-refusal tests.
 The [one-core decision](../docs/decisions/0014-one-core-library.md) explains
 Windows shared exports and why static archive options contain no final-link
 math option. Both C and Ada consumers import the root project.

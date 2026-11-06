@@ -74,7 +74,7 @@ package body Lua.Canonical_Runtime_Tests is
          Begin_Operation (State.all);
          begin
             Callee := Canonical.Adopt
-              (State.all, Lowered.Code, (Table_Kind, State.Globals));
+              (State.all, Lowered.Code, Global_Environment (State.all));
          exception
             when others => End_Operation (State.all); raise;
          end;
@@ -429,7 +429,7 @@ package body Lua.Canonical_Runtime_Tests is
            (1, Lua.Opcodes.Word (127));
          Begin_Operation (State.all);
          Callee := Canonical.Adopt
-           (State.all, Lowered.Code, (Table_Kind, State.Globals));
+           (State.all, Lowered.Code, Global_Environment (State.all));
          End_Operation (State.all);
          VM.Start (Driver, State, Callee, Values.Empty_Vector);
          begin

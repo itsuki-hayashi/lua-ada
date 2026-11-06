@@ -284,3 +284,14 @@ named/commented cases for state transitions, close paths, cells, weak graphs,
 inspection, hooks, native callback yield restrictions and host-policy recovery.
 Seeded lifecycle campaigns preserve source and mismatch output as regressions;
 crashes, resource failures and timeouts never count as syntax rejection or skips.
+
+## Output delivery regression consumer
+
+The ordinary test crate builds output_consumer alongside its AUnit/API mains.
+scripts/check-output-policy.ps1 captures raw process stdout rather than
+decoding it, preserving NUL and 0xff observations. Nine named cases exercise
+captured defaults, immediate native delivery, callback ordering, error/recovery,
+policy switching, reset, bounded quotas, CLI byte output and version ordering.
+The standard check.ps1 pipeline runs these processes after building the CLI.
+These are owned first-party regressions; passing them adds no whole upstream
+file to the execution inventory.

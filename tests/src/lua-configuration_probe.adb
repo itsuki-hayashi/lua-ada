@@ -25,7 +25,7 @@ begin
       --  Count actual registered functions, not only the selected flag. The
       --  parser witness likewise checks whether global is a reserved keyword.
       Math_Table := Get
-        ((Table_Kind, State.Globals), New_String (State, "math"));
+        (Global_Environment (State), New_String (State, "math"));
       Count_Export ("atan2");
       Count_Export ("cosh");
       Count_Export ("sinh");

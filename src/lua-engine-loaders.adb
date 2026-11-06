@@ -97,7 +97,7 @@ package body Lua.Engine.Loaders is
          end if;
          --  Initialization normally captures the original package table.
          --  The fallback supports explicitly constructed test activations.
-         return Field ((Table_Kind, State.Globals), "package");
+         return Field (Global_Environment (State), "package");
       end Package_Table;
 
       function Call (Function_Value : Value; Args : Values.Vector)
@@ -517,7 +517,7 @@ package body Lua.Engine.Loaders is
             Copy_Bytes (Arg (3), Mode, False);
          end if;
          Environment := (if Activation.Native_Arguments.Length >= 4
-                         then Arg (4) else (Table_Kind, State.Globals));
+                         then Arg (4) else Global_Environment (State));
          Result.Results := Compile_Buffer
            (Activation.Native_Buffer, Chunk_Name, Mode, Environment,
             Source_Name => Arg (2).Kind = Nil_Kind and then
@@ -559,7 +559,7 @@ package body Lua.Engine.Loaders is
          end if;
          Environment := (if Name not in "base.dofile" | "dofile" and then
                             Activation.Native_Arguments.Length >= 3
-                         then Arg (3) else (Table_Kind, State.Globals));
+                         then Arg (3) else Global_Environment (State));
          Result.Results := Compile_Buffer
            (Buffer, Chunk_Name, Mode, Environment);
          if Name in "base.dofile" | "dofile" then
@@ -610,7 +610,7 @@ package body Lua.Engine.Loaders is
                   Prepare_File (Buffer);
                   Result.Results := Compile_Buffer
                     (Buffer, Path, "t",
-                     (Table_Kind, State.Globals));
+                     Global_Environment (State));
                exception
                   when Error : Ada.Text_IO.Name_Error | Ada.Text_IO.Use_Error |
                     Ada.Text_IO.End_Error =>

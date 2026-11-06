@@ -79,7 +79,7 @@ package body Lua.Userdata_Tests is
 
    procedure Keep (State : in out World; Name : String; Item : Value) is
    begin
-      Set (State, (Table_Kind, State.Globals), New_String (State, Name), Item);
+      Set (State, Global_Environment (State), New_String (State, Name), Item);
    end Keep;
 
    function Weak_Values (State : in out World) return Value is

@@ -141,14 +141,17 @@ modes are fabricated.
 
 The debug subset is getinfo, getlocal, setlocal, getupvalue, setupvalue, upvalueid,
 sethook, gethook and traceback. The full-M3 implementation additionally provides
-getregistry, getmetatable, setmetatable and upvaluejoin, with shared primitive
+getregistry, getmetatable, setmetatable, getuservalue, setuservalue and
+upvaluejoin, with shared primitive
 type metatables. Fifteen focused session cases exercise actual registry roots,
 cell identities, mutation and collection. It inspects actual cells and logical Lua/native
 activations, including explicit-thread forms, source ranges, call-site names,
 tail calls and per-thread call/return/line/count hooks. Native continuation phases
 are hidden. Count cadence now follows executed canonical words and explicit native work;
 full hook-cadence parity remains an expanded acceptance obligation.
-Userdata storage is implemented; finalizers remain pending. Canonical source,
+Userdata storage and debug access to its actual traced uservalue slots are
+implemented. Existing nil slots return a second true result; absent slots
+return one nil. Finalizers remain pending. Canonical source,
 local/upvalue inspection, native binary load/dump and the added debug operations are M3
 implementation checkpoints with their own evidence and pending platform gates.
 
@@ -173,3 +176,19 @@ The [table algorithm guide](table-algorithms.md) owns iterative resumable
 sorting, real capacity hints and 24 focused cases. Runtime exports add table.sort
 and table.create. The full upstream sort.lua and final platform gates remain
 pending; its collector/OS/test-adapter dependencies are separate work.
+
+## M3 output and environment ownership
+
+Ada sessions provide explicit Captured/Process_Streams delivery policies.
+The CLI and C-created states select immediate native stdout; embedding defaults
+and Reset retain capture. Seventeen focused AUnit cases and nine raw-byte
+consumer processes cover quotas, callbacks, failures, switching, reset and
+version/output ordering. The latest local focused suite passes 1,038 cases;
+full-pipeline and platform evidence remain owned by status/session records.
+
+Four environment cases cover actual registry replacement, persistent _ENV
+cells, default load and host argument publication. Eight separate userdata
+inspection cases cover result counts, actual mutation, native integer indices,
+validation, raw bypass and collection. Corresponding valid-domain C cases
+were independently checked against both pinned configurations. These additions
+do not establish complete debug/C-API or whole-suite execution parity.

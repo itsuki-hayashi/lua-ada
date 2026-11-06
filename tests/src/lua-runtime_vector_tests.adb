@@ -93,7 +93,7 @@ package body Lua.Runtime_Vector_Tests is
       --  Keep one cyclic table alive and abandon many other cycles. Once all
       --  growth is refused, tracing/ephemeron work and compaction must still
       --  finish using only intrusive mark links and existing registry space.
-      Set (State, (Table_Kind, State.Globals), New_String (State, "kept"),
+      Set (State, Global_Environment (State), New_String (State, "kept"),
            Kept);
       Set (State, Kept, (Integer_Kind, 1), Kept);
       for Index in 1 .. 128 loop
@@ -140,11 +140,11 @@ package body Lua.Runtime_Vector_Tests is
       Activation.Is_Native := True;
       Activation.Native_Arguments.Append (Held);
       Context.Stack.Append (Activation);
-      Set (State, (Table_Kind, State.Globals), Key, Thread);
+      Set (State, Global_Environment (State), Key, Thread);
       Collect (State);
       Assert (State.Heap.Contains (Held.Reference),
               "reachable suspended packet retained table");
-      Set (State, (Table_Kind, State.Globals), Key, Nil_Value);
+      Set (State, Global_Environment (State), Key, Nil_Value);
       Collect (State);
       Assert (State.Contexts (Slot) = null,
               "unreachable Lua context released its managed frame packets");
@@ -158,7 +158,7 @@ package body Lua.Runtime_Vector_Tests is
       --  Deliberately violate one private registry link to interrupt marking
       --  before sweep. Restoring it must permit another collection;
       --  no stale mark color or intrusive link can hide a reachable object.
-      Set (State, (Table_Kind, State.Globals), New_String (State, "mark-test"),
+      Set (State, Global_Environment (State), New_String (State, "mark-test"),
            Thread);
       Thread.Reference.Context_Index := State.Contexts.Last_Index + 1;
       begin

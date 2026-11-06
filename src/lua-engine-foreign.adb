@@ -223,6 +223,9 @@ package body Lua.Engine.Foreign is
       State.Open_Standard_Libraries := False;
       Initialize (State.all, (others => <>));
       Set_Policy (State.all, Lua_Compatible);
+      --  C-created states publish to native stdout. Ada sessions select
+      --  capture by default, independently of their execution quota policy.
+      State.Output_Mode := Process_Streams;
       Begin_Operation (State.all);
       Operation_Active := True;
       Result := Create_Surface
@@ -1361,7 +1364,7 @@ package body Lua.Engine.Foreign is
                         when Lua.Chunks.Succeeded =>
                            Callee := Canonical.Adopt
                              (Owner.Universe.all, Decoded.Code,
-                              (Table_Kind, Owner.Universe.Globals));
+                              Global_Environment (Owner.Universe.all));
                            Push (Owner.Universe.all, Context, Callee);
                         when Lua.Chunks.Bad_Format =>
                            Error_Result (Name & ": " &
@@ -1406,7 +1409,7 @@ package body Lua.Engine.Foreign is
                               when Lua.Canonical_Compiler.Succeeded =>
                                  Callee := Canonical.Adopt
                                    (Owner.Universe.all, Lowered.Code,
-                                    (Table_Kind, Owner.Universe.Globals));
+                                    Global_Environment (Owner.Universe.all));
                                  Push (Owner.Universe.all, Context, Callee);
                               when Lua.Canonical_Compiler.Compiler_Limit =>
                                  Error_Result (Name & ": " &

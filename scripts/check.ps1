@@ -38,6 +38,7 @@ try {
         $adaRuntimeDirectory = $runtime.Directory + [IO.Path]::PathSeparator
     }
     & (Join-Path $PSScriptRoot 'check-documentation.ps1')
+    & (Join-Path $PSScriptRoot 'test-pe-unwind.ps1')
     Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario)
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-core-image.ps1'),
@@ -66,6 +67,10 @@ try {
     Set-Location (Join-Path $projectRoot 'cli')
     $cliExecutable = "bin/$LibraryType/lua_ada$suffix"
     $absoluteCli = Join-Path (Get-Location).Path $cliExecutable
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-output-policy.ps1'),
+        '-Consumer', (Join-Path $projectRoot "tests/bin/$LibraryType/output_consumer$suffix"),
+        '-Interpreter', $absoluteCli)
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-cli.ps1'), '-Interpreter', $absoluteCli)
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',

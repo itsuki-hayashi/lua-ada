@@ -83,3 +83,25 @@ Native-module loading, process-wide symbol resolution, concurrent first entry,
 installation/runtime search paths and complete public C exports retain separate
 acceptance obligations. This decision claims neither complete C ABI parity nor
 successful execution of the full upstream suite.
+
+## Windows partial-link unwind metadata
+
+Adding another narrow C platform unit exposed a GNU x64 BigObj partial-link
+defect. Its merged ordinary .pdata rows referenced the first .text/.xdata
+section symbols with zero offsets, even though the later C functions occupied
+different merged offsets. The final executable contained overlapping runtime
+function ranges. An allocator-refusal test then faulted in RtlVirtualUnwind2
+while GNAT recorded its exception traceback, before Ada recovery or GC ran.
+
+Windows x64 first-party C compilation now uses -ffunction-sections. Unique
+function section names preserve the relocation targets through the same BigObj
+partial link. Ada already emits such function sections. The final PE format,
+strict warnings, runtime checks and the binder's -Es exception tracebacks remain
+enabled. No interpreter path, allocator policy or failure assertion is bypassed.
+
+The core-image driver validates the final executable exception tables and the
+shared lua DLL when applicable, using a small first-party PE reader. It checks
+mapped bytes, complete table rows, sorted nonempty ranges and absence of
+overlap. Eleven synthetic boundary cases exercise the reader on any host.
+Actual C guard/refusal/error tests remain necessary: structural validity alone
+cannot prove every unwind opcode describes its machine instructions correctly.

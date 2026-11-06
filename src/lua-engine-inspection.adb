@@ -231,6 +231,43 @@ package body Lua.Engine.Inspection is
          end if;
          Append (New_String (State, To_String (Context.Hook_Mask)));
          Append ((Integer_Kind, Context.Hook_Reported_Count));
+      elsif Name in "debug.getuservalue" | "debug.setuservalue" then
+         declare
+            Setting : constant Boolean := Name = "debug.setuservalue";
+            Slot : constant Positive := (if Setting then 3 else 2);
+            Number : Integer_Value :=
+              (if Arg (Slot).Kind = Nil_Kind then 1 else Integer_Arg (Slot));
+         begin
+            --  The library's optional Lua integer is converted to native C
+            --  int before indexing, including its low-bit wrap on every
+            --  supported ABI. Keep absent/nil defaults distinct from an
+            --  existing uservalue whose stored value happens to be nil.
+            Number := Number mod (2 ** Interfaces.C.int'Size);
+            if Number >= 2 ** (Interfaces.C.int'Size - 1) then
+               Number := Number - 2 ** Interfaces.C.int'Size;
+            end if;
+            if Setting then
+               if Arg (1).Kind /= Userdata_Kind then
+                  Fail (State, "full userdata expected");
+               elsif Args.Length < 2 then
+                  Fail (State, "value expected");
+               end if;
+            end if;
+            if Arg (1).Kind /= Userdata_Kind or else Number < 1 or else
+              Number > Integer_Value (Arg (1).Reference.Uservalues.Length)
+            then
+               Append (Nil_Value);
+            elsif Setting then
+               --  Mutate the actual traced slot, without allocating a proxy
+               --  table or changing the userdata's stable C payload address.
+               Arg (1).Reference.Uservalues.Replace_Element
+                 (Positive (Number), Arg (2));
+               Append (Arg (1));
+            else
+               Append (Arg (1).Reference.Uservalues (Positive (Number)));
+               Append ((Boolean_Kind, True));
+            end if;
+         end;
       elsif Name = "debug.getregistry" then
          Append ((Table_Kind, State.Foreign_Registry));
       elsif Name = "debug.getmetatable" then

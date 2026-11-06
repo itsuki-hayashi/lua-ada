@@ -1105,29 +1105,19 @@ package body Lua.Engine.Machine is
    begin
       case Function_Id is
          when Print_Function =>
-            --  Capture output inside the universe first. The host sink
-            --  runs only after execution, so it cannot reenter live frames
-            --  or invalidate roots while this operation is in progress.
+            --  Both delivery policies use the same quota and byte producer.
+            --  This legacy primitive has no tostring continuation; ordinary
+            --  Lua-visible print below performs its callbacks explicitly.
             for Position in Arguments.First_Index .. Arguments.Last_Index
             loop
                if Position > 1 then
-                  Append (State.Output, Ada.Characters.Latin_1.HT);
+                  Emit_Output (State, [Ada.Characters.Latin_1.HT]);
                end if;
-               if Ada.Strings.Unbounded.Length (State.Output) +
-                 Image (State.Current.Memory, Arg (Position))'Length
-                 >= State.Bounds.Output_Bytes
-               then
-                  Fail (State, "output byte limit exceeded", True);
-               end if;
-               Append
-                 (State.Output, Image (State.Current.Memory, Arg (Position)));
+               Emit_Output
+                 (State, Image (State.Current.Memory, Arg (Position)));
             end loop;
-            if Ada.Strings.Unbounded.Length (State.Output) >=
-              State.Bounds.Output_Bytes
-            then
-               Fail (State, "output byte limit exceeded", True);
-            end if;
-            Append (State.Output, Ada.Characters.Latin_1.LF);
+            Emit_Output (State, [Ada.Characters.Latin_1.LF]);
+            Flush_Output (State);
          when Assert_Function =>
             Require (1);
             if not Truth (Arg (1)) then
@@ -1316,7 +1306,7 @@ package body Lua.Engine.Machine is
          --  shadowing it here would discard assignments between calls and
          --  split the binding observed by their nested Lua closures.
          Declare_Local (State, Item.Scope, Prototype.Environment_Symbol,
-                        (Table_Kind, State.Globals));
+                        Global_Environment (State));
       end if;
       for Position in Prototype.Parameters.First_Index ..
         Prototype.Parameters.Last_Index
@@ -2419,16 +2409,13 @@ package body Lua.Engine.Machine is
       elsif Name = "base.print" then
          if Activation.Native_Stage = 1 then
             Handler := First (Activation.Native_Results);
-            if Image (State.Current.Memory, Handler)'Length +
-              Boolean'Pos (Activation.Native_Index > 1) >
-              State.Bounds.Output_Bytes - Length (State.Output)
-            then
-               Fail (State, "output byte limit exceeded", Resource => True);
-            end if;
+            --  Publish each completed conversion before requesting another
+            --  __tostring callback. A later callback can observe the output
+            --  or fail, and neither event may erase the earlier argument.
             if Activation.Native_Index > 1 then
-               Append (State.Output, Ada.Characters.Latin_1.HT);
+               Emit_Output (State, [Ada.Characters.Latin_1.HT]);
             end if;
-            Append (State.Output, Image (State.Current.Memory, Handler));
+            Emit_Output (State, Image (State.Current.Memory, Handler));
             Activation.Native_Index := Activation.Native_Index + 1;
             Activation.Native_Stage := 0;
          elsif Activation.Native_Index = 0 then
@@ -2437,10 +2424,8 @@ package body Lua.Engine.Machine is
          if Activation.Native_Index >
            Natural (Activation.Native_Arguments.Length)
          then
-            if Length (State.Output) >= State.Bounds.Output_Bytes then
-               Fail (State, "output byte limit exceeded", Resource => True);
-            end if;
-            Append (State.Output, Ada.Characters.Latin_1.LF);
+            Emit_Output (State, [Ada.Characters.Latin_1.LF]);
+            Flush_Output (State);
             Complete (Self, Values.Empty_Vector);
          else
             Packet.Append (Arg (Activation.Native_Index));

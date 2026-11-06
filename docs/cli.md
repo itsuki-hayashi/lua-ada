@@ -29,6 +29,10 @@ line terminators; binary-safe stdin remains an open CLI requirement.
 Raw `-e` snippets are not file loading. Runtime
 `loadfile`/`dofile` use the shared file handling; raw `load` source is distinct.
 
+Normal execution selects Process_Streams output delivery. Runtime stdout bytes
+are written immediately through native stdio, including embedded NUL/high
+bytes; each print flushes its completed line. Earlier Ada help/version output
+is flushed before this switch, and captured result output is not replayed.
 Output already produced before a failure remains visible. Diagnostics go to
 stderr and failures return a failing process status. Script files now accept
 native Lua 5.5.1 binary chunks for the matching host configuration, including

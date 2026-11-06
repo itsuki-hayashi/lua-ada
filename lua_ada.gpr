@@ -22,8 +22,18 @@ library project Lua_Ada is
       when others => null;
    end case;
    C_ABI_Defines := ();
+   C_Unwind_Options := ();
    case Lua_Ada_Config.Alire_Host_OS is
       when "windows" =>
+         case Lua_Ada_Config.Alire_Host_Arch is
+            when "x86_64" =>
+               --  GNU's BigObj partial link merges ordinary C .text/.xdata
+               --  section symbols, losing their distinct unwind offsets.
+               --  Unique function sections preserve each .pdata target;
+               --  Ada already emits its execution code in such sections.
+               C_Unwind_Options := ("-ffunction-sections");
+            when others => null;
+         end case;
          case Library_Mode is
             when "relocatable" =>
                C_ABI_Defines :=
@@ -60,6 +70,7 @@ library project Lua_Ada is
      (
       "lua_ada_boundary.c",
       "lua_ada_host_numerics.c",
+      "lua_ada_streams.c",
       "lua_ada_config.ads",
       "lua-c_api.ads",
       "lua-big_naturals.ads",
@@ -96,6 +107,7 @@ library project Lua_Ada is
       "lua-opcodes.ads",
       "lua-platform_mathematics.ads",
       "lua-platform_numerics.ads",
+      "lua-platform_streams.ads",
       "lua-prototypes.ads",
       "lua-runtime_configuration.ads",
       "lua-sessions.ads",
@@ -138,7 +150,7 @@ library project Lua_Ada is
         ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
          "-I" & Project'Project_Dir & "c_api/include",
          "-I" & Project'Project_Dir & "c_api/include/api") &
-        C_ABI_Defines;
+        C_ABI_Defines & C_Unwind_Options;
    end Compiler;
 
    package Binder is

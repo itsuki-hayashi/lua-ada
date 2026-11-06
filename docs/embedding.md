@@ -48,6 +48,23 @@ receives the completed output synchronously and is never retained. Sink
 exceptions produce `Host_Error`; Lua syntax/runtime/resource failures have
 separate statuses and do not escape as unhandled Ada language exceptions.
 
+Sessions initialize and reset to Output_Policy.Captured. Set_Output_Policy
+can explicitly select Process_Streams without changing globals or execution
+quotas. That mode publishes bytes to actual C stdout during execution and
+leaves Execute.Output empty; a borrowed sink therefore receives no duplicate
+bytes. Native text-mode newline translation and buffering follow the host C
+runtime. print flushes after its newline and retains Lua's behavior of ignoring
+ordinary stdio write/flush errors. Explicit bounded output quotas are checked
+before each fragment, including separators and newlines. Compatible execution
+does not maintain an overflowing lifetime output counter. Explicit files and
+stderr remain separate from captured stdout as file/OS support is integrated.
+
+New source chunks and omitted load environments read the actual global table
+from registry entry LUA_RIDX_GLOBALS. Replacing it does not rewrite previously
+created _ENV cells. Set_Arguments targets that current table too. The engine
+retains no independent bootstrap-global root; ordinary owners such as
+package.loaded._G or an old closure can still keep the earlier table alive.
+
 Diagnostics separate source, line, column, and message. Wording is not a C Lua
 error-text ABI. Writes completed before a runtime failure remain observable;
 execution is not transactional. Recoverable failures leave the session usable.

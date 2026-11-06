@@ -22,6 +22,19 @@ private package Lua.Engine is
 
    type Execution_Policy is (Bounded, Lua_Compatible);
 
+   type Output_Policy is (Captured, Process_Streams);
+   --  Captured is the embedding default. Process_Streams publishes to actual
+   --  C stdout immediately; it never duplicates bytes in the result packet.
+
+   type Output_Result is record
+      Succeeded : Boolean := True;
+      Bytes_Written : Natural := 0;
+      Error : Interfaces.C.int := 0;
+   end record;
+   --  Native stream status, captured before allocating or executing Lua.
+   --  Print intentionally ignores write failures, as pinned C Lua does;
+   --  io.write/flush use the result to construct their actual failure tuple.
+
    Minimum_C_Stack : constant := 20;
    Initial_Stack_Size : constant := 2 * Minimum_C_Stack;
    Extra_Stack : constant := 5;
@@ -536,7 +549,6 @@ private package Lua.Engine is
       --  Current borrows a context owned by Contexts; it never owns it twice.
       Heap         : Objects.Vector;
       Programs     : Prototypes.Vector;
-      Globals      : Object_Access;
       Foreign_Registry : Object_Access;
       Memory_Error_Value : Value;
       Handling_Error_Value : Value;
@@ -562,9 +574,22 @@ private package Lua.Engine is
       Next_GC      : Positive := 256;
       Steps        : Natural := 0;
       Native_Depth : Natural := 0;
+      Output_Mode : Output_Policy := Captured;
+      Output_Used : Natural := 0;
       Output       : Unbounded_String;
    end record;
    type World_Access is access World;
+
+   function Emit_Output
+     (State : in out World; Bytes : String) return Output_Result;
+   procedure Emit_Output (State : in out World; Bytes : String);
+   --  Charge the complete bounded byte quota before any externally visible
+   --  write. Arbitrary String bounds and empty slices are supported. There
+   --  is no host callback while VM frames remain active.
+   function Flush_Output (State : in out World) return Output_Result;
+   procedure Flush_Output (State : in out World);
+   --  Captured stdout has no external buffer to flush. Process streams use
+   --  actual fflush(stdout), including the host's failure and errno.
 
    function Read_Number
      (Memory : not null Lua.Storage.Owner_Access; Text : String;
@@ -719,6 +744,11 @@ private package Lua.Engine is
       Sequence_Size, Hash_Size : Natural);
    --  Reserve actual storage in an empty table through its owning provider.
    --  Capacity publication is atomic; no keys or sequence values are added.
+
+   function Global_Environment (State : World) return Value;
+   --  Read the actual raw LUA_RIDX_GLOBALS registry entry. New chunks and
+   --  public C globals observe replacement; existing _ENV cells keep their
+   --  own bindings. This borrow performs no allocation or metamethod call.
 
    function New_Environment
      (State : in out World; Parent : Object_Access) return Object_Access;

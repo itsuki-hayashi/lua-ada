@@ -1,4 +1,5 @@
 with Lua.Engine.Canonical;
+with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
 with Lua.Number_Parsing;
 with Ada.Exceptions;
@@ -18,6 +19,8 @@ with Lua.Engine.Machine;
 
 package body Lua.Engine is
    use type Ada.Containers.Count_Type;
+   use type Interfaces.C.int;
+   use type Interfaces.C.size_t;
    use type Ada.Exceptions.Exception_Id;
    use type Integer_Value;
    use type System.Address;
@@ -921,6 +924,14 @@ package body Lua.Engine is
    end Reserve_Table;
 
 
+   function Global_Environment (State : World) return Value is
+   begin
+      --  The registry owns this edge. A cached bootstrap address must neither
+      --  retarget an existing closure nor keep a replaced table alive.
+      return Get
+        ((Table_Kind, State.Foreign_Registry), (Integer_Kind, 2));
+   end Global_Environment;
+
    function New_Environment
      (State : in out World; Parent : Object_Access) return Object_Access
    is
@@ -955,7 +966,7 @@ package body Lua.Engine is
                  ((if Index = 1 and then Capture /= null then
                      Find_Cell (Capture, Code.Environment_Symbol)
                    else New_Cell (State,
-                     (if Index = 1 then (Table_Kind, State.Globals)
+                     (if Index = 1 then Global_Environment (State)
                       else Nil_Value))));
             end loop;
          end if;
@@ -965,7 +976,7 @@ package body Lua.Engine is
          --  chunks. Debug updates and nested closures share this same cell.
          Item.Capture := New_Environment (State, null);
          Declare_Local (State, Item.Capture, Code.Environment_Symbol,
-                        (Table_Kind, State.Globals));
+                        Global_Environment (State));
          Item.Upvalues.Append
            (Find_Cell (Item.Capture, Code.Environment_Symbol));
       elsif Capture /= null then
@@ -1362,6 +1373,70 @@ package body Lua.Engine is
       end if;
    end Set_Policy;
 
+   function Emit_Output
+     (State : in out World; Bytes : String) return Output_Result
+   is
+      package Streams renames Lua.Platform_Streams;
+      Error : aliased Interfaces.C.int := 0;
+      Written : Interfaces.C.size_t;
+   begin
+      --  The output counter is independent of retained capture storage:
+      --  immediate process writes still obey explicit embedding quotas.
+      --  Subtraction avoids overflowing before testing a large write. Under
+      --  compatible policy no indefinitely increasing counter is maintained.
+      if State.Policy = Bounded then
+         if State.Output_Used > State.Bounds.Output_Bytes or else
+           Bytes'Length > State.Bounds.Output_Bytes - State.Output_Used
+         then
+            Fail (State, "output byte limit exceeded", Resource => True);
+         end if;
+         State.Output_Used := State.Output_Used + Bytes'Length;
+      end if;
+      if Bytes'Length = 0 then
+         return (others => <>);
+      elsif State.Output_Mode = Captured then
+         Append (State.Output, Bytes);
+         return (Bytes_Written => Bytes'Length, others => <>);
+      end if;
+      --  A String object's address denotes its first byte regardless of its
+      --  lower bound. The empty case above never borrows a nonexistent byte.
+      --  Native text translation/buffering remains libc's responsibility;
+      --  embedded NUL and every high byte pass through unchanged to fwrite.
+      Written := Streams.Write
+        (Streams.Standard (Streams.Standard_Output), Bytes'Address,
+         Interfaces.C.size_t (Bytes'Length), Error'Access);
+      return
+        (Succeeded => Written = Interfaces.C.size_t (Bytes'Length),
+         Bytes_Written => Natural (Written), Error => Error);
+   end Emit_Output;
+
+   procedure Emit_Output (State : in out World; Bytes : String) is
+      Ignored : constant Output_Result := Emit_Output (State, Bytes);
+      pragma Unreferenced (Ignored);
+   begin
+      null;
+   end Emit_Output;
+
+   function Flush_Output (State : in out World) return Output_Result is
+      package Streams renames Lua.Platform_Streams;
+      Error : aliased Interfaces.C.int := 0;
+      Status : Interfaces.C.int;
+   begin
+      if State.Output_Mode = Captured then
+         return (others => <>);
+      end if;
+      Status := Streams.Flush
+        (Streams.Standard (Streams.Standard_Output), Error'Access);
+      return (Succeeded => Status = 0, Error => Error, others => <>);
+   end Flush_Output;
+
+   procedure Flush_Output (State : in out World) is
+      Ignored : constant Output_Result := Flush_Output (State);
+      pragma Unreferenced (Ignored);
+   begin
+      null;
+   end Flush_Output;
+
    procedure Initialize (State : in out World; Bounds : Limits) is
       Table : Value;
       procedure Install (Name : String; Native : Native_Kind);
@@ -1423,7 +1498,6 @@ package body Lua.Engine is
       State.Handling_Error_Value :=
         New_String (State, "error in error handling");
       Table := New_Table (State);
-      State.Globals := Table.Reference;
       State.Loaded_Modules := New_Table (State).Reference;
       State.Preload_Modules := New_Table (State).Reference;
       --  Ada and C consumers see one real registry, not debug-only mirrors.
@@ -1432,7 +1506,7 @@ package body Lua.Engine is
       --  replaced without retargeting these internal module tables.
       State.Foreign_Registry := New_Table (State).Reference;
       Set (State, (Table_Kind, State.Foreign_Registry),
-           (Integer_Kind, 2), (Table_Kind, State.Globals));
+           (Integer_Kind, 2), Table);
       Set (State, (Table_Kind, State.Foreign_Registry),
            (Integer_Kind, 3), (Thread_Kind, State.Main_Thread));
       Set (State, (Table_Kind, State.Foreign_Registry),
@@ -1477,7 +1551,7 @@ package body Lua.Engine is
            New_Native (State, "base.collectgarbage"));
       Library ("debug", "getinfo getlocal setlocal getupvalue setupvalue " &
                  "upvalueid upvaluejoin getregistry " &
-                 "getmetatable setmetatable " &
+                 "getmetatable setmetatable getuservalue setuservalue " &
                  "sethook gethook traceback");
       Library ("coroutine",
                "create resume yield wrap status running isyieldable close");
@@ -1728,7 +1802,6 @@ package body Lua.Engine is
       --  Intrusive worklists avoid both allocation and Ada-stack traversal
       --  of user graphs. Their links are private scratch, cleared on removal.
       Mark (State.Main_Thread);
-      Mark (State.Globals);
       Mark (State.Foreign_Registry);
       Mark_Value (State.Memory_Error_Value);
       Mark_Value (State.Handling_Error_Value);
@@ -2066,7 +2139,6 @@ package body Lua.Engine is
          end;
       end loop;
       State.Programs.Release;
-      State.Globals := null;
       State.Foreign_Registry := null;
       State.String_Metatable := null;
       State.Type_Metatables := [others => null];
@@ -2093,6 +2165,7 @@ package body Lua.Engine is
       State.Current.Protected_Failure_Class := No_Failure;
       State.Current.Protected_Handler_Called := False;
       State.Output := Null_Unbounded_String;
+      State.Output_Used := 0;
       State.Steps := 0;
       State.Current.Failure_At := (others => 1);
       if State.GC_Running then

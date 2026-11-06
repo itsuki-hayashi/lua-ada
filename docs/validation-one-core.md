@@ -4,6 +4,18 @@ Date: 2026-11-06, Asia/Tokyo. Scope: production core-image evidence for
 [ADR 0014](decisions/0014-one-core-library.md). These checks use the production
 root library, rather than the earlier reports-only observation prototype.
 
+The later Windows x64 unwind repair preserves -Es and all compiler checks.
+Before the repair, the final PE contained overlapping ordinary C unwind ranges;
+GDB located the resulting allocator-refusal crash in RtlVirtualUnwind2 during
+Ada traceback capture. Decoding the partial object showed its later C rows all
+targeting the first zero-offset section symbols. Windows-only C function
+sections repair those actual relocations. The rebuilt validation/static image
+passes all 32 real C cases in reports/m3-c-unwind-consumer1.log, including the
+guarded continued-refusal path and balanced 26-point construction sweep.
+Its final exception directory has 11,930 disjoint entries. Eleven focused
+PE-reader cases pass. Shared/final-platform evidence for this source repair is
+recorded separately; earlier matrix results do not establish its acceptance.
+
 ## Verified configurations
 
 The selected GNAT 16.1.0 and GPRbuild 26.0.1 compiled the ordinary default
@@ -67,6 +79,15 @@ then passed, and every Mac log was inspected: all three core-image consumers,
 completed. Linux core consumers also passed, but that complete run failed its
 separate alternate-general formatting differential. These independent outcomes
 must not be combined into a green complete-milestone matrix.
+
+The later [1,009-case checkpoint matrix](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42217665982)
+passed all eighteen target OS/profile/link jobs and Windows static-PIC. Every
+job log was inspected: the C API consumer, mixed Ada/C consumer and C startup
+consumer all passed against the one selected core image. The independent
+formatting regression also passed at this checkpoint. The suite still covers
+five unchanged upstream execution files; report-only C conformance observations
+and the unfinished full M3 ledger are separate from this passing retained
+matrix. Subsequent output/IO/OS changes need fresh final-revision evidence.
 
 ## Commands and reports
 

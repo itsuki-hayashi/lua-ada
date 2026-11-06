@@ -90,8 +90,10 @@ goto/closing, coroutines, stable cells, weak/ephemeron tracing, debug inspection
 and hooks, collection controls and explicit execution policies. Read its
 [validation record](docs/validation-m3-lifecycle.md) before extending claims.
 Use the shared owned frontend for both checking and execution; never introduce
-a second grammar in VM lowering. Canonical opcode definitions are independent
-of the executable VM. See [frontend compatibility](docs/frontend.md) and
+a second grammar in VM lowering. Canonical opcode definitions form the word layer now used by normal
+compilation/execution; the older packet backend remains a migration path.
+Native binary loading/dumping has focused host evidence, with complete
+acceptance tracked separately. See [frontend compatibility](docs/frontend.md) and
 [M2a](docs/milestones/m2a.md) for their distinct acceptance boundaries.
 Lua/native callbacks must use explicit activation continuations; never recurse
 into the executor. Root retained arguments, captures, and pending results before

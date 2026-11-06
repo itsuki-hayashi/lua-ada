@@ -64,7 +64,7 @@ procedure Lua.Canonical_Runtime_Probe is
       Begin_Operation (State.all);
       begin
          Callee := Canonical.Adopt
-           (State.all, Model, (Table_Kind, State.Globals));
+           (State.all, Model, Global_Environment (State.all));
       exception
          when others => End_Operation (State.all); raise;
       end;

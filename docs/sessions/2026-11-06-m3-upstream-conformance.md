@@ -396,3 +396,60 @@ Remaining C continuations, call-origin accounting, allocation-free span
 transfers, physical cache/arena shrinking, collector modes/finalizers, IO/OS,
 full ABI/adapter/coverage and final platform gates remain open. No additional
 unchanged whole upstream file is claimed.
+
+## Runtime inspection, output and Windows unwind checkpoint
+
+Published checkpoint5 is 9377f4fd00cce2900b27dc1e6cf77b13b653d8d4, tree
+afd2217cf12efd7922d02d921e26ecf3b3574dd9. All18 jobs of run42217665982
+pass and their full logs were inspected: 1,009 AUnit cases, C32/mixed/startup,
+35 CLI cases, ten binary CLI comparisons, twelve differential files and the
+five retained upstream files. All six Linux jobs now pass both formatting
+campaigns. Windows static-validation also passes static-PIC. Checkout logs
+confirm actual PR merge9ec297c6 combines that head with baseline f7031f52;
+report revision and workflow head fields intentionally identify different Git
+objects. Native C aggregate observations on macOS still fail unchanged
+main.lua207's dynamic-readline warning assumption under pinned static readline;
+the original fixtures/configurations remain unchanged and M3 acceptance=false.
+
+The next local group adds debug.getuservalue/setuservalue for actual traced
+userdata slots and raw registry-selected initial global environments. Eight
+focused userdata cases and four independent environment cases pass within
+1,021 AUnit cases. A separate real C probe confirms all eight userdata and
+three valid-domain registry scenarios against default and upstream-test DLLs.
+The host Set_Arguments scenario is an additional Ada ownership regression.
+No cached bootstrap global pointer remains as a separate immortal GC root.
+
+Output delivery is now explicit. Ada sessions initialize/reset to Captured;
+the CLI and C-created states select Process_Streams. A single byte producer
+checks bounded quotas before each fragment, uses actual native stdio for
+process writes, and never replays those bytes as captured output. Compatible
+policy avoids an unbounded counter. Seventeen named AUnit cases and nine
+raw-byte processes cover callbacks, errors, policy changes, reset, quotas,
+NUL/0xff bytes and version ordering. GNATdoc guidance was applied to adjacent
+public API comments; documentation generation itself was not run.
+
+Strict reports/m3-output-policy-build3.log and tests2.log pass1,038/1,038,
+zero failures/errors. reports/m3-output-process-tests1.log passes all nine
+process cases. The first complete pipeline exposed a Windows native unwind
+crash during the retained protected allocator-refusal case, before emergency
+collection or error publication. BigObj inspection found merged C .pdata
+references pointing at the first text/xdata section rather than their actual
+merged offsets. A guard-only executable reproduces the crash without any
+preceding constructor sweep, ruling out earlier cleanup corruption.
+
+Windows x64 C function sections now preserve unique unwind relocation targets
+through the SAL partial link. The actual C32 consumer and isolated guard pass;
+the new PE structural checker rejects the saved broken image and validates
+disjoint ranges in repaired images. Eleven portable parser regressions cover
+malformed/overlapping metadata. Ada -Es tracebacks, strict flags and runtime
+checks remain unchanged. ADR0014 and the one-core guide own this narrow repair.
+
+reports/m3-output-policy-check2.log passes the complete validation/static
+pipeline: 1,038 AUnit, real C32/mixed/startup, Ada consumer, eleven PE cases,
+nine output processes, 35 CLI contracts, ten binary CLI comparisons, twelve
+differential fixtures and all five retained unchanged upstream files. The
+expected invalid-option child exits1 as its rejection assertion requires.
+Documentation validation passes74 Markdown files. Finalizer queues, real
+collector modes, IO/OS, complete C continuations/ABI, actual test adapter and
+full-source/platform acceptance remain in progress; their reports-only drafts
+are not executable coverage or additional whole-file passes.

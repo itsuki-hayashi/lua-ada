@@ -60,15 +60,30 @@ existing ADR 0003 floating-validity exception is unchanged.
 
 ## Current full M3 checkpoint
 
-The latest Windows/default/validation/static implementation passes 1,009
+The latest Windows/default/validation/static implementation passes 1,038
 separately named AUnit cases with zero failed assertions or unexpected errors.
 Canonical Lua and native/C activations now share one context-owned scalar
 arena, including actual captured cells, hidden varargs, overlapping call
 windows and collection of their ordered live union. Strict flags and runtime
 checks remain enabled. The complete retained pipeline passes its C32/mixed/startup consumers,
-Ada consumer, 35 CLI cases, ten binary CLI comparisons, twelve differential
+Ada consumer, nine new raw-byte output processes, eleven PE-table structural
+regressions, 35 CLI cases, ten binary CLI comparisons, twelve differential
 fixtures and five unchanged upstream files. This does not establish final
 platform or full-upstream acceptance. The session record owns exact commands and repairs.
+
+The earlier 1,009-case checkpoint at
+9377f4fd00cce2900b27dc1e6cf77b13b653d8d4 passes all 18 jobs in
+[run 42217665982](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42217665982),
+including Windows static-PIC. Every job log was inspected. CI tests the actual
+PR synthetic merge, 9ec297c6, into baseline f7031f52; the workflow records the
+branch head separately. Report-only native C aggregate observations still
+record the pinned macOS readline-assumption failure, not a full M3 pass.
+
+The new local checkpoint adds actual userdata debug slots, registry-selected
+default environments and immediate native stdout with explicit capture policy.
+It also repairs a measured Windows BigObj partial-link unwind-table defect.
+No Ada tracebacks, warnings or runtime checks were disabled. These newer changes
+require their own complete platform rerun.
 
 The earlier checkpoint sequence below retains its original evidence counts.
 

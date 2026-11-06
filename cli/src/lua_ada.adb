@@ -258,6 +258,11 @@ begin
             else Argument (Index + Script_Index));
       end loop;
       Universe.Set_Execution_Policy (Lua_Compatible);
+      --  Flush earlier Ada help/version text before C stdio starts writing.
+      --  Runtime bytes are then published immediately, in Lua program order,
+      --  and are not printed a second time from captured result packets.
+      Ada.Text_IO.Flush;
+      Universe.Set_Output_Policy (Process_Streams);
       Result := Universe.Set_Arguments (Args);
       if Result.Status /= Succeeded then
          Report (Result);

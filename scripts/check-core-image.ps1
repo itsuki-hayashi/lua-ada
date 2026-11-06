@@ -23,6 +23,7 @@ $records = [Collections.Generic.List[object]]::new()
 $scenarios = @("-XLUA_ADA_LIBRARY_TYPE=$LibraryType",
     "-XLUA_ADA_CONFIGURATION=$Configuration")
 Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'PEUnwind.psm1') -Force
 
 function Invoke-Build {
     param([string[]] $Arguments)
@@ -32,6 +33,16 @@ function Invoke-Build {
 
 function Invoke-Consumer {
     param([string] $Name, [string] $Executable, [string] $Marker)
+    $unwind = $null
+    if ($IsWindows) {
+        # The final image, rather than an intermediate object or successful
+        # linker exit, must contain disjoint x64 RUNTIME_FUNCTION intervals.
+        # Preserve the structural evidence beside the actual process capture.
+        $unwind = Test-PEUnwindTable -Path $Executable
+        $unwind | ConvertTo-Json | Set-Content -LiteralPath (
+            Join-Path $reportDirectory "$Name.unwind.json") -Encoding utf8
+        Write-Output "PASS: $Name PE unwind table ($($unwind.Entries) entries)"
+    }
     # Redirect both pipes before waiting so even an unexpected diagnostic flood
     # cannot deadlock the driver. Empty stderr is part of this consumer contract.
     $start = [Diagnostics.ProcessStartInfo]::new('alr')
@@ -57,7 +68,8 @@ function Invoke-Consumer {
         executable_sha256 = (Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant();
         exit_code = $process.ExitCode; timed_out = $timedOut;
         profile = $Profile; library_type = $LibraryType;
-        configuration = $Configuration }
+        configuration = $Configuration;
+        pe_unwind_entries = $(if ($null -eq $unwind) { $null } else { $unwind.Entries }) }
     $records.Add($record)
     if ($timedOut -or $process.ExitCode -ne 0 -or $stderr.Length -ne 0 -or
         -not $stdout.Contains($Marker)) {
@@ -94,6 +106,17 @@ try {
     $env:LD_LIBRARY_PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $savedLdPath
     $env:DYLD_LIBRARY_PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $adaRuntimeDirectory + $savedDyldPath
     $suffix = if ($IsWindows) { '.exe' } else { '' }
+    if ($IsWindows -and $LibraryType -eq 'relocatable') {
+        # The callback code lives in the DLL for shared consumers, so checking
+        # only the small importing executable would miss the broken metadata.
+        $images = @(Get-ChildItem -LiteralPath $runtimeDirectory -File |
+            Where-Object { $_.Name -match '^(lib)?lua\.dll$' })
+        if ($images.Count -ne 1) { throw 'Selected lua DLL is absent or ambiguous' }
+        $dllUnwind = Test-PEUnwindTable -Path $images[0].FullName
+        $dllUnwind | ConvertTo-Json | Set-Content -LiteralPath (
+            Join-Path $reportDirectory 'library.unwind.json') -Encoding utf8
+        Write-Output "PASS: shared lua PE unwind table ($($dllUnwind.Entries) entries)"
+    }
     Invoke-Consumer 'c-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/c_api_consumer$suffix") 'PASS: real Ada C API bootstrap consumer'
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
     Invoke-Consumer 'c-startup' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/c_image_client$suffix") 'CORE IMAGE C STARTUP OK'

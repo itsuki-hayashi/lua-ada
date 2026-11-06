@@ -27,8 +27,9 @@ Batch CLI / Ada host
 The root library never depends on AUnit, CLI, or reference C sources. The C
 oracle and ABI experiments are separate test artifacts. `Lua.Engine` and its
 descendants are implementation units beneath a private ancestor; public clients
-cannot depend on register layout or heap addresses. No serialized bytecode
-compatibility is implied.
+cannot depend on register layout or heap addresses. Checked native chunk
+loading/dumping uses the actual canonical model; its tested interoperability
+and remaining configuration gates are recorded in [binary chunks](docs/binary-chunks.md).
 
 The [real-world module fixtures](tests/modules/README.md) are future consumer
 compatibility inputs. They are separate from implementation/API references,
