@@ -141,6 +141,18 @@ private package Lua.Storage is
    --  A closed owner cannot be reused; construct a fresh owner for reset.
 
 private
+   --  Shared only with test-only child inspection. This is the production
+   --  provider header itself, never a copied test layout or public C ABI.
+   type Header is record
+      Parent : Owner_Access;
+      Before, After : System.Address;
+      Raw : System.Address;
+      Raw_Size : Byte_Count;
+      User : System.Address;
+      Size : Byte_Count;
+      Alignment : Byte_Count;
+   end record;
+
    type Managed_Subpool is new
      System.Storage_Pools.Subpools.Root_Subpool with record
       Parent : Owner_Access;

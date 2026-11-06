@@ -14,13 +14,20 @@ Pinned `ltests.c` SHA-256:
 | `userdata` | `ltests.c:1279`, `newuserdata` | Explicit public argument checks instead of auxiliary macros; actual `lua_newuserdatauv`; zero payload bytes. |
 | `test_warning` | `ltests.c:85`, `warnf` | Per-state registry-owned userdata replaces static state; public raw global access replaces private locking/auxiliary calls; same controls, fragment bound, unconsumed `_WARN` rejection and unexpected-warning abort. |
 | `inspect` | Original Ada adapter boundary | Returns scalars from private Ada inspection before C API publication; no foreign nonlocal jump crosses the Ada inspection call. |
+| `nonblock` | `ltests.c:2154`, `nonblock` | Validate real public stream payload/metatable with exported APIs; use actual POSIX descriptor flags; report native errors. Absent on Windows, matching the pinned driver's platform guard. |
 
 Collector color, age, phase, allocation statistics, parameter codec and physical
 storage controls use real Ada state. They do not emulate C private layouts.
-The registry/list verifier is currently a separately tested inspection helper;
-it is not yet exposed as a complete `T.checkmemory` equivalent. Full graph,
-allocator and finalizer invariant review remains required. `T.nonblock` remains
-unimplemented. This manifest does not close those obligations.
+`T.checkmemory` inspects the real registry, collector lists, heap/code edges,
+live activation windows, finalizer queues and allocator headers/accounting.
+Its implementation and negative tests still require independent review of the
+invariant mapping. `T.nonblock` requires POSIX execution evidence and Windows
+counterpart coverage; its absence on Windows does not resolve the guarded
+obligation. This manifest does not close those obligations.
+`T.ada_emergency_tables` is an explicitly named Ada
+counterpart for the C-specific 200-byte emergency allowance, with measured
+table storage and actual allocation refusal/recovery. Its source mapping is
+pending review in `tests/conformance/equivalents/gc-ada-instrumented.json`.
 
 Upstream license notice (also retained in the pinned public `lua.h`):
 

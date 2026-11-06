@@ -2,10 +2,19 @@
  * Lua 5.5.1 ltests.c at 7579fc9d7ed90240487251dfb69168f8e64e9294.
  * See lua.h for the upstream copyright notice. No C private layouts are used.
  */
+#if !defined(_WIN32)
+#define _POSIX_C_SOURCE 200809L
+#endif
 #include "lua.h"
+#include "lauxlib.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#if !defined(_WIN32)
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#endif
 
 struct adapter_result {
     int count;
@@ -85,6 +94,40 @@ static int install_warning(lua_State *L) {
     return 0;
 }
 
+#if !defined(_WIN32)
+/* ltests.c:2154, using the public luaL_Stream payload and real descriptor.
+ * Errors are checked rather than silently leaving the stream blocking. */
+static int nonblock(lua_State *L) {
+    luaL_Stream *stream;
+    int descriptor, flags, matched;
+    if (lua_type(L, 1) != LUA_TUSERDATA ||
+        lua_rawlen(L, 1) < sizeof(luaL_Stream) || !lua_getmetatable(L, 1)) {
+        lua_pushliteral(L, "file handle expected");
+        return lua_error(L);
+    }
+    lua_pushliteral(L, LUA_FILEHANDLE);
+    lua_rawget(L, LUA_REGISTRYINDEX);
+    matched = lua_rawequal(L, -1, -2);
+    lua_pop(L, 2);
+    if (!matched) {
+        lua_pushliteral(L, "file handle expected");
+        return lua_error(L);
+    }
+    stream = (luaL_Stream *)lua_touserdata(L, 1);
+    if (stream->f == NULL || stream->closef == NULL) {
+        lua_pushliteral(L, "closed file handle");
+        return lua_error(L);
+    }
+    descriptor = fileno(stream->f);
+    flags = fcntl(descriptor, F_GETFL, 0);
+    if (flags < 0 || fcntl(descriptor, F_SETFL, flags | O_NONBLOCK) < 0) {
+        lua_pushstring(L, strerror(errno));
+        return lua_error(L);
+    }
+    return 0;
+}
+#endif
+
 static int userdata(lua_State *L) {
     int valid = 1;
     lua_Integer size = 0, values = 0;
@@ -128,5 +171,12 @@ static int inspect(lua_State *L) {
 lua_CFunction lua_ada_test_adapter_callback(int operation) {
     if (operation == 0) return userdata;
     if (operation == 11) return install_warning;
+    if (operation == 14) {
+#if defined(_WIN32)
+        return NULL;
+#else
+        return nonblock;
+#endif
+    }
     return inspect;
 }

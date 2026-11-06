@@ -61,6 +61,20 @@ package body Lua.Engine.Loaders is
                      return Native_Action;
       Package_Value, Item, Function_Value, Data, Environment : Value;
       Buffer, Errors, Chunk_Name, Mode : Managed.Buffer;
+      procedure Validate_Mode;
+
+      procedure Validate_Mode is
+      begin
+         --  Fixed-buffer binary loading is a host C API facility. Lua source
+         --  cannot promise the lifetime of that backing storage, so lbaselib
+         --  rejects B before reading a file or invoking a reader callback.
+         for Index in 1 .. Length (Mode) loop
+            exit when Mode.Element (Index) = Character'Val (0);
+            if Mode.Element (Index) = 'B' then
+               Fail (State, "invalid mode");
+            end if;
+         end loop;
+      end Validate_Mode;
       Directory_Separator : constant String :=
         (if Lua_Ada_Config.Alire_Host_OS = "windows" then "\" else "/");
 
@@ -449,6 +463,7 @@ package body Lua.Engine.Loaders is
             else
                Copy_Bytes (Arg (3), Mode, False);
             end if;
+            Validate_Mode;
             if Arg (2).Kind /= Nil_Kind then
                Copy_Bytes (Arg (2), Chunk_Name, False);
             end if;
@@ -528,6 +543,13 @@ package body Lua.Engine.Loaders is
             Result.Results := Activation.Native_Results;
             return Result;
          end if;
+         if Name in "base.dofile" | "dofile" or else Arg (2).Kind = Nil_Kind
+         then
+            Mode.Set_Value ("bt");
+         else
+            Copy_Bytes (Arg (2), Mode, False);
+         end if;
+         Validate_Mode;
          begin
             if Arg (1).Kind = Nil_Kind then
                Read_Input (Buffer);
@@ -550,12 +572,6 @@ package body Lua.Engine.Loaders is
             Chunk_Name.Set_Value ("stdin");
          else
             Copy_Bytes (Arg (1), Chunk_Name, False);
-         end if;
-         if Name in "base.dofile" | "dofile" or else Arg (2).Kind = Nil_Kind
-         then
-            Mode.Set_Value ("bt");
-         else
-            Copy_Bytes (Arg (2), Mode, False);
          end if;
          Environment := (if Name not in "base.dofile" | "dofile" and then
                             Activation.Native_Arguments.Length >= 3

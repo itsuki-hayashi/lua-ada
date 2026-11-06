@@ -14,6 +14,8 @@ package body Lua.Core_Callback_Tests is
    end Check;
 
    procedure Minimum_Strings;
+   procedure Fixed_Load_Mode;
+   procedure Fixed_Loadfile_Mode;
    procedure Maximum_Strings;
    procedure Single_Any_Value;
    procedure Minimum_Tie_Type;
@@ -44,6 +46,25 @@ package body Lua.Core_Callback_Tests is
    procedure Direct_Unary_Fallback;
    procedure Arithmetic_Extra_Root_Trim;
    procedure Arithmetic_Short_Circuit_Budget;
+
+   procedure Fixed_Load_Mode is
+   begin
+      --  A reader cannot supply the host-owned immutable buffer required by
+      --  mode B. Reject before invoking it, including mixed mode strings.
+      Check ("local called=false; local function reader() called=true end; " &
+        "local ok,e=pcall(load,reader,'reader','btB'); " &
+        "assert(not ok and e:find('invalid mode',1,true) and not called); " &
+        "ok,e=pcall(load,'','','B'); " &
+        "assert(not ok and e:find('invalid mode',1,true))");
+   end Fixed_Load_Mode;
+
+   procedure Fixed_Loadfile_Mode is
+   begin
+      --  The mode error precedes opening a nonexistent file; a nil/message
+      --  open failure would incorrectly hide the invalid Lua-facing mode.
+      Check ("local ok,e=pcall(loadfile,'missing-fixed-buffer-file','B'); " &
+        "assert(not ok and e:find('invalid mode',1,true))");
+   end Fixed_Loadfile_Mode;
 
    procedure Minimum_Strings is
    begin
@@ -431,6 +452,10 @@ package body Lua.Core_Callback_Tests is
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
+      Test_Support.Add (Suite, "load: fixed mode rejects before reader",
+                        Fixed_Load_Mode'Access);
+      Test_Support.Add (Suite, "loadfile: fixed mode rejects before open",
+                        Fixed_Loadfile_Mode'Access);
       Test_Support.Add
         (Suite,
          "Core callbacks: minimum compares strings without numeric " &

@@ -133,3 +133,59 @@ The default incremental build reused the prior runner, detected by its case
 count. A forced test-runner rebuild in
 `reports/m3-t-adapter-default-forced-build.log` established the final 1,286-case
 default result. The source manifest records the pinned ltests.c hash.
+
+## Atomic barriers, refusal recovery and GC equivalent candidate
+
+The next signed checkpoint `35ab018` is published in
+[draft PR #9](https://github.com/itsuki-hayashi/lua-ada/pull/9). The draft remains
+open for implementation, not ready for acceptance or merge.
+
+Further instrumented execution found and repaired eager root retention at the
+enter-atomic boundary and backward-barrier whitening during sweep. Focused
+cases require temporary roots to expire, live roots to survive, a weak coroutine
+to die in the same cycle while its independently owned cell survives, and a
+userdata backward barrier to turn gray then survive subsequent cycles.
+
+`T.checkmemory` now inspects actual allocator headers/accounting, collector
+lists, heap/prototype edges, live activation windows and finalizer queues.
+The actual header type is private to Lua.Storage; only test code implements
+inspection. Negative tests reject registry corruption and foreign heap edges.
+POSIX `T.nonblock` now uses actual luaL_Stream payloads and descriptor flags;
+Windows retains its native absence, whose counterpart obligation is still open.
+
+Persistent refusal exposed unnecessary allocations in plain table lookup and
+GC result delivery. Existing fields now use an allocation-free raw fast path
+when no delegation applies. GC actions receive results by ownership transfer;
+unprotected independent result packets do not allocate redundant copies.
+Separate Lua-driven cases now prove finalizer deferral and eventual progress
+under real frame-cache and scalar-stack refusal, without an Ada-only reset.
+
+The source-hashed `gc-ada-instrumented` equivalent candidate completes through
+OK and its state-close assertions in
+`reports/m3-t-gc-equivalent-candidate.log`. It replaces three C-specific
+assumptions through four exact spans: measured weak-string payload reclamation,
+the real stable-cell child color, and measured emergency allocation headroom.
+There are no omitted diagnostic assertions in this candidate. All mappings
+remain pending independent review; this is not an accepted upstream pass.
+The generator rejects unreviewed acceptance, drift, overlapping spans, absent
+counterparts, identical author/reviewer, and reference-tree output.
+[ADR 0016](../decisions/0016-gc-adapter-equivalents.md) records the rationale.
+
+Instrumented validation/static has 1,299 passing AUnit cases in
+`reports/m3-t-load-mode-tests.log`. The latest two cases repair Lua-facing mode
+B rejection before reader invocation or file opening. They were exposed by
+opening files.lua's Windows-skipped temporary-file block in a disposable
+diagnostic runner. That runner then passed the IO/iterator block up to Unix
+device assumptions at line 467. A same-host C/Ada subprocess observation
+confirmed Windows stdin seek returns 1000 even for redirected input; this needs
+a platform mapping, not a runtime assertion copied from POSIX. Windows tmpnam
+returns a root-directory name that cannot be opened here; relocating its unique
+basename to the disposable directory is also a pending platform equivalent.
+
+Next required work includes native-platform file counterparts, C collector/IO
+openers and consumers, launcher shutdown/allocator telemetry, scoped ledger and
+acceptance integration, review artifacts, and the complete 26-context matrix.
+
+The complete retained default validation/static pipeline subsequently passed
+with 1,299 AUnit cases in `reports/m3-gc-adapter-expanded-check.log`. All eight
+equivalent-generator positive/negative checks passed again before committing.

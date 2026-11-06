@@ -699,14 +699,19 @@ package body Collector is
 
    procedure Root_Barrier (State : in out World; Item : Value) is
    begin
-      if State.GC.Phase in Propagating | Enter_Atomic then
+      --  At the enter-atomic boundary all running-thread roots are rescanned
+      --  before sweep. A transient call argument that has already returned
+      --  must not keep a weakly reachable coroutine alive for another cycle.
+      --  Heap edges still use their forward/back barriers: only root packets
+      --  defer to that mandatory atomic rescan.
+      if State.GC.Phase = Propagating then
          Shade_Value (State, Item);
       end if;
    end Root_Barrier;
 
    procedure Root_Barrier (State : in out World; Item : Object_Access) is
    begin
-      if State.GC.Phase in Propagating | Enter_Atomic then
+      if State.GC.Phase = Propagating then
          Shade (State, Item);
       end if;
    end Root_Barrier;
@@ -764,7 +769,8 @@ package body Collector is
          end if;
       end if;
       if Owner.Color = Black then
-         if State.GC.Phase in Propagating | Enter_Atomic or else
+         if State.GC.Phase in Propagating | Enter_Atomic |
+           Sweeping_Objects | Sweeping_Programs or else
            State.GC.Mode = Generational_Minor_Mode
          then
             --  One intrusive mark link cannot belong to two gray lists.
@@ -774,8 +780,6 @@ package body Collector is
             Owner.Gray_List := Revisit_Gray;
             Owner.Mark_Next := State.GC.Gray_Again;
             State.GC.Gray_Again := Owner;
-         elsif State.GC.Phase in Sweeping_Objects | Sweeping_Programs then
-            Owner.Color := State.GC.Current_White;
          end if;
       end if;
    end Back_Barrier;
@@ -983,6 +987,23 @@ package body Collector is
         (if State.GC.Cycle_Started_Bytes > Current
          then State.GC.Cycle_Started_Bytes - Current else 0);
    begin
+      --  Backward barriers may enqueue marked owners during incremental
+      --  sweep. They must become gray immediately (unlike forward barriers),
+      --  then sweep whitens their still-live nodes. No marking wave remains
+      --  in this cycle; unlink the completed revisit list before its owners
+      --  can become garbage in the next cycle. This never follows dead nodes:
+      --  only black, already marked objects enter this list during sweep.
+      if not State.GC.Cycle_Is_Minor then
+         while State.GC.Gray_Again /= null loop
+            declare
+               Item : constant Object_Access := State.GC.Gray_Again;
+            begin
+               State.GC.Gray_Again := Item.Mark_Next;
+               Item.Mark_Next := null;
+               Item.Gray_List := Not_Queued;
+            end;
+         end loop;
+      end if;
       State.GC.Last_Completed_Bytes := Current;
       State.GC.Last_Sampled_Bytes := Current;
       if State.Collections < Natural'Last then

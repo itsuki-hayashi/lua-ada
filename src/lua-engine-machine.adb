@@ -847,7 +847,8 @@ package body Lua.Engine.Machine is
       Call_Name : Unbounded_String := Null_Unbounded_String;
       Name_Kind : Unbounded_String := Null_Unbounded_String;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
-   procedure Complete (Self : Driver; Result : Values.Vector);
+   procedure Complete
+     (Self : Driver; Result : Values.Vector; Independent : Boolean := False);
    procedure Recover (Self : Driver);
    function Active_Handler (Self : Driver) return Value;
    procedure Invoke_Message_Handler (Self : Driver; Handler : Value);
@@ -1477,13 +1478,14 @@ package body Lua.Engine.Machine is
       end if;
    end Push_Frame;
 
-   procedure Complete (Self : Driver; Result : Values.Vector) is
+   procedure Complete_Packet
+     (Self : Driver; Result, Packet : Values.Vector);
+   procedure Complete_Packet
+     (Self : Driver; Result, Packet : Values.Vector) is
       State : World renames Self.Universe.all;
       Activation : Frame_Access := State.Current.Stack.Last_Element;
       Destination : constant Natural := Activation.Return_To;
       Policy : constant Completion_Policy := Activation.Completion;
-      Packet : constant Values.Vector :=
-        Wrap (State, Result, Activation.Protection);
    begin
       Pin (State, Result);
       Pin (State, Packet);
@@ -1507,8 +1509,8 @@ package body Lua.Engine.Machine is
          Hook_Event (Self, "return");
          return;
       end if;
-      --  Copy the outgoing packet before releasing its activation. No
-      --  collection occurs until the caller's destination owns it again.
+      --  Packet owns outgoing values independently of this activation. No
+      --  collection occurs until the caller's destination owns them again.
       --  The outermost chunk has no consumer and intentionally discards it.
       State.Current.Stack.Delete_Last;
       Release_Frame (State, Activation);
@@ -1522,6 +1524,29 @@ package body Lua.Engine.Machine is
          Copy_Roots
            (State, State.Current.Transfer.Results,
             Packet);
+      end if;
+   end Complete_Packet;
+
+   procedure Complete
+     (Self : Driver; Result : Values.Vector; Independent : Boolean := False)
+   is
+      State : World renames Self.Universe.all;
+      Protection : constant Natural :=
+        State.Current.Stack.Last_Element.Protection;
+   begin
+      if Independent and Protection = 0 then
+         --  A driver action owns its packet outside the retiring frame.
+         --  Borrow it through synchronous delivery instead of allocating an
+         --  identical wrapped packet. This permits collectgarbage to return
+         --  after finalizers were deferred by a genuinely refusing allocator.
+         Complete_Packet (Self, Result, Result);
+      else
+         declare
+            Packet : constant Values.Vector :=
+              Wrap (State, Result, Protection);
+         begin
+            Complete_Packet (Self, Result, Packet);
+         end;
       end if;
    end Complete;
 
@@ -2603,7 +2628,7 @@ package body Lua.Engine.Machine is
          return;
       end if;
       if Name = "base.collectgarbage" then
-         Action := Garbage_Collection.Advance (State, Activation);
+         Garbage_Collection.Advance (State, Activation, Action);
       elsif Name'Length > 3 and then Name (1 .. 3) = "io." then
          Action := IO_Libraries.Advance (State, Activation);
       elsif Name'Length > 3 and then Name (1 .. 3) = "os." then
@@ -2643,7 +2668,7 @@ package body Lua.Engine.Machine is
          --  scheduler step consumes its typed request before any results.
          return;
       elsif Action.Kind = Finished then
-         Complete (Self, Action.Results);
+         Complete (Self, Action.Results, Independent => True);
          return;
       elsif Action.Kind = Drain_Finalizers then
          --  The requesting library already saved its result/resume phase.

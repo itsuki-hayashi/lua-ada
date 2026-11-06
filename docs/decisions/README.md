@@ -1,6 +1,6 @@
 # Architecture Decision Log
 
-Latest: [ADR 0015: managed numeric scratch](0015-managed-numeric-scratch.md).
+Latest: [ADR 0016: collector inspection and storage equivalents](0016-gc-adapter-equivalents.md), pending independent conformance review.
 
 ADR 0007 records explicit native continuation frames, traced library/module
 state, shared budgets, and text loading. Its implementation passed M2b acceptance.
@@ -24,6 +24,7 @@ its runtime changes are planned, not implemented by the foundation gate.
 | 0013 | [C-owned calls and driver phases](0013-c-owned-call-boundary.md)       | accepted |
 | 0014 | [One Ada/C core image](0014-one-core-library.md)                       | accepted |
 | 0015 | [Managed exact numeric scratch](0015-managed-numeric-scratch.md)       | accepted |
+| 0016 | [Collector inspection and storage equivalents](0016-gc-adapter-equivalents.md) | review pending |
 
 ADR 0009 records the approved combined delivery order, iterative scheduler,
 stable cells, explicit cleanup, weak thread ownership and execution policies.

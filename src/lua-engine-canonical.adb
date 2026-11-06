@@ -945,13 +945,27 @@ package body Lua.Engine.Canonical is
                         (Integer_Kind, Integer_Value (Reg_C))
                       else Constant_At (State, Activation, Reg_C));
             if Op = Op_SELF then Put (Reg_A + 1, Left); end if;
-            declare
-               Arguments : Values.Vector := Owned_Values (State);
-            begin
-               Arguments.Append (Left);
-               Arguments.Append (Right);
-               Request ("@get", Arguments, Reg_A);
-            end;
+            Item := (if Left.Kind = Table_Kind then Get (Left, Right)
+                     else Nil_Value);
+            if Left.Kind = Table_Kind and then
+              (Item.Kind /= Nil_Kind or else
+               Tables.Raw_Field
+                 (Left.Reference.Metatable, "__index").Kind = Nil_Kind)
+            then
+               --  Plain lookup is allocation-free, as in the upstream VM.
+               --  In particular a host must be able to retrieve its existing
+               --  allocator-control callback while growth is refused. Only
+               --  actual delegation needs an owned continuation packet.
+               Put (Reg_A, Item);
+            else
+               declare
+                  Arguments : Values.Vector := Owned_Values (State);
+               begin
+                  Arguments.Append (Left);
+                  Arguments.Append (Right);
+                  Request ("@get", Arguments, Reg_A);
+               end;
+            end if;
          when Op_SETTABUP | Op_SETTABLE | Op_SETI | Op_SETFIELD =>
             Left := (if Op = Op_SETTABUP then
                        Upvalue_Cell (State, Activation, Reg_A).Cell_Value

@@ -10,15 +10,6 @@ package body Lua.Storage is
    --  Only this boundary interprets raw provider addresses. Everything above
    --  it deals in typed objects or owner-carrying buffers. The header is a
    --  trivially initialized record and contains no controlled Ada components.
-   type Header is record
-      Parent : Owner_Access;
-      Before, After : System.Address;
-      Raw : System.Address;
-      Raw_Size : Byte_Count;
-      User : System.Address;
-      Size : Byte_Count;
-      Alignment : Byte_Count;
-   end record;
    package Headers is new System.Address_To_Access_Conversions (Header);
    package Addresses is new
      System.Address_To_Access_Conversions (System.Address);

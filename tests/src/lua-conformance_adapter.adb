@@ -6,6 +6,7 @@ with Lua.Engine.Foreign;
 with Lua.Engine.Stacks;
 with Lua.Storage;
 with Lua.Runtime_Configuration;
+with Lua.Conformance_Memory;
 with System.Address_To_Access_Conversions;
 
 package body Lua.Conformance_Adapter is
@@ -17,6 +18,7 @@ package body Lua.Conformance_Adapter is
    use type Interfaces.Unsigned_8;
    use type C.size_t;
    use type Lua.Storage.Byte_Count;
+   use type Foreign.C_Function;
    procedure Free_Frame is new Ada.Unchecked_Deallocation
      (Frame, Frame_Access);
 
@@ -365,6 +367,84 @@ package body Lua.Conformance_Adapter is
                   Context.Stack_Error_Phase := Normal_Stack;
                end if;
             end;
+         when 12 =>
+            Verify_Collector_Lists (State);
+            Lua.Conformance_Memory.Verify (State);
+         when 13 =>
+            declare
+               Iterations : constant Integer_Value := Number (1);
+               Saved_Start : constant Positive := State.Operation_Start;
+               Item : Value;
+               Before, Cost, Limit, Refusals : Lua.Storage.Byte_Count;
+               Collections : Natural;
+               procedure Allocate_Table;
+               procedure Allocate_Table is
+               begin
+                  --  Model successive VM allocation operations without
+                  --  dropping the enclosing C callback's explicit roots.
+                  --  Earlier temporary tables are garbage, while the table
+                  --  being constructed is protected by the production
+                  --  operation serial boundary during an allocation retry.
+                  State.Operation_Start := State.Next_Object;
+                  Item := New_Table (State);
+                  if Item.Kind /= Table_Kind then raise Program_Error; end if;
+               end Allocate_Table;
+               procedure Reclaim;
+               procedure Reclaim is
+               begin
+                  State.Operation_Start := State.Next_Object;
+                  Collect (State, Emergency => True);
+               end Reclaim;
+            begin
+               if Iterations not in 2 .. 10_000 then
+                  raise Invalid_Argument;
+               end if;
+               --  Counterpart of gc.lua's C-layout-specific +200 allowance.
+               --  Prime one registry slot, then measure a real empty table
+               --  allocation on this build. Only that measured headroom is
+               --  permitted; every subsequent table requires actual recovery.
+               Allocate_Table;
+               Reclaim;
+               Before := Lua.Storage.Statistics (State.Memory).Raw_Bytes;
+               Allocate_Table;
+               Cost := Lua.Storage.Statistics (State.Memory).Raw_Bytes -
+                 Before;
+               if Cost = 0 then raise Program_Error; end if;
+               Reclaim;
+               Before := Lua.Storage.Statistics (State.Memory).Raw_Bytes;
+               if Before > Lua.Storage.Byte_Count'Last - Cost then
+                  raise Invalid_Argument;
+               end if;
+               Limit := Before + Cost;
+               Refusals := Lua.Storage.Statistics (State.Memory).Refusals;
+               Collections := State.Collections;
+               Lua.Storage.Set_Test_Ceiling (State.Memory, Limit);
+               for Index in 1 .. Iterations loop
+                  Allocate_Table;
+                  if Lua.Storage.Statistics (State.Memory).Raw_Bytes > Limit
+                  then
+                     raise Program_Error with "allocation ceiling bypassed";
+                  end if;
+               end loop;
+               Lua.Storage.Set_Test_Ceiling (State.Memory, 0);
+               Refusals :=
+                 Lua.Storage.Statistics (State.Memory).Refusals - Refusals;
+               Collections := State.Collections - Collections;
+               if Refusals = 0 or Collections = 0 then
+                  raise Program_Error with "emergency recovery not exercised";
+               end if;
+               Reclaim;
+               State.Operation_Start := Saved_Start;
+               Result.Count := 3;
+               Result.Integers :=
+                 [C.long_long (Refusals), C.long_long (Collections),
+                  C.long_long (Cost)];
+            exception
+               when others =>
+                  Lua.Storage.Set_Test_Ceiling (State.Memory, 0);
+                  State.Operation_Start := Saved_Start;
+                  raise;
+            end;
          when others => raise Invalid_Argument;
       end case;
    exception
@@ -407,6 +487,9 @@ package body Lua.Conformance_Adapter is
       Add ("resetCI", 9);
       Add ("reallocstack", 10);
       Add ("_installwarning", 11);
+      Add ("checkmemory", 12);
+      Add ("ada_emergency_tables", 13);
+      if Callback (14) /= null then Add ("nonblock", 14); end if;
       End_Operation (State);
    exception
       when others => End_Operation (State); raise;

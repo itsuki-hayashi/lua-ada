@@ -64,10 +64,10 @@ package body Lua.Engine.Garbage_Collection is
       return (if Reduced >= Half then Reduced - Modulus else Reduced);
    end To_C_Int;
 
-   function Advance
-     (State : in out World; Activation : Frame_Access) return Native_Action
+   procedure Advance
+     (State : in out World; Activation : Frame_Access;
+      Result : out Native_Action)
    is
-      Result : Native_Action := New_Action (State);
       Option : Option_Kind := Collect_Option;
       Parameter : Collector_Parameter := Pause_Ratio;
       Argument : Integer_Value := 0;
@@ -109,12 +109,13 @@ package body Lua.Engine.Garbage_Collection is
          Replace_Root (State, Activation.Native_Captures, 1, Item);
       end Save;
    begin
+      Result := New_Action (State);
       if Activation.Native_Stage = 1 then
          --  The scheduler has drained or deliberately deferred the real
          --  queue after its allocation/stack preflight. Its helper returns
          --  no values; the original control result stays in owned storage.
          Move_Roots (State, Result.Results, Activation.Native_Captures);
-         return Result;
+         return;
       end if;
       if Arg (1).Kind /= Nil_Kind then
          Strings.Query_Argument (State, Arg (1), Parse_Option'Access);
@@ -194,6 +195,5 @@ package body Lua.Engine.Garbage_Collection is
       else
          Move_Roots (State, Result.Results, Activation.Native_Captures);
       end if;
-      return Result;
    end Advance;
 end Lua.Engine.Garbage_Collection;
