@@ -299,7 +299,8 @@ package body Lua.String_Helper_Tests is
    end Binary_String_Formatting;
 
    procedure Empty_Match_Progression (State : in out World) is
-      Activation : Frame_Access := new Frame;
+      Activation : Frame_Access :=
+        New_Frame (State);
       Result : Native_Action;
    begin
       --  The native continuation emits each byte between empty matches once.
@@ -324,8 +325,9 @@ package body Lua.String_Helper_Tests is
    end Empty_Match_Progression;
 
    procedure Iterator_Persistence (State : in out World) is
-      Creation : Frame_Access := new Frame;
-      Invocation : Frame_Access := new Frame;
+      Creation : Frame_Access := New_Frame (State);
+      Invocation : Frame_Access :=
+        New_Frame (State);
       Created, Result : Native_Action;
    begin
       --  Each invocation has its own frame. Position state belongs to the
@@ -353,7 +355,8 @@ package body Lua.String_Helper_Tests is
    end Iterator_Persistence;
 
    procedure Formatting_Callback (State : in out World) is
-      Activation : Frame_Access := new Frame;
+      Activation : Frame_Access :=
+        New_Frame (State);
       Result : Native_Action;
    begin
       --  Formatting must suspend before %s, request ordinary tostring, and
@@ -381,7 +384,8 @@ package body Lua.String_Helper_Tests is
    end Formatting_Callback;
 
    procedure Replacement_Roots (State : in out World) is
-      Activation : Frame_Access := new Frame;
+      Activation : Frame_Access :=
+        New_Frame (State);
       Result : Native_Action;
    begin
       --  A Lua replacement can trigger collection before returning. Keep the
@@ -434,8 +438,9 @@ package body Lua.String_Helper_Tests is
    end Quoting_Budget;
 
    procedure Iterator_Copy_Budget (State : in out World) is
-      Creation : Frame_Access := new Frame;
-      Invocation : Frame_Access := new Frame;
+      Creation : Frame_Access := New_Frame (State);
+      Invocation : Frame_Access :=
+        New_Frame (State);
       Created, Result : Native_Action;
    begin
       --  Each resumed iterator copies the retained subject before matching.
@@ -472,7 +477,8 @@ package body Lua.String_Helper_Tests is
    end Iterator_Copy_Budget;
 
    procedure Replacement_Copy_Budget (State : in out World) is
-      Activation : Frame_Access := new Frame;
+      Activation : Frame_Access :=
+        New_Frame (State);
       Result : Native_Action;
    begin
       --  A replacement step also obtains a whole-subject view. Account for

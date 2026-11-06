@@ -98,7 +98,8 @@ package body Lua.Context_Tests is
 
    procedure Inactive_Frame_Root (State : in out World) is
       Other : constant Context_Id := Create_Context (State);
-      Activation : Frame_Access := new Frame;
+      Activation : Frame_Access :=
+        New_Frame (State);
       Item : constant Value := New_String (State, "capture");
    begin
       --  Pending native callbacks retain captures even on an inactive stack.
@@ -153,7 +154,8 @@ package body Lua.Context_Tests is
    begin
       --  Finalize owns every inactive activation too. Calling it again must
       --  tolerate the empty registry and null borrowed selector.
-      State.Contexts (Positive (Other)).Stack.Append (new Frame);
+      State.Contexts (Positive (Other)).Stack.Append
+        (New_Frame (State));
       Finalize (State);
       Finalize (State);
       Assert (State.Contexts.Is_Empty and then State.Current = null,

@@ -5,6 +5,7 @@ with Interfaces;
 with Lua.Engine.Strings;
 
 package body Lua.Engine.Formats is
+   package Managed renames Lua.Storage.Buffers;
    use type Integer_Value;
    use type Real_Value;
    use type Interfaces.Unsigned_64;
@@ -306,10 +307,10 @@ package body Lua.Engine.Formats is
       return To_String (Result);
    end Hex_Float;
 
-   function Render
+   procedure Render_Into
      (State : in out World; Specification : String; Item : Value;
+      Output : in out Managed.Buffer;
       Host : String := Lua_Ada_Config.Alire_Host_OS)
-      return String
    is
       Form : constant String (1 .. Specification'Length) := Specification;
       Cursor : Positive := 2;
@@ -318,7 +319,7 @@ package body Lua.Engine.Formats is
       Precision : Integer := -1;
       Precision_Digits : Natural := 0;
       Code : Character;
-      Text, Prefix : Unbounded_String;
+      Text, Prefix : Managed.Buffer;
       Number : Integer_Value;
       Real : Real_Value;
       Value : Lua.Numbers.Number;
@@ -327,6 +328,9 @@ package body Lua.Engine.Formats is
       Numeric : Boolean := False;
       use type Lua.Numbers.Number_Kind;
    begin
+      Text.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Prefix.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Output.Set_Owner (Lua.Storage.Reference (State.Memory));
       if Form'Length < 2 or else Form (1) /= '%' then
          Fail (State, "invalid conversion specification");
       elsif Form'Length >= 23 then
@@ -392,30 +396,30 @@ package body Lua.Engine.Formats is
             Numeric := True;
             Number := Strings.Integer_Argument (State, Item);
             if Code in 'd' | 'i' then
-               Text := To_Unbounded_String (Trim (Number'Image));
+               Text.Set_Value (Trim (Number'Image));
                if Number < 0 then
-                  Delete (Text, 1, 1);
+                  Text.Delete (1, 1);
                   Negative := True;
                end if;
             else
-               Text := To_Unbounded_String (Unsigned_Image
+               Text.Set_Value (Unsigned_Image
                  (Unsigned_Bits (Number),
                   (if Code = 'o' then 8 elsif Code = 'u' then 10 else 16)));
             end if;
             if Precision = 0 and then Number = 0 then
-               Text := Null_Unbounded_String;
+               Text.Clear;
             end if;
             while Length (Text) < Precision loop
                Work (State);
-               Insert (Text, 1, "0");
+               Text.Insert (1, "0");
             end loop;
             if Alternate and then Code = 'o' and then
-              (Length (Text) = 0 or else Element (Text, 1) /= '0')
+              (Length (Text) = 0 or else Text.Element (1) /= '0')
             then
-               Insert (Text, 1, "0");
+               Text.Insert (1, "0");
             elsif Alternate and then Number /= 0 and then Code in 'x' | 'X'
             then
-               Prefix := To_Unbounded_String ("0x");
+               Prefix.Set_Value ("0x");
             end if;
             if Code in 'u' | 'o' | 'x' | 'X' then
                Plus := False;
@@ -444,34 +448,41 @@ package body Lua.Engine.Formats is
             end if;
             Negative := (Bits (Real) and 2 ** 63) /= 0;
             if Real /= Real or else abs Real > Real_Value'Last then
-               Text := To_Unbounded_String
-                 ((if Real /= Real then "nan" else "inf"));
+               Text.Set_Value ((if Real /= Real then "nan" else "inf"));
                if Real /= Real and then Unsigned_NaN (Host) then
                   Negative := False;
                end if;
                Zero := False;
             elsif Code in 'a' | 'A' then
-               Text := To_Unbounded_String
-                 (Hex_Float (Real, Precision, Alternate, Host));
+               Text.Set_Value (Hex_Float (Real, Precision, Alternate, Host));
             else
-               Text := To_Unbounded_String
-                 (Float_Image (Real, Code, Precision, Alternate));
+               Text.Set_Value (Float_Image (Real, Code, Precision, Alternate));
             end if;
          when 's' =>
             if Item.Kind = String_Kind then
                Work (State, Length (Item.Reference.Bytes));
             end if;
-            Text := To_Unbounded_String (Image (Item));
+            if Item.Kind = String_Kind then
+               declare
+                  Source : constant String
+                    (1 .. Length (Item.Reference.Bytes))
+                    with Import, Address => Item.Reference.Bytes.Address;
+               begin
+                  Text.Set_Value (Source);
+               end;
+            else
+               Text.Set_Value (Image (Item));
+            end if;
             if Form /= "%s" then
-               for Byte of To_String (Text) loop
+               for Index in 1 .. Text.Length loop
                   Work (State);
-                  if Byte = Character'Val (0) then
+                  if Text.Element (Index) = Character'Val (0) then
                      Fail (State, "string contains zeros");
                   end if;
                end loop;
             end if;
             if Precision >= 0 and then Length (Text) > Precision then
-               Delete (Text, Precision + 1, Length (Text));
+               Text.Delete (Precision + 1, Length (Text));
             end if;
             Zero := False;
          when 'c' =>
@@ -479,37 +490,39 @@ package body Lua.Engine.Formats is
                Fail (State, "invalid conversion specification");
             end if;
             Number := Strings.Integer_Argument (State, Item);
-            Text := To_Unbounded_String
-              (String'(1 => Character'Val (Number mod 256)));
+            Text.Set_Value (String'(1 => Character'Val (Number mod 256)));
             Zero := False;
          when 'q' =>
             if Form /= "%q" then
                Fail (State, "specifier '%q' cannot have modifiers");
             end if;
             if Item.Kind = String_Kind then
-               --  Quote conversion first copies and then inspects every
-               --  source byte. Account for both phases, including bytes that
-               --  need no escaping, before a native call can return to Lua.
+               --  Borrow source bytes and emit escapes into managed storage.
+               --  Retain the existing source/assembly work charge even though
+               --  the old full-source Ada String snapshot is now unnecessary.
                Work (State, Length (Item.Reference.Bytes));
                Append (Text, '"');
                declare
-                  Source : constant String := To_String (Item.Reference.Bytes);
+                  Source : constant Byte_String := Item.Reference.Bytes;
                begin
-                  for Index in Source'Range loop
+                  for Index in 1 .. Length (Source) loop
                      Work (State);
-                     if Source (Index) in '"' | '\' | Character'Val (10) then
+                     if Element (Source, Index) in
+                       '"' | '\' | Character'Val (10)
+                     then
                         Append (Text, '\');
-                        Append (Text, Source (Index));
-                     elsif Character'Pos (Source (Index)) < 32 or else
-                       Character'Pos (Source (Index)) = 127
+                        Append (Text, Element (Source, Index));
+                     elsif Character'Pos (Element (Source, Index)) < 32 or else
+                       Character'Pos (Element (Source, Index)) = 127
                      then
                         declare
                            Decimal : constant String := Trim
-                             (Natural'Image (Character'Pos (Source (Index))));
+                             (Natural'Image (Character'Pos
+                                (Element (Source, Index))));
                         begin
                            Append (Text, '\');
-                           if Index < Source'Last and then
-                             Source (Index + 1) in '0' .. '9'
+                           if Index < Length (Source) and then
+                             Element (Source, Index + 1) in '0' .. '9'
                            then
                               for Pad in Decimal'Length + 1 .. 3 loop
                                  Work (State);
@@ -519,7 +532,7 @@ package body Lua.Engine.Formats is
                            Append (Text, Decimal);
                         end;
                      else
-                        Append (Text, Source (Index));
+                        Append (Text, Element (Source, Index));
                      end if;
                   end loop;
                end;
@@ -527,21 +540,21 @@ package body Lua.Engine.Formats is
             elsif Item.Kind = Real_Kind then
                Real := Item.Real_Data;
                if Real /= Real then
-                  Text := To_Unbounded_String ("(0/0)");
+                  Text.Set_Value ("(0/0)");
                elsif abs Real > Real_Value'Last then
-                  Text := To_Unbounded_String
+                  Text.Set_Value
                     ((if Real < 0.0 then "-1e9999" else "1e9999"));
                else
-                  Text := To_Unbounded_String
+                  Text.Set_Value
                     ((if (Bits (Real) and 2 ** 63) /= 0 then "-" else "") &
                      Hex_Float (Real, -1, False, Host));
                end if;
             elsif Item.Kind = Integer_Kind and then
               Item.Integer_Data = Integer_Value'First
             then
-               Text := To_Unbounded_String ("0x8000000000000000");
+               Text.Set_Value ("0x8000000000000000");
             elsif Item.Kind in Integer_Kind | Nil_Kind | Boolean_Kind then
-               Text := To_Unbounded_String (Image (Item));
+               Text.Set_Value (Image (Item));
             else
                Fail (State, "value has no literal form");
             end if;
@@ -549,10 +562,10 @@ package body Lua.Engine.Formats is
             if Item.Kind in String_Kind | Table_Kind | Closure_Kind |
               Native_Closure_Kind
             then
-               Text := To_Unbounded_String ("0x" & Unsigned_Image
+               Text.Set_Value ("0x" & Unsigned_Image
                  (Interfaces.Unsigned_64 (Item.Reference.Serial), 16));
             else
-               Text := To_Unbounded_String ("(null)");
+               Text.Set_Value ("(null)");
             end if;
             Zero := False;
          when others => Fail (State, "invalid conversion specification");
@@ -560,23 +573,22 @@ package body Lua.Engine.Formats is
       if Code in 'A' | 'E' | 'F' | 'G' | 'X' then
          for Index in 1 .. Length (Text) loop
             Work (State);
-            if Element (Text, Index) in 'a' .. 'z' then
-               Replace_Element (Text, Index, Character'Val
-                 (Character'Pos (Element (Text, Index)) - 32));
+            if Text.Element (Index) in 'a' .. 'z' then
+               Text.Replace_Element (Index, Character'Val
+                 (Character'Pos (Text.Element (Index)) - 32));
             end if;
          end loop;
          if Code = 'X' then
-            Prefix := To_Unbounded_String
-              ((if Length (Prefix) > 0 then "0X" else ""));
+            Prefix.Set_Value ((if Length (Prefix) > 0 then "0X" else ""));
          end if;
       end if;
       if Numeric then
          if Negative then
-            Insert (Prefix, 1, "-");
+            Prefix.Insert (1, "-");
          elsif Plus then
-            Insert (Prefix, 1, "+");
+            Prefix.Insert (1, "+");
          elsif Space then
-            Insert (Prefix, 1, " ");
+            Prefix.Insert (1, " ");
          end if;
       end if;
       Padding := (if Width > Length (Text) + Length (Prefix) then
@@ -586,73 +598,120 @@ package body Lua.Engine.Formats is
       Work (State, Padding);
       Work (State, Length (Text));
       Work (State, Length (Prefix));
-      if Left then
-         return To_String (Prefix) & To_String (Text) &
-           String'(1 .. Padding => ' ');
-      elsif Zero then
-         return To_String (Prefix) & String'(1 .. Padding => '0') &
-           To_String (Text);
-      else
-         return String'(1 .. Padding => ' ') & To_String (Prefix) &
-           To_String (Text);
-      end if;
+      declare
+         Remaining : Natural := State.Bounds.String_Bytes;
+         procedure Charge_Size (Count : Natural);
+         procedure Charge_Size (Count : Natural) is
+         begin
+            if Count > Remaining then
+               Fail (State, "string byte limit exceeded", Resource => True);
+            end if;
+            Remaining := Remaining - Count;
+         end Charge_Size;
+      begin
+         --  Validate combined size before growing the retained output. Borrow
+         --  each managed part only while copying it into its final position;
+         --  no input-sized Ada String or concatenation temporary is created.
+         Charge_Size (Output.Length);
+         Charge_Size (Text.Length);
+         Charge_Size (Prefix.Length);
+         Charge_Size (Padding);
+         Output.Reserve_Capacity
+           (State.Bounds.String_Bytes - Remaining);
+         if Left then
+            Output.Append (Prefix);
+            Output.Append (Text);
+            for Index in 1 .. Padding loop
+               Output.Append (' ');
+            end loop;
+         elsif Zero then
+            Output.Append (Prefix);
+            for Index in 1 .. Padding loop
+               Output.Append ('0');
+            end loop;
+            Output.Append (Text);
+         else
+            for Index in 1 .. Padding loop
+               Output.Append (' ');
+            end loop;
+            Output.Append (Prefix);
+            Output.Append (Text);
+         end if;
+      end;
+   end Render_Into;
+
+   function Render
+     (State : in out World; Specification : String; Item : Value;
+      Host : String := Lua_Ada_Config.Alire_Host_OS) return String
+   is
+      Output : Managed.Buffer;
+   begin
+      --  Compatibility wrapper for Ada-side inspection/tests. Runtime format
+      --  continuations call Render_Into to keep their complete output managed.
+      Render_Into (State, Specification, Item, Output, Host);
+      return To_String (Output);
    end Render;
 
    function Run
      (State : in out World; Arguments : Values.Vector) return Values.Vector
    is
       Result : Values.Vector;
-      Output : Unbounded_String;
+      Output : Managed.Buffer;
       Cursor : Positive := 1;
       First : Positive;
       Argument : Positive := 1;
    begin
+      Output.Set_Owner (Lua.Storage.Reference (State.Memory));
       if Arguments.Is_Empty then
          Fail (State, "string expected");
       end if;
       declare
-         Form : constant String := Strings.String_Argument
-           (State, Arguments (1));
-      begin
-         while Cursor <= Form'Last loop
-            if State.Steps >= State.Bounds.Instructions then
-               Fail (State, "instruction limit exceeded", Resource => True);
-            end if;
-            if State.Policy = Bounded then
-               State.Steps := State.Steps + 1;
-            end if;
-            if Form (Cursor) /= '%' then
-               Append (Output, Form (Cursor));
-               Cursor := Cursor + 1;
-            elsif Cursor < Form'Last and then Form (Cursor + 1) = '%' then
-               Append (Output, '%');
-               Cursor := Cursor + 2;
-            else
-               First := Cursor;
-               Cursor := Cursor + 1;
-               while Cursor <= Form'Last and then
-                 Form (Cursor) in '-' | '+' | ' ' | '#' | '0' .. '9' | '.'
-               loop
-                  Work (State);
+         procedure Apply_Format (Form : String);
+         procedure Apply_Format (Form : String) is
+         begin
+            while Cursor <= Form'Last loop
+               if State.Steps >= State.Bounds.Instructions then
+                  Fail (State, "instruction limit exceeded", Resource => True);
+               end if;
+               if State.Policy = Bounded then
+                  State.Steps := State.Steps + 1;
+               end if;
+               if Form (Cursor) /= '%' then
+                  Append (Output, Form (Cursor));
                   Cursor := Cursor + 1;
-               end loop;
-               if Cursor > Form'Last then
-                  Fail (State, "invalid conversion specification");
+               elsif Cursor < Form'Last and then Form (Cursor + 1) = '%' then
+                  Append (Output, '%');
+                  Cursor := Cursor + 2;
+               else
+                  First := Cursor;
+                  Cursor := Cursor + 1;
+                  while Cursor <= Form'Last and then
+                    Form (Cursor) in '-' | '+' | ' ' | '#' | '0' .. '9' | '.'
+                  loop
+                     Work (State);
+                     Cursor := Cursor + 1;
+                  end loop;
+                  if Cursor > Form'Last then
+                     Fail (State, "invalid conversion specification");
+                  end if;
+                  Argument := Argument + 1;
+                  if Argument > Natural (Arguments.Length) then
+                     Fail (State, "no value");
+                  end if;
+                  Render_Into
+                    (State, Form (First .. Cursor),
+                     Arguments (Argument), Output);
+                  Cursor := Cursor + 1;
                end if;
-               Argument := Argument + 1;
-               if Argument > Natural (Arguments.Length) then
-                  Fail (State, "no value");
+               if Length (Output) > State.Bounds.String_Bytes then
+                  Fail (State, "string byte limit exceeded", Resource => True);
                end if;
-               Append (Output, Render
-                 (State, Form (First .. Cursor), Arguments (Argument)));
-               Cursor := Cursor + 1;
-            end if;
-            if Length (Output) > State.Bounds.String_Bytes then
-               Fail (State, "string byte limit exceeded", Resource => True);
-            end if;
-         end loop;
+            end loop;
+         end Apply_Format;
+      begin
+         Strings.Query_Argument (State, Arguments (1), Apply_Format'Access);
       end;
-      Result.Append (New_String (State, To_String (Output)));
+      Result.Append (New_String (State, Output));
       return Result;
    end Run;
 end Lua.Engine.Formats;

@@ -150,6 +150,57 @@ C tests must cover header/record layout, symbols, callbacks, allocator failures,
 protected errors/yields, nested reentry, extra space, lifetime, loading modules,
 and C-only host initialization. Validate static/shared linkage independently.
 
+## Mathematics and seeded RNG
+
+The complete local validation/static pipeline builds the owning library, CLI
+and AUnit consumers, then discovers mathematics_campaign.lua alongside the
+other first-party differential fixtures:
+
+```text
+pwsh -NoProfile -File scripts/check.ps1 -Profile validation -LibraryType static
+```
+
+Lua.Mathematics_Tests registers 38 separately named cases. They cover host IEEE
+domains and signed zero, subnormal frexp decomposition, ldexp's C exponent cast,
+numeric-string arguments, pinned integer/float streams, rejection consumption,
+invalid-call advancement, independent states, 32/64-bit arithmetic equivalence
+and budget-preserving initialization/retries. Setup and expected-error helpers
+must execute the tested call inside its handled sequence; declaration-time
+failure must not accidentally become an unexpected AUnit exception.
+
+The differential fixture uses explicit pairs (0,0), (17,-9),
+(maxinteger,mininteger) and (-1,-1). It encodes binary64 values as bytes, retaining
+signed zero and host NaN bits. For C frexp's unspecified infinity/NaN exponent,
+only the fraction result is compared; all finite decomposition outputs remain
+in scope. Failure messages are compared by controlled outcome rather than
+source-path-dependent wording.
+
+The same fixture executes against the isolated instrumented C oracle, where
+the compatibility-only math names add one output line. Its current 714/715
+default/instrumented C lines and empty stderr are fixture-validation evidence,
+not Ada parity or an unchanged math.lua pass. Actual instrumented Ada comparisons
+require their separate configured runtime and completed conformance launcher;
+do not substitute a default binary or enable names only inside a test script.
+
+The [host mathematics decision](decisions/0011-host-mathematics.md) records the
+standard-Ada alternative, narrow libm imports and ownership boundary. Final
+acceptance still requires each target OS/profile/link configuration and the full
+M3 coverage contract. Optional proof/fuzz tools are not prerequisites here.
+
+## Canonical compiler and codec checks
+
+Standalone canonical prototype/chunk checks use the nested Lua.Chunk_Tests
+suite and scripts/check-chunk-codec.ps1. The [codec guide](binary-chunks.md)
+owns the native-profile commands and byte-exact/C-crossload evidence boundary.
+These checks do not execute canonical instructions in Ada or replace unchanged
+upstream runtime acceptance.
+
+Lua.Canonical_Compiler_Tests and scripts/check-canonical-compiler.ps1 separately
+cover canonical lowering. The latter executes both C-generated and Ada-generated
+programs in isolated C processes, so it must not be reported as Ada VM execution.
+[Runtime configurations](runtime-configurations.md) documents source selection,
+artifact separation and the distinct parser/math configuration witness.
+
 ## Optional fuzzing
 
 GNATfuzz is an AdaCore Pro tool with Linux/AFL environment requirements. It is

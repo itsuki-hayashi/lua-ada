@@ -29,7 +29,9 @@ function Invoke-ConformanceProcess {
     $start.RedirectStandardError = $true
     foreach ($name in @('LUA_INIT', 'LUA_INIT_5_5', 'LUA_PATH', 'LUA_PATH_5_5',
                          'LUA_CPATH', 'LUA_CPATH_5_5', 'LUA_READLINELIB', 'MEMLIMIT',
-                         'LUA_ADA_CONFORMANCE_ALLOCATOR')) {
+                         'LUA_ADA_CONFORMANCE_ALLOCATOR',
+                         'LUA_ADA_CONFORMANCE_TELEMETRY',
+                         'LUA_ADA_CONFORMANCE_RUN_ID')) {
         [void]$start.Environment.Remove($name)
     }
     foreach ($entry in $Environment.GetEnumerator()) {
@@ -47,6 +49,7 @@ function Invoke-ConformanceProcess {
     try {
         [void]$process.Start()
         $started = $true
+        $processId = $process.Id
         $process.StandardInput.Close()
         $outTask = $process.StandardOutput.BaseStream.CopyToAsync($outFile)
         $errTask = $process.StandardError.BaseStream.CopyToAsync($errFile)
@@ -102,6 +105,7 @@ function Invoke-ConformanceProcess {
                 else { $null }
     return [ordered]@{
         executable = $Executable
+        process_id = $processId
         executable_sha256 = (Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant()
         arguments = @($Arguments)
         working_directory = $Directory
@@ -167,6 +171,198 @@ function Get-ConformanceOutcome {
     }
 }
 
+function Test-ConformanceConfiguration {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][System.Collections.IDictionary] $Observed,
+          [Parameter(Mandatory)][ValidateSet('default', 'upstream-test')][string] $Configuration,
+          [Parameter(Mandatory)][ValidateSet('ReferenceC', 'Ada')][string] $Target,
+          [Parameter(Mandatory)][long] $AllocatorLimitBytes)
+    # Verify measured configuration before executing fixtures. In particular,
+    # a renamed C oracle cannot certify the Ada implementation or its ABI.
+    $required = @('schema_version', 'configuration', 'lua_release', 'integer_bytes',
+        'number_bytes', 'pointer_bytes', 'extra_space_bytes', 'expected_extra_space_bytes',
+        'allocator_limit_bytes', 'max_stack', 'max_c_calls', 'aux_buffer_bytes',
+        'compat_global', 'rand32', 'compat_math', 'allocator_accounting')
+    foreach ($field in $required) {
+        if (-not $Observed.Contains($field)) { throw "Configuration field missing: $field" }
+    }
+    foreach ($field in @('schema_version','integer_bytes','number_bytes','pointer_bytes',
+        'extra_space_bytes','expected_extra_space_bytes','allocator_limit_bytes',
+        'max_stack','max_c_calls','aux_buffer_bytes','compat_global')) {
+        if ($Observed[$field] -isnot [int] -and $Observed[$field] -isnot [long] -and
+            $Observed[$field] -isnot [ulong]) { throw "Nonintegral configuration field: $field" }
+    }
+    if ($Observed.rand32 -isnot [bool] -or $Observed.compat_math -isnot [bool] -or
+        $Observed.extra_space_bytes -le 0) { throw 'Invalid boolean/extra-space configuration field' }
+    if ($Observed.schema_version -ne 1 -or $Observed.configuration -cne $Configuration -or
+        $Observed.lua_release -cne 'Lua 5.5.1' -or
+        $Observed.integer_bytes -ne 8 -or $Observed.number_bytes -ne 8 -or
+        $Observed.pointer_bytes -ne [IntPtr]::Size -or
+        $Observed.extra_space_bytes -ne $Observed.expected_extra_space_bytes -or
+        $Observed.allocator_limit_bytes -ne $AllocatorLimitBytes -or
+        [string]::IsNullOrWhiteSpace($Observed.allocator_accounting)) {
+        throw 'Observed configuration does not match the requested numeric/allocator baseline'
+    }
+    $expected = if ($Configuration -eq 'default') {
+        @{ compat_global=1; max_stack=1000000; max_c_calls=200;
+           extra_space_bytes=[IntPtr]::Size; aux_buffer_bytes=16 * [IntPtr]::Size * 8;
+           rand32=$false; compat_math=$false }
+    } else {
+        @{ compat_global=0; max_stack=68000; max_c_calls=180;
+           aux_buffer_bytes=23; rand32=$true; compat_math=$true }
+    }
+    foreach ($field in $expected.Keys) {
+        if ($Observed[$field] -cne $expected[$field]) {
+            throw "Configuration drift: $Configuration/$field"
+        }
+    }
+    if ($Target -eq 'Ada' -and
+        (-not $Observed.Contains('implementation') -or
+         $Observed.implementation -cne 'Lua Ada' -or
+         -not $Observed.Contains('test_adapter') -or
+         $Observed.test_adapter -isnot [bool] -or
+         $Observed.test_adapter -cne ($Configuration -eq 'upstream-test'))) {
+        throw 'Ada configuration probe does not identify the actual runtime/test adapter'
+    }
+    return $true
+}
+
+function Test-ConformanceAcceptance {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][System.Collections.IDictionary] $Process,
+          [Parameter(Mandatory)][System.Collections.IDictionary] $Outcome,
+          [Parameter(Mandatory)][System.Collections.IDictionary] $Contract,
+          [Parameter(Mandatory)][string] $Operation,
+          [Parameter(Mandatory)][string] $Context,
+          [Parameter(Mandatory)][object[]] $SourceRecords,
+          [Parameter(Mandatory)][string] $RunId,
+          [Parameter(Mandatory)][string] $Configuration,
+          [Parameter(Mandatory)][long] $AllocatorLimitBytes,
+          [bool] $CoverageComplete = $false,
+          [System.Collections.IDictionary] $CoverageRecords = @{},
+          [System.Collections.IDictionary] $Telemetry)
+    # A process observation deliberately carries no coverage authority. This
+    # second, explicit gate requires the reviewed execution protocol AND the
+    # complete source/API ledger. Callers cannot promote an OK marker alone.
+    if (-not $CoverageComplete) { throw 'Complete reviewed coverage is required for acceptance' }
+    foreach ($field in @('schema_version','operation','context','reference_revision',
+                          'source_hashes','review','completion_marker','stdout_required',
+                          'stderr_expected','expected_skips')) {
+        if (-not $Contract.Contains($field)) { throw "Execution contract field missing: $field" }
+    }
+    if ($Contract.schema_version -ne 1 -or $Contract.operation -cne $Operation -or
+        $Contract.context -cne $Context -or
+        $Contract.reference_revision -cne '7579fc9d7ed90240487251dfb69168f8e64e9294') {
+        throw 'Execution contract identifies a different operation/context/reference'
+    }
+    $review = $Contract.review
+    foreach ($field in @('author','reviewer','artifact','rationale','original_c_evidence')) {
+        if ($null -eq $review -or -not $review.Contains($field) -or
+            [string]::IsNullOrWhiteSpace([string]$review[$field])) {
+            throw "Execution contract lacks independent review: $field"
+        }
+    }
+    if ($review.author -ceq $review.reviewer) { throw 'Execution contract author cannot be its reviewer' }
+    $hashes = $Contract.source_hashes
+    if ($null -eq $hashes -or $hashes.Count -eq 0) { throw 'Execution contract lacks source hashes' }
+    foreach ($entry in $hashes.GetEnumerator()) {
+        $matching = @($SourceRecords | Where-Object { $_.path -ceq $entry.Key })
+        if ($matching.Count -ne 1 -or $matching[0].sha256 -cne $entry.Value) {
+            throw "Execution contract source differs: $($entry.Key)"
+        }
+    }
+    $requiredFile = switch ($Operation) {
+        'aggregate' { 'all.lua' } 'heavy' { 'heavy.lua' }
+        { $_.StartsWith('file:') } { $_.Substring(5) }
+        default { throw 'Smoke observations cannot establish M3 acceptance' }
+    }
+    if (-not $hashes.Contains($requiredFile)) { throw 'Execution contract omits its primary source' }
+    if ($Operation -eq 'aggregate' -and @($hashes.Keys | Where-Object { $_ -like '*.lua' }).Count -ne 34) {
+        throw 'Aggregate contract must identify all 34 original Lua sources'
+    }
+    if (-not $Outcome.execution_completed) { throw "Execution did not complete: $($Outcome.status)" }
+    $stdout = [IO.File]::ReadAllText($Process.stdout_path)
+    $stderr = [IO.File]::ReadAllText($Process.stderr_path)
+    $marker = [string]$Contract.completion_marker
+    if ($marker -ne '' -and -not [regex]::IsMatch($stdout,
+        '(?m)^' + [regex]::Escape($marker) + '\r?$')) { throw 'Reviewed completion marker missing' }
+    if ($marker -eq '' -and @($Contract.stdout_required).Count -eq 0) {
+        throw 'A reviewed semantic completion witness is required'
+    }
+    foreach ($expectation in @($Contract.stdout_required)) {
+        if ($expectation.count -lt 1 -or [string]::IsNullOrWhiteSpace($expectation.pattern) -or
+            [regex]::Matches($stdout, $expectation.pattern).Count -ne $expectation.count) {
+            throw 'Reviewed stdout semantic witness differs'
+        }
+    }
+    # Every stderr line must belong to a counted expected warning/progress
+    # pattern. Aggregate runs intentionally print warnings, but unconstrained
+    # stderr would also hide allocator aborts and missing-feature diagnostics.
+    foreach ($expectation in @($Contract.stderr_expected)) {
+        if ($expectation.count -lt 1 -or -not $expectation.pattern.StartsWith('^') -or
+            -not $expectation.pattern.EndsWith('$') -or
+            [regex]::Matches($stderr, '(?m)' + $expectation.pattern).Count -ne $expectation.count) {
+            throw 'Reviewed stderr warning/progress count differs'
+        }
+    }
+    foreach ($line in ($stderr -split '\r\n|\n|\r' | Where-Object { $_ -ne '' })) {
+        if (@($Contract.stderr_expected | Where-Object {
+            [regex]::IsMatch($line, $_.pattern)
+        }).Count -eq 0) { throw "Unexpected stderr: $line" }
+    }
+    $expectedSkips = @($Contract.expected_skips)
+    $actualSkips = @($Outcome.skip_messages)
+    if ($expectedSkips.Count -ne $actualSkips.Count) { throw 'Unreviewed or missing omission message' }
+    foreach ($skip in $expectedSkips) {
+        $expectedCount = @($expectedSkips | Where-Object { $_.message -ceq $skip.message }).Count
+        if (@($actualSkips | Where-Object { $_ -ceq $skip.message }).Count -ne $expectedCount -or
+            @($skip.coverage_ids).Count -eq 0 -or
+            [string]::IsNullOrWhiteSpace($skip.review_artifact) -or
+            [string]::IsNullOrWhiteSpace($skip.original_c_evidence)) {
+            throw 'Omission message lacks exact independently reviewed coverage disposition'
+        }
+        foreach ($id in $skip.coverage_ids) {
+            # Link omissions to genuine resolved runtime obligations, never to
+            # a reviewed guard/template or an arbitrary nonempty identifier.
+            if (-not $CoverageRecords.Contains($id)) {
+                throw "Omission names an unknown coverage obligation: $id"
+            }
+            $record = $CoverageRecords[$id]
+            if ($record.status -cne 'passed' -or
+                $record.kind -notin @('assert-call','reviewed-block') -or
+                @($record.evidence | Where-Object { $_.result -ceq 'passed' }).Count -eq 0) {
+                throw "Omission lacks executed runtime coverage: $id"
+            }
+        }
+    }
+    # Only the process owning this report can certify its allocator events.
+    # Child interpreters use distinct PID sidecars, so their refusals cannot
+    # accidentally make the parent heavy.lua run appear to have caught one.
+    if ($null -eq $Telemetry) { throw 'Managed-allocation telemetry is missing' }
+    foreach ($field in @('schema_version','process_id','allocator_limit_bytes',
+        'managed_refusals','outstanding_bytes','outstanding_blocks')) {
+        if (-not $Telemetry.Contains($field) -or
+            ($Telemetry[$field] -isnot [int] -and $Telemetry[$field] -isnot [long] -and
+             $Telemetry[$field] -isnot [ulong]) -or $Telemetry[$field] -lt 0) {
+            throw "Invalid managed-allocation telemetry field: $field"
+        }
+    }
+    if ($Telemetry.schema_version -ne 1 -or
+        $Telemetry.run_id -cne $RunId -or $Telemetry.process_id -ne $Process.process_id -or
+        $Telemetry.configuration -cne $Configuration -or
+        $Telemetry.allocator_limit_bytes -ne $AllocatorLimitBytes -or
+        $Telemetry.outstanding_bytes -ne 0 -or $Telemetry.outstanding_blocks -ne 0) {
+        throw 'Missing, mismatched or unbalanced managed-allocation telemetry'
+    }
+    if ($Operation -eq 'heavy' -and
+        ($Telemetry.managed_refusals -lt 1 -or
+         -not [regex]::IsMatch($stdout, '(?im)^expected error:\s+.*not enough memory'))) {
+        throw 'heavy.lua did not demonstrate caught managed-allocation refusal'
+    }
+    return [ordered]@{ gate_acceptance=$true; operation=$Operation; context=$Context;
+        review_artifact=$review.artifact; allocator_telemetry_verified=$true }
+}
+
 function Copy-ConformanceFixtures {
     [CmdletBinding()]
     param([Parameter(Mandatory)][string] $Source,
@@ -205,4 +401,5 @@ function Test-ConformanceFixtureHashes {
 }
 
 Export-ModuleMember -Function Invoke-ConformanceProcess, Get-ConformanceOutcome,
-    Copy-ConformanceFixtures, Test-ConformanceFixtureHashes
+    Copy-ConformanceFixtures, Test-ConformanceFixtureHashes,
+    Test-ConformanceConfiguration, Test-ConformanceAcceptance

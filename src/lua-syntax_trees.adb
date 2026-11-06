@@ -2,13 +2,50 @@ with Lua.Lexers; use Lua.Lexers;
 
 package body Lua.Syntax_Trees is
    use type Lua.Syntax.Check_Status;
+   use type Lua.Storage.Owner_Access;
+
+   --  Library-level instantiation is required by the shared subpool. Local
+   --  access types could not allocate safely into a longer-lived owner.
+   type Jump_Record is record
+      Item : Node_Id;
+      Block : Natural;
+      Owner : Node_Id;
+      Active : Symbol_Lists.Vector;
+      Solved : Boolean := False;
+   end record;
+   package Jumps is new Lua.Storage.Vectors (Jump_Record);
+
+   function Text (Unit : Compilation_Unit; Item : Text_Ref) return String is
+     (Unit.Texts.Text (Item));
+
+   procedure Query_Text
+     (Unit : in out Compilation_Unit; Item : Text_Ref;
+      Process : not null access procedure (Text : String)) is
+   begin
+      Unit.Texts.Query (Item, Process);
+   end Query_Text;
+
+   function Text_Length (Item : Text_Ref) return Natural is (Item.Length);
+
+   function Text_Element
+     (Unit : Compilation_Unit; Item : Text_Ref; Index : Positive)
+      return Character is
+     (Unit.Texts.Element (Item, Index));
 
    procedure Parse
      (Unit : in out Compilation_Unit; Source, Name : String;
-      Limits : Lua.Syntax.Check_Limits)
+      Limits : Lua.Syntax.Check_Limits;
+      Memory : Lua.Storage.Owner_Access := null;
+      Compatible_Global : Boolean :=
+        Lua.Runtime_Configuration.Compatible_Global)
    is
-      Reader : Scanner := Open (Source, Limits.Tokens);
-      Current, Lookahead : Token;
+      Selected : constant not null Lua.Storage.Owner_Access :=
+        (if Memory /= null then Memory
+         else Lua.Storage.Reference (Unit.Default_Memory));
+      Reader : Lua.Lexer_Core.Scanner_State :=
+        (Maximum => Limits.Tokens, Compatible_Global => Compatible_Global,
+         others => <>);
+      Current, Lookahead : Lua.Lexer_Core.Token;
       Have_Lookahead : Boolean := False;
       Active : Symbol_Lists.Vector;
       Function_Node : Node_Id := No_Node;
@@ -19,25 +56,23 @@ package body Lua.Syntax_Trees is
       Scope : Natural := 0;
       Next_Scope : Natural := 0;
       Abandon : exception;
-      type Jump_Record is record
-         Item : Node_Id;
-         Block : Natural;
-         Owner : Node_Id;
-         Active : Symbol_Lists.Vector;
-         Solved : Boolean := False;
-      end record;
-      package Jumps is new Ada.Containers.Vectors (Positive, Jump_Record);
       Gotos, Labels : Jumps.Vector;
 
       function Here return Source_Location is (Current.Location);
       function Kind return Token_Kind is (Current.Kind);
-      function Text return String is (To_String (Current.Text));
+      function Image (Item : Text_Ref) return String is (Text (Unit, Item));
+      function Own (Bytes : String) return Text_Ref is
+        (Lua.Frontend_Text.Store (Unit.Texts, Bytes));
+      function Matches (Left, Right : Text_Ref) return Boolean is
+        (Unit.Texts.Equal (Left, Right));
+      function Matches (Left : Text_Ref; Right : String) return Boolean is
+        (Unit.Texts.Equal (Left, Right));
       procedure Error (Message : String; Resource : Boolean := False);
       procedure Advance;
       function Peek return Token_Kind;
       function Take (Expected : Token_Kind) return Boolean;
       procedure Expect (Expected : Token_Kind);
-      function Read_Name return Unbounded_String;
+      function Read_Name return Text_Ref;
       function Add (Item : Node) return Node_Id;
       function Fetch (Id : Node_Id) return Node is
         (Unit.Tree (Positive (Id)));
@@ -47,11 +82,11 @@ package body Lua.Syntax_Trees is
       function Make (What : Structural_Kind) return Node_Id;
       procedure Child (Parent, Item : Node_Id);
       function New_Name
-        (Name : Unbounded_String; Mode : Attribute := Regular;
+        (Name : Text_Ref; Mode : Attribute := Regular;
          Kind : Binding_Kind := Local_Name) return Symbol_Id;
       function Resolve
-        (Name : Unbounded_String; Environment : Boolean := False;
-         Referenced : Unbounded_String := Null_Unbounded_String)
+        (Name : Text_Ref; Environment : Boolean := False;
+         Referenced : Text_Ref := Empty_Text)
          return Node_Id;
       procedure Writable (Id : Node_Id);
       function Expression (Minimum : Natural := 0) return Node_Id;
@@ -74,25 +109,41 @@ package body Lua.Syntax_Trees is
 
       procedure Error (Message : String; Resource : Boolean := False) is
       begin
+         --  Error text belongs to the same unit as the failing token. Only
+         --  the public checking wrapper materializes a host diagnostic; an
+         --  allocator refusal here must remain the runtime's memory failure.
          Unit.Result.Status :=
            (if Resource then Lua.Syntax.Resource_Error
             else Lua.Syntax.Syntax_Error);
          Unit.Result.Error.Line := Current.After.Line;
          Unit.Result.Error.Column := Here.Column;
-         Unit.Result.Error.Message := To_Unbounded_String (Message);
+         Unit.Result.Error.Message := Own (Message);
          raise Abandon;
       end Error;
 
-      function Read_Token return Token;
-      function Read_Token return Token is
-         Step : constant Scan_Result := Next (Reader);
+      function Read_Token return Lua.Lexer_Core.Token;
+      function Read_Token return Lua.Lexer_Core.Token is
+         Step : constant Lua.Lexer_Core.Scan_Result :=
+           Lua.Lexer_Core.Next (Source, Reader, Unit.Texts);
       begin
+         --  The scanner retains no source copy or host token list. Its arena
+         --  references survive the Reader, so lowering can consume the unit
+         --  after parser-local scopes and one-token lookahead are discarded.
          if Step.Status /= Success then
             Current.Location := Step.Location;
             Current.After := Step.Location;
-            Error (To_String (Step.Message), Step.Status = Resource_Error);
+            --  A lexical diagnostic already belongs to the unit's arena.
+            --  Retain that reference directly instead of copying it through
+            --  a host String and appending a second diagnostic allocation.
+            Unit.Result.Status :=
+              (if Step.Status = Resource_Error then Lua.Syntax.Resource_Error
+               else Lua.Syntax.Syntax_Error);
+            Unit.Result.Error.Line := Step.Location.Line;
+            Unit.Result.Error.Column := Step.Location.Column;
+            Unit.Result.Error.Message := Step.Message;
+            raise Abandon;
          end if;
-         return Step.Tokens.First_Element;
+         return Step.Item;
       end Read_Token;
 
       procedure Advance is
@@ -133,21 +184,27 @@ package body Lua.Syntax_Trees is
          end if;
       end Expect;
 
-      function Read_Name return Unbounded_String is
-         Result : constant Unbounded_String := Current.Text;
+      function Read_Name return Text_Ref is
+         Result : constant Text_Ref := Current.Text;
       begin
          Expect (Identifier);
          return Result;
       end Read_Name;
 
       function Add (Item : Node) return Node_Id is
+         Owned : Node := Item;
       begin
          --  Enforce storage bounds before vector growth; no partially
          --  published node ID can escape a resource failure.
          if Natural (Unit.Tree.Length) >= Limits.Syntax_Nodes then
             Error ("syntax node limit exceeded", Resource => True);
          end if;
-         Unit.Tree.Append (Item);
+         --  Empty nested lists begin unbound. Bind them before publication;
+         --  later child/capture appends then share the compilation allocator.
+         Owned.Children.Set_Owner (Selected);
+         Owned.Symbols.Set_Owner (Selected);
+         Owned.Captures.Set_Owner (Selected);
+         Unit.Tree.Append (Owned);
          return Node_Id (Unit.Tree.Last_Index);
       end Add;
 
@@ -186,7 +243,7 @@ package body Lua.Syntax_Trees is
       end Leave;
 
       function New_Name
-        (Name : Unbounded_String; Mode : Attribute := Regular;
+        (Name : Text_Ref; Mode : Attribute := Regular;
          Kind : Binding_Kind := Local_Name) return Symbol_Id
       is
       begin
@@ -199,8 +256,8 @@ package body Lua.Syntax_Trees is
       end New_Name;
 
       function Resolve
-        (Name : Unbounded_String; Environment : Boolean := False;
-         Referenced : Unbounded_String := Null_Unbounded_String)
+        (Name : Text_Ref; Environment : Boolean := False;
+         Referenced : Text_Ref := Empty_Text)
          return Node_Id
       is
          Result : Node := (Kind => Name_Reference, Site => Here,
@@ -222,7 +279,7 @@ package body Lua.Syntax_Trees is
                      Collective := True;
                      Read_Only := Item.Mode = Constant_Name;
                   end if;
-               elsif Item.Name = Name then
+               elsif Matches (Item.Name, Name) then
                   Explicit_Name := True;
                   Result.Symbol :=
                     (if Item.Kind = Local_Name then Id else No_Symbol);
@@ -240,13 +297,13 @@ package body Lua.Syntax_Trees is
                   Found : Boolean := False;
                begin
                   for Id of reverse Active loop
-                     if Unit.Names (Positive (Id)).Name = Name then
+                     if Matches (Unit.Names (Positive (Id)).Name, Name) then
                         Found := True;
                         exit;
                      end if;
                   end loop;
                   if not Found then
-                     Error ("variable '" & To_String (Name) &
+                     Error ("variable '" & Image (Name) &
                             "' not declared");
                   end if;
                end;
@@ -258,11 +315,11 @@ package body Lua.Syntax_Trees is
             end if;
             if Environment then
                Error ("_ENV is global when accessing variable '" &
-                      To_String (Referenced) & "'");
+                      Image (Referenced) & "'");
             end if;
             declare
                Env : constant Node_Id := Resolve
-                 (To_Unbounded_String ("_ENV"), Environment => True,
+                 (Own ("_ENV"), Environment => True,
                   Referenced => Name);
             begin
                Result.Environment := Fetch (Env).Symbol;
@@ -299,22 +356,22 @@ package body Lua.Syntax_Trees is
             Error ("assignment target expected");
          elsif Item.Kind = Name_Reference and then Item.Flag then
             Error ("attempt to assign to const variable '" &
-                   To_String (Item.Text) & "'");
+                   Image (Item.Text) & "'");
          end if;
       end Writable;
 
       function Get_Attribute (Default : Attribute := Regular) return Attribute
       is
-         Name : Unbounded_String;
+         Name : Text_Ref;
       begin
          if not Take (Less) then
             return Default;
          end if;
          Name := Read_Name;
          Expect (Greater);
-         if Name = "const" then
+         if Matches (Name, "const") then
             return Constant_Name;
-         elsif Name = "close" then
+         elsif Matches (Name, "close") then
             return Closing_Name;
          else
             Error ("unknown variable attribute");
@@ -335,7 +392,7 @@ package body Lua.Syntax_Trees is
       function Constructor return Node_Id is
          Result : constant Node_Id := Make (Table_Expression);
          Field : Node_Id;
-         Key : Token;
+         Key : Lua.Lexer_Core.Token;
       begin
          --  Store fields in source order. A one-child field is sequential;
          --  a two-child field retains its explicit key/value evaluation order.
@@ -391,7 +448,7 @@ package body Lua.Syntax_Trees is
          Scope := 0;
          Expect (Left_Paren);
          if Method then
-            Id := New_Name (To_Unbounded_String ("self"));
+            Id := New_Name (Own ("self"));
             Active.Append (Id);
             Item.Symbols.Append (Id);
          end if;
@@ -431,7 +488,7 @@ package body Lua.Syntax_Trees is
 
       function Prefix return Node_Id is
          Result, Next : Node_Id;
-         Key : Token;
+         Key : Lua.Lexer_Core.Token;
          Method : Boolean;
       begin
          --  Build suffix nodes rather than reading an indexed value here.
@@ -586,12 +643,13 @@ package body Lua.Syntax_Trees is
                for Label of Labels loop
                   if Label.Block = Block and then
                     Label.Owner = Pending.Owner and then
-                    Fetch (Label.Item).Text = Fetch (Pending.Item).Text
+                    Matches (Fetch (Label.Item).Text,
+                             Fetch (Pending.Item).Text)
                   then
                      for Id of Label.Active loop
                         if not Pending.Active.Contains (Id) then
                            Error ("goto enters scope of '" &
-                                    To_String (Unit.Names
+                                    Image (Unit.Names
                                       (Positive (Id)).Name) & "'");
                         end if;
                      end loop;
@@ -606,7 +664,7 @@ package body Lua.Syntax_Trees is
                if not Pending.Solved then
                   if Parent = 0 then
                      Error ("no visible label '" &
-                            To_String (Fetch (Pending.Item).Text) & "'");
+                            Image (Fetch (Pending.Item).Text) & "'");
                   end if;
                   Pending.Block := Parent;
                   Pending.Active := Base;
@@ -708,7 +766,7 @@ package body Lua.Syntax_Trees is
             if Default = Closing_Name then
                Error ("global variables cannot be to-be-closed");
             end if;
-            Id := New_Name (Null_Unbounded_String, Default, Collective_Name);
+            Id := New_Name (Empty_Text, Default, Collective_Name);
             Active.Append (Id);
             Item.Symbols.Append (Id);
             Save (Result, Item);
@@ -716,7 +774,7 @@ package body Lua.Syntax_Trees is
          end if;
          loop
             declare
-               Name : constant Unbounded_String := Read_Name;
+               Name : constant Text_Ref := Read_Name;
             begin
                Mode := Get_Attribute (Default);
                if Mode = Closing_Name then
@@ -738,7 +796,7 @@ package body Lua.Syntax_Trees is
          if Take (Assign) then
             if Global then
                Item.Environment := Fetch (Resolve
-                 (To_Unbounded_String ("_ENV"), Environment => True)).Symbol;
+                 (Own ("_ENV"), Environment => True)).Symbol;
                Save (Result, Item);
             end if;
             Child (Result, Expression_List);
@@ -771,8 +829,9 @@ package body Lua.Syntax_Trees is
                  (Recursive => Take (Function_Word),
                   Definition => Function_Site);
             end;
-         elsif Kind = Identifier and then Text = "global" and then
-           Peek in Identifier | Less | Star | Function_Word
+         elsif Kind = Global_Word or else
+           (Kind = Identifier and then Matches (Current.Text, "global")
+            and then Peek in Identifier | Less | Star | Function_Word)
          then
             Advance;
             Function_Site := Here;
@@ -854,6 +913,9 @@ package body Lua.Syntax_Trees is
             Saved := Active;
             Id := New_Name (Read_Name, Constant_Name);
             Value := (Kind => Generic_For, Site => Site, others => <>);
+            --  This temporary list is populated before Add can bind a stored
+            --  node. Its loop-variable records already belong to this unit.
+            Value.Symbols.Set_Owner (Selected);
             Value.Symbols.Append (Id);
             if Take (Assign) then
                Value := (Kind => Numeric_For, Site => Site,
@@ -912,9 +974,9 @@ package body Lua.Syntax_Trees is
                   Expect (Double_Colon);
                   for Previous of Labels loop
                      if Previous.Owner = Function_Node and then
-                       Fetch (Previous.Item).Text = Value.Text
+                       Matches (Fetch (Previous.Item).Text, Value.Text)
                      then
-                        Error ("label '" & To_String (Value.Text) &
+                        Error ("label '" & Image (Value.Text) &
                                "' already defined");
                      end if;
                   end loop;
@@ -954,8 +1016,21 @@ package body Lua.Syntax_Trees is
       end Statement;
 
    begin
+      if Unit.Memory /= null and then Unit.Memory /= Selected then
+         raise Program_Error with "cannot rebind a compilation unit";
+      end if;
+      Unit.Memory := Selected;
+      --  All growable compilation state has an explicit owner before its
+      --  first append. No default vector can escape into the standard heap.
+      Unit.Texts.Set_Owner (Selected);
+      Unit.Tree.Set_Owner (Selected);
+      Unit.Names.Set_Owner (Selected);
+      Active.Set_Owner (Selected);
+      Gotos.Set_Owner (Selected);
+      Labels.Set_Owner (Selected);
+      Unit.Texts.Clear;
       Unit.Result := (Status => Lua.Syntax.Success,
-                      Error => (Source => To_Unbounded_String (Name),
+                      Error => (Source => Own (Name),
                                 others => <>));
       if Source'Length > Limits.Source_Bytes then
          Error ("source byte limit exceeded", Resource => True);
@@ -965,7 +1040,7 @@ package body Lua.Syntax_Trees is
       Unit.Root := No_Node;
       Unit.Unsupported := No_Node;
       Current := Read_Token;
-      Unit.Environment := New_Name (To_Unbounded_String ("_ENV"));
+      Unit.Environment := New_Name (Own ("_ENV"));
       Active.Append (Unit.Environment);
       Unit.Root := Block;
       Expect (End_Of_Input);
@@ -976,11 +1051,17 @@ package body Lua.Syntax_Trees is
          Unit.Names.Clear;
          Unit.Root := No_Node;
       when Storage_Error =>
+         --  A runtime allocator refusal is a distinct Allocation_Error and
+         --  propagates unchanged. Physical Ada exhaustion belongs to the
+         --  runtime boundary; standalone checking reports its resource result.
+         if Memory /= null then
+            raise;
+         end if;
          Unit.Tree.Clear;
          Unit.Names.Clear;
          Unit.Root := No_Node;
          Unit.Result.Status := Lua.Syntax.Resource_Error;
          Unit.Result.Error.Message :=
-           To_Unbounded_String ("frontend storage exhausted");
+           Own ("frontend storage exhausted");
    end Parse;
 end Lua.Syntax_Trees;

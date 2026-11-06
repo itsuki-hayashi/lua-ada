@@ -1,3 +1,4 @@
+with Lua.Engine.Mathematics;
 with Ada.Containers;
 with Ada.Unchecked_Conversion;
 with Interfaces;
@@ -264,6 +265,17 @@ package body Lua.Engine.Core_Libraries is
          Result.Append (Item);
          return Result;
       end if;
+      if Name in "math.acos" | "math.asin" | "math.atan" | "math.cos" |
+        "math.deg" | "math.exp" | "math.frexp" | "math.ldexp" | "math.log" |
+        "math.rad" | "math.sin" | "math.sqrt" | "math.tan" | "math.random" |
+        "math.randomseed" | "math.atan2" | "math.cosh" | "math.sinh" |
+        "math.tanh" | "math.pow" | "math.log10"
+      then
+         return Mathematics.Run (State, Name, Arguments);
+      end if;
+      --  Optional-argument RNG calls validate their own arity. Applying the
+      --  ordinary one-value requirement first would reject math.random() and
+      --  math.randomseed() before their native implementation can run.
       Require (1);
       Item := Arg (1);
       if Name = "math.type" then

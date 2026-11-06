@@ -1,10 +1,10 @@
 # Session Records
 
-Current: [major M3 language lifecycle](2026-11-06-m3-language-lifecycle.md).
+Current: [complete M3 upstream conformance](2026-11-06-m3-upstream-conformance.md).
 
-Previous: [M3-02A execution contexts](2026-11-06-m3-02-contexts.md).
-The current combined delivery follows merged PR #6 and supersedes the small
-sequential PR order for its selected M3 portions.
+Previous: [major M3 language lifecycle](2026-11-06-m3-language-lifecycle.md).
+The current delivery follows merged PR #7 and combines all remaining M3 work
+into one major PR. Historical session results retain their original scope.
 
 | Date       | Session                                                      |
 | ---------- | ---------------------------------------------------------    |

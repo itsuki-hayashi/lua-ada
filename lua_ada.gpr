@@ -1,18 +1,23 @@
 with "config/lua_ada_config.gpr";
+with "runtime_configuration";
 library project Lua_Ada is
 
    type Library_Type is ("static", "static-pic", "relocatable");
    Library_Mode : Library_Type :=
      external ("LUA_ADA_LIBRARY_TYPE", "static");
 
-   for Source_Dirs use ("src/", "config/");
+   Configuration_Subdir := Runtime_Configuration.Artifact_Subdir;
+   for Source_Dirs use
+     ("src/", "config/", Runtime_Configuration.Source_Directory);
    for Object_Dir use
-     "obj/" & Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
+     "obj/" & Configuration_Subdir &
+     Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
    for Create_Missing_Dirs use "True";
    for Library_Name use "lua_ada";
    for Library_Kind use Library_Mode;
    for Library_Dir use
-     "lib/" & Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
+     "lib/" & Configuration_Subdir &
+     Lua_Ada_Config.Build_Profile & "/" & Library_Mode;
    case Library_Mode is
       when "relocatable" =>
          case Lua_Ada_Config.Alire_Host_OS is

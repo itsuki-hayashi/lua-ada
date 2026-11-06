@@ -1,8 +1,10 @@
+with Lua.Storage.Buffers;
 with Ada.Strings.Fixed;
 with Ada.Unchecked_Conversion;
 with Interfaces;
 
 package body Lua.Engine.Packing is
+   package Managed renames Lua.Storage.Buffers;
    use type Integer_Value;
    use type Real_Value;
    use type Interfaces.Unsigned_64;
@@ -128,7 +130,7 @@ package body Lua.Engine.Packing is
          Alignment : U64 := 0;
       end record;
       Result : Values.Vector;
-      Buffer : Unbounded_String;
+      Buffer : Managed.Buffer;
       Format_Position : Positive := 1;
       Little : Boolean := Character'Pos (Bytes (1) (1)) = 1;
       Max_Alignment : U64 := 1;
@@ -143,6 +145,7 @@ package body Lua.Engine.Packing is
       procedure Charge (Amount : Natural := 1);
       procedure Grow (Amount : U64);
       procedure Put_Bytes (Raw : U64; Size : Positive; Negative : Boolean);
+      procedure Put_Zeros (Count : Natural);
       function Get_Bytes
         (Data : String; Position : Natural; Size : Positive;
          Signed : Boolean) return U64;
@@ -240,6 +243,16 @@ package body Lua.Engine.Packing is
          end loop;
          Append (Buffer, Data);
       end Put_Bytes;
+
+      procedure Put_Zeros (Count : Natural) is
+      begin
+         --  Padding length is format-controlled. Build it directly in managed
+         --  storage instead of materializing an unaccounted Ada String of the
+         --  same size; callers have already validated and charged this work.
+         for Index in 1 .. Count loop
+            Buffer.Append (Character'Val (0));
+         end loop;
+      end Put_Zeros;
 
       function Get_Bytes
         (Data : String; Position : Natural; Size : Positive;
@@ -387,6 +400,7 @@ package body Lua.Engine.Packing is
          return Item;
       end Details;
    begin
+      Buffer.Set_Owner (Lua.Storage.Reference (State.Memory));
       declare
          Raw_Format : constant String := Text (1);
          End_Position : Natural := Raw_Format'Last;
@@ -437,8 +451,7 @@ package body Lua.Engine.Packing is
                   if Total > U64 (State.Bounds.String_Bytes) then
                      Fail (State, "string byte limit exceeded", True);
                   end if;
-                  Append (Buffer, String'
-                    (1 .. Natural (Item.Alignment) => Character'Val (0)));
+                  Put_Zeros (Natural (Item.Alignment));
                   case Item.Kind is
                      when Signed_Integer | Unsigned_Integer =>
                         Number_Value := Integer_Arg (Argument);
@@ -482,9 +495,7 @@ package body Lua.Engine.Packing is
                               end if;
                               Charge (Natural (Item.Size));
                               Append (Buffer, Payload);
-                              Append (Buffer, String'
-                                (1 .. Natural (Item.Size - Count) =>
-                                   Character'Val (0)));
+                              Put_Zeros (Natural (Item.Size - Count));
                            elsif Item.Kind = Length_String then
                               if Item.Size < 8 and then
                                 Count >= 2 ** (Natural (Item.Size) * 8)
@@ -511,7 +522,8 @@ package body Lua.Engine.Packing is
                                  Fail
                                    (State, "string byte limit exceeded", True);
                               end if;
-                              Append (Buffer, Payload & Character'Val (0));
+                              Buffer.Append (Payload);
+                              Buffer.Append (Character'Val (0));
                            end if;
                         end;
                      when Padding => Append (Buffer, Character'Val (0));
@@ -582,7 +594,7 @@ package body Lua.Engine.Packing is
             if Name = "packsize" then
                Result.Append (Value'(Integer_Kind, Integer_Value (Total)));
             elsif Name = "pack" then
-               Result.Append (New_String (State, To_String (Buffer)));
+               Result.Append (New_String (State, Buffer));
             else
                Result.Append
                  (Value'(Integer_Kind, Integer_Value (Position) + 1));

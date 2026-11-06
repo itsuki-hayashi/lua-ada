@@ -1,4 +1,5 @@
 with Lua.Syntax_Trees;
+with Lua.Storage;
 with Ada.Strings.Unbounded;
 
 package body Lua.Syntax is
@@ -19,9 +20,20 @@ package body Lua.Syntax is
                      ("source byte limit exceeded"), others => <>));
       end if;
       Syntax_Trees.Parse (Unit, Source, Name, Limits);
-      return Unit.Result;
+      --  Public diagnostics deliberately own ordinary Ada strings. The
+      --  parser's internal result retains only references into Unit's arena;
+      --  copy at this host boundary before that temporary owner is finalized.
+      return
+        (Status => Unit.Result.Status,
+         Error =>
+           (Source => Ada.Strings.Unbounded.To_Unbounded_String
+              (Syntax_Trees.Text (Unit, Unit.Result.Error.Source)),
+            Message => Ada.Strings.Unbounded.To_Unbounded_String
+              (Syntax_Trees.Text (Unit, Unit.Result.Error.Message)),
+            Line => Unit.Result.Error.Line,
+            Column => Unit.Result.Error.Column));
    exception
-      when Storage_Error =>
+      when Storage_Error | Lua.Storage.Allocation_Error =>
          return (Status => Resource_Error,
                  Error => (Source =>
                    Ada.Strings.Unbounded.To_Unbounded_String (Name),

@@ -63,6 +63,13 @@ instruction streams or serialized chunks. Execution validates a complete chunk
 before lowering executable goto/label/close constructs. Complete validation
 still precedes execution and every runtime feature decision.
 
+Private Lua.Prototypes now owns canonical graphs separately from runtime heap
+objects. Lua.Chunks decodes and encodes the pinned native format through managed
+buffers, with flat graph cleanup and checked operands. This standalone codec
+does not yet replace the executable backend. See
+[canonical ownership](docs/decisions/0012-canonical-program-ownership.md) and
+[binary codec verification](docs/binary-chunks.md) for its exact boundary.
+
 Registers contain packets, allowing calls/varargs to produce zero or many
 results. Scalar consumers take the first result or nil; only final list
 expressions expand, and parentheses collapse. Assignment retains evaluated
@@ -126,10 +133,15 @@ runtime checks remain enabled in every profile. Explicit modular operations
 implement integer wrapping. Strings remain bytes.
 
 Numeric text conversion uses standard Ada big integers for exact binary64
-rounding; formatting implements Lua's 15/17-digit general format. One isolated
-host `pow` import is justified by measured rounding/domain incompatibilities
-in standard Ada exponentiation (ADR 0005). No downloaded production dependency
-is introduced. Packing and UTF-8 helpers use standard Ada types and explicit
+rounding; formatting implements Lua's 15/17-digit general format. The private
+host-math adapter extends ADR 0005's pow boundary to the pinned transcendental,
+decomposition and scaling primitives. [ADR 0011](docs/decisions/0011-host-mathematics.md)
+records their names, IEEE/domain/rounding rationale and verification limits.
+Argument handling and both xoshiro256** arithmetic paths remain Ada, with owned
+per-universe random state and explicit native-work charging. Full C-facade
+construction of independent reopened math libraries remains a later integration
+requirement. No downloaded production dependency is introduced.
+Packing and UTF-8 helpers use standard Ada types and explicit
 byte/bit operations. Native pack widths and maximum alignment come from C
 interface types, including long double; an isolated C99 probe verifies the host
 layout. Virtual packsize arithmetic does not allocate. Semantic size overflow

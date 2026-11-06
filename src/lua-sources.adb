@@ -1,5 +1,35 @@
 package body Lua.Sources is
+   function Inspect_File_Preamble
+     (Source : String) return File_Preamble_Info
+   is
+      Result : File_Preamble_Info;
+   begin
+      --  Empty String bounds may lie outside Positive. Relative counts avoid
+      --  conversion or a Last+1 sentinel even at the largest legal index.
+      if Source'Length = 0 then
+         return Result;
+      end if;
+      if Source'Length >= 3 and then
+        Source (Source'First .. Source'First + 2) =
+          Character'Val (16#EF#) & Character'Val (16#BB#) &
+          Character'Val (16#BF#)
+      then
+         Result.Skipped_Bytes := 3;
+      end if;
+      if Result.Skipped_Bytes < Source'Length and then
+        Source (Source'First + Result.Skipped_Bytes) = '#'
+      then
+         for Offset in Result.Skipped_Bytes .. Source'Length - 1 loop
+            exit when Source (Source'First + Offset) in
+              Character'Val (10) | Character'Val (13);
+            Result.Blanked_Bytes := Result.Blanked_Bytes + 1;
+         end loop;
+      end if;
+      return Result;
+   end Inspect_File_Preamble;
+
    function File_Preamble (Source : String) return String is
+      Info : constant File_Preamble_Info := Inspect_File_Preamble (Source);
    begin
       --  Null strings may have bounds outside Positive. Do not constrain
       --  their first index or inspect any byte before this empty fast path.
@@ -7,30 +37,15 @@ package body Lua.Sources is
          return Source;
       end if;
       declare
-         First : Positive := Source'First;
          Text : String := Source;
       begin
-         if Source'Length >= 3 and then Source (First .. First + 2) =
-           Character'Val (16#EF#) & Character'Val (16#BB#) &
-           Character'Val (16#BF#)
-         then
-            --  Avoid computing Last+1 when a BOM-only string is located at
-            --  Positive'Last. A nonempty suffix makes First+3 representable.
-            if Source'Length = 3 then
-               return "";
-            end if;
-            First := First + 3;
+         if Info.Skipped_Bytes = Source'Length then
+            return "";
          end if;
-         if Source (First) = '#' then
-            --  Blanking rather than deleting keeps diagnostic line numbers
-            --  stable. A for loop also avoids incrementing Positive'Last.
-            for Position in First .. Source'Last loop
-               exit when Source (Position) in
-                 Character'Val (10) | Character'Val (13);
-               Text (Position) := ' ';
-            end loop;
-         end if;
-         return Text (First .. Text'Last);
+         for Offset in 1 .. Info.Blanked_Bytes loop
+            Text (Source'First + (Info.Skipped_Bytes + Offset - 1)) := ' ';
+         end loop;
+         return Text (Source'First + Info.Skipped_Bytes .. Text'Last);
       end;
    end File_Preamble;
 end Lua.Sources;

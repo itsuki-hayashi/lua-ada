@@ -1,6 +1,19 @@
 package Lua.Sources is
    pragma Pure;
 
+   type File_Preamble_Info is record
+      Skipped_Bytes : Natural := 0;
+      Blanked_Bytes : Natural := 0;
+   end record;
+   --  Relative byte counts, independent of an Ada String's lower bound.
+   --  @field Skipped_Bytes Initial BOM bytes to remove (zero or three).
+   --  @field Blanked_Bytes Following interpreter bytes to replace with spaces.
+   function Inspect_File_Preamble (Source : String) return File_Preamble_Info;
+   --  Inspect without copying or changing source bytes. Managed loaders can
+   --  apply these offsets in place while sharing File_Preamble's exact policy.
+   --  @param Source File bytes, including arbitrary empty/nonempty bounds.
+   --  @return Counts whose sum is no greater than Source'Length.
+
    function File_Preamble (Source : String) return String;
    --  Prepare file/stdin bytes for the shared frontend. Remove one leading
    --  UTF-8 byte-order mark and blank an initial interpreter line beginning

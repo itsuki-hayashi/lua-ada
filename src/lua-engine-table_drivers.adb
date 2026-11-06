@@ -359,7 +359,7 @@ package body Lua.Engine.Table_Drivers is
             if Number (3) = Number (4) then
                if Name = "table.concat" then
                   Result.Results.Append
-                    (New_String (State, To_String (Activation.Native_Buffer)));
+                    (New_String (State, Activation.Native_Buffer));
                else
                   for Index in 9 ..
                     Natural (Activation.Native_Captures.Length)

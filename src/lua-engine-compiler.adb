@@ -12,6 +12,7 @@ package body Lua.Engine.Compiler is
      (State : in out World; Source, Name : String) return Prototype_Access
    is
       Unit : Compilation_Unit;
+      Was_Compiling : constant Boolean := State.Compiling;
       Current : Prototype_Access;
       Next_Register : Positive := 1;
       Scope_Depth : Natural := 0;
@@ -41,6 +42,11 @@ package body Lua.Engine.Compiler is
 
       function Fetch (Id : Node_Id) return Node is
         (Unit.Tree (Positive (Id)));
+      --  The legacy packet metadata still owns Unbounded_String fields.
+      --  Materialize only at that lowering boundary; parser/token storage is
+      --  already allocator-owned. Canonical metadata uses borrowed queries.
+      function Runtime_Text (Item : Text_Ref) return Unbounded_String is
+        (To_Unbounded_String (Lua.Syntax_Trees.Text (Unit, Item)));
       function Symbol (Id : Symbol_Id) return Positive is
         (Symbol_Base + Positive (Id) - 1);
       function New_Register return Positive;
@@ -65,7 +71,7 @@ package body Lua.Engine.Compiler is
          --  Names describe the call site, not a mutable function property.
          --  The same closure can be called through unrelated table fields.
          if Item.Kind = Name_Reference then
-            Code.Text := Item.Text;
+            Code.Text := Runtime_Text (Item.Text);
             Code.Name_Kind := To_Unbounded_String
               ((if Item.Symbol = No_Symbol then "global"
                 elsif Current.Capture_Symbols.Contains (Symbol (Item.Symbol))
@@ -74,7 +80,8 @@ package body Lua.Engine.Compiler is
            Fetch (Item.Children (2)).Kind = Literal and then
            Fetch (Item.Children (2)).Value.Kind = String_Literal
          then
-            Code.Text := Fetch (Item.Children (2)).Value.Text;
+            Code.Text := Runtime_Text
+              (Fetch (Item.Children (2)).Value.Text);
             Code.Name_Kind := To_Unbounded_String
               ((if Item.Kind = Method_Expression then "method" else "field"));
          end if;
@@ -154,7 +161,7 @@ package body Lua.Engine.Compiler is
                      B => Symbol (Item.Environment), others => <>));
                Result.Key_Reg := New_Register;
                Put ((Op => Load_String, A => Result.Key_Reg,
-                     Text => Item.Text, others => <>));
+                     Text => Runtime_Text (Item.Text), others => <>));
             end if;
          else
             Result.Table_Reg := Expression (Item.Children (1));
@@ -181,7 +188,8 @@ package body Lua.Engine.Compiler is
          Saved_Depth : constant Natural := Scope_Depth;
          Saved_Site : constant Source_Location := Site;
          Saved_Loops : constant Loops.Vector := Loop_Stack;
-         Child : constant Prototype_Access := new Prototype;
+         Child : constant Prototype_Access :=
+           New_Program (State);
          Result : Positive;
       begin
          --  Publish partial prototypes immediately: runtime ownership must
@@ -253,7 +261,8 @@ package body Lua.Engine.Compiler is
                            others => <>));
                   when String_Literal =>
                      Put ((Op => Load_String, A => Result,
-                           Text => Item.Value.Text, others => <>));
+                           Text => Runtime_Text (Item.Value.Text),
+                           others => <>));
                   when True_Word | False_Word =>
                      Put ((Op => Load_Value, A => Result,
                            Literal => (Boolean_Kind,
@@ -473,7 +482,8 @@ package body Lua.Engine.Compiler is
                                     others => <>));
                               Where.Key_Reg := New_Register;
                               Put ((Op => Load_String, A => Where.Key_Reg,
-                                    Text => Name.Name, others => <>));
+                                    Text => Runtime_Text (Name.Name),
+                                    others => <>));
                               Lvalues.Append (Where);
                            end if;
                         end;
@@ -507,8 +517,8 @@ package body Lua.Engine.Compiler is
                            Current.Uses_Closing := True;
                            Put ((Op => Register_Close,
                                  B => Symbol (Item.Symbols (Index)),
-                                 Text => Unit.Names
-                                   (Positive (Item.Symbols (Index))).Name,
+                                 Text => Runtime_Text (Unit.Names
+                                   (Positive (Item.Symbols (Index))).Name),
                                  others => <>));
                         end if;
                      end loop;
@@ -675,22 +685,24 @@ package body Lua.Engine.Compiler is
          end case;
       end Statement;
    begin
+      State.Compiling := True;
       Parse (Unit, Source, Name,
              (State.Bounds.Source_Bytes, State.Bounds.Tokens,
-              State.Bounds.Syntax_Nodes, State.Bounds.Syntax_Depth));
+              State.Bounds.Syntax_Nodes, State.Bounds.Syntax_Depth),
+             Memory => Lua.Storage.Reference (State.Memory));
       if Unit.Result.Status /= Lua.Syntax.Success then
          State.Current.Failure_At :=
            (Offset => 1, Line => Unit.Result.Error.Line,
             Column => Unit.Result.Error.Column);
          State.Current.Failure_Class := Syntax_Failure;
-         Fail (State, To_String (Unit.Result.Error.Message),
+         Fail (State, Lua.Syntax_Trees.Text (Unit, Unit.Result.Error.Message),
                Resource => Unit.Result.Status = Lua.Syntax.Resource_Error);
       end if;
       if Natural (Unit.Names.Length) >= Positive'Last - Symbol_Base then
          Fail (State, "lexical symbol limit exceeded", Resource => True);
       end if;
       State.Next_Symbol := Symbol_Base + Natural (Unit.Names.Length);
-      Current := new Prototype;
+      Current := New_Program (State);
       State.Programs.Append (Current);
       Current.Name := To_Unbounded_String (Name);
       Current.Vararg := True;
@@ -714,7 +726,7 @@ package body Lua.Engine.Compiler is
                then
                   Program.Names.Append
                     (Symbol_Name'(Symbol (Symbol_Id (Index)),
-                                  Unit.Names (Index).Name));
+                                  Runtime_Text (Unit.Names (Index).Name)));
                end if;
             end loop;
             for PC in Program.Code.First_Index .. Program.Code.Last_Index loop
@@ -736,6 +748,12 @@ package body Lua.Engine.Compiler is
             end loop;
          end;
       end loop;
+      State.Entry_Code := Current;
+      State.Compiling := Was_Compiling;
       return Current;
+   exception
+      when others =>
+         State.Compiling := Was_Compiling;
+         raise;
    end Compile;
 end Lua.Engine.Compiler;

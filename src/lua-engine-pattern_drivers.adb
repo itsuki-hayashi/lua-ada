@@ -1,7 +1,9 @@
+with Lua.Storage.Buffers;
 with Lua.Engine.Patterns;
 with Lua.Engine.Strings;
 
 package body Lua.Engine.Pattern_Drivers is
+   package Managed renames Lua.Storage.Buffers;
    use type Integer_Value;
 
    function Advance
@@ -13,7 +15,7 @@ package body Lua.Engine.Pattern_Drivers is
         (if Index <= Natural (Activation.Native_Arguments.Length) then
            Activation.Native_Arguments (Index) else Nil_Value);
       procedure Work (Count : Natural);
-      function Copy_Bytes (Text : Unbounded_String) return String;
+      function Copy_Bytes (Text : Byte_String) return String;
       function Copy_Argument (Item : Value) return String;
       procedure Append_Output (Text : String);
       procedure Finish (Subject : String);
@@ -30,10 +32,10 @@ package body Lua.Engine.Pattern_Drivers is
          end if;
       end Work;
 
-      function Copy_Bytes (Text : Unbounded_String) return String is
+      function Copy_Bytes (Text : Byte_String) return String is
       begin
-         --  Continuations retain unbounded byte strings, but the matcher
-         --  currently consumes String views. Charge that whole-subject copy
+         --  Continuations root immutable managed byte strings. The matcher
+         --  currently consumes String values. Charge that whole-subject copy
          --  before doing it on every resume: many tiny matches must not hide
          --  quadratic copying behind a small number of VM instructions.
          Work (Length (Text));
@@ -63,7 +65,7 @@ package body Lua.Engine.Pattern_Drivers is
       begin
          Append_Output (Subject (Activation.Native_Index + 1 .. Subject'Last));
          Action.Results.Append
-           (New_String (State, To_String (Activation.Native_Buffer)));
+           (New_String (State, Activation.Native_Buffer));
          Action.Results.Append
            (Value'(Integer_Kind, Integer_Value (Activation.Native_Aux)));
       end Finish;
@@ -133,10 +135,11 @@ package body Lua.Engine.Pattern_Drivers is
            Pattern (Pattern'First) = '^';
          Found : Patterns.Match_Result;
          Captures : Values.Vector;
-         Whole : Unbounded_String;
+         Whole : Managed.Buffer;
          Last : Integer_Value;
          Changed : Value;
       begin
+         Whole.Set_Owner (Lua.Storage.Reference (State.Memory));
          if Arg (4).Kind /= Nil_Kind then
             Limit := Strings.Integer_Argument (State, Arg (4));
          end if;
@@ -156,9 +159,10 @@ package body Lua.Engine.Pattern_Drivers is
             --  in this activation throughout the call.
             Changed := (if Activation.Native_Results.Is_Empty then Nil_Value
                         else Activation.Native_Results.First_Element);
-            Whole := Activation.Native_Captures (2).Reference.Bytes;
+            Whole.Set_Value
+              (To_String (Activation.Native_Captures (2).Reference.Bytes));
             if not Truth (Changed) then
-               Append_Output (To_String (Whole));
+               Whole.Query (Append_Output'Access);
             elsif Changed.Kind in String_Kind | Integer_Kind | Real_Kind then
                Append_Output (Strings.String_Argument (State, Changed));
             else
@@ -195,8 +199,7 @@ package body Lua.Engine.Pattern_Drivers is
          end if;
          Append_Output
            (Subject (Activation.Native_Index + 1 .. Found.First));
-         Whole := To_Unbounded_String
-           (Subject (Found.First + 1 .. Found.After));
+         Whole.Set_Value (Subject (Found.First + 1 .. Found.After));
          Captures := Patterns.Capture_Values (State, Subject, Found);
          Activation.Native_Index := Found.After;
          Activation.Native_Aux := Activation.Native_Aux + 1;
@@ -204,7 +207,7 @@ package body Lua.Engine.Pattern_Drivers is
          Activation.Native_Captures.Append
            (Value'(Integer_Kind, Integer_Value (Found.After)));
          Activation.Native_Captures.Append
-           (New_String (State, To_String (Whole)));
+           (New_String (State, Whole));
          for Item of Captures loop
             Activation.Native_Captures.Append (Item);
          end loop;
@@ -228,7 +231,7 @@ package body Lua.Engine.Pattern_Drivers is
                      elsif Text (Cursor) in '0' .. '9' then
                         Capture_Index := Character'Pos (Text (Cursor)) - 48;
                         if Capture_Index = 0 then
-                           Append_Output (To_String (Whole));
+                           Whole.Query (Append_Output'Access);
                         elsif Capture_Index > Natural (Captures.Length) then
                            Fail (State, "invalid capture index");
                         else

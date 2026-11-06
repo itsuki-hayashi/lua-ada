@@ -63,6 +63,31 @@ loader data, caching, and mutable searchers. Its internal registries survive
 replacement of public package.loaded/preload fields. The default package.path
 is `./?.lua;./?/init.lua`; native loading is deferred.
 
+## M3 mathematics implementation
+
+The implementation extends the historical M2b inventory above with the exports
+below. [ADR 0011](decisions/0011-host-mathematics.md) owns the dependency and RNG
+decisions. Implementation is distinct from final platform/upstream acceptance;
+current [status](status.md) owns verified test counts.
+
+| Configuration / group | Added functions                        |
+| --------------------- | -------------------------------------- |
+| Default trigonometry  | acos, asin, atan, cos, sin, tan        |
+| Default real helpers  | deg, exp, frexp, ldexp, log, rad, sqrt |
+| Default owned RNG     | random, randomseed                     |
+| Compatibility only    | atan2, cosh, sinh, tanh, pow, log10    |
+
+The default table excludes the compatibility-only names. Seeded RNG output
+uses xoshiro256** with native-64 or actual split-32 arithmetic, exact two-word
+seeding and unbiased interval rejection. Both paths retain per-universe state;
+reopening math through the future public C API still needs independently
+captured RNG instances. Host mathematical primitives preserve native IEEE
+domains, signed zero and rounding rather than raising Ada domain exceptions.
+
+There are 38 new focused mathematical cases and a first-party byte-encoded
+differential campaign. Oracle fixture validation is recorded; it does not by
+itself establish Ada parity, unchanged math.lua or complete M3 acceptance.
+
 ## Deliberately deferred
 
 M2a adds shared syntax checking and a private canonical opcode definition layer.
@@ -76,17 +101,17 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 - Canonical code generation: deferred; compiler lowers to private operations.
 - Canonical code execution: deferred; no binary chunk compatibility claim.
 
-| Facility                               | Later gate / current response                    |
-| -------------------------------------- | ------------------------------------------------ |
-| Finalization                           | Deferred; no finalizer execution                 |
-| Userdata and io/os                     | Deferred; unavailable facilities                 |
-| string.dump, table.sort/create         | Remaining library work; unavailable              |
-| Math RNG and remaining transcendentals | Remaining library work; unavailable              |
-| Binary chunks                          | M3; text-source interface only                   |
-| C exports and allocator parity         | M3; isolated feasibility probes only             |
-| Dynamic native modules / LuaRocks      | M4; no compatibility claim                       |
-| Whole upstream suite                   | M3; full coverage ledger remains incomplete      |
-| Interactive REPL                       | Future CLI work; no-input usage is intentional   |
+| Facility                               | Later gate / current response                        |
+| -------------------------------------- | ---------------------------------------------------- |
+| Finalization                           | Deferred; no finalizer execution                     |
+| Userdata and io/os                     | Deferred; unavailable facilities                     |
+| string.dump, table.sort/create         | Remaining library work; unavailable                  |
+| Reopened C-created math libraries      | C-facade integration; distinct RNG captures required |
+| Binary chunks                          | M3; text-source interface only                       |
+| C exports and allocator parity         | M3; isolated feasibility probes only                 |
+| Dynamic native modules / LuaRocks      | M4; no compatibility claim                           |
+| Whole upstream suite                   | M3; full coverage ledger remains incomplete          |
+| Interactive REPL                       | Future CLI work; no-input usage is intentional       |
 
 The runtime does not specify hash iteration order, ambiguous table borders,
 pointer text, or byte-identical diagnostic wording. Differential fixtures avoid

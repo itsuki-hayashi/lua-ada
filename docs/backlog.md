@@ -151,8 +151,9 @@ from completed coverage: pending cases are expected now and forbidden at M3-13.
 | M3-12 | Internal coverage equivalents  | planned     | M3-11          | Real test adapter and reviewed source-cited internal/platform cases; no unresolved omitted blocks                               |
 | M3-13 | Complete M3 acceptance         | planned     | M3-12          | Full matrices/coverage/evidence, all final logs inspected, documented scope and open unmerged acceptance PR                     |
 
-Each ID is a separate implementation task and PR. Continue from updated master
-after the predecessor is merged by the maintainer; do not merge automatically.
+The original separate-PR order is superseded by the approved full-upstream
+delivery below. These IDs remain stable acceptance owners, implemented through
+coherent checkpoints in one major PR. Do not merge automatically.
 M3-01's [evidence](sessions/2026-11-06-m3-01-contracts.md) and
 [merged PR #5](https://github.com/itsuki-hayashi/lua-ada/pull/5) record its verified
 implementation. Every M3 coverage obligation remains pending.
@@ -198,3 +199,23 @@ Evidence: [current session](sessions/2026-11-06-m3-language-lifecycle.md),
 [validation record](validation-m3-lifecycle.md), Runtime_Control_Tests and
 check-lifecycle.ps1. No reference
 or ecosystem-fixture pins have changed.
+
+## Complete upstream delivery
+
+The maintainer approved all remaining M3 requirements in one PR on
+codex/m3-upstream-conformance, based on merged PR #7. M3-FULL-1 through
+M3-FULL-8 are sequential checkpoints with bounded exit evidence in the
+[acceptance owner](milestones/m3.md). They advance the unfinished original
+M3-02 through M3-13 IDs; a subset does not close the parent milestone.
+
+M3-FULL-1 is in progress. The reviewed-candidate/link validator passes 62
+focused regressions and structural validation of all original 4,490 source
+anchors/473 API entries. All actual coverage entries remain pending. Baseline
+verification and runner acceptance evidence must be recorded independently.
+M3-FULL-2–8 remain open for runtime/storage/ABI/canonical/collector/library/CLI
+work, complete reviews, 26 final contexts and a verified, unmerged PR.
+
+Evidence: [current session](sessions/2026-11-06-m3-upstream-conformance.md),
+[ADR 0010](decisions/0010-full-upstream-delivery.md) and the
+[inventory contract](../tests/conformance/README.md). No fixture pin or source
+obligation is removed to make a completion check pass.

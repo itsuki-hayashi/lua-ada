@@ -10,6 +10,7 @@ package body Lua.Engine.Format_Drivers is
       Cursor : Positive;
       procedure Work (Count : Natural := 1);
       procedure Append_Output (Text : String);
+      procedure Render_Output (Specification : String; Item : Value);
 
       procedure Work (Count : Natural := 1) is
       begin
@@ -33,6 +34,17 @@ package body Lua.Engine.Format_Drivers is
          end if;
          Append (Activation.Native_Buffer, Text);
       end Append_Output;
+
+      procedure Render_Output (Specification : String; Item : Value) is
+         Before : constant Natural := Length (Activation.Native_Buffer);
+      begin
+         Formats.Render_Into
+           (State, Specification, Item, Activation.Native_Buffer);
+         --  Preserve the driver's extra assembly charge independently of the
+         --  formatter's conversion/assembly work; only the host String copy
+         --  has disappeared, not the retained execution budget accounting.
+         Work (Length (Activation.Native_Buffer) - Before);
+      end Render_Output;
    begin
       if Activation.Native_Arguments.Is_Empty then
          Fail (State, "string expected");
@@ -55,67 +67,75 @@ package body Lua.Engine.Format_Drivers is
          then
             Fail (State, "'__tostring' must return a string");
          end if;
-         Append_Output (Formats.Render
-           (State, To_String
+         Render_Output
+           (To_String
               (Activation.Native_Captures (1).Reference.Bytes),
-            Activation.Native_Results (1)));
+            Activation.Native_Results (1));
          Activation.Native_Results.Clear;
          Activation.Native_Captures.Clear;
          Activation.Native_Stage := 1;
       end if;
       declare
-         Form : constant String := Strings.String_Argument
-           (State, Activation.Native_Arguments (1));
-      begin
-         Cursor := Activation.Native_Index;
-         while Cursor <= Form'Last loop
-            Work;
-            if Form (Cursor) /= '%' then
-               Append_Output (String'(1 => Form (Cursor)));
-               Cursor := Cursor + 1;
-            elsif Cursor < Form'Last and then Form (Cursor + 1) = '%' then
-               Append_Output ("%");
-               Cursor := Cursor + 2;
-            else
-               First := Cursor;
-               Cursor := Cursor + 1;
-               while Cursor <= Form'Last and then
-                 Form (Cursor) in '-' | '+' | ' ' | '#' | '0' .. '9' | '.'
-               loop
-                  Work;
+         procedure Apply_Format (Form : String);
+         procedure Apply_Format (Form : String) is
+         begin
+            Cursor := Activation.Native_Index;
+            while Cursor <= Form'Last loop
+               Work;
+               if Form (Cursor) /= '%' then
+                  Append_Output (String'(1 => Form (Cursor)));
                   Cursor := Cursor + 1;
-               end loop;
-               if Activation.Native_Aux >
-                 Natural (Activation.Native_Arguments.Length)
-               then
-                  Fail (State, "no value");
-               elsif Cursor > Form'Last then
-                  Fail (State, "invalid conversion specification");
-               end if;
-               if Form (Cursor) = 's' then
-                  --  Always use the ordinary tostring path, including for
-                  --  strings: a per-type handler can override that behavior.
-                  Activation.Native_Captures.Append
-                    (New_String (State, Form (First .. Cursor)));
-                  Action.Kind := Invoke;
-                  Action.Function_Value := New_Native (State, "base.tostring");
-                  Action.Arguments.Append
-                    (Activation.Native_Arguments (Activation.Native_Aux));
-                  Activation.Native_Stage := 2;
+               elsif Cursor < Form'Last and then Form (Cursor + 1) = '%' then
+                  Append_Output ("%");
+                  Cursor := Cursor + 2;
                else
-                  Append_Output (Formats.Render
-                    (State, Form (First .. Cursor),
-                     Activation.Native_Arguments (Activation.Native_Aux)));
-                  Action.Kind := Continue_Step;
+                  First := Cursor;
+                  Cursor := Cursor + 1;
+                  while Cursor <= Form'Last and then
+                    Form (Cursor) in '-' | '+' | ' ' | '#' | '0' .. '9' | '.'
+                  loop
+                     Work;
+                     Cursor := Cursor + 1;
+                  end loop;
+                  if Activation.Native_Aux >
+                    Natural (Activation.Native_Arguments.Length)
+                  then
+                     Fail (State, "no value");
+                  elsif Cursor > Form'Last then
+                     Fail (State, "invalid conversion specification");
+                  end if;
+                  if Form (Cursor) = 's' then
+                     --  Always use the ordinary tostring path, including for
+                     --  strings: a per-type handler can override behavior.
+                     Activation.Native_Captures.Append
+                       (New_String (State, Form (First .. Cursor)));
+                     Action.Kind := Invoke;
+                     Action.Function_Value :=
+                       New_Native (State, "base.tostring");
+                     Action.Arguments.Append
+                       (Activation.Native_Arguments (Activation.Native_Aux));
+                     Activation.Native_Stage := 2;
+                  else
+                     Render_Output
+                       (Form (First .. Cursor),
+                        Activation.Native_Arguments (Activation.Native_Aux));
+                     Action.Kind := Continue_Step;
+                  end if;
+                  Activation.Native_Aux := Activation.Native_Aux + 1;
+                  Activation.Native_Index := Cursor + 1;
+                  return;
                end if;
-               Activation.Native_Aux := Activation.Native_Aux + 1;
-               Activation.Native_Index := Cursor + 1;
-               return Action;
-            end if;
-         end loop;
+            end loop;
+         end Apply_Format;
+      begin
+         Strings.Query_Argument
+           (State, Activation.Native_Arguments (1), Apply_Format'Access);
       end;
+      if Action.Kind /= Finished then
+         return Action;
+      end if;
       Action.Results.Append
-        (New_String (State, To_String (Activation.Native_Buffer)));
+        (New_String (State, Activation.Native_Buffer));
       return Action;
    end Advance;
 end Lua.Engine.Format_Drivers;

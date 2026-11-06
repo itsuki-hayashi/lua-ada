@@ -1,8 +1,11 @@
+with Lua.Engine.Canonical;
+with Lua.Prototypes;
 with Lua.Engine.Strings;
 with Ada.Strings.Fixed;
 
 package body Lua.Engine.Inspection is
    use type Integer_Value;
+   use type Lua.Prototypes.Prototype_Access;
 
    function Short_Source (Source : String) return String;
    function Short_Source (Source : String) return String is
@@ -55,6 +58,20 @@ package body Lua.Engine.Inspection is
       procedure Append (Item : Value);
       procedure Work;
       procedure Field (Table : Value; Key : String; Item : Value);
+      function Line_At (Item : Frame_Access; PC : Positive) return Natural;
+      function Current_PC (Item : Frame_Access) return Natural;
+
+      function Current_PC (Item : Frame_Access) return Natural is
+        (if Context.Hook_Active and then Item = Context.Hook_Frame then
+            Item.PC - 1 else Natural'Max (1, Item.PC - 1) - 1);
+      --  A hook observes the instruction about to run; a suspended caller
+      --  observes its saved call PC. Both are zero-based canonical offsets.
+
+      function Line_At (Item : Frame_Access; PC : Positive) return Natural is
+        (if Item.Code.Canonical_Node /= null then
+            Canonical.Source_Line (Item, PC - 1)
+         elsif PC <= Item.Code.Code.Last_Index then
+            Item.Code.Code (PC).Location.Line else 0);
 
       procedure Work is
       begin
@@ -218,15 +235,20 @@ package body Lua.Engine.Inspection is
                  Function_Value.Reference.Upvalues (Positive (Index)) else
                  Function_Value.Reference.Captures (Positive (Index)));
             if Name = "debug.upvalueid" then
-               Append ((Light_Identity_Kind, Cell.Serial));
+               Append ((Light_Identity_Kind, Cell.all'Address));
             else
                if Function_Value.Kind = Closure_Kind then
                   Code := Function_Value.Reference.Code;
                end if;
-               Append (New_String
-                 (State, (if Code = null then "" else Symbol_Text
-                    (Code, (if Code.Is_Main then Code.Environment_Symbol
-                     else Code.Capture_Symbols (Positive (Index)))))));
+               if Code /= null and then Code.Canonical_Node /= null then
+                  Append (Canonical.Upvalue_Name
+                    (State, Code, Positive (Index)));
+               else
+                  Append (New_String
+                    (State, (if Code = null then "" else Symbol_Text
+                       (Code, (if Code.Is_Main then Code.Environment_Symbol
+                        else Code.Capture_Symbols (Positive (Index)))))));
+               end if;
                if Name = "debug.setupvalue" then
                   Cell.Cell_Value := Arg (3);
                else
@@ -270,7 +292,10 @@ package body Lua.Engine.Inspection is
                else C_Option (Image (Arg (Base + 1))));
             Info : constant Value := New_Table (State);
             Source : constant String :=
-              (if Code = null then "=[C]" else To_String (Code.Name));
+              (if Code = null then "=[C]"
+               elsif Code.Canonical_Node /= null then
+                 To_String (Canonical.Source_Bytes (Code))
+               else To_String (Code.Name));
             Line : Integer_Value := -1;
             function Wants (Option : Character) return Boolean is
               (Ada.Strings.Fixed.Index (Options, "" & Option) /= 0);
@@ -281,19 +306,9 @@ package body Lua.Engine.Inspection is
                   Fail (State, "invalid option");
                end if;
             end loop;
-            if Selected /= null and then not Selected.Is_Native and then
-              Selected.PC > 1 and then
-              Selected.PC - 1 <= Selected.Code.Code.Last_Index
-            then
+            if Selected /= null and then not Selected.Is_Native then
                Line := Integer_Value
-                 (Selected.Code.Code (Selected.PC - 1).Location.Line);
-            end if;
-            if Context.Hook_Active and then Selected /= null and then
-              Selected = Context.Hook_Frame and then not Selected.Is_Native
-              and then Selected.PC <= Selected.Code.Code.Last_Index
-            then
-               Line := Integer_Value
-                 (Selected.Code.Code (Selected.PC).Location.Line);
+                 (Line_At (Selected, Current_PC (Selected) + 1));
             end if;
             if Wants ('l') then
                Field (Info, "currentline", (Integer_Kind, Line));
@@ -320,7 +335,9 @@ package body Lua.Engine.Inspection is
                     (Function_Value.Reference.Upvalues.Length))));
                Field (Info, "nparams", (Integer_Kind,
                  (if Code = null then 0 else
-                    Integer_Value (Code.Parameters.Length))));
+                    (if Code.Canonical_Node /= null then
+                        Integer_Value (Code.Canonical_Node.Parameters)
+                     else Integer_Value (Code.Parameters.Length)))));
                Field (Info, "isvararg", (Boolean_Kind,
                  Code = null or else Code.Vararg));
             end if;
@@ -361,12 +378,21 @@ package body Lua.Engine.Inspection is
                   Lines : constant Value := New_Table (State);
                begin
                   if Code /= null then
-                     for Instruction of Code.Code loop
-                        Set (State, Lines,
-                             (Integer_Kind,
-                              Integer_Value (Instruction.Location.Line)),
-                             (Boolean_Kind, True));
-                     end loop;
+                     if Code.Canonical_Node /= null then
+                        for PC in 1 .. Code.Canonical_Node.Lines.Last_Index
+                        loop
+                           Set (State, Lines, (Integer_Kind,
+                             Integer_Value (Canonical.Source_Line
+                               (Code, PC - 1))), (Boolean_Kind, True));
+                        end loop;
+                     else
+                        for Instruction of Code.Code loop
+                           Set (State, Lines,
+                                (Integer_Kind,
+                                 Integer_Value (Instruction.Location.Line)),
+                                (Boolean_Kind, True));
+                        end loop;
+                     end if;
                   end if;
                   Field (Info, "activelines", Lines);
                end;
@@ -382,7 +408,17 @@ package body Lua.Engine.Inspection is
             begin
                if Arg (Base).Kind = Closure_Kind then
                   Code := Arg (Base).Reference.Code;
-                  if Index > 0 and then
+                  if Index > 0 and then Code.Canonical_Node /= null then
+                     declare
+                        Local : constant Value := Canonical.Local_Name
+                          (State, Code, Positive (Index), 0);
+                     begin
+                        if Local.Kind /= Nil_Kind then
+                           Append (Local);
+                           return Result;
+                        end if;
+                     end;
+                  elsif Index > 0 and then
                     Index <= Integer_Value (Code.Parameters.Length)
                   then
                      Append (New_String
@@ -425,6 +461,33 @@ package body Lua.Engine.Inspection is
                      end if;
                   end if;
                   if Result.Is_Empty then
+                     Append (Nil_Value);
+                  end if;
+                  return Result;
+               end if;
+               if Selected.Code.Canonical_Node /= null then
+                  if Index > 0 and then Index <= Integer_Value
+                    (Selected.Canonical_GC_Top)
+                  then
+                     declare
+                        Local : Value := Canonical.Local_Name
+                          (State, Selected.Code, Positive (Index),
+                           Current_PC (Selected));
+                     begin
+                        if Local.Kind = Nil_Kind then
+                           Local := New_String (State, "(temporary)");
+                        end if;
+                        Append (Local);
+                        if Name = "debug.setlocal" then
+                           Canonical.Write_Register
+                             (State, Selected, Natural (Index) - 1,
+                              Arg (Base + 2));
+                        else
+                           Append (Canonical.Read_Register
+                             (State, Selected, Natural (Index) - 1));
+                        end if;
+                     end;
+                  else
                      Append (Nil_Value);
                   end if;
                   return Result;
@@ -498,12 +561,14 @@ package body Lua.Engine.Inspection is
                   Append (Text, "[C]: in function '" &
                     To_String (Item.Native_Name) & "'");
                else
-                  Append (Text, Short_Source (To_String (Item.Code.Name)) &
+                  Append (Text, Short_Source
+                    ((if Item.Code.Canonical_Node /= null then
+                       To_String (Canonical.Source_Bytes (Item.Code))
+                      else To_String (Item.Code.Name))) &
                     ":" &
                     Ada.Strings.Fixed.Trim
                       (Natural'Image
-                        (Item.Code.Code
-                           (Positive'Max (1, Item.PC - 1)).Location.Line),
+                        (Line_At (Item, Current_PC (Item) + 1)),
                        Ada.Strings.Both) & ": in " &
                     (if Item.Code.Is_Main then "main chunk"
                      else "function"));

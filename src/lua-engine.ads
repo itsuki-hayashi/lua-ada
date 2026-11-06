@@ -1,7 +1,14 @@
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 with Lua.Lexers;
+with Lua.Prototypes;
 with Lua.Numbers;
+with Interfaces;
+with Lua.Storage;
+with Lua.Storage.Vectors;
+with Lua.Storage.Buffers;
+with Lua.Runtime_Configuration;
+with System;
 
 private package Lua.Engine is
    --  The engine is deliberately private to Lua's descendants. Public Ada
@@ -29,13 +36,42 @@ private package Lua.Engine is
    end record;
    --  Bounds are per session/execution, not machine-specific compile flags.
 
+   type Byte_String is record
+      Address : System.Address := System.Null_Address;
+      Size : Natural := 0;
+   end record;
+   --  Immutable borrowed view of a string object's managed, NUL-terminated
+   --  payload. Copies do not own or extend its lifetime: retain the Lua value
+   --  in traced storage whenever a view must survive a collection point.
+   function To_String (Item : Byte_String) return String;
+   function Length (Item : Byte_String) return Natural;
+   function Element (Item : Byte_String; Index : Positive) return Character;
+   function "=" (Left, Right : Byte_String) return Boolean;
+   function "=" (Left : Byte_String; Right : String) return Boolean;
+   function "<" (Left, Right : Byte_String) return Boolean;
+
+   subtype Owned_Buffer is Lua.Storage.Buffers.Buffer;
+   function Length (Item : Owned_Buffer) return Natural
+     renames Lua.Storage.Buffers.Length;
+   function To_String (Item : Owned_Buffer) return String
+     renames Lua.Storage.Buffers.To_String;
+   procedure Append (Item : in out Owned_Buffer; Text : String)
+     renames Lua.Storage.Buffers.Append;
+   procedure Append (Item : in out Owned_Buffer; Text : Character)
+     renames Lua.Storage.Buffers.Append;
+
    type Heap_Kind is
      (String_Object, Table_Object, Environment, Closure, Native_Closure,
       Cell_Object, Thread_Object);
    type Heap_Object (Kind : Heap_Kind);
    type Object_Access is access Heap_Object;
+   for Object_Access'Storage_Pool use Lua.Storage.Pool;
    type Prototype;
    type Prototype_Access is access Prototype;
+   for Prototype_Access'Storage_Pool use Lua.Storage.Pool;
+   type Canonical_Program;
+   type Canonical_Program_Access is access Canonical_Program;
+   for Canonical_Program_Access'Storage_Pool use Lua.Storage.Pool;
 
    type Native_Kind is
      (Print_Function, Assert_Function, Error_Function, Pcall_Function,
@@ -58,7 +94,7 @@ private package Lua.Engine is
            Thread_Kind =>
             Reference : Object_Access;
          when Native_Kind_Value => Native_Data : Native_Kind;
-         when Light_Identity_Kind => Identity : Positive;
+         when Light_Identity_Kind => Identity : System.Address;
       end case;
    end record;
    Nil_Value : constant Value := (Kind => Nil_Kind);
@@ -67,14 +103,24 @@ private package Lua.Engine is
    package Objects is new Ada.Containers.Vectors (Positive, Object_Access);
    package Prototypes is new Ada.Containers.Vectors
      (Positive, Prototype_Access);
+   package Scalar_Values is new Lua.Storage.Vectors (Value);
+   package Cell_References is new Lua.Storage.Vectors (Object_Access);
+   package Canonical_Prototypes is new
+     Lua.Storage.Vectors (Prototype_Access);
    package Registers is new Ada.Containers.Vectors (Positive, Positive);
    package Symbols is new Ada.Containers.Vectors (Positive, Positive);
 
    type Table_Entry is record
       Key  : Value;
       Item : Value;
+      Next : Natural := 0;
+      Free_Next : Natural := 0;
+      Free_Listed : Boolean := False;
    end record;
-   package Entries is new Ada.Containers.Vectors (Positive, Table_Entry);
+   --  Member rows retain traversal order and deleted keys. Next links only
+   --  hash collisions; dense positive keys use a separate direct index.
+   package Table_Indexes is new Lua.Storage.Vectors (Natural);
+   package Entries is new Lua.Storage.Vectors (Table_Entry);
 
    type Binding is record
       Symbol : Positive;
@@ -88,9 +134,17 @@ private package Lua.Engine is
       case Kind is
          when Thread_Object => Context_Index : Positive := 1;
          when Cell_Object => Cell_Value : Value;
-         when String_Object => Bytes : Unbounded_String;
+         when String_Object =>
+            Bytes : Byte_String;
+            C_Bytes : System.Address := System.Null_Address;
+            --  Optional stable NUL-terminated view owned by Memory.
+            String_Hash : Interfaces.Unsigned_64 := 0;
          when Table_Object =>
             Members : Entries.Vector;
+            Array_Index : Table_Indexes.Vector;
+            Hash_Index : Table_Indexes.Vector;
+            Prefix_Length : Natural := 0;
+            Free_Row : Natural := 0;
             Metatable : Object_Access;
          when Environment =>
             Parent : Object_Access;
@@ -141,6 +195,9 @@ private package Lua.Engine is
    package Symbol_Names is new Ada.Containers.Vectors (Positive, Symbol_Name);
 
    type Prototype is record
+      Canonical_Node : Lua.Prototypes.Prototype_Access;
+      Canonical_Owner : Canonical_Program_Access;
+      Canonical_Constants : Scalar_Values.Vector;
       Marked       : Boolean := False;
       Name         : Unbounded_String;
       Code         : Instructions.Vector;
@@ -158,12 +215,30 @@ private package Lua.Engine is
       Register_Count     : Natural := 0;
    end record;
 
+   type Canonical_Program is record
+      Model : Lua.Prototypes.Program;
+      Wrappers : Canonical_Prototypes.Vector;
+      References : Natural := 0;
+      Marked : Boolean := False;
+   end record;
+   --  Runtime wrappers retain one managed immutable canonical graph as a
+   --  group. The last released wrapper destroys that owner exactly once.
+
+   type Canonical_Pending_Kind is
+     (No_Canonical_Result, Store_Canonical_Results,
+      Test_Canonical_Result, Concat_Canonical_Result);
+
    package Packets is new Ada.Containers.Vectors
      (Positive, Values.Vector, "=" => Values."=");
    type Close_Entry is record
       Cell : Object_Access;
       Symbol : Natural := 0;
       Depth : Natural := 0;
+      Frozen_Value : Value := Nil_Value;
+      Frozen : Boolean := False;
+      --  Snapshot only when this declaration starts leaving its scope.
+      --  A close handler may mutate the shared upvalue cell, but that must
+      --  not replace a later handler's already departing stack-slot value.
    end record;
    package Close_Lists is new Ada.Containers.Vectors (Positive, Close_Entry);
    type Unwind_Reason is
@@ -171,6 +246,7 @@ private package Lua.Engine is
       Coroutine_Exit);
    type Frame;
    type Frame_Access is access Frame;
+   for Frame_Access'Storage_Pool use Lua.Storage.Pool;
    package Frames is new Ada.Containers.Vectors (Positive, Frame_Access);
 
    type Frame is record
@@ -181,7 +257,7 @@ private package Lua.Engine is
       Native_Results : Values.Vector;
       Native_Captures : Values.Vector;
       Native_Self : Object_Access;
-      Native_Buffer : Unbounded_String;
+      Native_Buffer : Owned_Buffer;
       Native_Stage : Natural := 0;
       Native_Index : Natural := 0;
       Native_Aux : Natural := 0;
@@ -194,6 +270,16 @@ private package Lua.Engine is
       Scope      : Object_Access;
       Scope_Depth : Natural := 0;
       Slots      : Packets.Vector;
+      Canonical_Registers : Scalar_Values.Vector;
+      Canonical_Cells : Cell_References.Vector;
+      Canonical_Top : Natural := 0;
+      Canonical_GC_Top : Natural := 0;
+      --  Exclusive live scalar stack bound while a caller is suspended.
+      Canonical_Pending : Canonical_Pending_Kind := No_Canonical_Result;
+      Canonical_Base : Natural := 0;
+      Canonical_Wanted : Integer := 0;
+      Canonical_Test : Boolean := False;
+      Canonical_Concat_Last : Natural := 0;
       Varargs    : Values.Vector;
       Vararg_Table : Object_Access;
       Return_To  : Natural := 0;
@@ -241,7 +327,8 @@ private package Lua.Engine is
       Dead_Context);
    type Execution_Phase is (Executing, Closing);
    type Failure_Kind is
-     (No_Failure, Language_Failure, Syntax_Failure, Unsupported_Failure,
+     (No_Failure, Language_Failure, Memory_Failure, Syntax_Failure,
+      Unsupported_Failure,
       Host_Abort);
    type Transfer_Kind is
      (No_Transfer, Completed, Lua_Raised, Yielded, Resume_Requested,
@@ -256,9 +343,16 @@ private package Lua.Engine is
 
    type Execution_Context;
    type Context_Access is access Execution_Context;
+   for Context_Access'Storage_Pool use Lua.Storage.Pool;
    type Execution_Context is record
       Stack        : Frames.Vector;
       Arguments    : Values.Vector;
+      Foreign_Stack : Values.Vector;
+      Foreign_State : System.Address := System.Null_Address;
+      Foreign_Block : System.Address := System.Null_Address;
+      Foreign_Control : System.Address := System.Null_Address;
+      --  The public C stack is rooted independently of initial Lua arguments.
+      --  A synchronous foreign call borrows it without changing ownership.
       Failure      : Value;
       Has_Failure_Value : Boolean := False;
       Failure_Text : Unbounded_String;
@@ -291,10 +385,22 @@ private package Lua.Engine is
    type Context_Id is new Positive;
    --  IDs are relative to one owning world, not transferable object handles.
 
-   type World is record
+   type Random_State is array (0 .. 3) of Interfaces.Unsigned_64;
+
+   type World is limited record
+      Memory : Lua.Storage.Owner;
+      --  The allocator owner outlives every typed object and buffer in this
+      --  universe. Explicit subpool allocators never borrow a global owner.
       Bounds       : Limits;
       Saved_Bounds : Limits;
       Policy : Execution_Policy := Bounded;
+      Random_Words : Random_State := [others => 0];
+      Random_Seeded : Boolean := False;
+      Random_Use_32_Bits : Boolean :=
+        Lua.Runtime_Configuration.Random_32_Bits;
+      Math_Compatibility : Boolean :=
+        Lua.Runtime_Configuration.Compatibility_Math;
+      Open_Standard_Libraries : Boolean := True;
       Contexts     : Context_Lists.Vector;
       Current      : Context_Access;
       Main_Context : Context_Access;
@@ -303,6 +409,16 @@ private package Lua.Engine is
       Heap         : Objects.Vector;
       Programs     : Prototypes.Vector;
       Globals      : Object_Access;
+      Foreign_Registry : Object_Access;
+      Memory_Error_Value : Value;
+      Entry_Code : Prototype_Access;
+      Operation_Roots : Values.Vector;
+      Operation_Programs : Prototypes.Vector;
+      Operation_Active : Boolean := False;
+      Operation_Start : Positive := 1;
+      Compiling : Boolean := False;
+      Memory_Ready : Boolean := False;
+      Collector_Active : Boolean := False;
       String_Metatable : Object_Access;
       Loaded_Modules : Object_Access;
       Preload_Modules : Object_Access;
@@ -330,6 +446,23 @@ private package Lua.Engine is
                    Resource : Boolean := False);
    --  Record a diagnostic before raising the internal transfer exception.
 
+   procedure Begin_Operation (State : in out World);
+   procedure End_Operation (State : in out World);
+   --  Bound temporary construction roots to one atomic VM/foreign operation.
+   --  Publish outgoing values in frames/stacks before ending the operation.
+   procedure Pin (State : in out World; Item : Value);
+   procedure Pin (State : in out World; Items : Values.Vector);
+   procedure Pin (State : in out World; Code : Prototype_Access);
+   --  Retain preexisting values before destructive stack/frame transitions.
+   function Retry_Allocation
+     (State : in out World; Retried : in out Boolean) return Boolean;
+   --  Perform at most one emergency collection for a refused allocation.
+   --  Bootstrap and recursive collection never retry or call Lua finalizers.
+
+   procedure Record_Memory_Error (State : in out World);
+   --  Publish the preallocated memory-error object without a new Lua
+   --  allocation, and acknowledge any wrapped controlled-copy refusal.
+
    function Create_Context (State : in out World) return Context_Id;
    --  Register an empty context without selecting it or resetting budgets.
    --  Finalize releases all registered contexts. Host-owned inactive contexts
@@ -342,16 +475,34 @@ private package Lua.Engine is
    --  Preserve explicit host limits when temporarily selecting
    --  compatible work.
 
+   procedure Release_Foreign_Context
+     (State : in out World; Context : Context_Access);
+   --  Release opaque foreign control/surface blocks before a context dies.
+   --  Both blocks are trivially finalizable and owned by State.Memory.
+
    procedure Initialize (State : in out World; Bounds : Limits);
    procedure Finalize (State : in out World);
-   procedure Collect (State : in out World);
+   procedure Collect
+     (State : in out World; Emergency : Boolean := False);
    --  Mark/sweep sees globals, frames, packets, captures, and current failure.
 
    function New_Thread (State : in out World; Entry_Function : Value)
                         return Value;
    --  Allocate a Lua-owned context and its unique thread object.
 
+   function New_Frame (State : in out World) return Frame_Access;
+   function New_Program (State : in out World) return Prototype_Access;
+   procedure Release_Program (Item : in out Prototype_Access);
+   --  Release the wrapper and its shared canonical owner at the final edge.
+   function New_Cell (State : in out World; Item : Value) return Object_Access;
+   --  Allocate an actual stable lexical cell, rooted by its published owner.
+   --  Bind every frame-owned managed container before any capacity grows.
+
    function New_String (State : in out World; Text : String) return Value;
+   function New_String
+     (State : in out World; Text : in out Owned_Buffer) return Value;
+   --  Publish a managed builder through a borrowed view, avoiding an
+   --  input-sized temporary Ada String allocation.
    function New_Table (State : in out World) return Value;
    function New_Environment
      (State : in out World; Parent : Object_Access) return Object_Access;

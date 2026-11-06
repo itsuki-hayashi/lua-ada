@@ -7,10 +7,13 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Lua.Engine.Compiler;
 with Lua.Sources;
+with Lua.Storage.Buffers;
 with Lua_Ada_Config;
 
 package body Lua.Engine.Loaders is
+   package Managed renames Lua.Storage.Buffers;
    use type Ada.Containers.Count_Type;
+   use type Ada.Exceptions.Exception_Id;
    use type Ada.Directories.File_Kind;
    use type Ada.Streams.Stream_Element_Offset;
    use type Ada.Streams.Stream_IO.Count;
@@ -32,20 +35,31 @@ package body Lua.Engine.Loaders is
       function Field (Table : Value; Key : String) return Value;
       function Package_Table return Value;
       procedure Work;
-      function Read_File (Path : String) return String;
-      function Read_Input return String;
+      procedure Read_File (Path : String; Output : in out Managed.Buffer);
+      procedure Read_Input (Output : in out Managed.Buffer);
+      procedure Prepare_File (Source : in out Managed.Buffer);
+      procedure Copy_Bytes
+        (Item : Value; Output : in out Managed.Buffer; Appending : Boolean);
       function Replace_All (Source, Pattern, Replacement : String)
                             return String;
       function Search_Path
         (Module_Name, Path, Separator, Replacement : String;
-         Errors : out Unbounded_String) return String;
+         Errors : in out Managed.Buffer) return String;
       function Compile_Source
         (Source, Chunk_Name, Mode : String; Environment : Value)
+         return Values.Vector;
+      function Compile_Buffer
+        (Source : in out Managed.Buffer; Chunk_Name, Mode : String;
+         Environment : Value; Source_Name : Boolean := False)
+         return Values.Vector;
+      function Compile_Buffer
+        (Source, Chunk_Name, Mode : in out Managed.Buffer;
+         Environment : Value; Source_Name : Boolean := False)
          return Values.Vector;
       function Call (Function_Value : Value; Args : Values.Vector)
                      return Native_Action;
       Package_Value, Item, Function_Value, Data, Environment : Value;
-      Buffer, Errors, Chunk_Name, Mode : Unbounded_String;
+      Buffer, Errors, Chunk_Name, Mode : Managed.Buffer;
       Directory_Separator : constant String :=
         (if Lua_Ada_Config.Alire_Host_OS = "windows" then "\" else "/");
 
@@ -93,32 +107,34 @@ package body Lua.Engine.Loaders is
                  Arguments => Args, others => <>);
       end Call;
 
-      function Read_File (Path : String) return String is
+      procedure Read_File (Path : String; Output : in out Managed.Buffer) is
          package Files renames Ada.Streams.Stream_IO;
          File : Files.File_Type;
+         Data : Ada.Streams.Stream_Element_Array (1 .. 4_096);
+         Last : Ada.Streams.Stream_Element_Offset;
+         Text : String (1 .. 4_096);
       begin
          Files.Open (File, Files.In_File, Path);
          if Files.Size (File) > Files.Count (State.Bounds.Source_Bytes) then
             Files.Close (File);
             Fail (State, "source byte limit exceeded", Resource => True);
          end if;
-         declare
-            Data : Ada.Streams.Stream_Element_Array
-              (1 .. Ada.Streams.Stream_Element_Offset (Files.Size (File)));
-            Last : Ada.Streams.Stream_Element_Offset;
-            Source : String (1 .. Data'Length);
-         begin
+         Output.Clear;
+         --  File control records and this fixed transfer block are bounded
+         --  host I/O storage. Source-proportional bytes grow only in the
+         --  universe's managed buffer, including files that change after open.
+         while not Files.End_Of_File (File) loop
             Files.Read (File, Data, Last);
-            Files.Close (File);
-            if Last /= Data'Last then
-               raise Ada.Text_IO.End_Error with "short source read";
+            if Natural (Last) > State.Bounds.Source_Bytes - Output.Length then
+               Fail (State, "source byte limit exceeded", Resource => True);
             end if;
-            for Index in Source'Range loop
-               Source (Index) := Character'Val
+            for Index in 1 .. Natural (Last) loop
+               Text (Index) := Character'Val
                  (Data (Ada.Streams.Stream_Element_Offset (Index)));
             end loop;
-            return Source;
-         end;
+            Output.Append (Text (1 .. Natural (Last)));
+         end loop;
+         Files.Close (File);
       exception
          when others =>
             if Files.Is_Open (File) then
@@ -127,33 +143,78 @@ package body Lua.Engine.Loaders is
             raise;
       end Read_File;
 
-      function Read_Input return String is
-         Buffer : Unbounded_String;
+      procedure Read_Input (Output : in out Managed.Buffer) is
          Byte : Character;
       begin
+         Output.Clear;
          while not Ada.Text_IO.End_Of_File loop
             Work;
-            if Length (Buffer) >= State.Bounds.Source_Bytes then
+            if Output.Length >= State.Bounds.Source_Bytes then
                Fail (State, "source byte limit exceeded", Resource => True);
             end if;
             if Ada.Text_IO.End_Of_Line then
                Ada.Text_IO.Skip_Line;
-               Append (Buffer, Character'Val (10));
+               Output.Append (Character'Val (10));
             else
                Ada.Text_IO.Get (Byte);
-               Append (Buffer, Byte);
+               Output.Append (Byte);
             end if;
          end loop;
-         return To_String (Buffer);
       end Read_Input;
+
+      procedure Prepare_File (Source : in out Managed.Buffer) is
+         Info : Lua.Sources.File_Preamble_Info;
+         procedure Inspect (Text : String);
+         procedure Inspect (Text : String) is
+         begin
+            Info := Lua.Sources.Inspect_File_Preamble (Text);
+         end Inspect;
+      begin
+         Source.Query (Inspect'Access);
+         --  Apply the shared pure policy after releasing the borrowed view.
+         --  Moving away the BOM and blanking the interpreter line preserve
+         --  every newline byte without creating another full source string.
+         if Info.Skipped_Bytes /= 0 then
+            Source.Delete (1, Info.Skipped_Bytes);
+         end if;
+         for Index in 1 .. Info.Blanked_Bytes loop
+            Source.Replace_Element (Index, ' ');
+         end loop;
+      end Prepare_File;
+
+      procedure Copy_Bytes
+        (Item : Value; Output : in out Managed.Buffer; Appending : Boolean)
+      is
+         procedure Write (Text : String);
+         procedure Write (Text : String) is
+         begin
+            if Appending then
+               Output.Append (Text);
+            else
+               Output.Set_Value (Text);
+            end if;
+         end Write;
+      begin
+         if Item.Kind = String_Kind then
+            declare
+               View : constant String (1 .. Length (Item.Reference.Bytes))
+                 with Import, Address => Item.Reference.Bytes.Address;
+            begin
+               Write (View);
+            end;
+         else
+            Write (Bytes (Item));
+         end if;
+      end Copy_Bytes;
 
       function Replace_All (Source, Pattern, Replacement : String)
                             return String
       is
-         Result : Unbounded_String;
+         Result : Managed.Buffer;
          First : Positive := Source'First;
          Found : Natural;
       begin
+         Result.Set_Owner (Lua.Storage.Reference (State.Memory));
          if Pattern'Length = 0 then
             return Source;
          end if;
@@ -180,14 +241,14 @@ package body Lua.Engine.Loaders is
 
       function Search_Path
         (Module_Name, Path, Separator, Replacement : String;
-         Errors : out Unbounded_String) return String
+         Errors : in out Managed.Buffer) return String
       is
          Converted : constant String :=
            Replace_All (Module_Name, Separator, Replacement);
          First : Positive := Path'First;
          Last : Natural;
       begin
-         Errors := Null_Unbounded_String;
+         Errors.Clear;
          while First <= Path'Last loop
             Work;
             Last := First;
@@ -295,6 +356,11 @@ package body Lua.Engine.Loaders is
             when Language_Error =>
                if (State.Current.Failure_Class = Host_Abort) then
                   raise;
+               elsif State.Current.Failure_Class = Memory_Failure then
+                  Restore;
+                  Results.Append (Nil_Value);
+                  Results.Append (State.Memory_Error_Value);
+                  return Results;
                end if;
                declare
                   Message : constant String := Chunk_Name & ":" &
@@ -316,18 +382,72 @@ package body Lua.Engine.Loaders is
          Results.Append (New_Closure (State, Code, Scope));
          return Results;
       end Compile_Source;
+
+      function Compile_Buffer
+        (Source : in out Managed.Buffer; Chunk_Name, Mode : String;
+         Environment : Value; Source_Name : Boolean := False)
+         return Values.Vector
+      is
+         Results : Values.Vector;
+         procedure Compile (Text : String);
+         procedure Compile (Text : String) is
+         begin
+            Results := Compile_Source
+              (Text, (if Source_Name then Text else Chunk_Name),
+               Mode, Environment);
+         end Compile;
+      begin
+         --  The compiler consumes the borrowed view synchronously. Its owned
+         --  syntax/prototype storage must never retain this transient address.
+         Source.Query (Compile'Access);
+         return Results;
+      end Compile_Buffer;
+
+      function Compile_Buffer
+        (Source, Chunk_Name, Mode : in out Managed.Buffer;
+         Environment : Value; Source_Name : Boolean := False)
+         return Values.Vector
+      is
+         Results : Values.Vector;
+         procedure Compile_Text (Text : String);
+         procedure Compile_Text (Text : String) is
+            procedure With_Name (Name : String);
+            procedure With_Name (Name : String) is
+               procedure With_Mode (Flags : String);
+               procedure With_Mode (Flags : String) is
+               begin
+                  Results := Compile_Source
+                    (Text, (if Source_Name then Text else Name),
+                     Flags, Environment);
+               end With_Mode;
+            begin
+               Mode.Query (With_Mode'Access);
+            end With_Name;
+         begin
+            Chunk_Name.Query (With_Name'Access);
+         end Compile_Text;
+      begin
+         Source.Query (Compile_Text'Access);
+         return Results;
+      end Compile_Buffer;
    begin
+      Buffer.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Errors.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Chunk_Name.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Mode.Set_Owner (Lua.Storage.Reference (State.Memory));
       Work;
       if Name in "base.load" | "load" then
          if Activation.Native_Stage = 0 then
             --  Validate host-independent options before requesting a reader.
             --  An invalid mode/name must not run user callbacks as a side
             --  effect before raising its argument error.
-            Mode := (if Arg (3).Kind = Nil_Kind then
-                        To_Unbounded_String ("bt")
-                     else To_Unbounded_String (Bytes (Arg (3))));
+            if Arg (3).Kind = Nil_Kind then
+               Mode.Set_Value ("bt");
+            else
+               Copy_Bytes (Arg (3), Mode, False);
+            end if;
             if Arg (2).Kind /= Nil_Kind then
-               Chunk_Name := To_Unbounded_String (Bytes (Arg (2)));
+               Copy_Bytes (Arg (2), Chunk_Name, False);
             end if;
             if Is_Function (Arg (1)) or else
               Arg (1).Kind not in String_Kind | Integer_Kind | Real_Kind
@@ -344,7 +464,7 @@ package body Lua.Engine.Loaders is
                return Call ((Native_Kind_Value, Pcall_Function),
                             Values.To_Vector (Arg (1), 1));
             end if;
-            Activation.Native_Buffer := To_Unbounded_String (Bytes (Arg (1)));
+            Copy_Bytes (Arg (1), Activation.Native_Buffer, False);
          elsif Activation.Native_Stage = 1 then
             if not Truth (Returned (1)) then
                --  Error values need not be strings. Keep the exact object
@@ -364,34 +484,41 @@ package body Lua.Engine.Loaders is
             end if;
             if Item.Kind /= Nil_Kind then
                declare
-                  Part : constant String := Bytes (Item);
+                  Size : constant Natural :=
+                    (if Item.Kind = String_Kind then
+                       Length (Item.Reference.Bytes) else Bytes (Item)'Length);
                begin
-                  if Part'Length > State.Bounds.Source_Bytes -
+                  if Size > State.Bounds.Source_Bytes -
                     Length (Activation.Native_Buffer)
                   then
                      Fail (State, "source byte limit exceeded",
                            Resource => True);
                   end if;
-                  if Part'Length > 0 then
-                     Append (Activation.Native_Buffer, Part);
+                  if Size > 0 then
+                     Copy_Bytes (Item, Activation.Native_Buffer, True);
                      return Call ((Native_Kind_Value, Pcall_Function),
                                   Values.To_Vector (Arg (1), 1));
                   end if;
                end;
             end if;
          end if;
-         Chunk_Name := (if Arg (2).Kind = Nil_Kind then
-                          (if Is_Function (Arg (1)) then
-                             To_Unbounded_String ("=(load)")
-                           else Activation.Native_Buffer)
-                        else To_Unbounded_String (Bytes (Arg (2))));
-         Mode := (if Arg (3).Kind = Nil_Kind then To_Unbounded_String ("bt")
-                  else To_Unbounded_String (Bytes (Arg (3))));
+         if Arg (2).Kind = Nil_Kind then
+            Chunk_Name.Set_Value
+              ((if Is_Function (Arg (1)) then "=(load)" else ""));
+         else
+            Copy_Bytes (Arg (2), Chunk_Name, False);
+         end if;
+         if Arg (3).Kind = Nil_Kind then
+            Mode.Set_Value ("bt");
+         else
+            Copy_Bytes (Arg (3), Mode, False);
+         end if;
          Environment := (if Activation.Native_Arguments.Length >= 4
                          then Arg (4) else (Table_Kind, State.Globals));
-         Result.Results := Compile_Source
-           (To_String (Activation.Native_Buffer), To_String (Chunk_Name),
-            To_String (Mode), Environment);
+         Result.Results := Compile_Buffer
+           (Activation.Native_Buffer, Chunk_Name, Mode, Environment,
+            Source_Name => Arg (2).Kind = Nil_Kind and then
+              not Is_Function (Arg (1)));
       elsif Name in "base.loadfile" | "loadfile" | "base.dofile" | "dofile"
       then
          if Activation.Native_Stage = 1 then
@@ -399,10 +526,12 @@ package body Lua.Engine.Loaders is
             return Result;
          end if;
          begin
-            Buffer := To_Unbounded_String
-              (if Arg (1).Kind = Nil_Kind then
-                 Lua.Sources.File_Preamble (Read_Input)
-               else Lua.Sources.File_Preamble (Read_File (Bytes (Arg (1)))));
+            if Arg (1).Kind = Nil_Kind then
+               Read_Input (Buffer);
+            else
+               Read_File (Bytes (Arg (1)), Buffer);
+            end if;
+            Prepare_File (Buffer);
          exception
             when Error : Ada.Text_IO.Name_Error | Ada.Text_IO.Use_Error |
               Ada.Text_IO.End_Error =>
@@ -414,19 +543,22 @@ package body Lua.Engine.Loaders is
                  (State, Ada.Exceptions.Exception_Message (Error)));
                return Result;
          end;
-         Chunk_Name := (if Arg (1).Kind = Nil_Kind then
-                          To_Unbounded_String ("stdin")
-                        else To_Unbounded_String (Bytes (Arg (1))));
-         Mode := (if Name in "base.dofile" | "dofile" or else
-                    Arg (2).Kind = Nil_Kind
-                  then To_Unbounded_String ("bt")
-                  else To_Unbounded_String (Bytes (Arg (2))));
+         if Arg (1).Kind = Nil_Kind then
+            Chunk_Name.Set_Value ("stdin");
+         else
+            Copy_Bytes (Arg (1), Chunk_Name, False);
+         end if;
+         if Name in "base.dofile" | "dofile" or else Arg (2).Kind = Nil_Kind
+         then
+            Mode.Set_Value ("bt");
+         else
+            Copy_Bytes (Arg (2), Mode, False);
+         end if;
          Environment := (if Name not in "base.dofile" | "dofile" and then
                             Activation.Native_Arguments.Length >= 3
                          then Arg (3) else (Table_Kind, State.Globals));
-         Result.Results := Compile_Source
-           (To_String (Buffer), To_String (Chunk_Name), To_String (Mode),
-            Environment);
+         Result.Results := Compile_Buffer
+           (Buffer, Chunk_Name, Mode, Environment);
          if Name in "base.dofile" | "dofile" then
             if Result.Results.First_Element.Kind = Nil_Kind then
                Fail (State, Bytes (Result.Results (2)));
@@ -444,7 +576,7 @@ package body Lua.Engine.Loaders is
          begin
             if Path'Length = 0 then
                Result.Results.Append (Nil_Value);
-               Result.Results.Append (New_String (State, To_String (Errors)));
+               Result.Results.Append (New_String (State, Errors));
             else
                Result.Results.Append (New_String (State, Path));
             end if;
@@ -468,11 +600,13 @@ package body Lua.Engine.Loaders is
                Directory_Separator, Errors);
          begin
             if Path'Length = 0 then
-               Result.Results.Append (New_String (State, To_String (Errors)));
+               Result.Results.Append (New_String (State, Errors));
             else
                begin
-                  Result.Results := Compile_Source
-                    (Lua.Sources.File_Preamble (Read_File (Path)), Path, "t",
+                  Read_File (Path, Buffer);
+                  Prepare_File (Buffer);
+                  Result.Results := Compile_Buffer
+                    (Buffer, Path, "t",
                      (Table_Kind, State.Globals));
                exception
                   when Error : Ada.Text_IO.Name_Error | Ada.Text_IO.Use_Error |
@@ -502,7 +636,7 @@ package body Lua.Engine.Loaders is
             Activation.Native_Captures.Clear;
             Activation.Native_Captures.Append (Package_Value);
             Activation.Native_Captures.Append (Item);
-            Activation.Native_Buffer := To_Unbounded_String
+            Activation.Native_Buffer.Set_Value
               ("module '" & Bytes (Item) & "' not found:");
             if Length (Activation.Native_Buffer) > State.Bounds.String_Bytes
             then
@@ -566,5 +700,29 @@ package body Lua.Engine.Loaders is
          Fail (State, "unknown loader: " & Name);
       end if;
       return Result;
+   exception
+      when Error : Lua.Storage.Allocation_Error | Program_Error =>
+         if not Lua.Storage.Refusal_Pending (State.Memory) and then
+           Ada.Exceptions.Exception_Identity (Error) /=
+             Lua.Storage.Allocation_Error'Identity
+         then
+            raise;
+         end if;
+         if Name not in "base.load" | "load" | "base.loadfile" | "loadfile"
+         then
+            raise;
+         end if;
+         --  C Lua's protected parser returns nil/message for memory errors,
+         --  while dofile and module search raise them. Host quotas never enter
+         --  this branch: they retain the execution-abort policy.
+         Record_Memory_Error (State);
+         Result.Results.Clear;
+         Result.Results.Append (Nil_Value);
+         Result.Results.Append (State.Memory_Error_Value);
+         State.Current.Failure := Nil_Value;
+         State.Current.Has_Failure_Value := False;
+         State.Current.Failure_Class := No_Failure;
+         State.Current.Failure_Text := Null_Unbounded_String;
+         return Result;
    end Advance;
 end Lua.Engine.Loaders;

@@ -90,3 +90,17 @@ The bounded lifecycle runtime acceptance is complete: 587 AUnit cases, five
 selected unchanged execution files and all 18 inspected platform jobs plus
 Windows static-PIC. [Its validation record](validation-m3-lifecycle.md) owns the
 exact revision and scope; PR #7 records final publication-head checks.
+
+## Complete upstream implementation delivery
+
+Merged PR #7 is the starting point for one approved full-M3 implementation PR
+on codex/m3-upstream-conformance. [ADR 0010](decisions/0010-full-upstream-delivery.md)
+supersedes the earlier separate-PR sequence. Eight dependent checkpoints cover
+contracts, allocator-aware storage, a real C-boundary pilot, canonical execution
+and binary chunks, collection/finalization, complete APIs/libraries/CLI,
+source-cited coverage/equivalents, and all 26 final acceptance contexts.
+
+The [M3 acceptance owner](milestones/m3.md) defines exact exit evidence. Current
+inventory/harness work is partial infrastructure; the remaining runtime and
+review gates stay open. Do not stop after one checkpoint and present it as the
+requested full-suite delivery. Ecosystem testing/LuaRocks remains M4.
