@@ -277,6 +277,7 @@ private package Lua.Engine is
       Hook : Value;
       Hook_Mask : Unbounded_String;
       Hook_Count : Natural := 0;
+      Hook_Reported_Count : Integer_Value := 0;
       Hook_Remaining : Natural := 0;
       Hook_Active : Boolean := False;
       Hook_Frame : Frame_Access;
@@ -316,6 +317,11 @@ private package Lua.Engine is
       Output       : Unbounded_String;
    end record;
    type World_Access is access World;
+
+   function C_Option (Text : String) return String;
+   --  Return the prefix before NUL for pinned Lua's C-string option fields.
+   --  Lua values remain byte strings; apply this only at such option parsers.
+   --  Arbitrary Ada String lower bounds are preserved by the slice.
 
    Language_Error : exception;
    --  Internal structured control transfer only; sessions catch it.

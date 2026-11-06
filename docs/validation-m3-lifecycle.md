@@ -128,3 +128,9 @@ The final weak-mode boundary regression follows pinned lgc.c: __mode uses
 C-string flag scanning, so bytes after NUL add no weakness. Local AUnit now
 passes 578 cases (90 new), zero failed assertions/errors. Final acceptance must
 show those 578 cases in every current-head configuration.
+
+The completed API result/configuration audit adds nine focused regressions:
+collector status/default results, disabled hook arity, empty hook normalization,
+signed count reflection and C-string option boundaries. Local AUnit and the
+complete validation/static pipeline pass 587 cases (99 new), zero failures or
+unexpected errors. Current-head CI must show 587 in every configuration.

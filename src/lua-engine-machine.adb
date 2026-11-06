@@ -1245,18 +1245,18 @@ package body Lua.Engine.Machine is
          elsif Name = "base.collectgarbage" then
             declare
                Option : constant String :=
-                 (if Activation.Native_Arguments.Is_Empty then "collect"
-                  else Image (Left));
+                 (if Left.Kind = Nil_Kind then "collect"
+                  else C_Option (Image (Left)));
             begin
                if Option = "collect" then
                   Collect (State);
                   Finish ((Integer_Kind, 0));
                elsif Option = "stop" then
                   State.GC_Running := False;
-                  Complete (Values.Empty_Vector);
+                  Finish ((Integer_Kind, 0));
                elsif Option = "restart" then
                   State.GC_Running := True;
-                  Complete (Values.Empty_Vector);
+                  Finish ((Integer_Kind, 0));
                elsif Option = "isrunning" then
                   Finish ((Boolean_Kind, State.GC_Running));
                else

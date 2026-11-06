@@ -147,3 +147,21 @@ mode scan at NUL while preserving Lua byte strings everywhere else. A focused
 weak-mode regression brings local AUnit to 578 passing cases (90 new), with zero
 failed assertions/errors. Implementation changes are frozen for final acceptance
 except repairs required by an actual failing check.
+
+## Final API result and option audit
+
+Direct C comparisons found and repaired observable result/configuration edges:
+collector stop/restart return one integer zero, explicit nil selects collect,
+and disabled gethook returns one nil. Empty effective hook configurations disable
+the hook; negative requested counts remain visible without enabling count events.
+Pinned C-string option boundaries now apply to collector/debug options and hook
+masks as well as weak modes, using a private standard-Ada helper. Nine focused
+cases bring local AUnit to 587 passing cases (99 new), zero failed assertions or
+unexpected errors. A reflow preserved the exact bytes of 91 Lua fixtures while
+splitting their Ada literals at readable statement boundaries.
+
+scripts/check.ps1 -Profile validation -LibraryType static passed this contract
+revision, including 587 AUnit cases, 35 CLI cases, eight differential fixtures
+and all five selected unchanged upstream files. Evidence is in ignored
+reports/m3-final-contract-validation.log. Final-current-head platform checks
+must validate this revision rather than inherit an earlier checkpoint.

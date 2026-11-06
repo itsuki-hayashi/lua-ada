@@ -119,3 +119,8 @@ C-API, allocator, canonical execution, binary-chunk or ecosystem compatibility.
 Lifecycle runtime acceptance has passed the [18-job matrix](validation-m3-lifecycle.md)
 and Windows static-PIC. upvalueid exposes opaque light-userdata identities for
 actual cells; general userdata creation and C-visible pointers remain deferred.
+
+Collector controls return C Lua's integer status where applicable. A disabled
+gethook returns one nil; active hooks retain their requested signed count while
+only positive intervals enable count events. Option flags honor the pinned
+C-string NUL boundary without changing ordinary Lua byte-string semantics.

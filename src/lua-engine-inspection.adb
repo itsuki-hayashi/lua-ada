@@ -141,6 +141,7 @@ package body Lua.Engine.Inspection is
             Context.Hook := Nil_Value;
             Context.Hook_Mask := Null_Unbounded_String;
             Context.Hook_Count := 0;
+            Context.Hook_Reported_Count := 0;
          else
             if Arg (Base).Kind not in Closure_Kind | Native_Closure_Kind |
               Native_Kind_Value
@@ -151,7 +152,8 @@ package body Lua.Engine.Inspection is
                Fail (State, "string expected");
             end if;
             if Arg (Base + 2).Kind /= Nil_Kind and then
-              Integer_Arg (Base + 2) > Integer_Value (Natural'Last)
+              (Integer_Arg (Base + 2) > Integer_Value (Natural'Last) or else
+               Integer_Arg (Base + 2) < Integer_Value (Integer'First))
             then
                Fail (State, "hook count out of range");
             end if;
@@ -159,20 +161,35 @@ package body Lua.Engine.Inspection is
             Context.Hook_Mask := Null_Unbounded_String;
             for Mask of String'("crl") loop
                if Ada.Strings.Fixed.Index
-                 (Image (Arg (Base + 1)), "" & Mask) /= 0
+                 (C_Option (Image (Arg (Base + 1))), "" & Mask) /= 0
                then
                   Append (Context.Hook_Mask, Mask);
                end if;
             end loop;
+            --  Reflection preserves a signed requested count, while only a
+            --  positive interval enables instruction-count events.
+            Context.Hook_Reported_Count :=
+              (if Arg (Base + 2).Kind = Nil_Kind then 0
+               else Integer_Arg (Base + 2));
             Context.Hook_Count :=
               (if Arg (Base + 2).Kind = Nil_Kind then 0 else
                  Natural (Integer_Value'Max (0, Integer_Arg (Base + 2))));
             Context.Hook_Remaining := Context.Hook_Count;
+            if Length (Context.Hook_Mask) = 0 and then
+              Context.Hook_Count = 0
+            then
+               Context.Hook := Nil_Value;
+            end if;
          end if;
       elsif Name = "debug.gethook" then
          Append (Context.Hook);
+         --  With no hook, C Lua returns one nil, not a padded triple. Result
+         --  counts remain observable through select, varargs and table.pack.
+         if Context.Hook.Kind = Nil_Kind then
+            return Result;
+         end if;
          Append (New_String (State, To_String (Context.Hook_Mask)));
-         Append ((Integer_Kind, Integer_Value (Context.Hook_Count)));
+         Append ((Integer_Kind, Context.Hook_Reported_Count));
       elsif Name in "debug.getupvalue" | "debug.setupvalue" | "debug.upvalueid"
       then
          Function_Value := Arg (1);
@@ -250,7 +267,7 @@ package body Lua.Engine.Inspection is
          declare
             Options : constant String :=
               (if Arg (Base + 1).Kind = Nil_Kind then "flnSrtu"
-               else Image (Arg (Base + 1)));
+               else C_Option (Image (Arg (Base + 1))));
             Info : constant Value := New_Table (State);
             Source : constant String :=
               (if Code = null then "=[C]" else To_String (Code.Name));

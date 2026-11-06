@@ -5,6 +5,15 @@ with Test_Support;
 
 package body Runtime_Control_Tests is
    procedure Check (Source : String; Compatible : Boolean := False);
+   procedure Hook_Empty_Configuration;
+   procedure Hook_Negative_Count_Reflection;
+   procedure Hook_Mask_Nul_Boundary;
+   procedure Collection_Option_Nul_Boundary;
+   procedure Debug_Info_Option_Nul_Boundary;
+   procedure Collection_Stop_Result;
+   procedure Collection_Nil_Default;
+   procedure Collection_Restart_Result;
+   procedure Disabled_Hook_Result;
    procedure Debug_Iterator_Native_Frame;
    procedure Yieldability_After_Completion;
    procedure Closing_Quota_Abort;
@@ -116,10 +125,11 @@ package body Runtime_Control_Tests is
       --  Type and equality distinguish them from tables and each other.
    begin
       Check
-        ("local a=coroutine.create(function()end); local b=c" &
-         "oroutine.create(function()end); local t={[a]=42}; " &
-         "assert(type(a)=='thread' and a~=b and t[a]==42 and" &
-         " t[b]==nil)");
+        ("local a=coroutine.create(function()end);" &
+         " local b=coroutine.create(function()end);" &
+         " local t={[a]=42};" &
+         " assert(type(a)=='thread' and a~=b and t[a]==42 and " &
+         "t[b]==nil)");
    end Thread_Identity;
 
    procedure Main_Identity is
@@ -128,11 +138,12 @@ package body Runtime_Control_Tests is
       --  The main identity is stable and cannot yield.
    begin
       Check
-        ("local a,b=coroutine.running(); assert(b and a==cor" &
-         "outine.running()); assert(coroutine.status(a)=='ru" &
-         "nning'); assert(not coroutine.isyieldable() and no" &
-         "t coroutine.isyieldable(a)); assert(not pcall(coro" &
-         "utine.yield))");
+        ("local a,b=coroutine.running();" &
+         " assert(b and a==coroutine.running());" &
+         " assert(coroutine.status(a)=='running');" &
+         " assert(not coroutine.isyieldable() and not " &
+         "coroutine.isyieldable(a));" &
+         " assert(not pcall(coroutine.yield))");
    end Main_Identity;
 
    procedure Resume_Packets is
@@ -141,12 +152,12 @@ package body Runtime_Control_Tests is
       --  All values and result counts survive the transfer.
    begin
       Check
-        ("local co=coroutine.create(function(a) local x,y,z=" &
-         "coroutine.yield(a,nil,3); return x,y,z end); local" &
-         " r=table.pack(coroutine.resume(co,1)); assert(r.n=" &
-         "=4 and r[1] and r[2]==1 and r[3]==nil and r[4]==3)" &
-         "; r=table.pack(coroutine.resume(co,4,nil,6)); asse" &
-         "rt(r.n==4 and r[2]==4 and r[3]==nil and r[4]==6)");
+        ("local co=coroutine.create(function(a) local x,y," &
+         "z=coroutine.yield(a,nil,3); return x,y,z end);" &
+         " local r=table.pack(coroutine.resume(co,1));" &
+         " assert(r.n==4 and r[1] and r[2]==1 and r[3]==nil and " &
+         "r[4]==3); r=table.pack(coroutine.resume(co,4,nil,6));" &
+         " assert(r.n==4 and r[2]==4 and r[3]==nil and r[4]==6)");
    end Resume_Packets;
 
    procedure Nested_States is
@@ -155,13 +166,13 @@ package body Runtime_Control_Tests is
       --  The parent is normal until the child yields.
    begin
       Check
-        ("local parent; local child=coroutine.create(functio" &
-         "n() assert(coroutine.status(parent)=='normal'); re" &
-         "turn 9 end); parent=coroutine.create(function() as" &
-         "sert(coroutine.status(child)=='suspended'); local " &
-         "ok,v=coroutine.resume(child); assert(ok and v==9 a" &
-         "nd coroutine.status(child)=='dead') end); assert(c" &
-         "oroutine.resume(parent))");
+        ("local parent; local child=coroutine.create(function() " &
+         "assert(coroutine.status(parent)=='normal');" &
+         " return 9 end); parent=coroutine.create(function() " &
+         "assert(coroutine.status(child)=='suspended');" &
+         " local ok,v=coroutine.resume(child);" &
+         " assert(ok and v==9 and coroutine.status(child)" &
+         "=='dead') end); assert(coroutine.resume(parent))");
    end Nested_States;
 
    procedure Resume_Active is
@@ -171,9 +182,9 @@ package body Runtime_Control_Tests is
    begin
       Check
         ("local co; co=coroutine.create(function() local ok," &
-         "e=coroutine.resume(co); assert(not ok and type(e)=" &
-         "='string'); return 42 end); local ok,v=coroutine.r" &
-         "esume(co); assert(ok and v==42)");
+         "e=coroutine.resume(co);" &
+         " assert(not ok and type(e)=='string'); return 42 end);" &
+         " local ok,v=coroutine.resume(co); assert(ok and v==42)");
    end Resume_Active;
 
    procedure Resume_Dead is
@@ -182,9 +193,10 @@ package body Runtime_Control_Tests is
       --  It returns a dead-coroutine error.
    begin
       Check
-        ("local co=coroutine.create(function() return 7 end)" &
-         "; assert(coroutine.resume(co)); local ok,e=corouti" &
-         "ne.resume(co); assert(not ok and e:find('dead'))");
+        ("local co=coroutine.create(function() return 7 end);" &
+         " assert(coroutine.resume(co));" &
+         " local ok,e=coroutine.resume(co);" &
+         " assert(not ok and e:find('dead'))");
    end Resume_Dead;
 
    procedure Wrap_Error_Value is
@@ -193,9 +205,8 @@ package body Runtime_Control_Tests is
       --  Identity is retained instead of stringifying the error.
    begin
       Check
-        ("local e={}; local w=coroutine.wrap(function()error" &
-         "(e)end); local ok,v=pcall(w); assert(not ok and v=" &
-         "=e)");
+        ("local e={}; local w=coroutine.wrap(function()error(e)" &
+         "end); local ok,v=pcall(w); assert(not ok and v==e)");
    end Wrap_Error_Value;
 
    procedure Pcall_Suspension is
@@ -204,11 +215,11 @@ package body Runtime_Control_Tests is
       --  The resumed pcall returns false/error and the coroutine completes.
    begin
       Check
-        ("local co=coroutine.create(function() return pcall(" &
-         "function() coroutine.yield(7); error(8) end) end);" &
-         " local ok,v=coroutine.resume(co); assert(ok and v=" &
-         "=7); local a,b,c=coroutine.resume(co); assert(a an" &
-         "d b==false and c==8)");
+        ("local co=coroutine.create(function() return " &
+         "pcall(function() coroutine.yield(7);" &
+         " error(8) end) end); local ok,v=coroutine.resume(co);" &
+         " assert(ok and v==7); local a,b,c=coroutine.resume(co);" &
+         " assert(a and b==false and c==8)");
    end Pcall_Suspension;
 
    procedure Xpcall_Suspension is
@@ -217,11 +228,12 @@ package body Runtime_Control_Tests is
       --  The handler transforms the resumed error once.
    begin
       Check
-        ("local co=coroutine.create(function() return xpcall" &
-         "(function() coroutine.yield(1); error(8) end,funct" &
-         "ion(e)return e+1 end) end); assert(coroutine.resum" &
-         "e(co)); local a,b,c=coroutine.resume(co); assert(a" &
-         " and b==false and c==9)");
+        ("local co=coroutine.create(function() return " &
+         "xpcall(function() coroutine.yield(1);" &
+         " error(8) end,function(e)return e+1 end) end);" &
+         " assert(coroutine.resume(co));" &
+         " local a,b,c=coroutine.resume(co);" &
+         " assert(a and b==false and c==9)");
    end Xpcall_Suspension;
 
    procedure Gsub_Not_Yieldable is
@@ -230,11 +242,11 @@ package body Runtime_Control_Tests is
       --  The callback sees false and the failure remains protected.
    begin
       Check
-        ("local co=coroutine.create(function() return pcall(" &
-         "string.gsub,'a','.',function() assert(not coroutin" &
-         "e.isyieldable()); coroutine.yield() end) end); loc" &
-         "al a,b,c=coroutine.resume(co); assert(a and b==fal" &
-         "se and type(c)=='string')");
+        ("local co=coroutine.create(function() return " &
+         "pcall(string.gsub,'a','.',function() assert(not " &
+         "coroutine.isyieldable()); coroutine.yield() end) end);" &
+         " local a,b,c=coroutine.resume(co);" &
+         " assert(a and b==false and type(c)=='string')");
    end Gsub_Not_Yieldable;
 
    procedure Metamethod_Yield is
@@ -243,11 +255,11 @@ package body Runtime_Control_Tests is
       --  The suspended destination receives the final scalar.
    begin
       Check
-        ("local t=setmetatable({},{__add=function() local x=" &
-         "coroutine.yield(10); return x+1 end}); local co=co" &
-         "routine.create(function()return t+t end); local a," &
-         "b=coroutine.resume(co); assert(a and b==10); a,b=c" &
-         "oroutine.resume(co,20); assert(a and b==21)");
+        ("local t=setmetatable({},{__add=function() local " &
+         "x=coroutine.yield(10); return x+1 end});" &
+         " local co=coroutine.create(function()return t+t end);" &
+         " local a,b=coroutine.resume(co); assert(a and b==10);" &
+         " a,b=coroutine.resume(co,20); assert(a and b==21)");
    end Metamethod_Yield;
 
    procedure Close_Nil_False is
@@ -256,8 +268,7 @@ package body Runtime_Control_Tests is
       --  The block exits successfully.
    begin
       Check
-        ("do local x <close> = nil; local y <close> = false " &
-         "end");
+        ("do local x <close> = nil; local y <close> = false end");
    end Close_Nil_False;
 
    procedure Close_Invalid_Initializer is
@@ -266,9 +277,9 @@ package body Runtime_Control_Tests is
       --  Initialization raises a controlled error naming the variable.
    begin
       Check
-        ("local ok,e=pcall(function()local bad <close> = {} " &
-         "end); assert(not ok and e:find('bad') and e:find('" &
-         "non%-closable'))");
+        ("local ok,e=pcall(function()local bad <close> = {} end);" &
+         " assert(not ok and e:find('bad') and " &
+         "e:find('non%-closable'))");
    end Close_Invalid_Initializer;
 
    procedure Close_Reverse_Order is
@@ -277,10 +288,10 @@ package body Runtime_Control_Tests is
       --  The most recent declaration closes first.
    begin
       Check
-        ("local s=''; local function c(n)return setmetatable" &
-         "({},{__close=function()s=s..n end})end; do local a" &
-         " <close> = c('a'); local b <close> = c('b') end; a" &
-         "ssert(s=='ba')");
+        ("local s=''; local function c(n)return setmetatable({}," &
+         "{__close=function()s=s..n end})end;" &
+         " do local a <close> = c('a');" &
+         " local b <close> = c('b') end; assert(s=='ba')");
    end Close_Reverse_Order;
 
    procedure Close_Break is
@@ -289,9 +300,9 @@ package body Runtime_Control_Tests is
       --  The close callback runs exactly once.
    begin
       Check
-        ("local n=0; while true do local x <close> = setmeta" &
-         "table({},{__close=function() n=n+1 end}); break en" &
-         "d; assert(n==1)");
+        ("local n=0; while true do local x <close> = " &
+         "setmetatable({},{__close=function() n=n+1 end});" &
+         " break end; assert(n==1)");
    end Close_Break;
 
    procedure Close_Goto is
@@ -300,10 +311,10 @@ package body Runtime_Control_Tests is
       --  Every dynamic binding closes before its replacement.
    begin
       Check
-        ("local n=0; local i=0; ::again:: i=i+1; do local x " &
-         "<close> = setmetatable({},{__close=function()n=n+1" &
-         " end}); if i<3 then goto again end end; assert(n==" &
-         "3)");
+        ("local n=0; local i=0; ::again:: i=i+1;" &
+         " do local x <close> = setmetatable({}," &
+         "{__close=function()n=n+1 end});" &
+         " if i<3 then goto again end end; assert(n==3)");
    end Close_Goto;
 
    procedure Close_Return_Values is
@@ -312,10 +323,10 @@ package body Runtime_Control_Tests is
       --  The caller receives the live original table.
    begin
       Check
-        ("local function f() local x <close> = setmetatable(" &
-         "{},{__close=function()collectgarbage()end}); retur" &
-         "n {answer=42},nil,9 end; local a,b,c=f(); assert(a" &
-         ".answer==42 and b==nil and c==9)");
+        ("local function f() local x <close> = setmetatable({}," &
+         "{__close=function()collectgarbage()end});" &
+         " return {answer=42},nil,9 end; local a,b,c=f();" &
+         " assert(a.answer==42 and b==nil and c==9)");
    end Close_Return_Values;
 
    procedure Close_Return_Call is
@@ -324,10 +335,10 @@ package body Runtime_Control_Tests is
       --  Its results are evaluated before cleanup and then returned.
    begin
       Check
-        ("local n=0; local function f() local x <close> = se" &
-         "tmetatable({},{__close=function()n=n+1 end}); retu" &
-         "rn (function()assert(n==0);return 42 end)() end; a" &
-         "ssert(f()==42 and n==1)");
+        ("local n=0; local function f() local x <close> = " &
+         "setmetatable({},{__close=function()n=n+1 end});" &
+         " return (function()assert(n==0);return 42 end)() end;" &
+         " assert(f()==42 and n==1)");
    end Close_Return_Call;
 
    procedure Close_Error_Replacement is
@@ -336,12 +347,13 @@ package body Runtime_Control_Tests is
       --  The outer handler and pcall receive the replacement.
    begin
       Check
-        ("local got; local function c(f)return setmetatable(" &
-         "{},{__close=f})end; local ok,e=pcall(function() lo" &
-         "cal a <close> = c(function(_,e)got=e end); local b" &
-         " <close> = c(function(_,e)assert(e==1);error(2)end" &
-         "); error(1) end); assert(not ok and e==2 and got==" &
-         "2)");
+        ("local got; local function c(f)return setmetatable({}," &
+         "{__close=f})end;" &
+         " local ok,e=pcall(function() local a <close> = " &
+         "c(function(_,e)got=e end);" &
+         " local b <close> = c(function(_,e)assert(e==1);" &
+         "error(2)end); error(1) end);" &
+         " assert(not ok and e==2 and got==2)");
    end Close_Error_Replacement;
 
    procedure Close_Suspension is
@@ -350,12 +362,12 @@ package body Runtime_Control_Tests is
       --  Cleanup runs only on close and never executes the remainder.
    begin
       Check
-        ("local n=0; local co=coroutine.create(function()loc" &
-         "al x <close> = setmetatable({},{__close=function()" &
-         "n=n+1 end}); coroutine.yield(); n=100 end); assert" &
-         "(coroutine.resume(co)); assert(n==0); assert(corou" &
-         "tine.close(co)); assert(n==1 and coroutine.status(" &
-         "co)=='dead')");
+        ("local n=0; local co=coroutine.create(function()local x " &
+         "<close> = setmetatable({},{__close=function()n=n+1 end}" &
+         "); coroutine.yield(); n=100 end);" &
+         " assert(coroutine.resume(co)); assert(n==0);" &
+         " assert(coroutine.close(co));" &
+         " assert(n==1 and coroutine.status(co)=='dead')");
    end Close_Suspension;
 
    procedure Close_Abandoned is
@@ -364,12 +376,12 @@ package body Runtime_Control_Tests is
       --  Weak reachability clears it while the close counter stays zero.
    begin
       Check
-        ("local n=0; local w=setmetatable({},{__mode='v'}); " &
-         "do local co=coroutine.create(function()local x <cl" &
-         "ose> = setmetatable({},{__close=function()n=n+1 en" &
-         "d}); coroutine.yield()end); w[1]=co; assert(corout" &
-         "ine.resume(co)) end; collectgarbage(); assert(w[1]" &
-         "==nil and n==0)");
+        ("local n=0; local w=setmetatable({},{__mode='v'});" &
+         " do local co=coroutine.create(function()local x " &
+         "<close> = setmetatable({},{__close=function()n=n+1 end}" &
+         "); coroutine.yield()end); w[1]=co;" &
+         " assert(coroutine.resume(co)) end; collectgarbage();" &
+         " assert(w[1]==nil and n==0)");
    end Close_Abandoned;
 
    procedure Close_Wrap_Failure is
@@ -378,10 +390,10 @@ package body Runtime_Control_Tests is
       --  The closer runs and the original error is retained.
    begin
       Check
-        ("local n=0; local w=coroutine.wrap(function() local" &
-         " x <close> = setmetatable({},{__close=function()n=" &
-         "n+1 end}); error(17) end); local ok,e=pcall(w); as" &
-         "sert(not ok and e==17 and n==1)");
+        ("local n=0; local w=coroutine.wrap(function() local x " &
+         "<close> = setmetatable({},{__close=function()n=n+1 end}" &
+         "); error(17) end); local ok,e=pcall(w);" &
+         " assert(not ok and e==17 and n==1)");
    end Close_Wrap_Failure;
 
    procedure Close_Dead_Error_Once is
@@ -391,9 +403,9 @@ package body Runtime_Control_Tests is
    begin
       Check
         ("local co=coroutine.create(function()error(17)end);" &
-         " assert(not coroutine.resume(co)); local a,b=corou" &
-         "tine.close(co); assert(not a and b==17); assert(co" &
-         "routine.close(co))");
+         " assert(not coroutine.resume(co));" &
+         " local a,b=coroutine.close(co);" &
+         " assert(not a and b==17); assert(coroutine.close(co))");
    end Close_Dead_Error_Once;
 
    procedure Close_Self is
@@ -402,11 +414,11 @@ package body Runtime_Control_Tests is
       --  The resumer succeeds and code after close is never reached.
    begin
       Check
-        ("local n=0; local co=coroutine.create(function()loc" &
-         "al x <close> = setmetatable({},{__close=function()" &
-         "n=n+1 end}); coroutine.close(); error('unreachable" &
-         "')end); assert(coroutine.resume(co)); assert(n==1 " &
-         "and coroutine.status(co)=='dead')");
+        ("local n=0; local co=coroutine.create(function()local x " &
+         "<close> = setmetatable({},{__close=function()n=n+1 end}" &
+         "); coroutine.close(); error('unreachable')end);" &
+         " assert(coroutine.resume(co));" &
+         " assert(n==1 and coroutine.status(co)=='dead')");
    end Close_Self;
 
    procedure Close_Generic_For is
@@ -415,10 +427,11 @@ package body Runtime_Control_Tests is
       --  It remains open in every body and closes once at loop exit.
    begin
       Check
-        ("local n=0; local c=setmetatable({},{__close=functi" &
-         "on()n=n+1 end}); local function iter(_,i)i=i+1;if " &
-         "i<=3 then return i end end; for i in iter,nil,0,c " &
-         "do assert(n==0) end; assert(n==1)");
+        ("local n=0; local c=setmetatable({},{__close=function()" &
+         "n=n+1 end}); local function iter(_,i)i=i+1;" &
+         "if i<=3 then return i end end;" &
+         " for i in iter,nil,0,c do assert(n==0) end;" &
+         " assert(n==1)");
    end Close_Generic_For;
 
    procedure Close_Generic_Empty is
@@ -427,9 +440,9 @@ package body Runtime_Control_Tests is
       --  The fourth value closes even though no body executes.
    begin
       Check
-        ("local n=0; local c=setmetatable({},{__close=functi" &
-         "on()n=n+1 end}); for i in function()end,nil,nil,c " &
-         "do error('unreachable')end; assert(n==1)");
+        ("local n=0; local c=setmetatable({},{__close=function()" &
+         "n=n+1 end}); for i in function()end,nil,nil,c do " &
+         "error('unreachable')end; assert(n==1)");
    end Close_Generic_Empty;
 
    procedure Backward_Cells is
@@ -438,11 +451,12 @@ package body Runtime_Control_Tests is
       --  Fresh cells preserve the earlier captured values.
    begin
       Check
-        ("local a={};local i=0; ::again:: local x=i; a[#a+1]" &
-         "=function()return x end; i=i+1;if i<3 then goto ag" &
-         "ain end; assert(a[1]()==0 and a[2]()==1 and a[3]()" &
-         "==2); assert(debug.upvalueid(a[1],1)~=debug.upvalu" &
-         "eid(a[2],1))");
+        ("local a={};local i=0; ::again:: local x=i;" &
+         " a[#a+1]=function()return x end; i=i+1;" &
+         "if i<3 then goto again end;" &
+         " assert(a[1]()==0 and a[2]()==1 and a[3]()==2);" &
+         " assert(debug.upvalueid(a[1],1)~=debug.upvalueid(a[2]," &
+         "1))");
    end Backward_Cells;
 
    procedure Shared_Capture_Cell is
@@ -451,9 +465,10 @@ package body Runtime_Control_Tests is
       --  Both functions share the actual cell and mutation.
    begin
       Check
-        ("local x=1; local a=function()x=x+1 end;local b=fun" &
-         "ction()return x end;assert(debug.upvalueid(a,1)==d" &
-         "ebug.upvalueid(b,1));a();assert(b()==2)");
+        ("local x=1; local a=function()x=x+1 end;" &
+         "local b=function()return x end;" &
+         "assert(debug.upvalueid(a,1)==debug.upvalueid(b,1));a();" &
+         "assert(b()==2)");
    end Shared_Capture_Cell;
 
    procedure Debug_Upvalue_Mutation is
@@ -462,9 +477,10 @@ package body Runtime_Control_Tests is
       --  The closure immediately observes the replacement.
    begin
       Check
-        ("local x=1;local f=function()return x end;local n,v" &
-         "=debug.getupvalue(f,1);assert(n=='x' and v==1);ass" &
-         "ert(debug.setupvalue(f,1,42)=='x');assert(f()==42)");
+        ("local x=1;local f=function()return x end;" &
+         "local n,v=debug.getupvalue(f,1);" &
+         "assert(n=='x' and v==1);" &
+         "assert(debug.setupvalue(f,1,42)=='x');assert(f()==42)");
    end Debug_Upvalue_Mutation;
 
    procedure Debug_Load_Environment is
@@ -473,9 +489,9 @@ package body Runtime_Control_Tests is
       --  Later execution uses that environment.
    begin
       Check
-        ("local f=assert(load('return answer'));assert(debug" &
-         ".setupvalue(f,1,{answer=42})=='_ENV');assert(f()==" &
-         "42)");
+        ("local f=assert(load('return answer'));" &
+         "assert(debug.setupvalue(f,1,{answer=42})=='_ENV');" &
+         "assert(f()==42)");
    end Debug_Load_Environment;
 
    procedure Debug_Current_Local is
@@ -484,10 +500,11 @@ package body Runtime_Control_Tests is
       --  getlocal names it and subsequent source reads the new value.
    begin
       Check
-        ("local function f() local answer=1; local n,v=debug" &
-         ".getlocal(1,1); assert(n=='answer' and v==1); asse" &
-         "rt(debug.setlocal(1,1,42)=='answer');assert(answer" &
-         "==42)end;f()");
+        ("local function f() local answer=1;" &
+         " local n,v=debug.getlocal(1,1);" &
+         " assert(n=='answer' and v==1);" &
+         " assert(debug.setlocal(1,1,42)=='answer');" &
+         "assert(answer==42)end;f()");
    end Debug_Current_Local;
 
    procedure Debug_Suspended_Local is
@@ -496,12 +513,13 @@ package body Runtime_Control_Tests is
       --  Its resumed body observes the debug mutation.
    begin
       Check
-        ("local co=coroutine.create(function()local answer=1" &
-         ";coroutine.yield();return answer end);assert(corou" &
-         "tine.resume(co));local n,v=debug.getlocal(co,1,1);" &
-         "assert(n=='answer' and v==1);assert(debug.setlocal" &
-         "(co,1,1,42)=='answer');local ok,x=coroutine.resume" &
-         "(co);assert(ok and x==42)");
+        ("local co=coroutine.create(function()local answer=1;" &
+         "coroutine.yield();return answer end);" &
+         "assert(coroutine.resume(co));" &
+         "local n,v=debug.getlocal(co,1,1);" &
+         "assert(n=='answer' and v==1);" &
+         "assert(debug.setlocal(co,1,1,42)=='answer');" &
+         "local ok,x=coroutine.resume(co);assert(ok and x==42)");
    end Debug_Suspended_Local;
 
    procedure Debug_Source_Range is
@@ -510,10 +528,11 @@ package body Runtime_Control_Tests is
       --  Its type, parameter count and range come from the prototype.
    begin
       Check
-        ("local function f(a,...)return a end;local i=debug." &
-         "getinfo(f);assert(i.what=='Lua' and i.nparams==1 a" &
-         "nd i.isvararg and i.linedefined==1 and i.lastlined" &
-         "efined==1 and i.func==f)");
+        ("local function f(a,...)return a end;" &
+         "local i=debug.getinfo(f);" &
+         "assert(i.what=='Lua' and i.nparams==1 and i.isvararg " &
+         "and i.linedefined==1 and i.lastlinedefined==1 and " &
+         "i.func==f)");
    end Debug_Source_Range;
 
    procedure Hook_Trace is
@@ -528,10 +547,11 @@ package body Runtime_Control_Tests is
          Character'Val (10) &
          "return 2" &
          Character'Val (10) &
-         "end);debug.sethook(co,function(e)t[#t+1]=e end,'cl" &
-         "r');assert(coroutine.resume(co));assert(coroutine." &
-         "resume(co));assert(table.concat(t,',')=='call,line" &
-         ",call,return,line,return')");
+         "end);debug.sethook(co,function(e)t[#t+1]=e end,'clr');" &
+         "assert(coroutine.resume(co));" &
+         "assert(coroutine.resume(co));" &
+         "assert(table.concat(t,',')" &
+         "=='call,line,call,return,line,return')");
    end Hook_Trace;
 
    procedure Hook_Suppression is
@@ -540,9 +560,9 @@ package body Runtime_Control_Tests is
       --  The callback finishes and hooks can be disabled safely.
    begin
       Check
-        ("local n=0;local function helper()return 1 end;debu" &
-         "g.sethook(function()n=n+helper() end,'',3);local a" &
-         "=1+2;debug.sethook();assert(n>0 and a==3)");
+        ("local n=0;local function helper()return 1 end;" &
+         "debug.sethook(function()n=n+helper() end,'',3);" &
+         "local a=1+2;debug.sethook();assert(n>0 and a==3)");
    end Hook_Suppression;
 
    procedure Hook_Per_Thread is
@@ -551,10 +571,11 @@ package body Runtime_Control_Tests is
       --  The function, canonical mask and count belong to the child.
    begin
       Check
-        ("local co=coroutine.create(function()end);local h=f" &
-         "unction()end;debug.sethook(co,h,'lrc',7);local a,b" &
-         ",c=debug.gethook(co);assert(a==h and b=='crl' and " &
-         "c==7);assert(debug.gethook()==nil)");
+        ("local co=coroutine.create(function()end);" &
+         "local h=function()end;debug.sethook(co,h,'lrc',7);" &
+         "local a,b,c=debug.gethook(co);" &
+         "assert(a==h and b=='crl' and c==7);" &
+         "assert(debug.gethook()==nil)");
    end Hook_Per_Thread;
 
    procedure Weak_Values is
@@ -563,9 +584,9 @@ package body Runtime_Control_Tests is
       --  The entry disappears while numeric and string values survive.
    begin
       Check
-        ("local t=setmetatable({},{__mode='v'});do local x={" &
-         "};t.x=x end;t.s='bytes';t.n=42;collectgarbage();as" &
-         "sert(t.x==nil and t.s=='bytes' and t.n==42)");
+        ("local t=setmetatable({},{__mode='v'});do local x={};" &
+         "t.x=x end;t.s='bytes';t.n=42;collectgarbage();" &
+         "assert(t.x==nil and t.s=='bytes' and t.n==42)");
    end Weak_Values;
 
    procedure Weak_Keys is
@@ -574,9 +595,8 @@ package body Runtime_Control_Tests is
       --  Collection removes the entry.
    begin
       Check
-        ("local t=setmetatable({},{__mode='k'});do local k={" &
-         "};t[k]=42 end;collectgarbage();assert(next(t)==nil" &
-         ")");
+        ("local t=setmetatable({},{__mode='k'});do local k={};" &
+         "t[k]=42 end;collectgarbage();assert(next(t)==nil)");
    end Weak_Keys;
 
    procedure Ephemeron_Cycle is
@@ -585,9 +605,8 @@ package body Runtime_Control_Tests is
       --  The key/value cycle disappears together.
    begin
       Check
-        ("local t=setmetatable({},{__mode='k'});do local k={" &
-         "};t[k]={key=k} end;collectgarbage();assert(next(t)" &
-         "==nil)");
+        ("local t=setmetatable({},{__mode='k'});do local k={};" &
+         "t[k]={key=k} end;collectgarbage();assert(next(t)==nil)");
    end Ephemeron_Cycle;
 
    procedure Ephemeron_Fixed_Point is
@@ -596,11 +615,11 @@ package body Runtime_Control_Tests is
       --  The fixed point retains the whole reachable chain.
    begin
       Check
-        ("local a=setmetatable({},{__mode='k'});local b=setm" &
-         "etatable({},{__mode='k'});local first={};do local " &
-         "middle={};local last={answer=42};a[first]=middle;b" &
-         "[middle]=last end;collectgarbage();assert(b[a[firs" &
-         "t]].answer==42)");
+        ("local a=setmetatable({},{__mode='k'});" &
+         "local b=setmetatable({},{__mode='k'});local first={};" &
+         "do local middle={};local last={answer=42};" &
+         "a[first]=middle;b[middle]=last end;collectgarbage();" &
+         "assert(b[a[first]].answer==42)");
    end Ephemeron_Fixed_Point;
 
    procedure Coroutine_Closure_Graph is
@@ -610,10 +629,10 @@ package body Runtime_Control_Tests is
    begin
       Check
         ("local w=setmetatable({},{__mode='v'});do local co;" &
-         "co=coroutine.create(function()local f=function()re" &
-         "turn co end;coroutine.yield(f)end);w[1]=co;corouti" &
-         "ne.resume(co) end;collectgarbage();assert(w[1]==ni" &
-         "l)");
+         "co=coroutine.create(function()local f=function()return " &
+         "co end;coroutine.yield(f)end);w[1]=co;" &
+         "coroutine.resume(co) end;collectgarbage();" &
+         "assert(w[1]==nil)");
    end Coroutine_Closure_Graph;
 
    procedure Surviving_Capture is
@@ -622,11 +641,11 @@ package body Runtime_Control_Tests is
       --  Collection frees the wrapper and preserves mutable capture.
    begin
       Check
-        ("local w=setmetatable({},{__mode='v'});local f;do l" &
-         "ocal co=coroutine.wrap(function()local x=1;corouti" &
-         "ne.yield(function()x=x+1;return x end)end);w[1]=co" &
-         ";f=co()end;collectgarbage();assert(w[1]==nil and f" &
-         "()==2 and f()==3)");
+        ("local w=setmetatable({},{__mode='v'});local f;" &
+         "do local co=coroutine.wrap(function()local x=1;" &
+         "coroutine.yield(function()x=x+1;return x end)end);" &
+         "w[1]=co;f=co()end;collectgarbage();" &
+         "assert(w[1]==nil and f()==2 and f()==3)");
    end Surviving_Capture;
 
    procedure Collection_Control is
@@ -635,11 +654,13 @@ package body Runtime_Control_Tests is
       --  Explicit collection works while stopped and restart restores running.
    begin
       Check
-        ("assert(collectgarbage('isrunning'));collectgarbage" &
-         "('stop');assert(not collectgarbage('isrunning'));c" &
-         "ollectgarbage();assert(not collectgarbage('isrunni" &
-         "ng'));collectgarbage('restart');assert(collectgarb" &
-         "age('isrunning'))");
+        ("assert(collectgarbage('isrunning'));" &
+         "collectgarbage('stop');" &
+         "assert(not collectgarbage('isrunning'));" &
+         "collectgarbage();" &
+         "assert(not collectgarbage('isrunning'));" &
+         "collectgarbage('restart');" &
+         "assert(collectgarbage('isrunning'))");
    end Collection_Control;
 
    procedure Collection_Unsupported is
@@ -648,9 +669,9 @@ package body Runtime_Control_Tests is
       --  Both requests raise explicit unsupported-option errors.
    begin
       Check
-        ("local ok,e=pcall(collectgarbage,'count');assert(no" &
-         "t ok and e:find('unsupported'));assert(not pcall(c" &
-         "ollectgarbage,'generational'))");
+        ("local ok,e=pcall(collectgarbage,'count');" &
+         "assert(not ok and e:find('unsupported'));" &
+         "assert(not pcall(collectgarbage,'generational'))");
    end Collection_Unsupported;
 
    procedure Hook_Error_Recovery is
@@ -660,10 +681,11 @@ package body Runtime_Control_Tests is
    begin
       Check
         ("local co=coroutine.create(function()return 1 end);" &
-         "debug.sethook(co,function()error(17)end,'c');local" &
-         " ok,e=coroutine.resume(co);assert(not ok and e==17" &
-         ");debug.sethook(co);assert(not coroutine.close(co)" &
-         ");assert(coroutine.close(co));assert(1+1==2)");
+         "debug.sethook(co,function()error(17)end,'c');" &
+         "local ok,e=coroutine.resume(co);" &
+         "assert(not ok and e==17);debug.sethook(co);" &
+         "assert(not coroutine.close(co));" &
+         "assert(coroutine.close(co));assert(1+1==2)");
    end Hook_Error_Recovery;
 
    procedure Close_Normal_Yield is
@@ -672,11 +694,11 @@ package body Runtime_Control_Tests is
       --  The close executes once and preserves the return result.
    begin
       Check
-        ("local co=coroutine.create(function()local x <close" &
-         "> = setmetatable({},{__close=function()coroutine.y" &
-         "ield(7)end});return 42 end);local a,b=coroutine.re" &
-         "sume(co);assert(a and b==7);a,b=coroutine.resume(c" &
-         "o);assert(a and b==42)");
+        ("local co=coroutine.create(function()local x <close> = " &
+         "setmetatable({},{__close=function()coroutine.yield(7)" &
+         "end});return 42 end);local a,b=coroutine.resume(co);" &
+         "assert(a and b==7);a,b=coroutine.resume(co);" &
+         "assert(a and b==42)");
    end Close_Normal_Yield;
 
    procedure Close_Explicit_Not_Yieldable is
@@ -685,12 +707,13 @@ package body Runtime_Control_Tests is
       --  close returns false/error and leaves the coroutine dead.
    begin
       Check
-        ("local co=coroutine.create(function()local x <close" &
-         "> = setmetatable({},{__close=function()assert(not " &
-         "coroutine.isyieldable());coroutine.yield()end});co" &
-         "routine.yield()end);assert(coroutine.resume(co));l" &
-         "ocal ok,e=coroutine.close(co);assert(not ok and ty" &
-         "pe(e)=='string' and coroutine.status(co)=='dead')");
+        ("local co=coroutine.create(function()local x <close> = " &
+         "setmetatable({},{__close=function()assert(not " &
+         "coroutine.isyieldable());coroutine.yield()end});" &
+         "coroutine.yield()end);assert(coroutine.resume(co));" &
+         "local ok,e=coroutine.close(co);" &
+         "assert(not ok and type(e)=='string' and " &
+         "coroutine.status(co)=='dead')");
    end Close_Explicit_Not_Yieldable;
 
    procedure Semantic_Result_Overflow is
@@ -699,9 +722,10 @@ package body Runtime_Control_Tests is
       --  resume returns a catchable semantic error, not a host abort.
    begin
       Check
-        ("local co=coroutine.create(function()return table.u" &
-         "npack({},1,1000000)end);local ok,e=coroutine.resum" &
-         "e(co);assert(not ok and e:find('stack overflow'))",
+        ("local co=coroutine.create(function()return " &
+         "table.unpack({},1,1000000)end);" &
+         "local ok,e=coroutine.resume(co);" &
+         "assert(not ok and e:find('stack overflow'))",
          Compatible => True);
    end Semantic_Result_Overflow;
 
@@ -711,11 +735,11 @@ package body Runtime_Control_Tests is
       --  The string names a traceback and the thread stays suspended.
    begin
       Check
-        ("local co=coroutine.create(function()coroutine.yiel" &
-         "d()end);assert(coroutine.resume(co));local s=debug" &
-         ".traceback(co);assert(type(s)=='string' and s:find" &
-         "('stack traceback'));assert(coroutine.status(co)==" &
-         "'suspended')");
+        ("local co=coroutine.create(function()coroutine.yield()" &
+         "end);assert(coroutine.resume(co));" &
+         "local s=debug.traceback(co);" &
+         "assert(type(s)=='string' and s:find('stack traceback'))" &
+         ";assert(coroutine.status(co)=='suspended')");
    end Debug_Traceback;
 
 
@@ -725,12 +749,13 @@ package body Runtime_Control_Tests is
       --  The coroutine sees a protected error instead of suspension.
    begin
       Check
-        ("local t=setmetatable({},{__len=function()return 1 " &
-         "end,__index=function()assert(not coroutine.isyield" &
-         "able());coroutine.yield()end}); local co=coroutine" &
-         ".create(function()return pcall(table.concat,t)end)" &
-         ";local a,b,c=coroutine.resume(co);assert(a and b==" &
-         "false and type(c)=='string')");
+        ("local t=setmetatable({},{__len=function()return 1 end," &
+         "__index=function()assert(not coroutine.isyieldable());" &
+         "coroutine.yield()end});" &
+         " local co=coroutine.create(function()return " &
+         "pcall(table.concat,t)end);" &
+         "local a,b,c=coroutine.resume(co);" &
+         "assert(a and b==false and type(c)=='string')");
    end Table_Callback_Not_Yieldable;
 
    procedure Load_Reader_Not_Yieldable is
@@ -739,8 +764,9 @@ package body Runtime_Control_Tests is
       --  C Lua protects reader failures inside compilation, unlike require.
    begin
       Check
-        ("local co=coroutine.create(function()return load(function() " &
-         "assert(not coroutine.isyieldable());coroutine.yield()end)end);" &
+        ("local co=coroutine.create(function()return " &
+         "load(function() assert(not coroutine.isyieldable());" &
+         "coroutine.yield()end)end);" &
          "local ok,f,e=coroutine.resume(co);" &
          "assert(ok and f==nil and type(e)=='string')");
    end Load_Reader_Not_Yieldable;
@@ -751,11 +777,11 @@ package body Runtime_Control_Tests is
       --  require fails without suspending its enclosing native operation.
    begin
       Check
-        ("package.preload.x=function()assert(not coroutine.i" &
-         "syieldable());coroutine.yield()end;local co=corout" &
-         "ine.create(function()return pcall(require,'x')end)" &
-         ";local a,b=coroutine.resume(co);assert(a and b==fa" &
-         "lse)");
+        ("package.preload.x=function()assert(not " &
+         "coroutine.isyieldable());coroutine.yield()end;" &
+         "local co=coroutine.create(function()return " &
+         "pcall(require,'x')end);local a,b=coroutine.resume(co);" &
+         "assert(a and b==false)");
    end Require_Not_Yieldable;
 
    procedure Xpcall_Handler_Not_Yieldable is
@@ -764,11 +790,11 @@ package body Runtime_Control_Tests is
       --  The handler sees false and returns its transformed value.
    begin
       Check
-        ("local co=coroutine.create(function()return xpcall(" &
-         "function()error(7)end,function(e)assert(not corout" &
-         "ine.isyieldable());return e+1 end)end);local a,b,c" &
-         "=coroutine.resume(co);assert(a and b==false and c=" &
-         "=8)");
+        ("local co=coroutine.create(function()return " &
+         "xpcall(function()error(7)end,function(e)assert(not " &
+         "coroutine.isyieldable());return e+1 end)end);" &
+         "local a,b,c=coroutine.resume(co);" &
+         "assert(a and b==false and c==8)");
    end Xpcall_Handler_Not_Yieldable;
 
    procedure Debug_Parameter_Name is
@@ -777,10 +803,10 @@ package body Runtime_Control_Tests is
       --  getlocal returns the real name and exactly one nil when absent.
    begin
       Check
-        ("local function f(answer)return answer end;assert(d" &
-         "ebug.getlocal(f,1)=='answer');assert(select('#',de" &
-         "bug.getlocal(f,2))==1 and debug.getlocal(f,2)==nil" &
-         ")");
+        ("local function f(answer)return answer end;" &
+         "assert(debug.getlocal(f,1)=='answer');" &
+         "assert(select('#',debug.getlocal(f,2))==1 and " &
+         "debug.getlocal(f,2)==nil)");
    end Debug_Parameter_Name;
 
    procedure Debug_Invalid_Local is
@@ -789,8 +815,8 @@ package body Runtime_Control_Tests is
       --  getlocal returns one nil.
    begin
       Check
-        ("assert(select('#',debug.getlocal(1,999))==1 and de" &
-         "bug.getlocal(1,999)==nil)");
+        ("assert(select('#',debug.getlocal(1,999))==1 and " &
+         "debug.getlocal(1,999)==nil)");
    end Debug_Invalid_Local;
 
    procedure Debug_Native_Upvalue is
@@ -799,11 +825,11 @@ package body Runtime_Control_Tests is
       --  The state cell changes value without changing identity.
    begin
       Check
-        ("local f=string.gmatch('ab','.');local n,v=debug.ge" &
-         "tupvalue(f,3);assert(n=='' and v==0);local id=debu" &
-         "g.upvalueid(f,3);assert(f()=='a');assert(debug.upv" &
-         "alueid(f,3)==id);local _,v=debug.getupvalue(f,3);a" &
-         "ssert(v==1)");
+        ("local f=string.gmatch('ab','.');" &
+         "local n,v=debug.getupvalue(f,3);assert(n=='' and v==0);" &
+         "local id=debug.upvalueid(f,3);assert(f()=='a');" &
+         "assert(debug.upvalueid(f,3)==id);" &
+         "local _,v=debug.getupvalue(f,3);assert(v==1)");
    end Debug_Native_Upvalue;
 
    procedure Debug_Native_Cell_Write is
@@ -812,8 +838,8 @@ package body Runtime_Control_Tests is
       --  The iterator reads the changed cell.
    begin
       Check
-        ("local f=string.gmatch('abc','.');assert(debug.setu" &
-         "pvalue(f,3,1)=='');assert(f()=='b')");
+        ("local f=string.gmatch('abc','.');" &
+         "assert(debug.setupvalue(f,3,1)=='');assert(f()=='b')");
    end Debug_Native_Cell_Write;
 
    procedure Debug_Call_Name is
@@ -822,9 +848,9 @@ package body Runtime_Control_Tests is
       --  getinfo reports that name and its local classification.
    begin
       Check
-        ("local function named()local i=debug.getinfo(1,'n')" &
-         ";assert(i.name=='named' and i.namewhat=='local')en" &
-         "d;named()");
+        ("local function named()local i=debug.getinfo(1,'n');" &
+         "assert(i.name=='named' and i.namewhat=='local')end;" &
+         "named()");
    end Debug_Call_Name;
 
    procedure Debug_Method_Name is
@@ -833,9 +859,9 @@ package body Runtime_Control_Tests is
       --  getinfo reports the method name at that call site.
    begin
       Check
-        ("local t={};function t:run()local i=debug.getinfo(1" &
-         ",'n');assert(i.name=='run' and i.namewhat=='method" &
-         "')end;t:run()");
+        ("local t={};function t:run()local i=debug.getinfo(1,'n')" &
+         ";assert(i.name=='run' and i.namewhat=='method')end;" &
+         "t:run()");
    end Debug_Method_Name;
 
    procedure Hook_Backward_Line is
@@ -844,11 +870,11 @@ package body Runtime_Control_Tests is
       --  Events recur instead of being suppressed by line equality.
    begin
       Check
-        ("local n=0;local co=coroutine.create(function()loca" &
-         "l x=0;for i=1,4 do x=x+i end;return x end);debug.s" &
-         "ethook(co,function(e)if e=='line'then n=n+1 end en" &
-         "d,'l');local a,b=coroutine.resume(co);assert(a and" &
-         " b==10 and n>=4)");
+        ("local n=0;local co=coroutine.create(function()local " &
+         "x=0;for i=1,4 do x=x+i end;return x end);" &
+         "debug.sethook(co,function(e)if e=='line'then n=n+1 end " &
+         "end,'l');local a,b=coroutine.resume(co);" &
+         "assert(a and b==10 and n>=4)");
    end Hook_Backward_Line;
 
    procedure Hook_Tail_Call is
@@ -857,11 +883,11 @@ package body Runtime_Control_Tests is
       --  The trace includes the tail-call event.
    begin
       Check
-        ("local found=false;local function leaf()return 42 e" &
-         "nd;local co=coroutine.create(function()return leaf" &
-         "()end);debug.sethook(co,function(e)if e=='tail cal" &
-         "l'then found=true end end,'c');local a,b=coroutine" &
-         ".resume(co);assert(a and b==42 and found)");
+        ("local found=false;local function leaf()return 42 end;" &
+         "local co=coroutine.create(function()return leaf()end);" &
+         "debug.sethook(co,function(e)if e=='tail call'then " &
+         "found=true end end,'c');local a,b=coroutine.resume(co);" &
+         "assert(a and b==42 and found)");
    end Hook_Tail_Call;
 
    procedure Hook_Collection_Roots is
@@ -870,10 +896,11 @@ package body Runtime_Control_Tests is
       --  The captured table remains valid and the body completes.
    begin
       Check
-        ("local t={answer=42};local co=coroutine.create(func" &
-         "tion()return 1 end);debug.sethook(co,function()col" &
-         "lectgarbage();assert(t.answer==42)end,'c');assert(" &
-         "coroutine.resume(co))");
+        ("local t={answer=42};" &
+         "local co=coroutine.create(function()return 1 end);" &
+         "debug.sethook(co,function()collectgarbage();" &
+         "assert(t.answer==42)end,'c');" &
+         "assert(coroutine.resume(co))");
    end Hook_Collection_Roots;
 
    procedure Hook_No_Reentrant_Yield is
@@ -882,11 +909,11 @@ package body Runtime_Control_Tests is
       --  resume reports an error and does not suspend the hook.
    begin
       Check
-        ("local co=coroutine.create(function()return 42 end)" &
-         ";debug.sethook(co,function()coroutine.yield()end,'" &
-         "l');local ok,e=coroutine.resume(co);assert(not ok " &
-         "and type(e)=='string' and coroutine.status(co)=='d" &
-         "ead')");
+        ("local co=coroutine.create(function()return 42 end);" &
+         "debug.sethook(co,function()coroutine.yield()end,'l');" &
+         "local ok,e=coroutine.resume(co);" &
+         "assert(not ok and type(e)=='string' and " &
+         "coroutine.status(co)=='dead')");
    end Hook_No_Reentrant_Yield;
 
    procedure Weak_Mode_Change is
@@ -895,9 +922,9 @@ package body Runtime_Control_Tests is
       --  The newly weak entry stops retaining its object.
    begin
       Check
-        ("local m={};local t=setmetatable({},m);do local v={" &
-         "};t[1]=v end;m.__mode='v';collectgarbage();assert(" &
-         "t[1]==nil)");
+        ("local m={};local t=setmetatable({},m);do local v={};" &
+         "t[1]=v end;m.__mode='v';collectgarbage();" &
+         "assert(t[1]==nil)");
    end Weak_Mode_Change;
 
    procedure Weak_String_Keys is
@@ -906,8 +933,9 @@ package body Runtime_Control_Tests is
       --  Collection preserves both strings.
    begin
       Check
-        ("local t=setmetatable({},{__mode='kv'});t['a'..'b']" &
-         "='c'..'d';collectgarbage();assert(t.ab=='cd')");
+        ("local t=setmetatable({},{__mode='kv'});" &
+         "t['a'..'b']='c'..'d';collectgarbage();" &
+         "assert(t.ab=='cd')");
    end Weak_String_Keys;
 
    procedure Close_Generic_Break is
@@ -916,9 +944,9 @@ package body Runtime_Control_Tests is
       --  The fourth closing value runs once.
    begin
       Check
-        ("local n=0;local c=setmetatable({},{__close=functio" &
-         "n()n=n+1 end});for i in function()return 1 end,nil" &
-         ",nil,c do assert(n==0);break end;assert(n==1)");
+        ("local n=0;local c=setmetatable({},{__close=function()" &
+         "n=n+1 end});for i in function()return 1 end,nil,nil,c " &
+         "do assert(n==0);break end;assert(n==1)");
    end Close_Generic_Break;
 
    procedure Close_Error_Not_Yieldable is
@@ -927,10 +955,10 @@ package body Runtime_Control_Tests is
       --  The callback sees false and the original error is protected.
    begin
       Check
-        ("local ok,e=pcall(function()local x <close> = setme" &
-         "tatable({},{__close=function()assert(not coroutine" &
-         ".isyieldable())end});error(7)end);assert(not ok an" &
-         "d e==7)");
+        ("local ok,e=pcall(function()local x <close> = " &
+         "setmetatable({},{__close=function()assert(not " &
+         "coroutine.isyieldable())end});error(7)end);" &
+         "assert(not ok and e==7)");
    end Close_Error_Not_Yieldable;
 
    procedure Coroutine_Close_Main_Error is
@@ -939,8 +967,9 @@ package body Runtime_Control_Tests is
       --  The diagnostic identifies the main thread.
    begin
       Check
-        ("local m=coroutine.running();local ok,e=pcall(corou" &
-         "tine.close,m);assert(not ok and e:find('main'))");
+        ("local m=coroutine.running();" &
+         "local ok,e=pcall(coroutine.close,m);" &
+         "assert(not ok and e:find('main'))");
    end Coroutine_Close_Main_Error;
 
    procedure Native_Call_Overflow is
@@ -949,9 +978,10 @@ package body Runtime_Control_Tests is
       --  The semantic native-depth error is catchable and recoverable.
    begin
       Check
-        ("local function f()return coroutine.wrap(f)()end;lo" &
-         "cal ok,e=pcall(f);assert(not ok and e:find('stack " &
-         "overflow'));assert(2+2==4)",
+        ("local function f()return coroutine.wrap(f)()end;" &
+         "local ok,e=pcall(f);" &
+         "assert(not ok and e:find('stack overflow'));" &
+         "assert(2+2==4)",
          Compatible => True);
    end Native_Call_Overflow;
 
@@ -1080,9 +1110,9 @@ package body Runtime_Control_Tests is
       --  The source is retained and short_src omits the marker.
    begin
       Check
-        ("local f=assert(load('return 1','=literal'));local " &
-         "i=debug.getinfo(f,'S');assert(i.source=='=literal'" &
-         " and i.short_src=='literal')");
+        ("local f=assert(load('return 1','=literal'));" &
+         "local i=debug.getinfo(f,'S');" &
+         "assert(i.source=='=literal' and i.short_src=='literal')");
    end Debug_Literal_Source;
 
    procedure Debug_File_Source is
@@ -1091,10 +1121,11 @@ package body Runtime_Control_Tests is
       --  short_src preserves the final 56 bytes with an ellipsis.
    begin
       Check
-        ("local name='@'..string.rep('x',80)..'tail.lua';loc" &
-         "al f=assert(load('return 1',name));local i=debug.g" &
-         "etinfo(f,'S');assert(i.source==name and i.short_sr" &
-         "c=='...'..name:sub(-56))");
+        ("local name='@'..string.rep('x',80)..'tail.lua';" &
+         "local f=assert(load('return 1',name));" &
+         "local i=debug.getinfo(f,'S');" &
+         "assert(i.source==name and " &
+         "i.short_src=='...'..name:sub(-56))");
    end Debug_File_Source;
 
    procedure Debug_Snippet_Source is
@@ -1103,10 +1134,12 @@ package body Runtime_Control_Tests is
       --  The first line is kept and truncated content has an ellipsis.
    begin
       Check
-        ("local f=assert(load('return 1','raw'));assert(debu" &
-         "g.getinfo(f,'S').short_src=='[string ""raw""]');f=as" &
-         "sert(load('return 1','first\nsecond'));assert(debu" &
-         "g.getinfo(f,'S').short_src=='[string ""first...""]')");
+        ("local f=assert(load('return 1','raw'));" &
+         "assert(debug.getinfo(f,'S')" &
+         ".short_src=='[string ""raw""]');" &
+         "f=assert(load('return 1','first\nsecond'));" &
+         "assert(debug.getinfo(f,'S')" &
+         ".short_src=='[string ""first...""]')");
    end Debug_Snippet_Source;
 
    procedure Debug_Minimum_Vararg_Index is
@@ -1115,8 +1148,8 @@ package body Runtime_Control_Tests is
       --  The query returns nil rather than an internal overflow.
    begin
       Check
-        ("local function f(...)assert(debug.getlocal(1,math." &
-         "mininteger)==nil)end;f(1)");
+        ("local function f(...)assert(debug.getlocal(1," &
+         "math.mininteger)==nil)end;f(1)");
    end Debug_Minimum_Vararg_Index;
 
    procedure Debug_Hook_Count_Range is
@@ -1125,10 +1158,10 @@ package body Runtime_Control_Tests is
       --  A controlled range error leaves the previous registration intact.
    begin
       Check
-        ("local h=function()end;local ok,e=pcall(debug.setho" &
-         "ok,h,'',math.maxinteger);assert(not ok and e:find(" &
-         "'range') and not e:find('internal Ada'));assert(de" &
-         "bug.gethook()==nil)");
+        ("local h=function()end;" &
+         "local ok,e=pcall(debug.sethook,h,'',math.maxinteger);" &
+         "assert(not ok and e:find('range') and not " &
+         "e:find('internal Ada'));assert(debug.gethook()==nil)");
    end Debug_Hook_Count_Range;
 
    procedure Debug_Traceback_Level_Range is
@@ -1137,9 +1170,10 @@ package body Runtime_Control_Tests is
       --  A controlled diagnostic replaces any Ada range exception.
    begin
       Check
-        ("local ok,e=pcall(debug.traceback,'message',math.ma" &
-         "xinteger);assert(not ok and e:find('range') and no" &
-         "t e:find('internal Ada'))");
+        ("local ok,e=pcall(debug.traceback,'message'," &
+         "math.maxinteger);" &
+         "assert(not ok and e:find('range') and not " &
+         "e:find('internal Ada'))");
    end Debug_Traceback_Level_Range;
 
    procedure Debug_Split_Function_Lines is
@@ -1148,9 +1182,9 @@ package body Runtime_Control_Tests is
       --  The function keyword line and closing end line are retained.
    begin
       Check
-        ("local f=assert(load('return function\n(x)\nreturn " &
-         "x\nend'))();local i=debug.getinfo(f,'S');assert(i." &
-         "linedefined==1 and i.lastlinedefined==4)");
+        ("local f=assert(load('return function\n(x)\nreturn x\nen" &
+         "d'))();local i=debug.getinfo(f,'S');assert(i.linedefine" &
+         "d==1 and i.lastlinedefined==4)");
    end Debug_Split_Function_Lines;
 
    procedure Hook_Implicit_Return_Line is
@@ -1159,11 +1193,11 @@ package body Runtime_Control_Tests is
       --  The implicit return reports the closing end line.
    begin
       Check
-        ("local t={};local co=coroutine.create(assert(load('" &
-         "return function()\nlocal x=1\nend'))());debug.seth" &
-         "ook(co,function(e,l)if e=='line'then t[#t+1]=l end" &
-         " end,'l');assert(coroutine.resume(co));assert(t[1]" &
-         "==2 and t[2]==3 and #t==2)");
+        ("local t={};local co=coroutine.create(assert(load('retur" &
+         "n function()\nlocal x=1\nend'))());debug.sethook(co,fun" &
+         "ction(e,l)if e=='line'then t[#t+1]=l end end,'l');" &
+         "assert(coroutine.resume(co));" &
+         "assert(t[1]==2 and t[2]==3 and #t==2)");
    end Hook_Implicit_Return_Line;
 
    procedure Debug_Tail_Frame is
@@ -1172,10 +1206,10 @@ package body Runtime_Control_Tests is
       --  The active leaf reports istailcall instead of a fabricated caller.
    begin
       Check
-        ("local function leaf()return debug.getinfo(1,'t').i" &
-         "stailcall end;local co=coroutine.create(function()" &
-         "return leaf()end);local a,b=coroutine.resume(co);a" &
-         "ssert(a and b)");
+        ("local function leaf()return debug.getinfo(1,'t')" &
+         ".istailcall end;" &
+         "local co=coroutine.create(function()return leaf()end);" &
+         "local a,b=coroutine.resume(co);assert(a and b)");
    end Debug_Tail_Frame;
 
    procedure Close_Logical_Caller is
@@ -1184,9 +1218,9 @@ package body Runtime_Control_Tests is
       --  Internal protection and scheduler phases are hidden.
    begin
       Check
-        ("local what;do local x <close> = setmetatable({},{_" &
-         "_close=function()what=debug.getinfo(2,'S').what en" &
-         "d})end;assert(what=='main')");
+        ("local what;do local x <close> = setmetatable({}," &
+         "{__close=function()what=debug.getinfo(2,'S').what end})" &
+         "end;assert(what=='main')");
    end Close_Logical_Caller;
 
    procedure Debug_Iterator_Native_Frame is
@@ -1196,8 +1230,9 @@ package body Runtime_Control_Tests is
    begin
       Check
         ("local t=setmetatable({},{__index=function()" &
-         "assert(debug.getinfo(2,'S').what=='C');return nil end});" &
-         "local f,s,i=ipairs(t); assert(f(s,i)==nil)");
+         "assert(debug.getinfo(2,'S').what=='C');" &
+         "return nil end});local f,s,i=ipairs(t);" &
+         " assert(f(s,i)==nil)");
    end Debug_Iterator_Native_Frame;
 
    procedure Yieldability_After_Completion is
@@ -1209,14 +1244,17 @@ package body Runtime_Control_Tests is
    begin
       Check
         ("local co=coroutine.create(function()end);" &
-         "assert(coroutine.isyieldable(co));assert(coroutine.resume(co));" &
-         "assert(coroutine.status(co)=='dead' and " &
-         "coroutine.isyieldable(co));" &
-         "assert(coroutine.close(co));assert(coroutine.isyieldable(co));" &
-         "co=coroutine.create(function()string.gsub('a','.'," &
-         "function()error(7)end)end);assert(not coroutine.resume(co));" &
          "assert(coroutine.isyieldable(co));" &
-         "assert(not coroutine.close(co));assert(coroutine.isyieldable(co))");
+         "assert(coroutine.resume(co));" &
+         "assert(coroutine.status(co)=='dead' and " &
+         "coroutine.isyieldable(co));assert(coroutine.close(co));" &
+         "assert(coroutine.isyieldable(co));" &
+         "co=coroutine.create(function()string.gsub('a','.'," &
+         "function()error(7)end)end);" &
+         "assert(not coroutine.resume(co));" &
+         "assert(coroutine.isyieldable(co));" &
+         "assert(not coroutine.close(co));" &
+         "assert(coroutine.isyieldable(co))");
    end Yieldability_After_Completion;
 
    procedure Closing_Quota_Abort is
@@ -1247,10 +1285,125 @@ package body Runtime_Control_Tests is
       --  The unreachable value stays strong; bytes after NUL add no flags.
    begin
       Check
-        ("local z=string.char(0);for _,mode in ipairs{z..'v','k'..z..'v'} " &
-         "do local t=setmetatable({},{__mode=mode});" &
-         "do local x={};t[1]=x end;collectgarbage();assert(t[1]~=nil)end");
+        ("local z=string.char(0);" &
+         "for _,mode in ipairs{z..'v','k'..z..'v'} do local " &
+         "t=setmetatable({},{__mode=mode});do local x={};" &
+         "t[1]=x end;collectgarbage();assert(t[1]~=nil)end");
    end Weak_Mode_Nul_Boundary;
+
+   procedure Collection_Stop_Result is
+      --  Stopping the collector has an integer status result.
+      --  Capture the result packet without scalar padding.
+      --  Exactly one integer zero is returned, matching the C oracle.
+   begin
+      Check
+        ("local t=table.pack(collectgarbage('stop'));" &
+         "assert(t.n==1 and t[1]==0 and math.type(t[1])" &
+         "=='integer');assert(not collectgarbage('isrunning'))");
+   end Collection_Stop_Result;
+
+   procedure Collection_Restart_Result is
+      --  Restarting the collector also returns its integer status.
+      --  Stop first, then capture the restart packet.
+      --  Exactly one integer zero is returned and collection is running.
+   begin
+      Check
+        ("collectgarbage('stop');" &
+         "local t=table.pack(collectgarbage('restart'));" &
+         "assert(t.n==1 and t[1]==0 and math.type(t[1])" &
+         "=='integer');assert(collectgarbage('isrunning'))");
+   end Collection_Restart_Result;
+
+   procedure Disabled_Hook_Result is
+      --  A disabled hook has a one-result nil packet.
+      --  Query a new thread and a thread whose hook has been removed.
+      --  No mask/count padding is exposed by gethook.
+   begin
+      Check
+        ("local co=coroutine.create(function()end);" &
+         "local t=table.pack(debug.gethook(co));" &
+         "assert(t.n==1 and t[1]==nil);" &
+         "debug.sethook(co,function()end,'l');debug.sethook(co);" &
+         "t=table.pack(debug.gethook(co));" &
+         "assert(t.n==1 and t[1]==nil)");
+   end Disabled_Hook_Result;
+
+   procedure Collection_Nil_Default is
+      --  An explicit nil option selects the same default as no argument.
+      --  Capture both the result count and value rather than scalar padding.
+      --  The completed collection returns one integer zero, matching C Lua.
+   begin
+      Check
+        ("local t=table.pack(collectgarbage(nil));" &
+         "assert(t.n==1 and t[1]==0 and math.type(t[1])" &
+         "=='integer')");
+   end Collection_Nil_Default;
+
+   procedure Hook_Empty_Configuration is
+      --  An empty effective hook configuration disables the hook.
+      --  Install a function with empty and unknown-only masks at count zero.
+      --  gethook reports exactly one nil, matching C lua_sethook.
+   begin
+      Check
+        ("local co=coroutine.create(function()end);" &
+         "local h=function()end;" &
+         "for _,m in ipairs{'','?'} do debug.sethook(co,h,m,0);" &
+         "local t=table.pack(debug.gethook(co));" &
+         "assert(t.n==1 and t[1]==nil)end");
+   end Hook_Empty_Configuration;
+
+   procedure Hook_Negative_Count_Reflection is
+      --  Negative counts disable count events but remain reflected.
+      --  Install a call hook with a negative requested interval.
+      --  The function and call mask remain, and gethook returns negative
+      --  seven.
+   begin
+      Check
+        ("local co=coroutine.create(function()end);" &
+         "local h=function()end;debug.sethook(co,h,'c',-7);" &
+         "local f,m,n=debug.gethook(co);" &
+         "assert(f==h and m=='c' and n==-7);" &
+         "assert(select('#',debug.gethook(co))==3)");
+   end Hook_Negative_Count_Reflection;
+
+   procedure Hook_Mask_Nul_Boundary is
+      --  C Lua scans hook masks as C strings.
+      --  Place line flags after NUL with empty or call-only prefixes.
+      --  Only prefix flags are active and reflected.
+   begin
+      Check
+        ("local co=coroutine.create(function()end);" &
+         "local h=function()end;local z=string.char(0);" &
+         "debug.sethook(co,h,z..'l');" &
+         "assert(debug.gethook(co)==nil);" &
+         "debug.sethook(co,h,'c'..z..'l');" &
+         "local f,m,n=debug.gethook(co);" &
+         "assert(f==h and m=='c' and n==0)");
+   end Hook_Mask_Nul_Boundary;
+
+   procedure Collection_Option_Nul_Boundary is
+      --  Collector option names use the same C-string boundary as C Lua.
+      --  Append ignored bytes after a NUL to stop and restart options.
+      --  The named operations succeed with their real zero status.
+   begin
+      Check
+        ("local z=string.char(0);" &
+         "assert(collectgarbage('stop'..z..'invalid')==0);" &
+         "assert(not collectgarbage('isrunning'));" &
+         "assert(collectgarbage('restart'..z..'invalid')==0);" &
+         "assert(collectgarbage('isrunning'))");
+   end Collection_Option_Nul_Boundary;
+
+   procedure Debug_Info_Option_Nul_Boundary is
+      --  Debug info options stop at the C-string terminator.
+      --  Request source data followed by NUL and an invalid suffix.
+      --  The source fields appear and unrequested line data remains absent.
+   begin
+      Check
+        ("local f=function()end;" &
+         "local i=debug.getinfo(f,'S'..string.char(0)..'?');" &
+         "assert(i.what=='Lua' and i.currentline==nil)");
+   end Debug_Info_Option_Nul_Boundary;
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
@@ -1523,5 +1676,32 @@ package body Runtime_Control_Tests is
       Test_Support.Add
         (Suite, "control: Weak_Mode_Nul_Boundary",
           Weak_Mode_Nul_Boundary'Access);
+      Test_Support.Add
+        (Suite, "control: Collection_Stop_Result",
+         Collection_Stop_Result'Access);
+      Test_Support.Add
+        (Suite, "control: Collection_Restart_Result",
+         Collection_Restart_Result'Access);
+      Test_Support.Add
+        (Suite, "control: Disabled_Hook_Result",
+         Disabled_Hook_Result'Access);
+      Test_Support.Add
+        (Suite, "control: Collection_Nil_Default",
+          Collection_Nil_Default'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Empty_Configuration",
+         Hook_Empty_Configuration'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Negative_Count_Reflection",
+         Hook_Negative_Count_Reflection'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Mask_Nul_Boundary",
+         Hook_Mask_Nul_Boundary'Access);
+      Test_Support.Add
+        (Suite, "control: Collection_Option_Nul_Boundary",
+         Collection_Option_Nul_Boundary'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Info_Option_Nul_Boundary",
+         Debug_Info_Option_Nul_Boundary'Access);
    end Register;
 end Runtime_Control_Tests;

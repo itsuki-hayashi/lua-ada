@@ -83,6 +83,14 @@ package body Lua.Engine is
       return (if (Real_Bits (Item) and 2 ** 63) /= 0 then "-nan" else "nan");
    end NaN_Image;
 
+   function C_Option (Text : String) return String is
+      Zero : constant Natural := Ada.Strings.Fixed.Index
+        (Text, "" & Character'Val (0));
+   begin
+      return Text (Text'First ..
+        (if Zero = 0 then Text'Last else Zero - 1));
+   end C_Option;
+
    procedure Fail (State : in out World; Message : String;
                    Resource : Boolean := False)
    is
@@ -743,25 +751,17 @@ package body Lua.Engine is
 
       function Weak_Mode (Item : Object_Access) return String is
       begin
-         --  Metamethod lookup during collection must neither allocate nor
-         --  execute Lua. Read the raw mode directly from the metatable.
+         --  Raw mode lookup must not allocate Lua objects or call handlers.
+         --  Read the field directly; host work storage belongs to this pass.
          if Item.Metatable /= null then
             for Member of Item.Metatable.Members loop
                if Member.Key.Kind = String_Kind and then
                  Member.Key.Reference.Bytes = "__mode" and then
                  Member.Item.Kind = String_Kind
                then
-                  declare
-                     Mode : constant String :=
-                       To_String (Member.Item.Reference.Bytes);
-                     Zero : constant Natural := Ada.Strings.Fixed.Index
-                       (Mode, "" & Character'Val (0));
-                  begin
-                     --  Pinned Lua uses strchr for mode flags. Match its
-                     --  C-string boundary even though Lua strings are bytes.
-                     return Mode (Mode'First ..
-                       (if Zero = 0 then Mode'Last else Zero - 1));
-                  end;
+                  --  Lua scans these flags with strchr, not a byte length.
+                  return C_Option (To_String (Member.Item.Reference.Bytes));
+
                end if;
             end loop;
          end if;
