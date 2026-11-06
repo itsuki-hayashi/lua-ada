@@ -7,7 +7,9 @@ interface. The initial compatibility baseline is **Lua 5.5.1**.
 **Current capability:** reusable static/shared Ada sessions and a batch CLI
 execute the accepted [M1 Lua subset](docs/milestones/m1.md). M2b implementation
 adds core metamethods, strings/patterns/packing, UTF-8, common table/math helpers,
-and text/module loading; its full platform matrix has passed. See the
+and text/module loading; its full platform matrix has passed. The verified
+language lifecycle delivery adds goto/closing, coroutines, weak collection and
+runtime inspection/hooks on the private VM. See the
 [export inventory](docs/capabilities.md) and [status](docs/status.md) for exact
 scope and evidence. Complete Lua compatibility, C exports, native modules, and
 LuaRocks remain later milestones. **M1 is complete**, with its
@@ -87,6 +89,7 @@ upstream notices and serve only as future test inputs.
 
 The [combined M3 language lifecycle delivery](docs/milestones/m3-language-lifecycle.md)
 adds goto/labels, closing, coroutines, weak/ephemeron collection, runtime
-inspection/hooks and compatible CLI execution quotas. Its final platform
+inspection/hooks and compatible CLI execution quotas. Its runtime matrix is
+verified; publication-head
 acceptance is tracked separately in [status](docs/status.md). Selected unchanged
 upstream passes do not establish complete Lua/C-API conformance.

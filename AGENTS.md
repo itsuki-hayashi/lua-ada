@@ -84,7 +84,11 @@ text/Lua-module loading; read [M2b](docs/milestones/m2b.md) and current status
 before making acceptance claims. The [M2b validation](docs/validation-m2b.md)
 records its completed platform gates. Private bytecode, lexical captures,
 tables, tracing collection, and bounded
-diagnostics remain the execution substrate.
+diagnostics remain the execution substrate. The implemented
+[language lifecycle delivery](docs/milestones/m3-language-lifecycle.md) adds
+goto/closing, coroutines, stable cells, weak/ephemeron tracing, debug inspection
+and hooks, collection controls and explicit execution policies. Read its
+[validation record](docs/validation-m3-lifecycle.md) before extending claims.
 Use the shared owned frontend for both checking and execution; never introduce
 a second grammar in VM lowering. Canonical opcode definitions are independent
 of the executable VM. See [frontend compatibility](docs/frontend.md) and
@@ -104,7 +108,8 @@ transfers, goto/closing, coroutines, weak collection, debug support and CLI
 policy on codex/m3-language-lifecycle. Keep these checkpoints in one PR; do not
 stop after a small infrastructure slice. Preserve separate completion evidence
 for canonical execution, C ABI, allocator parity and other deferred gates.
-Each gate is a separate task and PR; start the next gate from updated master
-after the maintainer merges its predecessor. Preserve pending obligations in
+Remaining gates outside this approved combined delivery keep separate tasks
+and PRs, starting from updated master after the maintainer merges their
+predecessors. Preserve pending obligations in
 the conformance ledger. Native C observations, lexical inventory anchors, and
 successful harness collection are not passing Ada conformance evidence.

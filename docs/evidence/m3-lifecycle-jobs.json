@@ -1,0 +1,667 @@
+{
+  "schema_version": 1,
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "runtime_revision": "4b71475e8a84eaf9a34787695e9ac82f1b2a9b84",
+  "run_id": 42158285078,
+  "logs_inspected": true,
+  "expected_new_primary_files": [
+    "goto.lua",
+    "coroutine.lua"
+  ],
+  "retained_primary_files": [
+    "tpack.lua",
+    "utf8.lua",
+    "bitwise.lua"
+  ],
+  "coroutine_configuration": "default T absent with documented upstream omissions",
+  "jobs": [
+    {
+      "id": 127697563624,
+      "name": "check (ubuntu-latest, relocatable, development)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 135381,
+      "valid": true
+    },
+    {
+      "id": 127697563837,
+      "name": "check (ubuntu-latest, relocatable, validation)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 140616,
+      "valid": true
+    },
+    {
+      "id": 127697563892,
+      "name": "check (ubuntu-latest, static, validation)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 165178,
+      "valid": true
+    },
+    {
+      "id": 127697563898,
+      "name": "check (windows-latest, static, release)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 178240,
+      "valid": true
+    },
+    {
+      "id": 127697563899,
+      "name": "check (ubuntu-latest, static, release)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 140891,
+      "valid": true
+    },
+    {
+      "id": 127697563913,
+      "name": "check (windows-latest, relocatable, development)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 178053,
+      "valid": true
+    },
+    {
+      "id": 127697563921,
+      "name": "check (ubuntu-latest, static, development)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 134974,
+      "valid": true
+    },
+    {
+      "id": 127697563927,
+      "name": "check (windows-latest, relocatable, release)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 178062,
+      "valid": true
+    },
+    {
+      "id": 127697563953,
+      "name": "check (windows-latest, static, development)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 178115,
+      "valid": true
+    },
+    {
+      "id": 127697563991,
+      "name": "check (ubuntu-latest, relocatable, release)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 140642,
+      "valid": true
+    },
+    {
+      "id": 127697564036,
+      "name": "check (windows-latest, relocatable, validation)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 178327,
+      "valid": true
+    },
+    {
+      "id": 127697563917,
+      "name": "check (macos-latest, static, development)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 136792,
+      "valid": true
+    },
+    {
+      "id": 127697563944,
+      "name": "check (macos-latest, relocatable, release)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 141605,
+      "valid": true
+    },
+    {
+      "id": 127697563993,
+      "name": "check (macos-latest, relocatable, development)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 136813,
+      "valid": true
+    },
+    {
+      "id": 127697564009,
+      "name": "check (windows-latest, static, validation)",
+      "tests": 2,
+      "success": 2,
+      "failedZero": 2,
+      "unexpectedZero": 2,
+      "cli": 70,
+      "adaConsumer": 2,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 2
+        },
+        {
+          "file": "utf8",
+          "count": 2
+        },
+        {
+          "file": "bitwise",
+          "count": 2
+        },
+        {
+          "file": "goto",
+          "count": 2
+        },
+        {
+          "file": "coroutine",
+          "count": 2
+        }
+      ],
+      "campaign": 2,
+      "tool": "16.1.0",
+      "bytes": 307815,
+      "valid": true
+    },
+    {
+      "id": 127697564046,
+      "name": "check (macos-latest, relocatable, validation)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 142711,
+      "valid": true
+    },
+    {
+      "id": 127697564047,
+      "name": "check (macos-latest, static, validation)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 159676,
+      "valid": true
+    },
+    {
+      "id": 127697564079,
+      "name": "check (macos-latest, static, release)",
+      "tests": 1,
+      "success": 1,
+      "failedZero": 1,
+      "unexpectedZero": 1,
+      "cli": 35,
+      "adaConsumer": 1,
+      "upstream": [
+        {
+          "file": "tpack",
+          "count": 1
+        },
+        {
+          "file": "utf8",
+          "count": 1
+        },
+        {
+          "file": "bitwise",
+          "count": 1
+        },
+        {
+          "file": "goto",
+          "count": 1
+        },
+        {
+          "file": "coroutine",
+          "count": 1
+        }
+      ],
+      "campaign": 1,
+      "tool": "16.1.0",
+      "bytes": 142437,
+      "valid": true
+    }
+  ]
+}

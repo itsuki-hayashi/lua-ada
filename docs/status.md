@@ -1,8 +1,8 @@
 # Project Status
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**
-**M3 is in progress; the combined language lifecycle delivery is implemented
-and undergoing final acceptance.**
+**M3 remains in progress. The bounded language lifecycle delivery has verified
+runtime acceptance; publication-head checks gate PR readiness.**
 
 ## Implemented and verified
 
@@ -58,13 +58,15 @@ with identical stdout, empty stderr and OK markers. The coroutine result is
 complete coroutine or C-API conformance. Exact omitted source anchors and the
 900-second/2 GiB sampled resident-process policy are in the acceptance owner.
 
-Final source review, expanded differential campaigns, retained regressions,
-all 18 final platform configurations, Windows static-PIC and the open PR are
-still required. [PR #7](https://github.com/itsuki-hayashi/lua-ada/pull/7) is
-open as a draft while those gates run. These local observations do not
-establish the final platform gates.
-The [current session](sessions/2026-11-06-m3-language-lifecycle.md) owns commands
-and intermediate evidence. Reference and ecosystem module pins are unchanged.
+The runtime revision 4b71475e8a84eaf9a34787695e9ac82f1b2a9b84 passed all
+18 Windows/Linux/macOS profile/linking jobs and Windows static-PIC; every job
+log was inspected. All three static-validation jobs passed the retained ABI,
+frontend/opcode/layout/library campaigns and the new 1,024-case seeded lifecycle
+campaign. [Validation evidence](validation-m3-lifecycle.md) records the exact
+run, job IDs, tool versions, marker counts and scope limits. The final handoff
+commit changes documentation and evidence retention only; its own full matrix
+must pass before [PR #7](https://github.com/itsuki-hayashi/lua-ada/pull/7) is ready.
+Reference/module pins remain unchanged and ecosystem fixtures remain unused.
 
 ## Earlier evidence and remaining work
 

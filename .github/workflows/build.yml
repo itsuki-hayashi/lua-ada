@@ -96,3 +96,14 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/check.ps1 -LibraryType static-pic -Profile validation
+      - name: Preserve lifecycle observations
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: lifecycle-${{ runner.os }}-${{ matrix.profile }}-${{ matrix.library }}
+          path: |
+            reports/lifecycle/**
+            reports/m3-lifecycle-campaign*
+            LICENSE
+            docs/licenses/lua.md
+          if-no-files-found: warn

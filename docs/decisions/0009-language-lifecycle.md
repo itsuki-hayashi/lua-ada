@@ -1,6 +1,6 @@
 # ADR 0009: Language Lifecycle on the Private VM
 
-Date: 2026-11-06. Status: accepted design; final acceptance pending.
+Date: 2026-11-06. Status: accepted and implemented; runtime matrix verified.
 
 ## Context
 
@@ -69,3 +69,7 @@ cycles, ephemerons, hooks, native callback restrictions and policy recovery.
 Unchanged goto.lua and coroutine.lua require independent hash-verified C/Ada
 process runs; T-absent omissions are inventoried explicitly. Final platform jobs
 and the retained M2b/frontend/opcode/ABI campaigns remain mandatory.
+
+The [validation record](../validation-m3-lifecycle.md) records 575 passing AUnit
+cases, all five selected files, the 1,024-case campaign, all 18 inspected jobs
+and Windows static-PIC. Publication-head CI remains the final readiness gate.

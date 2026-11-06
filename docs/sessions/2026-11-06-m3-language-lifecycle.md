@@ -2,7 +2,8 @@
 
 Date: 2026-11-06, Asia/Tokyo. Branch: codex/m3-language-lifecycle.
 Baseline: merged PR #6, master bbc6e230cc1fcf4d20eb3caf02077b6bb0c0f46a.
-Status: implementation in progress. Do not present this checkpoint as a ready PR.
+Status: runtime acceptance verified. Final documentation/evidence-retention
+head checks remain mandatory before marking the single PR ready.
 
 ## Approved target
 
@@ -102,3 +103,20 @@ inspection, hooks, native-depth accounting and non-yieldable callback rules see
 it consistently. A focused callback regression raises the local suite to 575
 passing cases (87 new), zero failed assertions/unexpected errors. The validation
 owner is docs/validation-m3-lifecycle.md; final platform evidence remains pending.
+
+## Completed runtime acceptance and handoff checks
+
+Runtime/test revision 4b71475e8a84eaf9a34787695e9ac82f1b2a9b84 passed all 18
+jobs in PR run 42158285078. Every log was inspected: 575 successful AUnit cases,
+zero failed assertions/errors, Ada consumer, 35 CLI cases, eight differential
+fixtures and all five selected unchanged upstream files. Windows static-validation
+also repeated the complete pipeline with static-PIC. All three static-validation
+logs show ABI, 85-opcode/4,096-word, 10,000-byte-input, 2,000 grammar plus 2,000
+mutation, 34-file parse-only, C99 layout, 1,120-library and 1,024-lifecycle checks.
+
+The validation record and machine-readable evidence own exact job IDs, tool/host
+versions and marker counts. The final handoff commit updates documentation and
+adds per-configuration lifecycle artifact retention; runtime/test source is
+unchanged. Its full matrix must pass before PR #7 is marked ready. Do not merge.
+This completes the approved bounded runtime features, not the broader original
+M3 gates, canonical execution, C ABI/allocator parity or the complete suite.

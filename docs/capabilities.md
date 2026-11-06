@@ -66,12 +66,12 @@ is `./?.lua;./?/init.lua`; native loading is deferred.
 ## Deliberately deferred
 
 M2a adds shared syntax checking and a private canonical opcode definition layer.
-Syntax accepts goto/labels/close while execution returns Unsupported_Feature.
+Goto/labels/close now execute through the private lifecycle backend.
 See the [frontend inventory](frontend.md) for scope and current evidence.
 
 - Syntax accepted: full pinned default grammar/static-semantic target.
 - Runtime behavior: M1/M2b plus the implemented lifecycle delivery below;
-  final platform acceptance remains separately recorded.
+  verified runtime matrix and final publication checks are recorded separately.
 - Opcode format: all 85 canonical definitions and six encodings.
 - Canonical code generation: deferred; compiler lowers to private operations.
 - Canonical code execution: deferred; no binary chunk compatibility claim.
@@ -79,15 +79,15 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 | Facility                               | Later gate / current response                    |
 | -------------------------------------- | ------------------------------------------------ |
 
-| Finalization                           | Deferred; no finalizer execution                 |
-| Userdata and io/os                     | Deferred; unavailable facilities                 |
-| string.dump, table.sort/create         | Remaining library work; unavailable              |
-| Math RNG and remaining transcendentals | Remaining library work; unavailable              |
-| Binary chunks                          | M3; text-source interface only                   |
-| C exports and allocator parity         | M3; isolated feasibility probes only             |
-| Dynamic native modules / LuaRocks      | M4; no compatibility claim                       |
-| Whole upstream suite                   | M5; inventory records all deferred prerequisites |
-| Interactive REPL                       | Future CLI work; no-input usage is intentional   |
+| Finalization                           | Deferred; no finalizer execution               |
+| Userdata and io/os                     | Deferred; unavailable facilities               |
+| string.dump, table.sort/create         | Remaining library work; unavailable            |
+| Math RNG and remaining transcendentals | Remaining library work; unavailable            |
+| Binary chunks                          | M3; text-source interface only                 |
+| C exports and allocator parity         | M3; isolated feasibility probes only           |
+| Dynamic native modules / LuaRocks      | M4; no compatibility claim                     |
+| Whole upstream suite                   | M3; full coverage ledger remains incomplete    |
+| Interactive REPL                       | Future CLI work; no-input usage is intentional |
 
 The runtime does not specify hash iteration order, ambiguous table borders,
 pointer text, or byte-identical diagnostic wording. Differential fixtures avoid relying on
@@ -115,3 +115,7 @@ inspection remain outside this delivery.
 goto.lua/coroutine.lua execution, precise T-absent omissions and platform evidence.
 Passing those targets does not complete any original M3 gate or establish full
 C-API, allocator, canonical execution, binary-chunk or ecosystem compatibility.
+
+Lifecycle runtime acceptance has passed the [18-job matrix](validation-m3-lifecycle.md)
+and Windows static-PIC. upvalueid exposes opaque light-userdata identities for
+actual cells; general userdata creation and C-visible pointers remain deferred.

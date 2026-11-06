@@ -55,7 +55,8 @@ Resource failures abort the current chunk even inside `pcall`.
 
 M2b extends that rule to `xpcall` and callbacks reached through metamethods,
 pattern replacement, loading readers, and package searchers. Lua/native calls
-share one explicit activation stack and one budget. A callback language error
+share an explicit activation stack within each context and one execution-wide
+budget across the scheduler chain. A callback language error
 can be protected; resource exhaustion unwinds all abandoned continuation state
 and aborts the chunk. Later `Execute` calls remain usable with a fresh per-chunk
 instruction budget.

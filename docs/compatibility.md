@@ -68,3 +68,9 @@ Eight [consumer module fixtures](../tests/modules/README.md) are pinned for
 future C Lua/Lua Ada parity checks. The catalog owns revision, dependency, and
 update notes. All module execution/platform evidence is currently unrun; the
 checkouts do not expand M1 or establish LuaRocks/native-module compatibility.
+
+The [language lifecycle validation](validation-m3-lifecycle.md) adds unchanged
+goto.lua and coroutine.lua under default T-absent configuration, with the latter
+file's explicit upstream omissions inventoried by source anchor. All 18 runtime
+configurations and Windows static-PIC passed. These five selected default-file
+results advance the bounded delivery and leave broader M3 conformance open.

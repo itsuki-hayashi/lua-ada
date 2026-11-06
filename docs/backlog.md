@@ -125,8 +125,9 @@ retain their original counts rather than being rewritten as newer evidence.
 M3-01 is merged in PR #5. M3-02A implements context ownership, selection guards,
 all-context tracing and cleanup; its [evidence](sessions/2026-11-06-m3-02-contexts.md)
 records 488 local AUnit cases. The parent M3-02 gate remains in progress.
-M3-02B depends on this slice and must implement typed control transfers and
-semantic-error versus host-abort policy with protected-call/recovery tests.
+The typed-transfer and semantic-error/host-abort portion planned as M3-02B is
+implemented by the combined M3-LC delivery below, with protected-call and
+recovery evidence. Its completion does not close the broader original gates.
 
 The [accepted M3 contract](milestones/m3.md) owns configuration, resource,
 coverage and delivery rules. The machine-readable
@@ -187,11 +188,13 @@ fixtures are covered by M3-10 instead.
 The maintainer approved [M3-LC](milestones/m3-language-lifecycle.md) as one major
 PR from merged PR #6. Its sequential checkpoints M3-LC-01 through M3-LC-06 have
 explicit dependencies and exit evidence in that acceptance owner. M3-LC-01–05
-are implemented with focused local regressions; M3-LC-06 remains open until the
-final revision passes all required platform jobs and the PR is open. This
+are implemented with 575 focused regressions. M3-LC-06 has verified runtime
+evidence across all 18 jobs and Windows static-PIC, with the single PR open;
+its final documentation/evidence-retention head must pass before readiness. This
 advances selected portions of M3-02/06/07/08/11, without marking their broader
 canonical, allocator, finalizer, binary or full-CLI requirements complete.
 
 Evidence: [current session](sessions/2026-11-06-m3-language-lifecycle.md),
-Runtime_Control_Tests, check-lifecycle.ps1 and retained raw reports. No reference
+[validation record](validation-m3-lifecycle.md), Runtime_Control_Tests and
+check-lifecycle.ps1. No reference
 or ecosystem-fixture pins have changed.
