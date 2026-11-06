@@ -167,6 +167,14 @@ obligations. They carry no coverage authority and are not independent reviews.
 Reviewers must reconcile these candidates with the original source, actual
 per-context observations and equivalent counterparts before resolving the ledger.
 
+The [scoped API author candidate](reviews/api.candidate.json) assigns all
+77 selected header anchors to 11 semantic groups, with source-hashed existing
+test cases and explicit review limits. In particular, synchronous callk/pcallk
+cases do not establish yieldable continuations, and parameter round-trip tests
+do not alone establish collector parameter semantics. This candidate has no
+coverage authority; independent review must connect actual execution evidence
+to each applicable invariant before resolving any scoped API record.
+
 The named scope [gc-io-events](scopes/gc-io-events.json) selects events.lua,
 files.lua, gc.lua and gengc.lua, including every original anchor and subsequent
 reviewed block in those partitions, plus 77 directly exercised public API

@@ -602,3 +602,26 @@ reports/m3-io-oracle-instrumented.log, including all retained GC, startup and
 unwind consumers. Both CI configurations schedule the new comparison and
 retain its executable/library/source hashes. Final platform acceptance and
 independent semantic/equivalent review remain outstanding.
+
+The scoped API author candidate now maps every one of the 77 selected header
+anchors to one of 11 semantic groups. It records actual named regression
+functions, source hashes, behavioral invariants and explicit limits for
+synchronous continuations, collector parameter application, native equivalents
+and shutdown obligations. The generation audit checked unique/complete ID
+assignment and that each named function exists in its recorded source. This
+is author analysis only; all reviews and evidence lists remain pending/empty.
+Scope validation in reports/m3-api-candidate-scope.log still reports 762 source
+anchors and 77 API entries pending, with full structural inventory checked.
+
+At published 37cd287, Linux instrumented jobs 128111771779 (shared) and
+128111772163 (static) in run 42281617732 pass 1,299 AUnit cases, all four scoped
+C/Ada observations, 22 matrix regressions and both public GC/IO oracle
+comparisons. Full job logs were retained under reports/ci-37cd287 and inspected
+for error/warning diagnostics. Artifact 13535462449 has ZIP SHA-256
+0efd278601f9d1aabd59782916c3eed1b155d5aa12f035b023973949d706d5ec.
+Its four Ada reports identify exact head
+37cd287b87ef9894ea34837243f000e8ba1e4d19 with a clean recorded checkout; this
+confirms the corrected CI provenance. It retains the generated gc.lua source
+and separately reports that run as an Ada-internal equivalent, while the other
+three Linux files are unchanged. Alire 2.1.1, GNAT 16.1.0 and GPRbuild 26.0.1
+are recorded in both job logs. These observations do not close pending reviews.

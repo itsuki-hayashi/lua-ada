@@ -1,0 +1,590 @@
+{
+  "schema_version": 1,
+  "scope": "gc-io-events",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "author": "Codex",
+  "review_status": "pending",
+  "reviewer": null,
+  "coverage_authority": false,
+  "scoped_ledger_sha256": "ef97b2fcb8eeed4af4672afaa2322eb88c06b467e119abea53e78640046f21a4",
+  "notes": [
+    "Author semantic inventory, not an independent review, accepted execution contract or coverage closure.",
+    "All 77 selected header anchors are assigned exactly once. The global 473-entry C API ledger remains separate and pending.",
+    "Existing named regressions identify candidate evidence only. Review actual assertions, runtime paths, configuration applicability and final-revision execution artifacts in every required context.",
+    "The selected Lua files and their T adapters have additional dynamic, guarded, shutdown and native-platform obligations; these API groupings do not replace the four source inventories."
+  ],
+  "sections": [
+    {
+      "id": "allocator-and-state-lifetime",
+      "invariant": "Actual callback/data identity, seeded construction, refusal at measured growth positions, usable recovery, and physical release of all allocator-owned blocks.",
+      "scope_limit_and_review_checks": "AUnit and the public GC contract additionally exercise state-close finalizers. This group does not establish arbitrary foreign allocator replacement compatibility or unrelated allocator parity.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-TYPE-LUA_ALLOC-125",
+          "header": "lua.h",
+          "anchor_sha256": "125625b466ff7171d9c3a3e66e23cd42c5d8102059b99bf08b2acf6548b92f69"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_NEWSTATE-163",
+          "header": "lua.h",
+          "anchor_sha256": "5e35fee277846d9d2898328832af4150df0b2d603c83fc5ba860b158720de679"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_CLOSE-164",
+          "header": "lua.h",
+          "anchor_sha256": "c2094de96b1e5c2ed69f3241551b907dde733cdf765779e90dca8c897864b1b1"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_GETALLOCF-378",
+          "header": "lua.h",
+          "anchor_sha256": "424a1e892112a9bdaaf8da3bc4a411c59b00abd06ff963b7bb5a9017eb65e0fc"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_SETALLOCF-379",
+          "header": "lua.h",
+          "anchor_sha256": "dcf5a18cf7f4b5c32afc7a32d0c71097cdd6efa72886b12b585471e5ee87bc5c"
+        }
+      ],
+      "test_source": "c_api/tests/c_api_consumer.c",
+      "test_source_sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07",
+      "named_cases": [
+        "test_state_allocator_lifetime",
+        "test_constructor_refusal",
+        "test_cold_constructor_failure_sweep",
+        "test_guarded_allocator_refusal_and_recovery"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "stack-windows-and-result-adjustment",
+      "invariant": "Indices resolve before mutation, callbacks see their argument window, results are adjusted including multiple results, and failed growth preserves the live prefix and later calls.",
+      "scope_limit_and_review_checks": "Macros must be checked through the pinned headers and their expanded public calls. Merely compiling the macro name does not establish its observable stack effect.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_MULTRET-35",
+          "header": "lua.h",
+          "anchor_sha256": "8fa0bc125c96c18e6a25e1da303bf05197a88636f664fc5128aa39335d490c11"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_ABSINDEX-177",
+          "header": "lua.h",
+          "anchor_sha256": "c781de91987caa38049656085c3040b7dce3ccb13173e695551e3c074a117e30"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_GETTOP-178",
+          "header": "lua.h",
+          "anchor_sha256": "4790aa5dbe0b7ee065f6ff836f0daea8d43bf57f996b132377d7115fd69f304a"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_SETTOP-179",
+          "header": "lua.h",
+          "anchor_sha256": "1c01e041084973795012cbed57a6af67f065502a7c202ff82685405db2c4f9c1"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHVALUE-180",
+          "header": "lua.h",
+          "anchor_sha256": "2d6c6e7d0f75f08f19fdbae3916a66760767e5956215453f2d13c83c51d7b0b3"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_CHECKSTACK-183",
+          "header": "lua.h",
+          "anchor_sha256": "2f113538305f753e4a49767ec082bb9eb370cfc3c0dfc779e27e85c200723bcb"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_POP-396",
+          "header": "lua.h",
+          "anchor_sha256": "f6c33b2229420c3e2c57189c1ef548bece69b5c7e4ea4773c8b7810ed8e85779"
+        }
+      ],
+      "test_source": "c_api/tests/c_api_consumer.c",
+      "test_source_sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07",
+      "named_cases": [
+        "test_stack_rotation_copy_and_bounds",
+        "test_callback_stack_window",
+        "test_initial_free_stack_needs_no_growth",
+        "test_failed_checkstack_keeps_state_usable"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "status-and-type-tags",
+      "invariant": "Success, nil, absent optional arguments and actual full userdata remain distinct through public type queries and callback results.",
+      "scope_limit_and_review_checks": "The T.newuserdata optional-argument checks in tests/c/conformance_adapter.c also exercise lua_isnoneornil. Review invalid/missing arguments independently of successful allocations.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_OK-48",
+          "header": "lua.h",
+          "anchor_sha256": "027a0855b7235e4a1bea8dafd7c61ecad4e9d00105c1bd6dd0c43807d86a5388"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_TNIL-64",
+          "header": "lua.h",
+          "anchor_sha256": "85ab0890493328b90791dca690e9c1d5ffa2f080f73d5252975daeab3020c875"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_TUSERDATA-71",
+          "header": "lua.h",
+          "anchor_sha256": "572ddd6deb11f1d6772e41ffe92873cfa63068b879e92b23087cb5a656f8cb50"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_TYPE-197",
+          "header": "lua.h",
+          "anchor_sha256": "4f9c18c0cc8efdb6253b7b59a8d14710faec17c62d84897818c83d977df99ea2"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_ISNONEORNIL-411",
+          "header": "lua.h",
+          "anchor_sha256": "2b457f53b88a90f20b3915b3f2270161ea638f113f0136dda065814b208a07cf"
+        }
+      ],
+      "test_source": "c_api/tests/c_api_consumer.c",
+      "test_source_sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07",
+      "named_cases": [
+        "test_userdata_payload_alignment",
+        "test_userdata_uservalue_results",
+        "test_callback_stack_window"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "numeric-values-and-truth",
+      "invariant": "Integer bounds, nonintegral conversion refusal, valid numeric string conversion without changing source type, and Lua truth of integer zero are observable through real API values.",
+      "scope_limit_and_review_checks": "Test adapter parameter arguments and inspected results use these paths. This scope is not all numeric conversion/formatting compatibility.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_TONUMBERX-200",
+          "header": "lua.h",
+          "anchor_sha256": "321775f0caa641783e34ac2ed664ac13bfa745a1e9e25bf160049b815ab32c0c"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_TOINTEGERX-201",
+          "header": "lua.h",
+          "anchor_sha256": "379587c033cecda1870903dcde2e8fffb303fd6eff531b16d890bc7e3c1e3e42"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_TOBOOLEAN-202",
+          "header": "lua.h",
+          "anchor_sha256": "1548d807750174d0fa776a4625f66f42b3068d854706bedc010af2c36808d8f5"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHINTEGER-245",
+          "header": "lua.h",
+          "anchor_sha256": "9d9fb671ffdedcea5ba034c00efb3aa970b9f0902645953d4c6c3e7324455214"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_TONUMBER-393",
+          "header": "lua.h",
+          "anchor_sha256": "ec39a2f5011370af949fbe0225cc7e0b974a0f43c094534c966920c8901c4b9d"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_TOINTEGER-394",
+          "header": "lua.h",
+          "anchor_sha256": "7c4815965e8551e9c74c76fa5351acbc17562c8d3606750ab3da3f9ab470c8f7"
+        }
+      ],
+      "test_source": "c_api/tests/c_api_consumer.c",
+      "test_source_sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07",
+      "named_cases": [
+        "test_numeric_conversions",
+        "test_nonyieldable_callk",
+        "test_nonyieldable_pcallk"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "owned-byte-strings",
+      "invariant": "Embedded NUL and high bytes retain exact lengths and stable rooted addresses; null string input becomes nil, and real allocation failure stays within the C-owned error boundary.",
+      "scope_limit_and_review_checks": "Warning fragments and adapter diagnostics exercise actual retained byte strings. Source citations must not substitute for refusal/recovery execution.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHLSTRING-246",
+          "header": "lua.h",
+          "anchor_sha256": "b9699d874e9720f22521758341182a025bedc41e35cc933da2cd2975b3281552"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHSTRING-249",
+          "header": "lua.h",
+          "anchor_sha256": "8d2b8a12ab882bc88819d58d19d7523ca3c1bfe6e542e254d11658e7635e5a17"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_PUSHLITERAL-413",
+          "header": "lua.h",
+          "anchor_sha256": "59d3718e5f60843577c7256b5458d09b25a1543b8a4df4ba3dcd0413d33a26dc"
+        }
+      ],
+      "test_source": "c_api/tests/c_api_consumer.c",
+      "test_source_sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07",
+      "named_cases": [
+        "test_binary_strings_and_stable_addresses",
+        "test_protected_callback_memory_failure"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "raw-registry-tables-and-metatables",
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "scope_limit_and_review_checks": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_REGISTRYINDEX-43",
+          "header": "lua.h",
+          "anchor_sha256": "9d959d2d9a86768ebb202c73065b38f7007fb98582cbf13576b30efaebf6c46b"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_RAWGET-266",
+          "header": "lua.h",
+          "anchor_sha256": "4dae97a986aa0e5774d17d71be65d7bf3ff45f396ed0b89444f54a660638d95c"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_RAWGETI-267",
+          "header": "lua.h",
+          "anchor_sha256": "af22f0ca8fbff651803451b4d234c553e94bce9f8f2e808f4c7322bbbc1f7ff3"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_CREATETABLE-270",
+          "header": "lua.h",
+          "anchor_sha256": "4f3553a364c99288e760fc5b9e1ea2e222d87e305523ea450e5dc52fe8ce5754"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_RAWSET-283",
+          "header": "lua.h",
+          "anchor_sha256": "7e2a37bcf74ef1bd36168c5510f3db3087fdfc6b5cd0961de2f499067c527417"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_RAWSETP-285",
+          "header": "lua.h",
+          "anchor_sha256": "911366405eaa279edf19a363454ff0a5619272b846e54df64918a7231b4adca4"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_NEWTABLE-398",
+          "header": "lua.h",
+          "anchor_sha256": "659d35ef89ce32fa4b66e7e699ef61e72a30b6a275f50b56c053ce3881014ed3"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_RAWEQUAL-236",
+          "header": "lua.h",
+          "anchor_sha256": "c1cbc2d420db6f4a2934486de40fe1ce503c017563f12bb50d59aeaf237573fe"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_PUSHGLOBALTABLE-415",
+          "header": "lua.h",
+          "anchor_sha256": "065b2224f56b0c6b9c0475093a3585baa088e15e3af9ff53ebf641a6b1acbbca"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_GETMETATABLE-272",
+          "header": "lua.h",
+          "anchor_sha256": "8c2ccc2eafdadf2217549e599c90b21fac6b8f950c2b4e2f8d8f4e8bd877f90b"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_SETMETATABLE-286",
+          "header": "lua.h",
+          "anchor_sha256": "a8247a168848646714affafc1ec8f675895e16852d26d0f533824c3dbe9833f0"
+        }
+      ],
+      "test_source": "c_api/tests/c_api_consumer.c",
+      "test_source_sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07",
+      "named_cases": [
+        "test_raw_tables_and_pointer_identity",
+        "test_userdata_metatable_identity",
+        "test_threads_registry_extra_space_and_moves"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "userdata-storage-and-uservalues",
+      "invariant": "The public pointer addresses stable aligned writable payload storage; zero-size objects retain distinct identities; uservalue reads/writes obey nil, invalid-index, pop and maximum-count rules.",
+      "scope_limit_and_review_checks": "The selected T.newuserdata calls must use real C exports. GC/finalizer ownership remains a separate dynamic obligation in events.lua and gc.lua.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_RAWLEN-204",
+          "header": "lua.h",
+          "anchor_sha256": "a2174f81e8aedd5e54a7fd94d07167e272d13ca4dfc1d8c5d4d619399d7ef13e"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_TOUSERDATA-206",
+          "header": "lua.h",
+          "anchor_sha256": "d81f382dfebee067367e30b876cb9e05f95df695f532198ac0fea7228c6f8eeb"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_NEWUSERDATAUV-271",
+          "header": "lua.h",
+          "anchor_sha256": "9cf08a8649df682d66d27bffbf708cd986c752beb40746f77e2de46715094e00"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_GETIUSERVALUE-273",
+          "header": "lua.h",
+          "anchor_sha256": "2c1fe411928644b40b0517bbcc957a14de93d3d6c732a7f1854dac6e39c33470"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_SETIUSERVALUE-287",
+          "header": "lua.h",
+          "anchor_sha256": "30b9909b31e421578f067923b478b2d6764314842edf432cffca7ea01fd4322c"
+        }
+      ],
+      "test_source": "c_api/tests/c_api_consumer.c",
+      "test_source_sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07",
+      "named_cases": [
+        "test_userdata_payload_alignment",
+        "test_userdata_uservalue_results",
+        "test_userdata_metatable_identity",
+        "test_userdata_maximum_uservalue_count"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "guarded-callbacks-and-synchronous-calls",
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "scope_limit_and_review_checks": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-TYPE-LUA_CFUNCTION-106",
+          "header": "lua.h",
+          "anchor_sha256": "94098f9522711a90db4ab745c1c8689661864a201423e24101f5839009d42107"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_UPVALUEINDEX-44",
+          "header": "lua.h",
+          "anchor_sha256": "709d1f224fa8f6ec85dc2292901448c7d4097a60cc44e406c9bde3f8855f47af"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHCCLOSURE-253",
+          "header": "lua.h",
+          "anchor_sha256": "8dad1ea3ae39c040bf3ab3428b627a6e21684308f6f4111b9a09aed5eda2f048"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_PUSHCFUNCTION-402",
+          "header": "lua.h",
+          "anchor_sha256": "51e3a7c7fc638fe7516813cbbc006f5d396be9d9abbf7b142944f8c5ef29966f"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_CALLK-293",
+          "header": "lua.h",
+          "anchor_sha256": "69213913cd477db3ec6d98ac7320f5333c3c56eebf1fab05d4648b7a94eb4f74"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_CALL-295",
+          "header": "lua.h",
+          "anchor_sha256": "fd4b2b95abc1958839ebec8cd3d290e076d40993026a21163dbd03315c8b5264"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_PCALLK-297",
+          "header": "lua.h",
+          "anchor_sha256": "0c052a78fd4c50b18b56df6a4ef0bf9d32f5569eb44cf27d2825976d873523c6"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_PCALL-299",
+          "header": "lua.h",
+          "anchor_sha256": "6ee88f97f88e61e623915e9f00f45bcb8d11bf8a94d84b53d2f704b85a9aac83"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_ISYIELDABLE-315",
+          "header": "lua.h",
+          "anchor_sha256": "62bb811099a8a8266e2bb9570ae6ab35e39428f8c12ff35d2a192b84330ad4bc"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_ERROR-367",
+          "header": "lua.h",
+          "anchor_sha256": "5933e951927ad6b028cfcbcdb378518ad01da75742c5c12e8328b6ca0533fd15"
+        }
+      ],
+      "test_source": "c_api/tests/c_api_consumer.c",
+      "test_source_sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07",
+      "named_cases": [
+        "test_callback_stack_window",
+        "test_c_closure_cells",
+        "test_protected_c_error_identity",
+        "test_reentrant_c_to_c_calls",
+        "test_public_yieldability",
+        "test_nonyieldable_callk",
+        "test_nonyieldable_pcallk"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "warning-callback-lifetime-and-fragments",
+      "invariant": "Warning callbacks receive the registered data, exact literal fragments and continuation flags; nested delivery and protected callback errors return through guarded C paths without requiring managed allocation.",
+      "scope_limit_and_review_checks": "The shared GC contract checks fragmented warnings during collection and state close. Test-only @on/@off/@normal/@allow/@store and _WARN ownership must also be reviewed against the pinned ltests.c semantics.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-TYPE-LUA_WARNFUNCTION-131",
+          "header": "lua.h",
+          "anchor_sha256": "7473eb22b61db43ff76fbde3bb8e80265f5ceb948f31b483a7ad9e86c2841e3c"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_SETWARNF-323",
+          "header": "lua.h",
+          "anchor_sha256": "10643bf455462c0568822bfa468961316c1114204d12753156432fa2bebf4bc6"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_WARNING-324",
+          "header": "lua.h",
+          "anchor_sha256": "a91d1653c7fbe799e04671ff97c25d1ec6e5d81a2ac25bb849bda705ce6804a3"
+        }
+      ],
+      "test_source": "c_api/tests/c_api_consumer.c",
+      "test_source_sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07",
+      "named_cases": [
+        "test_custom_warning_literals",
+        "test_reentrant_warning",
+        "test_warning_error_boundary",
+        "test_warning_uses_no_allocator"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "public-collector-controls-and-close",
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "scope_limit_and_review_checks": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations.",
+      "api_entries": [
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCSTOP-331",
+          "header": "lua.h",
+          "anchor_sha256": "825207cda7d5224bb72208000d11b9ba0b28f5b10c7855497f968c169b27b974"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCRESTART-332",
+          "header": "lua.h",
+          "anchor_sha256": "12f93db3acedfd5b9c80ede3ecfeceb75ba07cf05dc7d67425b744dafe118598"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCCOLLECT-333",
+          "header": "lua.h",
+          "anchor_sha256": "8726af09ad86d070c765530a0c6d14458a473fa6e4dced16ab4afceda20f06ca"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCCOUNT-334",
+          "header": "lua.h",
+          "anchor_sha256": "b2b46e8effbb0643da7ffc16b33dac8825d920c21becc9ff9d8f197144297eca"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCCOUNTB-335",
+          "header": "lua.h",
+          "anchor_sha256": "98f2ff7bedd361eaf369c1ca745d17536cf6c5a1d2240037f77cff62ea65199d"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCSTEP-336",
+          "header": "lua.h",
+          "anchor_sha256": "59e030e0cf312c373d45ffe4631278fb4dbf8a4fa975f9b2daaa88d4a4e2490d"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCISRUNNING-337",
+          "header": "lua.h",
+          "anchor_sha256": "16654ea2cd385b0aaacb53585301f8052c44f0e9ef9cd36dc31afbe62b21c2bc"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCGEN-338",
+          "header": "lua.h",
+          "anchor_sha256": "c117cbd6acd4050a884df932a287fbf19c9637ffa632d7019aeeaa65b31c032a"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCINC-339",
+          "header": "lua.h",
+          "anchor_sha256": "b6eb69a0bd12183e90d42a144ffd5a940c37dcf53ad4a623fbae2a1aeff0a8a5"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCPARAM-340",
+          "header": "lua.h",
+          "anchor_sha256": "5ff7a225bd4e0f9633394c683f7cbddc577879214834bc41ffb8991a1d5ed933"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCPMINORMUL-347",
+          "header": "lua.h",
+          "anchor_sha256": "03501bf62d2e19da632110bbb779a1a0723c812081b1f06b333afe0e925c1d7f"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCPMAJORMINOR-348",
+          "header": "lua.h",
+          "anchor_sha256": "e41e1013643b56ec81e58bed80411d63859b7fcabb44241ee0d85a907235de16"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCPMINORMAJOR-349",
+          "header": "lua.h",
+          "anchor_sha256": "26f1af3cd517bd2a9737a50a0bcd2dcd65f4be5c830bffcfa90c0a9914a84713"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCPPAUSE-352",
+          "header": "lua.h",
+          "anchor_sha256": "aac25e05a54581b4e3e7dbb117736f2cad014a712975785fa2d34e414ac67f92"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCPSTEPMUL-353",
+          "header": "lua.h",
+          "anchor_sha256": "3c3e3fe5a5e62347b22f8b8a2d5933f8e9ea3e7f8acf13538934180634c1b57d"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCPSTEPSIZE-354",
+          "header": "lua.h",
+          "anchor_sha256": "07cc9526400832f7e684a965d57d9d149cc7a2c2e03cb5b88ed514218ca3f301"
+        },
+        {
+          "id": "CAPI-LUA-H-MACRO-LUA_GCPN-357",
+          "header": "lua.h",
+          "anchor_sha256": "32b6720010484a9bca94efb4b6b0df81a8fa0a423cbc84044eb1e8ad5e4e4128"
+        },
+        {
+          "id": "CAPI-LUA-H-FUNCTION-LUA_GC-360",
+          "header": "lua.h",
+          "anchor_sha256": "121dd75c744b67bbf5d6c5f05425a3fe52a6d568516dcb4fac635fcd19b38494"
+        }
+      ],
+      "test_source": "c_api/tests/gc_contract.h",
+      "test_source_sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6",
+      "named_cases": [
+        "test_gc_controls_without_allocation",
+        "test_gc_modes_and_stopped_steps",
+        "test_gc_finalizer_callback_order",
+        "test_gc_finalizer_storage_refusal",
+        "test_close_drains_c_finalizers",
+        "test_close_refusal_releases_storage",
+        "test_gc_and_close_warning_callbacks"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    },
+    {
+      "id": "public-file-payload-and-library-openers",
+      "invariant": "The public payload contains the actual FILE pointer and callable closer; reopening io retains live stream metatable identity; os returns callable exports without implicit global publication; native closer invocation closes the owned stream.",
+      "scope_limit_and_review_checks": "The standalone IO contract compares C and Ada with zero outstanding allocator storage after close. Native device/date/shell equivalents and partial-write behavior need their own source-bound review; these layout cases do not establish all IO semantics.",
+      "api_entries": [
+        {
+          "id": "CAPI-LAUXLIB-H-MACRO-LUA_FILEHANDLE-236",
+          "header": "lauxlib.h",
+          "anchor_sha256": "0a3365499ee54665a6b8cd102d6cdfa19ac413bb09a61d01da450adea008e5f5"
+        },
+        {
+          "id": "CAPI-LAUXLIB-H-TYPE-LUAL_STREAM-239",
+          "header": "lauxlib.h",
+          "anchor_sha256": "9616acc4a75ec4c083572e7bfaf04abfa6e7a2002170f3c2a51935c074ea94d8"
+        },
+        {
+          "id": "CAPI-LUALIB-H-FUNCTION-LUAOPEN_IO-35",
+          "header": "lualib.h",
+          "anchor_sha256": "19639c1ee72be49b40c78b53e61078eed8905399290225cf95f9d6b8ed39acdf"
+        },
+        {
+          "id": "CAPI-LUALIB-H-FUNCTION-LUAOPEN_OS-43",
+          "header": "lualib.h",
+          "anchor_sha256": "480d523a404de07f135bd99e5518feb8a12380239977f362d1597e5134418b20"
+        }
+      ],
+      "test_source": "c_api/tests/io_contract.h",
+      "test_source_sha256": "9553a625db792889399df3aa246594018aed850a90404659fe189c0835c47f86",
+      "named_cases": [
+        "test_io_opener_and_stream_layout",
+        "test_os_opener_without_global_publication",
+        "test_file_payload_closer_callback"
+      ],
+      "review_status": "pending",
+      "evidence": []
+    }
+  ]
+}
