@@ -965,7 +965,26 @@ package body Lua.Engine.Canonical is
                      else Reg (Reg_C));
             declare
                Arguments : Values.Vector := Owned_Values (State);
+               Retried : Boolean := False;
             begin
+               --  All three operands remain rooted in the current register
+               --  window or its prototype constants. Reserve the temporary
+               --  packet before publishing any entries, then retry one real
+               --  refusal through emergency collection. Weak __newindex
+               --  handlers may disappear during that collection: @set must
+               --  resolve the handler only after these rooted operands are
+               --  transferred to its activation.
+               loop
+                  begin
+                     Arguments.Reserve_Capacity (3);
+                     exit;
+                  exception
+                     when Lua.Storage.Allocation_Error =>
+                        if not Retry_Allocation (State, Retried) then
+                           raise;
+                        end if;
+                  end;
+               end loop;
                Arguments.Append (Left);
                Arguments.Append (Right);
                Arguments.Append (Item);

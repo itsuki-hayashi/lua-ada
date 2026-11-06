@@ -1,4 +1,5 @@
 with Binary_Runtime_Tests;
+with Lua.Conformance_Adapter_Tests;
 with Ada.Command_Line;
 with AUnit.Reporter.Text;
 with AUnit.Run;
@@ -87,6 +88,7 @@ procedure Test_Runner is
       Lua.Finalizer_Queue_Tests.Register (Result);
       Lua.Finalizer_Runtime_Tests.Register (Result);
       Lua.Collector_Tests.Register (Result);
+      Lua.Conformance_Adapter_Tests.Register (Result);
       Lua.Physical_Stack_Tests.Register (Result);
       Lua.GC_Control_Tests.Register (Result);
       Lua.Root_Packet_Tests.Register (Result);

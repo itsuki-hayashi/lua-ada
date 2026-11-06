@@ -71,3 +71,65 @@ files.lua skips its tmpname block and fails at line 896 on %Ex, as observed
 in the same-host C baseline. These are observations, not reviewed scope
 acceptance or evidence for omitted T/platform blocks. Next work is the real
 test adapter and the source-cited platform/internal equivalents.
+
+## Test adapter and shared launcher checkpoint
+
+The signed integration checkpoint `1cd294e` is published on
+`codex/m3-gc-io-conformance`. No PR or merge has occurred yet.
+
+The subsequent worktree adds actual C userdata allocation, distinct one-shot
+and persistent allocation refusal, an independent test allocation ceiling,
+actual byte/block/object counts, collector colors/ages/phases, the production
+parameter codec, physical unused-frame release and stack resize preserving
+live windows/cells. A private list verifier tests registry, generation, gray
+and remembered ownership, including a deliberate corruption rejection.
+Complete `checkmemory` and `nonblock` coverage remain open.
+
+The CLI driver is now shared by production and the test launcher. Default
+launchers leave T absent; instrumented launchers install the adapter and real
+C warning callback, with per-state registry-owned fragmented-message storage.
+The test launcher applies the independent 2 GiB managed ceiling. Configuration
+and subprocess/hash/telemetry acceptance still require harness integration.
+The extraction/change manifest is `tests/c/conformance_adapter.sources.md`.
+
+Instrumented events.lua initially failed at its one-shot refusal regression:
+the canonical table-write argument packet did not retry allocation. GDB
+identified the actual managed vector growth. The packet now reserves capacity
+with one emergency collection retry while operands remain rooted; a separate
+AUnit case protects weak delegation across this collection. Byte-identical
+events.lua and gengc.lua then reached OK with T installed, as exploratory
+runs only. gc.lua reached the missing warning-storage assertion; the subsequent
+warning implementation is being checked against that file.
+
+Local Windows validation/static evidence:
+
+- `reports/m3-t-warning-tests.log`: all 1,285 instrumented AUnit cases pass.
+- `reports/m3-t-warning-build.log`: strict instrumented build passes.
+- `reports/m3-shared-cli-tests.log`: production CLI regressions pass after
+  sharing the driver.
+- `reports/m3-t-events-probe2.log` and `reports/m3-t-gengc-probe.log`: preliminary
+  T-enabled successful execution, not scoped acceptance or final-revision
+  cross-platform evidence.
+
+Four existing lexical/session fixtures now assert the selected configuration's
+global-keyword contract. The collector corruption fixture no longer assumes
+that 1,000 work units reaches its invalid frame in both library configurations.
+No failures were skipped. Default rebuild, full final-revision validation,
+platform equivalents, reviewed obligation mappings and the 26-context matrix
+remain required.
+
+The warning callback advanced gc.lua to its line-477 fixed one-KiB memory
+allowance. A separately named diagnostic copy (not accepted upstream evidence)
+measured 877.3369140625 KiB versus 874.70703125 KiB before the block. The cause
+and an invariant-preserving equivalent remain under investigation; no byte
+allowance was relaxed. The warning process regression script passes all seven
+positive/negative cases, including a warning failure during state shutdown.
+The complete retained default pipeline passes in
+`reports/m3-t-default-full-check.log` at the 1,285-case checkpoint.
+The final object-kind validation adds one separately named test; both default
+and instrumented validation/static builds and all 1,286 AUnit cases pass in
+`reports/m3-t-adapter-final-{default,instrumented}-{build,tests}.log`.
+The default incremental build reused the prior runner, detected by its case
+count. A forced test-runner rebuild in
+`reports/m3-t-adapter-default-forced-build.log` established the final 1,286-case
+default result. The source manifest records the pinned ltests.c hash.

@@ -832,6 +832,13 @@ private package Lua.Engine is
    procedure Restart_Collection (State : in out World);
    procedure Set_Collector_Mode
      (State : in out World; Mode : Collector_Mode);
+   function Encode_Collector_Parameter
+     (Value : Lua.Storage.Byte_Count) return Interfaces.Unsigned_8;
+   function Apply_Collector_Parameter
+     (Encoded : Interfaces.Unsigned_8; Value : Lua.Storage.Byte_Count)
+      return Lua.Storage.Byte_Count;
+   --  Production parameter arithmetic, exposed only beneath private Engine
+   --  so test inspection exercises the same codec as collector controls.
    function Collector_Parameter_Value
      (State : in out World; Name : Collector_Parameter;
       Value : Integer_Value := Integer_Value'First) return Integer_Value;

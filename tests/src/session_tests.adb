@@ -3,6 +3,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Sessions; use Lua.Sessions;
 with Test_Support;
+with Lua.Test_Configuration;
 
 package body Session_Tests is
    procedure Check (Source, Expected : String);
@@ -402,13 +403,19 @@ package body Session_Tests is
    end Method_Syntax;
 
    procedure Global_Keyword_Name is
-      --  The default Lua 5.5 compatibility mode still allows global as a
-      --  name.
+      --  Default compatibility permits a name; the instrumented reference
+      --  configuration reserves it. Both branches execute the real frontend.
+      Universe : Session;
+      Result : constant Execution_Result :=
+        Universe.Execute ("global=42; print(global)", "global name");
    begin
-      Check
-       (
-        "global=42; print(global)",
-         "42");
+      if Lua.Test_Configuration.Compatible_Global then
+         Assert (Result.Status = Succeeded, "compatible global name");
+         Assert (To_String (Result.Output) = "42" &
+                 Ada.Characters.Latin_1.LF, "global name result");
+      else
+         Assert (Result.Status = Syntax_Error, "reserved global name");
+      end if;
    end Global_Keyword_Name;
 
    procedure Explicit_Globals is

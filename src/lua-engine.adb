@@ -439,6 +439,11 @@ package body Lua.Engine is
    end Record_Memory_Error;
 
    package Collector is
+      function Encode (Percent : Lua.Storage.Byte_Count)
+                       return Interfaces.Unsigned_8;
+      function Apply
+        (Encoded : Interfaces.Unsigned_8; Amount : Lua.Storage.Byte_Count)
+         return Lua.Storage.Byte_Count;
       procedure Full (State : in out World; Emergency : Boolean := False);
       procedure Advance
         (State : in out World; Work : Positive; Finished : out Boolean);
@@ -608,6 +613,15 @@ package body Lua.Engine is
    end Release_Registered_Program;
 
    package body Collector is separate;
+
+   function Encode_Collector_Parameter
+     (Value : Lua.Storage.Byte_Count) return Interfaces.Unsigned_8 is
+     (Collector.Encode (Value));
+
+   function Apply_Collector_Parameter
+     (Encoded : Interfaces.Unsigned_8; Value : Lua.Storage.Byte_Count)
+      return Lua.Storage.Byte_Count is
+     (Collector.Apply (Encoded, Value));
 
    procedure Advance_Collection
      (State : in out World; Work : Positive; Finished : out Boolean) is

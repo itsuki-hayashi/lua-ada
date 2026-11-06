@@ -39,9 +39,6 @@ package body Collector is
    procedure Minor (State : in out World);
    procedure Make_All_Old (State : in out World);
    function Bytes (State : World) return Lua.Storage.Byte_Count;
-   function Apply
-     (Encoded : Interfaces.Unsigned_8; Amount : Lua.Storage.Byte_Count)
-      return Lua.Storage.Byte_Count;
    procedure Initialize_Parameters (State : in out World);
    procedure Finish_Cycle (State : in out World);
    procedure Account (State : in out World);
@@ -783,8 +780,6 @@ package body Collector is
       end if;
    end Back_Barrier;
 
-   function Encode (Percent : Lua.Storage.Byte_Count)
-                    return Interfaces.Unsigned_8;
    function Encode (Percent : Lua.Storage.Byte_Count)
                     return Interfaces.Unsigned_8
    is

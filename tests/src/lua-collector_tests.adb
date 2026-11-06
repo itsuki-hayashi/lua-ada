@@ -305,12 +305,20 @@ package body Lua.Collector_Tests is
       --  A deliberately invalid private fixture forces stack validation to
       --  fail during marking. Queue links/colors must be neutralized so a
       --  later correct collection is safe, rather than retaining stale work.
+      --  Frame allocation can advance an earlier cycle under the smaller
+      --  instrumented settings. Start from an actual paused collector.
+      Finish (State);
       Activation.Has_Stack_Window := True;
-      Activation.Stack_Base := 1_000;
+      Activation.Stack_Base := Natural (State.Current.Foreign_Stack.Length);
       Activation.Canonical_GC_Top := 1;
       State.Current.Stack.Append (Activation);
       begin
-         Advance_Collection (State, 1_000, Done);
+         --  Instrumented libraries add roots, so a fixed work allowance
+         --  need not reach the thread in its first propagation slice.
+         for Slice in 1 .. 10_000 loop
+            Advance_Collection (State, 1_000, Done);
+            exit when Done;
+         end loop;
       exception
          when Program_Error => Rejected := True;
       end;

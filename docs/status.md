@@ -6,12 +6,15 @@ The maintainer resumed implementation after merged PR #8 on
 codex/m3-gc-io-conformance. The target is complete events.lua, gc.lua,
 gengc.lua and files.lua coverage, including T obligations and all 26 contexts.
 The [current handoff](sessions/2026-11-07-gc-io-conformance.md) records actual
-evidence: 1,271 local Windows/default/validation/static AUnit cases pass.
-Collector/IO integration passed the retained pipeline at the preceding
-1,270-case revision. Latest coroutine teardown and CLI shutdown repairs have
-focused build/AUnit/CLI evidence and successful T-absent gc.lua execution,
-including its shutdown marker. These observations do not close any selected
-file's full coverage; T, platform equivalents and the final matrix remain open.
+evidence: the integration checkpoint `1cd294e` is signed and published. The
+subsequent real test adapter and shared CLI launcher have passing local
+Windows validation/static AUnit runs in both configurations. The retained
+default pipeline passes at the 1,285-case checkpoint. Instrumented events.lua
+and gengc.lua reach OK in exploratory runs; gc.lua now passes warning storage
+but fails its fixed one-KiB memory allowance. files.lua still requires native
+platform equivalents and remaining behavior. These observations do not close
+any selected file's full coverage; complete T inspection, reviewed equivalents,
+scoped harness acceptance and the final 26-context matrix remain open.
 The paused-checkpoint statements below retain the prior delivery's evidence.
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**

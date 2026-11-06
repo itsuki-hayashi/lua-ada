@@ -4,7 +4,7 @@ with "config/lua_ada_tests_config.gpr";
 
 project Lua_Ada_Tests is
    for Languages use ("Ada", "C");
-   for Source_Dirs use ("src", "c");
+   for Source_Dirs use ("src", "c", "../cli/shared");
    for Object_Dir use
      "obj/" & Lua_Ada.Configuration_Subdir &
      Lua_Ada_Tests_Config.Build_Profile & "/" &
@@ -16,7 +16,7 @@ project Lua_Ada_Tests is
       "output_consumer.adb", "syntax_consumer.adb", "upstream_runner.adb",
       "lua-codec_layout_probe.adb", "lua-chunk_probe.adb",
       "lua-canonical_compiler_probe.adb", "lua-configuration_probe.adb",
-      "lua-canonical_runtime_probe.adb");
+      "lua-canonical_runtime_probe.adb", "conformance_runner.adb");
    package Binder is
       for Default_Switches ("Ada") use ("-Wb");
    end Binder;
