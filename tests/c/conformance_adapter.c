@@ -2,21 +2,11 @@
  * Lua 5.5.1 ltests.c at 7579fc9d7ed90240487251dfb69168f8e64e9294.
  * See lua.h for the upstream copyright notice. No C private layouts are used.
  */
-#if !defined(_WIN32)
-#define _POSIX_C_SOURCE 200809L
-#endif
 #include "lua.h"
 #include "lauxlib.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <fcntl.h>
-#include <errno.h>
-#if defined(_WIN32)
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
 
 struct adapter_result {
     int count;
@@ -25,6 +15,7 @@ struct adapter_result {
     char text[256];
 };
 extern void lua_ada_test_inspect(void *, int, struct adapter_result *);
+extern lua_CFunction lua_ada_test_platform_callback(int);
 
 /* Per-universe counterpart of ltests.c:85-169. The registry owns this real
  * userdata until after state-close finalizers finish. Unlike the oracle's
@@ -96,77 +87,6 @@ static int install_warning(lua_State *L) {
     return 0;
 }
 
-static luaL_Stream *checked_stream(lua_State *L) {
-    luaL_Stream *stream;
-    int matched;
-    if (lua_type(L, 1) != LUA_TUSERDATA ||
-        lua_rawlen(L, 1) < sizeof(luaL_Stream) || !lua_getmetatable(L, 1)) {
-        lua_pushliteral(L, "file handle expected");
-        lua_error(L);
-        return NULL;
-    }
-    lua_pushliteral(L, LUA_FILEHANDLE);
-    lua_rawget(L, LUA_REGISTRYINDEX);
-    matched = lua_rawequal(L, -1, -2);
-    lua_pop(L, 2);
-    if (!matched) {
-        lua_pushliteral(L, "file handle expected");
-        lua_error(L);
-        return NULL;
-    }
-    stream = (luaL_Stream *)lua_touserdata(L, 1);
-    if (stream->f == NULL || stream->closef == NULL) {
-        lua_pushliteral(L, "closed file handle");
-        lua_error(L);
-        return NULL;
-    }
-    return stream;
-}
-
-#if !defined(_WIN32)
-/* ltests.c:2154, using the public luaL_Stream payload and real descriptor.
- * Errors are checked rather than silently leaving the stream blocking. */
-static int nonblock(lua_State *L) {
-    luaL_Stream *stream = checked_stream(L);
-    int descriptor, flags;
-    descriptor = fileno(stream->f);
-    flags = fcntl(descriptor, F_GETFL, 0);
-    if (flags < 0 || fcntl(descriptor, F_SETFL, flags | O_NONBLOCK) < 0) {
-        lua_pushstring(L, strerror(errno));
-        return lua_error(L);
-    }
-    return 0;
-}
-#else
-/* Native Windows counterpart for /dev/full's buffered write/failed flush
- * sequence. Replace the descriptor, not the FILE pointer: the original public
- * closer and Ada ownership metadata remain authoritative, including abort
- * cleanup. The caller supplies a fresh ordinary temporary file. No Lua call
- * occurs while an unowned pipe descriptor is live. */
-static int failing_stream(lua_State *L) {
-    luaL_Stream *stream = checked_stream(L);
-    int descriptors[2], status, error;
-    if (_pipe(descriptors, 4096, _O_BINARY) != 0) {
-        lua_pushstring(L, strerror(errno));
-        return lua_error(L);
-    }
-    _close(descriptors[0]);
-    status = _dup2(descriptors[1], _fileno(stream->f));
-    error = errno;
-    _close(descriptors[1]);
-    if (status != 0) {
-        lua_pushstring(L, strerror(error));
-        return lua_error(L);
-    }
-    if (setvbuf(stream->f, NULL, _IOFBF, 4096) != 0) {
-        lua_pushliteral(L, "cannot buffer failure stream");
-        return lua_error(L);
-    }
-    lua_pushvalue(L, 1);
-    return 1;
-}
-#endif
-
 static int userdata(lua_State *L) {
     int valid = 1;
     lua_Integer size = 0, values = 0;
@@ -210,19 +130,7 @@ static int inspect(lua_State *L) {
 lua_CFunction lua_ada_test_adapter_callback(int operation) {
     if (operation == 0) return userdata;
     if (operation == 11) return install_warning;
-    if (operation == 14) {
-#if defined(_WIN32)
-        return NULL;
-#else
-        return nonblock;
-#endif
-    }
-    if (operation == 15) {
-#if defined(_WIN32)
-        return failing_stream;
-#else
-        return NULL;
-#endif
-    }
+    if (operation == 14 || operation == 15)
+        return lua_ada_test_platform_callback(operation);
     return inspect;
 }

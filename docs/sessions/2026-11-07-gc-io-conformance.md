@@ -230,3 +230,26 @@ T absent while exposing the explicitly named native counterpart. Replacing
 cat's byte-copy operation with the same launcher through bare lua completes
 both pipe directions. The next diagnostic failure is the Windows-absent Unix
 signal commands at line 814, not an IO byte-transfer failure.
+
+The native descriptor drivers are extracted into conformance_platform.c, which
+uses public Lua APIs only. It builds independently as a C-oracle module while
+the Ada launcher invokes the same functions through its existing guarded C
+callback path. The shared windows-buffered-failure.lua fixture passes against
+both instrumented implementations in `reports/m3-windows-buffered-counterpart.log`.
+The complete default validation/static pipeline, now including the same C/Ada
+counterpart, passes in `reports/m3-platform-full-default-check.log` with 1,301
+AUnit cases. Both pipeline commands retain counterpart artifact hashes and
+stdout/stderr. The mapping remains pending independent review.
+
+The complete instrumented regression command also passes after extraction in
+`reports/m3-platform-full-instrumented-check.log`. A separately compiled native
+Windows process fixture uses TerminateProcess with explicit 129/137 exit codes,
+providing actual forced termination rather than normal process return. The
+disposable files.lua diagnostic then completes its final date/version output
+against both instrumented Ada and C. Explicit diagnostic changes cover native
+null/full streams, temporary paths, stdin seek, shell commands/quoting and host
+date ranges. Ada evidence is `reports/files-probe/files-temp-diagnostic10.log`;
+C evidence is under reports/files-c-oracle/31b8997038b248bf92082bdf860c9e16.
+This diagnostic still omits the guarded Windows nonblocking-write block and
+has not become a reviewed equivalent manifest. That obligation needs a real
+native partial-write counterpart before any selected-file coverage is closed.

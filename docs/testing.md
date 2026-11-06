@@ -281,6 +281,14 @@ balanced allocator telemetry, equivalent review or the remaining files.lua
 obligations. CI runs six OS/link instrumented validation jobs plus Windows
 instrumented static-PIC alongside the existing default contexts.
 
+On Windows, `scripts/check-windows-buffered-failure.ps1` takes the Ada test
+launcher, C oracle and its library directory. It independently links the same
+public-API native driver to the oracle and executes the same buffered-write,
+failed-flush and close assertions against both implementations. Both pipelines
+run this counterpart and retain hashes/output in reports/windows-buffered-failure.
+This evidence supports a pending platform mapping; it is not an unchanged
+files.lua execution or an independent approval of that mapping.
+
 Run scripts/check-lifecycle.ps1 -Interpreter <normal-cli> after building the C
 oracle. The runner uses unchanged hash-verified goto.lua and coroutine.lua in
 fresh C/Ada processes, compares raw same-host output and empty stderr, requires

@@ -45,7 +45,9 @@ jobs:
         uses: actions/upload-artifact@v7.0.2
         with:
           name: instrumented-${{ runner.os }}-${{ matrix.library }}
-          path: reports/instrumented/**
+          path: |
+            reports/instrumented/**
+            reports/windows-buffered-failure/**
           if-no-files-found: error
   check:
     strategy:
@@ -142,6 +144,7 @@ jobs:
           path: |
             reports/lifecycle/**
             reports/m3-lifecycle-campaign*
+            reports/windows-buffered-failure/**
             LICENSE
             docs/licenses/lua.md
           if-no-files-found: warn

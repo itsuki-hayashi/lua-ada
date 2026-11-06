@@ -103,6 +103,13 @@ try {
     Set-Location $projectRoot
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli)
+    if ($IsWindows) {
+        Set-Location $projectRoot
+        & (Join-Path $PSScriptRoot 'check-windows-buffered-failure.ps1') `
+            -Interpreter (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix") `
+            -ReferenceInterpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `
+            -ReferenceLibraryDirectory (Join-Path $projectRoot 'build/conformance/default/lib')
+    }
     Write-Output "PASS: $Profile / $LibraryType (AUnit and CLI contracts)"
 }
 finally {
