@@ -4,6 +4,7 @@ with Lua.Storage;
 with System;
 
 package Lua.Engine.Foreign is
+   use type Interfaces.C.int;
    --  C entrypoints belong to the small C-owned boundary in c_api/. This
    --  package performs state operations and returns a typed result before
    --  that boundary raises an error or resumes any foreign callback. No
@@ -55,7 +56,9 @@ package Lua.Engine.Foreign is
       Reader_Barrier, Restore_Load_Stack, Prepare_Reader_Error,
       Load_Reader,
       Set_Hook, Get_Hook, Get_Hook_Mask, Get_Hook_Count,
-      Get_Debug_Frame, Get_Debug_Line);
+      Get_Debug_Frame, Get_Debug_Line, Get_Debug_Info,
+      Get_Local, Set_Local, Get_Upvalue, Set_Upvalue,
+      Upvalue_Id, Join_Upvalues);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
       Create_Thread => 3, Get_Top => 4, Set_Top => 5,
@@ -86,9 +89,34 @@ package Lua.Engine.Foreign is
       Dump_Function => 67, Reader_Barrier => 68, Restore_Load_Stack => 69,
       Prepare_Reader_Error => 70, Load_Reader => 71,
       Set_Hook => 80, Get_Hook => 81, Get_Hook_Mask => 82,
-      Get_Hook_Count => 83, Get_Debug_Frame => 84, Get_Debug_Line => 85);
+      Get_Hook_Count => 83, Get_Debug_Frame => 84, Get_Debug_Line => 85,
+      Get_Debug_Info => 86, Get_Local => 87, Set_Local => 88,
+      Get_Upvalue => 89, Set_Upvalue => 90, Upvalue_Id => 91,
+      Join_Upvalues => 92);
    for Operation_Code'Size use Interfaces.C.int'Size;
    pragma Convention (C, Operation_Code);
+
+   type Debug_Information is record
+      Name : System.Address := System.Null_Address;
+      Source : System.Address := System.Null_Address;
+      Source_Length : Interfaces.C.size_t := 0;
+      Name_Kind : Interfaces.C.int := 0;
+      What : Interfaces.C.int := 0;
+      Current_Line : Interfaces.C.int := -1;
+      First_Line : Interfaces.C.int := -1;
+      Last_Line : Interfaces.C.int := -1;
+      Upvalues : Interfaces.C.int := 0;
+      Parameters : Interfaces.C.int := 0;
+      Vararg : Interfaces.C.int := 1;
+      Tail : Interfaces.C.int := 0;
+      Extra_Arguments : Interfaces.C.int := 0;
+      First_Transfer : Interfaces.C.int := 0;
+      Transfer_Count : Interfaces.C.int := 0;
+      Short_Source : Interfaces.C.char_array (0 .. 59) :=
+        [others => Interfaces.C.nul];
+   end record with Convention => C;
+   --  Metadata crosses an ordinary checked C record. Its borrowed byte
+   --  addresses belong to actual frozen code/constants, never query scratch.
 
    type Request is record
       Operation : Operation_Code;
@@ -113,6 +141,7 @@ package Lua.Engine.Foreign is
       Continuation : C_Continuation := null;
       KContext : Interfaces.C.ptrdiff_t := 0;
       Reader : C_Reader := null;
+      Debug_Data : System.Address := System.Null_Address;
    end record with Convention => C;
 
    type Response is record

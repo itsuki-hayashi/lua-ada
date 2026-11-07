@@ -6,6 +6,14 @@ package body Lua.Engine.Call_Names is
    use Lua.Opcodes;
    use type Lua.Prototypes.Prototype_Access;
    use type Lua.Prototypes.String_Id;
+   use type System.Address;
+
+   Unknown_Name : aliased constant String := "?" & Character'Val (0);
+   Integer_Index : aliased constant String :=
+     "integer index" & Character'Val (0);
+   Iterator_Name : aliased constant String :=
+     "for iterator" & Character'Val (0);
+   Unknown_Bytes : constant Byte_String := (Unknown_Name'Address, 1);
 
    function Kind_Image (Kind : Name_Kind) return String is
      (case Kind is
@@ -17,10 +25,10 @@ package body Lua.Engine.Call_Names is
 
    function Resolve_Name
      (State : in out World; Caller : Frame_Access; Operand_Index : Natural)
-      return Identity;
+      return Borrowed_Identity;
    function Resolve_Name
      (State : in out World; Caller : Frame_Access; Operand_Index : Natural)
-      return Identity
+      return Borrowed_Identity
    is
       Code : Prototype_Access renames Caller.Code;
       Model : constant Lua.Prototypes.Prototype_Access := Code.Canonical_Node;
@@ -30,10 +38,11 @@ package body Lua.Engine.Call_Names is
       function Part (Item : Word; Id : Field) return Natural;
       procedure Charge;
       function Text (Id : Lua.Prototypes.String_Id; Kind : Name_Kind)
-                     return Identity;
-      function Literal_Name (Index : Natural) return Identity;
+                     return Borrowed_Identity;
+      function Literal_Name (Index : Natural) return Borrowed_Identity;
       function Resolve
-        (Register_Id, Before : Natural; Expanded : Boolean) return Identity;
+        (Register_Id, Before : Natural; Expanded : Boolean)
+         return Borrowed_Identity;
       function Is_Environment
         (Register_Id, Before : Natural; Is_Upvalue : Boolean) return Boolean;
       function Setter (Register_Id, Before : Natural) return Natural;
@@ -57,31 +66,27 @@ package body Lua.Engine.Call_Names is
       end Charge;
 
       function Text (Id : Lua.Prototypes.String_Id; Kind : Name_Kind)
-                     return Identity
+                     return Borrowed_Identity
       is
-         Item : Value;
-         procedure Publish (Bytes : String);
-         procedure Publish (Bytes : String) is
-         begin
-            Item := New_String (State, Bytes);
-         end Publish;
       begin
          if Id = Lua.Prototypes.No_String then
-            return (New_String (State, "?"), Kind);
+            return (Unknown_Bytes, Kind);
          end if;
-         Lua.Prototypes.Query_String
-           (Code.Canonical_Owner.Model, Id, Publish'Access);
-         return (Item, Kind);
+         return
+           ((Lua.Prototypes.String_Address (Code.Canonical_Owner.Model, Id),
+             Lua.Prototypes.String_Length (Code.Canonical_Owner.Model, Id)),
+            Kind);
       end Text;
 
-      function Literal_Name (Index : Natural) return Identity is
+      function Literal_Name (Index : Natural) return Borrowed_Identity is
       begin
          if Index < Natural (Code.Canonical_Constants.Length) and then
            Code.Canonical_Constants (Index + 1).Kind = String_Kind
          then
-            return (Code.Canonical_Constants (Index + 1), Constant_Value);
+            return (Code.Canonical_Constants (Index + 1).Reference.Bytes,
+                    Constant_Value);
          end if;
-         return (New_String (State, "?"), Unknown);
+         return (Unknown_Bytes, Unknown);
       end Literal_Name;
 
       function Setter (Register_Id, Before : Natural) return Natural is
@@ -130,7 +135,7 @@ package body Lua.Engine.Call_Names is
       function Is_Environment
         (Register_Id, Before : Natural; Is_Upvalue : Boolean) return Boolean
       is
-         Name : Identity;
+         Name : Borrowed_Identity;
       begin
          if Is_Upvalue then
             if Register_Id >= Natural (Model.Upvalues.Length) then
@@ -142,24 +147,25 @@ package body Lua.Engine.Call_Names is
             Name := Resolve (Register_Id, Before, Expanded => False);
          end if;
          return Name.Kind in Local_Binding | Upvalue_Binding and then
-           Name.Item.Reference.Bytes = "_ENV";
+           Name.Item = "_ENV";
       end Is_Environment;
 
       function Resolve
-        (Register_Id, Before : Natural; Expanded : Boolean) return Identity
+        (Register_Id, Before : Natural; Expanded : Boolean)
+         return Borrowed_Identity
       is
          Register : Natural := Register_Id;
          Limit : Natural := Before;
          Set_At : Natural;
          Item : Word;
          Operation_Id : Opcode;
-         Name : Value;
-         Key_Name : Identity;
+         Name : Byte_String;
+         Key_Name : Borrowed_Identity;
          Kind : Name_Kind;
       begin
          loop
-            Name := Canonical.Local_Name (State, Code, Register + 1, Limit);
-            if Name.Kind /= Nil_Kind then
+            Name := Canonical.Local_Bytes (Code, Register + 1, Limit);
+            if Name.Address /= System.Null_Address then
                return (Name, Local_Binding);
             end if;
             Set_At := Setter (Register, Limit);
@@ -193,11 +199,12 @@ package body Lua.Engine.Call_Names is
                   if Operation_Id in Op_GETTABLE | Op_GETVARG then
                      Key_Name := Resolve (Part (Item, C), Limit, False);
                      if Key_Name.Kind /= Constant_Value then
-                        Key_Name := (New_String (State, "?"), Unknown);
+                        Key_Name := (Unknown_Bytes, Unknown);
                      end if;
                   elsif Operation_Id = Op_GETI then
                      Key_Name :=
-                       (New_String (State, "integer index"), Unknown);
+                       ((Integer_Index'Address, Integer_Index'Length - 1),
+                        Unknown);
                   else
                      Key_Name := Literal_Name (Part (Item, C));
                   end if;
@@ -241,17 +248,30 @@ package body Lua.Engine.Call_Names is
          when Op_CALL | Op_TAILCALL =>
             return Resolve (Part (Instruction, A), PC, Expanded => True);
          when Op_TFORCALL =>
-            return (New_String (State, "for iterator"), Iterator_Call);
+            return ((Iterator_Name'Address, Iterator_Name'Length - 1),
+                    Iterator_Call);
          when others => return (others => <>);
       end case;
    end Resolve_Name;
 
+   function View_From_Caller
+     (State : in out World; Caller : Frame_Access)
+      return Borrowed_Identity is
+     (Resolve_Name (State, Caller, 0));
+
+   function Materialize
+     (State : in out World; Item : Borrowed_Identity) return Identity;
+   function Materialize
+     (State : in out World; Item : Borrowed_Identity) return Identity is
+     ((if Item.Item.Address = System.Null_Address then Nil_Value else
+         New_String (State, To_String (Item.Item))), Item.Kind);
+
    function From_Caller
      (State : in out World; Caller : Frame_Access) return Identity is
-     (Resolve_Name (State, Caller, 0));
+     (Materialize (State, View_From_Caller (State, Caller)));
 
    function From_Operand
      (State : in out World; Caller : Frame_Access; Index : Arithmetic_Operand)
       return Identity is
-     (Resolve_Name (State, Caller, Index));
+     (Materialize (State, Resolve_Name (State, Caller, Index)));
 end Lua.Engine.Call_Names;

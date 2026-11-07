@@ -922,7 +922,8 @@ package body Lua.Engine.Machine is
       Live : Registers.Vector := Registers.Empty_Vector);
    procedure Native_Step (Self : Driver);
    procedure Hook_Event
-     (Self : Driver; Event : String; Line : Natural := 0);
+     (Self : Driver; Event : String; Line : Natural := 0;
+      Target : Frame_Access := null);
    function Before_Step (Self : Driver) return Boolean;
    procedure Schedule
      (Self : Driver; Name : String; Arguments : Values.Vector;
@@ -1052,7 +1053,8 @@ package body Lua.Engine.Machine is
    end Schedule;
 
    procedure Hook_Event
-     (Self : Driver; Event : String; Line : Natural := 0) is
+     (Self : Driver; Event : String; Line : Natural := 0;
+      Target : Frame_Access := null) is
       State : World renames Self.Universe.all;
       Args : Values.Vector := Owned_Values (State);
       Callback : constant Value := Hooks.Callback (State, State.Current);
@@ -1076,7 +1078,11 @@ package body Lua.Engine.Machine is
       Args.Append
         ((if Event = "line" then (Integer_Kind, Integer_Value (Line))
           else Nil_Value));
-      State.Current.Hook_Frame := State.Current.Stack.Last_Element;
+      --  A return continuation is already above its departing owner. The
+      --  event still identifies that real owner, never the helper carrying
+      --  its result packet. Other events target the current activation.
+      State.Current.Hook_Frame :=
+        (if Target /= null then Target else State.Current.Stack.Last_Element);
       State.Current.Hook_Transfer := Event in "call" | "tail call" |
         "return";
       State.Current.Hook_Active := True;
@@ -1625,7 +1631,7 @@ package body Lua.Engine.Machine is
          Copy_Roots
            (State, State.Current.Stack.Last_Element.Unwind_Results,
             Result);
-         Hook_Event (Self, "return");
+         Hook_Event (Self, "return", Target => Activation);
          return;
       end if;
       --  Packet owns outgoing values independently of this activation. No
@@ -4519,6 +4525,13 @@ package body Lua.Engine.Machine is
          Fail (State, "invalid number of C callback results");
       end if;
       Count := (if Error_Status = 0 then Result_Count else 1);
+      if Error_Status = 0 then
+         --  The callback's topmost real C slots supply its return values.
+         --  Save their base before restoring that window or copying the
+         --  result packet, so return hooks expose the original position.
+         Activation.Transfer_First :=
+           Context.Foreign_Top - Context.Foreign_Base - Count + 1;
+      end if;
       if Error_Status /= 0 then
          --  Callback failure has one existing C-stack object. Do not allocate
          --  a temporary packet while a permanent provider refusal is active.

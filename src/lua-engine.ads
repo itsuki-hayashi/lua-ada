@@ -542,6 +542,9 @@ private package Lua.Engine is
       --  borrow is valid until this activation is retired/reused.
       Name_Kind : Unbounded_String;
       Transfer_Count : Natural := 0;
+      Transfer_First : Positive := 1;
+      --  Actual first transferred slot relative to the callee function.
+      --  Calls start at one; canonical/C returns retain their real offset.
       Entry_Hook_Done : Boolean := False;
       Return_Hook_Done : Boolean := False;
       Hook_Line : Natural := 0;

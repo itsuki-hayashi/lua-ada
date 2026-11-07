@@ -6,6 +6,16 @@ package Lua.Engine.Call_Names is
       Item : Value;
       Kind : Name_Kind := Unknown;
    end record;
+   type Borrowed_Identity is record
+      Item : Byte_String;
+      Kind : Name_Kind := Unknown;
+   end record;
+   function View_From_Caller
+     (State : in out World; Caller : Frame_Access)
+      return Borrowed_Identity;
+   --  Infer through the same reaching-definition walk without allocating.
+   --  Bytes are NUL-terminated immutable graph/constant storage, or static
+   --  markers; the caller must retain its actual activation/prototype owner.
    function Kind_Image (Kind : Name_Kind) return String;
    function From_Caller
      (State : in out World; Caller : Frame_Access) return Identity;

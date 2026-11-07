@@ -26,6 +26,7 @@ into one major PR. Historical session results retain their original scope.
 | 2026-11-06 | [M2b core libraries](2026-11-06-m2b-core-libraries.md)       |
 | 2026-11-06 | [M3-01 contracts and harness](2026-11-06-m3-01-contracts.md) |
 | 2026-11-07 | [Reader input](2026-11-07-demand-driven-input.md)            |
+| 2026-11-08 | [Public C debug identity](2026-11-08-c-debug-identity.md)    |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,

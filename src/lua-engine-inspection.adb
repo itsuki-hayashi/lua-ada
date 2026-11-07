@@ -574,7 +574,8 @@ package body Lua.Engine.Inspection is
                     Selected = Context.Hook_Frame;
                begin
                   Field (Info, "ftransfer", (Integer_Kind,
-                    (if Transferring then 1 else 0)));
+                    (if Transferring then
+                       Integer_Value (Selected.Transfer_First) else 0)));
                   Field (Info, "ntransfer", (Integer_Kind,
                     (if Transferring then
                        Integer_Value (Selected.Transfer_Count) else 0)));

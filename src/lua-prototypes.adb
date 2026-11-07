@@ -173,6 +173,10 @@ package body Lua.Prototypes is
          Fresh : String_Entry;
       begin
          Fresh.Bytes.Set_Owner (Self.Memory);
+         --  Public debug metadata borrows frozen program strings directly.
+         --  Even an empty debug name needs real stable NUL storage; reserve
+         --  it while constructing the graph, never during a read-only query.
+         Fresh.Bytes.Reserve_Capacity (1);
          Fresh.Bytes.Set_Value (Text);
          Fresh.Hash := Code;
          Fresh.Next := Self.Buckets (Bucket);
@@ -185,6 +189,9 @@ package body Lua.Prototypes is
 
    function String_Length (Self : Program; Id : String_Id) return Natural is
      (Self.Texts (Positive (Id)).Bytes.Length);
+   function String_Address
+     (Self : Program; Id : String_Id) return System.Address is
+     (Self.Texts (Positive (Id)).Bytes.Address);
    function String_Element
      (Self : Program; Id : String_Id; Index : Positive) return Character is
      (Self.Texts (Positive (Id)).Bytes.Element (Index));

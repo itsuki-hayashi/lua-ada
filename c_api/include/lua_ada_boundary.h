@@ -31,7 +31,31 @@ enum lua_ada_operation {
     ADA_READER_BARRIER, ADA_RESTORE_LOAD_STACK, ADA_PREPARE_READER_ERROR,
     ADA_LOAD_READER,
     ADA_SET_HOOK = 80, ADA_GET_HOOK, ADA_GET_HOOK_MASK, ADA_GET_HOOK_COUNT,
-    ADA_GET_DEBUG_FRAME, ADA_GET_DEBUG_LINE
+    ADA_GET_DEBUG_FRAME, ADA_GET_DEBUG_LINE, ADA_GET_DEBUG_INFO,
+    ADA_GET_LOCAL, ADA_SET_LOCAL, ADA_GET_UPVALUE, ADA_SET_UPVALUE,
+    ADA_UPVALUE_ID, ADA_JOIN_UPVALUES
+};
+
+/* Ordinary transport metadata, not a native private activation layout.
+ * Pointer fields borrow immutable function-owned bytes (or static strings).
+ * The actual public lua_Debug layout remains wholly on the C side. */
+struct lua_ada_debug_information {
+    const char *name;
+    const char *source;
+    size_t source_length;
+    int name_kind;
+    int what;
+    int current_line;
+    int first_line;
+    int last_line;
+    int upvalues;
+    int parameters;
+    int vararg;
+    int tail;
+    int extra_arguments;
+    int first_transfer;
+    int transfer_count;
+    char short_source[LUA_IDSIZE];
 };
 
 /* Identity is opaque C-owned transport, not a C Lua frame layout. Guard
@@ -64,6 +88,7 @@ struct lua_ada_request {
     lua_KFunction continuation;
     lua_KContext kcontext;
     lua_Reader reader;
+    struct lua_ada_debug_information *debug_information;
 };
 
 struct lua_ada_response {

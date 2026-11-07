@@ -26,7 +26,6 @@ package body Lua.Engine.Foreign is
    package Memory renames Lua.Storage;
    package VM renames Lua.Engine.Machine;
    use System.Storage_Elements;
-   use type C.int;
    use type C.long_long;
    use type C.size_t;
    use type Lua.Syntax.Check_Status;
@@ -57,6 +56,15 @@ package body Lua.Engine.Foreign is
    Stack_Limit : constant Natural :=
      Lua.Runtime_Configuration.Maximum_Stack;
    Foreign_Error : exception;
+   Debug_Native_Source : aliased constant String :=
+     "=[C]" & Character'Val (0);
+   Debug_Empty_Name : aliased constant String := "" & Character'Val (0);
+   Debug_Temporary : aliased constant String :=
+     "(temporary)" & Character'Val (0);
+   Debug_C_Temporary : aliased constant String :=
+     "(C temporary)" & Character'Val (0);
+   Debug_Vararg_Name : aliased constant String :=
+     "(vararg)" & Character'Val (0);
 
    type World_View is access all World;
    type Driver_View is access all VM.Driver;
@@ -293,6 +301,9 @@ package body Lua.Engine.Foreign is
             return C.size_t (Response'Object_Size / System.Storage_Unit);
          when 2 =>
             return C.size_t (Surface'Object_Size / System.Storage_Unit);
+         when 3 =>
+            return C.size_t
+              (Debug_Information'Object_Size / System.Storage_Unit);
          when others => return 0;
       end case;
    end Contract_Size;
@@ -778,6 +789,13 @@ package body Lua.Engine.Foreign is
       end;
    end Read_Bytes;
 
+   procedure Inspect_API
+     (State : in out World; Context : not null Context_Access;
+      Input : Request; Output : in out Response);
+   procedure Inspect_API
+     (State : in out World; Context : not null Context_Access;
+      Input : Request; Output : in out Response) is separate;
+
    function Dispatch
      (State : System.Address; Input : not null access constant Request;
       Output : not null access Response) return Action_Status
@@ -1242,6 +1260,10 @@ package body Lua.Engine.Foreign is
            Get_Debug_Frame | Get_Debug_Line =>
             Foreign_Hooks.Handle
               (Owner.Universe.all, Context, Input.all, Output.all);
+         when Get_Debug_Info | Get_Local | Set_Local | Get_Upvalue |
+           Set_Upvalue | Upvalue_Id | Join_Upvalues =>
+            Inspect_API
+              (Owner.Universe.all, Context, Input.all, Output.all);
          when Get_Status =>
             --  Resume retains the failure category after its public result
             --  window is inspected or cleared. Report the same public status
@@ -1595,7 +1617,7 @@ package body Lua.Engine.Foreign is
          when Create_Thread =>
             declare
                Item : constant Value := New_Thread
-                 (Owner.Universe.all, Nil_Value);
+                 (Owner.Universe.all, Nil_Value, Parent => Context);
             begin
                --  The parent stack roots the new thread before a caller can
                --  collect. Its C surface is borrowed, not a permanent root.

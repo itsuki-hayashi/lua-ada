@@ -33,7 +33,8 @@ static void initialize(void) {
     luainit();
     if (ada_lua_contract(0) != sizeof(struct lua_ada_request) ||
         ada_lua_contract(1) != sizeof(struct lua_ada_response) ||
-        ada_lua_contract(2) != sizeof(lua_State)) {
+        ada_lua_contract(2) != sizeof(lua_State) ||
+        ada_lua_contract(3) != sizeof(struct lua_ada_debug_information)) {
         fprintf(stderr,
                 "Lua Ada: incompatible C dispatch layout: "
                 "request C=%zu Ada=%zu; response C=%zu Ada=%zu; "

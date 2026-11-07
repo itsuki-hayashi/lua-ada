@@ -63,7 +63,26 @@ The demand-driven checkpoint passes the full local Windows/default/static
 consumer and 1,412 AUnit cases. Its standalone output matches the pinned native
 default and instrumented C runs; integrated Ada instrumented and complete
 platform acceptance remain separate final-delivery evidence.
-Full auxiliaries, debug APIs, builtin C trampolines and
+The public C debug surface now describes real active frames or a popped
+function through all `lua_getinfo` selectors, including source/name lifetimes,
+parameter/upvalue metadata, tail/`__call` data, transfer ranges and active lines.
+Inactive parameter names, active Lua/C locals, hidden varargs and captured
+locals share real canonical registers/cells; public upvalue get/set/id/join
+operate on the actual traced cells. Immutable graph names/source retain their
+NUL-terminated bytes without query allocations; simple selectors remain usable
+under provider refusal after stack reservation. `L` allocates its required
+result table and has separately exercised refusal/recovery behavior.
+`lua_gethook` returns an actual callable C dispatcher for Lua-installed hooks;
+C can save, directly invoke and restore it while the weak registry remains the
+callback owner. Hook transport stays hidden even after a hook replaces itself.
+The Windows/default/static checkpoint passes 1,489 AUnit cases and eighteen
+separately named C debug cases, with identical standalone output against pinned
+native default and T configurations. See its dated
+[session](../docs/sessions/2026-11-08-c-debug-identity.md) for exact checks and
+remaining integration limits. Complete platform/configuration acceptance is
+still required.
+
+Full auxiliaries, builtin C trampolines and
 remaining exports are pending. In particular, `lua_tocfunction` currently exposes
 real foreign callbacks; Ada native-library functions need their own stable C
 trampolines before complete `luaL_openlibs`/C-function inspection parity.

@@ -1214,6 +1214,7 @@ package body Lua.Engine is
       Item.Call_Name := Null_Unbounded_String;
       Item.Name_Kind := Null_Unbounded_String;
       Item.Transfer_Count := 0;
+      Item.Transfer_First := 1;
       Item.Entry_Hook_Done := False;
       Item.Return_Hook_Done := False;
       Item.Hook_Line := 0;

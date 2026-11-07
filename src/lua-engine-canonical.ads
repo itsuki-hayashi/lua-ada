@@ -61,6 +61,14 @@ package Lua.Engine.Canonical is
 
    function Source_Bytes (Code : Prototype_Access) return Byte_String;
    --  Borrow the immutable model's source bytes while Code remains rooted.
+   function Local_Bytes
+     (Code : Prototype_Access; Index : Positive; PC : Natural)
+      return Byte_String;
+   function Upvalue_Bytes
+     (Code : Prototype_Access; Index : Positive) return Byte_String;
+   --  Borrow actual NUL-terminated debug names from the same immutable
+   --  model. An absent local has a null address; stripped names use the
+   --  pinned static marker. No allocation or runtime string is needed.
    function Local_Name
      (State : in out World; Code : Prototype_Access; Index : Positive;
       PC : Natural) return Value;

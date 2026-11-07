@@ -20,6 +20,7 @@ package body Lua.Engine.Canonical is
    use type Lua.Numbers.Number_Kind;
    use type Integer_Value;
    use type Real_Value;
+   use type System.Address;
 
    function Integer_Bits is new Ada.Unchecked_Conversion
      (Integer_Value, Interfaces.Unsigned_64);
@@ -42,81 +43,85 @@ package body Lua.Engine.Canonical is
    function Register_List
      (State : in out World; Activation : Frame_Access;
       First, Count : Natural) return Values.Vector;
-   Unknown_Source : aliased constant String := "=?";
+   Unknown_Source : aliased constant String := "=?" & Character'Val (0);
+   Unknown_Name : aliased constant String :=
+     "(no name)" & Character'Val (0);
+
+   function String_Bytes
+     (Code : Prototype_Access; Id : Lua.Prototypes.String_Id)
+      return Byte_String;
+   function String_Bytes
+     (Code : Prototype_Access; Id : Lua.Prototypes.String_Id)
+      return Byte_String is
+     (Lua.Prototypes.String_Address (Code.Canonical_Owner.Model, Id),
+      Lua.Prototypes.String_Length (Code.Canonical_Owner.Model, Id));
 
    function Source_Bytes (Code : Prototype_Access) return Byte_String is
-      Result : Byte_String;
-      procedure Borrow (Text : String);
-      procedure Borrow (Text : String) is
-      begin
-         Result := (Text'Address, Text'Length);
-      end Borrow;
    begin
       if Code.Canonical_Node.Source = Lua.Prototypes.No_String then
-         return (Unknown_Source'Address, Unknown_Source'Length);
+         return (Unknown_Source'Address, Unknown_Source'Length - 1);
       end if;
-      --  Query borrows the model's managed buffer, not a copied Ada String.
-      --  Adopted graphs are immutable; the rooted wrapper owns its lifetime.
-      Lua.Prototypes.Query_String
-        (Code.Canonical_Owner.Model, Code.Canonical_Node.Source,
-         Borrow'Access);
-      return Result;
+      --  A frozen model owns stable preterminated buffers, including empty
+      --  names and arbitrary embedded bytes. C metadata borrows those bytes
+      --  without retaining a short-lived Query descriptor or making a copy.
+      return String_Bytes (Code, Code.Canonical_Node.Source);
    end Source_Bytes;
 
-   function Local_Name
-     (State : in out World; Code : Prototype_Access; Index : Positive;
-      PC : Natural) return Value
+   function Local_Bytes
+     (Code : Prototype_Access; Index : Positive; PC : Natural)
+      return Byte_String
    is
       Remaining : Natural := Index;
-      Result : Value;
-      procedure Publish (Text : String);
-      procedure Publish (Text : String) is
-      begin
-         Result := New_String (State, Text);
-      end Publish;
    begin
       --  Canonical local records are declaration ordered. An active local's
       --  ordinal is its stack slot + 1; compile-time constants have no slot
       --  and no live-local record. End_PC is exclusive, following
-      --  luaF_getlocalname.
+      --  luaF_getlocalname. Both Lua and C inspection use this one selection.
       for Item of Code.Canonical_Node.Locals loop
          if Item.Start_PC <= PC and then PC < Item.End_PC then
             Remaining := Remaining - 1;
             if Remaining = 0 then
                if Item.Name = Lua.Prototypes.No_String then
-                  return New_String (State, "(no name)");
+                  return (Unknown_Name'Address, Unknown_Name'Length - 1);
                end if;
-               Lua.Prototypes.Query_String
-                 (Code.Canonical_Owner.Model, Item.Name, Publish'Access);
-               return Result;
+               return String_Bytes (Code, Item.Name);
             end if;
          end if;
       end loop;
-      return Nil_Value;
+      return (others => <>);
+   end Local_Bytes;
+
+   function Upvalue_Bytes
+     (Code : Prototype_Access; Index : Positive) return Byte_String
+   is
+      Id : constant Lua.Prototypes.String_Id :=
+        Code.Canonical_Node.Upvalues (Index).Name;
+   begin
+      if Id = Lua.Prototypes.No_String then
+         return (Unknown_Name'Address, Unknown_Name'Length - 1);
+      end if;
+      return String_Bytes (Code, Id);
+   end Upvalue_Bytes;
+
+   function Local_Name
+     (State : in out World; Code : Prototype_Access; Index : Positive;
+      PC : Natural) return Value
+   is
+      Bytes : constant Byte_String := Local_Bytes (Code, Index, PC);
+   begin
+      return (if Bytes.Address = System.Null_Address then Nil_Value else
+                New_String (State, To_String (Bytes)));
    end Local_Name;
 
    function Upvalue_Name
      (State : in out World; Code : Prototype_Access; Index : Positive)
       return Value
    is
-      Result : Value;
-      Id : Lua.Prototypes.String_Id;
-      procedure Publish (Text : String);
-      procedure Publish (Text : String) is
-      begin
-         Result := New_String (State, Text);
-      end Publish;
    begin
       if Index > Code.Canonical_Node.Upvalues.Last_Index then
          Fail (State, "canonical upvalue name out of range");
       end if;
-      Id := Code.Canonical_Node.Upvalues (Index).Name;
-      if Id = Lua.Prototypes.No_String then
-         return New_String (State, "(no name)");
-      end if;
-      Lua.Prototypes.Query_String
-        (Code.Canonical_Owner.Model, Id, Publish'Access);
-      return Result;
+      return New_String (State, To_String (Upvalue_Bytes (Code, Index)));
    end Upvalue_Name;
 
    procedure Store_Results
@@ -1299,6 +1304,10 @@ package body Lua.Engine.Canonical is
             Copy_Roots
               (State, Activation.Unwind_Results,
                Register_List (State, Activation, Reg_A, Count));
+            --  A return hook observes the actual source register range,
+            --  before result adjustment/movement to its caller. A packet's
+            --  element one alone cannot recover this public stack offset.
+            Activation.Transfer_First := Reg_A + 1;
             Freeze_Closing (0);
             Result := (Kind => Return_Results,
                        Arguments => Activation.Unwind_Results, others => <>);
