@@ -799,3 +799,15 @@ pass in reports/review-scoped-warnings-darwin-final. Independent review tests
 the verifier against the actual downloaded Mac normal-warning stderr and
 rejects unrelated/cross-platform diagnostics. Corrected Mac shutdown/runtime
 evidence is still pending; synthetic classification is never called a Mac pass.
+
+The next CI harness stage exposed a stale fixed inventory count after adding
+reviewed semantic blocks. The regression now measures its starting inventory
+and requires exactly one added source record with unchanged pending count:
+one guard is reviewed and one pending runtime block is added. Independent
+events/harness review accepted this invariant without validator weakening.
+The separate harness stage had not been rerun after the ledger expansion;
+the earlier build success did not establish that stage's success. Fresh local
+runs pass 62 inventory, 41 scope, 40 runner, 33 matrix, 32 review-binding and
+18 native-review regressions. Logs are reports/review-inventory-dynamic-counts.log,
+reports/review-runner-after-ledger.log, reports/review-scope-inventory-fix.log
+and reports/review-matrix-inventory-fix.log. Final CI remains pending.
