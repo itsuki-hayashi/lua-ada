@@ -291,7 +291,9 @@ is
                     (State, Selected, Positive (-Index));
                end if;
             end if;
-         elsif Index <= C.long_long (Selected.Canonical_GC_Top) then
+         elsif Index <= C.long_long
+           (Inspection.Visible_Local_Top (Context, Selected))
+         then
             Name := Canonical.Local_Bytes
               (Selected.Code, Positive (Index), Current_PC (Selected)).Address;
             if Name = System.Null_Address then Name := Debug_Temporary'Address;
@@ -305,7 +307,7 @@ is
             end if;
          end if;
       elsif Index > 0 and then Index <= C.long_long
-        (Selected.Stack_Live_Top - Selected.Stack_Base)
+        (Inspection.Visible_Local_Top (Context, Selected))
       then
          Name := Debug_C_Temporary'Address;
          if Setting then

@@ -119,7 +119,7 @@ package Lua.Engine.Machine is
       Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
-      Retained_Depth : Natural := 0);
+      Retained_Depth : Natural := 0; Direct_Builtin : Boolean := False);
    --  Start a C-entry call behind an owned protected holder. Its handler runs
    --  above intact failed frames; the terminal packet has a success boolean.
 
@@ -159,7 +159,7 @@ package Lua.Engine.Machine is
       Message_Handler : Value := Nil_Value;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
       Yieldable : Boolean := False; Wanted : Integer := 0;
-      Protected_Call : Boolean := False);
+      Protected_Call : Boolean := False; Direct_Builtin : Boolean := False);
    function Has_Foreign_Result (Self : Driver) return Boolean;
    procedure Take_Foreign_Result
      (Self : Driver; Packet : in out Values.Vector; Error_Status : out Natural;

@@ -1136,6 +1136,9 @@ package body Lua.Engine is
       Item.Is_Native := False;
       Item.Native_Name := Null_Unbounded_String;
       Item.Native_Id := Print_Function;
+      Item.Native_Builtin_Direct := False;
+      Item.Native_Results_Published := False;
+      Item.Native_Return_First := 0;
       Item.Result_Failure_Class := No_Failure;
       Item.Result_Handler_Called := False;
       Item.Native_Self := null;
@@ -1640,8 +1643,17 @@ package body Lua.Engine is
      (State : in out World; Name : String;
       Captures : Values.Vector := Values.Empty_Vector) return Value
    is
-      Item : constant Object_Access := Allocate (State, Native_Closure);
+      Found : constant Lua.Builtin_Registry.Lookup :=
+        Lua.Builtin_Registry.Find (Name);
+      Item : Object_Access;
    begin
+      --  A stateless builtin is an actual light C function identity: no
+      --  closure object/cache survives in the universe merely to remember a
+      --  name. Stateful functions still own distinct real upvalue cells.
+      if Captures.Is_Empty and then Found.Exists then
+         return (Native_Kind_Value, Found.Id);
+      end if;
+      Item := Allocate (State, Native_Closure);
       Item.Native_Name := To_Unbounded_String (Name);
       for Capture of Captures loop
          declare
@@ -1656,6 +1668,13 @@ package body Lua.Engine is
       end loop;
       return (Native_Closure_Kind, Item);
    end New_Native;
+
+   function Native_Operation_Name
+     (Activation : not null Frame_Access) return String is
+     (if Activation.Native_Builtin_Direct and then
+         Activation.Native_Name = "@builtin.direct"
+      then Lua.Builtin_Registry.Implementation (Activation.Native_Id)
+      else To_String (Activation.Native_Name));
 
    function Metatable_Kind (Kind : Value_Kind) return Value_Kind;
    function Metatable_Kind (Kind : Value_Kind) return Value_Kind is
@@ -1871,7 +1890,9 @@ package body Lua.Engine is
             return Type_Name (Item) & ": " &
               Ada.Strings.Fixed.Trim
                 (Item.Reference.Serial'Image, Ada.Strings.Both);
-         when Native_Kind_Value => return "function: native";
+         when Native_Kind_Value =>
+            return "function: " &
+              Lua.Builtin_Registry.Handler_Address (Item.Native_Data)'Image;
       end case;
    end Image;
 

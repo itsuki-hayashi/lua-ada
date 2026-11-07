@@ -82,10 +82,22 @@ native default and T configurations. See its dated
 remaining integration limits. Complete platform/configuration acceptance is
 still required.
 
-Full auxiliaries, builtin C trampolines and
-remaining exports are pending. In particular, `lua_tocfunction` currently exposes
-real foreign callbacks; Ada native-library functions need their own stable C
-trampolines before complete `luaL_openlibs`/C-function inspection parity.
+Known stateless Ada builtins now use strong scalar identities with actual C
+trampolines; they allocate no closure/cache. C push/tocfunction roundtrips retain
+their identity and callability, while captured library functions retain distinct
+closures and real mutable cells. Direct C pointer calls share the current
+driver, allocator, registry, budget and capture owner through a hidden phase and
+a real C continuation, including yielding callbacks. Strict/lax UTF-8 iterators
+retain distinct stateless function identities. See
+[ADR 0020](../docs/decisions/0020-callable-builtin-identities.md).
+The local default/static checkpoint passes 1,515 AUnit cases, fifteen native-
+matched C builtin cases and the twenty-case C debug consumer. Return hooks read
+real result slots, with append/reuse/trim protocols independently observed;
+fifty-one native operation labels match first-transfer/count ranges. Complete
+matrix/full-upstream evidence remains with the parent delivery, as recorded in
+the dated [session](../docs/sessions/2026-11-08-callable-builtins.md).
+
+Full auxiliaries, external strings and remaining exports are pending.
 Missing APIs are missing symbols, never successful stubs. The separately named
 lua_ada_guard_probe remains a bootstrap boundary fixture; real lua_pcall is
 exercised independently by the consumer.

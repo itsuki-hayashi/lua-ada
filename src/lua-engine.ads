@@ -1,5 +1,6 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
+with Lua.Builtin_Registry;
 with Lua.Lexers;
 with Lua.Prototypes;
 with Lua.Numbers;
@@ -16,6 +17,7 @@ private package Lua.Engine is
    --  sessions expose ownership and diagnostics, never these heap pointers,
    --  register packets, or bytecode instructions.
    use Ada.Strings.Unbounded;
+   use type Lua.Builtin_Registry.Kind;
 
    subtype Integer_Value is Lua.Numbers.Integer_Value;
    subtype Real_Value is Lua.Numbers.Real_Value;
@@ -168,11 +170,41 @@ private package Lua.Engine is
    end record;
 
 
-   type Native_Kind is
-     (Print_Function, Assert_Function, Error_Function, Pcall_Function,
-      Type_Function, Tonumber_Function, Tostring_Function, Select_Function,
-      Next_Function, Pairs_Function, Ipairs_Function, Ipairs_Step,
-      Rawequal_Function, Rawget_Function, Rawset_Function, Rawlen_Function);
+   subtype Native_Kind is Lua.Builtin_Registry.Kind;
+   Print_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Print_Function;
+   Assert_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Assert_Function;
+   Error_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Error_Function;
+   Pcall_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Pcall_Function;
+   Type_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Type_Function;
+   Tonumber_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Tonumber_Function;
+   Tostring_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Tostring_Function;
+   Select_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Select_Function;
+   Next_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Next_Function;
+   Pairs_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Pairs_Function;
+   Ipairs_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Ipairs_Function;
+   Ipairs_Step : constant Native_Kind :=
+     Lua.Builtin_Registry.Ipairs_Step_Function;
+   Rawequal_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Rawequal_Function;
+   Rawget_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Rawget_Function;
+   Rawset_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Rawset_Function;
+   Rawlen_Function : constant Native_Kind :=
+     Lua.Builtin_Registry.Rawlen_Function;
+   subtype Primitive_Kind is Native_Kind range
+     Print_Function .. Rawlen_Function;
 
    type Value_Kind is
      (Nil_Kind, Boolean_Kind, Integer_Kind, Real_Kind, String_Kind,
@@ -441,6 +473,15 @@ private package Lua.Engine is
       Is_Native : Boolean := False;
       Native_Name : Unbounded_String;
       Native_Id : Native_Kind := Print_Function;
+      Native_Builtin_Direct : Boolean := False;
+      Native_Results_Published : Boolean := False;
+      Native_Return_First : Natural := 0;
+      --  A finishing Ada builtin publishes its real result range once,
+      --  before return hooks. Zero means ordinary append placement; a phase
+      --  that normalizes its argument top records its actual first slot.
+      --  A real C function-pointer invocation borrows its original C frame.
+      --  The hidden continuation's Native_Id selects the same Ada library;
+      --  Native_Name stays @builtin.direct for logical-frame filtering.
       Native_Arguments : Values.Vector;
       Native_Results : Values.Vector;
       Error_Packet : Values.Vector;
@@ -566,6 +607,11 @@ private package Lua.Engine is
    --  A packet preserves all results of a call/vararg expression. Scalar
    --  consumers read its first value; parentheses explicitly collapse it.
    --  Frames are explicit so tail calls need not consume the Ada call stack.
+   function Native_Operation_Name
+     (Activation : not null Frame_Access) return String;
+   --  Return the semantic Ada library phase. A direct C builtin invocation
+   --  retains an internal transport name on its hidden activation while its
+   --  scalar ID selects this same existing implementation.
 
    type Native_Action_Kind is
      (Finished, Invoke, Continue_Step, Drain_Finalizers);

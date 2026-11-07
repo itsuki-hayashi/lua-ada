@@ -33,7 +33,7 @@ enum lua_ada_operation {
     ADA_SET_HOOK = 80, ADA_GET_HOOK, ADA_GET_HOOK_MASK, ADA_GET_HOOK_COUNT,
     ADA_GET_DEBUG_FRAME, ADA_GET_DEBUG_LINE, ADA_GET_DEBUG_INFO,
     ADA_GET_LOCAL, ADA_SET_LOCAL, ADA_GET_UPVALUE, ADA_SET_UPVALUE,
-    ADA_UPVALUE_ID, ADA_JOIN_UPVALUES
+    ADA_UPVALUE_ID, ADA_JOIN_UPVALUES, ADA_BEGIN_BUILTIN
 };
 
 /* Ordinary transport metadata, not a native private activation layout.
@@ -147,6 +147,7 @@ int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
                             struct lua_ada_response *completion);
 int lua_ada_read_guarded(lua_State *state, lua_Reader reader, void *data,
                          struct lua_ada_response *completion);
+int lua_ada_invoke_builtin(lua_State *state, int id);
 
 /* Test-only C guard probe. It demonstrates that a failing exported operation
  * returned through Ada before C unwinds. It is not a lua_pcall replacement. */

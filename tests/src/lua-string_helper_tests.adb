@@ -363,7 +363,8 @@ package body Lua.String_Helper_Tests is
       Activation.Native_Arguments.Append (Value'(Integer_Kind, 7));
       Result := Format_Drivers.Advance (State, Activation);
       Assert (Result.Kind = Invoke, "format requests tostring");
-      Assert (Result.Function_Value.Reference.Native_Name = "base.tostring",
+      Assert (Lua.Engine.Equal
+                (Result.Function_Value, New_Native (State, "base.tostring")),
               "format uses normal tostring handler");
       Activation.Native_Results.Append (New_String (State, "value"));
       loop

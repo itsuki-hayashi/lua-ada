@@ -225,6 +225,29 @@ static int close_io_primitive(lua_State *state, int kind) {
     return (int)dispatch(state, input).integer_data;
 }
 
+static int builtin_continuation(lua_State *state, int status,
+                                 lua_KContext prefix) {
+    (void)status;
+    /* The VM owns the suspended builtin phase. Its boundary has appended
+     * resumed results above the original C argument prefix before requesting
+     * this real K callback; returning its tail completes that C activation. */
+    return lua_gettop(state) - (int)prefix;
+}
+
+int lua_ada_invoke_builtin(lua_State *state, int id) {
+    struct lua_ada_request input = request(ADA_BEGIN_BUILTIN);
+    struct lua_ada_response output;
+    int action;
+    input.index = id;
+    input.count = LUA_MULTRET;
+    input.continuation = builtin_continuation;
+    input.kcontext = lua_gettop(state);
+    action = ada_lua_dispatch(state, &input, &output);
+    action = pump_callbacks(action, &output);
+    raise_action(state, action, &output);
+    return (int)output.length;
+}
+
 /* These addresses are real callable lua_CFunction values stored in the public
  * luaL_Stream payload. Lua close validation/results stay Ada-owned; direct C
  * closef invocation deliberately creates no extra interpreter/debug frame. */

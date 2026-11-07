@@ -928,7 +928,10 @@ package body Lua.Engine.Machine is
    procedure Schedule
      (Self : Driver; Name : String; Arguments : Values.Vector;
       Destination : Natural;
-      Operator : Token_Kind := End_Of_Input);
+      Operator : Token_Kind := End_Of_Input; Direct : Boolean := False);
+   procedure Schedule_Builtin
+     (Self : Driver; Id : Native_Kind; Arguments : Values.Vector;
+      Destination : Natural; Caller : Frame_Access);
    function Native
      (Self : Driver; Function_Id : Native_Kind; Arguments : Values.Vector)
       return Values.Vector;
@@ -987,13 +990,14 @@ package body Lua.Engine.Machine is
    procedure Schedule
      (Self : Driver; Name : String; Arguments : Values.Vector;
       Destination : Natural;
-      Operator : Token_Kind := End_Of_Input)
+      Operator : Token_Kind := End_Of_Input; Direct : Boolean := False)
    is
       State : World renames Self.Universe.all;
       Activation : Frame_Access;
    begin
       Reserve_Frame (State, 0);
-      if Name (Name'First) /= '@' and then State.Native_Depth >=
+      if not Direct and then Name (Name'First) /= '@' and then
+        State.Native_Depth >=
         (if State.Current.Message_Depth > 0 then
             Lua.Runtime_Configuration.Maximum_C_Calls / 10 * 11
          else Lua.Runtime_Configuration.Maximum_C_Calls)
@@ -1009,7 +1013,8 @@ package body Lua.Engine.Machine is
          --  A visible native call receives its actual scalar window in
          --  Dispatch. Internal holders consume no semantic Lua stack slots.
          Activation.Slot_Cost := 0;
-         Activation.Native_Charge := Name (Name'First) /= '@';
+         Activation.Native_Charge := not Direct and then
+           Name (Name'First) /= '@';
          if Activation.Native_Charge then
             State.Native_Depth := State.Native_Depth + 1;
             State.Current.Native_Depth := State.Current.Native_Depth + 1;
@@ -1030,7 +1035,9 @@ package body Lua.Engine.Machine is
             State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
          end if;
          Activation.Is_Native := True;
-         Activation.Native_Name := To_Unbounded_String (Name);
+         Activation.Native_Name := To_Unbounded_String
+           ((if Direct then "@builtin.direct" else Name));
+         Activation.Native_Builtin_Direct := Direct;
          --  Empty default packets have no allocator owner. Copy their values
          --  into this frame's existing owned buffer rather than assigning the
          --  vector and discarding its owner/cached capacity. A later internal
@@ -1051,6 +1058,37 @@ package body Lua.Engine.Machine is
             raise;
       end;
    end Schedule;
+
+   procedure Schedule_Builtin
+     (Self : Driver; Id : Native_Kind; Arguments : Values.Vector;
+      Destination : Natural; Caller : Frame_Access)
+   is
+      State : World renames Self.Universe.all;
+      Activation : Frame_Access;
+   begin
+      --  A C library pointer called directly is part of its current C
+      --  activation. Preserve that public frame, its actual cells and the
+      --  native-depth count while an explicit hidden phase drives callbacks.
+      Schedule (Self, Lua.Builtin_Registry.Implementation (Id), Arguments,
+                Destination, Direct => True);
+      Activation := State.Current.Stack.Last_Element;
+      Activation.Native_Id := Id;
+      Activation.Callee :=
+        (if Caller = null then (Native_Kind_Value, Id) else Caller.Callee);
+      Root_Barrier (State, Activation.Callee);
+      if Caller /= null then
+         Activation.Native_Self := Caller.Native_Self;
+         Root_Barrier (State, Activation.Native_Self);
+         if Caller.Native_Self /= null then
+            for Cell of Caller.Native_Self.Captures loop
+               Append_Root
+                 (State, Activation.Native_Captures, Cell.Cell_Value);
+            end loop;
+         end if;
+      end if;
+      Open_Stack_Window
+        (State, Activation, Activation.Callee, Arguments, 0, False);
+   end Schedule_Builtin;
 
    procedure Hook_Event
      (Self : Driver; Event : String; Line : Natural := 0;
@@ -1498,6 +1536,8 @@ package body Lua.Engine.Machine is
             Result.Append (Value'(Integer_Kind, Index));
          when Pcall_Function =>
             raise Program_Error with "pcall must use frame dispatch";
+         when others =>
+            raise Program_Error with "named builtin used primitive driver";
       end case;
       return Result;
    end Native;
@@ -1601,6 +1641,13 @@ package body Lua.Engine.Machine is
       end if;
    end Push_Frame;
 
+   procedure Publish_Native_Return
+     (State : in out World; Activation : not null Frame_Access;
+      Result, Retained_Result : Values.Vector);
+   procedure Publish_Native_Return
+     (State : in out World; Activation : not null Frame_Access;
+      Result, Retained_Result : Values.Vector) is separate;
+
    procedure Complete_Packet
      (Self : Driver; Result, Packet : Values.Vector);
    procedure Complete_Packet
@@ -1609,9 +1656,57 @@ package body Lua.Engine.Machine is
       Activation : Frame_Access := State.Current.Stack.Last_Element;
       Destination : constant Natural := Activation.Return_To;
       Policy : constant Completion_Policy := Activation.Completion;
+      Public_Protection : constant Boolean := Activation.Is_Native and then
+        (Activation.Native_Name = "base.pcall" or else
+         Activation.Native_Name = "base.xpcall");
+      procedure Complete_Owned (Source : in out Values.Vector);
+
+      procedure Complete_Owned (Source : in out Values.Vector) is
+         Caller : Frame_Access;
+      begin
+         --  A permanently refusing protected call resumes with its reserved
+         --  error vector. That vector belongs to the departing activation:
+         --  retiring the metadata first would clear the packet. Keep this
+         --  actual owner traced while moving/borrowing its values directly
+         --  into the caller, without allocating another result workspace.
+         if State.Current.Stack.Length > 1 and then
+           (State.Current /= Self.Root_Context or else
+            Natural (State.Current.Stack.Length) - 1 > Self.Entry_Depth)
+         then
+            Caller := State.Current.Stack
+              (State.Current.Stack.Last_Index - 1);
+         end if;
+         Retire_Stack_Window (Activation);
+         if Caller /= null then
+            if Policy = Deliver_Results then
+               Deliver_Owned (Self, Caller, Destination, Source);
+            end if;
+         else
+            State.Current.Transfer.Kind := Completed;
+            Move_Roots (State, State.Current.Transfer.Results, Source);
+         end if;
+         State.Current.Stack.Delete_Last;
+         Release_Frame (State, Activation);
+      end Complete_Owned;
    begin
       Pin (State, Result);
       Pin (State, Packet);
+      if Activation.Is_Native and then
+        Activation.Has_Stack_Window and then
+        not Activation.Native_Results_Published and then
+        Activation.Foreign_Handler = System.Null_Address and then
+        Length (Activation.Native_Name) > 0 and then
+        Element (Activation.Native_Name, 1) /= '@'
+      then
+         if Public_Protection then
+            --  This public C builtin returns its status boolean as well as
+            --  the protected child's raw values. Other protected holders
+            --  still expose only their actual function's unwrapped range.
+            Publish_Native_Return (State, Activation, Packet, Result);
+         else
+            Publish_Native_Return (State, Activation, Result, Result);
+         end if;
+      end if;
       if not State.Current.Hook_Active and then
         State.Current.Finalizer_Hook_Suppression = 0 and then
         not Activation.Return_Hook_Done and then
@@ -1626,12 +1721,17 @@ package body Lua.Engine.Machine is
          --  Keep the departing frame and outgoing values alive while its
          --  return hook executes. Only the continuation retires them.
          Activation.Return_Hook_Done := True;
-         Activation.Transfer_Count := Natural (Result.Length);
+         Activation.Transfer_Count := Natural
+           ((if Public_Protection then Packet.Length else Result.Length));
          Schedule (Self, "@return.hook", Values.Empty_Vector, 0);
          Copy_Roots
            (State, State.Current.Stack.Last_Element.Unwind_Results,
             Result);
          Hook_Event (Self, "return", Target => Activation);
+         return;
+      end if;
+      if Packet'Address = Activation.Native_Results'Address then
+         Complete_Owned (Activation.Native_Results);
          return;
       end if;
       --  Packet owns outgoing values independently of this activation. No
@@ -1775,19 +1875,31 @@ package body Lua.Engine.Machine is
               Function_Item.Identity;
          elsif Function_Item.Kind = Native_Kind_Value then
             Schedule
-              (Self, (if Function_Item.Native_Data = Pcall_Function then
-                  "base.pcall" else "base.primitive"), Args, Return_To);
+              (Self, Lua.Builtin_Registry.Implementation
+                 (Function_Item.Native_Data), Args, Return_To);
             State.Current.Stack.Last_Element.Protection := Protection;
             State.Current.Stack.Last_Element.Native_Id :=
               Function_Item.Native_Data;
             State.Current.Stack.Last_Element.Callee := Function_Item;
             Root_Barrier (State, State.Current.Stack.Last_Element.Callee);
          else
-            Schedule
-              (Self, (if Function_Item.Reference.Foreign_Handler /=
-                        System.Null_Address then "foreign.callback" else
-                        To_String (Function_Item.Reference.Native_Name)),
-               Args, Return_To);
+            declare
+               Builtin : constant Lua.Builtin_Registry.Lookup :=
+                 Lua.Builtin_Registry.Find
+                   (To_String (Function_Item.Reference.Native_Name));
+            begin
+               Schedule
+                 (Self, (if Function_Item.Reference.Foreign_Handler /=
+                           System.Null_Address then "foreign.callback"
+                         elsif Builtin.Exists then
+                           Lua.Builtin_Registry.Implementation (Builtin.Id)
+                         else To_String
+                           (Function_Item.Reference.Native_Name)),
+                  Args, Return_To);
+               if Builtin.Exists then
+                  State.Current.Stack.Last_Element.Native_Id := Builtin.Id;
+               end if;
+            end;
             State.Current.Stack.Last_Element.Protection := Protection;
             if Function_Item.Reference.Foreign_Handler = System.Null_Address
             then
@@ -2049,9 +2161,15 @@ package body Lua.Engine.Machine is
                Release_Frame (State, Old);
             end;
          end loop;
-         if Holder.Retain_On_Failure then
-            --  Move into the same live sentinel without allocating. Its C
-            --  pump later consumes the packet while it is still a GC root.
+         if Holder.Retain_On_Failure or else
+           (Holder.Is_Native and then
+            (Native_Operation_Name (Holder) = "base.pcall" or else
+             Native_Operation_Name (Holder) = "base.xpcall"))
+         then
+            --  Move into the same live holder without allocating. A C
+            --  sentinel's pump consumes it; a public pcall/xpcall resumes
+            --  its own return phase so hooks can inspect the real status and
+            --  error slots before that logical C activation is retired.
             Holder.Protection := 0;
             Move_Roots (State, Holder.Native_Results, Holder.Error_Packet);
             Holder.Result_Failure_Class := Failure;
@@ -2273,7 +2391,7 @@ package body Lua.Engine.Machine is
       State : World renames Self.Universe.all;
       Activation : constant Frame_Access :=
         State.Current.Stack.Last_Element;
-      Name : constant String := To_String (Activation.Native_Name);
+      Name : constant String := Native_Operation_Name (Activation);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Activation.Native_Arguments.Length)
          then Activation.Native_Arguments (Index) else Nil_Value);
@@ -2501,9 +2619,15 @@ package body Lua.Engine.Machine is
                Packet.Append (Arg (Index));
             end loop;
             Activation.Native_Stage := 1;
-            Dispatch (Self, Handler, Packet, 0,
-                      Call_Base => Activation.Native_Index,
-                      Has_Call_Window => Activation.Native_Aux /= 0);
+            if Activation.Native_Builtin_Direct then
+               Schedule_Builtin
+                 (Self, Handler.Native_Data, Packet, 0,
+                  Activation.Foreign_Previous_Frame);
+            else
+               Dispatch (Self, Handler, Packet, 0,
+                         Call_Base => Activation.Native_Index,
+                         Has_Call_Window => Activation.Native_Aux /= 0);
+            end if;
             Activation.Native_Arguments.Clear;
          else
             Complete (Self, Activation.Native_Results);
@@ -2567,7 +2691,8 @@ package body Lua.Engine.Machine is
                       Has_Call_Window => True);
             Activation.Native_Arguments.Clear;
          else
-            Complete (Self, Activation.Native_Results);
+            Complete (Self, Activation.Native_Results,
+                      Independent => Activation.Protection = 0);
          end if;
          return;
       elsif Name = "@hook" then
@@ -3117,7 +3242,8 @@ package body Lua.Engine.Machine is
                       Has_Call_Window => True);
             Activation.Native_Arguments.Clear;
          else
-            Complete (Self, Activation.Native_Results);
+            Complete (Self, Activation.Native_Results,
+                      Independent => Activation.Protection = 0);
          end if;
       elsif Name = "base.tostring" then
          if Activation.Native_Arguments.Is_Empty then
@@ -3471,16 +3597,17 @@ package body Lua.Engine.Machine is
       elsif Name'Length > 5 and then Name (1 .. 5) = "utf8." then
          if Name = "utf8.codes" then
             Packet.Append (New_Native
-              (State, "utf8.step", One_Value (State, Arg (2), 1)));
+              (State, (if Truth (Arg (2)) then "utf8.lax_step"
+                       else "utf8.step")));
             for Item of Unicode.Run
               (State, "codes", Activation.Native_Arguments)
             loop
                Packet.Append (Item);
             end loop;
             Complete (Self, Packet);
-         elsif Name = "utf8.step" then
+         elsif Name in "utf8.step" | "utf8.lax_step" then
             Packet := Activation.Native_Arguments;
-            Packet.Append (First (Activation.Native_Captures));
+            Packet.Append ((Boolean_Kind, Name = "utf8.lax_step"));
             Complete (Self, Unicode.Run (State, "step", Packet));
          else
             Complete (Self, Unicode.Run
@@ -4274,7 +4401,7 @@ package body Lua.Engine.Machine is
       Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
-      Retained_Depth : Natural := 0)
+      Retained_Depth : Natural := 0; Direct_Builtin : Boolean := False)
    is
       Packet : Values.Vector := Owned_Values (State.all);
       Prepared : Boolean := False;
@@ -4296,6 +4423,10 @@ package body Lua.Engine.Machine is
       --  to a non-callable value has a real protected handler boundary. No
       --  synthetic heap closure or second executor is needed for C entry.
       Schedule (Self, "@foreign.entry", Packet, 0);
+      State.Current.Stack.Last_Element.Native_Builtin_Direct :=
+        Direct_Builtin;
+      State.Current.Stack.Last_Element.Foreign_Previous_Frame :=
+        State.Current.Foreign_Activation;
       State.Current.Stack.Last_Element.Native_Index := Call_Base;
       State.Current.Stack.Last_Element.Native_Aux :=
         Boolean'Pos (Has_Call_Window);
@@ -4602,7 +4733,7 @@ package body Lua.Engine.Machine is
       Message_Handler : Value := Nil_Value;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
       Yieldable : Boolean := False; Wanted : Integer := 0;
-      Protected_Call : Boolean := False)
+      Protected_Call : Boolean := False; Direct_Builtin : Boolean := False)
    is
       State : World renames Self.Universe.all;
       Original_Depth : constant Natural :=
@@ -4645,13 +4776,19 @@ package body Lua.Engine.Machine is
          State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
       end if;
       begin
-         Dispatch (Self, Callee, Arguments, 0,
+         if Direct_Builtin then
+            Schedule_Builtin
+              (Self, Callee.Native_Data, Arguments, 0,
+               State.Current.Foreign_Activation);
+         else
+            Dispatch (Self, Callee, Arguments, 0,
                    Call_Name => (if Hook_Origin then
                      To_Unbounded_String ("?") else Null_Unbounded_String),
                    Name_Kind => (if Hook_Origin then
                      To_Unbounded_String ("hook") else Null_Unbounded_String),
                    Call_Base => Call_Base,
-                   Has_Call_Window => Has_Call_Window);
+                      Has_Call_Window => Has_Call_Window);
+         end if;
       exception
          when Language_Error => Recover (Self);
          when Lua.Storage.Allocation_Error =>

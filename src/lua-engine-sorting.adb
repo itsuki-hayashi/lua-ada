@@ -312,6 +312,11 @@ package body Lua.Engine.Sorting is
                then
                   Fail (State, "function expected");
                end if;
+               --  Pinned sort normalizes the public C stack to receiver and
+               --  comparator only for a nontrivial sequence. Retain this
+               --  actual branch decision for its zero-result return hook;
+               --  querying length again later could repeat a user callback.
+               Activation.Native_Return_First := 3;
                Save_Number (Size, Count);
                Save_Number (Heap_End, Count);
                Save_Number (Build_Index, Count / 2);

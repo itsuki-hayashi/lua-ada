@@ -5,6 +5,7 @@ with Interfaces.C;
 with Lua.Big_Naturals;
 with Lua.Engine.Strings;
 with Lua.Platform_Numerics;
+with System.Storage_Elements;
 
 package body Lua.Engine.Formats is
    package Managed renames Lua.Storage.Buffers;
@@ -12,6 +13,7 @@ package body Lua.Engine.Formats is
    use type Real_Value;
    use type Interfaces.Unsigned_64;
    use type Interfaces.C.int;
+   use type System.Address;
    package Big renames Lua.Big_Naturals;
    use type Big.Ordering;
    function Bits is new Ada.Unchecked_Conversion
@@ -644,10 +646,22 @@ package body Lua.Engine.Formats is
             end if;
          when 'p' =>
             if Item.Kind in String_Kind | Table_Kind | Closure_Kind |
-              Native_Closure_Kind
+                Native_Closure_Kind | Thread_Kind | Userdata_Kind
             then
                Text.Set_Value ("0x" & Unsigned_Image
                  (Interfaces.Unsigned_64 (Item.Reference.Serial), 16));
+            elsif Item.Kind = Native_Kind_Value then
+               Text.Set_Value ("0x" & Unsigned_Image
+                 (Interfaces.Unsigned_64 (System.Storage_Elements.To_Integer
+                   (Lua.Builtin_Registry.Handler_Address
+                     (Item.Native_Data))), 16));
+            elsif Item.Kind in Foreign_Function_Kind | Light_Identity_Kind
+              and then Item.Identity /= System.Null_Address
+            then
+               Text.Set_Value ("0x" & Unsigned_Image
+                 (Interfaces.Unsigned_64
+                   (System.Storage_Elements.To_Integer (Item.Identity)),
+                  16));
             else
                Text.Set_Value ("(null)");
             end if;

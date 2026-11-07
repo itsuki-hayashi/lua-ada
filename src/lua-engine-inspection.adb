@@ -81,7 +81,7 @@ package body Lua.Engine.Inspection is
      (State : in out World; Activation : Frame_Access;
       Target_Frame : Frame_Access := null) return Values.Vector
    is
-      Name : constant String := To_String (Activation.Native_Name);
+      Name : constant String := Native_Operation_Name (Activation);
       Args : constant Values.Vector := Activation.Native_Arguments;
       Context : Context_Access := State.Current;
       Base : Positive := 1;
@@ -358,8 +358,12 @@ package body Lua.Engine.Inspection is
             if Arg (1).Kind /= Userdata_Kind or else Number < 1 or else
               Number > Integer_Value (Arg (1).Reference.Uservalues.Length)
             then
+               if Setting then
+                  Activation.Native_Return_First := 2;
+               end if;
                Append (Nil_Value);
             elsif Setting then
+               Activation.Native_Return_First := 1;
                --  Mutate the actual traced slot, without allocating a proxy
                --  table or changing the userdata's stable C payload address.
                Arg (1).Reference.Uservalues.Replace_Element

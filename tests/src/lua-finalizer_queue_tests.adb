@@ -316,6 +316,12 @@ package body Lua.Finalizer_Queue_Tests is
       --  Prepare a selected handler, then replace its metatable edge.
       --  Trace the current callback while its argument holder can allocate.
       --  The chosen callable and target remain independently rooted.
+      --  A stateless builtin is a scalar and requires no object root. This
+      --  ownership witness deliberately selects a real captured closure so
+      --  replacing the metatable edge still leaves collectable handler data.
+      Set (State, (Table_Kind, Item.Reference.Metatable),
+           New_String (State, "__gc"), New_Native
+             (State, "base.print", One_Value (State, Nil_Value)));
       F.Register (State, Item);
       F.Queue_Unreachable (State, Dead'Access);
       F.Begin_Next (State);

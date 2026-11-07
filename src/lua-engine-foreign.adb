@@ -97,6 +97,7 @@ package body Lua.Engine.Foreign is
       Context : Context_Id := 1;
       Activation : Frame_Access;
       Is_Resume : Boolean := False;
+      Direct_Builtin : Boolean := False;
       Saved_Driver : Driver_View;
       Saved_Owned_Driver : VM.Driver_Access;
       Saved_Calls : System.Address := System.Null_Address;
@@ -317,6 +318,7 @@ package body Lua.Engine.Foreign is
       pragma Assert (C.double'Size = 64);
       pragma Assert (Operation_Code'Size = C.int'Size);
       pragma Assert (C_Function'Size = System.Address'Size);
+      Lua.Builtin_Registry.Initialize;
    end Initialize_Bridge;
 
    function Context_Of (Owner : Controls.Object_Pointer)
@@ -1157,6 +1159,7 @@ package body Lua.Engine.Foreign is
          declare
             Protected_Call : constant Boolean := Pending.Protected_Call;
             Is_Resume : constant Boolean := Pending.Is_Resume;
+            Direct_Builtin : constant Boolean := Pending.Direct_Builtin;
             Saved_Driver : constant Driver_View := Pending.Saved_Driver;
             Saved_Owned : constant VM.Driver_Access :=
               Pending.Saved_Owned_Driver;
@@ -1184,6 +1187,9 @@ package body Lua.Engine.Foreign is
                  (if Index <= Natural (Packet.Length) then Packet (Index)
                   else Nil_Value));
             end loop;
+            if Direct_Builtin then
+               Output.Length := C.size_t (Count);
+            end if;
             Packet.Clear;
             Output.Integer_Data := C.long_long (Error_Status);
             Output.Error_Handled := Boolean'Pos (Handler_Called);
@@ -1985,6 +1991,9 @@ package body Lua.Engine.Foreign is
                   case Item.Kind is
                      when Light_Identity_Kind | Foreign_Function_Kind =>
                         Output.Pointer := Item.Identity;
+                     when Native_Kind_Value =>
+                        Output.Pointer := Lua.Builtin_Registry.Handler_Address
+                          (Item.Native_Data);
                      when Userdata_Kind =>
                         Output.Pointer := Userdata_Address (Item);
                      when String_Kind =>
@@ -2207,42 +2216,70 @@ package body Lua.Engine.Foreign is
             then
                raise Foreign_Error with "invalid C closure arguments";
             end if;
-            if Input.Count = 0 then
-               Push (Owner.Universe.all, Context, (Foreign_Function_Kind,
-                               Function_Address (Input.Function_Data)));
-            else
-               declare
-                  Captures : Values.Vector :=
-                    Owned_Values (Owner.Universe.all);
-                  Item : Value;
-               begin
-                  for Index in Context.Foreign_Top -
-                    Natural (Input.Count) + 1 ..
-                    Context.Foreign_Top
-                  loop
-                     Append_Root
-                       (Owner.Universe.all, Captures,
-                        Stacks.Read (Context, Index));
-                  end loop;
-                  Item := New_Native (Owner.Universe.all, "foreign.callback",
-                                      Captures);
-                  Item.Reference.Foreign_Handler :=
-                    Function_Address (Input.Function_Data);
-                  Pop (Context, Natural (Input.Count));
-                  Push (Owner.Universe.all, Context, Item);
-               end;
-            end if;
+            declare
+               Builtin : constant Lua.Builtin_Registry.Lookup :=
+                 Lua.Builtin_Registry.Find
+                   (Function_Address (Input.Function_Data));
+            begin
+               if Input.Count = 0 and then Builtin.Exists then
+                  Push (Owner.Universe.all, Context,
+                        (Native_Kind_Value, Builtin.Id));
+               elsif Input.Count = 0 then
+                  Push (Owner.Universe.all, Context, (Foreign_Function_Kind,
+                                  Function_Address (Input.Function_Data)));
+               else
+                  declare
+                     Captures : Values.Vector :=
+                       Owned_Values (Owner.Universe.all);
+                     Item : Value;
+                  begin
+                     for Index in Context.Foreign_Top -
+                       Natural (Input.Count) + 1 ..
+                       Context.Foreign_Top
+                     loop
+                        Append_Root
+                          (Owner.Universe.all, Captures,
+                           Stacks.Read (Context, Index));
+                     end loop;
+                     Item := New_Native
+                       (Owner.Universe.all,
+                        (if Builtin.Exists then
+                            Lua.Builtin_Registry.Name (Builtin.Id)
+                         else "foreign.callback"), Captures);
+                     if not Builtin.Exists then
+                        Item.Reference.Foreign_Handler :=
+                          Function_Address (Input.Function_Data);
+                     end if;
+                     Pop (Context, Natural (Input.Count));
+                     Push (Owner.Universe.all, Context, Item);
+                  end;
+               end if;
+            end;
          when To_C_Function =>
             declare
                Item : constant Value := Get_Value (Input.Index);
             begin
                if Item.Kind = Foreign_Function_Kind then
                   Output.Function_Data := Address_Function (Item.Identity);
+               elsif Item.Kind = Native_Kind_Value then
+                  Output.Function_Data := Address_Function
+                    (Lua.Builtin_Registry.Handler_Address (Item.Native_Data));
                elsif Item.Kind = Native_Closure_Kind and then
                  Item.Reference.Foreign_Handler /= System.Null_Address
                then
                   Output.Function_Data :=
                     Address_Function (Item.Reference.Foreign_Handler);
+               elsif Item.Kind = Native_Closure_Kind then
+                  declare
+                     Builtin : constant Lua.Builtin_Registry.Lookup :=
+                       Lua.Builtin_Registry.Find
+                         (To_String (Item.Reference.Native_Name));
+                  begin
+                     if Builtin.Exists then
+                        Output.Function_Data := Address_Function
+                          (Lua.Builtin_Registry.Handler_Address (Builtin.Id));
+                     end if;
+                  end;
                end if;
             end;
          when Close_IO_Primitive =>
@@ -2267,7 +2304,7 @@ package body Lua.Engine.Foreign is
                end loop;
                Output.Integer_Data := C.long_long (Packet.Length);
             end;
-         when Begin_Call =>
+         when Begin_Call | Begin_Builtin =>
             if not Main_Owner.Owns_Universe and then
               not Main_Owner.Driver_Borrowed and then
               Main_Owner.Calls = System.Null_Address
@@ -2275,17 +2312,26 @@ package body Lua.Engine.Foreign is
                raise Foreign_Error with
                  "host-owned state requires its active Ada execution";
             end if;
-            if Input.Index < 0 or else Input.Count < -1 or else
-              Input.Count > C.int (Stack_Limit) or else
-              Natural (Input.Index) >= Context.Foreign_Top
-                - Context.Foreign_Base
+            if Input.Count < -1 or else Input.Count > C.int (Stack_Limit) or
+              else Input.Index < 0 or else
+              (if Input.Operation = Begin_Builtin then
+                  Input.Index > Lua.Builtin_Registry.Kind'Pos
+                    (Lua.Builtin_Registry.Kind'Last)
+               else Natural (Input.Index) >=
+                  Context.Foreign_Top - Context.Foreign_Base)
             then
                raise Foreign_Error with "invalid C call arguments";
             end if;
             declare
                Slot : constant Positive :=
-                 Context.Foreign_Top - Natural (Input.Index);
-               Callee : constant Value := Stacks.Read (Context, Slot);
+                 (if Input.Operation = Begin_Builtin then
+                     Context.Foreign_Top + 1 else
+                     Context.Foreign_Top - Natural (Input.Index));
+               Callee : constant Value :=
+                 (if Input.Operation = Begin_Builtin then
+                     (Native_Kind_Value,
+                      Lua.Builtin_Registry.Kind'Val (Input.Index))
+                  else Stacks.Read (Context, Slot));
                Message_Handler : Value;
                Arguments : Values.Vector :=
                  Owned_Values (Owner.Universe.all);
@@ -2297,7 +2343,11 @@ package body Lua.Engine.Foreign is
                Result : Action_Status;
                Start_Error : Boolean := False;
             begin
-               for Index in Slot + 1 .. Context.Foreign_Top loop
+               for Index in
+                 (if Input.Operation = Begin_Builtin then
+                     Context.Foreign_Base + 1 else Slot + 1) ..
+                 Context.Foreign_Top
+               loop
                   Append_Root
                     (Owner.Universe.all, Arguments,
                      Stacks.Read (Context, Index));
@@ -2338,6 +2388,7 @@ package body Lua.Engine.Foreign is
                  Wanted => Input.Count,
                  Protected_Call => Input.Integer_Data /= 0,
                  Is_Root => Root_Call, Context => Owner.Context,
+                 Direct_Builtin => Input.Operation = Begin_Builtin,
                  Activation => Context.Foreign_Activation,
                  Entry_Depth => Natural (Context.Stack.Length),
                  Original_Top => Context.Foreign_Top,
@@ -2356,8 +2407,10 @@ package body Lua.Engine.Foreign is
                      VM.Start_Foreign
                        (Main_Owner.Driver.all, Main_Owner.Owned_Universe,
                         Callee, Arguments, Message_Handler,
-                        Call_Base => Slot, Has_Call_Window => True,
-                        Retained_Depth => Next.Entry_Depth);
+                        Call_Base => Slot,
+                        Has_Call_Window => Input.Operation /= Begin_Builtin,
+                        Retained_Depth => Next.Entry_Depth,
+                        Direct_Builtin => Input.Operation = Begin_Builtin);
                   else
                      if Context.Foreign_Activation /= null then
                         Context.Foreign_Activation.Foreign_Continuation :=
@@ -2371,7 +2424,8 @@ package body Lua.Engine.Foreign is
                         Call_Base => Slot, Has_Call_Window => True,
                         Yieldable => Input.Continuation /= null,
                         Wanted => Integer (Input.Count),
-                        Protected_Call => Input.Integer_Data /= 0);
+                        Protected_Call => Input.Integer_Data /= 0,
+                        Direct_Builtin => Input.Operation = Begin_Builtin);
                   end if;
                exception
                   when Language_Error => Start_Error := True;

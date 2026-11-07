@@ -22,7 +22,7 @@ package body Lua.Engine.Loaders is
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
-      Name : constant String := To_String (Activation.Native_Name);
+      Name : constant String := Native_Operation_Name (Activation);
       Result : Native_Action := New_Action (State);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Activation.Native_Arguments.Length)

@@ -187,7 +187,7 @@ package body Lua.Engine.IO_Libraries is
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action
    is
-      Name : constant String := To_String (Activation.Native_Name);
+      Name : constant String := Native_Operation_Name (Activation);
       Result : Native_Action := New_Action (State);
       First_Text, Second_Text : Managed.Buffer;
       Item : Value;

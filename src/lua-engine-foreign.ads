@@ -58,7 +58,7 @@ package Lua.Engine.Foreign is
       Set_Hook, Get_Hook, Get_Hook_Mask, Get_Hook_Count,
       Get_Debug_Frame, Get_Debug_Line, Get_Debug_Info,
       Get_Local, Set_Local, Get_Upvalue, Set_Upvalue,
-      Upvalue_Id, Join_Upvalues);
+      Upvalue_Id, Join_Upvalues, Begin_Builtin);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
       Create_Thread => 3, Get_Top => 4, Set_Top => 5,
@@ -92,7 +92,7 @@ package Lua.Engine.Foreign is
       Get_Hook_Count => 83, Get_Debug_Frame => 84, Get_Debug_Line => 85,
       Get_Debug_Info => 86, Get_Local => 87, Set_Local => 88,
       Get_Upvalue => 89, Set_Upvalue => 90, Upvalue_Id => 91,
-      Join_Upvalues => 92);
+      Join_Upvalues => 92, Begin_Builtin => 93);
    for Operation_Code'Size use Interfaces.C.int'Size;
    pragma Convention (C, Operation_Code);
 
