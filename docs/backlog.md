@@ -27,6 +27,15 @@ including seventeen native-default/T matched C cases and 1,738 passing
 AUnit cases. Finish file/trace/substitution/default-allocator helpers,
 instrumented/shared/POSIX and immutable full-target replay.
 
+Public reset/self-close now has [scoped evidence](sessions/2026-11-08-thread-reset.md):
+twenty-four default-native matched C cases, twenty-three native-T matches with
+one explicit instrumentation skip, and 1,737 passing local AUnit cases. Actual
+guard acknowledgements precede retirement; simple C closers and repeated error
+publication work under refusal. Complete fresh Lua-created coroutine function
+slots, relevant T command-driver operations, integrated final-head matrices and
+review. The native partial-reader cleanup defect is recorded, not counted as a
+passing C ownership test or copied into Ada behavior.
+
 Native loading now has [local component observations](sessions/2026-11-08-native-module-loading.md).
 Complete immutable same-image fixtures, reviewed platform counterparts,
 explicit unload/provider fault witnesses and instrumented/shared/POSIX gates.

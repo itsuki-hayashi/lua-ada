@@ -142,6 +142,28 @@ package Lua.Engine.Machine is
    --  Its terminal packet is the actual return/yield/error sequence without
    --  an invented protected-call boolean.
 
+   function Has_Thread_Closers (Context : not null Context_Access)
+                                return Boolean;
+   --  Inspect actual pending Lua/C closing owners without allocating.
+
+   procedure Reset_Without_Closers
+     (State : in out World; Native_Base : Natural)
+     with Pre => not Has_Thread_Closers (State.Current);
+   --  Reset an addressed idle/suspended thread without a callback or drive.
+   --  Existing failure ownership stays rooted for C status publication.
+
+   procedure Start_Close_Thread
+     (Self : in out Driver; State : in out World; Native_Base : Natural;
+      Self_Close : Boolean := False);
+   --  Start a real reset/closing walk after every target C body has been
+   --  abandoned. A self-close reuses the current driver/resumer relationship;
+   --  other closes borrow an idle driver and restore their caller in C.
+
+   procedure Acknowledge_Self_Close
+     (Self : Driver; Token : Callback_Identity);
+   --  Validate one exact actual callback and relinquish its live C window.
+   --  This never executes or physically releases any pending close owner.
+
    function Needs_Foreign_Call (Self : Driver) return Boolean;
    function Foreign_Handler (Self : Driver) return System.Address;
    function Foreign_Token (Self : Driver) return Callback_Identity;

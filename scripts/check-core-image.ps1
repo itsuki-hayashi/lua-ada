@@ -207,6 +207,13 @@ try {
     $nativeModuleAda=Invoke-NativeModuleConsumer -Name native-module-api `
         -Executable (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/native_module_contract$suffix") `
         -Implementation Ada -RuntimePath $runtimeDirectory -Compiler $fixtureCompiler
+    # Native T keeps its warning callback under the test lock and rejects API
+    # reentry there. Default pairs that public callback case; T records its
+    # single instrumentation skip in both outputs and in the receipt below.
+    $resetArguments = $(if ($Configuration -eq 'upstream-test') {
+        @('--without-warning-reentry')
+    } else { @() })
+    Invoke-Consumer 'thread-reset-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/thread_reset_api_contract$suffix") 'PASS: public thread reset/base closing contract' $resetArguments
     # Compile the identical public-header contract against the isolated pinned
     # C library. No reference object is linked into either Ada consumer.
     Invoke-Build @('exec', '--', 'gprbuild', '-P', 'experiments/conformance/reference.gpr', '-p', "-XLUA_CONFORMANCE_CONFIGURATION=$Configuration")
@@ -301,6 +308,11 @@ try {
     Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/native_module_contract.c'),
         '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceNativeModuleConsumer)+$nativeSystemLibraries)
+    $referenceThreadResetConsumer = Join-Path $reportDirectory "thread-reset-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/thread_reset_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceThreadResetConsumer)
     try {
         $env:PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:PATH
         $env:LD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
@@ -319,6 +331,7 @@ try {
         Invoke-Consumer 'buffer-oracle' $referenceBufferConsumer 'PASS: public luaL_Buffer contract'
         $nativeModuleC=Invoke-NativeModuleConsumer -Name native-module-oracle -Executable $referenceNativeModuleConsumer `
             -Implementation ReferenceC -RuntimePath $referenceDirectory -Compiler $fixtureCompiler
+        Invoke-Consumer 'thread-reset-oracle' $referenceThreadResetConsumer 'PASS: public thread reset/base closing contract' $resetArguments
         if($TargetPolicy -ne ''){
             Invoke-Consumer 'format-oracle' $referenceFormatConsumer 'PASS: public formatting contract'
             Invoke-Consumer 'value-oracle' $referenceValueConsumer 'PASS: public value operation contract'
@@ -400,6 +413,11 @@ try {
     if([IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-oracle.stdout'))){throw 'C/Ada public buffer contract output differs'}
     Write-Output 'PASS: identical public luaL_Buffer contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'thread-reset-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'thread-reset-oracle.stdout'))) {
+        throw 'C/Ada public thread reset contract output differs'
+    }
+    Write-Output 'PASS: identical public thread reset contract against C and Ada'
     $referenceLibraries = @(Get-ChildItem -LiteralPath $referenceDirectory -File |
         Where-Object { $_.Name -match '^libconformance_lua\.(dll|so(\.[0-9.]+)?|dylib)$' } |
         ForEach-Object { [ordered]@{ file=$_.Name;
@@ -470,6 +488,10 @@ try {
     $bufferContractSources=@(foreach($name in @('buffer_api_contract.c','consumer_allocator.h')){
         @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
     })
+    $threadResetContractSources = @(foreach ($name in @('thread_reset_api_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
     Invoke-Consumer 'c-startup' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/c_image_client$suffix") 'CORE IMAGE C STARTUP OK'
     # Old ignored products can remain after the library rename. Hash only the
@@ -493,7 +515,7 @@ try {
         consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources);
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources);
         configuration = $Configuration; consumers = $records.ToArray();
         library_files = $libraries;
         gc_contract = [ordered]@{ matching_output=$true; sources=$contractSources;
@@ -526,6 +548,10 @@ try {
             ada_fixture_directory=$nativeModuleAda.library_directory;c_fixture_directory=$nativeModuleC.library_directory;
             ada_fixture_records=$nativeModuleAda.records;c_fixture_records=$nativeModuleC.records};
         buffer_contract=@{matching_output=$true;sources=$bufferContractSources;matched_cases=17;reference_library_files=$referenceLibraries};
+        thread_reset_contract = [ordered]@{ matching_output=$true; sources=$threadResetContractSources;
+            matched_cases=$(if ($Configuration -eq 'upstream-test') { 23 } else { 24 });
+            skipped_warning_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 1 } else { 0 });
+            reference_library_files=$referenceLibraries };
         value_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$valueSources;reference_library_files=$referenceLibraries}}else{$null});
         auxiliary_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$auxiliarySources;platform_defines=$platformDefines;reference_library_files=$referenceLibraries}}else{$null}) } | ConvertTo-Json -Depth 6 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8

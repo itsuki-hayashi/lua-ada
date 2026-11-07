@@ -32,6 +32,15 @@ and fifteen retained C consumers. Captured providers, actual refused growth,
 bounded near-limit content and disposal without Lua have focused evidence.
 The remaining auxiliary surface and full target acceptance stay open.
 
+The [thread reset checkpoint](sessions/2026-11-08-thread-reset.md) implements
+public close/reset and typed self-close propagation through actual C guards.
+Twenty-four public cases match default C; native T matches twenty-three with
+one explicit warning-lock reentry skip. Strict local builds, all 1,737 AUnit
+cases and sixteen standalone C contracts pass. Additional Ada-owned reader,
+warning and host-quota cases preserve cleanup and the original shared budget.
+Fresh coroutine function slots, relevant T command-driver completion and final
+integrated image/platform/review acceptance remain open.
+
 The [native module checkpoint](sessions/2026-11-08-native-module-loading.md)
 builds the owned loader and CLI environment control locally, with 1,691
 passing AUnit cases and fourteen passing C consumers. Unchanged native

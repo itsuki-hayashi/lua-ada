@@ -68,7 +68,7 @@ package Lua.Engine.Foreign is
       Prepare_External_Release, Complete_External_Release,
       Prepare_Length, Prepare_Concatenation, Number_To_C_String,
       Prepare_Arithmetic, Prepare_Comparison,
-      String_To_Number,
+      Close_Thread, String_To_Number, Complete_Self_Close,
       Create_Formatter, Append_Format_Value, Append_Format_UTF8,
       Finish_Formatter, Release_Formatter, Charge_Aux_Work,
       Create_Aux_Box, Resize_Aux_Box, Release_Aux_Box, Publish_Aux_Box);
@@ -110,7 +110,8 @@ package Lua.Engine.Foreign is
       Prepare_Length => 100, Prepare_Concatenation => 101,
       Number_To_C_String => 102,
       Prepare_Arithmetic => 103, Prepare_Comparison => 104,
-      String_To_Number => 106,
+      Close_Thread => 105, String_To_Number => 106,
+      Complete_Self_Close => 107,
       Create_Formatter => 120, Append_Format_Value => 121,
       Append_Format_UTF8 => 122, Finish_Formatter => 123,
       Release_Formatter => 124, Charge_Aux_Work => 125,
@@ -188,13 +189,13 @@ package Lua.Engine.Foreign is
    type Action_Status is
      (Action_Done, Action_Call, Action_Raise, Action_Memory,
       Action_Handling, Action_Abort, Action_Warning, Action_Suspend,
-      Action_External_Release);
+      Action_External_Release, Action_Self_Close);
    for Action_Status use
      (Action_Done => 0, Action_Call => 1,
       Action_Raise => 2, Action_Memory => 4,
       Action_Handling => 5,
       Action_Abort => 6, Action_Warning => 7, Action_Suspend => 8,
-      Action_External_Release => 9);
+      Action_External_Release => 9, Action_Self_Close => 10);
    for Action_Status'Size use Interfaces.C.int'Size;
    pragma Convention (C, Action_Status);
 
@@ -224,6 +225,11 @@ package Lua.Engine.Foreign is
    --  may allocate. An Ada-only world without a C main surface does nothing;
    --  its first borrowed C entry prepares existing threads before invocation.
    --  Public thread-pointer queries subsequently borrow without allocation.
+
+   procedure Release_Context_Control (State : in out World;
+                                      Context : not null Context_Access);
+   --  Release reserved idle reset-driver/record ownership before freeing the
+   --  context's raw C control block. No callback or execution occurs here.
 
    function Contract_Size (Part : Interfaces.C.int)
                           return Interfaces.C.size_t

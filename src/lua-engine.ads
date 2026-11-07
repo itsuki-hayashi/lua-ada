@@ -493,6 +493,9 @@ private package Lua.Engine is
    type Frame is record
       Context : Context_Access;
       Cache_Next : Frame_Access;
+      Reset_Reserve : Boolean := False;
+      --  Dedicated empty continuation metadata, preserved across Clear_Frame
+      --  and loaned only during an actual reset. It owns no inactive values.
       Lifecycle : Frame_Lifecycle := Active;
       Stack_Base : Natural := 0;
       Stack_Window_Length : Natural := 0;
@@ -718,6 +721,8 @@ private package Lua.Engine is
    type Execution_Context is record
       Cache_Head : Frame_Access;
       Cache_Count : Natural := 0;
+      Reset_Frame_Head : Frame_Access;
+      Reset_Frame_Count : Natural := 0;
       Memory : Lua.Storage.Owner_Access;
       Stack        : Frames.Vector;
       Arguments    : Values.Vector;
@@ -815,6 +820,16 @@ private package Lua.Engine is
       Hook_Transfer : Boolean := False;
       C_Resuming : Boolean := False;
       --  An explicit lua_resume boundary can drive even a fresh main thread.
+      C_Reset_Requested : Boolean := False;
+      C_Reset_Active : Boolean := False;
+      C_Reset_Self : Boolean := False;
+      C_Reset_Error : Boolean := False;
+      --  A terminal reset error is already rooted by Failure and its real
+      --  base stack slot; publishing it needs no newly allocating packet.
+      C_Reset_From_Depth : Natural := 0;
+      C_Reset_Return_Depth : Natural := 0;
+      --  Self-reset first abandons real C guards through typed transfers.
+      --  Only their final acknowledgment may retire this thread's frames.
       Cleanup_Depth : Natural := 0;
    end record;
    --  Contexts own frames and transient argument/error roots. Referenced
@@ -1133,6 +1148,13 @@ private package Lua.Engine is
    --  Borrow one clean activation from its context-owned intrusive cache.
    --  A new record and every future buffer use State.Memory explicitly.
    --  Publish on Context.Stack before any later allocation can collect.
+
+   Reset_Continuation_Frames : constant Positive := 8;
+   procedure Prepare_Reset_Frames
+     (State : in out World; Context : not null Context_Access);
+   --  Reserve bounded reset/close/protection metadata while a C
+   --  surface is constructed. Empty owned buffers retain their capacities;
+   --  normal user-call frames remain independently metered and allocated.
 
    procedure Prepare_Private_Registers
      (Item : not null Frame_Access; Count : Natural);

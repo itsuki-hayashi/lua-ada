@@ -26,20 +26,33 @@ two named panic probes have local static evidence; final ABI/allocator
 acceptance remains open.
 
 
+The [thread reset checkpoint](../docs/sessions/2026-11-08-thread-reset.md)
+implements `lua_closethread`, including self-close inside a real resume.
+Each nearest C guard releases its own reader/writer/formatter ownership and
+acknowledges its actual callback before the shared Ada scheduler retires old
+execution and runs pending closers. No C transfer crosses suspended Ada.
+Twenty-four public cases match default C; native T matches twenty-three and
+explicitly skips warning API reentry rejected by its lock instrumentation.
+Fifteen new named AUnit cases pass within 1,737 local cases. Fresh Lua-created
+coroutine function slots, integrated T/shared/platform and final acceptance
+remain separate obligations. The session also records a native partial-reader
+scratch leak; the additional Ada-owned regression requires balanced cleanup.
+
 The [host base C closing checkpoint](../docs/sessions/2026-11-08-base-c-closing.md)
 supports direct idle-host `lua_toclose`, `lua_closeslot` and closing `lua_settop`
 through the actual scalar stack and shared iterative closer. Valid registration
 and thread-pointer queries make no selected-allocator request. Thirteen
-same-source cases match both native configurations locally; thread reset and
-full public auxiliary-buffer acceptance remain pending. See
+same-source cases match both native configurations locally. Full public
+auxiliary-buffer acceptance remains separate. See
 [ADR 0026](../docs/decisions/0026-base-c-closing-ownership.md) for ownership.
 
 The [protected error-closing checkpoint](../docs/sessions/2026-11-08-protected-error-closing.md)
 preserves actual regular C guard ownership across yieldable outer cleanup.
 Thirteen identical-source C cases match native default/T, including suspended
 callk boundaries, failed traceback locals and warm persistent-refusal transfer.
-Ownerless borrowed guards retain their real barriers; full reset and final
-matrix acceptance remain separate. See
+Ownerless borrowed guards retain their real barriers; self-close now propagates
+through their typed cleanup acknowledgements. Final matrix acceptance remains
+separate. See
 [ADR 0027](../docs/decisions/0027-protected-error-closing.md).
 
 The [public value/auxiliary checkpoint](../docs/sessions/2026-11-08-public-value-auxiliary.md)
@@ -180,7 +193,10 @@ exercised independently by the consumer.
 C sees a stable opaque surface whose prefix matches configured LUA_EXTRASPACE.
 Its control block and surface block use the owning universe's storage provider.
 Thread contexts own traced C stacks; registry entries refer to the actual globals
-and main-thread objects. Context reclamation releases its two raw C blocks.
+and main-thread objects. Context reclamation releases its surface/control blocks
+and reserved reset driver/record. C-visible contexts also retain a bounded pool
+of real reset continuation frames so simple C closers can run after refusal;
+arbitrary Lua handlers continue to use the same allocator and host budget.
 String pointers refer to real immutable byte storage and remain valid while the
 Lua string is reachable. A null light-userdata address remains distinct from nil.
 

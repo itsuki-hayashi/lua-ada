@@ -177,6 +177,9 @@ package body Lua.Engine.Foreign is
       Driver : Driver_View;
       Owned_Driver : VM.Driver_Access;
       Driver_Borrowed : Boolean := False;
+      Reset_Driver : VM.Driver_Access;
+      Reset_Record : System.Address := System.Null_Address;
+      Reset_Live : Boolean := False;
       Owns_Universe : Boolean := True;
       Calls : System.Address := System.Null_Address;
    end record;
@@ -194,6 +197,7 @@ package body Lua.Engine.Foreign is
       Context : Context_Id := 1;
       Activation : Frame_Access;
       Is_Resume : Boolean := False;
+      Is_Close : Boolean := False;
       Direct_Builtin : Boolean := False;
       Saved_Driver : Driver_View;
       Saved_Owned_Driver : VM.Driver_Access;
@@ -358,7 +362,12 @@ package body Lua.Engine.Foreign is
       --  exit, including a host abort caught by an Ada borrowed callback.
       if Pending.Is_Resume then
          VM.Cancel (Owner.Driver.all);
-         VM.Free_Driver (Owner.Owned_Driver);
+         if Pending.Is_Close then
+            Controls.To_Pointer
+              (Target.Foreign_Control).Reset_Live := False;
+         else
+            VM.Free_Driver (Owner.Owned_Driver);
+         end if;
          Owner.Driver := Pending.Saved_Driver;
          Owner.Owned_Driver := Pending.Saved_Owned_Driver;
          Owner.Driver_Borrowed := Pending.Saved_Borrowed;
@@ -382,8 +391,29 @@ package body Lua.Engine.Foreign is
             Target.Host_Stack_Top := Pending.Original_Top;
          end if;
       end if;
-      Memory.Release (State.Memory, Address);
+      if not Pending.Is_Close then
+         Memory.Release (State.Memory, Address);
+      end if;
    end Discard_Pending;
+
+   procedure Discard_Self_Calls
+     (Owner : Controls.Object_Pointer; Context : Context_Id);
+   procedure Discard_Self_Calls
+     (Owner : Controls.Object_Pointer; Context : Context_Id) is
+      Address : System.Address;
+      Pending : Calls.Object_Pointer;
+   begin
+      --  The corresponding live C bodies are abandoning their nested API
+      --  calls. Remove scalar transport records only; the existing driver
+      --  and real scope owners remain intact until the final guard ACK.
+      while Owner.Calls /= System.Null_Address loop
+         Pending := Calls.To_Pointer (Owner.Calls);
+         exit when Pending.Is_Root or else Pending.Context /= Context;
+         Address := Owner.Calls;
+         Owner.Calls := Pending.Previous;
+         Memory.Release (Owner.Universe.Memory, Address);
+      end loop;
+   end Discard_Self_Calls;
 
    function Read_Name (Pointer : System.Address; Default : String)
                        return String is
@@ -431,11 +461,20 @@ package body Lua.Engine.Foreign is
    is
       Item : constant Context_Access := State.Contexts (Positive (Context));
       Header, Block : System.Address := System.Null_Address;
+      Reset_Record : System.Address := System.Null_Address;
+      Reset_Driver : VM.Driver_Access;
       Result : System.Address;
    begin
       if Item.Foreign_State /= System.Null_Address then
          return Item.Foreign_State;
       end if;
+      if Item.Thread /= null then
+         --  A first Ada-host C entry also prepares preexisting weak threads.
+         --  New_Frame can retry through collection, so root this actual
+         --  thread before its context's reserved metadata is constructed.
+         Pin (State.all, (Thread_Kind, Item.Thread));
+      end if;
+      Prepare_Reset_Frames (State.all, Item);
       --  Ordinary pushes preserve one free error slot. Refusal therefore can
       --  publish the preallocated memory object without growing this stack.
       Stacks.Reserve
@@ -456,10 +495,18 @@ package body Lua.Engine.Foreign is
       Block := Memory.Allocate
         (State.Memory, Extra + Surface'Object_Size / System.Storage_Unit,
          Surface'Alignment);
+      --  lua_closethread is itself a nonthrowing protected operation. Its
+      --  scalar driver switch must remain possible after allocator refusal;
+      --  reserve those two metadata owners while constructing the surface.
+      Reset_Driver := VM.New_Driver (State.all);
+      Reset_Record := Memory.Allocate
+        (State.Memory, Call_Record'Object_Size / System.Storage_Unit,
+         Call_Record'Alignment);
       Result := Block + Storage_Offset (Extra);
       Controls.To_Pointer (Header).all :=
         (Universe => State, Context => Context, Extra => Extra,
          Seed => Seed, Driver => null,
+         Reset_Driver => Reset_Driver, Reset_Record => Reset_Record,
          Owns_Universe =>
            (if Main = System.Null_Address then Owns_Universe else
               Controls.To_Pointer
@@ -495,10 +542,26 @@ package body Lua.Engine.Foreign is
       return Result;
    exception
       when others =>
+         VM.Free_Driver (Reset_Driver);
+         Memory.Release (State.Memory, Reset_Record);
          Memory.Release (State.Memory, Block);
          Memory.Release (State.Memory, Header);
          raise;
    end Create_Surface;
+
+   procedure Release_Context_Control (State : in out World;
+                                      Context : not null Context_Access)
+   is
+      Owner : constant Controls.Object_Pointer :=
+        Controls.To_Pointer (Context.Foreign_Control);
+   begin
+      if Owner = null then return; end if;
+      if Owner.Reset_Live then
+         raise Program_Error with "releasing an active C reset control";
+      end if;
+      VM.Free_Driver (Owner.Reset_Driver);
+      Memory.Release (State.Memory, Owner.Reset_Record);
+   end Release_Context_Control;
 
    procedure Prepare_Thread_Surface
      (State : in out World; Context : Context_Id)
@@ -716,6 +779,7 @@ package body Lua.Engine.Foreign is
          when 5 => Status := Action_Handling;
          when 6 => Status := Action_Abort;
          when 8 => Status := Action_Suspend;
+         when 10 => Status := Action_Self_Close;
          when others =>
             raise Program_Error with "invalid borrowed C callback transfer";
       end case;
@@ -724,7 +788,7 @@ package body Lua.Engine.Foreign is
          --  or leave a foreign stack borrow installed. The ordinary guarded
          --  status is handled only after this ownership acknowledgment.
          External_Releases.Complete (State, Token);
-         if Status /= Action_Done then
+         if Status not in Action_Done | Action_Self_Close then
             Restore;
             raise Language_Error;
          end if;
@@ -737,6 +801,22 @@ package body Lua.Engine.Foreign is
               To_Unbounded_String ("foreign host abort");
          end if;
          raise Language_Error;
+      end if;
+      if Status = Action_Self_Close then
+         if not Target.C_Reset_Requested then
+            raise Program_Error with "unrequested borrowed self close";
+         end if;
+         if Is_Warning then
+            Warnings.Acknowledge (State, Token);
+         elsif not Is_Release then
+            VM.Acknowledge_Self_Close (Driver, Token);
+         end if;
+         Discard_Self_Calls
+           (Owner, Context_Id (Target.Thread.Context_Index));
+         VM.Start_Close_Thread
+           (Driver, State, Target.C_Reset_From_Depth, Self_Close => True);
+         Restore;
+         return;
       end if;
       if Is_Release then
          null;
@@ -1039,6 +1119,108 @@ package body Lua.Engine.Foreign is
       procedure Prepare_C_Slots
         (Frame : not null Frame_Access; Depth : Natural);
       function Pump (Start_Error : Boolean := False) return Action_Status;
+      function Reset_API return Action_Status;
+      function Reset_API return Action_Status is
+         Saved_Depth : constant Natural := Owner.Universe.Native_Depth;
+         From_Depth : Natural := 0;
+         Old_Status : Natural := 0;
+         Next : Calls.Object_Pointer;
+         Start_Error : Boolean := False;
+      begin
+         if Input.Operation /= Close_Thread then
+            if not Context.C_Reset_Requested or else Main_Owner.Driver = null
+            then
+               raise Foreign_Error with
+                 "unexpected self-close guard completion";
+            end if;
+            if Input.Operation = Complete_Self_Close then
+               VM.Acknowledge_Self_Close
+                 (Main_Owner.Driver.all, Input.Callback_Token);
+            end if;
+            Discard_Self_Calls (Main_Owner, Owner.Context);
+            if Input.Error_Index = 0 then
+               return Action_Self_Close;
+            end if;
+            VM.Start_Close_Thread
+              (Main_Owner.Driver.all, Owner.Universe.all,
+               Context.C_Reset_From_Depth, Self_Close => True);
+            return Pump;
+         elsif Input.Pointer = State then
+            if not Context.C_Resuming and then Context.Resumer = null then
+               raise Foreign_Error with "self close requires a running resume";
+            end if;
+            --  This request cannot retire a frame beneath a live C body. Each
+            --  nearest C guard runs cleanup and echoes its exact token; only
+            --  the last guard may start the actual close walk.
+            Context.C_Reset_Requested := True;
+            Context.C_Reset_From_Depth := Saved_Depth;
+            if not Context.C_Reset_Active or else not Context.C_Reset_Self then
+               Context.C_Reset_Return_Depth :=
+                 Saved_Depth - Context.Native_Depth;
+            end if;
+            return Action_Self_Close;
+         end if;
+         if Input.Pointer /= System.Null_Address then
+            From_Depth := Controls.To_Pointer
+              (Surfaces.To_Pointer (Input.Pointer).Owner).
+                Universe.Native_Depth;
+         end if;
+         if not VM.Has_Thread_Closers (Context) then
+            if Context.Status = Dead_Context and then Context.Has_Failure_Value
+            then
+               Old_Status :=
+                 (if Context.Failure_Class = Memory_Failure then 4
+                  elsif Context.Failure_Class = Handling_Failure then 5
+                  else 2);
+            end if;
+            VM.Reset_Without_Closers (Owner.Universe.all, From_Depth);
+            if Old_Status /= 0 then
+               Push (Owner.Universe.all, Context, Context.Failure);
+            end if;
+            Context.Failure := Nil_Value;
+            Context.Has_Failure_Value := False;
+            Context.Failure_Class := No_Failure;
+            Owner.Universe.Native_Depth := Saved_Depth;
+            Output.Integer_Data := C.long_long (Old_Status);
+            return Action_Done;
+         end if;
+         if Owner.Reset_Live then
+            raise Foreign_Error with "thread reset is already active";
+         end if;
+         --  Both scalar owners were reserved with the public C surface.
+         --  Switching suspends driver metadata, never an Ada executor or C
+         --  stack. The pump returns before each close callback runs.
+         Next := Calls.To_Pointer (Owner.Reset_Record);
+         Next.all :=
+           (Is_Root => True, Is_Resume => True, Is_Close => True, Wanted => -1,
+            Context => Owner.Context, Saved_Driver => Main_Owner.Driver,
+            Saved_Owned_Driver => Main_Owner.Owned_Driver,
+            Saved_Calls => Main_Owner.Calls,
+            Saved_Borrowed => Main_Owner.Driver_Borrowed,
+            Saved_Context => Previous, Saved_Native_Depth => Saved_Depth,
+            others => <>);
+         Owner.Reset_Live := True;
+         Main_Owner.Driver := Driver_View (Owner.Reset_Driver);
+         Main_Owner.Owned_Driver := Owner.Reset_Driver;
+         Main_Owner.Driver_Borrowed := False;
+         Main_Owner.Calls := Owner.Reset_Record;
+         begin
+            VM.Start_Close_Thread
+              (Main_Owner.Driver.all, Owner.Universe.all, From_Depth);
+         exception
+            when Language_Error => Start_Error := True;
+            when Memory.Allocation_Error =>
+               Record_Memory_Error (Owner.Universe.all);
+               Start_Error := True;
+            when Program_Error =>
+               if not Memory.Refusal_Pending (Owner.Universe.Memory) then
+                  raise;
+               end if;
+               Record_Memory_Error (Owner.Universe.all);
+               Start_Error := True;
+         end;
+         return Pump (Start_Error);
+      end Reset_API;
 
       procedure Prepare_C_Slots
         (Frame : not null Frame_Access; Depth : Natural)
@@ -1144,6 +1326,7 @@ package body Lua.Engine.Foreign is
          Error_Status : Natural := 0;
          Handler_Called : Boolean := False;
          Held_Error_View : Boolean := False;
+         Reset_Error : Boolean := False;
          Count : Natural;
          Address : System.Address;
       begin
@@ -1313,8 +1496,16 @@ package body Lua.Engine.Foreign is
                if Pending.Is_Resume then
                   Error_Status :=
                     (if VM.Outcome (Driver) = Yielded then 1
-                     elsif VM.Outcome (Driver) = Lua_Raised then 2 else 0);
-                  VM.Take_Results (Driver, Packet);
+                     elsif VM.Outcome (Driver) = Lua_Raised then
+                       (if Caller.Failure_Class = Memory_Failure then 4
+                        elsif Caller.Failure_Class = Handling_Failure then 5
+                        else 2)
+                     else 0);
+                  if Caller.C_Reset_Error then
+                     Reset_Error := True;
+                  else
+                     VM.Take_Results (Driver, Packet);
+                  end if;
                elsif VM.Outcome (Driver) /= Completed then
                   raise Foreign_Error with "unexpected C-call suspension";
                else
@@ -1399,6 +1590,7 @@ package body Lua.Engine.Foreign is
          declare
             Protected_Call : constant Boolean := Pending.Protected_Call;
             Is_Resume : constant Boolean := Pending.Is_Resume;
+            Is_Close : constant Boolean := Pending.Is_Close;
             Direct_Builtin : constant Boolean := Pending.Direct_Builtin;
             Saved_Driver : constant Driver_View := Pending.Saved_Driver;
             Saved_Owned : constant VM.Driver_Access :=
@@ -1408,24 +1600,36 @@ package body Lua.Engine.Foreign is
             Saved_Context : constant Context_Access := Pending.Saved_Context;
             Saved_Depth : constant Natural := Pending.Saved_Native_Depth;
          begin
-            Memory.Release (Owner.Universe.Memory, Address);
+            if not Is_Close then
+               Memory.Release (Owner.Universe.Memory, Address);
+            end if;
             if Is_Resume then
                --  Release/restore scalar driver ownership before result
                --  publication can allocate. A refused host-window growth
                --  must not strand the caller under a completed child drive.
-               VM.Free_Driver (Main_Owner.Owned_Driver);
+               if Is_Close then
+                  Controls.To_Pointer
+                    (Caller.Foreign_Control).Reset_Live := False;
+               else
+                  VM.Free_Driver (Main_Owner.Owned_Driver);
+               end if;
                Main_Owner.Driver := Saved_Driver;
                Main_Owner.Owned_Driver := Saved_Owned;
                Main_Owner.Calls := Saved_Calls;
                Main_Owner.Driver_Borrowed := Saved_Borrowed;
                Owner.Universe.Current := Saved_Context;
                Owner.Universe.Native_Depth := Saved_Depth;
-               Output.Length := C.size_t (Count);
+               Output.Length := C.size_t
+                 (Count + (if Caller.C_Reset_Self and then
+                   Error_Status not in 0 | 1 and then not Is_Close then
+                      Caller.Resume_Return_Top - Caller.Resume_Return_Base
+                   else 0));
             end if;
             if not Held_Error_View then
                for Index in 1 .. Count loop
                   Push (Owner.Universe.all, Caller,
-                    (if Index <= Natural (Packet.Length) then Packet (Index)
+                    (if Reset_Error then Caller.Failure
+                     elsif Index <= Natural (Packet.Length) then Packet (Index)
                      else Nil_Value));
                end loop;
             end if;
@@ -1433,6 +1637,14 @@ package body Lua.Engine.Foreign is
                Output.Length := C.size_t (Count);
             end if;
             Packet.Clear;
+            Caller.C_Reset_Error := False;
+            if Is_Close then
+               Caller.C_Reset_Requested := False;
+               Caller.C_Reset_Active := False;
+               Caller.Failure := Nil_Value;
+               Caller.Has_Failure_Value := False;
+               Caller.Failure_Class := No_Failure;
+            end if;
             Output.Integer_Data := C.long_long (Error_Status);
             Output.Error_Handled := Boolean'Pos (Handler_Called);
             if Error_Status /= 0 and then Protected_Call and then
@@ -1520,7 +1732,14 @@ package body Lua.Engine.Foreign is
          when Complete_External_Release =>
             External_Releases.Complete
               (Owner.Universe.all, Input.Callback_Token);
-            if Input.Index /= 0 then
+            if Input.Index = 10 then
+               declare
+                  Result : constant Action_Status := Reset_API;
+               begin
+                  Leave_Context;
+                  return Result;
+               end;
+            elsif Input.Index /= 0 then
                Leave_Context;
                return Action_Status'Enum_Val (Input.Index);
             elsif Input.Count /= 0 then
@@ -1545,12 +1764,22 @@ package body Lua.Engine.Foreign is
             --  as the driver, rather than treating every retained error as a
             --  language failure. Suspended execution still takes precedence.
             Output.Integer_Data :=
-              (if Context.Status = Suspended_Context then 1
+              (if Context.C_Reset_Active or else
+                   (Context.C_Reset_Error and then not Context.C_Reset_Self)
+               then 0
+               elsif Context.Status = Suspended_Context then 1
                elsif Context.Has_Failure_Value then
                  (if Context.Failure_Class = Memory_Failure then 4
                   elsif Context.Failure_Class = Handling_Failure then 5
                   else 2)
                else 0);
+         when Close_Thread | Complete_Self_Close =>
+            declare
+               Result : constant Action_Status := Reset_API;
+            begin
+               Leave_Context;
+               return Result;
+            end;
          when Prepare_Index =>
             declare
                Target : constant Value := Get_Value (Input.Index);
@@ -2076,7 +2305,7 @@ package body Lua.Engine.Foreign is
                Event : constant Frame_Access := Owner.Universe.Warning_Head;
                Result : Action_Status;
             begin
-               if Input.Index not in 0 | 2 | 4 | 5 or else
+               if Input.Index not in 0 | 2 | 4 | 5 | 10 or else
                  Event = null or else
                  Event.Warning_Phase /= Warning_Callback_Active or else
                  Event.all'Address /= Input.Callback_Token.Activation or else
@@ -2084,7 +2313,7 @@ package body Lua.Engine.Foreign is
                then
                   raise Foreign_Error with "invalid warning completion";
                end if;
-               if Input.Index /= 0 then
+               if Input.Index not in 0 | 10 then
                   Context.Failure :=
                     Stacks.Read (Context, Context.Foreign_Top);
                   Root_Barrier (Owner.Universe.all, Context.Failure);
@@ -2100,7 +2329,7 @@ package body Lua.Engine.Foreign is
                end if;
                Warnings.Acknowledge
                  (Owner.Universe.all, Input.Callback_Token);
-               Result := Pump;
+               Result := (if Input.Index = 10 then Reset_API else Pump);
                Leave_Context;
                return Result;
             end;

@@ -26,6 +26,7 @@ struct lua_ada_guard {
     jmp_buf target;
     struct lua_ada_guard *previous;
     volatile int error_handled;
+    volatile int self_closing;
     struct lua_ada_callback_identity callback_token;
 };
 
@@ -67,6 +68,14 @@ static void raise_action(lua_State *state, int status,
     /* This function is reached only after ada_lua_dispatch has returned.
      * Its checkpoint belongs to C; no abandoned Ada activation is retained. */
     if (status == LUA_OK) return;
+    if (status == ADA_ACTION_SELF_CLOSE && state != NULL) {
+        struct lua_ada_guard *item;
+        /* Mark the live C chain before unwinding its nearest checkpoint.
+         * Each parser/writer/formatter guard still runs its own cleanup;
+         * jumping directly to the oldest guard could cross waiting Ada. */
+        for (item = state->guard; item != NULL; item = item->previous)
+            item->self_closing = 1;
+    }
     if (state != NULL && state->guard != NULL) {
         state->guard->error_handled = output->error_handled;
         longjmp(state->guard->target, status);
@@ -83,6 +92,14 @@ static void raise_action(lua_State *state, int status,
     abort();
 }
 
+static int self_close_pending(lua_State *state) {
+    struct lua_ada_guard *item;
+    if (state == NULL) return 0;
+    for (item = state->guard; item != NULL; item = item->previous)
+        if (item->self_closing) return 1;
+    return 0;
+}
+
 static int dispatch_raw(lua_State *state,
                          const struct lua_ada_request *input,
                          struct lua_ada_response *output) {
@@ -92,10 +109,12 @@ static int dispatch_raw(lua_State *state,
      * intact; the drainer uses independent transport records. Close frees
      * this surface itself and therefore drains in its pre-teardown phase. */
     if (state && input->operation != ADA_CLOSE_STATE &&
+        !self_close_pending(state) &&
         input->operation != ADA_PREPARE_EXTERNAL_RELEASE &&
         input->operation != ADA_COMPLETE_EXTERNAL_RELEASE &&
         action != ADA_ACTION_CALL && action != ADA_ACTION_WARNING &&
-        action != ADA_ACTION_EXTERNAL_RELEASE && action != ADA_ACTION_SUSPEND)
+        action != ADA_ACTION_EXTERNAL_RELEASE && action != ADA_ACTION_SUSPEND &&
+        action != ADA_ACTION_SELF_CLOSE)
         lua_ada_drain_external_releases(state);
     return action;
 }
@@ -117,7 +136,7 @@ int lua_ada_debug_dispatch(lua_State *state,
 }
 
 int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
-    struct lua_ada_guard guard;
+    struct lua_ada_guard guard = {0};
     int status;
     guard.previous = state->guard;
     guard.error_handled = 0;
@@ -126,7 +145,7 @@ int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
     status = setjmp(guard.target);
     if (status == 0) body(state);
     state->guard = guard.previous;
-    if (status == ADA_ACTION_ABORT) {
+    if (status == ADA_ACTION_ABORT || status == ADA_ACTION_SELF_CLOSE) {
         struct lua_ada_response output;
         memset(&output, 0, sizeof output);
         raise_action(state, status, &output);
@@ -136,7 +155,7 @@ int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
 
 int lua_ada_run_protected(lua_State *state,
                          void (*body)(lua_State *, void *), void *data) {
-    struct lua_ada_guard guard;
+    struct lua_ada_guard guard = {0};
     int status;
     guard.previous = state->guard;
     guard.error_handled = 0;
@@ -160,7 +179,7 @@ void lua_ada_propagate_status(lua_State *state, int status) {
 int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
                             const struct lua_ada_response *pending,
                             struct lua_ada_response *completion) {
-    struct lua_ada_guard guard;
+    struct lua_ada_guard guard = {0};
     int status;
     volatile int count = 0;
     memset(completion, 0, sizeof *completion);
@@ -205,6 +224,7 @@ void lua_ada_drain_external_releases(lua_State *state) {
         struct lua_ada_request done = request(ADA_COMPLETE_EXTERNAL_RELEASE);
         done.index = status;
         done.callback_token = pending.callback_token;
+        done.error_index = state->guard == NULL;
         action = ada_lua_dispatch(state, &done, &output);
         raise_action(state, action, &output);
     }
@@ -229,7 +249,7 @@ static int pump_callbacks(int action, struct lua_ada_response *pending) {
         void *warning_data = output.warning_data;
         const char *warning_message = output.warning_message;
         int warning_continuation = output.warning_continuation;
-        struct lua_ada_guard guard;
+        struct lua_ada_guard guard = {0};
         int status;
         volatile int count = 0;
         /* Every Ada scheduler activation has returned before this checkpoint
@@ -261,11 +281,13 @@ static int pump_callbacks(int action, struct lua_ada_response *pending) {
         }
         input = request(is_release ? ADA_COMPLETE_EXTERNAL_RELEASE :
                         is_warning ? ADA_COMPLETE_WARNING :
+                        status == ADA_ACTION_SELF_CLOSE ? ADA_COMPLETE_SELF_CLOSE :
                                      ADA_COMPLETE_CALLBACK);
         input.index = status;
         input.count = is_release ? 1 : count;
         input.error_handled = guard.error_handled;
         input.callback_token = guard.callback_token;
+        input.error_index = guard.previous == NULL;
         action = dispatch_raw(callback_state, &input, &output);
     }
     *pending = output;
@@ -413,6 +435,22 @@ int lua_resume(lua_State *state, lua_State *from, int arguments, int *results) {
     return (int)output.integer_data;
 }
 
+int lua_closethread(lua_State *state, lua_State *from) {
+    struct lua_ada_request input = request(ADA_CLOSE_THREAD);
+    struct lua_ada_response output;
+    int action;
+    input.pointer = from;
+    action = dispatch_raw(state, &input, &output);
+    if (action == ADA_ACTION_SELF_CLOSE) raise_action(state, action, &output);
+    action = pump_callbacks(action, &output);
+    /* Like resume, close returns protected language/memory statuses. A self
+     * transfer and an embedding abort must abandon the live C body instead. */
+    if (action == ADA_ACTION_RAISE || action == ADA_ACTION_MEMORY ||
+        action == ADA_ACTION_HANDLING) return action;
+    raise_action(state, action, &output);
+    return (int)output.integer_data;
+}
+
 int lua_error(lua_State *state) {
     dispatch(state, request(ADA_RAISE_ERROR));
     abort(); /* A raise action cannot return through the C guard. */
@@ -426,7 +464,7 @@ static void release_buffer(lua_State *state, void *buffer) {
 
 int lua_ada_read_guarded(lua_State *state, lua_Reader reader, void *data,
                          struct lua_ada_response *completion) {
-    struct lua_ada_guard guard;
+    struct lua_ada_guard guard = {0};
     int status;
     memset(completion, 0, sizeof *completion);
     guard.previous = state->guard;
@@ -450,7 +488,7 @@ int lua_ada_read_guarded(lua_State *state, lua_Reader reader, void *data,
 
 int lua_load(lua_State *state, lua_Reader reader, void *data,
              const char *name, const char *mode) {
-    struct lua_ada_guard guard;
+    struct lua_ada_guard guard = {0};
     struct lua_ada_response output;
     volatile int barrier_active = 0;
     int top = lua_gettop(state);
@@ -490,7 +528,7 @@ int lua_load(lua_State *state, lua_Reader reader, void *data,
      * lua_settop closing handlers, after removing the parser yield barrier. */
     state->guard = guard.previous;
     if (barrier_active) dispatch(state, request(ADA_READER_BARRIER));
-    if (status == ADA_ACTION_ABORT) {
+    if (status == ADA_ACTION_ABORT || status == ADA_ACTION_SELF_CLOSE) {
         memset(&output, 0, sizeof output);
         raise_action(state, status, &output);
     }
@@ -506,7 +544,7 @@ int lua_load(lua_State *state, lua_Reader reader, void *data,
 int lua_dump(lua_State *state, lua_Writer writer, void *data, int strip) {
     struct lua_ada_request input = request(ADA_DUMP_FUNCTION);
     struct lua_ada_response output;
-    struct lua_ada_guard guard;
+    struct lua_ada_guard guard = {0};
     void *volatile buffer = NULL;
     int top = lua_gettop(state);
     volatile int result = 0;

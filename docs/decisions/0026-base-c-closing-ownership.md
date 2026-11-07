@@ -47,6 +47,43 @@ prefix to each pending close level and restore that floor on completion.
 This primitive is implemented; automatic error/reset callers are separate
 checkpoints and are not certified by its internal lifetime tests alone.
 
+### Public reset and self-close extension
+
+The reset caller now uses the same physical windows, closing links and saved
+prefix floors. It first adopts held error scopes after their genuine C guard
+acknowledgements, then retires abandoned execution top-down. Frozen lexical
+cells and the actual scalar prefix retain pending closers and pre-close locals.
+The existing iterative close controller lowers the prefix per handler and
+publishes either an empty reset stack or the actual final error object. It
+clears pending error-recovery continuations before starting this new execution.
+
+A self-close is a distinct typed C action. It marks live guards for that
+addressed state and unwinds only the nearest C checkpoint. Each reader,
+writer, formatter, warning or foreign callback owner performs its own cleanup
+and echoes its actual callback identity before propagation continues. Only
+the final guard starts reset. This avoids both jumping over waiting Ada
+finalization and executing old Lua PCs after a C body has been abandoned.
+An Ada-owned borrowed callback returns the same action to its existing driver;
+it does not start another executor. A recursive request during a closer keeps
+the genuine outer native-depth base.
+
+Each C surface reserves an idle reset driver, one transport record and eight
+real continuation frames with bounded argument/error/result capacity. Normal
+execution cannot consume this frame pool. It covers the bounded reset/close
+controllers and a simple C handler without a new allocation after refusal.
+Ignored C close results stay in the actual scalar window for return inspection;
+no unused packet is materialized. Reserved packet owners are copied into
+already reserved destinations rather than moved away between closers. This
+does not promise allocation-free arbitrary Lua handlers, hooks or metacall
+chains. Those still use the actual allocator and the original work budget.
+
+The extra metadata belongs to the same context/provider and is destroyed once
+with that context. It introduces no new value store or reference runtime.
+Protected reset errors retain their real Lua object and status. A self-reset
+error preserves the pinned outer-resume publication (the reset error followed
+by the terminal resume copy); subsequent non-self reset consumes that failure
+and leaves the normal zero-status reset thread.
+
 Thread C surfaces are prepared during thread construction when the world's
 main C surface exists. The first borrowed C entry into an Ada-only session
 prepares existing contexts before invoking native code. `lua_tothread` and
@@ -78,3 +115,12 @@ The retained persistent-refusal iterator test and twelve other C consumers
 also pass. This decision does not certify `lua_closethread`, initial coroutine
 function-stack behavior, logical error-scope retirement, auxiliary buffer
 completion, integrated Ada T/shared/platform gates or full upstream acceptance.
+
+The later [reset record](../sessions/2026-11-08-thread-reset.md) separately
+verifies this extension with 24 native-default C matches, 23 native-T matches
+and one explicit warning-lock skip, 15 named new cases within 1,737 AUnit
+cases, sixteen passing standalone C contracts and refusal/recovery sweeps.
+Initial coroutine function slots, integrated Ada T/shared/platform and final
+upstream acceptance remain open. Native partial-reader reset skips parser
+scratch cleanup; that diagnostic failure is retained separately while Ada's
+additional borrowed-reader regression requires balanced ownership.

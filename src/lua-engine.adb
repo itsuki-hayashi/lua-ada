@@ -346,6 +346,7 @@ package body Lua.Engine is
    is
    begin
       if Context /= null then
+         Lua.Engine.Foreign.Release_Context_Control (State, Context);
          Lua.Storage.Release (State.Memory, Context.Foreign_Block);
          Lua.Storage.Release (State.Memory, Context.Foreign_Control);
          Context.Foreign_State := System.Null_Address;
@@ -1344,7 +1345,19 @@ package body Lua.Engine is
       if Context.Memory /= Lua.Storage.Reference (State.Memory) then
          raise Program_Error with "activation belongs to another universe";
       end if;
-      if Context.Cache_Head /= null then
+      if Context.C_Reset_Active and then Context.Reset_Frame_Head /= null then
+         Item := Context.Reset_Frame_Head;
+         if Item.Lifecycle /= Available or else Item.Context /= Context or
+           else not Item.Reset_Reserve
+         then
+            raise Program_Error with "invalid reserved reset activation";
+         end if;
+         Context.Reset_Frame_Head := Item.Cache_Next;
+         Context.Reset_Frame_Count := Context.Reset_Frame_Count - 1;
+         Item.Cache_Next := null;
+         Item.Lifecycle := Active;
+         return Item;
+      elsif Context.Cache_Head /= null then
          Item := Context.Cache_Head;
          if Item.Lifecycle /= Available or else Item.Context /= Context then
             raise Program_Error with "invalid cached activation owner";
@@ -1385,6 +1398,38 @@ package body Lua.Engine is
       Item.Canonical_Cells.Set_Owner (Item.Memory);
       return Item;
    end New_Frame;
+
+   procedure Prepare_Reset_Frames
+     (State : in out World; Context : not null Context_Access)
+   is
+      Item : Frame_Access;
+   begin
+      Context.Stack.Reserve_Capacity
+        (Context.Stack.Length +
+           Ada.Containers.Count_Type (Context.Deferred_Error_Depth +
+             Reset_Continuation_Frames + 1));
+      while Context.Reset_Frame_Count < Reset_Continuation_Frames loop
+         Item := New_Frame (State, Context);
+         begin
+            --  These are actual continuation-owned argument/result owners,
+            --  not copies of live stack values. Three close arguments plus
+            --  protected success/error pairs fit without refusal-time growth.
+            Item.Native_Arguments.Reserve_Capacity (4);
+            Item.Native_Results.Reserve_Capacity (4);
+            Item.Error_Packet.Reserve_Capacity (2);
+            Item.Unwind_Results.Reserve_Capacity (2);
+            Item.Native_Captures.Reserve_Capacity (4);
+            Item.Call_Name_Bytes.Set_Value ("__close");
+            Item.Call_Name_Bytes.Clear;
+            Item.Reset_Reserve := True;
+            Return_Frame (Item);
+         exception
+            when others =>
+               Return_Frame (Item);
+               raise;
+         end;
+      end loop;
+   end Prepare_Reset_Frames;
 
    function New_Frame (State : in out World) return Frame_Access is
    begin
@@ -1435,6 +1480,14 @@ package body Lua.Engine is
          --  Keep its empty reserved metadata outside the ordinary cache so
          --  collection cannot shrink away allocation-free C registration.
          Item.Lifecycle := Active;
+         Item := null;
+         return;
+      end if;
+      if Item.Reset_Reserve then
+         Item.Cache_Next := Context.Reset_Frame_Head;
+         Item.Lifecycle := Available;
+         Context.Reset_Frame_Head := Item;
+         Context.Reset_Frame_Count := Context.Reset_Frame_Count + 1;
          Item := null;
          return;
       end if;
@@ -1494,6 +1547,13 @@ package body Lua.Engine is
          Item := Context.Cache_Head;
          Context.Cache_Head := Item.Cache_Next;
          Context.Cache_Count := Context.Cache_Count - 1;
+         Item.Cache_Next := null;
+         Free_Frame (Item);
+      end loop;
+      while Context.Reset_Frame_Head /= null loop
+         Item := Context.Reset_Frame_Head;
+         Context.Reset_Frame_Head := Item.Cache_Next;
+         Context.Reset_Frame_Count := Context.Reset_Frame_Count - 1;
          Item.Cache_Next := null;
          Free_Frame (Item);
       end loop;
