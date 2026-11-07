@@ -458,6 +458,12 @@ function Test-ConformanceTargetExclusion {
         for ($i = 0; $i -lt $words.Count; $i++) {
             $word = $words[$i]
             if ($word -cin @('if','function','do','repeat')) { $blocks.Add($word) }
+            elseif ($word -cin @('else','elseif') -and $blocks.Count -eq 1) {
+                # Only the initial then arm is guarded by a truthy T. An
+                # alternative belongs to T absence (or another predicate),
+                # even though it shares the enclosing if/end byte span.
+                throw 'Exclusion positive T guard cannot include outer alternatives'
+            }
             elseif ($word -cin @('end','until')) {
                 if ($blocks.Count -eq 0 -or (($word -ceq 'until') -ne ($blocks[-1] -ceq 'repeat'))) {
                     throw 'Exclusion T guard block nesting differs'

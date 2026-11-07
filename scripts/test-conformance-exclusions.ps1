@@ -112,6 +112,21 @@ Case 'nested T guard keeps the original block boundary' {
     Invoke-Fixture $f | Out-Null
 }
 
+Case 'outer else branch cannot borrow positive T eligibility' {
+    $f = New-Fixture -Text "if T then print('private') else assert(public()) end`n"
+    Assert-Rejected { Invoke-Fixture $f } 'cannot include outer alternatives'
+}
+
+Case 'outer elseif branch cannot borrow positive T eligibility' {
+    $f = New-Fixture -Text "if T then print('private') elseif ordinary then assert(public()) end`n"
+    Assert-Rejected { Invoke-Fixture $f } 'cannot include outer alternatives'
+}
+
+Case 'nested alternatives remain inside the positive T arm' {
+    $f = New-Fixture -Text "if T then if choice then print('private') elseif other then print('other') else assert(T.checkmemory()) end end`n"
+    Invoke-Fixture $f | Out-Null
+}
+
 Case 'T-absent top-level return can establish file suffix applicability' {
     # api/code/memerr use this original shape. The return itself does not
     # certify the excluded body or execute its omitted assertion.

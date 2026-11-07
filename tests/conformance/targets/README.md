@@ -36,7 +36,9 @@ make it eligible. Every exclusion contains:
   portion. Relevant T-driven public API behavior remains required.
 - `t_guard: {mode, byte_offset, byte_length, sha256}`, citing original bytes.
   `positive-guard` requires an actual `if T then ... end` token span containing
-  the obligation and ending at its matching block boundary. `absent-return`
+  the obligation and ending at its matching block boundary, without an outer
+  `else` or `elseif` arm. Nested alternatives entirely within the T arm remain
+  eligible. `absent-return`
   requires a preceding top-level literal `if T==nil then ... return end` or
   `if not T then ... return end`, without nested control flow in the reporting
   prefix. Quoted pseudo-guards and function-local returns are rejected. These
