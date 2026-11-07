@@ -16,19 +16,30 @@ $context = "$Configuration/$hostName/$Profile/$link"
 $records = @()
 $referenceOutput = $null
 $referenceError = $null
+$policy=@{acceptance=$false;contracts=@{}}
+Import-Module "$PSScriptRoot/ScopedAcceptancePolicy.psm1" -Force
+Import-Module "$PSScriptRoot/FilesOutput.psm1" -Force
 try {
+    $policy=Get-ScopedAcceptancePolicy -Root $root -Context $context
     foreach ($target in @('ReferenceC','Ada')) {
+        $contract=$null
         $report = Join-Path $directory "$target-files.lua.json"
         $arguments = @{Target=$target; Configuration=$Configuration; Scope='gc-io-events';
             Mode='File'; File='files.lua'; Report=$report; ReportOnly=$true; Context=$context;
             Interpreter=$(if ($target -eq 'Ada') { $Interpreter } else { $ReferenceInterpreter })}
         if ($target -eq 'Ada') { $arguments.RuntimeDirectory = $RuntimeDirectory }
+        if ($target -eq 'Ada' -and $policy.acceptance) {
+            $contract=$policy.contracts['files.lua']
+            $arguments.Remove('ReportOnly')
+            $arguments.RequireScopedAcceptance=$true
+            $arguments.AcceptanceContract=$contract.path
+        }
         if ($IsWindows) {
             $arguments.EquivalentManifest = Join-Path $root 'tests/conformance/equivalents/files-windows-platform.json'
-            $arguments.AllowUnreviewedEquivalent = $true
+            $arguments.AllowUnreviewedEquivalent = -not $policy.acceptance
         } elseif ($IsMacOS) {
             $arguments.EquivalentManifest = Join-Path $root 'tests/conformance/equivalents/files-macos-platform.json'
-            $arguments.AllowUnreviewedEquivalent = $true
+            $arguments.AllowUnreviewedEquivalent = -not $policy.acceptance
         }
         & "$PSScriptRoot/run-conformance.ps1" @arguments
         $code = $LASTEXITCODE
@@ -36,7 +47,10 @@ try {
         $records += [ordered]@{file='files.lua'; target=$target; report=$report;
             report_sha256=(Get-FileHash -LiteralPath $report -Algorithm SHA256).Hash.ToLowerInvariant();
             disposition=$observation.execution_disposition; status=$observation.status; context=$context;
-            exit_code=$code; scope_accepted=$false}
+            exit_code=$code; scope_accepted=$observation.scoped_operation_acceptance; contract=$contract}
+        if ($target -eq 'Ada' -and $policy.acceptance -and -not $observation.scoped_operation_acceptance) {
+            throw 'Scoped file acceptance missing'
+        }
         if ($code -ne 0 -or $observation.status -cne 'passed' -or
             @($observation.outcome.skip_messages).Count -ne 0) {
             throw "Scoped files observation failed: $target"
@@ -53,6 +67,8 @@ try {
         if ($IsWindows) {
             $expected = "'not-to-be-found-command' is not recognized as an internal or external command,`r`noperable program or batch file.`r`n" * 2
             if ($stderr -cne $expected) { throw "Unexpected scoped file stderr: $target" }
+        } elseif ($IsMacOS) {
+            $stderr = Convert-MacFilesError -Text $stderr
         } else {
             foreach ($line in $stderr.Split("`n", [StringSplitOptions]::RemoveEmptyEntries)) {
                 if ($line -notmatch '^(?:.*not-to-be-found-command.*|Hangup.*|Killed.*)$') {
@@ -65,9 +81,10 @@ try {
             throw 'Scoped C/Ada file output differs outside the final date value'
         }
     }
-    Write-Output "PASS: matching $Configuration scoped C/Ada file observations; semantic/mapping review pending"
+    $phase=if($policy.acceptance){'Ada scoped operation accepted; final matrix review pending'}else{'diagnostic observations; scoped acceptance pending'}
+    Write-Output "PASS: matching $Configuration scoped C/Ada file observations; $phase"
 } finally {
     [ordered]@{schema_version=1; scope='gc-io-events'; configuration=$Configuration; context=$context;
-        diagnostic_only=$true; scope_accepted=$false; observations=$records} |
+        diagnostic_only=(-not $policy.acceptance); scope_accepted=$false; observations=$records} |
         ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $directory 'index.json') -Encoding utf8
 }

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "kind": "independent-native-output-review",
+  "author": "Codex /root",
+  "reviewer": "Codex independent review agent /root/review_files",
+  "decision": "accepted-pid-only-normalization",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "bindings": [
+    {
+      "path": "scripts/FilesOutput.psm1",
+      "sha256": "f847742d2b5e89abbf3efe6e99f8499b01846f38a08dd5411d138156608d61ed"
+    },
+    {
+      "path": "scripts/test-files-output.ps1",
+      "sha256": "da776ef195974010752db2b36d4833f71f7ce2112c46b9acd08b9d8c00fddc23"
+    },
+    {
+      "path": "scripts/check-files-scoped.ps1",
+      "sha256": "a820219d1a909a2db4415962105b9ad4cf44406ce245324cfb6cf8f6dc31b7ab"
+    }
+  ],
+  "native_observation": {
+    "path": "reports/ci-artifacts/04b9968-mac-instrumented/conformance/f1ea0e28a6784b718a98c212e559c8b8/execution.stderr",
+    "sha256": "576799e66a8cc2b15c2254d8706a338399b536e78b4fc7965b2f97f1278148b5",
+    "scope": "Prior failed C-oracle file execution. Its first10stderr lines are expected shell diagnostics; subsequent date assertion/traceback remain failures."
+  },
+  "rationale": [
+    "Signal recognition is case-sensitive and anchored to sh: line1, positive decimal PID, Hangup signal1, spaces and the exact nested HUP command. Only the PID capture is replaced; remaining text/order/whitespace are preserved.",
+    "Six signal diagnostics and four exact missing-command diagnostics are required, matching diagnostic+counterpart+upstream operations. Unknown lines or wrong counts throw.",
+    "Mac-only scoped branch normalizes a local comparison string; raw recorded stderr and SHA256 remain unchanged. Both C and Ada undergo the same normalizer before equality comparison.",
+    "Successful source execution, final witnesses and zero exit remain prerequisites. Normalizing native stderr cannot hide the currently failing date assertion."
+  ],
+  "verification": [
+    "Executed all10 supplied normalizer regressions successfully.",
+    "Independently used the actual prior capture first10lines and verified normalized output differs only in six PID fields.",
+    "Independently passed the complete failed capture and confirmed rejection of the date assertion/traceback."
+  ],
+  "findings": [],
+  "limitations": [
+    "Pure normalizer checks are not Mac runtime acceptance. Corrected full C/Ada execution and final contexts remain pending.",
+    "Reviewed integration scope is the Mac stderr conversion/comparison only; unrelated scoped-acceptance policy changes in the same script are outside this review.",
+    "Counts6/4 depend on current diagnostic+counterpart+upstream setup and must be reviewed if that execution structure changes.",
+    "Raw bytes remain authoritative evidence; normalized text is only for paired native comparison."
+  ]
+}

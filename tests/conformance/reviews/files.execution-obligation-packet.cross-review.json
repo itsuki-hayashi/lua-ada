@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "kind": "independent-execution-obligation-packet-review",
+  "author": "Codex independent review agent /root/review_files",
+  "reviewer": "Codex independent review agent /root/review_gc",
+  "decision": "accepted-proposal-semantics",
+  "runtime_acceptance": false,
+  "bindings": [
+    {
+      "path": "tests/conformance/reviews/files.execution-obligation-packet.proposal.json",
+      "sha256": "70111e359f4a47dfef8269569d1e87fdc26b42d7072ad976d7fa6a66ea88e5ac"
+    },
+    {
+      "path": "tests/conformance/reviews/files.classification-proposal.json",
+      "sha256": "6e0827ec162d703bc4a06abb5f022ec1d66e1443dc1c5f59cae45bb8ccc7455c"
+    },
+    {
+      "path": "tests/conformance/equivalents/files-windows-platform.json",
+      "sha256": "b914b4572a90c7ad1b88ac8f8233e8b205b8fe4ee0042a89bbb3b864ed313970"
+    },
+    {
+      "path": "tests/conformance/equivalents/files-macos-platform.json",
+      "sha256": "d739ccf5aead9d12d24c67d3d676a1faf648636b07eb60fe0e4648768a678501"
+    },
+    {
+      "path": "tests/conformance/reviews/files-macos.equivalent-approval.json",
+      "sha256": "fe6af9557b6b06ecd60e82805af12cd508c64b21f63b84edb714e6c843e686e8"
+    },
+    {
+      "path": "tests/conformance/reviews/files-macos.semantic-cross-review.json",
+      "sha256": "5c9be4dd901171ef26f285ac51af6ee4d93c77af781038657be64ef7a42b7cb6"
+    }
+  ],
+  "checks": [
+    "All434uniqueidentities match344originalanchors+90reviewedblocks; all original byte spans/hashes verified against pinned source.",
+    "All input file hashes match; all final_evidence_bindings empty and runtime_acceptance false.",
+    "Windows/macOS replacement byte hashes and counterpart hashes verified for each linked span. Assertion305 intentionally maps Windows-span10 although its lexical assert token precedes changed input; the complete asserted expression is semantically changed.",
+    "Four macOS spans preserve separate buffered failure/native close result, unbuffered zero-byte refusal, and explicit outer nested-shell wait. Actual POSIX nonblocking receiver remains required.",
+    "T guard evaluation vs instrumented-only body/default omission preserved; generated receiver729 and native handle734 cannot be certified by default.",
+    "Generated date template851 links actual eight-field assertions and six invocation contexts; loadfile/reader and ten shell rows retain concrete execution requirements.",
+    "Native C-int/time/year/DST facts must match C/Ada and source branch matching preserves exact out-of-bound selector.",
+    "Full process/configuration/shutdown/allocator witnesses and exact finaldate/version are joint requirements; no broad skip or finalprint alone closes IO.",
+    "Prior failed macOS diagnostics and accepted semantic mapping remain distinct from corrected fullrun/final26 evidence."
+  ],
+  "findings": [],
+  "acceptance_limits": [
+    "Review accepts packet semantics only.",
+    "Strict future evidence replay must enforce each peranchor/configuration/native/equivalent requirement and expected source-bound stderr.",
+    "Corrected complete Mac C/Ada runs and final26context evidence remain pending."
+  ],
+  "execution_evidence": []
+}

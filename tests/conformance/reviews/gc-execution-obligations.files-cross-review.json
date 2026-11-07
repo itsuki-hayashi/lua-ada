@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "kind": "independent-execution-obligation-review",
+  "author": "Codex independent review agent /root/review_gc",
+  "reviewer": "Codex independent review agent /root/review_files",
+  "decision": "accepted-semantic-obligation-packet",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "proposal": {
+    "path": "tests/conformance/reviews/gc-execution-obligations.proposal.json",
+    "sha256": "1f39db965cff5d4ac71f1dd07370eeb28a7dca38ccbf07e5c1dc8667c7753855"
+  },
+  "source_bindings": [
+    {
+      "path": "references/lua/testes/gc.lua",
+      "sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99"
+    },
+    {
+      "path": "references/lua/testes/gengc.lua",
+      "sha256": "5a7a6e525752c97221fbabc4ea4374692e59b3167f6f836d10ceffef16574e03"
+    },
+    {
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json",
+      "sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e"
+    },
+    {
+      "path": "tests/c/conformance_adapter.c",
+      "sha256": "9f97b86315630bff7fcffb4e95a440992b9f9d0e493572fa28672a32bec79a4b"
+    },
+    {
+      "path": "experiments/conformance/c/bounded_ltests.c",
+      "sha256": "78ae618e2ba95fd2caee688fa992e8a366dbd43ca96b43ad658d2a29d6693f30"
+    },
+    {
+      "path": "experiments/conformance/c/conformance_cli.c",
+      "sha256": "cfd0f64c1e10e172413cb9d41d7632f1b5b5d519fef30648b142c9e7e3f8ad26"
+    },
+    {
+      "path": "tests/src/lua-conformance_allocator.adb",
+      "sha256": "8dda4fb7b3cb09b4fbaf6b5361d5b7caad17d546f5e6667129932834defd51e6"
+    },
+    {
+      "path": "tests/conformance/reviews/gc-shutdown-counter.cross-review.json",
+      "sha256": "779a7a96eec40f76370e5c28b605bb83f8a44f37ed0b5177e79251338885eab3"
+    }
+  ],
+  "verification": [
+    "All155 packet IDs, exact source spans/hashes and configuration sets independently verified against pinned files and current ledger.",
+    "Checked gc T guards, stored-warning phases, dynamic helpers, retained shutdown callbacks, and gengc default return at130 before T-only userdata/stepsize/codec tail.",
+    "Four Ada replacement identities are source-overlap indices into independently approved semantics, not new unchanged passes. Measured weak payload/emergency storage and stable-cell color counterparts remain required alongside whole-file execution.",
+    "Default not-T short circuit does not evaluate metadata operands; separate instrumented blocks12–15 retain actual age/color obligations.",
+    "Physical stack/frame/refusal evidence remains an explicitly unresolved replay dependency rather than inferred from zero aggregate allocation residue."
+  ],
+  "shutdown_counter_review": [
+    "Unique @expected warning is raised only after ordinal/prior-warning assertions in the ten retained source callbacks. Missing or failed trailing callback reduces completed matching-warning count; duplicate matching delivery exceeds10.",
+    "Ada observer increments after successful existing warning handling/storage and stack restoration. C observer invokes original pinned handler with unchanged userdata before counting completed assembled messages.",
+    "Telemetry is emitted after state-close completion; exact integer count10 is required in the same isolated process together with original order/_WARN assertions, closing marker, clean shutdown and zero residue.",
+    "Process-scoped reset and fragment capacity/overflow rules are explicit; this is not a general multi-state callback-count guarantee."
+  ],
+  "findings": [
+    {
+      "id": "GC-PACKET-X1",
+      "severity": "P2",
+      "issue": "Active packet Scope/adapter bindings stale after reviewed counter additions; refresh while preserving historical identities."
+    },
+    {
+      "id": "GC-PACKET-X2",
+      "severity": "P2",
+      "issue": "Current counter-review Scope/test bindings stale after Mac marker changes; inspect and refresh, retaining historical reviewed hashes."
+    },
+    {
+      "id": "GC-PACKET-X3",
+      "severity": "P2",
+      "issue": "Place exact post-close integer expected_finalizer_warnings10 requirement directly in BLOCK26/common instrumented contract; keep prior missing-count finding historical/source-resolved but runtime-pending."
+    }
+  ],
+  "limitations": [
+    "No build or runtime process executed by this reviewer.",
+    "Historical810e254 captures predate warn-on hardening and cannot establish final revision acceptance.",
+    "Final26 applicable contexts, corrected warning behavior, physical replay and exact shutdown count require actual final evidence."
+  ],
+  "execution_evidence": [],
+  "initial_proposal_binding": {
+    "path": "tests/conformance/reviews/gc-execution-obligations.proposal.json",
+    "sha256": "1f39db965cff5d4ac71f1dd07370eeb28a7dca38ccbf07e5c1dc8667c7753855"
+  },
+  "accepted_delta": {
+    "resolved_findings": [
+      "GC-PACKET-X1",
+      "GC-PACKET-X2",
+      "GC-PACKET-X3"
+    ],
+    "verification": "All packet active bindings and current counter-review source bindings rehashed successfully; candidate review hash matches. BLOCK26 explicitly requires numeric int/int64 exactly10 in each C/Ada same-process post-close telemetry. Original missing-count finding now marked historical/source-resolved/runtime-pending.",
+    "counter_review": {
+      "path": "tests/conformance/reviews/gc-shutdown-counter.cross-review.json",
+      "sha256": "779a7a96eec40f76370e5c28b605bb83f8a44f37ed0b5177e79251338885eab3"
+    },
+    "runtime_acceptance": false
+  }
+}

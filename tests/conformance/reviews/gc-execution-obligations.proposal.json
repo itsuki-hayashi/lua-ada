@@ -30,7 +30,7 @@
       "path": "tests/conformance/reviews/gc-aunit-context-replay.proposal.json"
     },
     {
-      "sha256": "f126875c609f56c950fde0fbe9cdc71636741475b0551195438ece5502e5899a",
+      "sha256": "b7004226e10dbc533a1df0bec6569e02247a215530bbcdcbd8786f31abe3ee2f",
       "path": "scripts/ConformanceScope.psm1"
     },
     {
@@ -38,7 +38,7 @@
       "path": "scripts/ManagedTelemetry.psm1"
     },
     {
-      "sha256": "bf6b12115bd9e97f2a3acdec21c291fce3649410eb5df8815c23c02010788c45",
+      "sha256": "9f97b86315630bff7fcffb4e95a440992b9f9d0e493572fa28672a32bec79a4b",
       "path": "tests/c/conformance_adapter.c"
     }
   ],
@@ -72,7 +72,8 @@
     "default_gengc_skip": "Exactly the source omission text: >>> testC not active: skipping some generational tests <<<, then OK and return. Blocks8-11 and exact T metadata12-15 need instrumented evidence.",
     "instrumented_skips": "No testC-not-active or other skip/omission output allowed.",
     "gc_stdout": "Require entry marker, steps, creating many objects, functions with errors, long strings, clearing tables, weak tables, long list, self-referenced threads, exact OK then later exact >>> closing state <<<. Instrumented additionally emergency collections and testing stack issues when calling finalizers.",
-    "gengc_stdout": "Require testing generational garbage collection and exact OK; instrumented additionally testing stop-the-world collection. Callback metatable output and source-reachable assertions remain reviewed paths, not arbitrary process success."
+    "gengc_stdout": "Require testing generational garbage collection and exact OK; instrumented additionally testing stop-the-world collection. Callback metatable output and source-reachable assertions remain reviewed paths, not arbitrary process success.",
+    "instrumented_gc_shutdown_count": "Same-process post-close telemetry expected_finalizer_warnings must be numeric int/int64 exactly10 for both C and Ada instrumented gc.lua; require existing ordered OK/closing marker and balanced shutdown too."
   },
   "witness_class_rules": {
     "measured-storage-or-AUnit": "Actual runtime measurement assertions and source-bound named AUnit evidence; aggregate case count insufficient.",
@@ -3513,7 +3514,7 @@
       ],
       "equivalent_replacements": [],
       "common_witness_contract": "GC-CONTEXT",
-      "additional_requirements": "Ten retained callbacks execute in reverse enrollment order after top-level OK; callback ordinals 1,2,3..10 exercise all warning-storage branches. Unexpected callback warnings fail the run.",
+      "additional_requirements": "Ten retained callbacks execute in reverse enrollment order after top-level OK; callback ordinals 1,2,3..10 exercise all warning-storage branches. Unexpected callback warnings fail the run.Same-process post-close telemetry expected_finalizer_warnings is numeric int/int64 exactly10; C and Ada each require actual completed delivery count plus original order/_WARN assertions.",
       "status": "proposal-only",
       "execution_evidence": []
     },
@@ -4609,7 +4610,9 @@
       "id": "GC-CLOSE-COUNT",
       "obligation": "LUA-GC-REVIEWED-BLOCK-0026",
       "finding": "Ten shutdown callbacks keep n local and only the later separate finalizer prints a marker. Skipping trailing callbacks could avoid their assertions while retaining OK/closing marker and balanced physical disposal.",
-      "required_resolution": "Provide independently reviewed exact shutdown callback count/order and expected stored-warning delivery evidence, e.g test-only observer of ten @expected warning deliveries plus existing ordinal assertions, or source-bound equivalent callback-count regression. Do not infer ten invocations from marker alone."
+      "required_resolution": "Provide independently reviewed exact shutdown callback count/order and expected stored-warning delivery evidence, e.g test-only observer of ten @expected warning deliveries plus existing ordinal assertions, or source-bound equivalent callback-count regression. Do not infer ten invocations from marker alone.",
+      "status": "historical gap: resolved at reviewed source level by real warning counter; actual final-context replay pending",
+      "resolution_review": "tests/conformance/reviews/gc-shutdown-counter.cross-review.json"
     },
     {
       "id": "GC-PHYSICAL-REPLAY",
@@ -4626,9 +4629,47 @@
   "execution_evidence": [],
   "shutdown_count_candidate": {
     "review": "tests/conformance/reviews/gc-shutdown-counter.cross-review.json",
-    "review_sha256": "a8fbe919612b377d5cf68b5dbc4702a533712dd13a924df2508e676dec1f0f73",
+    "review_sha256": "779a7a96eec40f76370e5c28b605bb83f8a44f37ed0b5177e79251338885eab3",
     "resolution": "Actual complete warning deliveries observed after underlying test handler succeeds, required exactly10 in same-process post-close telemetry for instrumentedgc.",
     "status": "source-reviewed including integer-schema hardening; actual final-context replay pending",
     "runtime_acceptance": false
-  }
+  },
+  "historical_bindings": [
+    {
+      "sha256": "90c868e396f05f1709271ae9238a4ade1f3c109154e0683762cb6b1d5fdb85cb",
+      "path": "tests/conformance/coverage/gc.jsonl"
+    },
+    {
+      "sha256": "9f1c9fc1182c5d5992eefa026bc0f4627173c6f25752de70ed7074a603334eeb",
+      "path": "tests/conformance/coverage/gengc.jsonl"
+    },
+    {
+      "sha256": "8165f338c8a64c2ac154673c0e26477f4dfabee7e0153b35c7eb1b9c87dfe963",
+      "path": "tests/conformance/reviews/gc-gengc.anchor-classification-proposal.json"
+    },
+    {
+      "sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e",
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json"
+    },
+    {
+      "sha256": "bf1668acb83299a3dc9107df9c54ecfd25e58dc1dbe524a02fff307b368547c6",
+      "path": "tests/conformance/reviews/gc-ada.equivalent-approval.json"
+    },
+    {
+      "sha256": "dab45c62c54b32f90d1856a159dbcaad69a575c90990e1fe68ba09e5da197c31",
+      "path": "tests/conformance/reviews/gc-aunit-context-replay.proposal.json"
+    },
+    {
+      "sha256": "b7004226e10dbc533a1df0bec6569e02247a215530bbcdcbd8786f31abe3ee2f",
+      "path": "scripts/ConformanceScope.psm1"
+    },
+    {
+      "sha256": "cda5cebf49c22e5b1f37560e776bc1506db66ba78a1f4217a59c45b3a9ff4f3e",
+      "path": "scripts/ManagedTelemetry.psm1"
+    },
+    {
+      "sha256": "9f97b86315630bff7fcffb4e95a440992b9f9d0e493572fa28672a32bec79a4b",
+      "path": "tests/c/conformance_adapter.c"
+    }
+  ]
 }

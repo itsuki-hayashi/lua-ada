@@ -270,3 +270,5 @@ Write-Output "PASS: $script:cases matrix regressions; no executed conformance cl
 & (Join-Path $PSScriptRoot 'test-consumer-evidence.ps1')
 & (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')
 & (Join-Path $PSScriptRoot 'test-matrix-named-evidence.ps1')
+& (Join-Path $PSScriptRoot 'test-scoped-acceptance-policy.ps1')
+& (Join-Path $PSScriptRoot 'test-files-output.ps1')

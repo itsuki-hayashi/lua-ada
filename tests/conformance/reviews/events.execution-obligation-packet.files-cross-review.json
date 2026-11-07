@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "independent-execution-obligation-review",
+  "author": "Codex /root/review_events_harness",
+  "reviewer": "Codex independent review agent /root/review_files",
+  "decision": "accepted-semantic-obligation-packet",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "proposal": {
+    "path": "tests/conformance/reviews/events.execution-obligation-packet.proposal.json",
+    "sha256": "26db79a99b321221f12862be1d4262ea8f6087c817bbee22ec27c7407c4e2f74"
+  },
+  "source_bindings": [
+    {
+      "path": "references/lua/testes/events.lua",
+      "sha256": "90449c1607a12a7c1841123a68237e0d23b7d6e109b8c445937fcd99306897c9"
+    },
+    {
+      "path": "tests/conformance/coverage/events.jsonl",
+      "sha256": "e6446283933508b15dc410d825287d8e9156daed2f026c491433df4b3632a27a"
+    },
+    {
+      "path": "tests/conformance/reviews/events.classification-proposal.jsonl",
+      "sha256": "d5f6ba1600af8d3498d18d936c9aeec192122a0182085dbf34851d055eb0f4c5"
+    },
+    {
+      "path": "tests/conformance/reviews/events-api.files-cross-review.json",
+      "sha256": "0150eea8ce2e4985eb3a912fcb8d50e097920df91d7db24e57443af00b481fc8"
+    },
+    {
+      "path": "tests/conformance/scopes/gc-io-events.api.jsonl",
+      "sha256": "97e1d2e96dbe0a0d2063ad43c75f7dc1dd5fcc7ac5b50a183b1adcc6c55fbba8"
+    },
+    {
+      "path": "scripts/ConformanceScope.psm1",
+      "sha256": "b7004226e10dbc533a1df0bec6569e02247a215530bbcdcbd8786f31abe3ee2f"
+    },
+    {
+      "path": "scripts/ConformanceMatrix.psm1",
+      "sha256": "1422bca694859abc2659627ef4eb0adab397043664fa793d112591b4e2bbc1ba"
+    },
+    {
+      "path": "scripts/run-conformance.ps1",
+      "sha256": "c0e9afaf7a7700fb5605097dc6de2421110bd841726f2c2c25cd932159a20e91"
+    }
+  ],
+  "verification": {
+    "records": 149,
+    "assertions": 147,
+    "reviewed_blocks": 1,
+    "manual_audits": 1,
+    "details": [
+      "All149 IDs/source spans/hashes/configuration sets match ledger; each context list is the correct filtered subset of26. All active semantic/source references match current hashes.",
+      "checkcap executes after every operator expression through189, checking operand count/value/math.type; comparison helper call at248 executes its callback assertions. Ordinary t references stay distinct from T adapter.",
+      "Six userdata assertions110–115 are instrumented-only. Default exact omission text matches pinned z-escape semantics and both actual historical default captures.",
+      "Silent weak delegation runs ten assignments in default; instrumented injects once before the same loop, with same-process Ada managed_refusals>=1. C wrapper zero counter is not misused as proof that ltests refusal did not happen.",
+      "Whole-file audit is review-only; final OK/process exit alone never promotes an assertion. Source return12 is explicitly not claimed measured by ordinary CLI.",
+      "All four historical reports match stated target/revision/configuration/context/status; independently rehashed all eight stdout/stderr captures. Historical labels are not final evidence."
+    ]
+  },
+  "historical_capture_checks": [
+    {
+      "path": "reports/ci-artifacts/18fbf83-mac-diagnostic/reports/conformance/a9707eec99254cf6b530ac5631a45c54/execution.stdout",
+      "sha256": "ad01a825c3e4bd9cb146f97f10c279baf02ab41943186f9203b208b014deaf54",
+      "use": "Historical capture identity only; no final-context acceptance"
+    },
+    {
+      "path": "reports/ci-artifacts/18fbf83-mac-diagnostic/reports/conformance/a9707eec99254cf6b530ac5631a45c54/execution.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "use": "Historical capture identity only; no final-context acceptance"
+    },
+    {
+      "path": "reports/ci-artifacts/18fbf83-mac-diagnostic/reports/conformance/b2604d3b79f0428ba39eeeb481bc45f9/execution.stdout",
+      "sha256": "ad01a825c3e4bd9cb146f97f10c279baf02ab41943186f9203b208b014deaf54",
+      "use": "Historical capture identity only; no final-context acceptance"
+    },
+    {
+      "path": "reports/ci-artifacts/18fbf83-mac-diagnostic/reports/conformance/b2604d3b79f0428ba39eeeb481bc45f9/execution.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "use": "Historical capture identity only; no final-context acceptance"
+    },
+    {
+      "path": "reports/ci-artifacts/810e254-linux-static/reports/conformance/4d9977854c2041d4a3c1462e5f558d70/execution.stdout",
+      "sha256": "17104754e071dda08030c7baf2dc81894ba3ffd628395e159a3ef91f4cb9bd1a",
+      "use": "Historical capture identity only; no final-context acceptance"
+    },
+    {
+      "path": "reports/ci-artifacts/810e254-linux-static/reports/conformance/4d9977854c2041d4a3c1462e5f558d70/execution.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "use": "Historical capture identity only; no final-context acceptance"
+    },
+    {
+      "path": "reports/ci-artifacts/810e254-linux-static/reports/conformance/a777a1754c0d419cacc8e94616a8e6b2/execution.stdout",
+      "sha256": "17104754e071dda08030c7baf2dc81894ba3ffd628395e159a3ef91f4cb9bd1a",
+      "use": "Historical capture identity only; no final-context acceptance"
+    },
+    {
+      "path": "reports/ci-artifacts/810e254-linux-static/reports/conformance/a777a1754c0d419cacc8e94616a8e6b2/execution.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "use": "Historical capture identity only; no final-context acceptance"
+    }
+  ],
+  "findings": [],
+  "limitations": [
+    "This is source/control-flow mapping review, not final execution acceptance.",
+    "Real standard streams, strict warning rejection, balanced physical shutdown and correct executable/library/configuration provenance remain required.",
+    "Actual final26contexts and independent per-obligation evidence replay remain pending; all final_evidence arrays stay empty."
+  ]
+}

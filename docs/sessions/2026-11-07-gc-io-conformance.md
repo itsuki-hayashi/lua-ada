@@ -870,3 +870,23 @@ f142d2452ede5db32d23256c351db44d713305b0a27654d1021497cb82e9efbf.
 Corrected Mac execution, final26contexts and per-obligation evidence promotion
 remain pending. GC/files execution packets are review proposals with empty
 final evidence bindings; no original coverage status was promoted.
+
+At published04b9968, Mac instrumented static job128252923753 passes the
+corrected shell counterpart and reaches the date checks. Artifact13554521443
+has archiveSHA14ebfcfd2dffe576557cea9a60aee17334cd5b5279c3a1e31a7bc035cae98702.
+The C oracle fails original files.lua926 (maximum-year second60 expected
+error); this does not distinguish a native success from a different error.
+Protected diagnostic probes now record second59/60/61 normalized calendars,
+reverse conversion and direct next-year input without replacing assertions.
+The captured expected shell diagnostics also contain PIDs; a Mac-only checker
+normalizes only that field in the exact observed nested-HUP line and requires
+six such lines and four exact missing-command messages. Ten synthetic output
+regressions pass; corrected native date observations remain pending.
+
+The independently reviewed scoped acceptance policy now switches completed
+ledgers to mandatory reviewed execution contracts, retaining diagnostic mode
+only while source/API obligations remain unresolved. Eleven policy regressions
+pass. No obligations are promoted here and full-M3 acceptance remains false.
+The latest complete local default/instrumented validation-static pipelines each
+pass1306 AUnit cases and four-file observations, but include uncommitted review
+work and therefore are not clean final-revision acceptance evidence.
