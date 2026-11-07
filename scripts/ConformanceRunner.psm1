@@ -248,11 +248,17 @@ function Test-ConformanceAcceptance {
           [Parameter(Mandatory)][long] $AllocatorLimitBytes,
           [bool] $CoverageComplete = $false,
           [System.Collections.IDictionary] $CoverageRecords = @{},
-          [System.Collections.IDictionary] $Telemetry)
+          [System.Collections.IDictionary] $Telemetry,
+          [ValidateSet('strict-upstream','remaining-upstream-compatibility')]
+          [string] $TargetPolicy = 'strict-upstream',
+          [Collections.IDictionary] $ResolvedExclusions = @{})
     # A process observation deliberately carries no coverage authority. This
     # second, explicit gate requires the reviewed execution protocol AND the
     # complete source/API ledger. Callers cannot promote an OK marker alone.
     if (-not $CoverageComplete) { throw 'Complete reviewed coverage is required for acceptance' }
+    if ($TargetPolicy -ceq 'strict-upstream' -and $ResolvedExclusions.Count -ne 0) {
+        throw 'Strict upstream execution cannot consume target exclusions'
+    }
     foreach ($field in @('schema_version','operation','context','reference_revision',
                           'source_hashes','review','completion_marker','stdout_required',
                           'stderr_expected','expected_skips')) {
@@ -320,6 +326,7 @@ function Test-ConformanceAcceptance {
     }
     $expectedSkips = @($Contract.expected_skips)
     $actualSkips = @($Outcome.skip_messages)
+    $excludedOmissions = @{}
     if ($expectedSkips.Count -ne $actualSkips.Count) { throw 'Unreviewed or missing omission message' }
     foreach ($skip in $expectedSkips) {
         $expectedCount = @($expectedSkips | Where-Object { $_.message -ceq $skip.message }).Count
@@ -336,6 +343,27 @@ function Test-ConformanceAcceptance {
                 throw "Omission names an unknown coverage obligation: $id"
             }
             $record = $CoverageRecords[$id]
+            if ($TargetPolicy -ceq 'remaining-upstream-compatibility' -and $ResolvedExclusions.Contains($id)) {
+                # The inventory caller has already checked original bytes and
+                # independent exclusion authority. Only a genuine default-T
+                # absence may link to that decision here. It remains a named
+                # exclusion, without inventing instrumented execution proof.
+                $excluded = $ResolvedExclusions[$id]
+                if ($Configuration -cne 'default' -or $skip.message -cnotmatch 'testC not active' -or
+                    $record.kind -cnotin @('assert-call','reviewed-block') -or $record.status -cne 'pending' -or
+                    $excluded.id -cne $id -or $excluded.status -cne 'excluded' -or
+                    $excluded.disposition -cne 'reviewed-t-internal-exclusion' -or
+                    $excluded.eligibility -cne 't-only-private-invariant' -or
+                    @($excluded.configurations).Count -ne 1 -or $excluded.configurations[0] -cne 'upstream-test' -or
+                    $excluded.public_api -isnot [bool] -or $excluded.public_api -or
+                    $excluded.mixed_obligation -isnot [bool] -or $excluded.mixed_obligation -or
+                    $excluded.module_observable -isnot [bool] -or $excluded.module_observable -or
+                    @($excluded.evidence).Count -ne 0) {
+                    throw "Omission cannot use this target exclusion: $id"
+                }
+                $excludedOmissions[$id] = $true
+                continue
+            }
             if ($record.status -cne 'passed' -or
                 $record.kind -notin @('assert-call','reviewed-block') -or
                 @($record.evidence | Where-Object { $_.result -ceq 'passed' }).Count -eq 0) {
@@ -379,7 +407,8 @@ function Test-ConformanceAcceptance {
         throw 'heavy.lua did not demonstrate caught managed-allocation refusal'
     }
     return [ordered]@{ gate_acceptance=$true; operation=$Operation; context=$Context;
-        review_artifact=$review.artifact; allocator_telemetry_verified=$true }
+        review_artifact=$review.artifact; allocator_telemetry_verified=$true;
+        excluded_omissions=@($excludedOmissions.Keys | Sort-Object) }
 }
 
 function Copy-ConformanceFixtures {

@@ -14,6 +14,9 @@ param(
     [switch] $RequireAcceptance,
     [ValidateSet('', 'gc-io-events','expanded-t-conformance')][string] $Scope = '',
     [switch] $RequireScopedAcceptance,
+    [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy = '',
+    [switch] $RequireTargetAcceptance,
+    [ValidatePattern('^[a-z0-9]+(?:-[a-z0-9]+)*$')][string] $Variant = 'primary',
     [ValidateSet(0,1)][int] $ConstructsBranch = 0,
     [string] $EquivalentManifest = '',
     [switch] $AllowUnreviewedEquivalent
@@ -38,13 +41,31 @@ if ($RequireAcceptance -and ($Scope -ne '' -or $RequireScopedAcceptance)) {
 if ($RequireScopedAcceptance -and ($Scope -eq '' -or $Target -ne 'Ada')) {
     throw 'Scoped acceptance requires the named scope and actual Ada target'
 }
+if (($TargetPolicy -ne '' -and ($Scope -ne '' -or $RequireAcceptance -or $RequireScopedAcceptance)) -or
+    ($RequireTargetAcceptance -and ($TargetPolicy -eq '' -or $Target -cne 'Ada')) -or
+    ($TargetPolicy -eq '' -and $Variant -cne 'primary')) {
+    throw 'Full-target policy and acceptance must be selected explicitly and separately from historical modes'
+}
+if ($TargetPolicy -ne '' -and $Mode -cnotin @('File','Aggregate','Heavy')) {
+    throw 'Full-target policy requires File, Aggregate or Heavy mode'
+}
+if ($TargetPolicy -ne '' -and $Mode -ceq 'File' -and $File -ceq 'constructs.lua') {
+    $expectedVariant = if ($ConstructsBranch -eq 1) { 'constructs-branch-1' } else { 'primary' }
+    if ($Variant -cnotin @('primary',$expectedVariant)) { throw 'Constructs variant differs from its requested real template' }
+    $Variant = $expectedVariant
+}
+$isolatedLauncher = $Scope -ne '' -or $TargetPolicy -ne ''
+$hasProfileWitness = $Scope -ceq 'expanded-t-conformance' -or ($TargetPolicy -ne '' -and $Mode -ceq 'File')
 if ($Scope -ne '') {
     $scopePolicy = Get-ConformanceScopePolicy -Scope $Scope
     if ($Mode -ne 'File' -or $File -cnotin $scopePolicy.Files) {
         throw 'Named scope requires File mode and one of its selected primary files'
     }
 }
-$acceptanceRequested = $RequireAcceptance -or $RequireScopedAcceptance
+$acceptanceRequested = $RequireAcceptance -or $RequireScopedAcceptance -or $RequireTargetAcceptance
+if ($TargetPolicy -ne '' -and $EquivalentManifest -ne '') {
+    throw 'Full-target equivalent execution replay is not implemented'
+}
 if (($EquivalentManifest -ne '' -and $Scope -eq '') -or
     ($AllowUnreviewedEquivalent -and ($EquivalentManifest -eq '' -or $acceptanceRequested))) {
     throw 'Unreviewed equivalents are scoped observations only, never acceptance'
@@ -75,6 +96,15 @@ $evidence = [ordered]@{
     status = 'setup-failed'
     gate_acceptance = $false
     coverage_scope = $Scope
+    target_policy = $TargetPolicy
+    target_acceptance_requested = [bool]$RequireTargetAcceptance
+    target_operation_acceptance = $false
+    target_complete = $false
+    synthetic_fixture = $false
+    variant = $Variant
+    excluded_obligations = @()
+    excluded_omissions = @()
+    exclusion_policy_sha256 = $null
     scoped_acceptance_requested = [bool]$RequireScopedAcceptance
     scoped_operation_acceptance = $false
     scope_complete = $false
@@ -97,7 +127,7 @@ $evidence = [ordered]@{
     launcher_identity = $null
     launcher_probe_run_id = $null
     launcher_probe_telemetry = @()
-    constructs_branch = $(if ($File -ceq 'constructs.lua' -and $Scope -ceq 'expanded-t-conformance') { $ConstructsBranch } else { $null })
+    constructs_branch = $(if ($File -ceq 'constructs.lua' -and $hasProfileWitness) { $ConstructsBranch } else { $null })
     execution_disposition = 'unchanged'
     equivalent = $null
     repl_preflight_process = $null
@@ -254,6 +284,35 @@ try {
             throw 'Scoped context does not identify this configuration and host'
         }
     }
+    if ($TargetPolicy -ne '') {
+        $evidence.coverage_validation = Test-ConformanceInventory -Root $root -TargetPolicy $TargetPolicy
+        $policyPath = Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility.exclusions.json'
+        $evidence.exclusion_policy_sha256 = (Get-FileHash -LiteralPath $policyPath).Hash.ToLowerInvariant()
+        if ($Context -cnotin $suite.acceptance_contexts -or
+            -not $Context.StartsWith("$Configuration/$($evidence.host.platform)/")) {
+            throw 'Full-target context does not identify this configuration and host'
+        }
+        if ($Mode -ceq 'File' -and $File -cnotin @($suite.files | Where-Object role -CEQ primary | ForEach-Object path)) {
+            throw 'Full-target File mode requires one of the 30 scheduled primary sources'
+        }
+        if ($Target -ceq 'Ada' -and $Configuration -ceq 'upstream-test') {
+            $evidence.excluded_obligations = @($evidence.coverage_validation.Exclusions | Where-Object {
+                ($Mode -ceq 'Aggregate' -and $_.source -cne 'heavy.lua') -or
+                ($Mode -ceq 'Heavy' -and $_.source -ceq 'heavy.lua') -or
+                ($Mode -ceq 'File' -and $_.source -ceq $File)
+            } | ForEach-Object id | Sort-Object)
+            if ($evidence.excluded_obligations.Count -gt 0) {
+                throw 'Full-target T adaptation execution replay is not implemented'
+            }
+        }
+        if ($RequireTargetAcceptance) {
+            if ($evidence.coverage_validation.PendingApiEntries -gt 0) {
+                throw 'Full-target global public API coverage remains unresolved'
+            }
+            $evidence.coverage_validation = Test-ConformanceInventory -Root $root `
+                -TargetPolicy $TargetPolicy -RequireComplete
+        }
+    }
     if ($acceptanceRequested) {
         # Observation mode remains useful during implementation. Final mode is
         # deliberately opt-in and cannot be softened by ReportOnly or an absent
@@ -294,7 +353,7 @@ try {
             throw "Manifest source hash mismatch: $($item.path)"
         }
     }
-    if ($Scope -ne '') {
+    if ($isolatedLauncher) {
         # Both bare lua and arg-selected children use this exact immutable
         # launcher. The source fixture tree remains unchanged and hash-checked.
         $selectedInterpreter = $Interpreter
@@ -311,7 +370,7 @@ try {
         LUA_ADA_CONFORMANCE_ALLOCATOR = [string]$evidence.allocator_limit_bytes
         MEMLIMIT = [string]$evidence.allocator_limit_bytes
     }
-    if ($Scope -ne '') {
+    if ($isolatedLauncher) {
         # Probe states finish before the selected file starts. Retain their
         # independent shutdown records without contaminating the file's child
         # count or allowing probe refusals to stand in for a tested refusal.
@@ -413,7 +472,7 @@ try {
         $observed = [IO.File]::ReadAllText($probe.stdout_path) | ConvertFrom-Json -AsHashtable
         [void](Test-ConformanceConfiguration -Observed $observed -Configuration $Configuration `
             -Target Ada -AllocatorLimitBytes $evidence.allocator_limit_bytes)
-        if ($Scope -ne '' -and $Context -ne '') {
+        if ($isolatedLauncher -and $Context -ne '') {
             Assert-ScopedBuildIdentity -Observed $observed -Context $Context
         }
         $evidence.observed_configuration = $observed
@@ -443,12 +502,12 @@ try {
             Build-Fixtures -Directory $fixtureDirectory `
                 -LibraryDirectory (Resolve-Path -LiteralPath $NativeLibraryDirectory).Path -LibraryName lua
         }
-        elseif ($RequireAcceptance) {
+        elseif ($RequireAcceptance -or $RequireTargetAcceptance) {
             throw 'Ada acceptance needs NativeLibraryDirectory for actual upstream C fixture modules'
         }
         }
     }
-    if ($Scope -ne '') {
+    if ($isolatedLauncher) {
         $argCode = 'local i=0; while arg[i] do i=i-1 end; local exe=arg[i+1]; '
         $argCode += if ($IsWindows) {
             'local command=''""''..exe..''" --conformance-config"''; '
@@ -479,7 +538,8 @@ try {
         }
         Assert-ScopedProbeTelemetry -Telemetry $probeTelemetry `
             -Processes @{parent=$probe; bare=$child; arg=$argChild} `
-            -RunId $evidence.launcher_probe_run_id -Configuration $Configuration -Target $Target
+            -RunId $evidence.launcher_probe_run_id -Configuration $Configuration -Target $Target `
+            -LimitBytes $evidence.allocator_limit_bytes
     }
     $marker = ''
     $arguments = @()
@@ -578,7 +638,7 @@ try {
                 artifact_sha256=(Get-FileHash $counterpartCopy).Hash.ToLowerInvariant()}
         }
     }
-    if ($Scope -ne '' -and $File -eq 'files.lua') {
+    if ($isolatedLauncher -and $File -eq 'files.lua') {
         # Upstream's read-only no-buffer example ignores its write result. The
         # separate C/Ada counterpart proves immediate visibility through a
         # second native handle, without adding any unmeasured subprocess.
@@ -615,7 +675,7 @@ try {
             disposition='native-platform-equivalent'}
         $nativeSetup += "; dofile('equivalent-files-native-branches.lua')"
     }
-    if ($Scope -ne '') {
+    if ($isolatedLauncher) {
         # Enable normal warnings before upstream execution, including close-time
         # finalizers. Otherwise the test handler's initial off state can hide
         # early assertions before a source explicitly enables its warnings.
@@ -626,7 +686,7 @@ try {
         if ($File -eq 'files.lua' -and $Configuration -eq 'upstream-test' -and -not $IsWindows) {
             $setup += "; assert(type(T.nonblock)=='function')"
         }
-        if ($Scope -ceq 'expanded-t-conformance') {
+        if ($hasProfileWitness) {
             $profileWitness = Join-Path $root 'tests/conformance/source-profile-witness.lua'
             $profileCopy = Join-Path $fixtureDirectory 'equivalent-source-profile-witness.lua'
             Copy-Item -LiteralPath $profileWitness -Destination $profileCopy
@@ -637,7 +697,7 @@ try {
                 source_sha256=$sourceHash; artifact=$profileCopy; artifact_sha256=$copyHash}
             $setup += "; dofile('equivalent-source-profile-witness.lua')"
         }
-        if ($File -eq 'bitwise.lua' -and $Scope -ceq 'expanded-t-conformance') {
+        if ($File -eq 'bitwise.lua' -and $hasProfileWitness) {
             $wrapper = Join-Path $root 'tests/conformance/bitwise-helper-witness.lua'
             $wrapperCopy = Join-Path $runRoot 'equivalent-bitwise-helper-witness.lua'
             Copy-Item -LiteralPath $wrapper -Destination $wrapperCopy
@@ -648,7 +708,7 @@ try {
                 source_sha256=$sourceHash; artifact=$wrapperCopy; artifact_sha256=$copyHash}
             $arguments = @($wrapperCopy)
         }
-        if ($File -eq 'constructs.lua' -and $Scope -ceq 'expanded-t-conformance') {
+        if ($File -eq 'constructs.lua' -and $hasProfileWitness) {
             $wrapper = Join-Path $root 'tests/conformance/constructs-seeded.lua'
             $wrapperCopy = Join-Path $runRoot 'equivalent-constructs-seeded.lua'
             Copy-Item -LiteralPath $wrapper -Destination $wrapperCopy
@@ -671,9 +731,17 @@ try {
             $arguments = @($wrapperCopy)
         }
         $arguments = @('-e', ($setup + $nativeSetup)) + $arguments
-        if ($File -ne 'files.lua') { $marker = if ($File -ceq 'utf8.lua') { 'ok' } else { 'OK' } }
+        if ($Mode -ceq 'File' -and $File -ne 'files.lua') {
+            # These three originals deliberately return before OK when T is
+            # absent. Preserve that measured omission; the reviewed contract
+            # must link its body to instrumented evidence or approved target
+            # exclusions rather than inventing a completion marker.
+            $marker = if ($TargetPolicy -ne '' -and $Configuration -ceq 'default' -and
+                $File -cin @('api.lua','code.lua','memerr.lua')) { '' }
+                elseif ($File -ceq 'utf8.lua') { 'ok' } else { 'OK' }
+        }
     }
-    if ($acceptanceRequested -or $Scope -ne '') {
+    if ($acceptanceRequested -or $isolatedLauncher) {
         $environment.LUA_ADA_CONFORMANCE_RUN_ID = $runId
         $environment.LUA_ADA_CONFORMANCE_TELEMETRY = Join-Path $runRoot 'allocator'
     }
@@ -681,7 +749,7 @@ try {
         -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'execution') `
         -TimeoutSeconds $evidence.timeout_seconds -Environment $environment
     $evidence.outcome = Get-ConformanceOutcome -Process $evidence.process -Marker $marker
-    if ($Scope -ceq 'expanded-t-conformance') {
+    if ($hasProfileWitness) {
         $evidence.source_profile_facts = Get-ScopedSourceProfileFacts `
             -Output ([IO.File]::ReadAllText($evidence.process.stdout_path)) -Observed $observed
         $selectedSource = @($suite.files | Where-Object path -CEQ $File)[0]
@@ -690,7 +758,7 @@ try {
         $evidence.source_condition_results = Get-ScopedMeasuredConditionResults `
             -Records $sourceConditions -Facts $evidence.source_profile_facts
     }
-    if ($File -ceq 'constructs.lua' -and $Scope -ceq 'expanded-t-conformance') {
+    if ($File -ceq 'constructs.lua' -and $hasProfileWitness) {
         $branchOutput = [IO.File]::ReadAllText($evidence.process.stdout_path)
         $pattern = '(?m)^testing short-circuit optimizations \(' + $ConstructsBranch + '\)\r?$'
         if ([regex]::Matches($branchOutput, $pattern).Count -ne 1) {
@@ -699,22 +767,28 @@ try {
     }
     $evidence.fixture_changes = Test-ConformanceFixtureHashes -Directory $fixtureDirectory -Records $evidence.fixture_records
     $evidence.status = if ($evidence.fixture_changes.Count -gt 0) { 'fixture-source-changed' } else { $evidence.outcome.status }
-    if ($Scope -ne '') {
+    if ($isolatedLauncher) {
         $telemetryPath = $environment.LUA_ADA_CONFORMANCE_TELEMETRY + '.' + $evidence.process.process_id + '.json'
         $telemetry = Get-Content -LiteralPath $telemetryPath -Raw | ConvertFrom-Json -AsHashtable
-        Assert-ScopedProcessCompletion -File $File -Process $evidence.process `
-            -Telemetry $telemetry -RunId $runId -Configuration $Configuration -Platform $evidence.host.platform -NativeOracle:($Target -eq 'ReferenceC')
+        Assert-ManagedTelemetry -Telemetry $telemetry -RunId $runId -ProcessId $evidence.process.process_id `
+            -Configuration $Configuration -LimitBytes $evidence.allocator_limit_bytes -RequireShutdown:($Target -ceq 'Ada')
+        if ($Scope -ne '' -or ($Mode -ceq 'File' -and $File -cin (Get-ConformanceScopePolicy -Scope expanded-t-conformance).Files)) {
+            Assert-ScopedProcessCompletion -File $File -Process $evidence.process `
+                -Telemetry $telemetry -RunId $runId -Configuration $Configuration -Platform $evidence.host.platform -NativeOracle:($Target -eq 'ReferenceC')
+        }
         $evidence.allocator_telemetry = [ordered]@{ path=$telemetryPath;
             sha256=(Get-FileHash -LiteralPath $telemetryPath -Algorithm SHA256).Hash.ToLowerInvariant(); data=$telemetry }
         if ($File -eq 'files.lua') {
             $evidence.native_branch_facts = Get-ScopedNativeBranchFacts -Output ([IO.File]::ReadAllText($evidence.process.stdout_path))
             Assert-NativeBranchWitnesses -Mapping $nativeMapping -Output ([IO.File]::ReadAllText($evidence.process.stdout_path))
+        }
+        if ($File -eq 'files.lua' -or $TargetPolicy -ne '') {
             foreach ($sidecar in Get-ChildItem -LiteralPath $runRoot -Filter 'allocator.*.json') {
                 $childId = [int]($sidecar.BaseName.Split('.')[-1])
                 if ($childId -eq $evidence.process.process_id) { continue }
                 $childTelemetry = Get-Content -LiteralPath $sidecar.FullName -Raw | ConvertFrom-Json -AsHashtable
                 Assert-ManagedTelemetry -Telemetry $childTelemetry -RunId $runId -ProcessId $childId `
-                    -Configuration $Configuration -RequireShutdown:($Target -eq 'Ada')
+                    -Configuration $Configuration -LimitBytes $evidence.allocator_limit_bytes -RequireShutdown:($Target -eq 'Ada')
                 $evidence.child_allocator_telemetry += [ordered]@{ path=$sidecar.FullName;
                     sha256=(Get-FileHash -LiteralPath $sidecar.FullName -Algorithm SHA256).Hash.ToLowerInvariant();
                     data=$childTelemetry }
@@ -723,11 +797,13 @@ try {
             # POSIX has two empty commands, four exits, and (with T) a pipe
             # receiver. Windows substitutes two Lua cat counterparts instead.
             # C exits bypass its writer; Ada typed exits always dispose/record.
-            $expectedChildren = if ($IsWindows) { 4 } else { 2 }
-            if (-not $IsWindows -and $Configuration -eq 'upstream-test') { $expectedChildren++ }
-            if ($Target -eq 'Ada') { $expectedChildren += 4 }
-            if ($evidence.child_allocator_telemetry.Count -ne $expectedChildren) {
-                throw 'Scoped file child allocator telemetry is incomplete'
+            if ($File -eq 'files.lua') {
+                $expectedChildren = if ($IsWindows) { 4 } else { 2 }
+                if (-not $IsWindows -and $Configuration -eq 'upstream-test') { $expectedChildren++ }
+                if ($Target -eq 'Ada') { $expectedChildren += 4 }
+                if ($evidence.child_allocator_telemetry.Count -ne $expectedChildren) {
+                    throw 'Scoped file child allocator telemetry is incomplete'
+                }
             }
         }
     }
@@ -770,6 +846,14 @@ try {
                 $evidence.scope_complete = $evidence.coverage_validation.ScopeComplete
                 Assert-ScopedProcessCompletion -File $File -Process $evidence.process `
                     -Telemetry $telemetry -RunId $runId -Configuration $Configuration -Platform $evidence.host.platform
+            } elseif ($RequireTargetAcceptance) {
+                if ($evidence.runtime_library_records.Count -eq 0 -or
+                    $evidence.process.executable_sha256 -cne $evidence.launcher_identity.sha256) {
+                    throw 'Full-target execution requires actual executable/library identities'
+                }
+                $evidence.coverage_validation = Test-ConformanceInventory -Root $root `
+                    -TargetPolicy $TargetPolicy -RequireComplete
+                $evidence.target_complete = $evidence.coverage_validation.TargetComplete
             } else {
                 $evidence.coverage_validation = Test-ConformanceInventory -Root $root -RequireComplete
             }
@@ -782,14 +866,24 @@ try {
                 }
             }
             $operation = if ($Mode -eq 'File') { 'file:' + $File } else { $Mode.ToLowerInvariant() }
+            $resolvedExclusions = @{}
+            if ($RequireTargetAcceptance) {
+                foreach ($exclusion in $evidence.coverage_validation.Exclusions) { $resolvedExclusions[$exclusion.id] = $exclusion }
+            }
             $accepted = Test-ConformanceAcceptance -Process $evidence.process -Outcome $evidence.outcome `
                 -Contract $contract -Operation $operation -Context $Context `
                 -SourceRecords $evidence.fixture_records -RunId $runId -Configuration $Configuration `
                 -AllocatorLimitBytes $evidence.allocator_limit_bytes `
-                -CoverageComplete $(if ($RequireScopedAcceptance) { $evidence.scope_complete } else { $evidence.coverage_validation.Complete }) `
-                -CoverageRecords $coverageRecords -Telemetry $telemetry
+                -CoverageComplete $(if ($RequireScopedAcceptance) { $evidence.scope_complete }
+                    elseif ($RequireTargetAcceptance) { $evidence.target_complete } else { $evidence.coverage_validation.Complete }) `
+                -CoverageRecords $coverageRecords -Telemetry $telemetry `
+                -TargetPolicy $(if ($RequireTargetAcceptance) { $TargetPolicy } else { 'strict-upstream' }) `
+                -ResolvedExclusions $resolvedExclusions
             if ($RequireScopedAcceptance) {
                 $evidence.scoped_operation_acceptance = $accepted.gate_acceptance
+            } elseif ($RequireTargetAcceptance) {
+                $evidence.target_operation_acceptance = $accepted.gate_acceptance
+                $evidence.excluded_omissions = $accepted.excluded_omissions
             } else { $evidence.gate_acceptance = $accepted.gate_acceptance }
         }
         catch {
@@ -814,6 +908,11 @@ if ($evidence.acceptance_error) { Write-Output "ACCEPTANCE BLOCKED: $($evidence.
 if ($RequireScopedAcceptance) {
     Write-Output "SCOPED OPERATION ACCEPTANCE: $($evidence.scoped_operation_acceptance); full M3 acceptance=False"
     if ($evidence.scoped_operation_acceptance) { exit 0 }
+    exit 1
+}
+if ($RequireTargetAcceptance) {
+    Write-Output "TARGET OPERATION ACCEPTANCE: $($evidence.target_operation_acceptance); reviewed exclusions=$($evidence.excluded_obligations.Count); full M3 acceptance=False"
+    if ($evidence.target_operation_acceptance) { exit 0 }
     exit 1
 }
 if ($RequireAcceptance) {

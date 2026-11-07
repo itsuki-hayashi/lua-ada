@@ -220,6 +220,17 @@ function Test-TargetMatrixReport {
     $telemetry = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable
     Assert-ManagedTelemetry -Telemetry $telemetry -RunId $Report.run_id -ProcessId $Report.process.process_id `
         -Configuration $parts[0] -LimitBytes $limit -RequireShutdown:($Target -ceq 'Ada')
+    $childIds = @{}
+    foreach ($identity in $Report.child_allocator_telemetry) {
+        $path = Resolve-TargetCapture -Root $ArtifactRoot -Original $identity.path -Sha256 $identity.sha256
+        $child = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable
+        $childId = [int]([IO.Path]::GetFileNameWithoutExtension($path).Split('.')[-1])
+        if ($childId -eq $Report.process.process_id -or $childIds.ContainsKey($childId) -or
+            $child.process_id -ne $childId) { throw 'Full-target child telemetry duplicates or misidentifies a process' }
+        Assert-ManagedTelemetry -Telemetry $child -RunId $Report.run_id -ProcessId $childId `
+            -Configuration $parts[0] -LimitBytes $limit -RequireShutdown:($Target -ceq 'Ada')
+        $childIds[$childId] = $true
+    }
     if ($heavy -and ($telemetry.managed_refusals -lt 1 -or
         [IO.File]::ReadAllText($Report.process.stdout_path) -cnotmatch '(?im)^expected error:\s+.*not enough memory')) {
         throw 'Full-target heavy operation lacks its own caught allocator refusal'
@@ -331,6 +342,8 @@ function Test-FullTargetMatrix {
         $retained = Test-RetainedMatrixWitnesses -Root $Root -Manifest $retainedIndex -Bundle $bundle -Suite $suite
     }
     $coverage = @{}
+    $resolvedExclusions = @{}
+    foreach ($exclusion in $inventory.Exclusions) { $resolvedExclusions[$exclusion.id] = $exclusion }
     foreach ($source in $suite.files) {
         foreach ($record in (Read-ConformanceJsonLines (Join-Path $Root ('tests/conformance/' + $source.coverage_file)))) {
             $coverage[$record.id] = $record
@@ -356,8 +369,8 @@ function Test-FullTargetMatrix {
             }
             $contextImages[$imageKey] = $signature
             if ($RequireTargetAcceptance) {
-                if ($report.synthetic_fixture -or $report.report_only -ne $false -or
-                    ($target -ceq 'ada' -and ($report.target_operation_acceptance -ne $true -or
+                if ($report.synthetic_fixture -or
+                    ($target -ceq 'ada' -and ($report.report_only -ne $false -or $report.target_operation_acceptance -ne $true -or
                         $report.execution_contract.sha256 -cne $entry.contract.sha256))) {
                     throw 'Full-target operation lacks actual accepted execution evidence'
                 }
@@ -388,7 +401,8 @@ function Test-FullTargetMatrix {
                     -Operation $entry.operation -Context $entry.context -SourceRecords $report.fixture_records `
                     -RunId $report.run_id -Configuration $report.requested_configuration `
                     -AllocatorLimitBytes $report.allocator_limit_bytes -CoverageComplete $inventory.TargetComplete `
-                    -CoverageRecords $coverage -Telemetry $observed.telemetry)
+                    -CoverageRecords $coverage -Telemetry $observed.telemetry `
+                    -TargetPolicy $TargetPolicy -ResolvedExclusions $resolvedExclusions)
             }
             $pair[$target] = $report
             $executions += @{operation=$entry.operation;context=$entry.context;target=$expectedTarget;

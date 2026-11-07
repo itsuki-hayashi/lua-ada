@@ -479,6 +479,87 @@ if ($ReferenceInterpreter -ne '') {
         Assert-True ([IO.File]::ReadAllText($p.stderr_path).Contains('invalid LUA_ADA_CONFORMANCE_ALLOCATOR')) 'budget diagnostic missing'
     }
 }
+function New-ExcludedOmissionFixture {
+    # Only protocol fixtures are synthesized here. Real exclusions must first
+    # pass the source/hash/independent-review inventory validator.
+    $fixture = New-AcceptanceFixture 'target-excluded-omission' `
+        'Write-Output ">>> testC not active: skipping opcode tests <<<"; Write-Output "DONE"'
+    $id = 'LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips = @(@{message=$fixture.Outcome.skip_messages[0];coverage_ids=@($id);
+        review_artifact='synthetic omission review';original_c_evidence='synthetic C absence'})
+    $fixture.CoverageRecords = @{$id=@{status='pending';kind='reviewed-block';evidence=@()}}
+    $fixture.TargetPolicy = 'remaining-upstream-compatibility'
+    $fixture.ResolvedExclusions = @{$id=@{id=$id;status='excluded';disposition='reviewed-t-internal-exclusion';
+        eligibility='t-only-private-invariant';configurations=@('upstream-test');public_api=$false;
+        mixed_obligation=$false;module_observable=$false;evidence=@()}}
+    return $fixture
+}
+Case 'explicit target T absence reports an exclusion without pass evidence' {
+    $fixture = New-ExcludedOmissionFixture
+    $result = Test-ConformanceAcceptance @fixture
+    Assert-True ($result.gate_acceptance -and $result.excluded_omissions.Count -eq 1) 'Authorized target omission rejected'
+    $record = @($fixture.CoverageRecords.Values)[0]
+    Assert-True ($record.status -ceq 'pending' -and @($record.evidence).Count -eq 0) 'Exclusion became runtime evidence'
+}
+Case 'strict execution cannot consume an approved target exclusion' {
+    $fixture = New-ExcludedOmissionFixture; $fixture.TargetPolicy = 'strict-upstream'
+    Assert-AcceptanceRejected $fixture 'Strict original-suite protocol accepted an exclusion'
+}
+Case 'instrumented T absence cannot be waived by an exclusion' {
+    $fixture = New-ExcludedOmissionFixture; $fixture.Configuration = 'upstream-test'
+    Assert-AcceptanceRejected $fixture 'Instrumented T omission accepted'
+}
+Case 'non-T omissions cannot consume the T-private exclusion policy' {
+    $fixture = New-ExcludedOmissionFixture
+    $fixture.Outcome.skip_messages = @('skipping an ordinary test')
+    $fixture.Contract.expected_skips[0].message = $fixture.Outcome.skip_messages[0]
+    Assert-AcceptanceRejected $fixture 'Ordinary behavior was excluded through a T policy'
+}
+Case 'public and mixed omissions still require real execution' {
+    foreach ($field in @('public_api','mixed_obligation','module_observable')) {
+        $fixture = New-ExcludedOmissionFixture
+        $fixture.ResolvedExclusions.Values | ForEach-Object { $_[$field] = $true }
+        Assert-AcceptanceRejected $fixture "Target omission waived $field"
+    }
+}
+Case 'target context mismatch blocks every operation before a compiler or Lua process' {
+    # This launches only the PowerShell producer. A context that names another
+    # host must stop before interpreter lookup or a fixture build, regardless
+    # of whether the real coverage ledger is pending or complete.
+    foreach ($mode in @('File','Aggregate','Heavy')) {
+        $reportPath = Join-Path $temporary "target-$mode.json"
+        $arguments = @('-NoProfile','-File',(Join-Path $PSScriptRoot 'run-conformance.ps1'),
+            '-Target','Ada','-TargetPolicy','remaining-upstream-compatibility','-RequireTargetAcceptance',
+            '-Mode',$mode,'-Context','default/unsupported/validation/static','-Report',$reportPath)
+        if ($mode -ceq 'File') { $arguments += @('-File','api.lua') }
+        $process = Invoke-ConformanceProcess -Executable $shell -Arguments $arguments -Directory $root `
+            -OutputPrefix (Join-Path $temporary "target-$mode-capture") -TimeoutSeconds 60
+        Assert-True ($process.exit_code -ne 0 -and -not $process.timed_out) 'Incomplete target accepted'
+        $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json -AsHashtable
+        Assert-True ($report.setup_error -ceq 'Full-target context does not identify this configuration and host' -and
+            $null -eq $report.process -and @($report.build_processes).Count -eq 0 -and
+            -not $report.target_operation_acceptance -and -not $report.gate_acceptance -and
+            $report.variant -ceq 'primary' -and $report.target_policy -ceq 'remaining-upstream-compatibility') `
+            'Producer bypassed its incomplete-coverage gate or performed a build'
+        if ($mode -ceq 'Heavy') {
+            Assert-True ($report.allocator_limit_bytes -eq 67108864 -and $report.timeout_seconds -eq 600) 'Heavy policy drift'
+        } elseif ($mode -ceq 'Aggregate') {
+            Assert-True ($report.allocator_limit_bytes -eq 2147483648 -and $report.timeout_seconds -eq 3600) 'Aggregate policy drift'
+        }
+    }
+}
+Case 'full-target smoke and mixed acceptance flags reject before setup' {
+    foreach ($arguments in @(
+        @('-TargetPolicy','remaining-upstream-compatibility','-Mode','Smoke'),
+        @('-TargetPolicy','remaining-upstream-compatibility','-Scope','expanded-t-conformance','-Mode','File','-File','api.lua'),
+        @('-RequireTargetAcceptance','-Target','Ada','-Mode','File','-File','api.lua')
+    )) {
+        $process = Invoke-ConformanceProcess -Executable $shell `
+            -Arguments (@('-NoProfile','-File',(Join-Path $PSScriptRoot 'run-conformance.ps1')) + $arguments) `
+            -Directory $root -OutputPrefix (Join-Path $temporary ('bad-target-' + [Guid]::NewGuid().ToString('N'))) -TimeoutSeconds 20
+        Assert-True ($process.exit_code -ne 0 -and $process.stderr_bytes -gt 0) 'Invalid target flags entered execution'
+    }
+}
 Write-Output "RUNNER TESTS: $script:cases cases; $($failures.Count) failed"
 if ($failures.Count -gt 0) { exit 1 }
 exit 0

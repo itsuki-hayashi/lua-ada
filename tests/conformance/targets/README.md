@@ -143,3 +143,29 @@ execution until exact-byte equivalent/adaptation replay is connected. This is
 an explicit incomplete acceptance facility, not evidence that those programs
 failed or passed. The follow-up execution producer/replay must close that gate
 before any full-target acceptance claim.
+
+## Explicit execution producer
+
+`run-conformance.ps1 -TargetPolicy remaining-upstream-compatibility` produces
+the corresponding reports for `File`, `Aggregate`, or `Heavy`, with a required
+host/configuration context. `-RequireTargetAcceptance` selects only target
+operation acceptance on the actual Ada target; it cannot be combined with the
+historical acceptance selectors. File mode selects the 30 scheduled primaries.
+`-ConstructsBranch 1` records the required `constructs-branch-1` variant and
+executes the existing seeded wrapper, retaining its actual branch witness.
+
+The producer isolates bare and arg-selected children on the selected launcher,
+retains the existing REPL/native-fixture prerequisites, records separate probe
+lifetimes and all available child allocator sidecars, and preserves retained
+file/warning/helper witnesses. Global API/source completion is checked before
+an acceptance run can start building fixtures or executing Lua. An unresolved
+or unimplemented gate is a setup failure, never report-only acceptance.
+
+Default T-absence contracts may link either actual instrumented runtime
+coverage or an exclusion already validated by the selected inventory policy.
+The latter is returned separately as `excluded_omissions`, with no pass
+evidence attached to the omitted invariant. This route is unavailable to strict
+callers, instrumented T-absence messages, ordinary omissions, public behavior,
+or mixed obligations. Actual instrumented source adaptation and full-target
+equivalent replay remain explicitly blocked until their exact-byte execution
+replay is implemented; the new selector alone does not establish coverage.

@@ -116,6 +116,7 @@ function New-ReportFixture([string] $Operation = 'file:api.lua', [string] $Targe
         arg_child_configuration_process=(New-Process $captures $text 102 30);
         process=(New-Process $captures $output 103 $timeout);launcher_probe_run_id=$probeRun;launcher_probe_telemetry=@();
         run_id=$runId;allocator_telemetry=(New-Telemetry $captures $runId $parts[0] 103 $limit $(if($Operation -ceq 'heavy'){1}else{0}));
+        child_allocator_telemetry=@();
         excluded_obligations=@();exclusion_policy_sha256=$policyHash}
     if ($Operation -ceq 'file:constructs.lua') { $report.constructs_branch = if ($Variant -ceq 'constructs-branch-1') { 1 } else { 0 } }
     $probePids = if ($Target -ceq 'Ada') { @(100,101,102,104,105) } else { @(101,102) }
@@ -256,6 +257,19 @@ Case 'heavy refusal cannot be borrowed from child telemetry' {
     $data.managed_refusals = 0; $f.report.allocator_telemetry.sha256 = Write-Json $path $data
     Reject { Invoke-Report $f } 'own caught allocator refusal'
 }
+Case 'child lifetime telemetry cannot duplicate a parent or another run' {
+    $f = New-ReportFixture
+    $directory = Split-Path $f.report.process.stdout_path
+    $f.report.child_allocator_telemetry = @(New-Telemetry $directory $f.report.run_id `
+        $f.report.requested_configuration 200 $f.report.allocator_limit_bytes)
+    Invoke-Report $f | Out-Null
+    $f.report.child_allocator_telemetry += $f.report.child_allocator_telemetry[0]
+    Reject { Invoke-Report $f } 'child telemetry duplicates'
+    $f = New-ReportFixture
+    $f.report.child_allocator_telemetry = @(New-Telemetry (Split-Path $f.report.process.stdout_path) 'another-run' `
+        $f.report.requested_configuration 200 $f.report.allocator_limit_bytes)
+    Reject { Invoke-Report $f } 'Mismatched or unbalanced'
+}
 Case 'unapproved or silently missing exclusion IDs fail report replay' {
     $f = New-ReportFixture; $f.report.excluded_obligations = @('unapproved')
     Reject { Invoke-Report $f } 'excluded obligation set or policy hash differs'
@@ -282,10 +296,9 @@ Case 'synthetic full matrix can never establish target acceptance' {
     $null = Write-Json $path $m
     Reject { Test-FullTargetMatrix -Root $root -ManifestPath $path -RequireTargetAcceptance } 'Synthetic fixture matrix'
 }
-Case 'actual-target flag does not bypass unresolved real global API ledger' {
-    $m = New-Manifest; $m.synthetic_fixture = $false
-    $path = Join-Path $temporary 'pending-api-matrix.json'; $null = Write-Json $path $m
-    Reject { Test-FullTargetMatrix -Root $root -ManifestPath $path -RequireTargetAcceptance } 'global public API coverage remains unresolved'
+Case 'zero pending counters cannot replace the complete reviewed inventory gate' {
+    $inventory = @{PendingApiEntries=0;RequiredPendingSourceAnchors=0;TargetComplete=$false}
+    Reject { Assert-TargetMatrixCoverage $inventory -RequireComplete } 'reviewed coverage is incomplete'
 }
 Case 'bundle contracts cannot escape the reviewed artifact directory' {
     $m = New-Manifest; $m.operations[0].contract.path = '../escape.json'
