@@ -12,6 +12,7 @@
 *.jsonl text eol=lf
 *.c text eol=lf
 *.h text eol=lf
+*.lua text eol=lf
 .editorconfig text eol=lf
 .gitattributes text eol=lf
 .gitignore text eol=lf

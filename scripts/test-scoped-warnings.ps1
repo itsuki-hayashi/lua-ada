@@ -8,6 +8,61 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1') -Force
+# GNAT's POSIX signal handler may convert abort to Program_Error. Exit 1
+# qualifies only with both specific diagnostics, never an arbitrary error.
+function Test-WarningTermination {
+    param([string] $Mode, [string] $Target, [bool] $Windows,
+        [int] $Code, [string] $Diagnostic,
+        [string] $CaseName = 'normal-warning', [string] $Output = '')
+    if ($Mode -eq 'default') { return $Code -eq 0 }
+    if ($Target -eq 'ReferenceC') { return $Code -eq 1 }
+    if ($Windows) { return $Code -eq 3 }
+    $expectedText = if ($CaseName -eq 'shutdown-warning') { 'scoped shutdown assertion' }
+        else { 'scoped unexpected warning' }
+    if ($Diagnostic -notmatch ('(?m)^T warning failure: unexpected warning: [^\r\n]*' +
+            [regex]::Escape($expectedText) + '[^\r\n]*\r?$')) { return $false }
+    if ($CaseName -eq 'shutdown-warning' -and $Output -notmatch '(?m)^OK\r?$') { return $false }
+    if ($Code -eq 134) { return $true }
+    # Close runs outside Execute's error conversion and reaches Lua_CLI's
+    # outer handler. This source-derived expectation still needs CI evidence.
+    if ($CaseName -eq 'shutdown-warning') {
+        return $Code -eq 1 -and $Diagnostic -match '(?m)^lua_ada: unhandled signal\r?$'
+    }
+    return $Code -eq 1 -and $Diagnostic -match `
+        '(?m)^\(command line\):1: internal Ada check: unhandled signal\r?$'
+}
+# Fixtures validate the verifier; they do not claim foreign-platform runtime
+# passes. The actual process tests below separately exercise this host.
+$gnatWarning = "T warning failure: unexpected warning: scoped unexpected warning`n(command line):1: internal Ada check: unhandled signal`n"
+$verifierCases = @(
+    @{code=1;diagnostic=$gnatWarning;expected=$true},
+    @{code=134;diagnostic='T warning failure: unexpected warning: scoped unexpected warning';expected=$true},
+    @{code=2;diagnostic=$gnatWarning;expected=$false},
+    @{code=139;diagnostic=$gnatWarning;expected=$false},
+    @{code=1;diagnostic='T warning failure: unexpected warning: scoped unexpected warning';expected=$false},
+    @{code=1;diagnostic='(command line):1: internal Ada check: unhandled signal';expected=$false},
+    @{code=1;diagnostic="T warning failure: unexpected warning: scoped unexpected warning`n(command line):1: internal Ada check: unrelated error";expected=$false},
+    @{code=134;diagnostic='unrelated abort';expected=$false}
+)
+foreach ($fixture in $verifierCases) {
+    $actual = Test-WarningTermination -Mode upstream-test -Target Ada -Windows $false `
+        -Code $fixture.code -Diagnostic $fixture.diagnostic
+    if ($actual -ne $fixture.expected) { throw 'Warning termination verifier regression' }
+}
+$shutdownWarning = "T warning failure: unexpected warning: error in __gc (scoped shutdown assertion)`nlua_ada: unhandled signal`n"
+$shutdownFixtures = @(
+    @{name='shutdown-warning';output='OK';diagnostic=$shutdownWarning;expected=$true},
+    @{name='normal-warning';output='OK';diagnostic=$shutdownWarning;expected=$false},
+    @{name='normal-warning';output='OK';diagnostic=$shutdownWarning.Replace('scoped shutdown assertion','scoped unexpected warning');expected=$false},
+    @{name='shutdown-warning';output='';diagnostic=$shutdownWarning;expected=$false},
+    @{name='shutdown-warning';output='OK';diagnostic=$shutdownWarning.Replace('unhandled signal','unrelated error');expected=$false},
+    @{name='shutdown-warning';output='OK';diagnostic=$gnatWarning.Replace('scoped unexpected warning','scoped shutdown assertion');expected=$false}
+)
+foreach ($fixture in $shutdownFixtures) {
+    $actual = Test-WarningTermination -Mode upstream-test -Target Ada -Windows $false `
+        -Code 1 -Diagnostic $fixture.diagnostic -CaseName $fixture.name -Output $fixture.output
+    if ($actual -ne $fixture.expected) { throw 'Shutdown warning verifier regression' }
+}
 $root = Split-Path -Parent $PSScriptRoot
 [void][IO.Directory]::CreateDirectory($OutputDirectory)
 $directory = (Resolve-Path -LiteralPath $OutputDirectory).Path
@@ -72,14 +127,12 @@ foreach ($target in @('ReferenceC','Ada')) {
             if ($accepted -or $stderr -notmatch [regex]::Escape($case.diagnostic)) {
                 throw "Unexpected warning escaped scoped rejection: $target/$($case.name)"
             }
-            # ltests.c badexit uses EXIT_FAILURE (1). The Ada test handler
-            # calls abort: the Windows CRT returns 3; POSIX SIGABRT is 6 and
-            # Process.ExitCode reports 128+signal. Other crashes are failures.
-            $expectedExit = if ($Configuration -eq 'default') { 0 }
-                elseif ($target -eq 'ReferenceC') { 1 }
-                elseif ($IsWindows) { 3 } else { 134 }
-            if ($process.exit_code -ne $expectedExit) {
-                throw "Unexpected warning termination status: $target/$($case.name): $($process.exit_code), expected $expectedExit"
+            # Keep C exit 1 and Windows abort 3, while recognizing the
+            # specifically diagnosed GNAT POSIX signal conversion.
+            if (-not (Test-WarningTermination -Mode $Configuration -Target $target `
+                    -Windows $IsWindows -Code $process.exit_code -Diagnostic $stderr `
+                    -CaseName $case.name -Output $stdout)) {
+                throw "Unexpected warning termination status: $target/$($case.name): $($process.exit_code)"
             }
             if ($Configuration -eq 'default' -and $stdout -notmatch '(?m)^OK\r?$') {
                 throw "Default warning interrupted normal completion: $target/$($case.name)"
@@ -96,6 +149,7 @@ foreach ($target in @('ReferenceC','Ada')) {
 }
 [ordered]@{schema_version=1;configuration=$Configuration;repository_revision=$revision;
     repository_dirty=($repositoryStatus.Count -ne 0);repository_status=$repositoryStatus;
-    source_records=@($sourceRecords);library_records=$libraryRecords;cases=$records} |
+    source_records=@($sourceRecords);library_records=$libraryRecords;
+    verifier_fixture_count=($verifierCases.Count + $shutdownFixtures.Count);cases=$records} |
     ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $directory 'index.json') -Encoding utf8
 Write-Output "PASS: $($records.Count) actual scoped warning regressions"

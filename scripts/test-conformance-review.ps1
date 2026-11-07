@@ -5,6 +5,41 @@ $root = Split-Path -Parent $PSScriptRoot
 $temporary = Join-Path $root ('reports/review-binding-selftest/' + [Guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($temporary)
 $script:cases = 0
+# Content-addressed counterparts must retain their reviewed bytes after a
+# Windows checkout. Exercise Git's actual checkout conversion with autocrlf
+# enabled; hashing normalized text in the validator would hide this defect.
+$checkoutFixture = Join-Path $temporary 'checkout'
+[void][IO.Directory]::CreateDirectory($checkoutFixture)
+Copy-Item -LiteralPath (Join-Path $root '.gitattributes') -Destination $checkoutFixture
+$luaBytes = "assert(true)`nassert(1 == 1)`n"
+[IO.File]::WriteAllText((Join-Path $checkoutFixture 'counterpart.lua'), $luaBytes, [Text.UTF8Encoding]::new($false))
+& git -C $checkoutFixture init --quiet
+if ($LASTEXITCODE -ne 0) { throw 'Cannot initialize checkout regression' }
+& git -C $checkoutFixture -c core.autocrlf=true add .gitattributes counterpart.lua
+if ($LASTEXITCODE -ne 0) { throw 'Cannot stage checkout regression' }
+$checkoutOutput = (Join-Path $checkoutFixture 'materialized').Replace('\', '/') + '/'
+& git -C $checkoutFixture -c core.autocrlf=true checkout-index --all --prefix=$checkoutOutput
+if ($LASTEXITCODE -ne 0) { throw 'Cannot materialize checkout regression' }
+if ((Get-FileHash -LiteralPath (Join-Path $checkoutFixture 'counterpart.lua')).Hash -cne
+    (Get-FileHash -LiteralPath (Join-Path $checkoutOutput 'counterpart.lua')).Hash) {
+    throw 'Autocrlf checkout changed reviewed Lua counterpart bytes'
+}
+$script:cases++
+Write-Output 'PASS: autocrlf checkout preserves reviewed Lua counterpart bytes'
+# Reproduce the original missing-rule failure as a control, so this regression
+# cannot pass merely because Git ignored autocrlf or reused the input file.
+$attributes = Join-Path $checkoutFixture '.gitattributes'
+$withoutLua = [IO.File]::ReadAllText($attributes).Replace("*.lua text eol=lf`n", '')
+[IO.File]::WriteAllText($attributes, $withoutLua, [Text.UTF8Encoding]::new($false))
+$controlOutput = (Join-Path $checkoutFixture 'without-lua-rule').Replace('\', '/') + '/'
+& git -C $checkoutFixture -c core.autocrlf=true checkout-index --all --prefix=$controlOutput
+if ($LASTEXITCODE -ne 0) { throw 'Cannot materialize checkout control' }
+if ((Get-FileHash -LiteralPath (Join-Path $checkoutFixture 'counterpart.lua')).Hash -ceq
+    (Get-FileHash -LiteralPath (Join-Path $controlOutput 'counterpart.lua')).Hash) {
+    throw 'Missing Lua EOL rule failed to reproduce byte mismatch'
+}
+$script:cases++
+Write-Output 'PASS: missing Lua EOL rule reproduces autocrlf byte mismatch'
 function Hash-Text([string] $Text) {
     [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($Text))).ToLowerInvariant()
 }
