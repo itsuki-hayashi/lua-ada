@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "kind": "independent-consumer-witness-review",
+  "author": "Codex /root/review_events_harness",
+  "reviewer": "Codex independent review agent /root/review_files",
+  "decision": "accepted-semantic-witness-mapping",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "proposal": {
+    "path": "tests/conformance/reviews/api.consumer-witness-proposal.json",
+    "sha256": "8e012e811fd37e843de3de7bc5577cbabf959b6e0f36f4fb5f3b78c938e59b51"
+  },
+  "source_bindings": [
+    {
+      "path": "tests/conformance/reviews/api.mapping-proposal.json",
+      "sha256": "6d90221ce821a169d675d7df5ea03af60e6077a4bdeba10b322446b1aef6de2d"
+    },
+    {
+      "path": "c_api/tests/c_api_consumer.c",
+      "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
+    },
+    {
+      "path": "c_api/tests/gc_contract.h",
+      "sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6"
+    },
+    {
+      "path": "c_api/tests/io_contract.h",
+      "sha256": "9553a625db792889399df3aa246594018aed850a90404659fe189c0835c47f86"
+    },
+    {
+      "path": "c_api/tests/gc_api_contract.c",
+      "sha256": "07f9f3dcb712d6caa773d428fb84672f29d0bb331858792c83130a9b9275c2ef"
+    },
+    {
+      "path": "c_api/tests/io_api_contract.c",
+      "sha256": "fa571c0bb84a3164723546dd083431b0d1b0911257f78ff6572c9df8d2790a22"
+    },
+    {
+      "path": "c_api/tests/consumer_allocator.h",
+      "sha256": "c888b195716ea9ea6023b01d06e9b21eb82035f6ee5beca1cf2bb7095749268c"
+    },
+    {
+      "path": "c_api/consumer.gpr",
+      "sha256": "6ecaba2cb213e4eeaa0a4e18de74a676c1950927ea00d7b072f99a76b47b02de"
+    },
+    {
+      "path": "scripts/check-core-image.ps1",
+      "sha256": "c299fc50efbc1c85652311673c7213db81eaee6921f4599bc9db412381afa9b5"
+    }
+  ],
+  "verification": {
+    "api_entries": 77,
+    "named_cases": 41,
+    "source_hashes": "All41 named-case source hashes and function-body hashes independently recomputed with C string/comment-aware brace extraction; all matched.",
+    "registration": "Every case is invoked by the appropriate C/API, GC/API or IO/API main; consumer/stdout routing matches check-core-image.ps1.",
+    "witnesses": "All40 exact witnesses are actual terminal puts calls within their named function. The remaining cold-constructor witness is the terminal measured-count printf.",
+    "links": "All77 entries resolve to the same complete source#case identity sets in the reviewed API mapping; no missing case identities or fabricated stdout strings."
+  },
+  "cold_sweep_review": {
+    "source": "c_api/tests/c_api_consumer.c",
+    "line": 48,
+    "reason": "Baseline measures actual growth count and asserts it positive. Every position1..growths is refused persistently in a fresh state, requiring null constructor result and zero bytes/blocks. A growths+1 recovery run must succeed and release everything before the terminal measured-count print.",
+    "pattern": "Positive integer count is appropriate; no fixed platform value should be required. Independently checked proposed regex accepts37 and rejects0 and trailing junk. Match exact lines and require exactly one occurrence.",
+    "boundary": "This witness certifies the named measured sweep when actual execution provenance and full process checks hold; it does not imply identical C/Ada object layouts or growth counts."
+  },
+  "capture_driver_review": [
+    "Driver captures both streams before waiting; timeout/nonzero exit/nonempty stderr/missing final consumer marker reject the run.",
+    "Each consumer record now contains executable and stdout/stderr SHA256, exact profile/library/configuration and timeout/exit status. Final report binds repository revision/dirty state, runtime libraries and consumer sources.",
+    "GC and IO real-library contracts execute separately against the pinned C oracle and compare captured output byte-for-byte. Ordinary c-api consumer is Ada execution; no nonexistent full C-oracle consumer pass is asserted.",
+    "Consumer GPR retains assert-enabled C compilation; no NDEBUG switch is present. Named-case witness checking must remain in addition to the existing process-level marker, not replaced by it."
+  ],
+  "limitations": [
+    "This is source/semantic mapping review only. No new consumer process or build was executed by this reviewer.",
+    "Actual final-revision result.json/capture hashes and exact context/configuration still must be inspected before runtime promotion.",
+    "The witness proposal does not itself implement exact-count matching; acceptance code must enforce its stated requirements and reject missing, duplicate or mismatched captures.",
+    "Supporting cases stay supporting; union of markers cannot expand reviewed API semantics, especially collector parameter scheduling and full ABI boundaries."
+  ],
+  "findings": [],
+  "capture_metadata_delta_review": {
+    "reviewer": "Codex independent review agent /root/review_files",
+    "author": "Codex /root",
+    "decision": "accepted-metadata-design",
+    "runtime_acceptance": false,
+    "source": {
+      "path": "scripts/check-core-image.ps1",
+      "sha256": "c299fc50efbc1c85652311673c7213db81eaee6921f4599bc9db412381afa9b5"
+    },
+    "rationale": [
+      "Platform identity is derived from the actual host for the supported Windows/macOS/Linux contexts; reference revision is read from the pinned reference checkout and command failure throws.",
+      "Repository revision and dirty state are captured before the campaign; dirty runs are explicitly diagnostic-only. Consumer source hashes and executable/library identities remain recorded.",
+      "stdout/stderr path and SHA256 are computed from the just-written capture files, alongside exit code, timeout, profile, library type and configuration.",
+      "Original named-case bodies, proposal mappings and process success/failure checks are unchanged."
+    ],
+    "limitations": [
+      "Metadata availability alone is not acceptance; final ingestion must verify clean expected revision, pinned reference, context and capture/source hashes.",
+      "This review runs no build or consumer and establishes no runtime pass."
+    ],
+    "previous_active_binding": {
+      "path": "scripts/check-core-image.ps1",
+      "sha256": "e148bfc71a8b8c7aa698cf6d815de8675c245d3e7aceb478bef15609a1294402"
+    }
+  }
+}

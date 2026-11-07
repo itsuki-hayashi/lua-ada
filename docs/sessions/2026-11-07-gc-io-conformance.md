@@ -811,3 +811,16 @@ runs pass 62 inventory, 41 scope, 40 runner, 33 matrix, 32 review-binding and
 18 native-review regressions. Logs are reports/review-inventory-dynamic-counts.log,
 reports/review-runner-after-ledger.log, reports/review-scope-inventory-fix.log
 and reports/review-matrix-inventory-fix.log. Final CI remains pending.
+
+Independent review identified missing replay of named C API observations in
+the acceptance matrix. The 77 API mappings now have a separately reviewed
+proposal covering 41 existing terminal consumer witnesses, including the
+measured cold-constructor refusal sweep. Consumer reports now bind captures,
+source/dirty revision, platform and reference pin. Matrix acceptance replays
+exact case counts, process completion, source/configuration identities and
+matching C/Ada contract captures and library hashes. Twenty-three synthetic
+negative/positive helper cases pass; actual default validation/static consumers
+pass in reports/review-consumer-context-bindings.log. Dirty diagnostic runs
+are not accepted evidence. Clean final-revision replay, matrix-level rejection
+fixtures, AUnit-equivalent evidence binding and all platform contexts remain
+pending; no coverage ledger entry was promoted by this checkpoint.

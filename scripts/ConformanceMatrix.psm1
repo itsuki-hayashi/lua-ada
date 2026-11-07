@@ -5,6 +5,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConsumerEvidence.psm1')
 
 function Assert-MatrixReview {
     param([Collections.IDictionary] $Review)
@@ -117,6 +118,66 @@ function Test-ScopedMatrix {
         if ($LASTEXITCODE -ne 0 -or $head -cne $manifest.revision) { throw 'Matrix is not the final checkout revision' }
         $dirty = @(& git -C $Root -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal)
         if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw 'Matrix acceptance requires a clean final checkout' }
+        # API status alone cannot prove a named C regression executed. Replay
+        # its independently reviewed witnesses from every context's captures.
+        $identity = $manifest.consumer_mapping
+        $mappingPath = Resolve-ReviewedFile -Root $Root -Path $identity.path -Sha256 $identity.sha256
+        $reviewPath = Resolve-ReviewedFile -Root $Root -Path $identity.review -Sha256 $identity.review_sha256
+        $mapping = Get-Content -LiteralPath $mappingPath -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+        $review = Get-Content -LiteralPath $reviewPath -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+        if ($review.decision -cne 'accepted-semantic-witness-mapping' -or
+            [string]::IsNullOrWhiteSpace($review.author) -or
+            [string]::IsNullOrWhiteSpace($review.reviewer) -or $review.author -ceq $review.reviewer -or
+            $review.author -cne $mapping.author -or $review.proposal.path -cne $identity.path -or
+            $review.proposal.sha256 -cne $identity.sha256) { throw 'Consumer mapping lacks independent review' }
+        foreach ($source in $review.source_bindings) {
+            [void](Resolve-ReviewedFile -Root $Root -Path $source.path -Sha256 $source.sha256)
+        }
+        foreach ($case in $mapping.cases) {
+            if (@($review.source_bindings | Where-Object {
+                $_.path -ceq $case.source -and $_.sha256 -ceq $case.source_sha256
+            }).Count -ne 1) { throw 'Reviewed consumer source binding incomplete' }
+        }
+        $api = @(Read-ConformanceJsonLines -Path (Join-Path $Root 'tests/conformance/scopes/gc-io-events.api.jsonl'))
+        if (@($mapping.entries).Count -ne $api.Count) { throw 'Consumer mapping API inventory differs' }
+        foreach ($obligation in $api) {
+            $matched = @($mapping.entries | Where-Object { $_.id -ceq $obligation.id })
+            if ($matched.Count -ne 1) { throw 'Consumer mapping API obligation missing/duplicate' }
+            $expected = @($obligation.named_cases | ForEach-Object { $_.source + '#' + $_.id } | Sort-Object -Unique)
+            $actual = @($matched[0].cases | Sort-Object -Unique)
+            if (($expected -join "`n") -cne ($actual -join "`n")) { throw 'Consumer mapping API cases differ' }
+            foreach ($case in $expected) {
+                if (@($mapping.cases | Where-Object { ($_.source + '#' + $_.case_id) -ceq $case }).Count -ne 1) {
+                    throw 'Consumer mapping case missing/duplicate'
+                }
+            }
+        }
+        $contexts = @{}
+        $consumerReports = @{}
+        foreach ($consumer in $manifest.named_consumers) {
+            if ($consumer.context -cnotin $suite.acceptance_contexts -or $contexts.ContainsKey($consumer.context)) {
+                throw 'Unknown/duplicate named consumer context'
+            }
+            $consumerReport = Read-MatrixHashedJson -Path (Join-Path $bundle $consumer.report) -Hash $consumer.sha256
+            foreach ($kind in @('gc','io')) {
+                $contract = $consumerReport["${kind}_contract"]
+                foreach ($name in @("${kind}_api_contract.c", "${kind}_contract.h", 'consumer_allocator.h')) {
+                    $source = @($contract.sources | Where-Object { $_.file -ceq "c_api/tests/$name" })
+                    if ($source.Count -ne 1) { throw 'Consumer oracle driver source missing/duplicate' }
+                    [void](Resolve-ReviewedFile -Root $Root -Path $source[0].file -Sha256 $source[0].sha256)
+                }
+            }
+            $consumerRoot = [IO.Path]::GetFullPath((Join-Path $bundle $consumer.artifact_root))
+            $resolve = { param($path,$hash)
+                Resolve-MatrixCapture -Original $path -ArtifactRoot $consumerRoot -Hash $hash
+            }
+            $contexts[$consumer.context] = Test-NamedConsumerEvidence -Report $consumerReport -Mapping $mapping `
+                -Revision $manifest.revision -Context $consumer.context -ResolveCapture $resolve
+            $consumerReports[$consumer.context] = $consumerReport
+        }
+        foreach ($context in $suite.acceptance_contexts) {
+            if (-not $contexts.ContainsKey($context)) { throw "Missing named consumer context: $context" }
+        }
     }
     $coverage = @{}
     foreach ($file in $scope.Definition.files) {
@@ -138,6 +199,26 @@ function Test-ScopedMatrix {
             $report = Read-MatrixHashedJson -Path (Join-Path $bundle $identity.report) -Hash $identity.sha256
             $artifacts = [IO.Path]::GetFullPath((Join-Path $bundle $identity.artifact_root))
             $expectedTarget = if ($target -eq 'ada') { 'Ada' } else { 'ReferenceC' }
+            if ($RequireScopedAcceptance -and $target -eq 'ada') {
+                foreach ($library in $consumerReports[$entry.context].library_files) {
+                    $same = @($report.runtime_library_records | Where-Object {
+                        [IO.Path]::GetFileName($_.path.Replace('\','/')) -ceq $library.file -and
+                        $_.sha256 -ceq $library.sha256
+                    })
+                    if ($same.Count -ne 1) { throw 'Consumer and file execution libraries differ' }
+                }
+            }
+            if ($RequireScopedAcceptance -and $target -eq 'c') {
+                foreach ($kind in @('gc','io')) {
+                    foreach ($library in $consumerReports[$entry.context]["${kind}_contract"].reference_library_files) {
+                        $same = @($report.reference_library_records | Where-Object {
+                            [IO.Path]::GetFileName($_.path.Replace('\','/')) -ceq $library.file -and
+                            $_.sha256 -ceq $library.sha256
+                        })
+                        if ($same.Count -ne 1) { throw 'Consumer and file execution oracle libraries differ' }
+                    }
+                }
+            }
             if ($report.repository_revision -cne $manifest.revision -or $report.repository_dirty -ne $false -or
                 $report.reference_revision -cne $suite.reference_revision -or $report.target -cne $expectedTarget -or
                 $report.coverage_scope -cne $manifest.scope -or $report.operation -cne "file:$($entry.file)" -or

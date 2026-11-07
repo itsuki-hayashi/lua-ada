@@ -182,4 +182,4 @@ function Assert-NativeBranchWitnesses {
     }
 }
 
-Export-ModuleMember -Function Assert-EquivalentReviewBinding, Assert-MatrixReviewBinding, Assert-NativeBranchReviewBinding, Assert-NativeBranchWitnesses
+Export-ModuleMember -Function Resolve-ReviewedFile, Assert-EquivalentReviewBinding, Assert-MatrixReviewBinding, Assert-NativeBranchReviewBinding, Assert-NativeBranchWitnesses

@@ -266,3 +266,4 @@ Write-Output "PASS: $script:cases matrix regressions; no executed conformance cl
 # Approval-file binding is tested separately from synthetic execution reports.
 # Both default CI and instrumented campaigns call this retained entrypoint.
 & (Join-Path $PSScriptRoot 'test-conformance-review.ps1')
+& (Join-Path $PSScriptRoot 'test-consumer-evidence.ps1')

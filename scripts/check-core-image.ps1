@@ -66,6 +66,10 @@ function Invoke-Consumer {
     [IO.File]::WriteAllText((Join-Path $reportDirectory "$Name.stderr"), $stderr)
     $record = [ordered]@{ name = $Name; executable = $Executable;
         executable_sha256 = (Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant();
+        stdout = (Join-Path $reportDirectory "$Name.stdout");
+        stdout_sha256 = (Get-FileHash -LiteralPath (Join-Path $reportDirectory "$Name.stdout") -Algorithm SHA256).Hash.ToLowerInvariant();
+        stderr = (Join-Path $reportDirectory "$Name.stderr");
+        stderr_sha256 = (Get-FileHash -LiteralPath (Join-Path $reportDirectory "$Name.stderr") -Algorithm SHA256).Hash.ToLowerInvariant();
         exit_code = $process.ExitCode; timed_out = $timedOut;
         profile = $Profile; library_type = $LibraryType;
         configuration = $Configuration;
@@ -87,6 +91,14 @@ function Invoke-Consumer {
 
 try {
     Set-Location $projectRoot
+    # Bind captured cases to the source tree that produced this campaign.
+    # Dirty runs remain useful diagnostics but cannot supply final acceptance.
+    $repositoryRevision = (& git rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot identify consumer source revision' }
+    $repositoryChanges = @(& git -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal)
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect consumer source state' }
+    $referenceRevision = (& git -C references/lua rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot identify consumer reference revision' }
     $adaRuntimeDirectory = ''
     if ($IsMacOS) {
         $runtime = Get-SelectedAdaRuntime
@@ -182,6 +194,14 @@ try {
     })
     if ($libraries.Count -eq 0) { throw 'Selected root lua image is absent' }
     [ordered]@{ profile = $Profile; library_type = $LibraryType;
+        repository_revision = $repositoryRevision;
+        repository_dirty = ($repositoryChanges.Count -ne 0);
+        platform = $(if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' });
+        reference_revision = $referenceRevision;
+        consumer_sources = @(foreach ($name in @('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'consumer_allocator.h')) {
+            [ordered]@{ file="c_api/tests/$name";
+                sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+        });
         configuration = $Configuration; consumers = $records.ToArray();
         library_files = $libraries;
         gc_contract = [ordered]@{ matching_output=$true; sources=$contractSources;
