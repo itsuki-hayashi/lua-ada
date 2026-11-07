@@ -9,6 +9,15 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 if ($SourceRoot -eq '') { $SourceRoot = $root }
 $SourceRoot = [IO.Path]::GetFullPath($SourceRoot)
+$sourceGitRoot = (& git -C $SourceRoot rev-parse --show-toplevel 2>$null)
+$sourceSnapshot = @{kind='synthetic-or-external-source-fixture';revision=$null;repository_dirty=$null}
+if ($LASTEXITCODE -eq 0 -and [IO.Path]::GetFullPath(($sourceGitRoot -join '').Trim()) -ieq $SourceRoot) {
+    $sourceRevision = (& git -C $SourceRoot rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot identify author proposal source revision' }
+    $sourceChanges = @(& git -C $SourceRoot -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal)
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect author proposal source state' }
+    $sourceSnapshot = @{kind='repository-source-snapshot';revision=$sourceRevision;repository_dirty=($sourceChanges.Count -ne 0)}
+}
 $output = if ($OutputDirectory -ne '') { [IO.Path]::GetFullPath($OutputDirectory) }
     else { Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility' }
 $relativeOutput = [IO.Path]::GetRelativePath($root,$output).Replace('\','/')
@@ -20,7 +29,7 @@ $utf8 = [Text.UTF8Encoding]::new($false)
 function Save-Proposal([string] $Name,[object] $Value) {
     $path = Join-Path $output $Name
     [IO.File]::WriteAllText($path,(ConvertTo-Json -InputObject $Value -Depth 64).Replace("`r`n","`n") + "`n",$utf8)
-    return @{path=$path;sha256=(Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()}
+    return @{path=[IO.Path]::GetRelativePath($root,$path).Replace('\','/');sha256=(Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()}
 }
 function Source-Hash([string] $Relative) {
     if ([IO.Path]::IsPathRooted($Relative)) { throw 'Witness source identity must be repository-relative' }
@@ -100,10 +109,46 @@ $unit.kind = 'remaining-upstream-aunit-witness-author-proposal'
 [void][IO.Directory]::CreateDirectory($output)
 $consumerIdentity = Save-Proposal 'consumer-witness.author-proposal.json' $consumer
 $unitIdentity = Save-Proposal 'aunit-witness.author-proposal.json' $unit
+$globalRecords = @(Get-Content -LiteralPath (Join-Path $SourceRoot 'tests/conformance/c-api.jsonl') |
+    Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_ | ConvertFrom-Json -AsHashtable -Depth 48 })
+$retainedApi = @(Get-Content -LiteralPath (Join-Path $root 'tests/conformance/scopes/expanded-t-conformance.api.jsonl') |
+    Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_ | ConvertFrom-Json -AsHashtable -Depth 48 })
+if ($globalRecords.Count -ne 473 -or $retainedApi.Count -ne 159) { throw 'Global/retained API predecessor inventory changed' }
+$apiProposals = @()
+foreach ($record in $globalRecords) {
+    $old = @($retainedApi | Where-Object id -CEQ $record.id)
+    if ($old.Count -gt 1) { throw 'Retained API predecessor contains duplicate identities' }
+    $previous = if ($old.Count -eq 1) { @($consumer.entries | Where-Object id -CEQ $record.id)[0] } else { $null }
+    # Preserve old semantic routes as proposals needing fresh current-source
+    # review. Header kind alone does not classify a macro as a runtime call,
+    # constant, conditional alternative, type or configuration declaration.
+    $apiProposals += [ordered]@{id=$record.id;header=$record.header;kind=$record.kind;name=$record.name;
+        line=$record.line;byte_offset=$record.byte_offset;byte_length=$record.byte_length;anchor_sha256=$record.anchor_sha256;
+        declaration=$record.declaration;conditions=@($record.conditions);classification='pending-semantic-review';
+        invariant=$(if($null -ne $previous){$previous.invariant}else{$null});
+        boundaries=$(if($null -ne $previous){$previous.boundaries}else{$null});
+        retained_route=($old.Count -eq 1);
+        named_c_cases=@(if($null -ne $previous){$previous.cases});
+        named_aunit_cases=@(if($old.Count -eq 1){$old[0].named_aunit_cases | ForEach-Object { $_.source + '#' + $_.id }});
+        compiled_witnesses=@();applicability_review=$null;review_status='pending';
+        runtime_acceptance=$false;coverage_authority=$false;execution_evidence=@()}
+}
+$api = [ordered]@{schema_version=1;kind='remaining-upstream-global-api-author-proposal';
+    target='remaining-upstream-compatibility';reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';
+    author='Codex /root/validation_delivery';independent_review_status='pending';runtime_acceptance=$false;
+    coverage_authority=$false;source_snapshot=$sourceSnapshot;retained_api_routes=159;global_api_entries=473;entries=$apiProposals;
+    requirements=@('Every global entry requires independent semantic classification and fresh context-specific evidence.',
+        'Actual function/function-like-macro behavior uses named executed C or Ada cases.',
+        'Types, constants and declaration-only entries use appropriate actual compiled ABI/layout/header witnesses; do not invent runtime calls.',
+        'Conditional declarations require independently reviewed original-source applicability and measured compiled-configuration witnesses.',
+        'Preserve all 159 retained API routes and original 100 C/94 AUnit witness identities and protocols.',
+        'No passed ledger status, token mention, registration or author proposal alone establishes execution or acceptance.')}
+$apiIdentity = Save-Proposal 'global-api.author-proposal.json' $api
 $summary = @{schema_version=1;kind='remaining-upstream-witness-successor-author-index';target='remaining-upstream-compatibility';
-    predecessors=$predecessors;changed_source_bindings=$changed;retained_consumer_cases=100;retained_aunit_cases=94;
+    predecessors=$predecessors;source_snapshot=$sourceSnapshot;changed_source_bindings=$changed;retained_consumer_cases=100;retained_aunit_cases=94;
     proposed_consumer_cases=@($consumer.cases).Count;proposed_aunit_cases=@($unit.entries).Count;
-    consumer=$consumerIdentity;aunit=$unitIdentity;independent_review_status='pending';coverage_authority=$false;runtime_acceptance=$false}
+    consumer=$consumerIdentity;aunit=$unitIdentity;global_api=$apiIdentity;global_api_entries=473;retained_api_routes=159;
+    independent_review_status='pending';coverage_authority=$false;runtime_acceptance=$false}
 $index = Save-Proposal 'witnesses.author-index.json' $summary
 Write-Output "AUTHOR PROPOSALS ONLY: retained 100 C / 94 AUnit witnesses; proposed $($summary.proposed_consumer_cases) C / $($summary.proposed_aunit_cases) AUnit; changed sources=$($changed.Count); index=$($index.path)"
 Write-Output 'No historical artifact, semantic approval, execution evidence or acceptance status was changed.'

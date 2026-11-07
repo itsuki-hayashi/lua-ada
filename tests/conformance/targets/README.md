@@ -326,3 +326,25 @@ arguments outside the subprocess source strings tested by main.lua.
 fixtures. Its optional `-ReferenceInterpreter` cases run tiny synthetic chunks
 to reject incorrect return values and incorrect coroutine termination; those
 checks do not execute the original upstream files or establish Ada conformance.
+
+The successor witness producer also emits `global-api.author-proposal.json` for
+all 473 global header inventory entries. It preserves the 159 retained semantic
+routes and original 100 C/94 AUnit identities, and leaves every classification
+pending for fresh independent review. The other 314 entries have empty routes;
+the producer does not guess that a macro is a function call or that compilation
+of a declaration checks runtime behavior. Appropriate compiled ABI, layout or
+header witnesses are required for types/constants/declaration-only entries,
+with measured configuration evidence for conditional declarations. Current
+source hashes and repository snapshot state are authoring context only. None
+of these proposals carries historical execution evidence onto the new tree.
+
+`TargetContext.psm1` derives 26 builds and 130 execution partitions from suite.json:
+three shards of ten primary files, Aggregate and Heavy for every context. The
+shard owning constructs.lua also owns its mandatory second-template supplement.
+Its image transport records the exact revision/context, actual selected
+launcher basename, each binary/library/capture byte hash and Unix mode. Restore
+can write only generated binary/library and observation paths; source paths,
+traversal/aliases, duplicate identities and reparse-point destinations reject.
+Payloads remain without runtime or coverage authority. Byte/mode verification
+before and after a partition protects the shared context image; successful
+transport is not evidence that any Lua, C or AUnit operation passed.

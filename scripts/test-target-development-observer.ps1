@@ -53,7 +53,7 @@ $consumer = Get-Content $consumerSource -Raw | ConvertFrom-Json -AsHashtable -De
 $unit = Get-Content $unitSource -Raw | ConvertFrom-Json -AsHashtable -Depth 64
 $fixtureRoot = Join-Path $temporary 'sources'
 $sources = @(@($consumer.source_bindings.path) + @($unit.bindings.path) + @($consumer.cases.source) +
-    @($unit.entries | ForEach-Object { $_.case.Split('#')[0] }) | Sort-Object -Unique)
+    @($unit.entries | ForEach-Object { $_.case.Split('#')[0] }) + @('tests/conformance/c-api.jsonl') | Sort-Object -Unique)
 foreach ($source in $sources) {
     $target = Join-Path $fixtureRoot $source
     [void][IO.Directory]::CreateDirectory((Split-Path -Parent $target))
@@ -89,6 +89,25 @@ Case 'successor authoring cannot overwrite accepted historical artifacts' {
     Assert-True ($p.exit_code -ne 0) 'Historical witness output directory was accepted'
     Assert-True ((Get-FileHash $consumerSource).Hash -ceq $consumerOriginalHash -and
         (Get-FileHash $unitSource).Hash -ceq $unitOriginalHash) 'Historical metadata changed'
+}
+Case 'all 473 global API entries remain distinct from retained 159 routes and need fresh review' {
+    $api = Get-Content (Join-Path $proposalOutput 'global-api.author-proposal.json') -Raw |
+        ConvertFrom-Json -AsHashtable -Depth 64
+    Assert-True ($api.entries.Count -eq 473 -and $api.global_api_entries -eq 473 -and $api.retained_api_routes -eq 159 -and
+        @($api.entries | Where-Object retained_route -EQ $true).Count -eq 159 -and
+        @($api.entries | Where-Object classification -CNE pending-semantic-review).Count -eq 0 -and
+        -not $api.runtime_acceptance -and -not $api.coverage_authority) 'Global author catalogue gained classification or acceptance'
+    foreach ($entry in $consumer.entries) {
+        $next = @($api.entries | Where-Object id -CEQ $entry.id)
+        Assert-True ($next.Count -eq 1 -and (@($next[0].named_c_cases) -join '|') -ceq (@($entry.cases) -join '|') -and
+            $next[0].invariant -ceq $entry.invariant -and $next[0].boundaries -ceq $entry.boundaries) 'Retained route was changed'
+    }
+    $new = @($api.entries | Where-Object retained_route -EQ $false)
+    Assert-True ($new.Count -eq 314 -and @($new | Where-Object {
+        @($_.named_c_cases).Count -ne 0 -or @($_.named_aunit_cases).Count -ne 0 -or
+        @($_.compiled_witnesses).Count -ne 0 -or $_.review_status -cne 'pending' -or
+        $_.runtime_acceptance -or $_.coverage_authority -or @($_.execution_evidence).Count -ne 0
+    }).Count -eq 0) 'Unmapped global declarations acquired invented witnesses'
 }
 Case 'new cases are explicit pending proposals rather than inferred runtime coverage' {
     $path = Join-Path $temporary 'additional.json'

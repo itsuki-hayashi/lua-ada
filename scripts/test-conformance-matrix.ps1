@@ -293,3 +293,5 @@ if ($LASTEXITCODE -ne 0) { throw 'Exact-byte transform regressions failed' }
 if ($LASTEXITCODE -ne 0) { throw 'Development observer regressions failed' }
 & (Join-Path $PSScriptRoot 'test-target-file-protocols.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Target file completion regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-context.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target context/image regressions failed' }
