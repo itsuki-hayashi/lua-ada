@@ -1,0 +1,114 @@
+{
+  "source_observation": {
+    "sha256": "b00e1251fb9cb9a7b5a363dd43c46f59f28dd45c142075c4d91a5b81246efbb2",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-equivalence.source.author-proposal.json"
+  },
+  "decision": "accepted",
+  "execution_evidence": [],
+  "equivalent": {
+    "id": "gc-ada-remaining-upstream",
+    "source_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+    "generated_sha256": "059aaafb1068bc4245b23f56b2e10a75a66301b0bf05eede8ce3e7fd8a56b6dd",
+    "source": "references/lua/testes/gc.lua",
+    "disposition": "ada-internal-equivalent",
+    "configuration": "default-and-upstream-test",
+    "platform": null
+  },
+  "schema_version": 1,
+  "reviewer": "Codex independent source review /root",
+  "decisions": [
+    {
+      "review_evidence": {
+        "sha256": "ce436a724e457dc1a12641cc6756b4179f0d7ef35d5f116dbac441e4e37fa3f2",
+        "path": "tests\\conformance\\targets\\remaining-upstream-compatibility\\gc-ada-equivalence.independent-review.json"
+      },
+      "id": "measure-live-payloads",
+      "length_bytes": 49,
+      "decision": "accepted",
+      "reviewer": "Codex independent source review /root",
+      "historical_rationale": "The original C one-KiB residual allowance does not describe retained Ada table/index capacity. The replacement samples actual live managed bytes with both original 4-MiB string payloads present, then requires at least 8 MiB to be released. The untouched weak-value/key removal, last-entry deletion, empty traversal and safe dead-key lookup checks remain. Production New_String owns one real text buffer; the test does not substitute fabricated C-size counts. The focused 64-KiB case repeats three times and is present as OK in the instrumented Windows AUnit artifact.",
+      "start_byte": 11479,
+      "counterparts": [
+        {
+          "sha256": "26e26e3c389384ebdf49740e80f6e83608a42b42c5dd0b847a633659a022a0e3",
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
+        }
+      ],
+      "source_sha256": "4bb49bacb1a6d2575ad3abbb475fd83ff2e7ad65102d29c93d02e7bdf43f700e",
+      "rationale": "The pre-collection measurement retains both original long payloads and measures actual managed live bytes. It removes no weak-graph or semantic assertion.",
+      "replacement_sha256": "833abcf9a2278f2a5cb3cd892f26de6e8af7cc426bdb718144234527dcd97d9d",
+      "author": "Codex /root/validation_delivery"
+    },
+    {
+      "review_evidence": {
+        "sha256": "ce436a724e457dc1a12641cc6756b4179f0d7ef35d5f116dbac441e4e37fa3f2",
+        "path": "tests\\conformance\\targets\\remaining-upstream-compatibility\\gc-ada-equivalence.independent-review.json"
+      },
+      "id": "reclaim-payloads",
+      "length_bytes": 40,
+      "decision": "accepted",
+      "reviewer": "Codex independent source review /root",
+      "historical_rationale": "The original C one-KiB residual allowance does not describe retained Ada table/index capacity. The replacement samples actual live managed bytes with both original 4-MiB string payloads present, then requires at least 8 MiB to be released. The untouched weak-value/key removal, last-entry deletion, empty traversal and safe dead-key lookup checks remain. Production New_String owns one real text buffer; the test does not substitute fabricated C-size counts. The focused 64-KiB case repeats three times and is present as OK in the instrumented Windows AUnit artifact.",
+      "start_byte": 11963,
+      "counterparts": [
+        {
+          "sha256": "26e26e3c389384ebdf49740e80f6e83608a42b42c5dd0b847a633659a022a0e3",
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
+        }
+      ],
+      "source_sha256": "c520c19e1c58d291af4e63c84b5083a165dd416be4983767261653ccd569cbc6",
+      "rationale": "The replacement requires release of both original 4 MiB payloads while preserving traversal, deletion and dead-key safety. It accounts for Ada retained table capacity rather than substituting C allocation geometry.",
+      "replacement_sha256": "0244ab649f62283a93b423e4250bba43ea0c044bcaaf8f87334b520f94378b15",
+      "author": "Codex /root/validation_delivery"
+    },
+    {
+      "review_evidence": {
+        "sha256": "ce436a724e457dc1a12641cc6756b4179f0d7ef35d5f116dbac441e4e37fa3f2",
+        "path": "tests\\conformance\\targets\\remaining-upstream-compatibility\\gc-ada-equivalence.independent-review.json"
+      },
+      "id": "stable-cell-color",
+      "length_bytes": 31,
+      "decision": "accepted",
+      "reviewer": "Codex independent source review /root",
+      "historical_rationale": "The independently allocated Ada cell owns its value and applies the production forward barrier at the update. A black cell shades the new table gray, unlike the C open-upvalue white assumption. The replacement changes only that inspection assertion; the weak coroutine must still be white, disappear in the same cycle, and leave an exported closure returning 30. Dead context teardown clears cell associations without dereferencing already reclaimed cells before frame destruction.",
+      "start_byte": 14278,
+      "counterparts": [
+        {
+          "sha256": "26e26e3c389384ebdf49740e80f6e83608a42b42c5dd0b847a633659a022a0e3",
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Orphan_Cell"
+        }
+      ],
+      "source_sha256": "3368876c423554b8967a1fca42de51cf3fc6dc96f2dbe3bc3263b2f14b5aacdf",
+      "rationale": "Store_Cell calls the actual collector write barrier before publishing Cell_Value. The gray child expectation matches independently owned Ada cells; the same-cycle weak coroutine death and surviving final capture value remain asserted.",
+      "replacement_sha256": "8962292d95f5a292ba02ad38b282fe93d1f4a072994b8ec38fe55e7c65206ec6",
+      "author": "Codex /root/validation_delivery"
+    },
+    {
+      "review_evidence": {
+        "sha256": "ce436a724e457dc1a12641cc6756b4179f0d7ef35d5f116dbac441e4e37fa3f2",
+        "path": "tests\\conformance\\targets\\remaining-upstream-compatibility\\gc-ada-equivalence.independent-review.json"
+      },
+      "id": "measured-emergency-headroom",
+      "length_bytes": 80,
+      "decision": "accepted",
+      "reviewer": "Codex independent source review /root",
+      "historical_rationale": "The test-only adapter measures the actual empty-table allocation cost, permits only one table of headroom, and performs 200 real New_Table operations under the production test ceiling. Construction serial roots are preserved; real allocation refusals invoke production emergency retry. Returned refusal and collection deltas must each be at least 199; the limit is removed on success and exceptions, and the independent 2-GiB host ceiling is untouched. Subsequent original exact table/closure/thread count assertions remain. No Lua finalizer is invoked by the emergency collection path.",
+      "start_byte": 16478,
+      "counterparts": [
+        {
+          "sha256": "26e26e3c389384ebdf49740e80f6e83608a42b42c5dd0b847a633659a022a0e3",
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Measured_Emergency_Headroom"
+        }
+      ],
+      "source_sha256": "342a5139c4c1d3792c706e27094019af1eb85691e390a7fafbca2ad2d3b75559",
+      "rationale": "The adapter measures a real empty-table allocation, sets a genuine provider ceiling, counts actual refusals and collections across 200 allocations, checks the ceiling, and restores state on every exit. It preserves recovery rather than accepting synthetic allocation counts.",
+      "replacement_sha256": "acee89ad1dbc5dc0421b883804eadcb693bdaf5958114b874bf24b37e2b9ba4b",
+      "author": "Codex /root/validation_delivery"
+    }
+  ],
+  "kind": "equivalent-approval",
+  "coverage_authority": false,
+  "target": "remaining-upstream-compatibility",
+  "runtime_acceptance": false,
+  "author": "Codex /root/validation_delivery"
+}

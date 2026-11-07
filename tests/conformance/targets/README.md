@@ -267,3 +267,10 @@ fixtures rather than inheriting their authority onto changed production files.
 They deliberately reject a changed counterpart with an old approval. Current
 production replay applicability is reported separately; a frozen fixture pass
 does not clear a stale production source binding or establish runtime coverage.
+
+The target-owned `remaining-upstream-compatibility/gc-ada-equivalence.json`
+has an independent source-semantic review of its four unchanged predecessor
+transformations and current counterpart bindings. Its approval and narrative
+remain separate from the historical mapping. The generated source hash is
+unchanged; its source review grants no runtime or coverage acceptance. Fresh
+GC and named counterpart execution must still bind the final runtime image.

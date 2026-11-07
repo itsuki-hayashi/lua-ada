@@ -1,0 +1,26 @@
+{
+  "runtime_acceptance": false,
+  "author": "Codex /root/validation_delivery",
+  "source_observation": {
+    "sha256": "b00e1251fb9cb9a7b5a363dd43c46f59f28dd45c142075c4d91a5b81246efbb2",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/gc-equivalence.source.author-proposal.json"
+  },
+  "coverage_authority": false,
+  "decision": "accepted-semantic-mapping",
+  "inspection": [
+    "Independently verified raw predecessor/current body bytes and registrations for Check and all three counterparts.",
+    "Read current counterpart assertions, measured provider-ceiling driver, Store_Cell publication/barrier, and unchanged source replacements.",
+    "This approves source semantic mapping only. Fresh execution and final runtime/storage review remain required; no source/API ledger record is discharged."
+  ],
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "reviewed_revision": "f6f0beba49541e901ce66b54ac85d4d2cf603cd4",
+  "decisions": {
+    "measured-emergency-headroom": "The adapter measures a real empty-table allocation, sets a genuine provider ceiling, counts actual refusals and collections across 200 allocations, checks the ceiling, and restores state on every exit. It preserves recovery rather than accepting synthetic allocation counts.",
+    "measure-live-payloads": "The pre-collection measurement retains both original long payloads and measures actual managed live bytes. It removes no weak-graph or semantic assertion.",
+    "reclaim-payloads": "The replacement requires release of both original 4 MiB payloads while preserving traversal, deletion and dead-key safety. It accounts for Ada retained table capacity rather than substituting C allocation geometry.",
+    "stable-cell-color": "Store_Cell calls the actual collector write barrier before publishing Cell_Value. The gray child expectation matches independently owned Ada cells; the same-cycle weak coroutine death and surviving final capture value remain asserted."
+  },
+  "schema_version": 1,
+  "kind": "equivalent-independent-source-review",
+  "reviewer": "Codex independent source review /root"
+}
