@@ -96,17 +96,23 @@ foreach ($case in $consumer.cases) {
 foreach ($entry in $unit.entries) { $entry.source_sha256 = Source-Hash $entry.case.Split('#')[0] }
 if ($AdditionalConsumerCases -ne '') {
     $additional = Get-Content -LiteralPath $AdditionalConsumerCases -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    $allowedContexts=(Get-Content (Join-Path $root 'tests/conformance/suite.json') -Raw|ConvertFrom-Json -AsHashtable).acceptance_contexts
     foreach ($case in $additional.cases) {
         $key = $case.source + '#' + $case.case_id
         if (@($consumer.cases | Where-Object { ($_.source + '#' + $_.case_id) -ceq $key }).Count -ne 0 -or
             $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api','value-api','auxiliary-api',
                 'load-dump-api','debug-api','external-api','conversion-api','operator-api','index-type-api','base-closing-api','native-module-api','buffer-api',
                 'allocator-api','allocator-panic-string-api','allocator-panic-number-api','substitution-api',
-                'loadfile-api','loadfile-stdin-text-api','loadfile-stdin-binary-c-api') -or
+                'loadfile-api','loadfile-stdin-text-api','loadfile-stdin-binary-c-api','pointer-identity-api','concat-api','thread-reset-api') -or
             $case.source -cnotmatch '^(?:c_api/tests/[a-zA-Z0-9_-]+\.(?:c|h)|tests/c/[a-zA-Z0-9_-]+\.c)$' -or
             (@($case.exact_witnesses).Count -eq 0 -and ($null -eq $case.pattern_witness -or
                 -not $case.pattern_witness.StartsWith('^') -or -not $case.pattern_witness.EndsWith('$'))) -or
             $case.expected_count -ne 1) { throw 'Invalid or duplicate additional consumer witness proposal' }
+        if($case.Contains('contexts') -and ($case.contexts -isnot [Array] -or $case.contexts.Count -eq 0 -or
+            @($case.contexts|Sort-Object -Unique).Count -ne $case.contexts.Count -or
+            @($case.contexts|Where-Object{$_ -cnotin $allowedContexts}).Count)){
+            throw 'Additional C receiver applicability requires explicit supported contexts'
+        }
         $case.source_sha256 = Source-Hash $case.source
         $case['runtime_acceptance'] = $false; $case['execution_evidence'] = @(); $case['independent_review_status'] = 'pending'
         $consumer.cases += $case
@@ -187,7 +193,7 @@ $api = [ordered]@{schema_version=1;kind='remaining-upstream-global-api-author-pr
 if($AdditionalApiRoutes -ne ''){
     $routes=Get-Content -LiteralPath $AdditionalApiRoutes -Raw|ConvertFrom-Json -AsHashtable -Depth 64
     $seenRoutes=@{};$knownC=@{};$knownUnit=@{}
-    foreach($case in $consumer.cases){$knownC[$case.source+'#'+$case.case_id]=$true}
+    foreach($case in $consumer.cases){$knownC[$case.source+'#'+$case.case_id]=$case}
     foreach($case in $unit.entries){$knownUnit[$case.case]=$true}
     $suite=Get-Content (Join-Path $root 'tests/conformance/suite.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 48
     foreach($route in $routes.entries){
@@ -217,7 +223,8 @@ if($AdditionalApiRoutes -ne ''){
         # the actual semantic classification/review pending and avoid the
         # final schema's runtime-observed disposition until independent review.
         $entry['proposed_context_witnesses']=@(foreach($context in $suite.acceptance_contexts){
-            @{context=$context;required_disposition='runtime-observed';named_c_cases=@($route.named_c_cases);
+            $activeC=@($route.named_c_cases|Where-Object{-not $knownC[$_].Contains('contexts') -or $context -cin $knownC[$_].contexts})
+            @{context=$context;required_disposition=$(if($activeC.Count+@($route.named_aunit_cases).Count -gt 0){'runtime-observed'}else{'pending-original-source-applicability-review'});named_c_cases=$activeC;
                 named_aunit_cases=@($route.named_aunit_cases);compiled_witnesses=@();review_status='pending';runtime_acceptance=$false}
         })
     }

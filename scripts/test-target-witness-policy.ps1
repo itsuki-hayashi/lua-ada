@@ -75,6 +75,14 @@ Case 'changed actual source cannot inherit an old source binding' {
     [IO.File]::AppendAllText((Join-Path $f.root $f.consumer.cases[0].source),'changed synthetic source',$utf8)
     Reject { Read-Fixture $f } 'hash differs'
 }
+Case 'retained C protocols cannot be narrowed and new receiver contexts must belong to the actual matrix'{
+    $f=New-Fixture;$f.consumer.cases[0].contexts=@('default/windows/validation/static');Update-Fixture $f
+    Reject {Read-Fixture $f} 'Retained C witness context'
+    $f=New-Fixture;$case=$f.consumer.cases[0]|ConvertTo-Json -Depth 32|ConvertFrom-Json -AsHashtable
+    $case.case_id='synthetic-new-context-only';$case.contexts=@('unknown/platform/profile/link')
+    $f.consumer.cases+=@($case);Update-Fixture $f
+    Reject {Read-Fixture $f} 'unknown or malformed receiver context'
+}
 Case 'global inventory cardinality anchors and retained routes are independently mandatory' {
     $f=New-Fixture; $f.api.entries=@($f.api.entries | Select-Object -Skip 1); Update-Fixture $f
     Reject { Read-Fixture $f } 'omit retained or global'
@@ -129,10 +137,15 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
     $relative=[IO.Path]::GetRelativePath($root,(Join-Path $path 'witness-policy.author-proposal.json')).Replace('\','/')
     $r=Read-TargetWitnessPolicy -Root $root -Path $relative
     $new=@($r.global_api.entries|Where-Object{ $_.Contains('proposed_classification') })
-    Assert-True ($r.consumer.cases.Count -eq 408 -and $r.aunit.entries.Count -eq 185 -and $new.Count -eq 84 -and
+    Assert-True ($r.consumer.cases.Count -eq 461 -and $r.aunit.entries.Count -eq 260 -and $new.Count -eq 86 -and
         @($new|Where-Object{ $_.classification -cne 'pending-semantic-review' -or $_.review_status -cne 'pending' -or
             $_.runtime_acceptance -or $_.execution_evidence.Count }).Count -eq 0 -and -not $r.source_reviewed -and -not $r.runtime_acceptance) 'Source routes invented acceptance'
     foreach($entry in $new){Assert-True ($entry.proposed_context_witnesses.Count -eq 26 -and -not $entry.Contains('context_witnesses')) 'A future route became an actual context observation'}
+    $reset=@($new|Where-Object name -CEQ lua_closethread)[0]
+    foreach($route in $reset.proposed_context_witnesses){
+        $warning='c_api/tests/thread_reset_api_contract.c#self-warning'
+        Assert-True (($route.context.StartsWith('default/')) -eq ($warning -cin $route.named_c_cases)) 'Native warning-lock skip became a T pass or a missing default witness'
+    }
     Reject {Read-TargetWitnessPolicy -Root $root -Path $relative -RequireReview} 'incomplete|independent review|function source'
 }
 Case 'API author routes reject invented witnesses declaration-only calls and smuggled passing metadata'{

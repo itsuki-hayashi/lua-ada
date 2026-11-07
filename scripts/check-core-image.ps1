@@ -227,6 +227,8 @@ try {
     Invoke-Consumer 'substitution-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/substitution_api_contract$suffix") 'PASS: public luaL_addgsub and luaL_gsub contract'
     $loadfileConsumer=Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/loadfile_api_contract$suffix"
     Invoke-Consumer 'loadfile-api' $loadfileConsumer 'PASS: public luaL_loadfilex contract'
+    Invoke-Consumer 'pointer-identity-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/pointer_identity_contract$suffix") 'PASS: public pointer identity contract'
+    Invoke-Consumer 'concat-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/concat_api_contract$suffix") 'PASS: public lua_concat contract'
     $compilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
     if($LASTEXITCODE -ne 0){throw 'Cannot identify selected native module fixture compiler'}
     $fixtureCompiler=($compilerOutput -join '').Trim()
@@ -342,6 +344,14 @@ try {
     Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/loadfile_api_contract.c'),
         '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceLoadfileConsumer)
+    $referencePointerConsumer=Join-Path $reportDirectory "pointer-identity-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/pointer_identity_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referencePointerConsumer)
+    $referenceConcatConsumer=Join-Path $reportDirectory "concat-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/concat_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceConcatConsumer)
     $nativeSystemLibraries=if($IsLinux){@('-ldl')}else{@()}
     Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/native_module_contract.c'),
@@ -375,6 +385,8 @@ try {
         }
         Invoke-Consumer 'substitution-oracle' $referenceSubstitutionConsumer 'PASS: public luaL_addgsub and luaL_gsub contract'
         Invoke-Consumer 'loadfile-oracle' $referenceLoadfileConsumer 'PASS: public luaL_loadfilex contract'
+        Invoke-Consumer 'pointer-identity-oracle' $referencePointerConsumer 'PASS: public pointer identity contract'
+        Invoke-Consumer 'concat-oracle' $referenceConcatConsumer 'PASS: public lua_concat contract'
         $fileContext=$Configuration+'/'+$(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'})+'/'+$Profile+'/'+$(if($LibraryType -ceq 'relocatable'){'shared'}else{$LibraryType})
         $fileIO=Invoke-FileConsumerIO -Root $projectRoot -Context $fileContext -AdaExecutable $loadfileConsumer `
             -ReferenceExecutable $referenceLoadfileConsumer -RecordDirectory (Join-Path $reportDirectory 'file-stdin')
@@ -469,7 +481,7 @@ try {
     if([IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-oracle.stdout'))){throw 'C/Ada public buffer contract output differs'}
     Write-Output 'PASS: identical public luaL_Buffer contract against C and Ada'
-    foreach($kind in @('allocator','substitution','loadfile')){
+    foreach($kind in @('allocator','substitution','loadfile','pointer-identity','concat')){
         foreach($stream in @('stdout','stderr')){
             if((Get-FileHash (Join-Path $reportDirectory "$kind-api.$stream")).Hash -cne
                 (Get-FileHash (Join-Path $reportDirectory "$kind-oracle.$stream")).Hash){throw "C/Ada public $kind contract $stream differs"}
@@ -560,6 +572,12 @@ try {
     $loadfileContractSources=@(foreach($name in @('loadfile_api_contract.c','consumer_allocator.h')){
         @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
     })
+    $pointerContractSources=@(foreach($name in @('pointer_identity_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $concatContractSources=@(foreach($name in @('concat_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
     $threadResetContractSources = @(foreach ($name in @('thread_reset_api_contract.c', 'consumer_allocator.h')) {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
@@ -587,7 +605,7 @@ try {
         consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources);
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources + $pointerContractSources + $concatContractSources);
         configuration = $Configuration; consumers = $records.ToArray();
         reference_compiler_defines=$referenceCompilerDefines;
         library_files = $libraries;
@@ -624,6 +642,8 @@ try {
         allocator_contract=@{matching_output=$true;sources=$allocatorContractSources;matched_cases=13;panic_modes=@('string','number');reference_library_files=$referenceLibraries};
         substitution_contract=@{matching_output=$true;sources=$substitutionContractSources;matched_cases=16;reference_library_files=$referenceLibraries};
         loadfile_contract=@{matching_output=$true;sources=$loadfileContractSources;matched_cases=21;stdin_io=$fileIO;reference_library_files=$referenceLibraries};
+        pointer_identity_contract=@{matching_output=$true;sources=$pointerContractSources;matched_cases=8;reference_library_files=$referenceLibraries};
+        concat_contract=@{matching_output=$true;sources=$concatContractSources;matched_cases=21;reference_library_files=$referenceLibraries};
         thread_reset_contract = [ordered]@{ matching_output=$true; sources=$threadResetContractSources;
             matched_cases=$(if ($Configuration -eq 'upstream-test') { 23 } else { 24 });
             skipped_warning_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 1 } else { 0 });

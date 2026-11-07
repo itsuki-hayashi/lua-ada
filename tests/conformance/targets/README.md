@@ -737,6 +737,22 @@ binding intentionally; fresh generated header mappings remain pending until
 the stable candidate receives its final source review. No prior approval is
 silently carried forward by regenerating proposal hashes.
 
+The typed file, pointer identity, concat and reset successor proposals now
+assemble 461 C and 260 AUnit identities. New pointer/concat operations extend
+the existing routes without removing the value-driver concat witnesses.
+Actual registered source contains 35 identity and 25 C concat AUnit names; the
+latter includes four host-quota cases. These source registrations are pending
+witness proposals, not a new passing execution certificate.
+
+New C witnesses may carry a nonempty `contexts` array only through the explicit
+remaining-target selector. Historical 100 C protocols cannot acquire that field
+or become narrower. The final API consumer rejects routes to inactive receiver
+witnesses. Reset keeps 24 default C cases and 23 T passes with the exact native
+warning-lock skip. Its default-only warning C witness remains separately
+inapplicable in T; no exclusion or fabricated pass is produced. Additional
+Ada borrowed-reader cleanup and policy witnesses make no native-equivalence
+claim for the known native partial-parser cleanup behavior.
+
 Final image replay also binds the actual selected C/C++ frontend identities,
 the compiler/query processes, both executables and every capture. Declaration
 and applicability reconciliation checks every required language/configuration

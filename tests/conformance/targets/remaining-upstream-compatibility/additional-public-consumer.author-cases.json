@@ -4331,6 +4331,769 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/pointer_identity_contract.c",
+      "case_id": "table-identity",
+      "consumer": "pointer-identity-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: pointer-identity-table-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/pointer_identity_contract.c",
+      "case_id": "full-userdata-identity",
+      "consumer": "pointer-identity-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: pointer-identity-full-userdata-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/pointer_identity_contract.c",
+      "case_id": "light-userdata-identity",
+      "consumer": "pointer-identity-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: pointer-identity-light-userdata-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/pointer_identity_contract.c",
+      "case_id": "null-light-userdata-identity",
+      "consumer": "pointer-identity-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: pointer-identity-null-light-userdata-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/pointer_identity_contract.c",
+      "case_id": "light-cfunction-identity",
+      "consumer": "pointer-identity-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: pointer-identity-light-cfunction-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/pointer_identity_contract.c",
+      "case_id": "captured-closure-identity",
+      "consumer": "pointer-identity-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: pointer-identity-captured-closure-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/pointer_identity_contract.c",
+      "case_id": "coroutine-identity",
+      "consumer": "pointer-identity-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: pointer-identity-coroutine-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/pointer_identity_contract.c",
+      "case_id": "raw-string-identity",
+      "consumer": "pointer-identity-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: pointer-identity-raw-string-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "caller-mutation",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-caller-mutation"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "weak-operand-lifetime",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-weak-operand-lifetime"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "retained-prefix",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-retained-prefix"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "error-location",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-error-location"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "current-pair-roots",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-current-pair-roots"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "primitive-suffix",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-primitive-suffix"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "numeric-primitives",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-numeric-primitives"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "empty-result",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-empty-result"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "singleton-identity",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-singleton-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "empty-right-refusal",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-empty-right-refusal"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "empty-left-refusal",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-empty-left-refusal"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "external-empty-copy",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-external-empty-copy"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "handler-error-identity",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-handler-error-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "nonyieldable-handler",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-nonyieldable-handler"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "external-empty-left-copy",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-external-empty-left-copy"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "empty-handler-result",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-empty-handler-result"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "number-before-handler",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-number-before-handler"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "number-after-handler",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-number-after-handler"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "grouped-storage",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-grouped-storage"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "transient-growth-retry",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-transient-growth-retry"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/concat_api_contract.c",
+      "case_id": "binary-run",
+      "consumer": "concat-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: concat-binary-run"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "fresh-values",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-fresh-values"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "suspended-lua",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-suspended-lua"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "suspended-c",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-suspended-c"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "original-error",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-original-error"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "closing-error",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-closing-error"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "reinitialize-thread",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-reinitialize-thread"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "weak-prefix-lifetime",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-weak-prefix-lifetime"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "no-closer-refusal",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-no-closer-refusal"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "self-close-direct",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-self-close-direct"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "self-close-nested",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-self-close-nested"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "self-close-lua-resume",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-self-close-lua-resume"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "base-c-settop",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-base-c-settop"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "base-c-closeslot",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-base-c-closeslot"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "base-c-reset",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-base-c-reset"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "self-reader",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-self-reader"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "self-writer",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-self-writer"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "self-warning",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-self-warning"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "default/windows/validation/static-pic"
+      ]
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "self-hook",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-self-hook"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "self-close-error",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-self-close-error"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "c-closer-refusal",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-c-closer-refusal"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "multiple-closers-refusal",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-multiple-closers-refusal"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "closer-error-refusal",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-closer-error-refusal"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "recursive-self-close",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-recursive-self-close"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/thread_reset_api_contract.c",
+      "case_id": "reset-memory-recovery",
+      "consumer": "thread-reset-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: reset-reset-memory-recovery"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
     }
   ],
   "source_measurements": {

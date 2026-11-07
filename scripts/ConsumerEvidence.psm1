@@ -9,8 +9,9 @@ function Test-NamedConsumerEvidence {
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
           [switch] $RequireFormatContract,
-          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','allocator','substitution','loadfile')]
-          [string[]] $AdditionalContracts=@())
+          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','allocator','substitution','loadfile','pointer-identity','concat','thread-reset')]
+          [string[]] $AdditionalContracts=@(),
+          [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy='')
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
     $parts = $Context.Split('/')
@@ -44,7 +45,9 @@ function Test-NamedConsumerEvidence {
         'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';external='PASS: public external string contract';
         conversion='PASS: public numeric conversion contract';operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract';
         'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external';buffer='PASS: public luaL_Buffer contract';
-        allocator='PASS: public allocator contract';substitution='PASS: public luaL_addgsub and luaL_gsub contract';loadfile='PASS: public luaL_loadfilex contract'}
+        allocator='PASS: public allocator contract';substitution='PASS: public luaL_addgsub and luaL_gsub contract';loadfile='PASS: public luaL_loadfilex contract';
+        'pointer-identity'='PASS: public pointer identity contract';concat='PASS: public lua_concat contract';
+        'thread-reset'='PASS: public thread reset/base closing contract'}
     foreach($kind in $additional|Sort-Object -Unique){
         $markers["$kind-api"]=$additionalMarkers[$kind];$markers["$kind-oracle"]=$additionalMarkers[$kind]
         $contractKinds+=$kind;$consumerKinds+="$kind-api"
@@ -150,7 +153,7 @@ function Test-NamedConsumerEvidence {
             }
         }
     }
-    foreach($kind in @('allocator','substitution','loadfile')){if($kind -cin $additional){
+    foreach($kind in @('allocator','substitution','loadfile','pointer-identity','concat')){if($kind -cin $additional){
         $names=if($kind -ceq 'allocator'){
             @('null-block-ignores-old-size','zero-size-frees-and-returns-null','grow-preserves-prefix','shrink-preserves-prefix',
                 'fresh-allocation-after-free','numeric-userdata-alignment','huge-refusal-preserves-old-block','public-allocator-identity-and-use',
@@ -159,17 +162,25 @@ function Test-NamedConsumerEvidence {
             @('literal-metachars','nonoverlap-matches','replacement-not-rescanned','shrinking-replacement','growing-replacement',
                 'empty-replacement','no-match','empty-subject','prefix-suffix','embedded-nul-subject','embedded-nul-pattern',
                 'buffer-append-reuse','large-growth-prefix','callback-result','callback-error-cleanup','allocator-refusal-recovery')
-        }else{
+        }elseif($kind -ceq 'loadfile'){
             @('empty-file-no-results','bom-skipped','shebang-line-numbers','crlf-line-numbers','incomplete-bom-syntax','syntax-error-class',
                 'text-mode-rejects-binary','binary-mode-rejects-text','dump-file-loads-runs','stripped-dump-no-source','source-info-matches-file',
                 'missing-file-errno','filename-nul-suffix','success-keeps-stack','missing-keeps-stack','syntax-failure-keeps-stack','protected-callback',
                 'persistent-refusal-recovers','prefixed-binary-alignment','actual-file-growth-sweep','shebang-lone-CR')
+        }elseif($kind -ceq 'pointer-identity'){
+            @('table-identity','full-userdata-identity','light-userdata-identity','null-light-userdata-identity',
+                'light-cfunction-identity','captured-closure-identity','coroutine-identity','raw-string-identity')
+        }else{
+            @('caller-mutation','weak-operand-lifetime','retained-prefix','error-location','current-pair-roots','primitive-suffix',
+                'numeric-primitives','empty-result','singleton-identity','empty-right-refusal','empty-left-refusal','external-empty-copy',
+                'handler-error-identity','nonyieldable-handler','external-empty-left-copy','empty-handler-result','number-before-handler',
+                'number-after-handler','grouped-storage','transient-growth-retry','binary-run')
         }
         $lines=@(for($i=0;$i -lt $names.Count;$i++){
             if($kind -ceq 'allocator'){"PASS: allocator-api-$i $($names[$i])"}else{"PASS: $kind-$($names[$i])"}
         })
         $expected=($lines -join "`n")+"`n"+$additionalMarkers[$kind]+"`n"
-        $contract=$Report[$kind+'_contract']
+        $contract=$Report[$kind.Replace('-','_')+'_contract']
         if(($contract.matched_cases -isnot [int] -and $contract.matched_cases -isnot [long]) -or $contract.matched_cases -ne $names.Count){
             throw "Named $kind contract requires all $($names.Count) actual cases"
         }
@@ -186,6 +197,25 @@ function Test-NamedConsumerEvidence {
             ReferenceC=@($Report.consumers|Where-Object name -CEQ loadfile-oracle)[0].executable_sha256}
         $stdin=Test-FileConsumerIO -Observation $Report.loadfile_contract.stdin_io -Context $Context -DriverHashes $hashes -ResolveCapture $ResolveCapture
         foreach($name in $stdin.named_outputs.Keys){$outputs[$name]=$stdin.named_outputs[$name];$consumerKinds+=$name}
+    }
+    if('thread-reset' -cin $additional){
+        $names=@('fresh-values','suspended-lua','suspended-c','original-error','closing-error','reinitialize-thread',
+            'weak-prefix-lifetime','no-closer-refusal','self-close-direct','self-close-nested','self-close-lua-resume',
+            'base-c-settop','base-c-closeslot','base-c-reset','self-reader','self-writer','self-warning','self-hook',
+            'self-close-error','c-closer-refusal','multiple-closers-refusal','closer-error-refusal','recursive-self-close','reset-memory-recovery')
+        $instrumented=$parts[0] -ceq 'upstream-test'
+        $count=if($instrumented){23}else{24};$skip=[int]$instrumented
+        $contract=$Report.thread_reset_contract
+        if(($contract.matched_cases -isnot [int] -and $contract.matched_cases -isnot [long]) -or $contract.matched_cases -ne $count -or
+            ($contract.skipped_warning_reentry_cases -isnot [int] -and $contract.skipped_warning_reentry_cases -isnot [long]) -or
+            $contract.skipped_warning_reentry_cases -ne $skip){throw 'Named thread reset actual case and native instrumentation skip counts differ'}
+        $lines=@($names|ForEach-Object{if($instrumented -and $_ -ceq 'self-warning'){'SKIP: reset-self-warning (native T lock rejects API reentry)'}else{'PASS: reset-'+$_}})
+        $expected=($lines -join "`n")+"`nPASS: public thread reset/base closing contract`n"
+        foreach($name in @('thread-reset-api','thread-reset-oracle')){
+            $record=@($Report.consumers|Where-Object name -CEQ $name)[0]
+            if($record.arguments -isnot [Array] -or ($record.arguments -join '|') -cne $(if($instrumented){'--without-warning-reentry'}else{''}) -or
+                $outputs[$name].text.Replace("`r`n","`n") -cne $expected){throw 'Named thread reset actual native-lock mode or complete ordered protocol differs'}
+        }
     }
     if('allocator' -cin $additional){
         # Default panic is intentionally observed through the installed public
@@ -218,12 +248,20 @@ function Test-NamedConsumerEvidence {
             $consumerKinds+="allocator-panic-$mode-api"
         }
     }
-    $seen = @{}
+    $seen = @{};$allIds=@{};$contextOmissions=@()
     foreach ($case in $Mapping.cases) {
         $key = $case.source + '#' + $case.case_id
-        if ($seen.ContainsKey($key) -or $case.expected_count -ne 1 -or
+        if ($allIds.ContainsKey($key) -or $case.expected_count -ne 1 -or
             $case.consumer -cnotin $consumerKinds) {
             throw "Invalid/duplicate named consumer mapping: $key"
+        }
+        $allIds[$key]=$true
+        if($case.Contains('contexts')){
+            if($TargetPolicy -cne 'remaining-upstream-compatibility' -or $case.contexts -isnot [Array] -or
+                $case.contexts.Count -eq 0 -or @($case.contexts|Sort-Object -Unique).Count -ne $case.contexts.Count){
+                throw 'Context-specific C witnesses require the explicit remaining target selector and a nonempty context array'
+            }
+            if($Context -cnotin $case.contexts){$contextOmissions+=$key;continue}
         }
         $source = @($Report.consumer_sources | Where-Object { $_.file -ceq $case.source })
         if ($source.Count -ne 1 -or $source[0].sha256 -cne $case.source_sha256) {
@@ -264,7 +302,7 @@ function Test-NamedConsumerEvidence {
     }
     if ($seen.Count -eq 0) { throw 'Named consumer mapping empty' }
     return [ordered]@{context=$Context; revision=$Revision; cases=@($seen.Keys | Sort-Object);
-        runtime_observed=$true; scoped_acceptance=$false}
+        context_inapplicable_witnesses=$contextOmissions;runtime_observed=$true; scoped_acceptance=$false}
 }
 
 Export-ModuleMember -Function Test-NamedConsumerEvidence

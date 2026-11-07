@@ -98,6 +98,7 @@ function Read-TargetWitnessPolicy {
     foreach ($old in $oldConsumer.cases) {
         $next = @($consumer.cases | Where-Object { $_.source -ceq $old.source -and $_.case_id -ceq $old.case_id })
         if ($next.Count -ne 1) { throw 'Missing or duplicate retained C witness identity' }
+        if($next[0].Contains('contexts')){throw 'Retained C witness context applicability cannot be narrowed'}
         foreach ($field in @('consumer','expected_count','pattern_witness')) {
             $before = if ($old.Contains($field)) { $old[$field] } else { $null }
             $after = if ($next[0].Contains($field)) { $next[0][$field] } else { $null }
@@ -112,11 +113,18 @@ function Read-TargetWitnessPolicy {
             $next[0].required_stdout_line -cne $old.required_stdout_line) { throw 'Retained AUnit witness protocol changed' }
     }
     if($unit.expected_stderr -cne $oldUnit.expected_stderr){throw 'Retained AUnit finalizer warning protocol changed'}
-    $cIds = @{}; $unitIds = @{}
+    $cIds = @{}; $cContexts=@{}; $unitIds = @{}
     foreach ($case in $consumer.cases) {
         $key = $case.source + '#' + $case.case_id
         if ($cIds.ContainsKey($key)) { throw 'Duplicate target C witness identity' }
         $cIds[$key] = $true
+        $cContexts[$key]=@($suite.acceptance_contexts)
+        if($case.Contains('contexts')){
+            if($case.contexts -isnot [Array] -or $case.contexts.Count -eq 0 -or
+                @($case.contexts|Sort-Object -Unique).Count -ne $case.contexts.Count -or
+                @($case.contexts|Where-Object{$_ -cnotin $suite.acceptance_contexts}).Count){throw 'Target C witness names an unknown or malformed receiver context'}
+            $cContexts[$key]=@($case.contexts)
+        }
         [void](Resolve-ReviewedFile -Root $Root -Path $case.source -Sha256 $case.source_sha256)
         if (@($consumer.source_bindings | Where-Object { $_.path -ceq $case.source -and $_.sha256 -ceq $case.source_sha256 }).Count -ne 1) {
             throw 'Target C witness lacks its current source binding'
@@ -204,7 +212,10 @@ function Read-TargetWitnessPolicy {
                     ($route.disposition -ceq 'compiled-not-applicable' -and @($entry.conditions).Count -eq 0)) {
                     throw 'Global API classification lacks appropriate runtime or compiled context evidence'
                 }
-                foreach ($case in $route.named_c_cases) { if (-not $cIds.ContainsKey($case)) { throw 'Global API context names unknown C witness' } }
+                foreach ($case in $route.named_c_cases) {
+                    if (-not $cIds.ContainsKey($case)) { throw 'Global API context names unknown C witness' }
+                    if($route.context -cnotin $cContexts[$case]){throw 'Global API context selects an inactive C witness receiver'}
+                }
                 foreach ($case in $route.named_aunit_cases) { if (-not $unitIds.ContainsKey($case)) { throw 'Global API context names unknown AUnit witness' } }
                 foreach($case in $route.compiled_witnesses){
                     if(-not $compiledIds.ContainsKey($case) -or $route.context -cnotin $compiledIds[$case].contexts){
@@ -299,7 +310,8 @@ function Test-TargetNamedContextEvidence {
         'load-dump'='load_dump_api_contract.c';debug='debug_api_contract.c';external='external_string_contract.c';
         conversion='conversion_api_contract.c';operator='operator_api_contract.c';'index-type'='index_type_api_contract.c';
         'base-closing'='base_closing_api_contract.c';'native-module'='native_module_contract.c';buffer='buffer_api_contract.c';
-        allocator='allocator_api_contract.c';substitution='substitution_api_contract.c';loadfile='loadfile_api_contract.c'}
+        allocator='allocator_api_contract.c';substitution='substitution_api_contract.c';loadfile='loadfile_api_contract.c';
+        'pointer-identity'='pointer_identity_contract.c';concat='concat_api_contract.c';'thread-reset'='thread_reset_api_contract.c'}
     foreach($kind in $driverNames.Keys){if($kind -ceq 'native-module' -or @($Policy.consumer.cases|Where-Object consumer -CEQ "$kind-api").Count -gt 0){
         if($kind -cnotin $additional){$additional+=$kind}
         $names=@(('c_api/tests/'+$driverNames[$kind]))
@@ -312,7 +324,7 @@ function Test-TargetNamedContextEvidence {
         }
     }}
     $c = Test-NamedConsumerEvidence -Report $consumer -Mapping $Policy.consumer -Revision $Revision -Context $Context `
-        -ResolveCapture $resolve -RequireForeignContract -AdditionalContracts $additional
+        -ResolveCapture $resolve -RequireForeignContract -AdditionalContracts $additional -TargetPolicy remaining-upstream-compatibility
     $activeArtifactRoot = $AUnitArtifactRoot
     $a = Test-NamedAUnitEvidence -Report $unit -Mapping $Policy.aunit -Revision $Revision -Context $Context -ResolveCapture $resolve
     foreach ($library in $unit.library_files) {

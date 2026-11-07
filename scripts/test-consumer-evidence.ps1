@@ -35,11 +35,12 @@ $resolve = {param($path,$expected)
     return $path
 }
 $count = 0
-function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected,[switch]$Foreign,[switch]$Format,[string[]]$Additional=@()) {
+function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected,[switch]$Foreign,[switch]$Format,[string[]]$Additional=@(),[switch]$RemainingTarget) {
     $report = $baseline | ConvertTo-Json -Depth 16 | ConvertFrom-Json -AsHashtable
     & $Mutation $report
     $failure = $null
-    try { $null = Test-NamedConsumerEvidence $report $mapping $revision $context $resolve -RequireForeignContract:$Foreign -RequireFormatContract:$Format -AdditionalContracts $Additional }
+    try { $null = Test-NamedConsumerEvidence $report $mapping $revision $context $resolve -RequireForeignContract:$Foreign -RequireFormatContract:$Format -AdditionalContracts $Additional `
+        -TargetPolicy $(if($RemainingTarget){'remaining-upstream-compatibility'}else{''}) }
     catch { $failure = $_.Exception.Message }
     if (($Expected -eq '' -and $null -ne $failure) -or
         ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))) {
@@ -49,6 +50,16 @@ function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected,[switch
     Write-Output "CONSUMER EVIDENCE PASS: $Name"
 }
 Run-Case 'complete synthetic observations' {} ''
+$mapping.cases+=@{source='case.c';case_id='target-context-only';source_sha256=$hash;consumer='c-api';expected_count=1;
+    exact_witnesses=@('not emitted in this context');pattern_witness=$null;contexts=@('upstream-test/windows/validation/static')}
+Run-Case 'strict legacy caller cannot narrow a named witness through context metadata' {} 'explicit remaining target selector'
+Run-Case 'explicit remaining target records an inapplicable new witness separately from observed cases' {} '' -RemainingTarget
+$mapping.cases[1].contexts=@($context)
+Run-Case 'applicable target witness still requires its actual operation output' {} 'witness missing' -RemainingTarget
+$mapping.cases[1].contexts=@('upstream-test/windows/validation/static')
+$mapping.cases+=@($mapping.cases[1])
+Run-Case 'duplicate inactive witness cannot hide behind a context selector' {} 'duplicate named' -RemainingTarget
+$mapping.cases=@($mapping.cases[0])
 Run-Case 'dirty source tree' {param($r) $r.repository_dirty=$true} 'dirty'
 Run-Case 'wrong revision' {param($r) $r.repository_revision='c'*40} 'revision'
 Run-Case 'wrong configuration' {param($r) $r.configuration='upstream-test'} 'context'
@@ -349,6 +360,66 @@ $panicCase.witness_stream='stderr'
 $mapping.cases[0].witness_stream='stderr'
 Run-Case 'ordinary witness cannot borrow the narrowly named panic stderr protocol' {} 'witness stream' -Foreign -Format -Additional $extended
 $mapping.cases[0].Remove('witness_stream')
+$pointerNames=@('table-identity','full-userdata-identity','light-userdata-identity','null-light-userdata-identity',
+    'light-cfunction-identity','captured-closure-identity','coroutine-identity','raw-string-identity')
+$concatNames=@('caller-mutation','weak-operand-lifetime','retained-prefix','error-location','current-pair-roots','primitive-suffix',
+    'numeric-primitives','empty-result','singleton-identity','empty-right-refusal','empty-left-refusal','external-empty-copy',
+    'handler-error-identity','nonyieldable-handler','external-empty-left-copy','empty-handler-result','number-before-handler',
+    'number-after-handler','grouped-storage','transient-growth-retry','binary-run')
+$moreProtocols=@{}
+foreach($kind in @('pointer-identity','concat')){
+    $names=if($kind -ceq 'pointer-identity'){$pointerNames}else{$concatNames}
+    $completion=if($kind -ceq 'pointer-identity'){'PASS: public pointer identity contract'}else{'PASS: public lua_concat contract'}
+    $moreProtocols[$kind]=(@($names|ForEach-Object{"PASS: $kind-$_"}) -join "`n")+"`n$completion`n"
+    $baseline[$kind.Replace('-','_')+'_contract']=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=$names.Count}
+    foreach($name in @("$kind-api","$kind-oracle")){
+        $record=$records[0].Clone();$record.name=$name;$record.arguments=@();$out=Join-Path $directory "$name.stdout"
+        [IO.File]::WriteAllText($out,$moreProtocols[$kind]);$record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$baseline.consumers+=$record
+    }
+}
+$extended+=@('pointer-identity','concat')
+Run-Case 'pointer identity8 and concat21 require both full actual counterpart protocols' {} '' -Foreign -Format -Additional $extended
+Run-Case 'pointer identity cannot borrow another native consumer' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE pointer-identity-oracle)
+} 'missing/duplicate' -Foreign -Format -Additional $extended
+Run-Case 'matching concat completion cannot omit actual weak operand lifetime' {param($r)
+    foreach($name in @('concat-api','concat-oracle')){Replace-Capture $r $name stdout ($moreProtocols.concat.Replace("PASS: concat-weak-operand-lifetime`n",''))}
+} 'complete ordered protocol' -Foreign -Format -Additional $extended
+Run-Case 'pointer and concat counts must remain measured integers' {param($r)
+    $r.concat_contract.matched_cases='21'
+} 'all21actual|all 21 actual' -Foreign -Format -Additional $extended
+$resetNames=@('fresh-values','suspended-lua','suspended-c','original-error','closing-error','reinitialize-thread','weak-prefix-lifetime',
+    'no-closer-refusal','self-close-direct','self-close-nested','self-close-lua-resume','base-c-settop','base-c-closeslot','base-c-reset',
+    'self-reader','self-writer','self-warning','self-hook','self-close-error','c-closer-refusal','multiple-closers-refusal','closer-error-refusal',
+    'recursive-self-close','reset-memory-recovery')
+$resetFull=(@($resetNames|ForEach-Object{'PASS: reset-'+$_}) -join "`n")+"`nPASS: public thread reset/base closing contract`n"
+$resetT=$resetFull.Replace('PASS: reset-self-warning','SKIP: reset-self-warning (native T lock rejects API reentry)')
+$baseline.thread_reset_contract=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=24;skipped_warning_reentry_cases=0}
+foreach($name in @('thread-reset-api','thread-reset-oracle')){
+    $record=$records[0].Clone();$record.name=$name;$record.arguments=@();$out=Join-Path $directory "$name.stdout"
+    [IO.File]::WriteAllText($out,$resetFull);$record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$baseline.consumers+=$record
+}
+Run-Case 'default reset requires all24actual original-slot and self-transfer cases' {} '' -Foreign -Format -Additional ($extended+@('thread-reset'))
+Run-Case 'default reset cannot silently choose the T warning-reentry omission' {param($r)
+    foreach($name in @('thread-reset-api','thread-reset-oracle')){Replace-Capture $r $name stdout $resetT}
+} 'native-lock mode' -Foreign -Format -Additional ($extended+@('thread-reset'))
+$context='upstream-test/windows/validation/static'
+$defaultMappedCases=$mapping.cases
+$mapping.cases=@($mapping.cases|Where-Object consumer -CIn @('c-api','foreign-api'))
+Run-Case 'T reset records23passes and the exact native-lock omission without a fabricated warning pass' {param($r)
+    $r.configuration='upstream-test';foreach($child in $r.consumers){$child.configuration='upstream-test'}
+    $r.thread_reset_contract.matched_cases=23;$r.thread_reset_contract.skipped_warning_reentry_cases=1
+    foreach($name in @('thread-reset-api','thread-reset-oracle')){
+        @($r.consumers|Where-Object name -CEQ $name)[0].arguments=@('--without-warning-reentry');Replace-Capture $r $name stdout $resetT
+    }
+} '' -Foreign -Additional thread-reset
+Run-Case 'T reset count cannot promote the skipped warning to actual execution' {param($r)
+    $r.configuration='upstream-test';foreach($child in $r.consumers){$child.configuration='upstream-test'}
+    $r.thread_reset_contract.matched_cases=23;$r.thread_reset_contract.skipped_warning_reentry_cases=1
+    foreach($name in @('thread-reset-api','thread-reset-oracle')){@($r.consumers|Where-Object name -CEQ $name)[0].arguments=@('--without-warning-reentry')}
+} 'native-lock mode' -Foreign -Additional thread-reset
+$context='default/windows/validation/static'
+$mapping.cases=$defaultMappedCases
 $loadfileNames=@('empty-file-no-results','bom-skipped','shebang-line-numbers','crlf-line-numbers','incomplete-bom-syntax','syntax-error-class',
     'text-mode-rejects-binary','binary-mode-rejects-text','dump-file-loads-runs','stripped-dump-no-source','source-info-matches-file',
     'missing-file-errno','filename-nul-suffix','success-keeps-stack','missing-keeps-stack','syntax-failure-keeps-stack','protected-callback',

@@ -804,6 +804,681 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Primitive_Text",
+      "registered_label": "identity: primitive text",
+      "required_stdout_line": "OK identity: primitive text",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Table_Text",
+      "registered_label": "identity: table identity text",
+      "required_stdout_line": "OK identity: table identity text",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Named_Table",
+      "registered_label": "identity: named table",
+      "required_stdout_line": "OK identity: named table",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Nul_Name",
+      "registered_label": "identity: NUL name prefix",
+      "required_stdout_line": "OK identity: NUL name prefix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Empty_Name",
+      "registered_label": "identity: empty name prefix",
+      "required_stdout_line": "OK identity: empty name prefix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Leading_Nul_Name",
+      "registered_label": "identity: leading NUL prefix",
+      "required_stdout_line": "OK identity: leading NUL prefix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Nonstring_Name",
+      "registered_label": "identity: nonstring name fallback",
+      "required_stdout_line": "OK identity: nonstring name fallback",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Raw_Name_Lookup",
+      "registered_label": "identity: raw name lookup",
+      "required_stdout_line": "OK identity: raw name lookup",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Lua_Function",
+      "registered_label": "identity: Lua function identity",
+      "required_stdout_line": "OK identity: Lua function identity",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Builtin_Function",
+      "registered_label": "identity: builtin function identity",
+      "required_stdout_line": "OK identity: builtin function identity",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Named_Function",
+      "registered_label": "identity: named function",
+      "required_stdout_line": "OK identity: named function",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Thread_Identity",
+      "registered_label": "identity: thread identity across resume",
+      "required_stdout_line": "OK identity: thread identity across resume",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Long_String",
+      "registered_label": "identity: long string identity",
+      "required_stdout_line": "OK identity: long string identity",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Handler_Long_String",
+      "registered_label": "identity: handler long string identity",
+      "required_stdout_line": "OK identity: handler long string identity",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Handler_Integer",
+      "registered_label": "identity: handler integer",
+      "required_stdout_line": "OK identity: handler integer",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Handler_Real",
+      "registered_label": "identity: handler real",
+      "required_stdout_line": "OK identity: handler real",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Handler_Type_Error",
+      "registered_label": "identity: handler type error",
+      "required_stdout_line": "OK identity: handler type error",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Missing_Value",
+      "registered_label": "identity: missing value error",
+      "required_stdout_line": "OK identity: missing value error",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Null_Format",
+      "registered_label": "identity: null pointer format",
+      "required_stdout_line": "OK identity: null pointer format",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Field_Widths",
+      "registered_label": "identity: native pointer field widths",
+      "required_stdout_line": "OK identity: native pointer field widths",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Primitive_Name_Ignored",
+      "registered_label": "identity: primitive name ignored",
+      "required_stdout_line": "OK identity: primitive name ignored",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#String_Handler",
+      "registered_label": "identity: string handler identity",
+      "required_stdout_line": "OK identity: string handler identity",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#C_Table",
+      "registered_label": "identity: C table",
+      "required_stdout_line": "OK identity: C table",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#C_Userdata",
+      "registered_label": "identity: C userdata payload",
+      "required_stdout_line": "OK identity: C userdata payload",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#C_Light_Userdata",
+      "registered_label": "identity: C light userdata",
+      "required_stdout_line": "OK identity: C light userdata",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#C_Null_Pointer",
+      "registered_label": "identity: C null light userdata",
+      "required_stdout_line": "OK identity: C null light userdata",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#C_Light_Function",
+      "registered_label": "identity: C light function",
+      "required_stdout_line": "OK identity: C light function",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#C_Captured_Function",
+      "registered_label": "identity: C captured function",
+      "required_stdout_line": "OK identity: C captured function",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#C_Thread",
+      "registered_label": "identity: C thread lifecycle",
+      "required_stdout_line": "OK identity: C thread lifecycle",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#C_String",
+      "registered_label": "identity: C string identity",
+      "required_stdout_line": "OK identity: C string identity",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Late_C_Thread",
+      "registered_label": "identity: before first C borrow",
+      "required_stdout_line": "OK identity: before first C borrow",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#First_Surface_Refusal",
+      "registered_label": "identity: actual first surface refusal",
+      "required_stdout_line": "OK identity: actual first surface refusal",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Weak_Thread",
+      "registered_label": "identity: formatted weak thread collected",
+      "required_stdout_line": "OK identity: formatted weak thread collected",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Name_Scan_Quota",
+      "registered_label": "identity: long name host quota",
+      "required_stdout_line": "OK identity: long name host quota",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-pointer_identity_tests.adb#Short_C_Prefix",
+      "registered_label": "identity: short C prefix huge suffix",
+      "required_stdout_line": "OK identity: short C prefix huge suffix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Caller_Mutation",
+      "registered_label": "C concat: caller operand mutation",
+      "required_stdout_line": "OK C concat: caller operand mutation",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Weak_Operand_Lifetime",
+      "registered_label": "C concat: weak operand lifetime",
+      "required_stdout_line": "OK C concat: weak operand lifetime",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Retained_Prefix",
+      "registered_label": "C concat: retained prefix and bounds",
+      "required_stdout_line": "OK C concat: retained prefix and bounds",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Error_Location",
+      "registered_label": "C concat: native error location",
+      "required_stdout_line": "OK C concat: native error location",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Current_Pair_Roots",
+      "registered_label": "C concat: current pair roots retire",
+      "required_stdout_line": "OK C concat: current pair roots retire",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Primitive_Suffix",
+      "registered_label": "C concat: primitive suffix actual slots",
+      "required_stdout_line": "OK C concat: primitive suffix actual slots",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Numeric_Primitives",
+      "registered_label": "C concat: numeric primitive fold",
+      "required_stdout_line": "OK C concat: numeric primitive fold",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Empty_Result",
+      "registered_label": "C concat: empty result preserves prefix",
+      "required_stdout_line": "OK C concat: empty result preserves prefix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Singleton_Identity",
+      "registered_label": "C concat: singleton keeps table identity",
+      "required_stdout_line": "OK C concat: singleton keeps table identity",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Empty_Right_Refusal",
+      "registered_label": "C concat: empty right zero growth",
+      "required_stdout_line": "OK C concat: empty right zero growth",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Empty_Left_Refusal",
+      "registered_label": "C concat: empty left zero growth",
+      "required_stdout_line": "OK C concat: empty left zero growth",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#External_Empty_Copy",
+      "registered_label": "C concat: external empty copies long string",
+      "required_stdout_line": "OK C concat: external empty copies long string",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Handler_Error_Identity",
+      "registered_label": "C concat: handler error identity and recovery",
+      "required_stdout_line": "OK C concat: handler error identity and recovery",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Nonyieldable_Handler",
+      "registered_label": "C concat: live C boundary rejects yield",
+      "required_stdout_line": "OK C concat: live C boundary rejects yield",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#External_Empty_Left_Copy",
+      "registered_label": "C concat: external empty left copies string",
+      "required_stdout_line": "OK C concat: external empty left copies string",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Empty_Handler_Result",
+      "registered_label": "C concat: empty handler result becomes nil",
+      "required_stdout_line": "OK C concat: empty handler result becomes nil",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Number_Before_Handler",
+      "registered_label": "C concat: left number reaches handler",
+      "required_stdout_line": "OK C concat: left number reaches handler",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Number_After_Handler",
+      "registered_label": "C concat: right number reaches handler",
+      "required_stdout_line": "OK C concat: right number reaches handler",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Grouped_Storage",
+      "registered_label": "C concat: whole run bounded growth",
+      "required_stdout_line": "OK C concat: whole run bounded growth",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Transient_Growth_Retry",
+      "registered_label": "C concat: transient growth retry",
+      "required_stdout_line": "OK C concat: transient growth retry",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Binary_Run",
+      "registered_label": "C concat: grouped binary bytes",
+      "required_stdout_line": "OK C concat: grouped binary bytes",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Primitive_Quota",
+      "registered_label": "C concat: primitive fold host quota",
+      "required_stdout_line": "OK C concat: primitive fold host quota",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Extent_Quota",
+      "registered_label": "C concat: result extent host quota",
+      "required_stdout_line": "OK C concat: result extent host quota",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Handler_Quota",
+      "registered_label": "C concat: handler shares host quota",
+      "required_stdout_line": "OK C concat: handler shares host quota",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_concat_tests.adb#Byte_Quota",
+      "registered_label": "C concat: byte copy host quota",
+      "required_stdout_line": "OK C concat: byte copy host quota",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Suspended_Lua",
+      "registered_label": "C reset: suspended Lua",
+      "required_stdout_line": "OK C reset: suspended Lua",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Original_Error",
+      "registered_label": "C reset: incoming error",
+      "required_stdout_line": "OK C reset: incoming error",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Close_Error",
+      "registered_label": "C reset: closing error",
+      "required_stdout_line": "OK C reset: closing error",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Weak_Prefix",
+      "registered_label": "C reset: actual weak prefix",
+      "required_stdout_line": "OK C reset: actual weak prefix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Self_Nested",
+      "registered_label": "C reset: nested C guards",
+      "required_stdout_line": "OK C reset: nested C guards",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Self_Reader",
+      "registered_label": "C reset: reader cleanup",
+      "required_stdout_line": "OK C reset: reader cleanup",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Self_Warning",
+      "registered_label": "C reset: warning ACK",
+      "required_stdout_line": "OK C reset: warning ACK",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Refused_C_Closer",
+      "registered_label": "C reset: C closer refusal",
+      "required_stdout_line": "OK C reset: C closer refusal",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Refused_Multiple_Closers",
+      "registered_label": "C reset: repeated closer refusal",
+      "required_stdout_line": "OK C reset: repeated closer refusal",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Refused_Closer_Error",
+      "registered_label": "C reset: error closer refusal",
+      "required_stdout_line": "OK C reset: error closer refusal",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Recursive_Self_Close",
+      "registered_label": "C reset: recursive self close",
+      "required_stdout_line": "OK C reset: recursive self close",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Reset_Memory_Recovery",
+      "registered_label": "C reset: memory refusal recovery",
+      "required_stdout_line": "OK C reset: memory refusal recovery",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Borrowed_Reader",
+      "registered_label": "C reset: borrowed reader",
+      "required_stdout_line": "OK C reset: borrowed reader",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Borrowed_Warning",
+      "registered_label": "C reset: borrowed warning",
+      "required_stdout_line": "OK C reset: borrowed warning",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_thread_reset_tests.adb#Shared_Close_Quota",
+      "registered_label": "C reset: original close quota",
+      "required_stdout_line": "OK C reset: original close quota",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
     }
   ]
 }
