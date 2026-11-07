@@ -8,7 +8,7 @@
   "runtime_acceptance": false,
   "mapping_source": {
     "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-author-proposal.json",
-    "sha256": "4934edebb0d20b7d3a66b20f5412092dab62c05bf225d8baed4e2717103c7fba"
+    "sha256": "dc5c06b1f7b6e52429c8c72547bcdcc1990ffb30ab504c2f1b896e0d5317a35c"
   },
   "source_bindings": [
     {
@@ -68,6 +68,38 @@
       "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9"
     },
     {
+      "path": "tests/src/lua-condition_root_tests.adb",
+      "sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.ads",
+      "sha256": "e6fded8c7879538fd53fb4a92896d32158c85d2f783fb35a6e1a0466ffbb1c62"
+    },
+    {
+      "path": "references/lua/testes/closure.lua",
+      "sha256": "d03b641a7a7c4cb395762321200532f786e1554395e8499838e702b56d21880a"
+    },
+    {
+      "path": "tests/lua/condition_while_root.lua",
+      "sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9"
+    },
+    {
+      "path": "tests/lua/condition_if_root.lua",
+      "sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476"
+    },
+    {
+      "path": "tests/lua/condition_repeat_value_root.lua",
+      "sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228"
+    },
+    {
+      "path": "tests/lua/condition_repeat_root.lua",
+      "sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c"
+    },
+    {
+      "path": "tests/lua/condition_short_circuit_root.lua",
+      "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
+    },
+    {
       "path": "c_api/tests/c_api_consumer.c",
       "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
     },
@@ -117,7 +149,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "b03f1471382c5e28e4f4a0a538459eaa7e77ed4a4f42f7b42306385e0afd4037"
+      "sha256": "93a2d0d3f9ab57df8bc30419303ec38e7521c986941e23ddc3d6e0c8d65976e3"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",

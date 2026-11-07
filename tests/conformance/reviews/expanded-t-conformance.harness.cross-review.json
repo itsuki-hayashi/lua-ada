@@ -108,11 +108,11 @@
     },
     {
       "path": "tests/conformance/scopes/expanded-t-conformance.json",
-      "sha256": "668df0f7e4770dd337c18a4f1049b0b171ddc1bef24225e6e755bacff117ff76"
+      "sha256": "7eb7c36afa22c965fe58938d69ee98839f24f8826adf92725145696beacf701d"
     },
     {
       "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
-      "sha256": "fbcd24a25da8393326281787bc22c4235b98fce633768dd502e96f05a50664a6"
+      "sha256": "3d5119a070f3d40e2787fc1574edab255712b8ca42dd48addeda717f5e2b751f"
     },
     {
       "path": "tests/conformance/scopes/expanded-t-conformance.contracts.json",
@@ -120,7 +120,7 @@
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-author-proposal.json",
-      "sha256": "e964df0c8d5f33a23ab030660633e2f20d65cc95341bf6232ce0694ad392d36d"
+      "sha256": "d9064fe1b4dc5b5ac9dbc72fe494ff8f5a24d8b072a5c79a445ee5c409ad5c7c"
     },
     {
       "path": "scripts/ExpandedMatrixBundle.psm1",
@@ -136,15 +136,15 @@
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-author-proposal.json",
-      "sha256": "4934edebb0d20b7d3a66b20f5412092dab62c05bf225d8baed4e2717103c7fba"
+      "sha256": "dc5c06b1f7b6e52429c8c72547bcdcc1990ffb30ab504c2f1b896e0d5317a35c"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-      "sha256": "f66b29f58ea51ec2d405018d97c834aae0861422466d1d65ed7a93666d4cc80f"
+      "sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json",
-      "sha256": "7c8563b1ac7293ce368b8065d3b3f8d01de9785cc65d0875bb4628dbc72a8989"
+      "sha256": "a03a6018d809d03f52247ebb889e300d46bc3f1105a5952a37d3b516159eb402"
     },
     {
       "path": "scripts/ScopedWarnings.psm1",
@@ -172,16 +172,72 @@
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-mapping-installation.json",
-      "sha256": "2ad59ecb0462ee30e3e8f0411f4c7efbbab12840bfe21b1c27bfcfbb61334d85"
+      "sha256": "76ac8f16edd3d999af3356b5fdd95ecdd2fe5eaac3b66004b58fae04adf4ded3"
+    },
+    {
+      "path": "src/lua-canonical_compiler.adb",
+      "sha256": "41f97f79a0f56c532fed38f933ff0825f75772cf2b1d271ce11d51dc17231269"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.adb",
+      "sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.ads",
+      "sha256": "e6fded8c7879538fd53fb4a92896d32158c85d2f783fb35a6e1a0466ffbb1c62"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "93a2d0d3f9ab57df8bc30419303ec38e7521c986941e23ddc3d6e0c8d65976e3"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-condition-roots.cross-review.json",
+      "sha256": "fcc8833405756300096a0f6d450dd6215770776d529e051cff506db212059508"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-author-proposal.json",
+      "sha256": "b320cc94b82c29fb83350a7d014d6b9de42e4aff9a86e0ee23425979376eed21"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness.cross-review.json",
+      "sha256": "e5f9d01167687f5580c23c4ef7f9df363140ad9da0b1c20a1be2eb902dbe269a"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-author-proposal.json",
+      "sha256": "2661d5b532fe92f09813cd1d532b2fafc8a45e867c607a02a0213ad92631b15c"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness.cross-review.json",
+      "sha256": "d1b464513518a05110fd793ee05c438541291b5e006eeb287310058518fb646e"
+    },
+    {
+      "path": "tests/lua/condition_if_root.lua",
+      "sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476"
+    },
+    {
+      "path": "tests/lua/condition_repeat_root.lua",
+      "sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c"
+    },
+    {
+      "path": "tests/lua/condition_repeat_value_root.lua",
+      "sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228"
+    },
+    {
+      "path": "tests/lua/condition_short_circuit_root.lua",
+      "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
+    },
+    {
+      "path": "tests/lua/condition_while_root.lua",
+      "sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9"
     }
   ],
   "input_manifest": {
-    "sha256": "98b9f9cc070fba99e50860645261c0f1eb2ba27538195f9c3562dd0066ce0979",
+    "sha256": "6fa368b25739796462d1521dfbbd498dcca04bec4b58f5b2d11b3973ad4846ab",
     "path": "reports/expanded-harness-review-inputs.json"
   },
   "scope_selection": {
     "result": "Installed selection metadata validates 13 actual primary files, 2493 source anchors, one helper and 159 APIs; 142 source and 159 API obligations remain pending.",
-    "sha256": "7c8563b1ac7293ce368b8065d3b3f8d01de9785cc65d0875bb4628dbc72a8989",
+    "sha256": "a03a6018d809d03f52247ebb889e300d46bc3f1105a5952a37d3b516159eb402",
     "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json"
   },
   "resolved_findings": [
@@ -234,7 +290,7 @@
     "expanded_harness_regressions": 58,
     "native_mapping_regressions": 18,
     "notes": "Synthetic protocol regressions plus current source/hash checks. Fourteen existing final-runtime Windows captures independently pass the new shared verifier as diagnostic corroboration. No foreign-platform or final runtime/context acceptance is inferred.",
-    "source_input_hashes": 41,
+    "source_input_hashes": 55,
     "review_binding_regressions": 46,
     "git_diff_check": "passed",
     "bundle_collector_regressions": 10,
@@ -253,7 +309,8 @@
     "reports/expanded-t-conformance/independent-expanded-harness-review-3.log",
     "reports/expanded-t-conformance/independent-bundle-collector-2.log",
     "reports/expanded-t-conformance/independent-warning-evidence-review-2.log",
-    "reports/expanded-t-conformance/independent-review-bindings-3.log"
+    "reports/expanded-t-conformance/independent-review-bindings-3.log",
+    "reports/expanded-t-conformance/independent-condition-witness-mapping-verification.log"
   ],
   "findings": [],
   "remaining_gates": [
@@ -262,5 +319,24 @@
     "Full M3, unselected primary files, aggregate/heavy and unrelated global ABI/ecosystem claims remain outside this bounded decision."
   ],
   "newline_identity": "Reviewed as exact UTF-8 without BOM and LF repository bytes. Captured stdout/stderr retain original native bytes and hashes.",
-  "supersedes_sha256": "ef35c25b233cef9f895f92900401fb3da91e7670c57eb9cf0ef5c1df4e26a66e"
+  "supersedes_sha256": "f3dbf7240c00b66f561d78cd5b264da07eef275aceb2f11d22b07135dcebf11c",
+  "condition_root_delta": {
+    "scoped_api_entries": 159,
+    "independent_production_review": {
+      "reviewer": "Codex /root/conformance_scope",
+      "sha256": "fcc8833405756300096a0f6d450dd6215770776d529e051cff506db212059508",
+      "path": "tests/conformance/reviews/expanded-condition-roots.cross-review.json"
+    },
+    "runtime_acceptance": false,
+    "source_identity_verification": "All55 current file hashes, installed13-file/2493-anchor/159-API scope selection and exactLF metadata validated.142source and159API runtime obligations remain pending.",
+    "named_aunit_cases": 89,
+    "decision": "accepted-harness-and-witness-identity-refresh-only",
+    "rationale": "The actual Mac closure timeout exposed a consumed statement-condition root. The condition compiler and five focused cases are bound for identity only and approved by their separate independent production reviewer. This harness/mapping certificate does not self-review that production implementation. The five new Ada Session lifetime supports remain distinct from real public C export witnesses; all prior API claims and scope identities are retained.",
+    "api_mapping_approval": {
+      "sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429",
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json"
+    },
+    "harness_implementation_unchanged": true,
+    "named_c_cases": 100
+  }
 }

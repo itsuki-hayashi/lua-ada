@@ -65,6 +65,38 @@
       "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9"
     },
     {
+      "path": "tests/src/lua-condition_root_tests.adb",
+      "sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.ads",
+      "sha256": "e6fded8c7879538fd53fb4a92896d32158c85d2f783fb35a6e1a0466ffbb1c62"
+    },
+    {
+      "path": "references/lua/testes/closure.lua",
+      "sha256": "d03b641a7a7c4cb395762321200532f786e1554395e8499838e702b56d21880a"
+    },
+    {
+      "path": "tests/lua/condition_while_root.lua",
+      "sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9"
+    },
+    {
+      "path": "tests/lua/condition_if_root.lua",
+      "sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476"
+    },
+    {
+      "path": "tests/lua/condition_repeat_value_root.lua",
+      "sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228"
+    },
+    {
+      "path": "tests/lua/condition_repeat_root.lua",
+      "sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c"
+    },
+    {
+      "path": "tests/lua/condition_short_circuit_root.lua",
+      "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
+    },
+    {
       "path": "c_api/tests/c_api_consumer.c",
       "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
     },
@@ -114,7 +146,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "b03f1471382c5e28e4f4a0a538459eaa7e77ed4a4f42f7b42306385e0afd4037"
+      "sha256": "93a2d0d3f9ab57df8bc30419303ec38e7521c986941e23ddc3d6e0c8d65976e3"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -1701,6 +1733,108 @@
       "historical_label_observations": [],
       "runtime_acceptance": false,
       "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#While_Guard",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: consumed while guard",
+      "required_stdout_line": "OK condition roots: consumed while guard",
+      "registration_procedure": "While_Guard",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A consumed truthy while guard must release its private weak-value temporary before an allocating RHS explicitly collects; the loop completes once and the weak entry becomes nil.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [
+        "LUA-CLOSURE-REVIEWED-BLOCK-0001"
+      ],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_while_root.lua",
+        "source_sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#If_Guard",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: consumed if guard",
+      "required_stdout_line": "OK condition roots: consumed if guard",
+      "registration_procedure": "If_Guard",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A consumed truthy if guard releases its private weak-value temporary before the selected body performs an explicit collection.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_if_root.lua",
+        "source_sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#Repeat_Guard",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: consumed repeat guard",
+      "required_stdout_line": "OK condition roots: consumed repeat guard",
+      "registration_procedure": "Repeat_Guard",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A consumed truthy until guard with no closing body local releases its weak-value temporary before a later allocating RHS explicitly collects.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_repeat_value_root.lua",
+        "source_sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#Repeat_Closing",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: repeat closing local",
+      "required_stdout_line": "OK condition roots: repeat closing local",
+      "registration_procedure": "Repeat_Closing",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "Retiring a repeat guard must preserve the real body closing local; its actual __close callback receives its table and can collect before scope exit.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_repeat_root.lua",
+        "source_sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#Short_Circuit_Result",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: short circuit result",
+      "required_stdout_line": "OK condition roots: short circuit result",
+      "registration_procedure": "Short_Circuit_Result",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "Expression and/or tests retain their actual table-valued result through explicit collection; statement guard retirement cannot erase an operand still required as a result.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_short_circuit_root.lua",
+        "source_sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
     }
   ],
   "required_contexts": [
@@ -1734,6 +1868,7 @@
   "requirements": [
     "Require every exact registered label once in the complete real AUnit capture, zero failures/unexpected errors, matching source/runtime identity and physical shutdown provenance.",
     "Retained35 collector/storage witnesses supplement unchanged source assertions. New C-driven cases use the real exported Ada functions; hook case6 is an explicitly Ada-only safety contract, not an invalid native invocation.",
+    "Five statement-condition regressions execute actual Ada Session programs and require the same focused lifetime observations; their native Lua counterparts are separately source-bound. They supplement real public C calls and cannot certify a C export independently.",
     "Source registration, assertion bodies and direct underlying C selector must remain bound to their actual current bytes."
   ],
   "execution_evidence": []

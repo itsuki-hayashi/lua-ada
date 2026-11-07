@@ -7,7 +7,7 @@
   "reviewer": "Codex /root/draft_assessment",
   "decision": "accepted-semantic-witness-mapping",
   "proposal": {
-    "sha256": "6a4736ec778b8290c9327175eeb3dc1a19aec924ff284d92d60b7c2630f0b7c9",
+    "sha256": "2661d5b532fe92f09813cd1d532b2fafc8a45e867c607a02a0213ad92631b15c",
     "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-author-proposal.json"
   },
   "source_bindings": [
@@ -68,6 +68,38 @@
       "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9"
     },
     {
+      "path": "tests/src/lua-condition_root_tests.adb",
+      "sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.ads",
+      "sha256": "e6fded8c7879538fd53fb4a92896d32158c85d2f783fb35a6e1a0466ffbb1c62"
+    },
+    {
+      "path": "references/lua/testes/closure.lua",
+      "sha256": "d03b641a7a7c4cb395762321200532f786e1554395e8499838e702b56d21880a"
+    },
+    {
+      "path": "tests/lua/condition_while_root.lua",
+      "sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9"
+    },
+    {
+      "path": "tests/lua/condition_if_root.lua",
+      "sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476"
+    },
+    {
+      "path": "tests/lua/condition_repeat_value_root.lua",
+      "sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228"
+    },
+    {
+      "path": "tests/lua/condition_repeat_root.lua",
+      "sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c"
+    },
+    {
+      "path": "tests/lua/condition_short_circuit_root.lua",
+      "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
+    },
+    {
       "path": "c_api/tests/c_api_consumer.c",
       "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
     },
@@ -117,7 +149,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "b03f1471382c5e28e4f4a0a538459eaa7e77ed4a4f42f7b42306385e0afd4037"
+      "sha256": "93a2d0d3f9ab57df8bc30419303ec38e7521c986941e23ddc3d6e0c8d65976e3"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -135,7 +167,7 @@
   ],
   "verified_counts": {
     "retained_c_cases": 52,
-    "named_aunit_cases": 84,
+    "named_aunit_cases": 89,
     "foreign_c_cases": 48,
     "api_entries": 159,
     "named_c_cases": 100
@@ -150,10 +182,28 @@
     "All author proposal runtime statuses and evidence remain pending; final clean revision, all26 contexts and independent matrix review are separate gates."
   ],
   "verification": {
-    "script_sha256": "5f61ed939aaefe5b4d7460db38380b9c7de4235b68068fb7a35b28dd4f2ab687",
-    "log": "reports/expanded-t-conformance/independent-witness-mapping-verification.log",
-    "result": "159 original header anchors,100 C mapping links,84 exact fresh AUnit labels, current source hashes and48 separately native C contracts in both configurations verified; all checks passed",
-    "log_sha256": "6d3266ec10966754ac035d4227b98718da0841f0cfb03790edbde39cd4336941",
+    "script_sha256": "89a503f976939e6cc2b1eec97a13344ed792fd50808afc5dbad2d568b5ef599a",
+    "log": "reports/expanded-t-conformance/independent-condition-witness-mapping-verification.log",
+    "result": "159 original header anchors,100 C links,89 exact fresh AUnit labels,current source hashes and48 separately native C contracts in both configurations verified. Existing API invariants,boundaries,anchors and C witnesses are unchanged.",
+    "log_sha256": "fd22f0b6b265bb773d7a94473a3316613ba2fdc100cd411234ff8feead88cb77",
     "script": "reports/expanded-t-conformance/verify-independent-witness-mappings.ps1"
+  },
+  "condition_root_delta": {
+    "rationale": "Five separately registered Ada Session lifetime cases supplement public C collection witnesses. Their Lua counterparts force consumed if/while/until temporary collection or preserve repeat closing and expression and/or values. They are explicitly Ada-only supporting API evidence and do not claim direct invocation of lua_gc; unchanged closure source block0001 remains independently required. Compiler implementation is independently reviewed by Codex /root/conformance_scope, outside this mapping-only decision.",
+    "independent_compiler_review": {
+      "path": "tests/conformance/reviews/expanded-condition-roots.cross-review.json",
+      "sha256": "fcc8833405756300096a0f6d450dd6215770776d529e051cff506db212059508"
+    },
+    "changed_api_fields": [
+      "lua_gc/named_aunit_cases",
+      "lua_gc/selected_lua_runtime_obligations",
+      "LUA_GCCOLLECT/named_aunit_cases",
+      "LUA_GCCOLLECT/selected_lua_runtime_obligations"
+    ],
+    "decision": "accepted-source-mapping-delta-only",
+    "new_aunit_cases": 5,
+    "all_existing_c_cases_unchanged": true,
+    "runtime_acceptance": false,
+    "all_existing_api_claims_unchanged": true
   }
 }

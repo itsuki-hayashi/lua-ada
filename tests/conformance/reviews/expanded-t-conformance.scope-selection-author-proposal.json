@@ -243,7 +243,7 @@
     },
     "api_semantic_review": {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-      "sha256": "f66b29f58ea51ec2d405018d97c834aae0861422466d1d65ed7a93666d4cc80f"
+      "sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429"
     }
   },
   "configuration_context_count": 26,

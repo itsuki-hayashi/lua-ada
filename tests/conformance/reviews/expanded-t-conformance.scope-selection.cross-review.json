@@ -7,7 +7,7 @@
   "reviewer": "Codex /root/draft_assessment",
   "decision": "accepted",
   "proposal": {
-    "sha256": "e964df0c8d5f33a23ab030660633e2f20d65cc95341bf6232ce0694ad392d36d",
+    "sha256": "d9064fe1b4dc5b5ac9dbc72fe494ff8f5a24d8b072a5c79a445ee5c409ad5c7c",
     "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-author-proposal.json"
   },
   "approved_identity": {
@@ -246,7 +246,7 @@
     },
     "api_semantic_review": {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-      "sha256": "f66b29f58ea51ec2d405018d97c834aae0861422466d1d65ed7a93666d4cc80f"
+      "sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429"
     }
   },
   "scope_of_decision": "Source selection and semantic obligation boundary only. This approval does not pass any runtime obligation, API, execution contract or final matrix.",
@@ -285,5 +285,6 @@
   "coverage_authority": false,
   "runtime_acceptance": false,
   "findings": [],
-  "newline_identity": "Reviewed as UTF-8 without BOM and LF; these exact bytes are required in the repository and review hash."
+  "newline_identity": "Reviewed as UTF-8 without BOM and LF; these exact bytes are required in the repository and review hash.",
+  "condition_root_mapping_delta": "Selection remains exactly13primary sources,one helper and159API anchors. The updated immutable API semantic review binds five separately registered Ada-only condition-lifetime supports and unchanged closure block0001, without broadening existing public C claims or promoting runtime obligations."
 }
