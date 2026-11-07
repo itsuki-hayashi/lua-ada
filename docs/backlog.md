@@ -13,6 +13,12 @@ component progress. The binary Lua searcher now accepts native chunks and its
 focused caching/loader-data regression passes within 1,391 local AUnit cases.
 Full target and all original unfinished M3 gates remain open.
 
+The two public C formatting exports now have focused native/Ada comparisons,
+allocation-failure sweeps and bounded-session regressions within a passing
+1,551-case local run. See the
+[checkpoint](sessions/2026-11-08-c-varargs-formatting.md). Remaining auxiliary
+exports, native fixtures and final target reconciliation remain mandatory.
+
 Shared parser token/semantic diagnostics, Lua load-name formatting and fixed
 return-count refusal now have 16 focused regressions and matching native/Ada
 evidence. See the [checkpoint](sessions/2026-11-08-syntax-diagnostic-tokens.md).

@@ -78,6 +78,7 @@ library project Lua_Ada is
       "lua_ada_libraries.c",
       "lua_ada_debug.c",
       "lua_ada_builtins.c",
+      "lua_ada_format.c",
       "lua_ada_host_numerics.c",
       "lua_ada_streams.c",
       "lua_ada_os.c",

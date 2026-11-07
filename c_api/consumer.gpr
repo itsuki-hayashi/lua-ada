@@ -9,7 +9,8 @@ project Consumer is
       "foreign_api_contract.c", "foreign_continuation_contract.c",
       "foreign_hook_contract.c", "math_reopen_contract.c",
       "library_opener_contract.c", "load_dump_api_contract.c",
-      "debug_api_contract.c", "builtin_api_contract.c");
+      "debug_api_contract.c", "builtin_api_contract.c",
+      "format_api_contract.c");
    for Object_Dir use
      "../build/c-api/consumer/" & Lua_Ada.Configuration_Subdir &
        Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
@@ -19,7 +20,8 @@ project Consumer is
    for Main use
      ("c_api_consumer.c", "gc_api_contract.c", "io_api_contract.c",
       "foreign_api_contract.c", "load_dump_api_contract.c",
-      "debug_api_contract.c", "builtin_api_contract.c");
+      "debug_api_contract.c", "builtin_api_contract.c",
+      "format_api_contract.c");
    for Create_Missing_Dirs use "True";
 
    package Compiler is

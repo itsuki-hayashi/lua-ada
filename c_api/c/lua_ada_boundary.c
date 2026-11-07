@@ -106,6 +106,28 @@ int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
     return status;
 }
 
+int lua_ada_run_protected(lua_State *state,
+                         void (*body)(lua_State *, void *), void *data) {
+    struct lua_ada_guard guard;
+    int status;
+    guard.previous = state->guard;
+    guard.error_handled = 0;
+    state->guard = &guard;
+    /* An ABI helper can catch a refusal without adding a Lua call frame.
+     * Its caller owns data and must release temporary storage on every
+     * status before forwarding a host abort to the surrounding C guard. */
+    status = setjmp(guard.target);
+    if (status == LUA_OK) body(state, data);
+    state->guard = guard.previous;
+    return status;
+}
+
+void lua_ada_propagate_status(lua_State *state, int status) {
+    struct lua_ada_response output;
+    memset(&output, 0, sizeof output);
+    raise_action(state, status, &output);
+}
+
 int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
                             const struct lua_ada_response *pending,
                             struct lua_ada_response *completion) {

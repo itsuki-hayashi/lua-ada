@@ -55,6 +55,7 @@ with Lua.Storage_Buffer_Tests;
 with Lua.Loader_Storage_Tests;
 with Lua.Streaming_Reader_Tests;
 with Lua.Builtin_Bridge_Tests;
+with Lua.Formatter_Tests;
 with Lua.Frontend_Storage_Tests;
 with Lua.Chunk_Tests;
 with Lua.Canonical_Compiler_Tests;
@@ -138,6 +139,7 @@ procedure Test_Runner is
       Lua.Loader_Storage_Tests.Register (Result);
       Lua.Streaming_Reader_Tests.Register (Result);
       Lua.Builtin_Bridge_Tests.Register (Result);
+      Lua.Formatter_Tests.Register (Result);
       Lua.Frontend_Storage_Tests.Register (Result);
       Lua.Chunk_Tests.Register (Result);
       Lua.Canonical_Compiler_Tests.Register (Result);

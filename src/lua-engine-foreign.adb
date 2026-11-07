@@ -25,6 +25,21 @@ package body Lua.Engine.Foreign is
    package C renames Interfaces.C;
    package Memory renames Lua.Storage;
    package VM renames Lua.Engine.Machine;
+   type Formatting_Data is record
+      Owner : Memory.Owner_Access;
+      Bytes : Owned_Buffer;
+   end record;
+   type Formatting_Access is access Formatting_Data;
+   for Formatting_Access'Storage_Pool use Memory.Pool;
+   package Formatting_Views is new
+     System.Address_To_Access_Conversions (Formatting_Data);
+   function Formatting_Handle is new Ada.Unchecked_Conversion
+     (Formatting_Views.Object_Pointer, Formatting_Access);
+   procedure Free_Formatting is new Ada.Unchecked_Deallocation
+     (Formatting_Data, Formatting_Access);
+   --  A live C raw guard owns each temporary. No pointer or Lua value is
+   --  retained beyond that guard; refusal/host abort releases Bytes before
+   --  propagating. Its payload grows only through this world's provider.
    use System.Storage_Elements;
    use type C.long_long;
    use type C.size_t;
@@ -798,6 +813,13 @@ package body Lua.Engine.Foreign is
      (State : in out World; Context : not null Context_Access;
       Input : Request; Output : in out Response) is separate;
 
+   procedure Format_API
+     (State : in out World; Context : not null Context_Access;
+      Input : Request; Output : in out Response);
+   procedure Format_API
+     (State : in out World; Context : not null Context_Access;
+      Input : Request; Output : in out Response) is separate;
+
    function Dispatch
      (State : System.Address; Input : not null access constant Request;
       Output : not null access Response) return Action_Status
@@ -1262,6 +1284,9 @@ package body Lua.Engine.Foreign is
       --  when it is an inactive coroutine. Borrowing it never resets budgets
       --  or resumes Lua execution, and the caller's context is restored below.
       case Input.Operation is
+         when Create_Formatter | Append_Format_Value | Append_Format_UTF8 |
+           Finish_Formatter | Release_Formatter | Charge_Aux_Work =>
+            Format_API (Owner.Universe.all, Context, Input.all, Output.all);
          when Set_Hook | Get_Hook | Get_Hook_Mask | Get_Hook_Count |
            Get_Debug_Frame | Get_Debug_Line =>
             Foreign_Hooks.Handle
@@ -2492,6 +2517,15 @@ package body Lua.Engine.Foreign is
             then
                Output.Pointer :=
                  Stacks.Read (Context, Context.Foreign_Top).Reference.C_Bytes;
+               if Stacks.Read (Context, Context.Foreign_Top).Reference =
+                 Owner.Universe.Memory_Error_Value.Reference
+               then
+                  --  lua_error recognizes the actual preallocated memory
+                  --  error string, including after a protected formatter
+                  --  returned NULL rather than throwing at its caller.
+                  Leave_Context;
+                  return Action_Memory;
+               end if;
             end if;
             Leave_Context;
             return Action_Raise;

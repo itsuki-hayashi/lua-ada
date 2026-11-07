@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [C varargs formatting checkpoint](sessions/2026-11-08-c-varargs-formatting.md)
+passes strict Windows validation/static builds and all 1,551 current AUnit
+cases. Its four public C contracts also pass unchanged against default and
+instrumented C Lua, including actual growth-refusal sweeps and recovery.
+This completes two exports locally; full C surface and target acceptance
+remain open.
+
 The [syntax diagnostic checkpoint](sessions/2026-11-08-syntax-diagnostic-tokens.md)
 passes strict Windows validation/static builds and 1,534 AUnit cases. Its
 focused Lua witness matches both C configurations; unchanged unreduced
