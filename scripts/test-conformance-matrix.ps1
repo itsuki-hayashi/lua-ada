@@ -309,3 +309,5 @@ if ($LASTEXITCODE -ne 0) { throw 'Target observation bundle transport regression
 if ($LASTEXITCODE -ne 0) { throw 'Native image linkage regressions failed' }
 & (Join-Path $PSScriptRoot 'test-native-lua-fixture-evidence.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Native fixture evidence regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-attrib-windows-proposal.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Windows attrib source proposal regressions failed' }

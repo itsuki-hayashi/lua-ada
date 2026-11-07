@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "attrib-windows-source-author-proposal",
+  "author": "Codex /root/validation_delivery",
+  "source": "references/lua/testes/attrib.lua",
+  "source_sha256": "dd2eb13be29628ac0268cddfafdc6a816edcba6552ae15e8637afc6a79742e52",
+  "generated_sha256": "a56021013a850cf69feb421e5385ac0e5f8e6b5841d107c9c7a55ed5ea172dca",
+  "exact_replacement_count": 10,
+  "replacement_ids": [
+    "windows-path-require-b-lua",
+    "windows-path-require-a-lua",
+    "windows-path-require-a-lc",
+    "windows-path-fallback-l-first",
+    "windows-path-fallback-l-reload",
+    "windows-path-require-xx-x",
+    "windows-path-mixed-subpackage-template",
+    "windows-path-subpackage-separator",
+    "windows-path-hyphen-native-prefix",
+    "windows-path-c-root-native-prefix"
+  ],
+  "counterpart": {
+    "path": "tests/conformance/platform/windows-package-paths.lua",
+    "sha256": "d3700e1babb78724741101d2a2ce66a0add4525455ff40d6bc9047d5fd0337f4"
+  },
+  "preserved_helper_spans": [
+    {
+      "start_byte": 2292,
+      "source_sha256": "8090b8750b81b493148f55b20f1367b2a9af0670d4dd0bc01cf01872b99d3a87",
+      "length_bytes": 82,
+      "id": "D"
+    },
+    {
+      "start_byte": 2437,
+      "source_sha256": "9526ec21562e02710f00c1e0ca2549ecc4e09c476a606d91b126dd6fcb97b8ee",
+      "length_bytes": 97,
+      "id": "DC"
+    },
+    {
+      "start_byte": 3814,
+      "source_sha256": "c8b5631a717d5098a9472d76bdd8b206bcb466eed6c0ffd5f04b58c1b2d3cdfb",
+      "length_bytes": 160,
+      "id": "try"
+    }
+  ],
+  "assertion_identifier_count": 138,
+  "T_identifier_count": 3,
+  "source_preservation": {
+    "D_helper_unchanged": true,
+    "all_changes_are_exact_expected_path_literals": true,
+    "exclusions": [],
+    "all_T_checks_unchanged": true,
+    "DC_helper_unchanged": true,
+    "port_guard_unchanged": true,
+    "assertion_calls_removed": 0,
+    "try_helper_unchanged": true
+  },
+  "required_contexts": [
+    "default/windows/development/static",
+    "default/windows/development/shared",
+    "default/windows/validation/static",
+    "default/windows/validation/shared",
+    "default/windows/release/static",
+    "default/windows/release/shared",
+    "upstream-test/windows/validation/static",
+    "upstream-test/windows/validation/shared",
+    "default/windows/validation/static-pic",
+    "upstream-test/windows/validation/static-pic"
+  ],
+  "review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "pending_requirements": [
+    "Independent exact-span semantic review before executing an adapted Ada target.",
+    "Fresh unchanged original C native captures for each selected actual context/image/configuration, including the Windows path assertion failure.",
+    "Fresh actual standalone path counterpart captures with unchanged fixture C bytes and same-image linkage receipts.",
+    "Fresh full transformed File and Aggregate C/Ada observations after source approval; preserve the 27 return protocol and every native/T assertion.",
+    "Post-observation native applicability review must bind original C source spans and captures; no Ada-only exception or passing claim."
+  ]
+}

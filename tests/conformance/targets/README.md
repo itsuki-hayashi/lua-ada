@@ -614,6 +614,19 @@ anchors retain behavioral obligations. No compiled cases are installed by this
 generator, and the existing global catalogue, acceptance policy and historical
 scopes remain the authorities for their respective validation modes.
 
+`new-target-attrib-windows-proposal.ps1` reconstructs a pending native-platform
+mapping for ten expected path literals in the pinned attrib.lua. Nine use its
+existing `D` helper; the P1/init.lua expectation retains the literal slash from
+the original mixed-separator template. The original D/DC/try helpers, every
+assertion and every T/native-module check remain intact. The source packet
+binds all ten original spans, preserved helper spans and the separately named
+`windows-package-paths.lua` counterpart cases. Those cases exercise require
+loader data, fallback/reload selection, mixed and native separators, and both
+native prefix lookups. They must run with unchanged fixture C sources bound to
+the actual host image. The pending packet installs no exclusion or source
+approval. Fresh original C applicability captures, independent source review,
+and full paired File/Aggregate observations remain required in each context.
+
 Artifact transport follows the official [upload-artifact v7 documentation](https://github.com/actions/upload-artifact/tree/v7.0.2)
 and [download-artifact v8 documentation](https://github.com/actions/download-artifact/tree/v8).
 Unix mode bits are restored from the content-bound image manifest because the
