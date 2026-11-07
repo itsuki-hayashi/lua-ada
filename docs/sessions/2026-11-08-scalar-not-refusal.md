@@ -45,6 +45,18 @@ NOT allocation is gone; further permanent-refusal library behavior remains
 open. The fixture and upstream source were not reduced, edited or skipped.
 Logs and dump artifacts remain under reports/not-*.
 
+An additional unreduced observation invokes the original memerr.lua directly,
+with no _soft flag, through the same 2 GiB configured T conformance runner.
+The executable SHA256 is
+6F4B5E608E56AB14A4E10D38A4B44B78CC958E229D02B1D1ECE0639755A7A118.
+It exits 1 at memerr.lua:7 with "not enough memory". The actual configuration
+reports maximum stack 68,000, maximum C calls 180, auxiliary buffer 23 and
+actual/expected extra space 8; this is not private USER_H ABI evidence.
+Telemetry run bf9689c88b99457f8328d2752706975a reports managed refusals 4,
+provider refusals 5, peak bytes 1,048,281, outstanding bytes/blocks zero,
+shutdown complete and no accounting fault. This failed full-file observation
+is retained independently of the soft diagnostic and establishes no acceptance.
+
 Continue the assigned shared borrowed Lua CI/custom C hook repair and the
 remaining source/T/allocator matrices. The final PR, automatic GitHub review,
 review fixes and authorized merge remain part of the full ongoing task.
