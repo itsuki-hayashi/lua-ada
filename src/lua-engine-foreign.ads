@@ -60,6 +60,7 @@ package Lua.Engine.Foreign is
       Get_Local, Set_Local, Get_Upvalue, Set_Upvalue,
       Upvalue_Id, Join_Upvalues, Begin_Builtin, Push_External_String,
       Prepare_External_Release, Complete_External_Release,
+      Prepare_Length, Prepare_Concatenation, Number_To_C_String,
       Create_Formatter, Append_Format_Value, Append_Format_UTF8,
       Finish_Formatter, Release_Formatter, Charge_Aux_Work);
    for Operation_Code use
@@ -97,6 +98,8 @@ package Lua.Engine.Foreign is
       Get_Upvalue => 89, Set_Upvalue => 90, Upvalue_Id => 91,
       Join_Upvalues => 92, Begin_Builtin => 93, Push_External_String => 94,
       Prepare_External_Release => 95, Complete_External_Release => 96,
+      Prepare_Length => 100, Prepare_Concatenation => 101,
+      Number_To_C_String => 102,
       Create_Formatter => 120, Append_Format_Value => 121,
       Append_Format_UTF8 => 122, Finish_Formatter => 123,
       Release_Formatter => 124, Charge_Aux_Work => 125);

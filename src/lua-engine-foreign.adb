@@ -1434,6 +1434,84 @@ package body Lua.Engine.Foreign is
                if Is_Set then Push (Owner.Universe.all, Context, Item); end if;
                Output.Length := 1;
             end;
+         when Prepare_Length =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+            begin
+               if Item.Kind = String_Kind then
+                  Push (Owner.Universe.all, Context,
+                    (Integer_Kind,
+                     Integer_Value (Length (Item.Reference.Bytes))));
+               elsif Item.Kind = Table_Kind and then
+                 Metafield (Owner.Universe.all, Item, "__len").Kind = Nil_Kind
+               then
+                  Push (Owner.Universe.all, Context,
+                        (Integer_Kind, Integer_Value (Table_Length (Item))));
+               else
+                  --  Use the existing iterative unary operation. The C
+                  --  wrapper enters its ordinary nonyieldable call portal
+                  --  only after this Ada dispatcher has returned.
+                  Pin (Owner.Universe.all, Item);
+                  Push (Owner.Universe.all, Context,
+                        New_Native (Owner.Universe.all, "@length"));
+                  Push (Owner.Universe.all, Context, Item);
+                  Output.Length := 1;
+               end if;
+            end;
+         when Prepare_Concatenation =>
+            if Input.Count < 0 or else
+              Input.Count > C.int
+                (Context.Foreign_Top - Context.Foreign_Base)
+            then
+               raise Foreign_Error with "invalid concatenation operand count";
+            elsif Input.Count = 0 then
+               Push (Owner.Universe.all, Context,
+                     New_String (Owner.Universe.all, ""));
+            elsif Input.Count > 1 then
+               declare
+                  Arguments : Values.Vector := Owned_Values
+                    (Owner.Universe.all);
+               begin
+                  --  Root every operand before retiring its public stack
+                  --  edge. The hidden continuation folds from the right via
+                  --  the same binary operation used by canonical code;
+                  --  arbitrary Lua/C handlers never run in this activation.
+                  for Index in reverse 1 .. Natural (Input.Count) loop
+                     Append_Root (Owner.Universe.all, Arguments,
+                                  Get_Value (-C.int (Index)));
+                  end loop;
+                  Pin (Owner.Universe.all, Arguments);
+                  Pop (Context, Natural (Input.Count));
+                  Push (Owner.Universe.all, Context,
+                        New_Native (Owner.Universe.all, "@api.concat"));
+                  for Item of Arguments loop
+                     Push (Owner.Universe.all, Context, Item);
+                  end loop;
+                  Output.Length := 1;
+               end;
+            end if;
+         when Number_To_C_String =>
+            declare
+               Item : constant Value := Get_Value (Input.Index);
+            begin
+               if Item.Kind in Integer_Kind | Real_Kind then
+                  if Input.Pointer = System.Null_Address then
+                     raise Foreign_Error with "null number output buffer";
+                  end if;
+                  declare
+                     Text : constant String :=
+                       Image (Context.Memory, Item) & Character'Val (0);
+                     Bytes : String (1 .. Text'Length)
+                       with Import, Address => Input.Pointer;
+                  begin
+                     --  The public caller supplies LUA_N2SBUFFSZ. Numeric
+                     --  rendering has constant scalar workspace, changes
+                     --  no value/stack slot and makes no provider request.
+                     Bytes := Text;
+                     Output.Length := C.size_t (Text'Length);
+                  end;
+               end if;
+            end;
          when Mark_Close =>
             declare
                Frame : constant Frame_Access := Context.Foreign_Activation;
@@ -2610,8 +2688,8 @@ package body Lua.Engine.Foreign is
                  Owner.Universe.Memory_Error_Value.Reference
                then
                   --  lua_error recognizes the actual preallocated memory
-                  --  error string, including after a protected formatter
-                  --  returned NULL rather than throwing at its caller.
+                  --  error string, including after a protected variadic
+                  --  formatter handed that error back to its C caller.
                   Leave_Context;
                   return Action_Memory;
                end if;

@@ -11,6 +11,17 @@ The installable headers under include/api are unchanged pinned copies with
 per-file hashes and retained notices; production include paths do not enter
 the reference-only tree.
 
+The [public value/auxiliary checkpoint](../docs/sessions/2026-11-08-public-value-auxiliary.md)
+adds lua_len, lua_concat and lua_numbertocstring, plus 28 argument, option,
+metatable, userdata, reference, registration and error/result helpers. All
+value operations execute in Ada; the auxiliary C layer composes public calls
+and handles native varargs. Scalar output uses the shared exact renderer and
+parser with bounded fixed scratch, making no Lua allocator request. Seven
+value cases (including 20,000 seeded binary64 spellings) and 76 auxiliary cases
+match both separately built C configurations locally. Native-platform/shared
+and whole-target gates remain open. Public buffer, file, traceback and further
+core exports still require completion; see [ADR 0023](../docs/decisions/0023-public-value-auxiliary-operations.md).
+
 The implemented surface covers seeded state construction, default construction,
 closure, thread surfaces, allocator selection, stack movement/indexing,
 primitive values/conversions, stable NUL-terminated byte strings, raw tables,

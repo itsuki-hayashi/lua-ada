@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [public value/auxiliary checkpoint](sessions/2026-11-08-public-value-auxiliary.md)
+has matching local C/Ada evidence for three core and 28 auxiliary exports.
+Its 20,000-value binary64 text fingerprint matches both C configurations;
+the six scalar and two auxiliary quota regressions pass within 1,664 AUnit
+cases. Full surface, runtime matrix and whole-target acceptance remain pending.
+
 The [fixed numeric scratch checkpoint](sessions/2026-11-08-fixed-numeric-scratch.md)
 reuses the exact parser with a bounded local provider. Strict local default
 builds and 1,640 AUnit cases pass. Public C conversion wiring, integrated T,

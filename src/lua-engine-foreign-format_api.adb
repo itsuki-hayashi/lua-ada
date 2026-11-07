@@ -77,8 +77,16 @@ begin
       return;
    elsif Input.Operation = Create_Formatter then
       Data := new (Memory.Handle (State.Memory)) Formatting_Data;
-      Data.Owner := Memory.Reference (State.Memory);
-      Data.Bytes.Set_Owner (Data.Owner);
+      begin
+         Data.Owner := Memory.Reference (State.Memory);
+         Data.Bytes.Set_Owner (Data.Owner);
+      exception
+         when others =>
+            --  Ownership is not published to C until initialization ends.
+            --  Keep that handoff exception-safe if owner setup ever changes.
+            Free_Formatting (Data);
+            raise;
+      end;
       Output.Pointer := Data.all'Address;
       return;
    end if;

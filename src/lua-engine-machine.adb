@@ -3262,6 +3262,31 @@ package body Lua.Engine.Machine is
       if Name = "@invoke" then
          Handler := First (Activation.Native_Captures);
          Invoke (Handler, Activation.Native_Arguments);
+      elsif Name = "@api.concat" then
+         if Activation.Native_Stage = 0 then
+            Activation.Native_Index :=
+              Natural (Activation.Native_Arguments.Length);
+            Append_Root (State, Activation.Native_Captures,
+                         Arg (Activation.Native_Index));
+         else
+            Activation.Native_Captures.Clear;
+            Append_Root (State, Activation.Native_Captures,
+                         First (Activation.Native_Results));
+            Activation.Native_Index := Activation.Native_Index - 1;
+         end if;
+         if Activation.Native_Index = 1 then
+            --  Copy the scalar out of its vector before completion retires
+            --  that vector's frame; no indexing borrow may span retirement.
+            Return_Native (Activation.Native_Captures.First_Element);
+         else
+            --  C concat is a right fold, including handler order and
+            --  non-string intermediate handler results. Reuse the actual
+            --  binary primitive/metamethod continuation and its roots.
+            Packet.Append (Arg (Activation.Native_Index - 1));
+            Packet.Append (Activation.Native_Captures (1));
+            Activation.Native_Stage := 1;
+            Schedule (Self, "@binary", Packet, 0, Concatenate);
+         end if;
       elsif Name in "@length" | "@equal" then
          if Activation.Native_Stage = 1 then
             Return_Native (First (Activation.Native_Results));

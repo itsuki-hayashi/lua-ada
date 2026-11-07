@@ -823,6 +823,25 @@ int lua_gettable(lua_State *state, int index) {
     return lua_type(state, -1);
 }
 
+void lua_len(lua_State *state, int index) {
+    struct lua_ada_request input = request(ADA_PREPARE_LENGTH);
+    input.index = index;
+    if (dispatch(state, input).length != 0) lua_call(state, 1, 1);
+}
+
+void lua_concat(lua_State *state, int count) {
+    struct lua_ada_request input = request(ADA_PREPARE_CONCATENATION);
+    input.count = count;
+    if (dispatch(state, input).length != 0) lua_call(state, count, 1);
+}
+
+unsigned lua_numbertocstring(lua_State *state, int index, char *buffer) {
+    struct lua_ada_request input = request(ADA_NUMBER_TO_C_STRING);
+    input.index = index;
+    input.pointer = buffer;
+    return (unsigned)dispatch(state, input).length;
+}
+
 void lua_settable(lua_State *state, int index) {
     struct lua_ada_request input = request(ADA_PREPARE_INDEX);
     struct lua_ada_response output;

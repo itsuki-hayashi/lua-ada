@@ -18,6 +18,8 @@ package body Lua.Formatter_Tests is
    procedure Dispose (State : in out World);
    procedure Shared_Work_Quota;
    procedure String_Extent_Quota;
+   procedure Option_Prefix_Quota;
+   procedure Default_Length_Quota;
 
    procedure Install (State : in out World; Choice : Interfaces.C.int) is
       Item : Value;
@@ -77,6 +79,44 @@ package body Lua.Formatter_Tests is
       when others => Finalize (State); raise;
    end String_Extent_Quota;
 
+   procedure Option_Prefix_Quota is
+      State : World;
+   begin
+      --  Comparing one large equal option/default is real runtime work,
+      --  even though the option list contains only one foreign entry.
+      Initialize (State, (Instructions => 200, others => <>));
+      Install (State, 3);
+      Assert (not Execute (State,
+        "pcall(format); error('option abort was caught')", "option-work"),
+        "option common-prefix scanning consumes the host work budget");
+      Assert (State.Current.Failure_Class = Host_Abort,
+              "option scanning quota remains an uncatchable host abort");
+      Assert (Execute (State, "return 29", "option-work-recovery"),
+              "option scanning restores the host after quota failure");
+      Dispose (State);
+   exception
+      when others => Finalize (State); raise;
+   end Option_Prefix_Quota;
+
+   procedure Default_Length_Quota is
+      State : World;
+   begin
+      --  Computing the requested default length scans borrowed C bytes.
+      --  The auxiliary API must not hide that scan behind a libc strlen.
+      Initialize (State, (Instructions => 200, others => <>));
+      Install (State, 4);
+      Assert (not Execute (State,
+        "pcall(format); error('default abort was caught')", "default-work"),
+        "default length scanning consumes the host work budget");
+      Assert (State.Current.Failure_Class = Host_Abort,
+              "default length quota remains an uncatchable host abort");
+      Assert (Execute (State, "return 31", "default-work-recovery"),
+              "default length scan restores the host after quota failure");
+      Dispose (State);
+   exception
+      when others => Finalize (State); raise;
+   end Default_Length_Quota;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -85,5 +125,11 @@ package body Lua.Formatter_Tests is
       Test_Support.Add
         (Suite, "C formatter: output obeys bounded string extent quota",
          String_Extent_Quota'Access);
+      Test_Support.Add
+        (Suite, "C auxiliary: option prefix scanning shares host quota",
+         Option_Prefix_Quota'Access);
+      Test_Support.Add
+        (Suite, "C auxiliary: default length scanning shares host quota",
+         Default_Length_Quota'Access);
    end Register;
 end Lua.Formatter_Tests;

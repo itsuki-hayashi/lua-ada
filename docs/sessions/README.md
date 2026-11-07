@@ -20,21 +20,22 @@ Previous: [major M3 language lifecycle](2026-11-06-m3-language-lifecycle.md).
 The current delivery follows merged PR #7 and combines all remaining M3 work
 into one major PR. Historical session results retain their original scope.
 
-| Date       | Session                                                      |
-| ---------- | ---------------------------------------------------------    |
-| 2026-11-05 | [Initial foundation](2026-11-05-foundation.md)               |
-| 2026-11-05 | [Initial M1 gates](2026-11-05-m1-gates.md)                   |
-| 2026-11-05 | [M1 interpreter](2026-11-05-m1-interpreter.md)               |
-| 2026-11-06 | [Module fixture setup](2026-11-06-ecosystem-fixtures.md)     |
-| 2026-11-06 | [M2a frontend implementation](2026-11-06-m2a-frontend.md)    |
-| 2026-11-06 | [M2b core libraries](2026-11-06-m2b-core-libraries.md)       |
-| 2026-11-06 | [M3-01 contracts and harness](2026-11-06-m3-01-contracts.md) |
-| 2026-11-07 | [Reader input](2026-11-07-demand-driven-input.md)            |
-| 2026-11-08 | [Public C debug identity](2026-11-08-c-debug-identity.md)    |
-| 2026-11-08 | [Callable builtins](2026-11-08-callable-builtins.md)         |
-| 2026-11-08 | [C varargs formatting](2026-11-08-c-varargs-formatting.md)   |
+| Date       | Session                                                              |
+| ---------- | -------------------------------------------------------------------- |
+| 2026-11-05 | [Initial foundation](2026-11-05-foundation.md)                       |
+| 2026-11-05 | [Initial M1 gates](2026-11-05-m1-gates.md)                           |
+| 2026-11-05 | [M1 interpreter](2026-11-05-m1-interpreter.md)                       |
+| 2026-11-06 | [Module fixture setup](2026-11-06-ecosystem-fixtures.md)             |
+| 2026-11-06 | [M2a frontend implementation](2026-11-06-m2a-frontend.md)            |
+| 2026-11-06 | [M2b core libraries](2026-11-06-m2b-core-libraries.md)               |
+| 2026-11-06 | [M3-01 contracts and harness](2026-11-06-m3-01-contracts.md)         |
+| 2026-11-07 | [Reader input](2026-11-07-demand-driven-input.md)                    |
+| 2026-11-08 | [Public C debug identity](2026-11-08-c-debug-identity.md)            |
+| 2026-11-08 | [Callable builtins](2026-11-08-callable-builtins.md)                 |
+| 2026-11-08 | [C varargs formatting](2026-11-08-c-varargs-formatting.md)           |
+| 2026-11-08 | [Public value and auxiliary](2026-11-08-public-value-auxiliary.md)   |
 | 2026-11-08 | [External string ownership](2026-11-08-external-string-ownership.md) |
-| 2026-11-08 | [Fixed numeric scratch](2026-11-08-fixed-numeric-scratch.md) |
+| 2026-11-08 | [Fixed numeric scratch](2026-11-08-fixed-numeric-scratch.md)         |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,

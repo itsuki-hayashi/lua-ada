@@ -25,6 +25,13 @@ component progress. The binary Lua searcher now accepts native chunks and its
 focused caching/loader-data regression passes within 1,391 local AUnit cases.
 Full target and all original unfinished M3 gates remain open.
 
+Three public value operations and 28 auxiliary helpers now have actual
+same-source C/Ada component evidence, including zero-provider number output
+and exact seeded decimal spellings. See the
+[checkpoint](sessions/2026-11-08-public-value-auxiliary.md). Remaining public
+buffer/file/traceback and core functions, relevant T drivers and native-module
+loading stay required; component evidence does not close the global ledgers.
+
 The two public C formatting exports now have focused native/Ada comparisons,
 allocation-failure sweeps and bounded-session regressions within a passing
 1,551-case local run. See the

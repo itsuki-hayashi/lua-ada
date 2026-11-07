@@ -99,12 +99,12 @@ static void format_body(lua_State *L, void *opaque) {
             break;
         case 'p': {
             char text[2 * sizeof(void *) + 8];
-            int length = snprintf(text, sizeof text, "%p",
-                                  va_arg(call->arguments, void *));
-            if (length < 0 || (size_t)length >= sizeof text) {
+            int written = snprintf(text, sizeof text, "%p",
+                                   va_arg(call->arguments, void *));
+            if (written < 0 || (size_t)written >= sizeof text) {
                 lua_ada_propagate_status(L, ADA_ACTION_ABORT);
             }
-            append_bytes(L, call, text, (size_t)length);
+            append_bytes(L, call, text, (size_t)written);
             break;
         }
         case 'U':

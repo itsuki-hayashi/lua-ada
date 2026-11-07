@@ -3,6 +3,8 @@ with Lua.Engine.Canonical;
 with Lua.Engine.Finalizers;
 with Lua.Engine.Warnings;
 with Lua.Engine.External_Releases;
+with Lua.Engine.Formats;
+with Lua.Storage.Fixed_Arenas;
 with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
 with Lua.Number_Parsing;
@@ -11,7 +13,6 @@ with Ada.Exceptions;
 with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
 with Ada.Strings.Fixed;
-with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 with Ada.Unchecked_Conversion;
 with Lua_Ada_Config;
@@ -396,9 +397,7 @@ package body Lua.Engine is
    function Allocate
      (State : in out World; Kind : Heap_Kind;
       Payload_Length : Lua.Storage.Byte_Count := 0) return Object_Access;
-   function Real_Image
-     (Memory : not null Lua.Storage.Owner_Access;
-      Item : Real_Value) return String;
+   function Real_Image (Item : Real_Value) return String;
    function NaN_Image (Item : Real_Value; Host : String) return String;
    --  Keep host formatting policy separate from arithmetic and test values.
 
@@ -1965,98 +1964,64 @@ package body Lua.Engine is
            Foreign_Function_Kind =>
             "function");
 
-   function Real_Image
-     (Memory : not null Lua.Storage.Owner_Access;
-      Item : Real_Value) return String is
-      package Real_IO is new Ada.Text_IO.Float_IO (Real_Value);
-      Buffer : String (1 .. 64);
-      Precision : Positive := 15;
+   function Real_Image (Item : Real_Value) return String is
    begin
       if Item /= Item then
-         --  Windows and macOS printf omit NaN's sign; Linux retains it.
-         --  Three-platform differential runs established this distinction.
-         --  Numeric comparisons still use the original IEEE representation.
          return NaN_Image (Item, Lua_Ada_Config.Alire_Host_OS);
       elsif Item > Real_Value'Last then
          return "inf";
       elsif Item < -Real_Value'Last then
          return "-inf";
       end if;
-      --  Lua 5.5 first formats fifteen significant digits, then uses
-      --  seventeen when that text would not round-trip to the same double.
-      --  Ada supplies rounded digits; we implement general-format selection
-      --  and Lua's integer-looking .0 suffix without importing printf.
-      loop
-         Real_IO.Put (Buffer, Item, Aft => Precision - 1, Exp => 3);
-         exit when Precision = 17 or else Lua.Numbers.To_Real
-           (Read_Number
-              (Memory, Ada.Strings.Fixed.Trim
-                 (Buffer, Ada.Strings.Both))) = Item;
-         Precision := 17;
-      end loop;
       declare
-         Text : constant String :=
-           Ada.Strings.Fixed.Trim (Buffer, Ada.Strings.Both);
-         E : constant Positive := Ada.Strings.Fixed.Index (Text, "E");
-         Power : constant Integer := Integer'Value (Text (E + 1 .. Text'Last));
-         Negative : constant Boolean := Text (Text'First) = '-';
-         First : constant Positive := (if Negative then 2 else 1);
-         Digits_Text : Unbounded_String;
-         Result : Unbounded_String;
-         Point : constant Integer := Power + 1;
+         Arena : Lua.Storage.Fixed_Arenas.Arena;
+         Memory : Lua.Storage.Owner;
+         Output : Owned_Buffer;
+         Precision : Positive := 15;
+         Text : String (1 .. 64);
+         Size : Natural;
+         Integer_Looking : Boolean := True;
+         Point : constant Character := Character'Val (Locales.Decimal_Point);
       begin
-         for Index in First .. E - 1 loop
-            if Text (Index) /= '.' then
-               Append (Digits_Text, Text (Index));
-            end if;
-         end loop;
-         while Length (Digits_Text) > 1 and then
-           Element (Digits_Text, Length (Digits_Text)) = '0'
+         --  Finite binary64 conversion has a fixed rational/digit bound.
+         --  Run the existing exact renderer and parser in a scoped fixed
+         --  arena: public numbertocstring must make no Lua allocator request
+         --  even when every provider growth is refused. The arena precedes
+         --  its owner and all buffers, preserving reverse-order teardown.
+         Lua.Storage.Fixed_Arenas.Bind (Arena, Memory);
+         Output.Set_Owner (Lua.Storage.Reference (Memory));
          loop
-            Delete (Digits_Text, Length (Digits_Text), Length (Digits_Text));
+            Formats.Finite_Number_Image
+              (Lua.Storage.Reference (Memory), Item, Precision, Output);
+            exit when Precision = 17 or else Lua.Numbers.To_Real
+              (Read_Number (Lua.Storage.Reference (Memory),
+                            Output.To_String)) = Item;
+            Precision := 17;
          end loop;
-         if Negative then
-            Append (Result, '-');
-         end if;
-         if Power < -4 or else Power >= Precision then
-            Append (Result, Element (Digits_Text, 1));
-            if Length (Digits_Text) > 1 then
-               Append (Result, '.' & Slice (Digits_Text, 2,
-                                           Length (Digits_Text)));
+         Size := Output.Length;
+         for Index in 1 .. Size loop
+            Text (Index) := Output.Element (Index);
+            if Text (Index) not in '-' | '0' .. '9' then
+               Integer_Looking := False;
             end if;
-            declare
-               Magnitude : constant String := Ada.Strings.Fixed.Trim
-                 (Integer'Image (abs Power), Ada.Strings.Both);
-            begin
-               Append (Result, 'e');
-               Append (Result, (if Power < 0 then '-' else '+'));
-               if Magnitude'Length < 2 then
-                  Append (Result, '0');
-               end if;
-               Append (Result, Magnitude);
-            end;
-         elsif Point <= 0 then
-            Append (Result, "0.");
-            for Index in 1 .. -Point loop
-               Append (Result, '0');
-            end loop;
-            Append (Result, Digits_Text);
-         elsif Point >= Length (Digits_Text) then
-            Append (Result, Digits_Text);
-            for Index in Length (Digits_Text) + 1 .. Point loop
-               Append (Result, '0');
-            end loop;
-            Append (Result, ".0");
-         else
-            Append (Result, Slice (Digits_Text, 1, Point) & '.' &
-                    Slice (Digits_Text, Point + 1, Length (Digits_Text)));
+            if Text (Index) = '.' then
+               Text (Index) := Point;
+            end if;
+         end loop;
+         if Integer_Looking then
+            --  Preserve a real value's numeric type when it has an integer
+            --  looking general spelling, including either sign of zero.
+            Text (Size + 1) := Point;
+            Text (Size + 2) := '0';
+            Size := Size + 2;
          end if;
-         return To_String (Result);
+         return Text (1 .. Size);
       end;
    end Real_Image;
 
    function Image (Memory : not null Lua.Storage.Owner_Access;
                    Item : Value) return String is
+      pragma Unreferenced (Memory);
    begin
       case Item.Kind is
          when Light_Identity_Kind =>
@@ -2069,7 +2034,7 @@ package body Lua.Engine is
          when Integer_Kind =>
             return Ada.Strings.Fixed.Trim
               (Item.Integer_Data'Image, Ada.Strings.Both);
-         when Real_Kind => return Real_Image (Memory, Item.Real_Data);
+         when Real_Kind => return Real_Image (Item.Real_Data);
          when String_Kind => return To_String (Item.Reference.Bytes);
          when Table_Kind | Closure_Kind | Native_Closure_Kind | Thread_Kind |
            Userdata_Kind =>

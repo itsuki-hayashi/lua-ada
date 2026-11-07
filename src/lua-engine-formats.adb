@@ -163,16 +163,17 @@ package body Lua.Engine.Formats is
    end Decimal_Exponent;
 
    procedure Float_Image
-     (State : in out World; Item : Real_Value; Code : Character;
+     (Memory : not null Lua.Storage.Owner_Access;
+      Item : Real_Value; Code : Character;
       Precision : Integer; Alternate : Boolean;
       Output : in out Managed.Buffer);
    procedure Float_Image
-     (State : in out World; Item : Real_Value; Code : Character;
+     (Memory : not null Lua.Storage.Owner_Access;
+      Item : Real_Value; Code : Character;
       Precision : Integer; Alternate : Boolean;
       Output : in out Managed.Buffer)
    is
-      Value : constant Rational :=
-        Exact (Lua.Storage.Reference (State.Memory), Item);
+      Value : constant Rational := Exact (Memory, Item);
       Exponent : Integer := Decimal_Exponent (Value);
       Significant : Natural := (if Precision < 0 then 6 else Precision);
       Rounded_Digits : Managed.Buffer;
@@ -194,8 +195,8 @@ package body Lua.Engine.Formats is
          end loop;
       end Append_Digits;
    begin
-      Rounded_Digits.Set_Owner (Lua.Storage.Reference (State.Memory));
-      Output.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Rounded_Digits.Set_Owner (Memory);
+      Output.Set_Owner (Memory);
       Output.Clear;
       if Code in 'f' | 'F' then
          Rounded (Value, Significant, Rounded_Digits);
@@ -299,6 +300,20 @@ package body Lua.Engine.Formats is
          end if;
       end if;
    end Float_Image;
+
+   procedure Finite_Number_Image
+     (Memory : not null Lua.Storage.Owner_Access; Item : Real_Value;
+      Precision : Positive; Output : in out Managed.Buffer)
+   is
+   begin
+      --  Share the exact quotient/remainder and ties-to-even rounding used
+      --  by string.format. The scalar API changes ownership, not arithmetic
+      --  or notation rules, and introduces no second numeric renderer.
+      Float_Image (Memory, Item, 'g', Precision, False, Output);
+      if (Bits (Item) and 2 ** 63) /= 0 then
+         Output.Insert (1, "-");
+      end if;
+   end Finite_Number_Image;
 
    procedure Hex_Float
      (State : in out World; Item : Real_Value; Precision : Integer;
@@ -539,7 +554,9 @@ package body Lua.Engine.Formats is
             elsif Code in 'a' | 'A' then
                Hex_Float (State, Real, Precision, Alternate, Host, Text);
             else
-               Float_Image (State, Real, Code, Precision, Alternate, Text);
+               Float_Image
+                 (Lua.Storage.Reference (State.Memory), Real, Code,
+                  Precision, Alternate, Text);
             end if;
          when 's' =>
             if Item.Kind = String_Kind then

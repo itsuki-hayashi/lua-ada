@@ -30,6 +30,10 @@ spans and processing conversions consume the original bounded work counter.
 The existing bounded string limit remains enforced; neither configured limit
 becomes a catchable Lua allocation error.
 
+Scanning and copying are separate linear work: complete 4,096-byte scan blocks
+are charged before continuing, and each copied span charges its full length.
+This is a conservative host cost model, not a C instruction-count equivalence.
+
 The variadic lua_pushfstring raises memory failure. Its va_list counterpart
 returns NULL. Native observations of the pinned default and instrumented C
 builds show that this NULL return leaves the entry stack unchanged: clearbuff
@@ -39,6 +43,18 @@ The adapter follows the measured pinned implementation, records this explicit
 discrepancy and retains source-linked regressions. No public assertion is
 excluded. Unknown conversions are copied literally as pinned lobject.c does;
 the manual still requires valid conversion specifiers from consumers.
+
+The shared encoder accepts the pinned checked code-point range through
+0x7FFFFFFF. Pinned instrumented C asserts that precondition; values beyond it
+and a terminal bare percent are invalid caller input, with no portable result
+claimed. The adapter stops safely at a terminal percent. Caller va_list reuse
+after formatting likewise has no portable C contract; the adapter consumes a
+va_copy. Managed byte extents retain the engine's existing Natural limit.
+Above that representation an actual allocation refusal is reported; C's
+MAX_SIZE overflow truncation at its much larger host-size boundary is not
+implemented. The accepted campaign's 2 GiB provider ceiling still applies to
+every complete runtime allocation. No executed witness covers that extreme
+size boundary, and this is not a passing equivalence or an approved exclusion.
 
 The actual preallocated memory error string retains LUA_ERRMEM when passed to
 lua_error, including after a protected call hands that object back to C.

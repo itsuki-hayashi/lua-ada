@@ -10,7 +10,8 @@ project Consumer is
       "foreign_hook_contract.c", "math_reopen_contract.c",
       "library_opener_contract.c", "load_dump_api_contract.c",
       "debug_api_contract.c", "builtin_api_contract.c",
-      "format_api_contract.c", "external_string_contract.c");
+      "format_api_contract.c", "external_string_contract.c",
+      "value_api_contract.c", "auxiliary_api_contract.c");
    for Object_Dir use
      "../build/c-api/consumer/" & Lua_Ada.Configuration_Subdir &
        Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
@@ -21,14 +22,16 @@ project Consumer is
      ("c_api_consumer.c", "gc_api_contract.c", "io_api_contract.c",
       "foreign_api_contract.c", "load_dump_api_contract.c",
       "debug_api_contract.c", "builtin_api_contract.c",
-      "format_api_contract.c", "external_string_contract.c");
+      "format_api_contract.c", "external_string_contract.c",
+      "value_api_contract.c", "auxiliary_api_contract.c");
    for Create_Missing_Dirs use "True";
 
    package Compiler is
       for Default_Switches ("C") use
         ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
          "-I" & Project'Project_Dir & "include",
-         "-I" & Project'Project_Dir & "include/api");
+         "-I" & Project'Project_Dir & "include/api") &
+        Lua_Ada.C_Platform_Defines;
    end Compiler;
    package Linker is
       case Lua_Ada_Config.Alire_Host_OS is

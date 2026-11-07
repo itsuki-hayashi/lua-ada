@@ -132,6 +132,14 @@ Ada host callback registration, exposed object handles and thread synchronizatio
 remain deferred. The separate C facade has a partial real exported surface;
 its current pilot is not complete public API/ABI acceptance. A sink is an output destination, not a Lua host-function API.
 
+The public C value/auxiliary checkpoint implements metamethod-aware length,
+right-fold concatenation and fixed-buffer number output, plus 28 argument,
+metatable, reference, registration and error/result helpers. Their actual
+operations share the Ada runtime and C-owned continuation portal. Scalar
+number output uses fixed owned scratch and requests no Lua allocator storage.
+See [ADR 0023](decisions/0023-public-value-auxiliary-operations.md) and its dated
+validation record for the local scope and remaining C-surface obligations.
+
 The real C surface includes luaopen_io and luaopen_os. Each pushes a fresh
 module table without publishing a global or loaded-module entry. IO opening
 initializes registry-owned defaults and retains the existing FILE* metatable
