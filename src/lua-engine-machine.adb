@@ -1824,6 +1824,62 @@ package body Lua.Engine.Machine is
       Native_Tail : Boolean := False;
       Call_Metamethod_Count : Natural := 0;
       Packet : Values.Vector := Owned_Values (State);
+      procedure Bad_Call;
+      procedure Bad_Call is
+         use type Call_Names.Name_Kind;
+         Caller : constant Frame_Access :=
+           Inspection.Logical_Frame (State, State.Current, 0);
+         Origin : Call_Names.Borrowed_Identity;
+         Description : Unbounded_String := To_Unbounded_String
+           ("attempt to call a " & Diagnostic_Type (State, Function_Item) &
+            " value");
+      begin
+         --  luaG_callerror asks about the real caller before a callee exists.
+         --  Failed owners retained for closing have already unwound; public
+         --  C protection frames contribute neither a Lua source nor an opcode.
+         if Length (Name_Kind) > 0 then
+            Append (Description, " (" & To_String (Name_Kind) & " '" &
+              To_String (Call_Name) & "')");
+         else
+            if State.Current.Hook_Active and then
+              Caller = State.Current.Hook_Frame
+            then
+               Origin := (Call_Names.Hook_Name, Call_Names.Hook_Call);
+            elsif not State.Current.Stack.Is_Empty and then
+              State.Current.Stack.Last_Element.Is_Native and then
+              State.Current.Stack.Last_Element.Native_Name =
+                "@finalizer.invoke"
+            then
+               --  This is the actual finalizer controller's pending call.
+               --  Its invalid handler has no activation to carry the normal
+               --  entry marker; CIST_HOOKED still takes priority over FIN.
+               Origin :=
+                 (Call_Names.Finalizer_Name, Call_Names.Metamethod_Call);
+            elsif Caller /= null and then not Caller.Is_Native then
+               Origin := Call_Names.View_From_Caller (State, Caller);
+            end if;
+            if Origin.Kind /= Call_Names.Unknown then
+               Append (Description, " (" &
+                 Call_Names.Kind_Image (Origin.Kind) & " '" &
+                 To_String (Origin.Item) & "')");
+            end if;
+         end if;
+         if Caller /= null and then not Caller.Is_Native then
+            declare
+               Line : constant Natural := Line_At
+                 (Caller, Positive'Max (1, Caller.PC - 1));
+               Prefix : constant String := Inspection.Short_Source
+                 ((if Caller.Code.Canonical_Node /= null then
+                     To_String (Canonical.Source_Bytes (Caller.Code))
+                   else To_String (Caller.Code.Name))) & ":" &
+                 (if Line = 0 then "?" else Ada.Strings.Fixed.Trim
+                    (Line'Image, Ada.Strings.Both)) & ": ";
+            begin
+               Fail (State, Prefix & To_String (Description));
+            end;
+         end if;
+         Fail (State, To_String (Description));
+      end Bad_Call;
    begin
       Pin (State, Function_Value);
       Pin (State, Arguments);
@@ -1842,9 +1898,7 @@ package body Lua.Engine.Machine is
             else
                Handler := Metafield (State, Function_Item, "__call");
                if Handler.Kind = Nil_Kind then
-                  Fail (State, "attempt to call a " &
-                          Diagnostic_Type (State, Function_Item) &
-                          " value");
+                  Bad_Call;
                end if;
                Hops := Hops + 1;
                if Hops > 15 then
@@ -2828,9 +2882,9 @@ package body Lua.Engine.Machine is
                           Closing.Cell.Cell_Value);
                if Truth (Left) then
                   Handler := Metafield (State, Left, "__close");
-                  if Handler.Kind = Nil_Kind then
-                     Handler := New_Native (State, "@invalid.close");
-                  end if;
+                  --  Re-read the current handler, including nil/noncallable
+                  --  replacements. The protected real dispatch raises its
+                  --  call error and lets outer closers observe that new error.
                   Packet.Append (Left);
                   --  Lua 5.5 supplies only self on normal close. A genuine
                   --  error adds its second argument; an explicit nil value
@@ -2920,8 +2974,6 @@ package body Lua.Engine.Machine is
             end;
          end;
          return;
-      elsif Name = "@invalid.close" then
-         Fail (State, "attempt to close a non-closable value");
       end if;
       if Name'Length >= 10 and then
         Name (Name'First .. Name'First + 9) = "coroutine."

@@ -635,6 +635,68 @@ static void direct_gc_no_transport_events(lua_State *L) {
     assert(direct_gc_finalizers == 1 && direct_gc_hook_events == 0);
 }
 
+static void protected_nil_call_error(lua_State *L) {
+    lua_pushnil(L);
+    assert(lua_pcall(L, 0, 0, 0) == LUA_ERRRUN);
+    assert(strcmp(lua_tostring(L, -1), "attempt to call a nil value") == 0);
+    lua_pop(L, 1);
+}
+
+static int removed_slot_body(lua_State *L) {
+    lua_newuserdatauv(L, 0, 0);
+    lua_createtable(L, 0, 1);
+    lua_pushcfunction(L, direct_gc_finalizer);
+    lua_setfield(L, 2, "__close");
+    lua_setmetatable(L, 1);
+    lua_toclose(L, 1);
+    assert(lua_getmetatable(L, 1));
+    lua_pushnil(L); lua_setfield(L, 2, "__close"); lua_pop(L, 1);
+    lua_closeslot(L, 1);
+    assert(0); /* Replacing the handler with nil must fail through C. */
+    return 0;
+}
+
+static void removed_c_slot_call_error(lua_State *L) {
+    lua_pushcfunction(L, removed_slot_body);
+    assert(lua_pcall(L, 0, 0, 0) == LUA_ERRRUN);
+    assert(strcmp(lua_tostring(L, -1), "attempt to call a nil value") == 0);
+    lua_pop(L, 1);
+}
+
+static char bad_finalizer_text[512];
+static size_t bad_finalizer_size;
+static int bad_finalizer_warnings;
+
+static void capture_bad_finalizer(void *ud, const char *text, int more) {
+    size_t size = strlen(text);
+    (void)ud;
+    assert(size < sizeof bad_finalizer_text - bad_finalizer_size);
+    memcpy(bad_finalizer_text + bad_finalizer_size, text, size + 1);
+    bad_finalizer_size += size;
+    if (!more) ++bad_finalizer_warnings;
+}
+
+static void invalid_finalizer_call_error(lua_State *L) {
+    int i;
+    lua_newuserdatauv(L, 0, 0);
+    lua_createtable(L, 0, 1);
+    lua_pushinteger(L, 4); lua_setfield(L, 2, "__gc");
+    lua_setmetatable(L, 1);
+    lua_settop(L, 0);
+    assert(lua_checkstack(L, 64));
+    for (i = 0; i < 64; ++i) lua_pushnil(L);
+    lua_settop(L, 0);
+    bad_finalizer_size = 0;
+    bad_finalizer_warnings = 0;
+    bad_finalizer_text[0] = '\0';
+    lua_setwarnf(L, capture_bad_finalizer, NULL);
+    lua_gc(L, LUA_GCCOLLECT);
+    lua_setwarnf(L, NULL, NULL);
+    assert(bad_finalizer_warnings == 1);
+    assert(strcmp(bad_finalizer_text, "error in __gc (attempt to call a "
+                  "number value (metamethod '__gc'))") == 0);
+}
+
 static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     assert(lua_gettop(L) == 0);
     body(L);
@@ -673,6 +735,9 @@ int main(void) {
     check("finalizer-call-origin", finalizer_call_origin, L);
     check("hooked-finalizer-call-origin", hooked_finalizer_call_origin, L);
     check("direct-gc-no-transport-events", direct_gc_no_transport_events, L);
+    check("protected-nil-call-error", protected_nil_call_error, L);
+    check("removed-c-slot-call-error", removed_c_slot_call_error, L);
+    check("invalid-finalizer-call-error", invalid_finalizer_call_error, L);
     lua_close(L); assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public debug contract");
     return 0;

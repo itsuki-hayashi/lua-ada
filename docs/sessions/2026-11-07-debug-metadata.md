@@ -489,7 +489,7 @@ The unchanged-source disposable-tree diagnostics advance db.lua from line
 from line 544 to 562 (removed __close call-error provenance). Neither full file,
 T-enabled Ada execution nor full-upstream acceptance is established. A separate
 T.listcode inspection of a default-produced chunk hits the native test build's
-MAXIWTHABS=3 assumption versus the default compiler interval128; configuration
+MAXIWTHABS=3 assumption versus the default compiler interval 128; configuration
 line-anchor validation remains separate from these default cross-checks.
 
 ## 2026-11-08 iteration cells and suppressed count periods
@@ -532,3 +532,44 @@ in its live-hook assertion executes additional boolean materialization words
 before reading the counter. Conditional lowering remains a separate measured
 followup. No assertion was relaxed, no hook was selectively suppressed, no
 reference was changed, and no full db.lua or upstream pass is claimed here.
+
+## 2026-11-08 invalid call and replaced-close diagnostics
+
+Dispatch now diagnoses an invalid callee from its actual surviving logical
+caller before constructing any callee activation. It borrows the calling
+opcode's name, retains explicit hook origins, recognizes a real pending
+finalizer invocation, and adds a Lua source location only when that caller is
+Lua. This follows pinned ldebug.c:luaG_callerror/formatvarinfo. Stripped source
+and line markers remain ?:?; native protection does not receive an invented
+Lua prefix. The invalid value's raw __name still supplies its diagnostic type.
+
+Closing re-reads and protected-dispatches the actual current __close handler,
+including nil/number/false replacements. The old @invalid.close error stub is
+removed. A normal close reports metamethod 'close' at its actual caller; error
+and coroutine closing have already unwound to protection/the coroutine base.
+Outer closers receive that actual replacement error through the existing
+continuation, with no new recursive execution path or ownership shortcut.
+
+Sixteen named AUnit/source cases cover local/global/field/method/upvalue names,
+custom types, removed and invalid close handlers, error/coroutine closing,
+protected nil calls, invalid __call handlers, stripped locations and outer
+error replacement. Native default and instrumented C pass all sixteen; the
+prior Ada binary passed two and failed fourteen. Three new public C cases
+protect a direct protected nil call, a removed marked C-slot handler and a
+noncallable finalizer's full warning text. All prior C cases are preserved.
+
+Strict default root/test/C consumer builds pass under GNAT 16.1.0. All 1,607
+AUnit cases pass, with zero failed assertions/errors. All 31 debug C cases and
+the six other retained C consumers pass the rebuilt Ada library. The identical
+31-case debug source passes native default/T with GCC 13.2.0 and zero counted
+blocks/bytes remaining at close. Both producers' full call_error_phases.lua
+chunks pass on both default runtimes, with empty stderr and stdout SHA256
+0E785674CD082B6C1E5C144864FB29AA20F72DF915A43D394A15629AA374279B.
+All 36 retained four-way cases pass after the final change; whitespace is clean.
+
+The unchanged copied locals.lua soft diagnostic advances line 562 to 1015. It
+now passes replaced-handler error wording and the subsequent close-error
+checks, then finds a yieldability mismatch after a normal closer raises an
+error and a remaining closer tries to yield. This remains the next real
+lifecycle issue; neither the complete file nor full-upstream acceptance is
+claimed. Pinned reference bytes and revisions remain unchanged.
