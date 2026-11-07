@@ -139,3 +139,28 @@ Full unchanged default errors.lua now reaches the numeric-for diagnostics:
 message is still `'for' initial value must be a number`. Actual C concat
 windows, numeric-for/library diagnostics, T file paths and final matrices
 remain unfinished. These focused checkpoints do not close the file ledger.
+
+## Numeric-for diagnostic followup
+
+A small typed VM failure helper now shares raw diagnostic types and actual
+Lua source attribution with canonical numeric-for conversion failures. The
+existing conversion and control paths retain their ordering: integer loops
+test a zero step before converting their limit; float loops validate limit,
+step and initial value before testing zero. No loop control is given a
+fabricated variable annotation.
+
+Seventeen new cases cover initial/limit/step roles, table/function/FILE* and
+raw/NUL `__name` types, both validation orders, zero steps including coerced
+strings, multiline FORPREP source, and successful integer/float coercions.
+Both native configurations pass both complete eighty-case fixtures; all four
+default compiler/runtime combinations pass them too. Strict root/tests/C
+serial builds pass, as do all 1,826 AUnit cases, thirty-six retained four-way
+cases and seventeen retained C consumers. The initial compile's missed
+forward/body parameter type update was corrected; no flags were relaxed.
+
+Full unchanged default errors.lua advances to its light-userdata argument
+diagnostic: debug.setuservalue currently reports `full userdata expected`
+instead of identifying the rejected light userdata. Separate measured
+library gaps concern FILE* numeric arguments, named IO arguments and named
+tostring output. Those, actual C concat windows and full file/T/matrix
+acceptance remain open.

@@ -9,9 +9,9 @@ final allocator/lifecycle campaign across every required context.
 
 
 Concatenation has [local evaluation/diagnostic evidence](sessions/2026-11-08-concat-operation-diagnostics.md):
-sixty-three named primitive/index/name-boundary cases within 1,809 passing
+eighty named primitive/index/name-boundary cases within 1,826 passing
 AUnit cases, two complete default four-way fixtures and a matching unchanged
-db.lua replay. Numeric-for diagnostics are the next unchanged errors.lua
+db.lua replay. Library argument diagnostics are the next unchanged errors.lua
 failure. Finish those, actual public C concat windows, the locals.lua progress
 output policy, T paths and final-head matrices; component results do not
 complete these obligations.

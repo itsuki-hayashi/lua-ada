@@ -815,6 +815,209 @@ package body Operation_Error_Tests is
          " e:find('\0',1,true),tostring(e))");
    end Dofile_Nul_Field;
 
+   procedure For_Initial_Table;
+   procedure For_Initial_Table is
+   begin
+      --  An invalid initial control reports its actual table type and Lua
+      --  source.
+      Check
+        ("  local f=assert(load([=[for i={},10 do end]=],'" &
+         "=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' initial value (number expected, g" &
+         "ot table)]=],tostring(e))");
+   end For_Initial_Table;
+
+   procedure For_Limit_String;
+   procedure For_Limit_String is
+   begin
+      --  A nonnumeric limit string reports the limit role.
+      Check
+        ("  local f=assert(load([=[for i=1,'x',10 do end]=" &
+         "],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' limit (number expected, got strin" &
+         "g)]=],tostring(e))");
+   end For_Limit_String;
+
+   procedure For_Limit_Table;
+   procedure For_Limit_Table is
+   begin
+      --  An integer loop reports a failed limit conversion with its table
+      --  type.
+      Check
+        ("  local f=assert(load([=[for i=1,{} do end]=],'=" &
+         "for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' limit (number expected, got table" &
+         ")]=],tostring(e))");
+   end For_Limit_Table;
+
+   procedure For_Step_Function;
+   procedure For_Step_Function is
+   begin
+      --  A failed step conversion reports the function type.
+      Check
+        ("  local f=assert(load([=[for i=1,10,print do end" &
+         "]=],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' step (number expected, got functi" &
+         "on)]=],tostring(e))");
+   end For_Step_Function;
+
+   procedure For_Named_Type;
+   procedure For_Named_Type is
+   begin
+      --  Numeric-for diagnostics honor raw table __name.
+      Check
+        ("  local f=assert(load([=[local x=setmetatable({}" &
+         ",{__name='Box'});for i=x,10 do end]=],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' initial value (number expected, g" &
+         "ot Box)]=],tostring(e))");
+   end For_Named_Type;
+
+   procedure For_File_Type;
+   procedure For_File_Type is
+   begin
+      --  An actual full userdata control reports its FILE* metatable name.
+      Check
+        ("  local f=assert(load([=[for i=io.stdin,10 do en" &
+         "d]=],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' initial value (number expected, g" &
+         "ot FILE*)]=],tostring(e))");
+   end For_File_Type;
+
+   procedure For_Limit_First;
+   procedure For_Limit_First is
+   begin
+      --  The float path validates limit before step and initial values.
+      Check
+        ("  local f=assert(load([=[for i={},false,{} do en" &
+         "d]=],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' limit (number expected, got boole" &
+         "an)]=],tostring(e))");
+   end For_Limit_First;
+
+   procedure For_Step_Before_Initial;
+   procedure For_Step_Before_Initial is
+   begin
+      --  A valid float limit leaves step validation before the initial
+      --  value.
+      Check
+        ("  local f=assert(load([=[for i={},10,false do en" &
+         "d]=],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' step (number expected, got boolea" &
+         "n)]=],tostring(e))");
+   end For_Step_Before_Initial;
+
+   procedure For_Zero_Integer;
+   procedure For_Zero_Integer is
+   begin
+      --  An integer zero step is rejected before converting a bad limit.
+      Check
+        ("  local f=assert(load([=[for i=1,{},0 do end]=]," &
+         "'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: 'for' step is zero]=],tostring(e))");
+   end For_Zero_Integer;
+
+   procedure For_Zero_Float;
+   procedure For_Zero_Float is
+   begin
+      --  The float path converts a bad limit before testing its zero step.
+      Check
+        ("  local f=assert(load([=[for i=1.0,{},0 do end]=" &
+         "],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' limit (number expected, got table" &
+         ")]=],tostring(e))");
+   end For_Zero_Float;
+
+   procedure For_Initial_Before_Float_Zero;
+   procedure For_Initial_Before_Float_Zero is
+   begin
+      --  A float-path initial conversion fails before testing a zero step.
+      Check
+        ("  local f=assert(load([=[for i={},10,0 do end]=]" &
+         ",'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' initial value (number expected, g" &
+         "ot table)]=],tostring(e))");
+   end For_Initial_Before_Float_Zero;
+
+   procedure For_Zero_Actual_Float;
+   procedure For_Zero_Actual_Float is
+   begin
+      --  A real zero step retains its actual numeric-for source.
+      Check
+        ("  local f=assert(load([=[for i=1,10,0.0 do end]=" &
+         "],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: 'for' step is zero]=],tostring(e))");
+   end For_Zero_Actual_Float;
+
+   procedure For_Nul_Type;
+   procedure For_Nul_Type is
+   begin
+      --  The raw diagnostic __name ends at its embedded NUL.
+      Check
+        ("  local f=assert(load([=[local x=setmetatable({}" &
+         ",{__name='A\0B'});for i=1,x do end]=],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: bad 'for' limit (number expected, got A)]=]" &
+         ",tostring(e))");
+   end For_Nul_Type;
+
+   procedure For_Multiline;
+   procedure For_Multiline is
+   begin
+      --  A multiline loop failure uses the real FORPREP header source
+      --  event.
+      Check
+        ("  local f=assert(load([=[for i={}," & ASCII.LF &
+         "10 do end]=],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:2: bad 'for' initial value (number expected, g" &
+         "ot table)]=],tostring(e))");
+   end For_Multiline;
+
+   procedure For_Zero_String;
+   procedure For_Zero_String is
+   begin
+      --  A coerced string zero step preserves zero-step diagnostics.
+      Check
+        ("  local f=assert(load([=[for i=1,10,'0' do end]=" &
+         "],'=for'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[fo" &
+         "r:1: 'for' step is zero]=],tostring(e))");
+   end For_Zero_String;
+
+   procedure For_String_Coercion;
+   procedure For_String_Coercion is
+   begin
+      --  String controls still select the float loop and retain their
+      --  values.
+      Check
+        ("  local sum=0;for i='1','3','1' do assert(math.t" &
+         "ype(i)=='float');sum=sum+i end" & ASCII.LF &
+         "  assert(sum==6)");
+   end For_String_Coercion;
+
+   procedure For_Integer_Limit_Coercion;
+   procedure For_Integer_Limit_Coercion is
+   begin
+      --  Coercing only the limit preserves the integer loop
+      --  representation.
+      Check
+        ("  local sum=0;for i=1,'3',1 do assert(math.type(" &
+         "i)=='integer');sum=sum+i end" & ASCII.LF &
+         "  assert(sum==6)");
+   end For_Integer_Limit_Coercion;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -1006,5 +1209,56 @@ package body Operation_Error_Tests is
       Test_Support.Add
         (Suite, "operation error: Dofile_Nul_Field",
          Dofile_Nul_Field'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Initial_Table",
+         For_Initial_Table'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Limit_String",
+         For_Limit_String'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Limit_Table",
+         For_Limit_Table'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Step_Function",
+         For_Step_Function'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Named_Type",
+         For_Named_Type'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_File_Type",
+         For_File_Type'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Limit_First",
+         For_Limit_First'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Step_Before_Initial",
+         For_Step_Before_Initial'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Zero_Integer",
+         For_Zero_Integer'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Zero_Float",
+         For_Zero_Float'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Initial_Before_Float_Zero",
+         For_Initial_Before_Float_Zero'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Zero_Actual_Float",
+         For_Zero_Actual_Float'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Nul_Type",
+         For_Nul_Type'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Multiline",
+         For_Multiline'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Zero_String",
+         For_Zero_String'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_String_Coercion",
+         For_String_Coercion'Access);
+      Test_Support.Add
+        (Suite, "operation error: For_Integer_Limit_Coercion",
+         For_Integer_Limit_Coercion'Access);
    end Register;
 end Operation_Error_Tests;

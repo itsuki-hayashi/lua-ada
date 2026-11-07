@@ -1,3 +1,5 @@
+-- Named operation diagnostics mirrored by individual AUnit cases.
+-- The direct-code companion separately exercises each actual producer.
 -- Temporary_Right: A convertible left operand reports the actual invalid right type.
 do
   local f=assert(load([=[return 1 .. {}]=],'=concat'))
@@ -387,6 +389,109 @@ end
 do
   local t={['a\0b']=dofile};local ok,e=pcall(function()t['a\0b']({},{})end)
   assert(not ok and e:find("bad argument #1 to 'a' (string expected, got table)",1,true) and not e:find('\0',1,true),tostring(e))
+end
+
+-- For_Initial_Table: An invalid initial control reports its actual table type and Lua source.
+do
+  local f=assert(load([=[for i={},10 do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' initial value (number expected, got table)]=],tostring(e))
+end
+
+-- For_Limit_String: A nonnumeric limit string reports the limit role.
+do
+  local f=assert(load([=[for i=1,'x',10 do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' limit (number expected, got string)]=],tostring(e))
+end
+
+-- For_Limit_Table: An integer loop reports a failed limit conversion with its table type.
+do
+  local f=assert(load([=[for i=1,{} do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' limit (number expected, got table)]=],tostring(e))
+end
+
+-- For_Step_Function: A failed step conversion reports the function type.
+do
+  local f=assert(load([=[for i=1,10,print do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' step (number expected, got function)]=],tostring(e))
+end
+
+-- For_Named_Type: Numeric-for diagnostics honor raw table __name.
+do
+  local f=assert(load([=[local x=setmetatable({},{__name='Box'});for i=x,10 do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' initial value (number expected, got Box)]=],tostring(e))
+end
+
+-- For_File_Type: An actual full userdata control reports its FILE* metatable name.
+do
+  local f=assert(load([=[for i=io.stdin,10 do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' initial value (number expected, got FILE*)]=],tostring(e))
+end
+
+-- For_Limit_First: The float path validates limit before step and initial values.
+do
+  local f=assert(load([=[for i={},false,{} do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' limit (number expected, got boolean)]=],tostring(e))
+end
+
+-- For_Step_Before_Initial: A valid float limit leaves step validation before the initial value.
+do
+  local f=assert(load([=[for i={},10,false do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' step (number expected, got boolean)]=],tostring(e))
+end
+
+-- For_Zero_Integer: An integer zero step is rejected before converting a bad limit.
+do
+  local f=assert(load([=[for i=1,{},0 do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: 'for' step is zero]=],tostring(e))
+end
+
+-- For_Zero_Float: The float path converts a bad limit before testing its zero step.
+do
+  local f=assert(load([=[for i=1.0,{},0 do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' limit (number expected, got table)]=],tostring(e))
+end
+
+-- For_Initial_Before_Float_Zero: A float-path initial conversion fails before testing a zero step.
+do
+  local f=assert(load([=[for i={},10,0 do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' initial value (number expected, got table)]=],tostring(e))
+end
+
+-- For_Zero_Actual_Float: A real zero step retains its actual numeric-for source.
+do
+  local f=assert(load([=[for i=1,10,0.0 do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: 'for' step is zero]=],tostring(e))
+end
+
+-- For_Nul_Type: The raw diagnostic __name ends at its embedded NUL.
+do
+  local f=assert(load([=[local x=setmetatable({},{__name='A\0B'});for i=1,x do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: bad 'for' limit (number expected, got A)]=],tostring(e))
+end
+
+-- For_Multiline: A multiline loop failure uses the real FORPREP header source event.
+do
+  local f=assert(load([=[for i={},
+10 do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:2: bad 'for' initial value (number expected, got table)]=],tostring(e))
+end
+
+-- For_Zero_String: A coerced string zero step preserves zero-step diagnostics.
+do
+  local f=assert(load([=[for i=1,10,'0' do end]=],'=for'))
+  local ok,e=pcall(f);assert(not ok and e==[=[for:1: 'for' step is zero]=],tostring(e))
+end
+
+-- For_String_Coercion: String controls still select the float loop and retain their values.
+do
+  local sum=0;for i='1','3','1' do assert(math.type(i)=='float');sum=sum+i end
+  assert(sum==6)
+end
+
+-- For_Integer_Limit_Coercion: Coercing only the limit preserves the integer loop representation.
+do
+  local sum=0;for i=1,'3',1 do assert(math.type(i)=='integer');sum=sum+i end
+  assert(sum==6)
 end
 
 print('operation error phases OK')

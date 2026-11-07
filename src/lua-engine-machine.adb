@@ -303,6 +303,27 @@ package body Lua.Engine.Machine is
          Diagnostic_Type (State, Item) & " value", Operand_Index);
    end Operand_Error;
 
+   procedure For_Error
+     (State : in out World; Kind : For_Failure_Kind;
+      Item : Value := Nil_Value) is
+   begin
+      --  forprep's caller has already selected the real failing operand in
+      --  pinned validation order. Reuse the same raw type-name and actual
+      --  Lua-source policy as other primitive faults, without giving loop
+      --  controls a fabricated local/field varinfo annotation.
+      if Kind = Zero_Step then
+         Operation_Error (State, "'for' step is zero");
+      else
+         Operation_Error
+           (State, "bad 'for' " &
+            (case Kind is
+                when Initial_Not_Number => "initial value",
+                when Limit_Not_Number => "limit",
+                when others => "step") & " (number expected, got " &
+            Diagnostic_Type (State, Item) & ")");
+      end if;
+   end For_Error;
+
    function Numeric (State : in out World; Item : Value)
                      return Lua.Numbers.Number
    is

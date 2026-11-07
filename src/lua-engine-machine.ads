@@ -13,6 +13,15 @@ package Lua.Engine.Machine is
    --  helpers never dispatch metamethods; callers must select primitive
    --  applicability before bypassing a canonical metamethod instruction.
 
+   type For_Failure_Kind is
+     (Initial_Not_Number, Limit_Not_Number, Step_Not_Number, Zero_Step);
+   procedure For_Error
+     (State : in out World; Kind : For_Failure_Kind;
+      Item : Value := Nil_Value);
+   --  Raise the pinned numeric-for diagnostic at its actual Lua source.
+   --  Conversion failures use Item's table/userdata diagnostic type; zero
+   --  step has no offending type and ignores the default nil Item.
+
    function Ensure_Stack
      (State : in out World; Context : not null Context_Access;
       Last : Natural; Raise_Error : Boolean := True) return Boolean;

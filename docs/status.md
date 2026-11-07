@@ -11,11 +11,11 @@ the remaining file/traceback/substitution auxiliaries remain pending.
 
 The [concatenation operation checkpoint](sessions/2026-11-08-concat-operation-diagnostics.md)
 preserves actual operand capture, merged source events, primitive/index
-diagnostic names and rendered C name boundaries. Sixty-three named cases pass
-within 1,809 local AUnit cases, with two complete default four-way fixtures.
+diagnostic names and rendered C name boundaries. Eighty named cases pass
+within 1,826 local AUnit cases, with two complete default four-way fixtures.
 Unchanged db.lua still matches native output; locals.lua assertions and stdout
 pass with an explicit collection-progress stderr difference. Full errors.lua
-next fails numeric-for diagnostics. Actual C concat windows, remaining T paths
+next fails library argument diagnostics. Actual C concat windows, remaining T paths
 and full target acceptance remain open.
 
 The [auxiliary buffer checkpoint](sessions/2026-11-08-auxiliary-buffer-ownership.md)

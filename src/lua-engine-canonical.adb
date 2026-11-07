@@ -127,8 +127,12 @@ package body Lua.Engine.Canonical is
    procedure Store_Results
      (State : in out World; Activation : Frame_Access;
       Base : Natural; Wanted : Integer; Results : Values.Vector);
+   subtype For_Number_Role is Lua.Engine.Machine.For_Failure_Kind range
+     Lua.Engine.Machine.Initial_Not_Number ..
+       Lua.Engine.Machine.Step_Not_Number;
+
    function Number
-     (State : in out World; Item : Value; Role : String)
+     (State : in out World; Item : Value; Role : For_Number_Role)
       return Lua.Numbers.Number;
    procedure Prepare_For
      (State : in out World; Activation : Frame_Access;
@@ -573,7 +577,7 @@ package body Lua.Engine.Canonical is
    end Adopt;
 
    function Number
-     (State : in out World; Item : Value; Role : String)
+     (State : in out World; Item : Value; Role : For_Number_Role)
       return Lua.Numbers.Number
    is
       Result : Lua.Numbers.Number;
@@ -589,7 +593,7 @@ package body Lua.Engine.Canonical is
             end if;
          when others => null;
       end case;
-      Fail (State, "'for' " & Role & " value must be a number");
+      Lua.Engine.Machine.For_Error (State, Role, Item);
       return (Kind => Lua.Numbers.Invalid);
    end Number;
 
@@ -610,9 +614,9 @@ package body Lua.Engine.Canonical is
          Start := Initial.Integer_Data;
          Stride := Step.Integer_Data;
          if Stride = 0 then
-            Fail (State, "'for' step is zero");
+            Lua.Engine.Machine.For_Error (State, Lua.Engine.Machine.Zero_Step);
          end if;
-         Bound := Number (State, Limit, "limit");
+         Bound := Number (State, Limit, Lua.Engine.Machine.Limit_Not_Number);
          if Bound.Kind = Lua.Numbers.Integer_Number then
             Last := Bound.Integer_Item;
          else
@@ -657,12 +661,14 @@ package body Lua.Engine.Canonical is
       else
          --  Conversion order is observable when several operands are bad:
          --  Lua validates limit, step, then initial value in the float path.
-         F_Last := Lua.Numbers.To_Real (Number (State, Limit, "limit"));
-         F_Stride := Lua.Numbers.To_Real (Number (State, Step, "step"));
+         F_Last := Lua.Numbers.To_Real
+           (Number (State, Limit, Lua.Engine.Machine.Limit_Not_Number));
+         F_Stride := Lua.Numbers.To_Real
+           (Number (State, Step, Lua.Engine.Machine.Step_Not_Number));
          F_Start := Lua.Numbers.To_Real
-           (Number (State, Initial, "initial"));
+           (Number (State, Initial, Lua.Engine.Machine.Initial_Not_Number));
          if F_Stride = 0.0 then
-            Fail (State, "'for' step is zero");
+            Lua.Engine.Machine.For_Error (State, Lua.Engine.Machine.Zero_Step);
          end if;
          Skip := (if F_Stride > 0.0 then F_Last < F_Start
                   else F_Start < F_Last);
