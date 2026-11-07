@@ -643,6 +643,13 @@ package body Lua.Engine.IO_Libraries is
       begin
          for Index in First .. Activation.Native_Arguments.Last_Index loop
             Work (State);
+            if Activation.Native_Arguments (Index).Kind not in
+              String_Kind | Integer_Kind | Real_Kind
+            then
+               Diagnostics.Type_Error
+                 (State, Index, "string",
+                  Activation.Native_Arguments (Index));
+            end if;
             Strings.Query_Argument
               (State, Activation.Native_Arguments (Index), Write'Access);
             if Failed then

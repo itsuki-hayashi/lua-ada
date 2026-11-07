@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [I/O and collector argument checkpoint](sessions/2026-11-08-io-collector-arguments.md)
+uses the shared argument diagnostic for invalid write operands and the first
+collector option. Ten focused Lua cases match both native configurations and
+both Ada configurations; each local configuration passes 2,028 AUnit cases.
+Unchanged errors.lua now reaches the string-method `bad self` diagnostic.
+This evidence does not establish completion of that file or the full target.
+
 The [public identity checkpoint](sessions/2026-11-08-public-value-identities.md)
 shares actual C/Lua identities and preserves returned long strings. Both
 local configurations pass 1,993 AUnit cases and twenty-two C consumers; eight

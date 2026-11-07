@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Continue the unchanged errors.lua campaign from the string-method `bad self`
+failure after the [I/O/collector argument checkpoint](sessions/2026-11-08-io-collector-arguments.md).
+Its ten native-paired regressions and 2,028 AUnit cases in each local
+configuration cover the argument gates; remaining method diagnostics,
+traceback, relevant T paths and final platform acceptance remain open.
+
 Public identities have [local evidence](sessions/2026-11-08-public-value-identities.md):
 1,993 AUnit cases in each configuration, native-paired pointer/rendering,
 actual first-surface refusal, retry and balanced shutdown. Fix the next

@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [I/O and collector arguments](2026-11-08-io-collector-arguments.md).
+
 Component: [public value identities](2026-11-08-public-value-identities.md).
 
 Component: [public C concat windows](2026-11-08-c-concat-windows.md).

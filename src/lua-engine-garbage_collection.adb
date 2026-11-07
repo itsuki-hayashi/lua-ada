@@ -1,6 +1,7 @@
 with Ada.Unchecked_Conversion;
 with Lua.Engine.Finalizers;
 with Lua.Engine.Strings;
+with Lua.Engine.Diagnostics;
 
 package body Lua.Engine.Garbage_Collection is
    use type Integer_Value;
@@ -184,6 +185,9 @@ package body Lua.Engine.Garbage_Collection is
          return;
       end if;
       if Arg (1).Kind /= Nil_Kind then
+         if Arg (1).Kind not in String_Kind | Integer_Kind | Real_Kind then
+            Diagnostics.Type_Error (State, 1, "string", Arg (1));
+         end if;
          Strings.Query_Argument (State, Arg (1), Parse_Option'Access);
          if not Found then
             Fail (State, "invalid option for 'collectgarbage'");
