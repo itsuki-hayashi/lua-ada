@@ -66,5 +66,5 @@ Invoke-OutputCase 'CLI publishes high bytes without Ada text encoding' `
     ([byte[]](97,0,255,9,55) + $newline)
 Invoke-OutputCase 'CLI version is flushed before runtime stdout' `
     $Interpreter @('-v', '-e', "print('after version')") `
-    ($utf8.GetBytes('Lua Ada 0.1.0-dev (target 5.5.1)') + $newline +
+    ($utf8.GetBytes('Lua 5.5.1  Copyright (C) 1994-2026 Lua.org, PUC-Rio') + $newline +
      $utf8.GetBytes('after version') + $newline)

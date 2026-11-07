@@ -22,15 +22,8 @@ function Get-NativeDynamicSymbols {
     $arguments=if($Platform -ceq 'macos'){@('-g',$(if($Undefined){'-u'}else{'-U'}),$ImagePath)}
         else{@('-D',$(if($Undefined){'--undefined-only'}else{'--defined-only'}),$ImagePath)}
     $process=Invoke-NativeFixtureTool -Executable $nm -Arguments $arguments -Directory (Split-Path -Parent $Prefix) -Prefix $Prefix
-    $symbols=@()
-    foreach($line in [IO.File]::ReadAllLines($process.stdout_path)){
-        if($line -match '\s([A-Za-z_][A-Za-z0-9_]*(?:@[^\s]+)?)$'){
-            $name=$Matches[1]
-            if($Platform -ceq 'macos' -and $name.StartsWith('_')){$name=$name.Substring(1)}
-            $symbols+=($name -split '@')[0]
-        }
-    }
-    return @{symbols=@($symbols|Sort-Object -Unique);process=$process;tool=@{path=$nm;sha256=(Get-FileHash $nm).Hash.ToLowerInvariant()}}
+    $symbols=@(ConvertFrom-NativeSymbolTable -Lines ([IO.File]::ReadAllLines($process.stdout_path)) -Platform $Platform)
+    return @{symbols=$symbols;process=$process;tool=@{path=$nm;sha256=(Get-FileHash $nm).Hash.ToLowerInvariant()}}
 }
 
 function New-NativeLuaFixturePlan {

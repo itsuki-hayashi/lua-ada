@@ -127,10 +127,20 @@ try {
         -Arguments @((Join-Path $root 'tests/instrumented/t_coroutine_api.lua')) `
         -Directory $root -Witness 'T COROUTINE API OK' -Telemetry
     & "$PSScriptRoot/check-conformance-telemetry.ps1" -Interpreter $runner -Configuration upstream-test
-    & "$PSScriptRoot/check-conformance-equivalents.ps1"
-    & "$PSScriptRoot/check-conformance-scope.ps1"
-    & "$PSScriptRoot/test-conformance-scope.ps1"
-    & "$PSScriptRoot/test-conformance-matrix.ps1"
+    if ($TargetPolicy -eq '') {
+        & "$PSScriptRoot/check-conformance-equivalents.ps1"
+        & "$PSScriptRoot/check-conformance-scope.ps1"
+        & "$PSScriptRoot/test-conformance-scope.ps1"
+        & "$PSScriptRoot/test-conformance-matrix.ps1"
+    } else {
+        # The accepted scopes remain bound to their original source tree.
+        # Target builds exercise the successor validators and frozen-input
+        # reconstruction tests; those tests report stale production bindings
+        # explicitly and never grant runtime or target acceptance.
+        & "$PSScriptRoot/test-conformance-transforms.ps1"
+        & "$PSScriptRoot/test-target-development-observer.ps1"
+        & "$PSScriptRoot/test-conformance-target-matrix.ps1"
+    }
 
     Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')

@@ -4,6 +4,7 @@ $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtureEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'NativeModuleLinkage.psm1')
 $directory=Join-Path $root ('reports/native-fixture-evidence-selftest/'+[Guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($directory)
 $utf8=[Text.UTF8Encoding]::new($false);$script:Cases=0;$script:Serial=0
@@ -54,6 +55,25 @@ Case 'synthetic Mach-O lookup captures preserve exact nm modes and frozen tool b
     Reject {& (Get-Module NativeLuaFixtureEvidence) {param($r,$root) Read-NativeSymbolCapture -Record $r -ArtifactRoot $root -ToolHash ('1'*64) -ImagePath /synthetic/module.so -Platform macos -Undefined} $record $root} 'tool identity invocation'
     $record.process.arguments[1]='-u';$record.tool.sha256='0'*64
     Reject {& (Get-Module NativeLuaFixtureEvidence) {param($r,$root) Read-NativeSymbolCapture -Record $r -ArtifactRoot $root -ToolHash ('1'*64) -ImagePath /synthetic/module.so -Platform macos -Undefined} $record $root} 'symbol tool differs'
+}
+Case 'synthetic Apple nm bare undefined names use the same parser as fixture production and replay'{
+    # Mirrors the output format captured from d83214a's macOS lib1 build.
+    # This synthetic regression checks parsing only, not module execution.
+    $out=Join-Path $directory 'synthetic-macho-bare.stdout';$err=Join-Path $directory 'synthetic-macho-bare.stderr'
+    $lines=@('_luaL_checkversion_','_luaL_setfuncs','_lua_gettop','_lua_tointegerx','dyld_stub_binder')
+    [IO.File]::WriteAllText($out,($lines -join "`n")+"`n",$utf8)
+    [IO.File]::WriteAllText($err,'',$utf8)
+    $expected=@('dyld_stub_binder','lua_gettop','lua_tointegerx','luaL_checkversion_','luaL_setfuncs'|Sort-Object -Unique)
+    $symbols=@(ConvertFrom-NativeSymbolTable -Lines $lines -Platform macos)
+    Assert-True (($symbols -join '|') -ceq ($expected -join '|')) 'Bare undefined symbols were lost or renamed'
+    $record=@{tool=@{sha256=('1'*64)};symbols=$symbols;process=@{executable_sha256=('1'*64);
+        arguments=@('-g','-u','/synthetic/module.so');exit_code=0;timed_out=$false;capture_exceeded=$false;pipe_drain_failed=$false;
+        process_tree_kill_error=$null;abnormal_exit_kind=$null;stdout_path=$out;stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();
+        stdout_bytes=(Get-Item $out).Length;stderr_path=$err;stderr_sha256=(Get-FileHash $err).Hash.ToLowerInvariant();stderr_bytes=0}}
+    $result=& (Get-Module NativeLuaFixtureEvidence) {param($r,$root) Read-NativeSymbolCapture -Record $r -ArtifactRoot $root -ToolHash ('1'*64) -ImagePath /synthetic/module.so -Platform macos -Undefined} $record $root
+    Assert-True (($result -join '|') -ceq ($expected -join '|')) 'Producer and replay parsed different names'
+    $record.symbols=@('lua_invented')
+    Reject {& (Get-Module NativeLuaFixtureEvidence) {param($r,$root) Read-NativeSymbolCapture -Record $r -ArtifactRoot $root -ToolHash ('1'*64) -ImagePath /synthetic/module.so -Platform macos -Undefined} $record $root} 'recorded symbols differ'
 }
 if($Compiler -ne ''){
     if(-not $IsWindows -or $ReferenceInterpreter -eq '' -or $ReferenceRuntimeDirectory -eq ''){

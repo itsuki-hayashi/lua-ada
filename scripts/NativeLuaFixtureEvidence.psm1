@@ -51,15 +51,7 @@ function Read-NativeSymbolCapture {
     if($Record.tool.sha256 -cne $ToolHash){throw 'Native fixture symbol tool differs from its frozen context'}
     Assert-NativeFixtureToolCapture -Process $Record.process -ArtifactRoot $ArtifactRoot -ToolHash $ToolHash -Arguments $arguments
     $path=Resolve-NativeFixtureCapture -Root $ArtifactRoot -Original $Record.process.stdout_path -Sha256 $Record.process.stdout_sha256
-    $symbols=@()
-    foreach($line in [IO.File]::ReadAllLines($path)){
-        if($line -match '\s([A-Za-z_][A-Za-z0-9_]*(?:@[^\s]+)?)$'){
-            $name=$Matches[1]
-            if($Platform -ceq 'macos' -and $name.StartsWith('_')){$name=$name.Substring(1)}
-            $symbols+=($name -split '@')[0]
-        }
-    }
-    $symbols=@($symbols|Sort-Object -Unique)
+    $symbols=@(ConvertFrom-NativeSymbolTable -Lines ([IO.File]::ReadAllLines($path)) -Platform $Platform)
     if((@($Record.symbols)-join '|') -cne ($symbols-join '|')){throw 'Native fixture recorded symbols differ from actual tool captures'}
     return ,$symbols
 }

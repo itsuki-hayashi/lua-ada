@@ -2,6 +2,26 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 
+function ConvertFrom-NativeSymbolTable {
+    param([Parameter(Mandatory)][AllowEmptyCollection()][string[]] $Lines,
+          [Parameter(Mandatory)][ValidateSet('linux','macos')][string] $Platform)
+    # Apple's `nm -g -u` emits bare names, whereas GNU nm and defined Mach-O
+    # symbols include a type/address prefix. Accept both actual nm formats.
+    # Remove exactly the Mach-O C symbol prefix and an ELF version suffix;
+    # retain the public API spelling for the subsequent owner intersection.
+    $symbols = @()
+    foreach ($line in $Lines) {
+        if ($line -match '(?:^|\s)([A-Za-z_][A-Za-z0-9_]*(?:@[^\s]+)?)$') {
+            $name = $Matches[1]
+            if ($Platform -ceq 'macos' -and $name.StartsWith('_')) {
+                $name = $name.Substring(1)
+            }
+            $symbols += ($name -split '@')[0]
+        }
+    }
+    return @($symbols | Sort-Object -Unique)
+}
+
 function Read-PEAscii {
     param([object] $Reader,[int] $Rva)
     if($Rva -le 0){throw 'PE name has an invalid address'}
@@ -223,4 +243,4 @@ function Assert-PEModuleOwner {
 }
 
 Export-ModuleMember -Function Get-PEImageExports, Get-PEImageImports, New-PEHostDefinition, New-PEHostImportLibrary,
-    Assert-PEModuleOwner
+    Assert-PEModuleOwner, ConvertFrom-NativeSymbolTable
