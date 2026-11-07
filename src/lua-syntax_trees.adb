@@ -1,4 +1,6 @@
 with Lua.Lexers; use Lua.Lexers;
+with Ada.Characters.Handling;
+with Lua.Storage.Buffers;
 
 package body Lua.Syntax_Trees is
    use type Lua.Syntax.Check_Status;
@@ -82,7 +84,9 @@ package body Lua.Syntax_Trees is
         (Unit.Texts.Equal (Left, Right));
       procedure Error
         (Message : String; Resource : Boolean := False;
-         Incomplete : Boolean := False);
+         Incomplete : Boolean := False; Near_Token : Boolean := True);
+      function Expected_Name (Item : Token_Kind) return String;
+      function Line_Text (Line : Positive) return String;
       procedure Advance;
       function Peek return Token_Kind;
       function Take (Expected : Token_Kind) return Boolean;
@@ -123,9 +127,63 @@ package body Lua.Syntax_Trees is
       procedure Enter;
       procedure Leave;
 
+      function Line_Text (Line : Positive) return String is
+         Image : constant String := Line'Image;
+      begin
+         return Image (2 .. Image'Last);
+      end Line_Text;
+
+      function Expected_Name (Item : Token_Kind) return String is
+         Label : constant String := Token_Kind'Image (Item);
+      begin
+         --  Token names describe diagnostics, not another grammar. Keep the
+         --  fixed spellings from llex.c distinct from source identifiers.
+         if Item in And_Word .. While_Word then
+            return "'" & Ada.Characters.Handling.To_Lower
+              (Label (Label'First .. Label'Last - 5)) & "'";
+         end if;
+         return (case Item is
+            when End_Of_Input => "<eof>", when Identifier => "<name>",
+            when Integer_Literal => "<integer>",
+            when Float_Literal => "<number>",
+            when String_Literal => "<string>",
+            when Plus => "'+'", when Minus => "'-'", when Star => "'*'",
+            when Slash => "'/'", when Floor_Divide => "'//'",
+            when Percent => "'%'", when Power => "'^'", when Length => "'#'",
+            when Bit_And => "'&'", when Bit_Or => "'|'", when Bit_Xor => "'~'",
+            when Shift_Left => "'<<'", when Shift_Right => "'>>'",
+            when Equal => "'=='", when Not_Equal => "'~='",
+            when Less => "'<'", when Less_Equal => "'<='",
+            when Greater => "'>'", when Greater_Equal => "'>='",
+            when Assign => "'='", when Left_Paren => "'('",
+            when Right_Paren => "')'", when Left_Brace => "'{'",
+            when Right_Brace => "'}'", when Left_Bracket => "'['",
+            when Right_Bracket => "']'", when Semicolon => "';'",
+            when Colon => "':'", when Double_Colon => "'::'",
+            when Comma => "','", when Dot => "'.'",
+            when Concatenate => "'..'", when Lua.Lexers.Varargs => "'...'",
+            when others => "<symbol>");
+      end Expected_Name;
+
       procedure Error
         (Message : String; Resource : Boolean := False;
-         Incomplete : Boolean := False) is
+         Incomplete : Boolean := False; Near_Token : Boolean := True)
+      is
+         Diagnostic : Lua.Storage.Buffers.Buffer;
+         Truncated : Boolean := False;
+         procedure Append_Text (Bytes : String);
+         procedure Append_Text (Bytes : String) is
+         begin
+            --  txtToken uses a C string: embedded NUL ends the diagnostic,
+            --  although the actual owned token retains every decoded byte.
+            for Byte of Bytes loop
+               if Byte = Character'Val (0) then
+                  Truncated := True;
+                  exit;
+               end if;
+               Diagnostic.Append (Byte);
+            end loop;
+         end Append_Text;
       begin
          --  Error text belongs to the same unit as the failing token. Only
          --  the public checking wrapper materializes a host diagnostic; an
@@ -136,9 +194,54 @@ package body Lua.Syntax_Trees is
          Unit.Result.Error.Line := Current.After.Line;
          Unit.Result.Error.Column := Here.Column;
          Unit.Result.Incomplete_Input := Incomplete and then not Resource;
-         Unit.Result.Error.Message := Own
-           (Message & (if Unit.Result.Incomplete_Input then
-                         " near <eof>" else ""));
+         Diagnostic.Set_Owner (Selected);
+         Diagnostic.Append (Message);
+         if Near_Token and then not Resource then
+            Diagnostic.Append (" near ");
+            if Kind = End_Of_Input then
+               Diagnostic.Append ("<eof>");
+            elsif Kind = Byte_Symbol and then
+              Character'Pos (Source.Element (Here.Offset)) not in 32 .. 126
+            then
+               declare
+                  Code : constant String := Natural'Image
+                    (Character'Pos (Source.Element (Here.Offset)));
+               begin
+                  Diagnostic.Append ("'<\" & Code (2 .. Code'Last) & ">'");
+               end;
+            else
+               Diagnostic.Append (''');
+               if Kind = String_Literal then
+                  --  Quoted strings keep their delimiters in C's token
+                  --  buffer. Long strings keep the complete bracket level;
+                  --  borrow only those already-read delimiter bytes here.
+                  declare
+                     First : constant Character :=
+                       Source.Element (Here.Offset);
+                     Level : Natural := 1;
+                  begin
+                     if First = '[' then
+                        while Source.Element (Here.Offset + Level) = '='
+                        loop
+                           Level := Level + 1;
+                        end loop;
+                        Level := Level + 1;
+                     end if;
+                     Source.Query (Here.Offset, Level, Append_Text'Access);
+                     Unit.Texts.Query (Current.Text, Append_Text'Access);
+                     if not Truncated then
+                        Source.Query (Current.After.Offset - Level, Level,
+                                      Append_Text'Access);
+                     end if;
+                  end;
+               else
+                  Unit.Texts.Query (Current.Text, Append_Text'Access);
+               end if;
+               Diagnostic.Append (''');
+            end if;
+         end if;
+         Unit.Result.Error.Message :=
+           Lua.Frontend_Text.Store (Unit.Texts, Diagnostic);
          raise Abandon;
       end Error;
 
@@ -202,7 +305,7 @@ package body Lua.Syntax_Trees is
       procedure Expect (Expected : Token_Kind) is
       begin
          if not Take (Expected) then
-            Error (Token_Kind'Image (Expected) & " expected",
+            Error (Expected_Name (Expected) & " expected",
                    Incomplete => Kind = End_Of_Input);
          end if;
       end Expect;
@@ -336,7 +439,7 @@ package body Lua.Syntax_Trees is
                   end loop;
                   if not Found then
                      Error ("variable '" & Image (Name) &
-                            "' not declared");
+                            "' not declared", Near_Token => False);
                   end if;
                end;
             end if;
@@ -347,7 +450,7 @@ package body Lua.Syntax_Trees is
             end if;
             if Environment then
                Error ("_ENV is global when accessing variable '" &
-                      Image (Referenced) & "'");
+                      Image (Referenced) & "'", Near_Token => False);
             end if;
             declare
                Env : constant Node_Id := Resolve
@@ -388,7 +491,7 @@ package body Lua.Syntax_Trees is
             Error ("assignment target expected");
          elsif Item.Kind = Name_Reference and then Item.Flag then
             Error ("attempt to assign to const variable '" &
-                   Image (Item.Text) & "'");
+                   Image (Item.Text) & "'", Near_Token => False);
          end if;
       end Writable;
 
@@ -409,7 +512,8 @@ package body Lua.Syntax_Trees is
             --  Retain the attribute spelling in the diagnostic. Attributes
             --  are contextual names, so an unknown one must not be reported
             --  as a general declaration failure (lparser.c:1807).
-            Error ("unknown attribute '" & Image (Name) & "'");
+            Error ("unknown attribute '" & Image (Name) & "'",
+                   Near_Token => False);
             return Regular;
          end if;
       end Get_Attribute;
@@ -538,7 +642,7 @@ package body Lua.Syntax_Trees is
             Child (Result, Expression);
             Expect (Right_Paren);
          else
-            Error ("expression expected", Incomplete => Kind = End_Of_Input);
+            Error ("unexpected symbol", Incomplete => Kind = End_Of_Input);
             return No_Node;
          end if;
          Remember_End (Result);
@@ -690,9 +794,14 @@ package body Lua.Syntax_Trees is
                   then
                      for Id of Label.Active loop
                         if not Pending.Active.Contains (Id) then
-                           Error ("goto enters scope of '" &
+                           Error ("<goto " &
+                                    Image (Fetch (Pending.Item).Text) &
+                                    "> at line " & Line_Text
+                                      (Fetch (Pending.Item).Site.Line) &
+                                    " jumps into the scope of '" &
                                     Image (Unit.Names
-                                      (Positive (Id)).Name) & "'");
+                                      (Positive (Id)).Name) & "'",
+                                  Near_Token => False);
                         end if;
                      end loop;
                      Destination := Fetch (Pending.Item);
@@ -706,7 +815,10 @@ package body Lua.Syntax_Trees is
                if not Pending.Solved then
                   if Parent = 0 then
                      Error ("no visible label '" &
-                            Image (Fetch (Pending.Item).Text) & "'");
+                            Image (Fetch (Pending.Item).Text) &
+                            "' for <goto> at line " & Line_Text
+                              (Fetch (Pending.Item).Site.Line),
+                            Near_Token => False);
                   end if;
                   Pending.Block := Parent;
                   Pending.Active := Base;
@@ -806,7 +918,8 @@ package body Lua.Syntax_Trees is
          Default := Get_Attribute;
          if Global and then Take (Star) then
             if Default = Closing_Name then
-               Error ("global variables cannot be to-be-closed");
+               Error ("global variables cannot be to-be-closed",
+                      Near_Token => False);
             end if;
             Id := New_Name (Empty_Text, Default, Collective_Name);
             Active.Append (Id);
@@ -821,9 +934,11 @@ package body Lua.Syntax_Trees is
                Mode := Get_Attribute (Default);
                if Mode = Closing_Name then
                   if Global then
-                     Error ("global variables cannot be to-be-closed");
+                     Error ("global variables cannot be to-be-closed",
+                            Near_Token => False);
                   elsif Closing then
-                     Error ("multiple to-be-closed variables in local list");
+                     Error ("multiple to-be-closed variables in local list",
+                            Near_Token => False);
                   end if;
                   Closing := True;
                   Unit.Unsupported := Result;
@@ -1019,10 +1134,11 @@ package body Lua.Syntax_Trees is
             if Take (Semicolon) then
                null;
             end if;
-         elsif Take (Break_Word) then
+         elsif Kind = Break_Word then
             if Loop_Depth = 0 then
                Error ("break outside loop");
             end if;
+            Advance;
             Result := Add
               ((Kind => Break_Statement, Site => Site, others => <>));
          elsif Kind in Goto_Word | Double_Colon then
@@ -1033,6 +1149,7 @@ package body Lua.Syntax_Trees is
                Result := Make
                  ((if Label then Label_Statement else Goto_Statement));
                Value := Fetch (Result);
+               Value.Site := Site;
                Value.Text := Read_Name;
                Save (Result, Value);
                Unit.Unsupported := Result;
@@ -1043,7 +1160,9 @@ package body Lua.Syntax_Trees is
                        Matches (Fetch (Previous.Item).Text, Value.Text)
                      then
                         Error ("label '" & Image (Value.Text) &
-                               "' already defined");
+                               "' already defined on line " & Line_Text
+                                 (Fetch (Previous.Item).Site.Line),
+                               Near_Token => False);
                      end if;
                   end loop;
                   Labels.Append

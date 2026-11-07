@@ -76,6 +76,7 @@ package body Lua.Canonical_Compiler is
       return (case Error is
          when No_Error => "",
          when Register_Limit => "too many registers",
+         when Return_Limit => "too many returns",
          when Local_Limit => "too many local variables",
          when Upvalue_Limit => "too many upvalues",
          when Jump_Limit => "control structure too long",
@@ -1345,6 +1346,12 @@ package body Lua.Canonical_Compiler is
                      --  keeps the keyword line; a multiline result uses its
                      --  final token line (lparser.c:retstat/lcode:luaK_code).
                      Site.Line := Item.End_Line;
+                     --  The B field encodes a fixed result count plus one.
+                     --  Match luaK_ret's semantic limit before field packing
+                     --  can turn a valid-source refusal into an Ada check.
+                     if not Open_Last and then Count > 254 then
+                        Fail (Return_Limit);
+                     end if;
                      Put (Fn, ABC (Op_RETURN, Left,
                        (if Open_Last then 0 else Count + 1),
                        (if (Fn.Code.Flags and 1) /= 0 then

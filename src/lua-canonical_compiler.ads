@@ -7,7 +7,8 @@ private package Lua.Canonical_Compiler is
    type Status is
      (Succeeded, Compiler_Limit, Resource_Limit, Memory_Failure);
    type Error_Kind is
-     (No_Error, Register_Limit, Local_Limit, Upvalue_Limit, Jump_Limit,
+     (No_Error, Register_Limit, Return_Limit, Local_Limit, Upvalue_Limit,
+      Jump_Limit,
       Constant_Encoding_Limit, Instruction_Budget, Constant_Budget,
       Prototype_Budget, Nesting_Budget, Allocation_Refused);
    type Lowering_Limits is record

@@ -10,6 +10,13 @@ source/token/node/nesting limits. It returns Success, Syntax_Error, or
 Resource_Error. Lexical and static-semantic rejection are syntax failures.
 It exposes no trees or runtime objects and has no Lua side effects.
 
+Syntax diagnostics retain pinned token spellings and near-token context through
+allocator-owned buffers. Semantic binding/goto errors retain source-line detail
+and omit lexical context. Lua string-load errors share debug's bounded chunk
+identifier; reader loads keep their explicit/default labels. The
+[diagnostic checkpoint](sessions/2026-11-08-syntax-diagnostic-tokens.md) records
+focused native/Ada evidence and the remaining runtime-error obligations.
+
 `Check_Result.Incomplete_Input` reports an unfinished quoted/long token or a
 grammar expectation at actual EOF. Interactive hosts can request more input
 from this structured fact, without inspecting diagnostic wording or introducing

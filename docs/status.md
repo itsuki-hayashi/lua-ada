@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [syntax diagnostic checkpoint](sessions/2026-11-08-syntax-diagnostic-tokens.md)
+passes strict Windows validation/static builds and 1,534 AUnit cases. Its
+focused Lua witness matches both C configurations; unchanged unreduced
+calls.lua reaches OK locally. Full file protocols, runtime error diagnostics,
+instrumented paths and final matrix acceptance remain open.
+
 The [table length checkpoint](sessions/2026-11-08-table-length-results.md)
 matches pinned conversion diagnostics and unpack ordering, with 1,507 passing
 local AUnit cases. Unchanged unreduced sort.lua reaches OK locally; literals.lua

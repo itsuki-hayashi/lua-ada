@@ -13,6 +13,12 @@ component progress. The binary Lua searcher now accepts native chunks and its
 focused caching/loader-data regression passes within 1,391 local AUnit cases.
 Full target and all original unfinished M3 gates remain open.
 
+Shared parser token/semantic diagnostics, Lua load-name formatting and fixed
+return-count refusal now have 16 focused regressions and matching native/Ada
+evidence. See the [checkpoint](sessions/2026-11-08-syntax-diagnostic-tokens.md).
+The next observed errors.lua mismatch concerns bitwise runtime diagnostics;
+the source/global API and final platform gates remain open.
+
 Table library length conversion/order now has focused native/Ada evidence;
 unreduced sort.lua completes locally and literals.lua has a fresh matching
 default runner pair. The dated

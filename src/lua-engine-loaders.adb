@@ -6,6 +6,7 @@ with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Lua.Engine.Compiler;
+with Lua.Engine.Inspection;
 with Lua.Sources;
 with Lua.Storage.Buffers;
 with Lua_Ada_Config;
@@ -321,6 +322,13 @@ package body Lua.Engine.Loaders is
          Results : Values.Vector := Owned_Values (State);
          Code : Prototype_Access;
          Scope : Object_Access;
+         Terminator : constant Natural := Ada.Strings.Fixed.Index
+           (Chunk_Name, "" & Character'Val (0));
+         Label : String renames Chunk_Name
+           (Chunk_Name'First .. (if Terminator = 0 then Chunk_Name'Last
+                                else Terminator - 1));
+         --  Lua load's name is a C string, even though its source is counted
+         --  bytes. Borrow the prefix without copying/truncating the source.
          Saved_Text : constant Unbounded_String := State.Current.Failure_Text;
          Saved_Value : constant Value := State.Current.Failure;
          Saved_Has_Value : constant Boolean := State.Current.Has_Failure_Value;
@@ -368,7 +376,7 @@ package body Lua.Engine.Loaders is
          end if;
          begin
             State.Current.Failure_Class := No_Failure;
-            Code := Compiler.Compile (State, Source, Chunk_Name);
+            Code := Compiler.Compile (State, Source, Label);
          exception
             when Language_Error =>
                if (State.Current.Failure_Class = Host_Abort) then
@@ -381,11 +389,10 @@ package body Lua.Engine.Loaders is
                end if;
                declare
                   Display_Name : constant String :=
-                    (if Chunk_Name'Length > 0 and then
-                        Chunk_Name (Chunk_Name'First) in '@' | '='
-                     then Chunk_Name
-                       (Chunk_Name'First + 1 .. Chunk_Name'Last)
-                     else Chunk_Name);
+                    Inspection.Short_Source (Label);
+                  --  luaG_addinfo uses the same bounded chunk identifier as
+                  --  debug records. A default string-load name is source
+                  --  text, not an unquoted file path or a synthetic label.
                   Message : constant String := Display_Name & ":" &
                     Ada.Strings.Fixed.Trim
                       (State.Current.Failure_At.Line'Image, Ada.Strings.Both) &

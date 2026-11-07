@@ -62,6 +62,7 @@ with Lua.Warning_Tests;
 with Lua.Borrowed_Callback_Tests;
 with Syntax_Tests;
 with Syntax_Incomplete_Tests;
+with Syntax_Diagnostic_Tests;
 with Incremental_Lexer_Tests;
 with Lua.Library_Codec_Tests;
 with Lua.String_Helper_Tests;
@@ -142,6 +143,7 @@ procedure Test_Runner is
       Lua.Borrowed_Callback_Tests.Register (Result);
       Syntax_Tests.Register (Result);
       Syntax_Incomplete_Tests.Register (Result);
+      Syntax_Diagnostic_Tests.Register (Result);
       Incremental_Lexer_Tests.Register (Result);
       Lua.Library_Codec_Tests.Register (Result);
       Lua.String_Helper_Tests.Register (Result);
