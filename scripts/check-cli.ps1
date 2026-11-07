@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $executable = (Resolve-Path -LiteralPath $Interpreter).Path
-$fixtureRoot = Join-Path $projectRoot 'reports/cli-fixtures'
+$fixtureRoot = Join-Path $projectRoot ('reports/cli-fixtures/'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fixtureRoot -Force | Out-Null
 $utf8 = [Text.UTF8Encoding]::new($false)
 $newline = [Environment]::NewLine
@@ -103,10 +103,21 @@ function Invoke-Case {
         if ($Case.ContainsKey('Contains') -and -not $output.Contains($Case.Contains)) {
             throw "Missing CLI output: $($Case.Title): <$output>"
         }
+        if ($Case.ContainsKey('CaptureOutput')) { & $Case.CaptureOutput $output }
         Write-Output "CLI PASS: $($Case.Title)"
     }
     finally { $process.Dispose() }
 }
+
+# The expansion operation inserts the selected executable's actual clean
+# default. Its platform/executable directories come from pinned luaconf.h;
+# the old minimal './?.lua' path is no longer its first template. Capture
+# defaults in separate -E children, retaining every byte for the environment
+# cases below. NativeProtocol executes these same expansion regressions.
+Invoke-Case @{Title='capture clean package.path default';Args=@('-E','-e','io.write(package.path)');
+    CaptureOutput={param($text) if([string]::IsNullOrEmpty($text)){throw 'Empty clean package.path'};$script:DefaultPackagePath=$text}}
+Invoke-Case @{Title='capture clean package.cpath default';Args=@('-E','-e','io.write(package.cpath)');
+    CaptureOutput={param($text) if([string]::IsNullOrEmpty($text)){throw 'Empty clean package.cpath'};$script:DefaultPackageCPath=$text}}
 
 $cases = @(
     # Lua narrows lua_Integer to the native C int before process exit.
@@ -295,8 +306,23 @@ $cases += @(
        Args = @('-E', '-e', 'print(init_ran)'); Output = "nil$newline" },
     @{ Title = 'LUA_PATH ;; expands to the default path';
        Env = @{ LUA_PATH = './cli_env/?.lua;;' };
-       Args = @('-e', 'print(package.path:find("^%./cli_env/%?%.lua;%./%?%.lua") == 1)');
-       Output = "true$newline" },
+       Args = @('-e', 'io.write(package.path)');
+       Output = ('./cli_env/?.lua;'+$script:DefaultPackagePath) },
+    @{ Title = 'LUA_PATH only separators selects the complete default';
+       Env = @{ LUA_PATH = ';;' };Args = @('-e','io.write(package.path)');
+       Output = $script:DefaultPackagePath },
+    @{ Title = 'LUA_PATH expands only the first double separator';
+       Env = @{ LUA_PATH = 'before;;after;;literal' };Args = @('-e','io.write(package.path)');
+       Output = ('before;'+$script:DefaultPackagePath+';after;;literal') },
+    @{ Title = 'LUA_PATH leading separator preserves the remaining suffix';
+       Env = @{ LUA_PATH = ';;after;;literal' };Args = @('-e','io.write(package.path)');
+       Output = ($script:DefaultPackagePath+';after;;literal') },
+    @{ Title = 'LUA_CPATH only separators selects the complete default';
+       Env = @{ LUA_CPATH = ';;' };Args = @('-e','io.write(package.cpath)');
+       Output = $script:DefaultPackageCPath },
+    @{ Title = 'LUA_CPATH expands only the first double separator';
+       Env = @{ LUA_CPATH = 'before;;after;;literal' };Args = @('-e','io.write(package.cpath)');
+       Output = ('before;'+$script:DefaultPackageCPath+';after;;literal') },
     @{ Title = 'LUA_PATH_5_5 takes precedence over LUA_PATH';
        Env = @{ LUA_PATH = 'plain'; LUA_PATH_5_5 = 'versioned' };
        Args = @('-e', 'print(package.path)'); Output = "versioned$newline" },
@@ -381,6 +407,12 @@ $nativeTitles = @(
     'LUA_INIT @file loads a file',
     'LUA_INIT failure is reported',
     '-E ignores LUA_INIT',
+    'LUA_PATH ;; expands to the default path',
+    'LUA_PATH only separators selects the complete default',
+    'LUA_PATH expands only the first double separator',
+    'LUA_PATH leading separator preserves the remaining suffix',
+    'LUA_CPATH only separators selects the complete default',
+    'LUA_CPATH expands only the first double separator',
     'LUA_PATH_5_5 takes precedence over LUA_PATH',
     '-E ignores LUA_PATH',
     '-i prints banner, prompts and expression results',

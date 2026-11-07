@@ -46,7 +46,10 @@ function Copy-FrozenInput([string] $Relative,[string] $ExpectedHash,[string] $De
         try {
             $process.StandardOutput.BaseStream.CopyTo($buffer)
             $diagnostic = $process.StandardError.ReadToEnd(); $process.WaitForExit()
-            if ($process.ExitCode -ne 0) { throw "Cannot read frozen predecessor input: $relativeFile`: $diagnostic" }
+            if ($process.ExitCode -ne 0) {
+                throw ("Cannot read required frozen predecessor blob d438f1fb2491006c1c248e0888637b4afa5ae0fc:$relativeFile. " +
+                    "CI checkout must retain repository history (fetch-depth: 0). $diagnostic")
+            }
             $bytes = $buffer.ToArray()
         } finally { $buffer.Dispose(); $process.Dispose() }
     }
