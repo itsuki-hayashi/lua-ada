@@ -77,6 +77,18 @@ function Invoke-Case {
 }
 
 $cases = @(
+    # Lua narrows lua_Integer to the native C int before process exit.
+    # Windows exposes the signed status; POSIX reports its lowest byte.
+    @{ Title = 'negative process exit retains native status';
+       ExitCode = $(if ($IsWindows) { -1 } else { 255 });
+       Args = @('-e', 'os.exit(-1,false)'); Output = '' },
+    @{ Title = 'oversized process exit retains low C int bits'; ExitCode = 0;
+       Args = @('-e', 'os.exit(4294967296,false); error("unreachable")'); Output = '' },
+    # The native unbuffered call ignores buffer capacity. A checked Ada
+    # range conversion must not reject the otherwise valid Lua integer.
+    @{ Title = 'unbuffered file accepts negative size_t input';
+       Args = @('-e', 'local f=assert(io.open("negative-size.tmp","w")); assert(f:setvbuf("no",-1)); assert(f:write("ok")); assert(f:close()); assert(os.remove("negative-size.tmp"))');
+       Output = '' },
     @{ Title = 'typed exit without Lua close handlers'; ExitCode = 42;
        Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("finalized") end}); local x <close> = setmetatable({}, {__close=function() print("closed") end}); os.exit(42,false)', '-e', 'error("unreachable")');
        Output = '' },

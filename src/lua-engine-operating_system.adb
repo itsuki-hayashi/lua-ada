@@ -592,7 +592,7 @@ package body Lua.Engine.Operating_System is
                --  C's explicit int cast retains its native low bits; a large
                --  valid lua_Integer must not become an Ada range exception.
                Code := Signed_Code
-                 (C.unsigned (Strings.Integer_Argument (State, Arg (1))));
+                 (C.unsigned'Mod (Strings.Integer_Argument (State, Arg (1))));
             end if;
             Request_Process_Exit (State, Code, Truth (Arg (2)));
          end;

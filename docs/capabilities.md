@@ -18,7 +18,7 @@ does not establish platform acceptance or full conformance.
 | Lifetime   | Incremental/generational GC; weak tables and finalizers     | Barriers, physical storage and shutdown        |
 | IO and OS  | Native streams, iterators, children, calendar and exits     | Lua file tests, native and C stream cases      |
 | Ada host   | Unique sessions, persistent globals, output sink            | Lifecycle Ada consumer                         |
-| CLI        | Files, snippets, stdin, arguments, usage, checking/status   | 35 process cases                               |
+| CLI        | Files, snippets, stdin, arguments, usage, checking/status   | 42 process cases                               |
 | Builds     | Static/shared, strict profiles                              | Acceptance matrix; see status                  |
 
 ## M2b export inventory

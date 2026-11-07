@@ -1007,8 +1007,11 @@ package body Lua.Engine.IO_Libraries is
             if Arg (3).Kind /= Nil_Kind then
                Size := Strings.Integer_Argument (State, Arg (3));
             end if;
+            --  Lua passes the low size_t bits even for a negative integer.
+            --  Let stdio return its own result for that mode and size.
             Status := Streams.Set_Buffering
-              (Files.Header (Item).File, Mode, C.size_t (Size), Error'Access);
+              (Files.Header (Item).File, Mode, C.size_t'Mod (Size),
+               Error'Access);
             Result.Results := System_Results.File_Result
               (State, Status = 0, Error);
          end;

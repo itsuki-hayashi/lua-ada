@@ -962,3 +962,11 @@ artifacts and run `scripts/check-conformance-matrix.ps1 -Manifest <manifest>
 -RequireScopedAcceptance`; the report must identify 104 accepted operations
 and 208 executions on that exact clean revision. Candidate observations must
 not be substituted for these accepted reports.
+
+PR review identified two range-checked conversions at the native boundary.
+The corrected exit conversion reduces the Lua integer modulo the width of
+C unsigned before interpreting it as a signed exit status. File buffering
+passes the native size_t bit pattern to stdio. The Windows pinned C oracle
+returned status -1 for os.exit(-1,false), zero for os.exit(4294967296,false),
+and success for unbuffered mode with size -1. The rebuilt Ada CLI matched
+all three results in its 42-case local validation/static campaign.
