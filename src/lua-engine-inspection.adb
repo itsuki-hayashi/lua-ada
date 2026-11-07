@@ -64,7 +64,8 @@ package body Lua.Engine.Inspection is
       --  frame, so its immutable transport marker contributes no boundary.
       --  The protected C collector pump likewise creates no public call.
       while Window /= null and then Window /= Item loop
-         if not Window.Is_C_Hook_Transport and then
+         if not Window.Logically_Unwound and then
+           not Window.Is_C_Hook_Transport and then
            not Window.Is_C_Collector_Transport
          then
             Child := Window;
@@ -93,7 +94,8 @@ package body Lua.Engine.Inspection is
 
    function Published_Frame (Item : Frame_Access) return Boolean;
    function Published_Frame (Item : Frame_Access) return Boolean is
-     (not Item.Is_C_Hook_Transport and then
+     (not Item.Logically_Unwound and then
+      not Item.Is_C_Hook_Transport and then
       not Item.Is_C_Collector_Transport and then
       (not Item.Is_Native or else
        (Length (Item.Native_Name) > 0 and then

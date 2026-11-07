@@ -1300,6 +1300,7 @@ package body Lua.Engine is
       Item.Is_C_Hook_Transport := False;
       Item.Is_C_Collector_Transport := False;
       Item.Is_Finalizer_Call := False;
+      Item.Logically_Unwound := False;
       Item.Is_Tail_Call := False;
       Item.Call_Metamethod_Count := 0;
       Item.Native_Tail_State := No_Native_Tail;

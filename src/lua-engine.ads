@@ -617,6 +617,9 @@ private package Lua.Engine is
       --  This actual activation was entered by the finalizer controller.
       --  It has the __gc origin even without a Lua calling opcode. Reuse and
       --  Lua tail replacement clear the marker; descendants do not inherit it.
+      Logically_Unwound : Boolean := False;
+      --  Execution has genuinely abandoned this activation. Cells/closers
+      --  remain owned until cleanup; its calls/depth/barriers cannot resume.
       Is_Tail_Call : Boolean := False;
       Call_Metamethod_Count : Natural range 0 .. 15 := 0;
       --  Receivers inserted on entry to this logical frame, independently

@@ -871,6 +871,91 @@ package body Lua.Engine.Machine is
       Return_Frame (Item);
    end Release_Frame;
 
+   procedure Retire_Frame_Execution
+     (State : in out World; Item : not null Frame_Access) is
+      Context : constant Context_Access := Item.Context;
+   begin
+      if Item.Logically_Unwound then return; end if;
+      if Item.Foreign_Entered and then Item.Native_Stage = 1 then
+         raise Program_Error with "abandoning a live foreign body";
+      elsif Item.Warning_Borrow_Depth /= 0 then
+         raise Program_Error with "abandoning a live C stack borrow";
+      end if;
+      --  Freeze the actual departing values and detach lexical cells before
+      --  their scalar interval is reused by a closer. A handler may mutate a
+      --  closed upvalue without replacing another slot's pending close value.
+      if Item.Code /= null and then Item.Code.Canonical_Node /= null then
+         Canonical.Prepare_Close (State, Item, 0);
+      else
+         for Index in Item.Closers.First_Index .. Item.Closers.Last_Index loop
+            declare
+               Closing_Entry : Close_Entry := Item.Closers (Index);
+            begin
+               if not Closing_Entry.Frozen then
+                  Closing_Entry.Frozen_Value := Closing_Entry.Cell.Cell_Value;
+                  Closing_Entry.Frozen := True;
+                  Item.Closers.Replace_Element (Index, Closing_Entry);
+               end if;
+            end;
+         end loop;
+      end if;
+      --  These charges belong to execution, not to retained cleanup roots.
+      --  Clearing each ownership bit makes later physical release idempotent
+      --  and prevents stale C barriers/depth from rejecting a real closer.
+      if Item.Native_Charge then
+         Context.Native_Depth := Context.Native_Depth - 1;
+         State.Native_Depth := State.Native_Depth - 1;
+         Item.Native_Charge := False;
+      end if;
+      if Item.Blocks_Yield then
+         Context.Non_Yieldable := Context.Non_Yieldable - 1;
+         Item.Blocks_Yield := False;
+      end if;
+      if Item.Message_Charge then
+         Context.Message_Depth := Context.Message_Depth - 1;
+         Item.Message_Charge := False;
+      end if;
+      if Item.Unwind_Charge then
+         Context.Cleanup_Depth := Context.Cleanup_Depth - 1;
+         Item.Unwind_Charge := False;
+      end if;
+      if Item.Is_Native and then Item.Native_Name = "@hook" then
+         Context.Hook_Active := False;
+         Context.Hook_Frame := null;
+         Context.Hook_Suspended := False;
+         Context.Hook_Yield_Pending := False;
+      end if;
+      if Item.Foreign_Entered then
+         if Context.Foreign_Activation = Item then
+            Context.Foreign_Top := Item.Saved_Foreign_Top;
+            Context.Foreign_Base := Item.Foreign_Previous_Base;
+            Context.Foreign_Activation := Item.Foreign_Previous_Frame;
+         end if;
+         Item.Foreign_Entered := False;
+      end if;
+      --  The actual physical window retires only after its cells/closers
+      --  own their values. A caller-controlled close prefix may retain lower
+      --  scalar slots during pending handlers; capacity stays owned.
+      Retire_Stack_Window (Item);
+      Item.Native_Arguments.Clear;
+      Item.Native_Results.Clear;
+      Item.Native_Captures.Clear;
+      Item.Error_Packet.Clear;
+      Item.Unwind_Results.Clear;
+      Item.Varargs.Clear;
+      for Index in 1 .. Item.Active_Registers loop
+         Item.Slots (Index).Clear;
+      end loop;
+      Item.Active_Registers := 0;
+      Item.Callee := Nil_Value;
+      Item.Native_Self := null;
+      Item.Vararg_Table := null;
+      Item.Unwind_Error := Nil_Value;
+      Item.Message_Handler := Nil_Value;
+      Item.Warning_Root := Nil_Value;
+      Item.Logically_Unwound := True;
+   end Retire_Frame_Execution;
+
    procedure Reserve_Frame (State : in out World; Cost : Natural);
    procedure Reserve_Frame (State : in out World; Cost : Natural) is
       Maximum : constant Positive :=

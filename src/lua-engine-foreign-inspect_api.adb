@@ -37,7 +37,9 @@ is
       --  stale token or one from another thread never becomes an unchecked
       --  dereference, even though native C callers must obey that lifetime.
       for Item of Context.Stack loop
-         if Item.all'Address = Address then
+         if not Item.Logically_Unwound and then
+           Item.all'Address = Address
+         then
             return Item;
          end if;
       end loop;

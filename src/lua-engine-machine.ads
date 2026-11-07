@@ -202,6 +202,19 @@ package Lua.Engine.Machine is
    --  Borrow an idle driver to release queued external payloads before
    --  physical teardown. No executor step spans a C allocator callback.
 
+   procedure Retire_Frame_Execution
+     (State : in out World; Item : not null Frame_Access)
+     with Pre => Item.Context = State.Current and then
+       (not Item.Has_Stack_Window or else
+        Item.Context.Stack_Window = Item);
+   --  Retire genuinely abandoned execution ownership exactly once, visiting
+   --  physical windows from top to bottom. The caller establishes the active
+   --  native-depth accounting and preserves any scalar prefix needed during
+   --  closing before this call. Closed cells/frozen closers/code stay rooted
+   --  until physical release; pending result/argument temporaries do not.
+   --  Never call across a live foreign body: acknowledge its typed C transfer
+   --  first. An already retired activation is harmless; reuse resets it.
+
    procedure Clear_Frames
      (State : in out World; Retained_Depth : Natural := 0);
    --  Release all frame-owned packets after success or failed execution.

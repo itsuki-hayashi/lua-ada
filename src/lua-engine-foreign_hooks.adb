@@ -101,7 +101,9 @@ package body Lua.Engine.Foreign_Hooks is
             --  stale lua_Debug, another coroutine's token or an arbitrary C
             --  address cannot grant access to an inactive Ada activation.
             for Item of Context.Stack loop
-               if Item.all'Address = Input.Pointer then
+               if not Item.Logically_Unwound and then
+                 Item.all'Address = Input.Pointer
+               then
                   Selected := Item;
                   exit;
                end if;

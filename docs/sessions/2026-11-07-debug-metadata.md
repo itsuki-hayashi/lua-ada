@@ -698,3 +698,33 @@ evidence for db.lua, not the final conformance certificate or instrumented Ada
 matrix. Reference files/pins are unchanged; git diff --check is clean. The
 next lifecycle work remains locals.lua error-close yieldability through real
 continuation-capable protection, preserving explicit-close and C barriers.
+## 2026-11-08 execution retirement dependency
+
+A private, idempotent Retire_Frame_Execution operation now separates genuinely
+abandoned execution ownership from retained closing ownership. The caller must
+acknowledge any live C body first, establish the active context's real depth
+accounting, and visit physical windows from top to bottom. The operation freezes
+pending close values and detaches canonical cells before retiring the actual
+window. It relinquishes native depth, yield barriers, handler/cleanup depth and
+hook execution ownership once, then drops dead arguments, results and temporary
+packets. Code, lexical cells and frozen close values remain traced until the
+record is physically released. A reset marker prevents cached activations from
+inheriting abandoned state; shared Lua/C debug lookup excludes marked owners.
+
+Five separately named AUnit cases pause actual scheduled VM activations to
+check charge balance through physical release, outgoing argument reclamation
+across both caller and callee, cached record reuse, frozen close-value lifetime,
+and zero growth attempts under permanent provider refusal. The argument case
+initially retired only its callee; its failed assertion correctly exposed the
+still-live caller's outgoing slot. It now abandons the real whole path in order.
+Strict root/tests builds pass with GNAT 16.1.0 and the retained validation flags;
+all 1,685 AUnit cases pass. Reference sources and pins are unchanged, and
+`git diff --check` is clean.
+
+This is a dependency checkpoint. Existing error paths do not invoke the helper
+yet, and no error-close yieldability or complete locals.lua acceptance is
+claimed. Production reset/error retirement must first preserve the actual
+scalar prefix below pending TBC slots; the coordinated C reset work owns that
+physical-window lifetime extension. Regular C callback error deferral must also
+wait until the corresponding typed C guard has acknowledged abandonment.
+Ownerless reader, warning and external-release guards remain real barriers.
