@@ -706,6 +706,17 @@ compilers. Machine replay checks source hashes separately. This approval
 accepts candidate eligibility and probe design only; it leaves every global
 semantic classification and all runtime/platform/coverage acceptance pending.
 
+`Invoke-ConformanceProcess -StandardInputPath` freezes a separate raw `.stdin`
+snapshot before launch and records its digest, extent, completed write and EOF.
+The optional input is written asynchronously while stdout/stderr drain, so a
+child which never reads cannot block the existing wall timeout. Empty input
+remains an explicit zero-byte stream. Incomplete writes fail process evidence
+even after an exit-zero child; the default without an input file still sends
+immediate EOF. Six actual transport regressions cover binary/empty input,
+simultaneous pipe pressure, blocked readers, early exit and invalid input.
+They establish transport behavior only; source-bound Lua file/stdin consumer
+protocols and complete runtime/context evidence remain separate obligations.
+
 Final image replay also binds the actual selected C/C++ frontend identities,
 the compiler/query processes, both executables and every capture. Declaration
 and applicability reconciliation checks every required language/configuration

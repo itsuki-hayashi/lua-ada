@@ -10,13 +10,33 @@ function Invoke-ConformanceProcess {
         [Parameter(Mandatory)][string] $OutputPrefix,
         [ValidateRange(1, 3600)][int] $TimeoutSeconds,
         [hashtable] $Environment = @{},
-        [ValidateRange(1024, 1073741824)][long] $CaptureLimitBytes = 67108864
+        [ValidateRange(1024, 1073741824)][long] $CaptureLimitBytes = 67108864,
+        [string] $StandardInputPath = '',
+        [ValidateRange(1, 1073741824)][long] $InputLimitBytes = 67108864
     )
     # Streams go directly to files, preserving invalid UTF-8 and avoiding an
     # unbounded in-memory capture. Classification decodes a separate view only.
     $outPath = $OutputPrefix + '.stdout'
     $errPath = $OutputPrefix + '.stderr'
     [void][IO.Directory]::CreateDirectory((Split-Path -Parent $outPath))
+    $inputFile=$null;$inputRecord=$null;$inputTask=$null;$inputClosed=$false
+    if($StandardInputPath -ne ''){
+        # Freeze the bytes actually supplied, including empty input, NUL and
+        # invalid UTF-8. A later change to the producer's output cannot rewrite
+        # the consumer's evidence. Copy before opening stdout, since a caller
+        # may intentionally use an earlier stdout capture as its input.
+        $sourceInput=(Resolve-Path -LiteralPath $StandardInputPath -ErrorAction Stop).Path
+        if(-not (Test-Path -LiteralPath $sourceInput -PathType Leaf) -or
+            (Get-Item -LiteralPath $sourceInput).Length -gt $InputLimitBytes){throw 'Standard input file is missing or exceeds its byte limit'}
+        $inputPath=$OutputPrefix+'.stdin'
+        [IO.File]::Copy($sourceInput,$inputPath,$false)
+        if((Get-Item -LiteralPath $inputPath).Length -gt $InputLimitBytes){throw 'Standard input snapshot exceeds its byte limit'}
+        $inputFile=[IO.File]::OpenRead($inputPath)
+        $inputRecord=[ordered]@{source_path=$sourceInput;path=$inputPath;bytes=$inputFile.Length;
+            sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($inputFile)).ToLowerInvariant();
+            byte_limit=$InputLimitBytes;write_completed=$false;eof_sent=$false}
+        $inputFile.Position=0
+    }
     $outFile = [IO.File]::Create($outPath)
     $errFile = [IO.File]::Create($errPath)
     $start = [Diagnostics.ProcessStartInfo]::new()
@@ -50,14 +70,25 @@ function Invoke-ConformanceProcess {
         [void]$process.Start()
         $started = $true
         $processId = $process.Id
-        $process.StandardInput.Close()
         $outTask = $process.StandardOutput.BaseStream.CopyToAsync($outFile)
         $errTask = $process.StandardError.BaseStream.CopyToAsync($errFile)
+        if($null -eq $inputFile){$process.StandardInput.Close();$inputClosed=$true}
+        else{
+            # Output draining starts before the asynchronous input write: a
+            # child may fill stdout before reading stdin, or stop reading.
+            # Neither case may block the timer on a synchronous pipe write.
+            $inputTask=$inputFile.CopyToAsync($process.StandardInput.BaseStream)
+        }
         while (-not $process.WaitForExit(50)) {
+            if($null -ne $inputTask -and $inputTask.IsCompleted -and -not $inputClosed){
+                $process.StandardInput.BaseStream.Close();$inputClosed=$true
+                $inputRecord.eof_sent=$true
+            }
             $timedOut = $watch.Elapsed.TotalSeconds -ge $TimeoutSeconds
             $captureExceeded = $outFile.Length -gt $CaptureLimitBytes -or
                                $errFile.Length -gt $CaptureLimitBytes
-            if ($timedOut -or $captureExceeded -or $outTask.IsFaulted -or $errTask.IsFaulted) {
+            if ($timedOut -or $captureExceeded -or $outTask.IsFaulted -or $errTask.IsFaulted -or
+                ($null -ne $inputTask -and $inputTask.IsFaulted)) {
                 try { $process.Kill($true) } catch { $killError = $_.Exception.Message }
                 break
             }
@@ -69,12 +100,21 @@ function Invoke-ConformanceProcess {
             try { $process.Kill($true) } catch { $killError = $_.Exception.Message }
             $drainFailed = $true
         }
-        $tasks = [Threading.Tasks.Task[]]@($outTask, $errTask)
+        [Threading.Tasks.Task[]]$tasks = @($outTask, $errTask)
+        if($null -ne $inputTask){$tasks+=$inputTask}
         $combined = [Threading.Tasks.Task]::WhenAll($tasks)
         try {
             if (-not $combined.Wait(5000)) { $drainFailed = $true }
         }
         catch { $drainFailed = $true }
+        if($null -ne $inputTask){
+            # Close the raw stream, avoiding any text writer encoding or BOM.
+            # A child which exits before reading the supplied data leaves an
+            # explicit failed pipe observation even if it returned status 0.
+            if(-not $inputClosed){$process.StandardInput.BaseStream.Close();$inputClosed=$true;$inputRecord.eof_sent=$true}
+            $inputRecord.write_completed=$inputTask.IsCompletedSuccessfully
+            if(-not $inputRecord.write_completed){$drainFailed=$true}
+        }
         if ($drainFailed) {
             $process.StandardOutput.Close()
             $process.StandardError.Close()
@@ -91,6 +131,7 @@ function Invoke-ConformanceProcess {
             try { $process.Kill($true) } catch { $killError = $_.Exception.Message }
         }
         $process.Dispose()
+        if($null -ne $inputFile){$inputFile.Dispose()}
         $outFile.Dispose()
         $errFile.Dispose()
     }
@@ -103,7 +144,7 @@ function Invoke-ConformanceProcess {
                     'possible-posix-signal-status'
                 }
                 else { $null }
-    return [ordered]@{
+    $record=[ordered]@{
         executable = $Executable
         process_id = $processId
         executable_sha256 = (Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -126,6 +167,8 @@ function Invoke-ConformanceProcess {
         stderr_bytes = (Get-Item -LiteralPath $errPath).Length
         stderr_sha256 = (Get-FileHash -LiteralPath $errPath -Algorithm SHA256).Hash.ToLowerInvariant()
     }
+    if($null -ne $inputRecord){$record.standard_input=$inputRecord}
+    return $record
 }
 
 function Get-ConformanceOutcome {

@@ -591,6 +591,9 @@ Case 'full-target smoke and mixed acceptance flags reject before setup' {
         Assert-True ($process.exit_code -ne 0 -and $process.stderr_bytes -gt 0) 'Invalid target flags entered execution'
     }
 }
+Case 'exact binary stdin and bounded simultaneous pipe transport' {
+    & (Join-Path $PSScriptRoot 'test-conformance-stdin.ps1')
+}
 Write-Output "RUNNER TESTS: $script:cases cases; $($failures.Count) failed"
 if ($failures.Count -gt 0) { exit 1 }
 if ($ReferenceInterpreter -ne '') {
