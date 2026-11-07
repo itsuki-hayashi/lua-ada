@@ -19,8 +19,11 @@ package Lua.Engine.Canonical is
       Has_Call_Window : Boolean := False;
       --  Absolute original callee slot, distinct from relative result IDs.
    end record;
-   --  Every callback packet is also retained in its owning frame before Step
-   --  returns. Machine publishes it into the next explicit activation before
+   --  Every callback packet is retained in its owning frame before Step
+   --  returns. Invoke_Function/Tail_Invoke borrow Native_Arguments directly;
+   --  their scalar action must not copy a controlled vector on every call.
+   --  Other actions carry an owned copy where retirement needs independent
+   --  lifetime. Machine publishes the packet into the next activation before
    --  ending the current operation. Destination is register index + 1.
 
    function Adopt_Program

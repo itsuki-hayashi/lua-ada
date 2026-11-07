@@ -202,6 +202,7 @@ package body Lua.Engine.Foreign is
       Activation : Frame_Access;
       Is_Resume : Boolean := False;
       Is_Close : Boolean := False;
+      Is_Panic : Boolean := False;
       Is_Cross_Call : Boolean := False;
       --  A C call can address another context in this same universe. Its
       --  entry drive suspends only scalar driver ownership, not a Lua resume.
@@ -1190,13 +1191,14 @@ package body Lua.Engine.Foreign is
       function Pump (Start_Error : Boolean := False) return Action_Status;
       function Reset_API return Action_Status;
       function Reset_API return Action_Status is
+         Panic : constant Boolean := Input.Operation = Prepare_Panic;
          Saved_Depth : constant Natural := Owner.Universe.Native_Depth;
          From_Depth : Natural := 0;
          Old_Status : Natural := 0;
          Next : Calls.Object_Pointer;
          Start_Error : Boolean := False;
       begin
-         if Input.Operation /= Close_Thread then
+         if Input.Operation not in Close_Thread | Prepare_Panic then
             if not Context.C_Reset_Requested or else Main_Owner.Driver = null
             then
                raise Foreign_Error with
@@ -1229,6 +1231,25 @@ package body Lua.Engine.Foreign is
             end if;
             return Action_Self_Close;
          end if;
+         if Panic then
+            if Input.Index not in 2 | 4 | 5 or else
+              Context.Foreign_Top <= Context.Foreign_Base
+            then
+               raise Foreign_Error with "invalid unprotected panic entry";
+            end if;
+            --  No local C guard owns this failure. Publish the real top
+            --  error as the reset's incoming status before retiring base C
+            --  closers, exactly as luaD_throw calls luaE_resetthread first.
+            Context.Failure :=
+              Stacks.Read (Context, Context.Foreign_Top);
+            Root_Barrier (Owner.Universe.all, Context.Failure);
+            Context.Has_Failure_Value := True;
+            Context.Failure_Class :=
+              (if Input.Index = 4 then Memory_Failure
+               elsif Input.Index = 5 then Handling_Failure
+               else Language_Failure);
+            Context.Status := Dead_Context;
+         end if;
          if Input.Pointer /= System.Null_Address then
             From_Depth := Controls.To_Pointer
               (Surfaces.To_Pointer (Input.Pointer).Owner).
@@ -1246,11 +1267,16 @@ package body Lua.Engine.Foreign is
             if Old_Status /= 0 then
                Push (Owner.Universe.all, Context, Context.Failure);
             end if;
-            Context.Failure := Nil_Value;
-            Context.Has_Failure_Value := False;
-            Context.Failure_Class := No_Failure;
+            if not Panic then
+               Context.Failure := Nil_Value;
+               Context.Has_Failure_Value := False;
+               Context.Failure_Class := No_Failure;
+            end if;
             Owner.Universe.Native_Depth := Saved_Depth;
             Output.Integer_Data := C.long_long (Old_Status);
+            if Panic and then Context.Failure.Kind = String_Kind then
+               Output.Pointer := Context.Failure.Reference.C_Bytes;
+            end if;
             return Action_Done;
          end if;
          if Owner.Reset_Live then
@@ -1261,7 +1287,8 @@ package body Lua.Engine.Foreign is
          --  stack. The pump returns before each close callback runs.
          Next := Calls.To_Pointer (Owner.Reset_Record);
          Next.all :=
-           (Is_Root => True, Is_Resume => True, Is_Close => True, Wanted => -1,
+           (Is_Root => True, Is_Resume => True, Is_Close => True,
+            Is_Panic => Panic, Wanted => -1,
             Context => Owner.Context, Saved_Driver => Main_Owner.Driver,
             Saved_Owned_Driver => Main_Owner.Owned_Driver,
             Saved_Calls => Main_Owner.Calls,
@@ -1684,6 +1711,7 @@ package body Lua.Engine.Foreign is
             Protected_Call : constant Boolean := Pending.Protected_Call;
             Is_Resume : constant Boolean := Pending.Is_Resume;
             Is_Close : constant Boolean := Pending.Is_Close;
+            Is_Panic : constant Boolean := Pending.Is_Panic;
             Is_Cross_Call : constant Boolean := Pending.Is_Cross_Call;
             Direct_Builtin : constant Boolean := Pending.Direct_Builtin;
             Saved_Driver : constant Driver_View := Pending.Saved_Driver;
@@ -1745,9 +1773,20 @@ package body Lua.Engine.Foreign is
             if Is_Close then
                Caller.C_Reset_Requested := False;
                Caller.C_Reset_Active := False;
-               Caller.Failure := Nil_Value;
-               Caller.Has_Failure_Value := False;
-               Caller.Failure_Class := No_Failure;
+               if Is_Panic then
+                  --  Public reset normalizes status; luaD_throw's private
+                  --  reset retains the final error for the actual panic
+                  --  callback, including replacement errors from closers.
+                  Caller.Status := Dead_Context;
+                  Output.Pointer :=
+                    (if Caller.Failure.Kind = String_Kind then
+                        Caller.Failure.Reference.C_Bytes
+                     else System.Null_Address);
+               else
+                  Caller.Failure := Nil_Value;
+                  Caller.Has_Failure_Value := False;
+                  Caller.Failure_Class := No_Failure;
+               end if;
             end if;
             Output.Integer_Data := C.long_long (Error_Status);
             Output.Error_Handled := Boolean'Pos (Handler_Called);
@@ -1899,7 +1938,7 @@ package body Lua.Engine.Foreign is
                   elsif Context.Failure_Class = Handling_Failure then 5
                   else 2)
                else 0);
-         when Close_Thread | Complete_Self_Close =>
+         when Close_Thread | Complete_Self_Close | Prepare_Panic =>
             declare
                Result : constant Action_Status := Reset_API;
             begin
@@ -2838,7 +2877,7 @@ package body Lua.Engine.Foreign is
             then
                raise Foreign_Error with "invalid userdata uservalue count";
             elsif Input.Length > C.size_t (Memory.Byte_Count'Last) then
-               raise Memory.Allocation_Error with "userdata block too large";
+               raise Foreign_Error with "block too big";
             end if;
             declare
                Item : constant Value := New_Userdata

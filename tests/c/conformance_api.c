@@ -15,6 +15,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,6 +36,33 @@ static int load_libraries(lua_State *);
 static int run_remote(lua_State *);
 static int close_state(lua_State *);
 static void set_hook_script(lua_State *, int, int, const char *);
+static int check_panic(lua_State *);
+
+/* The test host binds a real zero-upvalue C leaf in the registry. Calling it
+ * directly does not allocate a Lua call boundary while growth is disabled.
+ * Its only argument is temporarily placed in slot 1; the actual old value is
+ * rooted in a spare C slot and restored before another command observes it.
+ * Native oracle modules bind the original native T.alloccount C function. */
+static void allocation_count(lua_State *L, int limit) {
+    int top = lua_gettop(L), results;
+    lua_CFunction control;
+    luaL_checkstack(L, 2, "allocation control");
+    lua_getfield(L, LUA_REGISTRYINDEX, LUA_ADA_T_COUNT_KEY);
+    control = lua_tocfunction(L, -1);
+    lua_pop(L, 1);
+    if (control == NULL) {
+        lua_pushliteral(L, "allocation control is not installed");
+        lua_error(L);
+        return;
+    }
+    if (top > 0) lua_pushvalue(L, 1);
+    lua_pushinteger(L, limit);
+    if (top > 0) lua_replace(L, 1);
+    results = control(L);
+    assert(results == 0 && lua_gettop(L) == (top ? top + 1 : 1));
+    if (top > 0) lua_copy(L, top + 1, 1);
+    lua_settop(L, top);
+}
 
 /* Argument validation deliberately uses the public core API so this driver
  * does not rely on unimplemented auxiliary convenience functions. Raising
@@ -175,7 +203,9 @@ static int run_commands(lua_State *L, lua_State *target, const char *pc) {
         /* These commands contain only operand decoding and exported API
          * calls. All lookup, handler, arithmetic, lifetime and error behavior
          * belongs to the selected runtime, including commands on other states. */
-        if (strcmp(instruction, "absindex") == 0)
+        if (strcmp(instruction, "alloccount") == 0)
+            allocation_count(L, number(L, target, &pc));
+        else if (strcmp(instruction, "absindex") == 0)
             lua_pushinteger(target, index_operand(L, target, &pc));
         else if (strcmp(instruction, "append") == 0) {
             int index = index_operand(L, target, &pc);
@@ -269,6 +299,9 @@ static int run_commands(lua_State *L, lua_State *target, const char *pc) {
         else if (strcmp(instruction, "Llen") == 0)
             lua_pushinteger(target, luaL_len(target,
                 index_operand(L, target, &pc)));
+        else if (strcmp(instruction, "loadfile") == 0)
+            luaL_loadfilex(target, luaL_checkstring(target,
+                number(L, target, &pc)), "t");
         else if (strcmp(instruction, "loadstring") == 0) {
             size_t length;
             const char *source = luaL_checklstring(target,
@@ -578,6 +611,98 @@ static int new_state(lua_State *L) {
     return 1;
 }
 
+/* Copy only genuine callback/pointer scalars between independent worlds;
+ * lua_xmove would be invalid across universes. The controlling test provider
+ * remains the inherited one, while normal Lua values keep separate owners. */
+static void copy_allocation_control(lua_State *L, lua_State *other) {
+    lua_CFunction control;
+    void *owner;
+    lua_getfield(L, LUA_REGISTRYINDEX, LUA_ADA_T_COUNT_KEY);
+    control = lua_tocfunction(L, -1);
+    lua_pop(L, 1);
+    if (control == NULL) return;
+    lua_pushcfunction(other, control);
+    lua_setfield(other, LUA_REGISTRYINDEX, LUA_ADA_T_COUNT_KEY);
+    lua_getfield(L, LUA_REGISTRYINDEX, LUA_ADA_T_OWNER_KEY);
+    owner = lua_touserdata(L, -1);
+    lua_pop(L, 1);
+    lua_pushlightuserdata(other, owner);
+    lua_setfield(other, LUA_REGISTRYINDEX, LUA_ADA_T_OWNER_KEY);
+}
+
+struct panic_context {
+    jmp_buf jump;
+    lua_State *caller;
+    const char *panic_code;
+    const char *result;
+};
+
+static int panic_setup(lua_State *L) {
+    lua_pushvalue(L, 1);
+    lua_setfield(L, LUA_REGISTRYINDEX, "_jmpbuf");
+    return 0;
+}
+
+static int panic_back(lua_State *L) {
+    struct panic_context *context;
+    luaL_checkstack(L, 1, "panic context");
+    lua_getfield(L, LUA_REGISTRYINDEX, "_jmpbuf");
+    context = (struct panic_context *)lua_touserdata(L, -1);
+    lua_pop(L, 1);
+    assert(context != NULL);
+    (void)run_commands(context->caller, L, context->panic_code);
+    /* Every exported operation and every Ada dispatch has returned. This
+     * jump targets only the actual live C check_panic frame below it. */
+    longjmp(context->jump, 1);
+    return 0;
+}
+
+static int copy_panic_result(lua_State *L) {
+    struct panic_context *context =
+        (struct panic_context *)lua_touserdata(L, 1);
+    lua_pushstring(L, context->result);
+    return 1;
+}
+
+static int check_panic(lua_State *L) {
+    struct panic_context context;
+    void *data;
+    lua_Alloc allocator;
+    lua_State *other;
+    const char *code = luaL_checkstring(L, 1);
+    int status;
+    context.caller = L;
+    context.panic_code = luaL_optstring(L, 2, "");
+    allocator = lua_getallocf(L, &data);
+    other = lua_newstate(allocator, data, 0);
+    if (other == NULL) {
+        lua_pushliteral(L, "not enough memory");
+        return 1;
+    }
+    /* Register the real C context under an ordinary protected call before
+     * installing panic. Unlike the source's unguarded setup, refusal here
+     * cannot jump through an uninitialized jmp_buf or strand the new state. */
+    lua_pushcfunction(other, panic_setup);
+    lua_pushlightuserdata(other, &context);
+    status = lua_pcall(other, 1, 0, 0);
+    if (status == LUA_OK) {
+        lua_atpanic(other, panic_back);
+        if (setjmp(context.jump) == 0) {
+            (void)run_commands(L, other, code);
+            context.result = "no errors";
+        } else context.result = lua_tostring(other, -1);
+    } else context.result = lua_tostring(other, -1);
+    /* The borrowed child string stays alive until this protected publication
+     * finishes. Release the child even if parent result creation refuses,
+     * then propagate the parent's actual error through its original guard. */
+    lua_pushcfunction(L, copy_panic_result);
+    lua_pushlightuserdata(L, &context);
+    status = lua_pcall(L, 1, 1, 0);
+    lua_close(other);
+    if (status != LUA_OK) return lua_error(L);
+    return 1;
+}
+
 /* These helpers retain ltests.c's public API behavior. memcpy implements the
  * byte probe without the source's potentially unaligned double dereference;
  * the bytes still come from an actual host double and an actual Lua string. */
@@ -680,7 +805,7 @@ static int open_api(lua_State *L) {
     static const char *const names[] = {"testC", "makeCfunc", "sethook",
         "resume", "newstate", "loadlib", "doremote", "closestate",
         "d2s", "s2d", "pushuserdata", "udataval", "ref", "getref",
-        "unref", "upvalue", "doonnewstack", "externstr"};
+        "unref", "upvalue", "doonnewstack", "externstr", "checkpanic"};
     unsigned i;
     lua_newtable(L);
     for (i = 0; i < sizeof(names) / sizeof(names[0]); ++i) {
@@ -692,6 +817,7 @@ static int open_api(lua_State *L) {
 
 static int load_libraries(lua_State *L) {
     lua_State *other = state_argument(L);
+    copy_allocation_control(L, other);
     luaL_openselectedlibs(other, integer_argument(L, 2),
                          integer_argument(L, 3));
     luaL_requiref(other, "T", open_api, 0);
@@ -732,7 +858,7 @@ lua_CFunction lua_ada_test_api_callback(int operation) {
         set_hook, resume_thread, new_state, load_libraries, run_remote,
         close_state, double_to_string, string_to_double, push_userdata_address,
         userdata_address, create_reference, get_reference, release_reference,
-        inspect_upvalue, run_new_stack, external_string};
-    if (operation < 17 || operation > 34) return NULL;
+        inspect_upvalue, run_new_stack, external_string, check_panic};
+    if (operation < 17 || operation > 35) return NULL;
     return callbacks[operation - 17];
 }

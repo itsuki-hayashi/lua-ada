@@ -7,6 +7,7 @@ with Lua.Engine.Stacks;
 with Lua.Storage;
 with Lua.Runtime_Configuration;
 with Lua.Conformance_Memory;
+with Lua.Conformance_Allocator;
 with System.Address_To_Access_Conversions;
 
 package body Lua.Conformance_Adapter is
@@ -14,11 +15,13 @@ package body Lua.Conformance_Adapter is
    package C renames Interfaces.C;
    package Worlds is new System.Address_To_Access_Conversions (World);
    use type C.int;
+   use type C.long_long;
    use type Integer_Value;
    use type Interfaces.Unsigned_8;
    use type C.size_t;
    use type Lua.Storage.Byte_Count;
    use type Foreign.C_Function;
+   use type System.Address;
    procedure Free_Frame is new Ada.Unchecked_Deallocation
      (Frame, Frame_Access);
 
@@ -127,6 +130,50 @@ package body Lua.Conformance_Adapter is
      (Pointer : System.Address; Operation : C.int;
       Result : not null access Adapter_Result)
      with Export, Convention => C, External_Name => "lua_ada_test_inspect";
+   procedure Control_Count
+     (State : in out World; Limit : C.long_long; Remove : Boolean := False);
+   function Set_Count
+     (Pointer : System.Address; Limit : C.long_long) return C.int
+     with Export, Convention => C,
+          External_Name => "lua_ada_test_set_allocation_count";
+
+   procedure Control_Count
+     (State : in out World; Limit : C.long_long; Remove : Boolean := False)
+   is
+   begin
+      --  The configured launcher's actual shared callback also allocates for
+      --  independently constructed states. Plain AUnit worlds keep their
+      --  original owner-local controls. Neither setter executes Lua or grows.
+      if Lua.Conformance_Allocator.Attached_To
+        (Lua.Storage.Reference (State.Memory))
+      then
+         if Remove or else Limit < 0 then
+            Lua.Conformance_Allocator.Clear_Count_Limit;
+         else
+            Lua.Conformance_Allocator.Set_Count_Limit
+              (Lua.Storage.Byte_Count (Limit));
+         end if;
+      elsif Remove or else Limit < 0 then
+         Lua.Storage.Clear_Failures (State.Memory);
+      else
+         Lua.Storage.Set_Failure_Countdown
+           (State.Memory, Lua.Storage.Byte_Count (Limit));
+      end if;
+   end Control_Count;
+
+   function Set_Count
+     (Pointer : System.Address; Limit : C.long_long) return C.int
+   is
+   begin
+      if Pointer = System.Null_Address then return -1; end if;
+      Control_Count (Worlds.To_Pointer (Pointer).all, Limit);
+      return 0;
+   exception
+      when others =>
+         --  This C-convention leaf returns before C diagnoses a broken test
+         --  control. No exception or nonlocal Lua transfer crosses Ada here.
+         return -1;
+   end Set_Count;
 
    procedure Inspect
      (Pointer : System.Address; Operation : C.int;
@@ -179,12 +226,9 @@ package body Lua.Conformance_Adapter is
             Lua.Storage.Fail_Next_Growth (State.Memory);
          when 2 =>
             if Context.Foreign_Top = Context.Foreign_Base then
-               Lua.Storage.Clear_Failures (State.Memory);
-            elsif Number (1) < 0 then
-               raise Invalid_Argument;
+               Control_Count (State, 0, Remove => True);
             else
-               Lua.Storage.Set_Failure_Countdown
-                 (State.Memory, Lua.Storage.Byte_Count (Number (1)));
+               Control_Count (State, C.long_long (Number (1)));
             end if;
          when 3 | 4 =>
             declare
@@ -212,6 +256,9 @@ package body Lua.Conformance_Adapter is
                  Lua.Storage.Statistics (State.Memory);
                Item : constant Value := Argument (1);
                Count : Integer_Value := 0;
+               Shared : constant Boolean :=
+                 Lua.Conformance_Allocator.Attached_To
+                   (Lua.Storage.Reference (State.Memory));
             begin
                if Context.Foreign_Top = Context.Foreign_Base then
                   Result.Count := 3;
@@ -219,6 +266,18 @@ package body Lua.Conformance_Adapter is
                     [C.long_long (Stats.Raw_Bytes),
                      C.long_long (Stats.Live_Blocks),
                      C.long_long (Stats.Peak_Raw_Bytes)];
+                  if Shared then
+                     declare
+                        Measured : constant
+                          Lua.Conformance_Allocator.Provider_Statistics :=
+                            Lua.Conformance_Allocator.Measurements;
+                     begin
+                        Result.Integers :=
+                          [C.long_long (Measured.Bytes),
+                           C.long_long (Measured.Blocks),
+                           C.long_long (Measured.Peak)];
+                     end;
+                  end if;
                elsif Item.Kind = String_Kind then
                   --  Count real Lua identities, excluding internal cells,
                   --  prototypes and auxiliary managed allocations.
@@ -246,8 +305,13 @@ package body Lua.Conformance_Adapter is
                   Integer_Result (Count);
                else
                   if Number (1) < 0 then raise Invalid_Argument; end if;
-                  Lua.Storage.Set_Test_Ceiling
-                    (State.Memory, Lua.Storage.Byte_Count (Number (1)));
+                  if Shared then
+                     Lua.Conformance_Allocator.Set_Byte_Limit
+                       (Lua.Storage.Byte_Count (Number (1)));
+                  else
+                     Lua.Storage.Set_Test_Ceiling
+                       (State.Memory, Lua.Storage.Byte_Count (Number (1)));
+                  end if;
                end if;
             end;
          when 6 =>
@@ -545,6 +609,7 @@ package body Lua.Conformance_Adapter is
       Add ("upvalue", 32);
       Add ("doonnewstack", 33);
       Add ("externstr", 34);
+      Add ("checkpanic", 35);
       --  The source's regcodes roots these actual status strings before
       --  refusal tests. The driver can then push them without resurrecting
       --  an unrooted weak short string while allocator growth is disabled.
@@ -554,6 +619,15 @@ package body Lua.Conformance_Adapter is
       Keep_Status ("ERRSYNTAX");
       Keep_Status ("not enough memory");
       Keep_Status ("ERRERR");
+      --  Only test hosts install this binding. The public command driver
+      --  invokes a genuine zero-upvalue C leaf, with an explicit scalar
+      --  limit, so restoring refusal cannot allocate a Lua call boundary.
+      Set (State, (Table_Kind, State.Foreign_Registry),
+           New_String (State, "LUA_ADA_T_OWNER"),
+           (Light_Identity_Kind, State'Address));
+      Set (State, (Table_Kind, State.Foreign_Registry),
+           New_String (State, "LUA_ADA_T_COUNT"),
+           (Foreign_Function_Kind, Address (Callback (36))));
       End_Operation (State);
    exception
       when others => End_Operation (State); raise;

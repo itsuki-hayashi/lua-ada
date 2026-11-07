@@ -46,13 +46,14 @@ Complete traceback, relevant T drivers and final shared/platform matrices;
 none of these local observations closes the full source/API ledger.
 
 
-Public T commands now have [scoped driver evidence](sessions/2026-11-08-public-api-driver.md):
-94 implemented names (not 94 passing command contracts), ten real helpers,
-nineteen native-T paired witnesses and 1,896 passing AUnit cases in both local
-configurations. The actual cross-context C call and host-stop ownership gap is
-fixed. Next implement checkpanic/shared alloccount and public loadfile/traceback
-driver routes, replay unchanged api.lua/memerr.lua, and retain unresolved private
-inspection candidates for independent review. No missing driver is an exclusion.
+Public T commands now have [panic/provider evidence](sessions/2026-11-08-panic-provider-controls.md):
+96 implemented names, actual checkpanic/pre-panic closing and inherited-provider
+byte/count controls. Both local configurations pass 1,973 AUnit cases, including
+513 refusal positions; fourteen additional witnesses match native T and the
+same C module. Continue actual borrowed Lua C views and permanent-refusal
+behavior, remaining traceback/private-driver review, unchanged api.lua/memerr.lua
+and final matrices. The api.lua fixed-buffer delta at 580 remains unreviewed;
+no missing driver or physical-shape failure is an exclusion by itself.
 
 Literal substitution has [component evidence](sessions/2026-11-08-auxiliary-substitution.md):
 sixteen native-matched C cases and three bounded policy/cleanup witnesses.

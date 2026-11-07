@@ -1,4 +1,5 @@
 with Ada.Containers;
+with Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Interfaces.C;
 with Lua.Engine; use Lua.Engine;
@@ -382,8 +383,9 @@ package body Lua.Userdata_Tests is
       Before : constant Byte_Count :=
         Statistics (State.Memory).Growth_Attempts;
    begin
-      --  Mathematical object-size overflow is a managed memory failure; it
-      --  must not request enormous storage or become an Ada range exception.
+      --  Mathematical object-size overflow is Lua's runtime "block too big"
+      --  error before allocation, distinct from refusal of a valid request.
+      --  Preserve the original guard against enormous/provider allocations.
       declare
          Unexpected : Value;
          pragma Unreferenced (Unexpected);
@@ -391,7 +393,10 @@ package body Lua.Userdata_Tests is
          Unexpected := New_Userdata (State, Byte_Count'Last);
          Assert (False, "overflowing userdata size was accepted");
       exception
-         when Allocation_Error => null;
+         when Language_Error =>
+            Assert (State.Current.Failure_Class = Language_Failure and then
+              Ada.Strings.Unbounded.To_String (State.Current.Failure_Text) =
+                "block too big", "oversized userdata lost runtime error");
       end;
       Assert (Statistics (State.Memory).Growth_Attempts = Before,
               "overflowing payload reached the allocator");

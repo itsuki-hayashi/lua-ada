@@ -2818,6 +2818,23 @@ package body Lua.Engine.Machine is
          Holder : Frame_Access := State.Current.Stack (Protected_Index);
          Caller : Frame_Access;
       begin
+         if Holder.Error_Packet.Capacity < 2 then
+            --  Public pcall already owns a nonempty argument packet before
+            --  entering its protected phase. After the failing operation has
+            --  unwound, that packet is no longer an execution input: actual
+            --  C scalar slots retain the inspectable arguments. Adopt its
+            --  existing capacity for false/error instead of allocating a
+            --  second recovery vector while the provider refuses growth.
+            --  A prior completion can have moved that buffer to Results;
+            --  either move is allocation-free and leaves the holder traced.
+            if Holder.Native_Arguments.Capacity >= 2 then
+               Move_Roots
+                 (State, Holder.Error_Packet, Holder.Native_Arguments);
+            elsif Holder.Native_Results.Capacity >= 2 then
+               Move_Roots
+                 (State, Holder.Error_Packet, Holder.Native_Results);
+            end if;
+         end if;
          if Protection /= 1 or else Holder.Error_Packet.Capacity < 2 then
             raise Program_Error with "unreserved protected failure holder";
          end if;
@@ -3398,16 +3415,25 @@ package body Lua.Engine.Machine is
             if Activation.Native_Arguments.Is_Empty then
                Fail (State, "value expected");
             end if;
-            Packet := Activation.Native_Arguments;
-            Handler := Packet (1);
-            Packet.Delete_First;
-            Activation.Error_Packet.Reserve_Capacity (2);
+            --  The activation already owns this rooted C argument packet.
+            --  Keep its function as an operation root and remove only that
+            --  first element in place. A fresh controlled copy allocated
+            --  before pcall established protection, so provider refusal
+            --  escaped the very call intended to catch it.
+            Handler := Activation.Native_Arguments.First_Element;
+            Pin (State, Handler);
+            Activation.Native_Arguments.Delete_First;
+            --  The argument packet will be empty after callee publication,
+            --  and Recover can adopt its capacity if this target fails.
+            --  Keeping that real owned reserve avoids allocating an unused
+            --  parallel error packet before protection is established.
+            Activation.Native_Arguments.Reserve_Capacity (2);
             Activation.Protection := Activation.Protection + 1;
             Activation.Native_Stage := 1;
             Stacks.Write
               (State, State.Current, Activation.Stack_Base + 1,
                (Boolean_Kind, True));
-            Dispatch (Self, Handler, Packet, 0,
+            Dispatch (Self, Handler, Activation.Native_Arguments, 0,
                       Call_Base => Activation.Stack_Base + 2,
                       Has_Call_Window => True);
             Activation.Native_Arguments.Clear;
@@ -4880,7 +4906,11 @@ package body Lua.Engine.Machine is
                --  authoritative, including debug mutations during handlers.
                Activation.Native_Arguments.Clear;
             when Canonical.Invoke_Function =>
-               Dispatch (Self, Next.Function_Value, Next.Arguments,
+               --  The source frame roots its retained argument packet until
+               --  Dispatch publishes the callee. A separate Action copy
+               --  would allocate even for a warmed zero-growth C callback.
+               Dispatch (Self, Next.Function_Value,
+                         Activation.Native_Arguments,
                          Next.Destination,
                          Call_Base => Next.Call_Base,
                          Has_Call_Window => Next.Has_Call_Window);
@@ -4893,7 +4923,10 @@ package body Lua.Engine.Machine is
                   --  than retire that slot without invoking its handler.
                   Fail (State, "canonical tail call has pending close values");
                end if;
-               Dispatch (Self, Next.Function_Value, Next.Arguments,
+               --  Dispatch owns a copy before retiring a tail/metacall
+               --  source, while ordinary calls can borrow it synchronously.
+               Dispatch (Self, Next.Function_Value,
+                         Activation.Native_Arguments,
                          Next.Destination, Tail => True,
                          Call_Base => Next.Call_Base,
                          Has_Call_Window => Next.Has_Call_Window);

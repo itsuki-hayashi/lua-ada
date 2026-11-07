@@ -18,14 +18,16 @@ Pinned `ltests.c` SHA-256:
 | `test_warning` | `ltests.c:85`, `warnf` | Per-state registry-owned userdata replaces static state; public raw global access replaces private locking/auxiliary calls; same controls, fragment bound, unconsumed `_WARN` rejection and unexpected-warning abort. |
 | `inspect` | Original Ada adapter boundary | Returns scalars from private Ada inspection before C API publication; no foreign nonlocal jump crosses the Ada inspection call. |
 | `nonblock` | `ltests.c:2154`, `nonblock` | Validate real public stream payload/metatable with exported APIs; use actual POSIX descriptor flags; report native errors. Absent on Windows, matching the pinned driver's platform guard. |
-| `conformance_api.c` command driver | `ltests.c:1496-2060`, `runC`, `testC`, `Cfunc`, `Cfunck`, `makeCfunc` | Delegate 94 command names to actual exports. Bound token/int parsing; permit registry U0 and absent U256; unsupported commands raise. Continuation contexts refer to the actual retained stack/upvalue script. Lexical implementation is not execution coverage. |
+| `conformance_api.c` command driver | `ltests.c:1496-2060`, `runC`, `testC`, `Cfunc`, `Cfunck`, `makeCfunc` | Delegate 96 command names to actual exports or the real test-provider control. Bound token/int parsing; permit registry U0 and absent U256; unsupported commands raise. Continuation contexts refer to the actual retained stack/upvalue script. Lexical implementation is not execution coverage. |
 | `set_hook`, `command_hook`, `resume_thread` | `ltests.c:2075-2144`, `Chook`, `sethookaux`, `sethook`, `coresume` | Registry-owned scripts, actual public hooks and resume; explicit event and argument checks. The error branch copies the resumed coroutine's actual error object text. |
 | Independent-state drivers | `ltests.c:1338-1399`, `newstate`, `getstate`, `loadlib`, `closestate`, `doremote` | Real seeded construction using the parent allocator; selected public library opening and repeated requiref identity assertion. Remote T exposes this public driver subset. No private C state or fabricated return values. |
 | Public API helpers | `ltests.c:1223-1324,1469-1490`, reference/upvalue/address/double/new-stack/external-string helpers | Use the real reference free list, capture cells, C addresses, host-double bytes, same-world thread calls and original external payload allocator. Replace unaligned double dereference with memcpy and reject short input before reading. |
+| Panic helper | `ltests.c:1412-1465`, `panicback`, `checkpanic` | Actual child allocator, selected C panic callback and C-owned setjmp. Protect jump-context setup before installing panic and protect parent result publication so child ownership is released on refusal. Optional panic commands use the actual child API stack. |
+| Shared allocation controls | `ltests.c:211`, `debug_realloc`; `ltests.c:949`, `alloc_count`; `ltests.c:1884`, runC alloccount | Test-only common provider measures and limits inherited raw allocations, preserving host ceiling, old-block ownership and free/shrink behavior. Registry-bound real C leaf takes a scalar count without allocating a Lua call boundary. Exact private allocation positions/type-tag accounting are not emulated. |
 
-The driver now implements 94 of the pinned runC's 98 nonempty command names.
-The remaining commands are `alloccount`, `loadfile`, `traceback` and the private
-`printstack` inspection. Unsupported commands raise an actual Lua error.
+The driver now implements 96 of the pinned runC's 98 nonempty command names.
+The remaining commands are `traceback` and the private `printstack` inspection.
+Unsupported commands raise an actual Lua error.
 No requirement is excluded merely because its driver is still missing.
 The implemented groups cover stack/index/rotation, scalar/type/conversion,
 raw/handler table operations, arithmetic/comparison/length/concatenation,
@@ -71,7 +73,7 @@ scalar results retain the pinned driver's textual transfer behavior. A resume
 source state supplies C-call depth without sharing values or registry ownership.
 New states retain the exported runtime's ordinary panic policy; the source's
 private `tpanic` test callback is not installed. The remote `T` table contains
-the eighteen public drivers/helpers listed above. It does not pretend to expose
+the nineteen public drivers/helpers listed above. It does not pretend to expose
 the Ada-specific inspection operations of a different world.
 
 A protected C call on another context uses a genuine entry drive while scalar

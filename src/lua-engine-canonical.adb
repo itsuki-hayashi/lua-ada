@@ -40,9 +40,9 @@ package body Lua.Engine.Canonical is
    function Upvalue_Cell
      (State : in out World; Activation : Frame_Access; Index : Natural)
       return Object_Access;
-   function Register_List
-     (State : in out World; Activation : Frame_Access;
-      First, Count : Natural) return Values.Vector;
+   procedure Copy_Registers
+     (State : in out World; Target : in out Values.Vector;
+      Activation : Frame_Access; First, Count : Natural);
    Unknown_Source : aliased constant String := "=?" & Character'Val (0);
    Unknown_Name : aliased constant String :=
      "(no name)" & Character'Val (0);
@@ -256,22 +256,30 @@ package body Lua.Engine.Canonical is
       Close_Cells (Activation, From);
    end Prepare_Close;
 
-   function Register_List
-     (State : in out World; Activation : Frame_Access;
-      First, Count : Natural) return Values.Vector
+   procedure Copy_Registers
+     (State : in out World; Target : in out Values.Vector;
+      Activation : Frame_Access; First, Count : Natural)
    is
-      Result : Values.Vector := Owned_Values (State);
    begin
       if First > Activation.Stack_Window_Length or else
         Count > Activation.Stack_Window_Length - First
       then
          Fail (State, "canonical register range out of bounds");
       end if;
+      --  The scalar window already roots this whole live argument/result
+      --  range. Copy directly into the activation-owned packet, preserving
+      --  its capacity across instructions and cached frame reuse. A fresh
+      --  temporary vector here allocated for every CALL, even when all real
+      --  call/stack capacity was already reserved. In particular it prevented
+      --  a warmed allocation-control callback from clearing provider refusal.
+      Target.Reserve_Capacity (Ada.Containers.Count_Type (Count));
+      Target.Clear;
       for Offset in 1 .. Count loop
-         Result.Append (Read_Register (State, Activation, First + Offset - 1));
+         Append_Root
+           (State, Target,
+            Read_Register (State, Activation, First + Offset - 1));
       end loop;
-      return Result;
-   end Register_List;
+   end Copy_Registers;
 
    procedure Store_Results
      (State : in out World; Activation : Frame_Access;
@@ -865,7 +873,6 @@ package body Lua.Engine.Canonical is
       end Require_Next;
 
       procedure Invoke_Iterator (Base, Wanted : Natural) is
-         Arguments : Values.Vector := Owned_Values (State);
       begin
          Require_Next (Op_TFORLOOP);
          if Part (State, Prototype.Code (Activation.PC), A) /= Base then
@@ -877,16 +884,15 @@ package body Lua.Engine.Canonical is
          Put (Base + 5, Reg (Base + 3));
          Put (Base + 4, Reg (Base + 1));
          Put (Base + 3, Reg (Base));
-         Arguments.Append (Reg (Base + 4));
-         Arguments.Append (Reg (Base + 5));
-         Copy_Roots (State, Activation.Native_Arguments, Arguments);
+         Copy_Registers
+           (State, Activation.Native_Arguments, Activation, Base + 4, 2);
          Activation.Native_Captures.Clear;
          Append_Root (State, Activation.Native_Captures, Reg (Base));
          Activation.Canonical_Pending := Store_Call_Results;
          Activation.Canonical_Base := Base + 3;
          Activation.Canonical_Wanted := Wanted;
          Result := (Kind => Invoke_Function,
-                    Function_Value => Reg (Base), Arguments => Arguments,
+                    Function_Value => Reg (Base),
                     Destination => Base + 4,
                     Call_Base => Activation.Stack_Base + Base + 4,
                     Has_Call_Window => True, others => <>);
@@ -1282,9 +1288,9 @@ package body Lua.Engine.Canonical is
                Activation.Canonical_Top := Reg_A + Reg_B;
             end if;
             Activation.Canonical_GC_Top := Reg_A + Count + 1;
-            Copy_Roots
+            Copy_Registers
               (State, Activation.Native_Arguments,
-               Register_List (State, Activation, Reg_A + 1, Count));
+               Activation, Reg_A + 1, Count);
             Activation.Native_Captures.Clear;
             Append_Root
               (State, Activation.Native_Captures,
@@ -1296,7 +1302,6 @@ package body Lua.Engine.Canonical is
             Result := (Kind => (if Op = Op_CALL then Invoke_Function
                                 else Tail_Invoke),
                        Function_Value => Reg (Reg_A),
-                       Arguments => Activation.Native_Arguments,
                        Destination => Reg_A + 1,
                        Call_Base => Activation.Stack_Base + Reg_A + 1,
                        Has_Call_Window => True, others => <>);
@@ -1310,9 +1315,8 @@ package body Lua.Engine.Canonical is
                       elsif Op = Op_RETURN1 then 1
                       elsif Reg_B /= 0 then Reg_B - 1
                       else Activation.Canonical_Top - Reg_A);
-            Copy_Roots
-              (State, Activation.Unwind_Results,
-               Register_List (State, Activation, Reg_A, Count));
+            Copy_Registers
+              (State, Activation.Unwind_Results, Activation, Reg_A, Count);
             --  A return hook observes the actual source register range,
             --  before result adjustment/movement to its caller. A packet's
             --  element one alone cannot recover this public stack offset.

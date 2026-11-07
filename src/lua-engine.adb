@@ -1218,6 +1218,19 @@ package body Lua.Engine is
       Item.Varargs.Set_Owner (Item.Memory);
       Item.Unwind_Results.Set_Owner (Item.Memory);
 
+      if Item.Native_Arguments.Capacity = 0 and then
+        Item.Native_Results.Capacity >= 2
+      then
+         --  A refusing protected call can adopt its argument buffer for the
+         --  false/error result. Scalar delivery then leaves that capacity in
+         --  Results. Both packets are empty now: reclaim it for the next C
+         --  call so cached metadata can clear refusal without allocating a
+         --  replacement argument vector. Moving empty storage creates no
+         --  Lua edge; explicitly rebind the emptied source for later reuse.
+         Values.Move (Item.Native_Arguments, Item.Native_Results);
+         Item.Native_Results.Set_Owner (Item.Memory);
+      end if;
+
       --  Never assign a default Frame aggregate: controlled component
       --  assignment would replace owned buffers rather than reusing them.
       --  Each pointer, value and scheduler phase is reset explicitly so an
@@ -1846,7 +1859,10 @@ package body Lua.Engine is
       --  one-byte subtype includes every fixed component and tail padding,
       --  so this conservative exact-type bound never undercounts storage.
       if Size > Lua.Storage.Byte_Count'Last - Header_Bytes - Block_Bytes then
-         raise Lua.Storage.Allocation_Error with "userdata block too large";
+         --  This is a representability error before a provider request, not
+         --  refusal of a valid allocation. The public C API exposes Lua's
+         --  ordinary "block too big" runtime error for this distinction.
+         Fail (State, "block too big");
       end if;
       Item := Allocate (State, Userdata_Object, Physical);
       Item.Userdata_Size := Size;

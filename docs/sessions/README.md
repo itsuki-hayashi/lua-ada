@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [panic and provider controls](2026-11-08-panic-provider-controls.md).
+
 Component: [shared traceback rendering](2026-11-08-shared-traceback.md).
 
 Component: [I/O and collector arguments](2026-11-08-io-collector-arguments.md).

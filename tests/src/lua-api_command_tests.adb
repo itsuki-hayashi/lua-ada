@@ -2,13 +2,29 @@ with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Conformance_Adapter;
+with Lua.Conformance_Allocator;
 with Lua.Engine; use Lua.Engine;
 with Lua.Storage;
 with Test_Support;
 
 package body Lua.API_Command_Tests is
    use type Lua.Storage.Byte_Count;
-   procedure Check (Source : String);
+   procedure Check (Source : String; Interpose : Boolean := False);
+   procedure Panic_Trivial;
+   procedure Panic_Status;
+   procedure Panic_Stack;
+   procedure Panic_Argument;
+   procedure Panic_Memory;
+   procedure Panic_Closing;
+   procedure Panic_Close_Error;
+   procedure Panic_Closing_Status;
+   procedure Panic_No_Error;
+   procedure Count_Restores_Stack;
+   procedure Child_Byte_Limit;
+   procedure Child_Count_Limit;
+   procedure Loaded_File;
+   procedure Oversized_Userdata;
+   procedure Panic_Refusal_Sweep;
    procedure Light_Upvalues;
    procedure Absent_Upvalue;
    procedure Stack_Reordering;
@@ -33,20 +49,35 @@ package body Lua.API_Command_Tests is
    procedure Coroutine_Cross_Budget;
    procedure Nested_Cross_Budget;
    procedure Budget_Check (Source : String);
-   procedure Check (Source : String) is
+   procedure Check (Source : String; Interpose : Boolean := False) is
       State : World;
+      Success : Boolean;
    begin
       Initialize (State, (others => <>));
+      if Interpose then
+         Conformance_Allocator.Attach (Lua.Storage.Reference (State.Memory));
+      end if;
       Conformance_Adapter.Install (State);
-      Assert (Execute (State, Source, "=public-api-command"),
+      Success := Execute (State, Source, "=public-api-command");
+      if Interpose then
+         Conformance_Allocator.Clear_Count_Limit;
+         Conformance_Allocator.Set_Byte_Limit (0);
+      end if;
+      Assert (Success,
               To_String (State.Current.Failure_Text));
       Finalize (State);
+      if Interpose then Conformance_Allocator.Finish; end if;
       Assert (Lua.Storage.Statistics (State.Memory).Live_Blocks = 0,
               "public command retained context, value or callback ownership");
    exception
       when others =>
+         if Interpose then
+            Conformance_Allocator.Clear_Count_Limit;
+            Conformance_Allocator.Set_Byte_Limit (0);
+         end if;
          Lua.Storage.Clear_Failures (State.Memory);
          Finalize (State);
+         if Interpose then Conformance_Allocator.Finish; end if;
          raise;
    end Check;
 
@@ -311,6 +342,151 @@ package body Lua.API_Command_Tests is
          "error('nested cross-context quota was caught')");
    end Nested_Cross_Budget;
 
+   procedure Panic_Trivial is
+   begin
+      --  An unprotected child error calls the selected real panic function.
+      --  Its C-only return jump must leave the parent runtime usable.
+      Check ("assert(T.checkpanic('pushstring hi;error')=='hi')", True);
+   end Panic_Trivial;
+
+   procedure Panic_Status is
+   begin
+      --  Reset before panic retains ERRRUN rather than normalizing the
+      --  status as the public lua_closethread operation does.
+      Check ("assert(T.checkpanic('pushstring hi;error'," &
+             "'threadstatus;return 2')=='ERRRUN')", True);
+   end Panic_Status;
+
+   procedure Panic_Stack is
+   begin
+      --  Panic owns the actual child stack and may grow/concatenate it.
+      Check ("assert(T.checkpanic('pushstring hi;error',[[checkstack 5 XX;" &
+             "pushstring ' alo';pushstring ' mundo';concat 3]])==" &
+             "'hi alo mundo')", True);
+   end Panic_Stack;
+
+   procedure Panic_Argument is
+   begin
+      --  A child host API call has no Lua function frame from which an
+      --  auxiliary error formatter could invent a function name.
+      Check ("assert(T.checkpanic('loadstring 4 name bt')==" &
+             "'bad argument #4 (string expected, got no value)')", True);
+   end Panic_Argument;
+
+   procedure Panic_Memory is
+   begin
+      --  Parent and independently constructed child inherit one provider.
+      --  The panic command restores its count before allocating its suffix.
+      Check ("local x=T.checkpanic('alloccount 0;newtable'," &
+             "'alloccount -1;pushstring XX;threadstatus;concat 2;return 1');" &
+             "T.alloccount();assert(x=='XXnot enough memory')", True);
+   end Panic_Memory;
+
+   procedure Panic_Closing is
+   begin
+      --  An actual host C to-be-closed value executes its Lua handler before
+      --  panic observes the global. The incoming error remains on the stack.
+      Check ("assert(T.checkpanic([[pushstring ""return {__close=" &
+             "function()Y='ho'end}"";newtable;loadstring -2 name t;" &
+             "call 0 1;setmetatable -2;toclose -1;pushstring hi;error]]," &
+             "'getglobal Y;concat 2')=='hiho')", True);
+   end Panic_Closing;
+
+   procedure Panic_Close_Error is
+   begin
+      --  A failing close handler replaces the incoming error before the
+      --  selected panic receives it; no old error string is substituted.
+      Check ("local x=T.checkpanic([[pushstring ""return {__close=" &
+             "function()return 1//0 end}"";newtable;loadstring -2 name t;" &
+             "call 0 1;setmetatable -2;toclose -1;pushstring hi;error]]);" &
+             "assert(x:find('divide by zero',1,true))", True);
+   end Panic_Close_Error;
+
+   procedure Panic_Closing_Status is
+   begin
+      --  A successful close walk must still report the incoming ERRRUN to
+      --  panic, rather than the reset driver's normal-completion status.
+      Check ("assert(T.checkpanic([[pushstring ""return {__close=" &
+             "function()end}"";newtable;loadstring -2 name t;call 0 1;" &
+             "setmetatable -2;toclose -1;pushstring hi;error]]," &
+             "'threadstatus;return 2')=='ERRRUN')", True);
+   end Panic_Closing_Status;
+
+   procedure Panic_No_Error is
+   begin
+      --  A successful command sequence closes its temporary universe without
+      --  calling panic, and publishes the source helper's success message.
+      Check ("assert(T.checkpanic('pushint 37')=='no errors')", True);
+   end Panic_No_Error;
+
+   procedure Count_Restores_Stack is
+   begin
+      --  Scalar count control must neither allocate a C call frame under
+      --  refusal nor replace the original command and argument slots.
+      Check ("local code='alloccount 0;pushvalue 2;alloccount -1;return 1';" &
+             "local x={};T.testC(code,x);assert(T.testC(code,x)==x)", True);
+   end Count_Restores_Stack;
+
+   procedure Child_Byte_Limit is
+   begin
+      --  Limiting only the original Storage.Owner let newstate bypass this
+      --  ceiling. The inherited real provider must refuse the child's data.
+      Check ("local st=assert(T.newstate());T.loadlib(st,129,0);" &
+             "assert(T.doremote(st,'return 1')=='1');collectgarbage();" &
+             "local before=T.totalmem();T.totalmem(before+200000);" &
+             "local ok,a,b,c=pcall(T.doremote,st," &
+             """return #string.rep('x',1000000)"");T.totalmem(0);" &
+             "T.closestate(st);assert(ok and a==nil and " &
+             "b=='not enough memory' and c==4)", True);
+   end Child_Byte_Limit;
+
+   procedure Child_Count_Limit is
+   begin
+      --  The child's C leaf controls the actual inherited provider using a
+      --  scalar owner binding, rather than reading the parent's Lua slots.
+      Check ("local st=assert(T.newstate());T.loadlib(st,1,0);" &
+             "local code=[[local ok,e=pcall(function()T.testC(" &
+             "'alloccount 0');return{}end);T.testC('alloccount -1');" &
+             "return(not ok and e=='not enough memory')and 37 or 0]];" &
+             "local ok,a,b,c=pcall(T.doremote,st,code);T.alloccount();" &
+             "T.closestate(st);assert(ok and a=='37' and b==nil and " &
+             "c==nil)", True);
+   end Child_Count_Limit;
+
+   procedure Loaded_File is
+   begin
+      --  The command delegates to the public text-mode file loader; it does
+      --  not read host files or compile source in the test driver itself.
+      Check ("local f=T.testC('loadfile 2;return 1'," &
+             "'tests/lua/public_panic_file.lua');" &
+             "assert(type(f)=='function' and f()==37)", True);
+   end Loaded_File;
+
+   procedure Oversized_Userdata is
+   begin
+      --  An unrepresentable public userdata request is a runtime error,
+      --  whereas a valid request refused by the provider is a memory error.
+      Check ("local ok,e=pcall(T.newuserdata,math.maxinteger);" &
+             "assert(not ok and e:find('block too big',1,true))", True);
+   end Oversized_Userdata;
+
+   procedure Panic_Refusal_Sweep is
+   begin
+      --  This additional first-party safety campaign refuses successive
+      --  provider growths during construction, jump-context setup and result
+      --  publication. A failed parent publication must still close its child.
+      --  Finish independently checks all inherited physical blocks at exit.
+      --  The pinned helper's unguarded setup is not a native oracle for this
+      --  stronger cleanup extension; ordinary paired cases remain separate.
+      Check ("local code='pushstring panic_fault;error';" &
+             "local panic='alloccount -1';local mem='not enough memory';" &
+             "assert(T.checkpanic(code,panic)=='panic_fault');" &
+             "for n=0,512 do T.alloccount(n);" &
+             "local ok,e=pcall(T.checkpanic,code,panic);T.alloccount();" &
+             "if not(e==mem or(ok and e=='panic_fault'))then " &
+             "error(n..':'..tostring(ok)..':'..tostring(e))end end", True);
+   end Panic_Refusal_Sweep;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "API driver: light C upvalues",
@@ -359,5 +535,35 @@ package body Lua.API_Command_Tests is
                         Coroutine_Cross_Budget'Access);
       Test_Support.Add (Suite, "API driver: nested cross-context budget",
                         Nested_Cross_Budget'Access);
+      Test_Support.Add (Suite, "Panic: actual selected callback",
+                        Panic_Trivial'Access);
+      Test_Support.Add (Suite, "Panic: retained thread status",
+                        Panic_Status'Access);
+      Test_Support.Add (Suite, "Panic: actual usable child stack",
+                        Panic_Stack'Access);
+      Test_Support.Add (Suite, "Panic: argument error without frames",
+                        Panic_Argument'Access);
+      Test_Support.Add (Suite, "Panic: shared provider memory error",
+                        Panic_Memory'Access);
+      Test_Support.Add (Suite, "Panic: closes before callback",
+                        Panic_Closing'Access);
+      Test_Support.Add (Suite, "Panic: failing closer replaces error",
+                        Panic_Close_Error'Access);
+      Test_Support.Add (Suite, "Panic: status after successful close walk",
+                        Panic_Closing_Status'Access);
+      Test_Support.Add (Suite, "Panic: no-error cleanup",
+                        Panic_No_Error'Access);
+      Test_Support.Add (Suite, "API driver: count preserves actual stack",
+                        Count_Restores_Stack'Access);
+      Test_Support.Add (Suite, "Test provider: child byte ceiling",
+                        Child_Byte_Limit'Access);
+      Test_Support.Add (Suite, "Test provider: child growth countdown",
+                        Child_Count_Limit'Access);
+      Test_Support.Add (Suite, "API driver: public file load",
+                        Loaded_File'Access);
+      Test_Support.Add (Suite, "API driver: oversized userdata diagnostic",
+                        Oversized_Userdata'Access);
+      Test_Support.Add (Suite, "Panic: provider refusal cleanup sweep",
+                        Panic_Refusal_Sweep'Access);
    end Register;
 end Lua.API_Command_Tests;

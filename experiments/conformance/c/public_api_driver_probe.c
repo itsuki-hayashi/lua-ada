@@ -9,5 +9,28 @@
 __declspec(dllexport)
 #endif
 int luaopen_public_api_driver(lua_State *L) {
-    return open_api(L);
+    int original;
+    /* Native T's genuine control C function needs no private structure or
+     * fake allocator. Preserve it before the caller replaces global T. */
+    lua_getglobal(L, "T");
+    original = lua_gettop(L);
+    if (lua_istable(L, -1)) {
+        lua_getfield(L, -1, "alloccount");
+        if (lua_iscfunction(L, -1)) {
+            lua_pushvalue(L, -1);
+            lua_setfield(L, LUA_REGISTRYINDEX, LUA_ADA_T_COUNT_KEY);
+        }
+        lua_pop(L, 1);
+    }
+    open_api(L);
+    if (lua_istable(L, original)) {
+        lua_getfield(L, original, "alloccount");
+        lua_setfield(L, -2, "alloccount");
+        lua_getfield(L, original, "totalmem");
+        lua_setfield(L, -2, "totalmem");
+        lua_getfield(L, original, "newuserdata");
+        lua_setfield(L, -2, "newuserdata");
+    }
+    lua_remove(L, original);
+    return 1;
 }

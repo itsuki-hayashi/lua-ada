@@ -52,14 +52,16 @@ directions of C/Ada binary loading. Traceback, remaining drivers and final
 shared/platform/full-target acceptance remain open.
 
 
-The [public API driver checkpoint](sessions/2026-11-08-public-api-driver.md)
-adds ordinary T command/helper delegation and real cross-context C entry.
-Default and upstream-test strict builds pass all 1,896 local AUnit cases.
-Nineteen Lua witnesses match native T, including an independently compiled
-identical C driver; three host-budget cases preserve actual guard ownership.
-Unchanged T api.lua advances from line 33 to missing checkpanic at 415;
-memerr.lua still needs that fixture at 28. Panic/refusal drivers, fresh coroutine
-function slots, remaining relevant T operations and final acceptance stay open.
+The [panic/provider checkpoint](sessions/2026-11-08-panic-provider-controls.md)
+extends the [public driver](sessions/2026-11-08-public-api-driver.md) to 96
+command names with actual panic callbacks, pre-panic closing and shared test
+refusal across independent states. Both local configurations pass 1,973 AUnit
+cases, including a 513-position refusal sweep; fourteen new Lua witnesses match
+original native T and the identical C helper module. Unchanged soft T api.lua
+reaches line 580's fixed-buffer allocation delta; memerr.lua passes initial
+panic/oversized checks but still escapes memory refusal through checkerr.
+Borrowed Lua C views, fresh coroutine function slots, remaining drivers and
+final acceptance stay open. No source obligation is excluded by this checkpoint.
 
 The [literal substitution checkpoint](sessions/2026-11-08-auxiliary-substitution.md)
 completes two more public auxiliary exports through owned buffers. Sixteen

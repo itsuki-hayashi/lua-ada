@@ -73,3 +73,6 @@ returned-string identity and selected-owner default rendering.
 
 ADR 0033 records [shared traceback rendering](0033-shared-traceback-rendering.md),
 destination-owned builders and metered borrowed-frame traversal.
+
+ADR 0032 records [panic and test-provider controls](0032-panic-and-test-provider-controls.md),
+real pre-panic closing and shared refusal across independently owned states.

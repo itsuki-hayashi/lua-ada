@@ -30,6 +30,8 @@ struct lua_ada_guard {
     struct lua_ada_callback_identity callback_token;
 };
 
+static int prepare_panic(lua_State *, int, struct lua_ada_response *);
+
 size_t lua_ada_surface_size(void) { return sizeof(lua_State); }
 size_t lua_ada_request_size(void) { return sizeof(struct lua_ada_request); }
 size_t lua_ada_response_size(void) { return sizeof(struct lua_ada_response); }
@@ -65,6 +67,7 @@ static struct lua_ada_request request(enum lua_ada_operation operation) {
 
 static void raise_action(lua_State *state, int status,
                          const struct lua_ada_response *output) {
+    struct lua_ada_response prepared;
     /* This function is reached only after ada_lua_dispatch has returned.
      * Its checkpoint belongs to C; no abandoned Ada activation is retained. */
     if (status == LUA_OK) return;
@@ -89,6 +92,25 @@ static void raise_action(lua_State *state, int status,
         longjmp(state->guard->target, status);
     }
     if (status != ADA_ACTION_ABORT) {
+        if (state != NULL &&
+            (status == ADA_ACTION_RAISE || status == ADA_ACTION_MEMORY ||
+             status == ADA_ACTION_HANDLING)) {
+            /* Unprotected errors close their actual thread before panic.
+             * The close walk itself is iterative Ada work; every requested
+             * C closer runs only after that dispatch has returned. */
+            status = prepare_panic(state, status, &prepared);
+            output = &prepared;
+            if (status == ADA_ACTION_ABORT)
+                raise_action(state, status, output);
+            if (state != state->main && state->main->guard != NULL) {
+                /* Native luaD_throw retains the failed child error and
+                 * copies it to an existing main-thread handler. Both guards
+                 * here are actual live C checkpoints, never saved Ada. */
+                lua_pushvalue(state, -1);
+                lua_xmove(state, state->main, 1);
+                raise_action(state->main, status, output);
+            }
+        }
         if (state != NULL && state->main->panic != NULL)
             state->main->panic(state);
         /* A returning (or absent) panic handler completes the public policy.
@@ -300,6 +322,16 @@ static int pump_callbacks(int action, struct lua_ada_response *pending) {
     }
     *pending = output;
     return action;
+}
+
+static int prepare_panic(lua_State *state, int status,
+                          struct lua_ada_response *output) {
+    struct lua_ada_request input = request(ADA_PREPARE_PANIC);
+    int action;
+    input.index = status;
+    action = dispatch_raw(state, &input, output);
+    action = pump_callbacks(action, output);
+    return action == ADA_ACTION_DONE ? (int)output->integer_data : action;
 }
 
 static int drive_call(lua_State *state, int arguments, int results,
