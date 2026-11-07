@@ -25,7 +25,8 @@ project Consumer is
       "conversion_api_contract.c", "operator_api_contract.c",
       "index_type_api_contract.c", "base_closing_api_contract.c",
       "native_module_contract.c", "buffer_api_contract.c",
-      "close_yield_contract.c", "allocator_api_contract.c");
+      "close_yield_contract.c", "allocator_api_contract.c",
+      "substitution_api_contract.c");
    for Object_Dir use
      "../build/c-api/consumer/" & Lua_Ada.Configuration_Subdir &
        Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
@@ -41,7 +42,8 @@ project Consumer is
       "conversion_api_contract.c", "operator_api_contract.c",
       "index_type_api_contract.c", "base_closing_api_contract.c",
       "native_module_contract.c", "buffer_api_contract.c",
-      "close_yield_contract.c", "allocator_api_contract.c");
+      "close_yield_contract.c", "allocator_api_contract.c",
+      "substitution_api_contract.c");
    for Create_Missing_Dirs use "True";
 
    package Compiler is

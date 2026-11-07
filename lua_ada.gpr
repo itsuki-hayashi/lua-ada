@@ -104,6 +104,7 @@ library project Lua_Ada is
       "lua_ada_auxiliary.c",
       "lua_ada_buffer.c",
       "lua_ada_allocator.c",
+      "lua_ada_substitution.c",
       "lua_ada_modules.c",
       "lua_ada_host_numerics.c",
       "lua_ada_streams.c",

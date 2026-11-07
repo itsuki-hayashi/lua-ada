@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Literal substitution has [component evidence](sessions/2026-11-08-auxiliary-substitution.md):
+sixteen native-matched C cases and three bounded policy/cleanup witnesses.
+Complete public file/traceback helpers and final instrumented/shared/platform
+replay; these observations do not resolve the full source/API ledger.
+
+
 Public allocator/seed now have [component evidence](sessions/2026-11-08-public-auxiliary-allocator.md),
 including default-constructor identity, inert seed behavior and thirteen
 native-matched C cases. Finish file/traceback/substitution helpers and the

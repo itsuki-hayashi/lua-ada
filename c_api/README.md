@@ -11,6 +11,13 @@ The installable headers under include/api are unchanged pinned copies with
 per-file hashes and retained notices; production include paths do not enter
 the reference-only tree.
 
+The [literal auxiliary substitution checkpoint](../docs/sessions/2026-11-08-auxiliary-substitution.md)
+provides literal nonoverlapping substitution through the owned buffer API,
+with metered foreign scans/comparisons and public stack/result lifetimes.
+Sixteen native-matched C cases and three bounded-work cleanup cases have
+local evidence; complete C API and full-target acceptance remain open.
+
+
 The [public allocator checkpoint](../docs/sessions/2026-11-08-public-auxiliary-allocator.md)
 exports the standard realloc/free callback and host seed function. The C
 auxiliary constructor uses their actual public identities and installs the

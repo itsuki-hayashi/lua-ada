@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [literal substitution checkpoint](sessions/2026-11-08-auxiliary-substitution.md)
+completes two more public auxiliary exports through owned buffers. Sixteen
+C cases match native default/T; all 1,858 combined local AUnit cases pass,
+including three bounded-work/cleanup witnesses. File/traceback helpers and
+full-target instrumented/platform acceptance remain open.
+
+
 The [auxiliary allocator checkpoint](sessions/2026-11-08-public-auxiliary-allocator.md)
 completes the public allocator/seed and default-constructor identity locally.
 Thirteen shared-source cases match native default/T; 1,822 AUnit and eighteen

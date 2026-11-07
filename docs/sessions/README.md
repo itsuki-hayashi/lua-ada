@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [literal auxiliary substitution](2026-11-08-auxiliary-substitution.md).
+
 Component: [public auxiliary allocator](2026-11-08-public-auxiliary-allocator.md).
 
 Current: [remaining upstream compatibility](2026-11-07-remaining-upstream-compatibility.md).
