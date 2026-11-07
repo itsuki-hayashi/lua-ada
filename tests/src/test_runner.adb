@@ -4,6 +4,7 @@ with Lua.Foreign_Hook_Tests;
 with Lua.Foreign_Continuation_Tests;
 with Lua.Math_Reopen_Tests;
 with Lua.Library_Opener_Tests;
+with Lua.Condition_Root_Tests;
 with Ada.Command_Line;
 with AUnit.Reporter.Text;
 with AUnit.Run;
@@ -97,6 +98,7 @@ procedure Test_Runner is
       Lua.Foreign_Continuation_Tests.Register (Result);
       Lua.Math_Reopen_Tests.Register (Result);
       Lua.Library_Opener_Tests.Register (Result);
+      Lua.Condition_Root_Tests.Register (Result);
       Lua.Physical_Stack_Tests.Register (Result);
       Lua.GC_Control_Tests.Register (Result);
       Lua.Root_Packet_Tests.Register (Result);

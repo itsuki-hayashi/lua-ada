@@ -158,7 +158,7 @@ The complete upstream-test pipeline and clean 26-context candidate remain next.
 ## Evidence freeze corrections
 
 Candidate f6b96b0 starts workflow 42341677097. Its first Linux and macOS logs
-pass strict builds, 1,380 AUnit cases and the retained preceding pipeline, then
+pass strict builds, all registered AUnit cases and the retained pipeline, then
 reject stale review hashes before expanded execution. Six locally authored
 review JSON files used Windows line endings while Git published LF bytes.
 Normalize the review artifacts before hashing and cascade all bound identities;
@@ -189,3 +189,35 @@ review-binding, 18 native-mapping and ten bundle-collector regressions, plus
 the retained suites. Fourteen actual Windows default/T warning captures pass
 the shared exact-byte verifier. Foreign-platform verifier fixtures remain
 synthetic until the replacement CI campaign executes them.
+
+## Consumed condition root repair
+
+Clean a1ffa07 runs the complete Windows upstream-test validation/static
+pipeline successfully in instrumented-full-check-2.log, including all 13
+primary files, both constructs templates, the helper and matched native
+GC/IO/foreign consumers. Linux and Windows default/shared/T jobs also pass.
+Their pre-repair AUnit totals differ by applicable platform cases: Windows
+1,380, Linux 1,375 and macOS 1,378. Those totals are not skipped test cases.
+
+Workflow 42342542403 finds a real macOS failure: Ada closure.lua times out
+after 900 seconds before its first plus marker while unchanged C passes.
+The killed process has no shutdown sidecar; the missing file is a secondary
+capture error, not the initial failure. This candidate cannot be accepted.
+
+Independent native/owned-bytecode inspection locates the weak-table loop at
+closure.lua:39-42. Its consumed guard stays in register R5 while inner string
+concatenations allocate in higher registers. Repeated root snapshots can mark
+that dead value indefinitely; allocation layout and GC phase determine whether
+the bug appears. A bounded explicit-collection reproduction fails on old Ada
+and passes on native C, without depending on automatic collection cadence.
+
+The compiler now retires only the temporary on truthy if/while/repeat edges,
+before body evaluation or closing callbacks. Lexical/captured values, closing
+locals and and/or operand values remain live. Five separately named AUnit and
+native-matched Lua regressions cover consumed while, if and repeat guards,
+repeat closing, and short-circuit result retention. Independent review is
+expanded-condition-roots.cross-review.json. Both strict Windows builds and
+all 1,385 AUnit cases pass in both configurations; unchanged closure.lua and
+coroutine.lua with T pass again, along with all seven focused T API phases.
+Fresh macOS execution and the entire corrected 26-context matrix remain
+required. The 900-second/2 GiB primary policy is unchanged.

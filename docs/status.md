@@ -19,6 +19,12 @@ and final-revision acceptance remain pending.
 The full local default/validation/static pipeline also passes all 13 primary
 files, both constructs templates and retained consumer/CLI/binary checks.
 
+The clean first cross-platform candidate exposed a macOS closure.lua timeout
+caused by a dead condition temporary remaining a GC root. The reviewed compiler
+repair and five native-matched regressions pass all 1,385 Windows AUnit cases
+in both configurations, unchanged closure.lua, and coroutine.lua with T.
+Corrected cross-platform execution and final scope adjudication remain pending.
+
 ## Four-file conformance follow-up (2026-11-07)
 
 [PR #9](https://github.com/itsuki-hayashi/lua-ada/pull/9) covers

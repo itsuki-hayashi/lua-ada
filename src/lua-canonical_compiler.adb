@@ -208,6 +208,24 @@ package body Lua.Canonical_Compiler is
                Fn.Last_Line := Site.Line;
                Fn.Code.Code.Append (Instruction);
             end Put;
+            procedure Retire_Condition
+              (Fn : in out Function_State; Register_Id : Natural);
+            procedure Retire_Condition
+              (Fn : in out Function_State; Register_Id : Natural) is
+            begin
+               --  Statement conditions consume a private temporary. Their
+               --  truthy edge must retire its value before evaluating the
+               --  body or running close handlers: a later RHS can allocate
+               --  in higher registers before overwriting this lower slot.
+               --  Keeping a weakly reachable condition there can mark it
+               --  again on every collection, preventing loop termination.
+               --  Local/captured cells remain below Base. TEST itself keeps
+               --  its ordinary value semantics for and/or expressions.
+               if Register_Id < Fn.Base then
+                  raise Program_Error with "condition is not a temporary";
+               end if;
+               Put (Fn, ABC (Op_LOADNIL, Register_Id));
+            end Retire_Condition;
             function Jump (Fn : in out Function_State) return Positive;
             function Jump (Fn : in out Function_State) return Positive is
                Index : constant Positive := PC (Fn);
@@ -1105,6 +1123,7 @@ package body Lua.Canonical_Compiler is
                         Expression (Fn, Item.Children (Index), Left);
                         Put (Fn, ABC (Op_TEST, Left));
                         Branch := Jump (Fn);
+                        Retire_Condition (Fn, Left);
                         Fn.Next := Fn.Base;
                         Block (Fn, Item.Children (Index + 1));
                         Finishes.Append (Jump (Fn));
@@ -1123,6 +1142,7 @@ package body Lua.Canonical_Compiler is
                      Expression (Fn, Item.Children (1), Left);
                      Put (Fn, ABC (Op_TEST, Left));
                      Branch := Jump (Fn);
+                     Retire_Condition (Fn, Left);
                      Fn.Next := Fn.Base;
                      Begin_Loop (Fn, Base);
                      Block (Fn, Item.Children (2));
@@ -1139,6 +1159,7 @@ package body Lua.Canonical_Compiler is
                      Expression (Fn, Item.Children (2), Left);
                      Put (Fn, ABC (Op_TEST, Left));
                      Branch := Jump (Fn);
+                     Retire_Condition (Fn, Left);
                      if Fn.Base > Base then
                         Put (Fn, ABC (Op_CLOSE, Base));
                      end if;
