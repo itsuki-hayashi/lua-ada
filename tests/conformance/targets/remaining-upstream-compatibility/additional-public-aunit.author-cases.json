@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "additional-target-aunit-author-cases",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "entries": [
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-formatter_tests.adb#Shared_Work_Quota",
+      "registered_label": "C formatter: foreign scanning shares bounded work quota",
+      "required_stdout_line": "OK C formatter: foreign scanning shares bounded work quota",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-formatter_tests.adb#String_Extent_Quota",
+      "registered_label": "C formatter: output obeys bounded string extent quota",
+      "required_stdout_line": "OK C formatter: output obeys bounded string extent quota",
+      "execution_evidence": []
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: positive even decimal tie",
+      "required_stdout_line": "OK scalar text: positive even decimal tie",
+      "case": "tests/src/lua-scalar_text_tests.adb#Positive_Even_Tie",
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: negative even decimal tie",
+      "required_stdout_line": "OK scalar text: negative even decimal tie",
+      "case": "tests/src/lua-scalar_text_tests.adb#Negative_Even_Tie",
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: large even decimal tie",
+      "required_stdout_line": "OK scalar text: large even decimal tie",
+      "case": "tests/src/lua-scalar_text_tests.adb#Large_Even_Tie",
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: fifteen digit subnormal",
+      "required_stdout_line": "OK scalar text: fifteen digit subnormal",
+      "case": "tests/src/lua-scalar_text_tests.adb#Subnormal_Fifteen_Digits",
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: maximum finite retry",
+      "required_stdout_line": "OK scalar text: maximum finite retry",
+      "case": "tests/src/lua-scalar_text_tests.adb#Maximum_Finite",
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: negative real zero",
+      "required_stdout_line": "OK scalar text: negative real zero",
+      "case": "tests/src/lua-scalar_text_tests.adb#Negative_Zero",
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "C auxiliary: option prefix scanning shares host quota",
+      "required_stdout_line": "OK C auxiliary: option prefix scanning shares host quota",
+      "case": "tests/src/lua-formatter_tests.adb#Option_Prefix_Quota",
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "C auxiliary: default length scanning shares host quota",
+      "required_stdout_line": "OK C auxiliary: default length scanning shares host quota",
+      "case": "tests/src/lua-formatter_tests.adb#Default_Length_Quota",
+      "runtime_acceptance": false
+    }
+  ]
+}

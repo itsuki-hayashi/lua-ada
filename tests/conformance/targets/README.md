@@ -145,8 +145,8 @@ and compares the actual generated artifact and execution-contract identity.
 Native-platform acceptance additionally needs current original-C applicability
 observations for every changed invariant. A narrative alone or an Ada-only
 failure cannot establish a platform exception. Aggregate transformation bundles
-remain an explicit pending facility; selecting an aggregate affected by T
-exclusions cannot silently run its original private checks or hide them.
+use the separately reviewed reconstruction described below; an affected
+aggregate cannot silently run its original private checks or hide exclusions.
 
 ## Explicit execution producer
 
@@ -330,8 +330,14 @@ checks do not execute the original upstream files or establish Ada conformance.
 The successor witness producer also emits `global-api.author-proposal.json` for
 all 473 global header inventory entries. It preserves the 159 retained semantic
 routes and original 100 C/94 AUnit identities, and leaves every classification
-pending for fresh independent review. The other 314 entries have empty routes;
-the producer does not guess that a macro is a function call or that compilation
+pending for fresh independent review. Explicit additional source proposals add
+32 routes for the 31 value/auxiliary exports and the actually invoked
+`luaL_checkversion` macro. Their `proposed_classification` and
+`proposed_context_witnesses` are future evidence obligations; they do not carry
+an observed disposition, accepted review or execution evidence. The remaining
+282 unretained entries still have empty routes. The producer rejects invented
+named cases, passing metadata and runtime routes for declaration-only entries;
+it does not guess that a macro is a function call or that compilation
 of a declaration checks runtime behavior. Appropriate compiled ABI, layout or
 header witnesses are required for types/constants/declaration-only entries,
 with measured configuration evidence for conditional declarations. Current
@@ -362,14 +368,25 @@ acceptance on a changed runtime tree. The historical default commands retain
 their prior behavior. `-TargetDevelopmentObservation` permits author-only
 source mappings for diagnostic collection; it does not authorize acceptance.
 
-Target builds include the independently authored formatter consumer (four
-named C cases) and two formatter AUnit cases. They compare the same C source
+Target builds include independently authored formatter, value and auxiliary
+consumers (4, 7 and 76 named C cases respectively) and 10 additional AUnit
+names: two formatter quotas, six scalar-text boundaries and two auxiliary
+quotas. They compare the same C source
 against the Ada SAL and the separate pinned C library, bind the actual source
 files and library images, and keep the original 100/94 witness identities and
-protocols. The staged successor proposals therefore contain 104 C and 96 AUnit
+protocols. The staged successor proposals therefore contain 187 C and 104 AUnit
 names. These are mapping proposals, not executed-case counts. The retained
 API projection's separately added foreign-hook-13 memory-status route is
 preserved alongside its older consumer-catalogue routes in the new successor.
+The auxiliary oracle uses the same Linux/macOS platform defines as the root
+and Ada consumer projects, so its wait-status assertions check the actual
+platform branch. Value text requires all 15 indexed records in order, the
+source-bound 20,000-value seeded fingerprint and identical same-host C/Ada
+bytes. The Windows sample in the author packet records its measured exact
+lines and `90eb8de147d180eb` fingerprint without imposing a portable NaN spelling
+or establishing any matrix observation. `-AdditionalApiRoutes` only adds
+pending source-linked routes; final classification and every actual context
+remain independent review and execution obligations.
 
 `TargetWitnessPolicy.psm1` validates all 473 original declarations separately
 from the old 159-route projection. Accepted policies require an independent

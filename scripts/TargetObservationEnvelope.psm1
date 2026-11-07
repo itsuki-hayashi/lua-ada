@@ -161,7 +161,9 @@ function Assert-TargetBuildRuntimeBindings {
         }
     }
     $kinds=@('gc','io','foreign')
-    if($ConsumerReport.Contains('format_contract') -and $null -ne $ConsumerReport.format_contract){$kinds+='format'}
+    foreach($kind in @('format','value','auxiliary','load_dump','debug','builtin','external','conversion')){
+        if($ConsumerReport.Contains("${kind}_contract") -and $null -ne $ConsumerReport["${kind}_contract"]){$kinds+=$kind}
+    }
     foreach($kind in $kinds){
         foreach($library in $ConsumerReport["${kind}_contract"].reference_library_files){
             $path=$Image.paths.c_runtime+'/'+$library.file

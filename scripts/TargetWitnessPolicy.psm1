@@ -278,16 +278,17 @@ function Test-TargetNamedContextEvidence {
             (Get-FileHash -LiteralPath $actual).Hash.ToLowerInvariant() -cne $hash) { throw 'Target named capture path or hash differs' }
         return $actual
     }
-    $requiresFormat=@($Policy.consumer.cases|Where-Object consumer -CEQ 'format-api').Count -gt 0
-    if($requiresFormat){
-        foreach($name in @('c_api/tests/format_api_contract.c','c_api/tests/consumer_allocator.h')){
-            $source=@($consumer.format_contract.sources|Where-Object file -CEQ $name)
-            if($source.Count -ne 1){throw 'Target formatter oracle source binding is missing or duplicated'}
+    $additional=@()
+    foreach($kind in @('format','value','auxiliary')){if(@($Policy.consumer.cases|Where-Object consumer -CEQ "$kind-api").Count -gt 0){
+        $additional+=$kind
+        foreach($name in @("c_api/tests/${kind}_api_contract.c",'c_api/tests/consumer_allocator.h')){
+            $source=@($consumer["${kind}_contract"].sources|Where-Object file -CEQ $name)
+            if($source.Count -ne 1){throw 'Target additional oracle source binding is missing or duplicated'}
             [void](Resolve-ReviewedFile -Root $Root -Path $name -Sha256 $source[0].sha256)
         }
-    }
+    }}
     $c = Test-NamedConsumerEvidence -Report $consumer -Mapping $Policy.consumer -Revision $Revision -Context $Context `
-        -ResolveCapture $resolve -RequireForeignContract -RequireFormatContract:$requiresFormat
+        -ResolveCapture $resolve -RequireForeignContract -AdditionalContracts $additional
     $activeArtifactRoot = $AUnitArtifactRoot
     $a = Test-NamedAUnitEvidence -Report $unit -Mapping $Policy.aunit -Revision $Revision -Context $Context -ResolveCapture $resolve
     foreach ($library in $unit.library_files) {

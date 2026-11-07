@@ -35,11 +35,11 @@ $resolve = {param($path,$expected)
     return $path
 }
 $count = 0
-function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected,[switch]$Foreign,[switch]$Format) {
+function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected,[switch]$Foreign,[switch]$Format,[string[]]$Additional=@()) {
     $report = $baseline | ConvertTo-Json -Depth 16 | ConvertFrom-Json -AsHashtable
     & $Mutation $report
     $failure = $null
-    try { $null = Test-NamedConsumerEvidence $report $mapping $revision $context $resolve -RequireForeignContract:$Foreign -RequireFormatContract:$Format }
+    try { $null = Test-NamedConsumerEvidence $report $mapping $revision $context $resolve -RequireForeignContract:$Foreign -RequireFormatContract:$Format -AdditionalContracts $Additional }
     catch { $failure = $_.Exception.Message }
     if (($Expected -eq '' -and $null -ne $failure) -or
         ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))) {
@@ -142,4 +142,39 @@ Run-Case 'target formatter completion alone is not its named case evidence' {par
     Replace-Capture $r format-api stdout "PASS: public formatting contract`n"
     Replace-Capture $r format-oracle stdout "PASS: public formatting contract`n"
 } 'witness missing' -Foreign -Format
+foreach($kind in @('value','auxiliary')){
+    $completion=if($kind -ceq 'value'){'PASS: public value operation contract'}else{'PASS: public auxiliary contract'}
+    $mapping.cases+=@{source="$kind.c";case_id="$kind-case";source_sha256=$hash;consumer="$kind-api";
+        expected_count=1;exact_witnesses=@("$kind actual case");pattern_witness=$null}
+    $baseline.consumer_sources+=@{file="$kind.c";sha256=$hash}
+    $baseline["${kind}_contract"]=@{matching_output=$true;reference_library_files=@(@{sha256=$hash})}
+    foreach($name in @("$kind-api","$kind-oracle")){
+        $record=$records[0].Clone();$record.name=$name;$out=Join-Path $directory "$name.stdout"
+        $numbers=if($kind -ceq 'value'){"value-number-0: native spelling`nvalue-number-1: another native spelling`n"}else{''}
+        [IO.File]::WriteAllText($out,($numbers+"$kind actual case`n$completion`n"))
+        $record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$baseline.consumers+=$record
+    }
+}
+$valueCase=@($mapping.cases|Where-Object consumer -CEQ value-api)[0]
+$valueCase.ordered_witness_patterns=@('^value-number-0: [^\r\n]+\r?$','^value-number-1: [^\r\n]+\r?$','^value actual case\r?$')
+Run-Case 'target value and auxiliary cases require identical actual native counterpart captures' {} '' -Foreign -Format -Additional value,auxiliary
+Run-Case 'target auxiliary cannot lose its C oracle' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE auxiliary-oracle)
+} 'missing/duplicate' -Foreign -Format -Additional value,auxiliary
+Run-Case 'target value cannot replace a seeded result with another native result' {param($r)
+    Replace-Capture $r value-oracle stdout "changed native value`nPASS: public value operation contract`n"
+} 'oracle bytes differ' -Foreign -Format -Additional value,auxiliary
+Run-Case 'target auxiliary case assertions cannot disappear behind matching completion lines' {param($r)
+    Replace-Capture $r auxiliary-api stdout "PASS: public auxiliary contract`n"
+    Replace-Capture $r auxiliary-oracle stdout "PASS: public auxiliary contract`n"
+} 'witness missing' -Foreign -Format -Additional value,auxiliary
+Run-Case 'target indexed number records cannot be omitted behind equal case markers' {param($r)
+    foreach($name in @('value-api','value-oracle')){Replace-Capture $r $name stdout "value-number-0: native spelling`nvalue actual case`nPASS: public value operation contract`n"}
+} 'ordered witness' -Foreign -Format -Additional value,auxiliary
+Run-Case 'target indexed number records cannot be duplicated in both equal outputs' {param($r)
+    foreach($name in @('value-api','value-oracle')){Replace-Capture $r $name stdout "value-number-0: native spelling`nvalue-number-0: native spelling`nvalue-number-1: another native spelling`nvalue actual case`nPASS: public value operation contract`n"}
+} 'ordered witness' -Foreign -Format -Additional value,auxiliary
+Run-Case 'target indexed number records retain their source order in both equal outputs' {param($r)
+    foreach($name in @('value-api','value-oracle')){Replace-Capture $r $name stdout "value-number-1: another native spelling`nvalue-number-0: native spelling`nvalue actual case`nPASS: public value operation contract`n"}
+} 'ordered witness' -Foreign -Format -Additional value,auxiliary
 Write-Output "PASS: $count named consumer evidence regressions; synthetic observations only"

@@ -38,7 +38,12 @@ if ($WitnessPolicy -eq '') {
     if ($DevelopmentObservation) {
         $proposals = Join-Path $buildDirectory 'author-proposals'
         $proposalArguments=@{OutputDirectory=$proposals}
-        if(Test-Path -LiteralPath (Join-Path $root 'c_api/tests/format_api_contract.c')){
+        if((Test-Path -LiteralPath (Join-Path $root 'c_api/tests/value_api_contract.c')) -and
+            (Test-Path -LiteralPath (Join-Path $root 'c_api/tests/auxiliary_api_contract.c'))){
+            $proposalArguments.AdditionalConsumerCases='tests/conformance/targets/remaining-upstream-compatibility/additional-public-consumer.author-cases.json'
+            $proposalArguments.AdditionalAUnitCases='tests/conformance/targets/remaining-upstream-compatibility/additional-public-aunit.author-cases.json'
+            $proposalArguments.AdditionalApiRoutes='tests/conformance/targets/remaining-upstream-compatibility/additional-public-api.author-routes.json'
+        }elseif(Test-Path -LiteralPath (Join-Path $root 'c_api/tests/format_api_contract.c')){
             $proposalArguments.AdditionalConsumerCases='tests/conformance/targets/remaining-upstream-compatibility/formatter-consumer.author-cases.json'
             $proposalArguments.AdditionalAUnitCases='tests/conformance/targets/remaining-upstream-compatibility/formatter-aunit.author-cases.json'
         }

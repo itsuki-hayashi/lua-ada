@@ -2,7 +2,8 @@ param(
     [string] $SourceRoot = '',
     [string] $OutputDirectory = '',
     [string] $AdditionalConsumerCases = '',
-    [string] $AdditionalAUnitCases = ''
+    [string] $AdditionalAUnitCases = '',
+    [string] $AdditionalApiRoutes = ''
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -71,9 +72,11 @@ if ($AdditionalConsumerCases -ne '') {
     foreach ($case in $additional.cases) {
         $key = $case.source + '#' + $case.case_id
         if (@($consumer.cases | Where-Object { ($_.source + '#' + $_.case_id) -ceq $key }).Count -ne 0 -or
-            $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api') -or
+            $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api','value-api','auxiliary-api') -or
             $case.source -cnotmatch '^(?:c_api/tests/[a-zA-Z0-9_-]+\.(?:c|h)|tests/c/[a-zA-Z0-9_-]+\.c)$' -or
-            @($case.exact_witnesses).Count -eq 0 -or $case.expected_count -ne 1) { throw 'Invalid or duplicate additional consumer witness proposal' }
+            (@($case.exact_witnesses).Count -eq 0 -and ($null -eq $case.pattern_witness -or
+                -not $case.pattern_witness.StartsWith('^') -or -not $case.pattern_witness.EndsWith('$'))) -or
+            $case.expected_count -ne 1) { throw 'Invalid or duplicate additional consumer witness proposal' }
         $case.source_sha256 = Source-Hash $case.source
         $case['runtime_acceptance'] = $false; $case['execution_evidence'] = @(); $case['independent_review_status'] = 'pending'
         $consumer.cases += $case
@@ -151,6 +154,44 @@ $api = [ordered]@{schema_version=1;kind='remaining-upstream-global-api-author-pr
         'Conditional declarations require independently reviewed original-source applicability and measured compiled-configuration witnesses.',
         'Preserve all 159 retained API routes and original 100 C/94 AUnit witness identities and protocols.',
         'No passed ledger status, token mention, registration or author proposal alone establishes execution or acceptance.')}
+if($AdditionalApiRoutes -ne ''){
+    $routes=Get-Content -LiteralPath $AdditionalApiRoutes -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    $seenRoutes=@{};$knownC=@{};$knownUnit=@{}
+    foreach($case in $consumer.cases){$knownC[$case.source+'#'+$case.case_id]=$true}
+    foreach($case in $unit.entries){$knownUnit[$case.case]=$true}
+    $suite=Get-Content (Join-Path $root 'tests/conformance/suite.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    foreach($route in $routes.entries){
+        $entry=@($api.entries|Where-Object id -CEQ $route.id)
+        if($entry.Count -ne 1 -or $seenRoutes.ContainsKey($route.id) -or $route.review_status -cne 'pending' -or
+            $route.runtime_acceptance -isnot [bool] -or $route.runtime_acceptance -or
+            $route.coverage_authority -isnot [bool] -or $route.coverage_authority -or @($route.execution_evidence).Count -ne 0 -or
+            $route.proposed_classification -cne 'runtime-behavior' -or
+            [string]::IsNullOrWhiteSpace([string]$route.invariant) -or [string]::IsNullOrWhiteSpace([string]$route.boundaries) -or
+            $route.named_c_cases -isnot [Array] -or $route.named_aunit_cases -isnot [Array] -or
+            (@($route.named_c_cases).Count+@($route.named_aunit_cases).Count) -eq 0){
+            throw 'Additional API routes require distinct pending actual named behavioral witnesses'
+        }
+        $entry=$entry[0];$seenRoutes[$route.id]=$true
+        if($entry.kind -cne 'function' -and ($entry.kind -cne 'macro' -or
+            $entry.declaration -cnotmatch ('^#define\s+'+[regex]::Escape($entry.name)+'\('))){
+            throw 'Declaration-only entries cannot acquire invented runtime route proposals'
+        }
+        foreach($case in $route.named_c_cases){if(-not $knownC.ContainsKey($case)){throw 'Additional API route names an unknown actual C witness'}}
+        foreach($case in $route.named_aunit_cases){if(-not $knownUnit.ContainsKey($case)){throw 'Additional API route names an unknown actual AUnit witness'}}
+        if(-not $entry.retained_route){$entry.invariant=$route.invariant;$entry.boundaries=$route.boundaries}
+        $entry['proposed_classification']=$route.proposed_classification
+        $entry['proposed_invariant']=$route.invariant;$entry['proposed_boundaries']=$route.boundaries
+        $entry.named_c_cases=@((@($entry.named_c_cases)+@($route.named_c_cases))|Sort-Object -Unique)
+        $entry.named_aunit_cases=@((@($entry.named_aunit_cases)+@($route.named_aunit_cases))|Sort-Object -Unique)
+        # These are required future evidence routes, not observations. Keep
+        # the actual semantic classification/review pending and avoid the
+        # final schema's runtime-observed disposition until independent review.
+        $entry['proposed_context_witnesses']=@(foreach($context in $suite.acceptance_contexts){
+            @{context=$context;required_disposition='runtime-observed';named_c_cases=@($route.named_c_cases);
+                named_aunit_cases=@($route.named_aunit_cases);compiled_witnesses=@();review_status='pending';runtime_acceptance=$false}
+        })
+    }
+}
 $consumerIdentity = Save-Proposal 'consumer-witness.author-proposal.json' $consumer
 $unitIdentity = Save-Proposal 'aunit-witness.author-proposal.json' $unit
 $apiIdentity = Save-Proposal 'global-api.author-proposal.json' $api

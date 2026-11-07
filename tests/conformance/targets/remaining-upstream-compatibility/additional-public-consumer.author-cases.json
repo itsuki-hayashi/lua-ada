@@ -1,0 +1,1268 @@
+{
+  "schema_version": 1,
+  "kind": "additional-target-consumer-author-cases",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "cases": [
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-1: scalar, counted binary and extended UTF-8 results"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "scalars"
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-2: native platform pointer rendering"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "pointers"
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-3: actual growth refusal sweep and recovery"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "allocation_sweep"
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-4: protected callback memory error class"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "error_class"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "value-api-1: length primitives, handler operands and errors"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "lengths",
+      "expected_count": 1,
+      "consumer": "value-api",
+      "source": "c_api/tests/value_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "value-api-2: concatenation count, right fold and retained roots"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "concatenation",
+      "expected_count": 1,
+      "consumer": "value-api",
+      "source": "c_api/tests/value_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "value-api-3: C operations retain nonyieldable handler barriers"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "yield_barriers",
+      "expected_count": 1,
+      "consumer": "value-api",
+      "source": "c_api/tests/value_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "value-api-4: handler sees the actual public C caller"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "caller_windows",
+      "expected_count": 1,
+      "consumer": "value-api",
+      "source": "c_api/tests/value_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "value-api-5: number spelling, type preservation and invalid slots"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "number_text",
+      "expected_count": 1,
+      "consumer": "value-api",
+      "source": "c_api/tests/value_api_contract.c",
+      "ordered_witness_patterns": [
+        "^value-number-0: [^\\r\\n]+\\r?$",
+        "^value-number-1: [^\\r\\n]+\\r?$",
+        "^value-number-2: [^\\r\\n]+\\r?$",
+        "^value-number-3: [^\\r\\n]+\\r?$",
+        "^value-number-4: [^\\r\\n]+\\r?$",
+        "^value-number-5: [^\\r\\n]+\\r?$",
+        "^value-number-6: [^\\r\\n]+\\r?$",
+        "^value-number-7: [^\\r\\n]+\\r?$",
+        "^value-number-8: [^\\r\\n]+\\r?$",
+        "^value-number-9: [^\\r\\n]+\\r?$",
+        "^value-number-10: [^\\r\\n]+\\r?$",
+        "^value-number-11: [^\\r\\n]+\\r?$",
+        "^value-number-12: [^\\r\\n]+\\r?$",
+        "^value-number-13: [^\\r\\n]+\\r?$",
+        "^value-number-14: [^\\r\\n]+\\r?$",
+        "^value-api-5:\\ number\\ spelling,\\ type\\ preservation\\ and\\ invalid\\ slots\\r?$"
+      ],
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "value-api-6: number conversion makes no allocator request"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "refusal_number",
+      "expected_count": 1,
+      "consumer": "value-api",
+      "source": "c_api/tests/value_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": "^value-api-7: seeded binary64 text [0-9a-f]{16}\\r?$",
+      "execution_evidence": [],
+      "exact_witnesses": [],
+      "runtime_acceptance": false,
+      "case_id": "seeded_number_text",
+      "expected_count": 1,
+      "consumer": "value-api",
+      "source": "c_api/tests/value_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-1 checkversion-accepts-matching-core"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkversion_accepts_matching_core",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-2 checkversion-rejects-version"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkversion_rejects_version",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-3 checkversion-rejects-numeric-layout"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkversion_rejects_numeric_layout",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-4 getmetafield-returns-raw-field"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "getmetafield_returns_raw_field",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-5 getmetafield-absent-pushes-nothing"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "getmetafield_absent_pushes_nothing",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-6 getmetafield-ignores-index-fallback"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "getmetafield_ignores_index_fallback",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-7 callmeta-calls-metamethod-with-object"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "callmeta_calls_metamethod_with_object",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-8 callmeta-absent-pushes-nothing"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "callmeta_absent_pushes_nothing",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-9 callmeta-resolves-relative-index"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "callmeta_resolves_relative_index",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-10 tolstring-renders-numbers"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "tolstring_renders_numbers",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-11 tolstring-renders-nil-and-booleans"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "tolstring_renders_nil_and_booleans",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-12 tolstring-keeps-string-bytes"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "tolstring_keeps_string_bytes",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-13 tolstring-uses-tostring-metafield"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "tolstring_uses_tostring_metafield",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-14 tolstring-rejects-nonstring-tostring"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "tolstring_rejects_nonstring_tostring",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-15 tolstring-uses-name-field"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "tolstring_uses_name_field",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-16 tolstring-ignores-nonstring-name"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "tolstring_ignores_nonstring_name",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-17 argerror-names-plain-argument"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "argerror_names_plain_argument",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-18 argerror-method-adjusts-argument"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "argerror_method_adjusts_argument",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-19 argerror-method-bad-self"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "argerror_method_bad_self",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-20 argerror-global-name-from-host"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "argerror_global_name_when_called_from_host",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-21 argerror-unknown-name-question-mark"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "argerror_unknown_name_uses_question_mark",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-22 typeerror-uses-name-field"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "typeerror_uses_name_field",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-23 typeerror-light-userdata"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "typeerror_light_userdata",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-24 typeerror-absent-and-nil"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "typeerror_absent_and_nil",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-25 checklstring-converts-and-keeps-length"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checklstring_converts_numbers_and_keeps_length",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-26 checklstring-rejects-table"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checklstring_rejects_table",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-27 optlstring-default-and-value"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "optlstring_default_and_value",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-28 optlstring-null-default"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "optlstring_null_default",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-29 checknumber-converts-numeric-string"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checknumber_converts_numeric_string",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-30 checknumber-rejects-nonnumber"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checknumber_rejects_nonnumber",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-31 optnumber-default-and-value"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "optnumber_default_and_value",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-32 optnumber-rejects-nonnumber"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "optnumber_rejects_nonnumber",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-33 checkinteger-accepts-integral-values"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkinteger_accepts_integral_values",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-34 checkinteger-rejects-fraction"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkinteger_rejects_fraction",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-35 checkinteger-rejects-nonnumber"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkinteger_rejects_nonnumber",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-36 optinteger-default-and-value"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "optinteger_default_and_value",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-37 optinteger-rejects-fraction"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "optinteger_rejects_fraction",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-38 checkstack-reserves-requested-slots"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkstack_reserves_requested_slots",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-39 checkstack-overflow-names-message"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkstack_overflow_names_message",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-40 checkstack-overflow-without-message"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkstack_overflow_without_message",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-41 checktype-accepts-matching-type"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checktype_accepts_matching_type",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-42 checktype-rejects-other-type"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checktype_rejects_other_type",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-43 checkany-accepts-nil"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkany_accepts_nil",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-44 checkany-rejects-absent"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkany_rejects_absent",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-45 newmetatable-registers-once"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "newmetatable_registers_once",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-46 newmetatable-returns-existing-value"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "newmetatable_returns_existing_value",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-47 setmetatable-attaches-registry-metatable"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "setmetatable_attaches_registry_metatable",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-48 testudata-matches-only-tagged-userdata"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "testudata_matches_only_tagged_userdata",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-49 checkudata-returns-payload"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkudata_returns_payload",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-50 checkudata-rejects-other-metatable"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkudata_rejects_other_metatable",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-51 where-reports-caller-line"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "where_reports_caller_line",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-52 where-level-zero-is-empty"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "where_level_zero_is_empty",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-53 where-missing-level-is-empty"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "where_missing_level_is_empty",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-54 error-prefixes-caller-line"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "error_prefixes_caller_line",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-55 error-from-host-has-no-position"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "error_from_host_has_no_position",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-56 checkoption-matches-and-defaults"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkoption_matches_and_defaults",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-57 checkoption-requires-argument-without-default"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkoption_requires_argument_without_default",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-58 checkoption-rejects-unknown-name"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "checkoption_rejects_unknown_name",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-59 fileresult-success-pushes-true"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "fileresult_success_pushes_true",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-60 fileresult-failure-with-name"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "fileresult_failure_with_name",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-61 fileresult-failure-without-name"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "fileresult_failure_without_name",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-62 fileresult-zero-errno-message"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "fileresult_zero_errno_message",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-63 execresult-clean-exit"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "execresult_clean_exit",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-64 execresult-errno-is-file-error"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "execresult_errno_is_file_error",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-65 execresult-exit-status-platform"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "execresult_exit_status_platform",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-66 execresult-signal-platform"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "execresult_signal_platform",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-67 ref-nil-returns-refnil"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "ref_nil_returns_refnil",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-68 ref-stores-value-and-pops"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "ref_stores_value_and_pops",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-69 unref-reuses-released-reference"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "unref_reuses_released_reference",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-70 unref-ignores-sentinels"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "unref_ignores_sentinels",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-71 len-string-and-table"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "len_string_and_table",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-72 len-uses-len-metamethod"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "len_uses_len_metamethod",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-73 len-rejects-non-integer"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "len_rejects_non_integer",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-74 setfuncs-captures-upvalues-and-placeholders"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "setfuncs_captures_upvalues_and_placeholders",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-75 setfuncs-zero-upvalues"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "setfuncs_zero_upvalues",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    },
+    {
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: auxiliary-api-76 setfuncs-rejects-excess-upvalues"
+      ],
+      "runtime_acceptance": false,
+      "case_id": "setfuncs_rejects_excess_upvalues",
+      "expected_count": 1,
+      "consumer": "auxiliary-api",
+      "source": "c_api/tests/auxiliary_api_contract.c",
+      "independent_review_status": "pending",
+      "function_source_review": "pending"
+    }
+  ],
+  "source_measurements": {
+    "repository_revision": "1e7addafcd2d694e0c153411c40db64191c68b63",
+    "sha256": "4dbc7c89b753fb099e84244673ae1ec5234cd507a85b0e59b3c389e01cfd9758",
+    "review_status": "pending",
+    "seeded_binary64_fingerprint": "90eb8de147d180eb",
+    "runtime_acceptance": false,
+    "coverage_authority": false,
+    "capture": "reports/remaining-combined-value_api_contract.log",
+    "kind": "author-recorded-Windows-sample",
+    "number_lines": [
+      "value-number-0: 0.0",
+      "value-number-1: -0.0",
+      "value-number-2: 1.1",
+      "value-number-3: 2.0",
+      "value-number-4: 1e-05",
+      "value-number-5: 0.0001",
+      "value-number-6: 100000000000000.0",
+      "value-number-7: 1e+15",
+      "value-number-8: 1.2345678901234567",
+      "value-number-9: 1.7976931348623157e+308",
+      "value-number-10: 2.2250738585072014e-308",
+      "value-number-11: 4.94065645841247e-324",
+      "value-number-12: inf",
+      "value-number-13: -inf",
+      "value-number-14: nan"
+    ],
+    "portable_expectation": false
+  }
+}

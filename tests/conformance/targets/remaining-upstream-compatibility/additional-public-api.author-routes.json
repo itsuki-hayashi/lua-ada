@@ -1,0 +1,544 @@
+{
+  "runtime_acceptance": false,
+  "schema_version": 1,
+  "review_status": "pending",
+  "author": "Codex /root/validation_delivery",
+  "entries": [
+    {
+      "name": "lua_len",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LUA-H-FUNCTION-LUA_LEN-372",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Binary string and table sequence lengths, arbitrary handler results, nonlengthable types, retained error objects and yield refusal.",
+      "named_c_cases": [
+        "c_api/tests/value_api_contract.c#lengths",
+        "c_api/tests/value_api_contract.c#yield_barriers",
+        "c_api/tests/value_api_contract.c#caller_windows"
+      ],
+      "invariant": "Public length preserves string/table results, original metamethod operands and caller frame, exact error identity and nonyieldable C barriers.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "lua_concat",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CONCAT-371",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Zero and singleton counts, binary strings, number coercion, ordered handlers collecting during each call, error identity and yield refusal.",
+      "named_c_cases": [
+        "c_api/tests/value_api_contract.c#concatenation",
+        "c_api/tests/value_api_contract.c#yield_barriers"
+      ],
+      "invariant": "Public concatenation consumes its requested frame values using the pinned right fold and retains metamethod roots, errors and C barriers.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "lua_numbertocstring",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LUA-H-FUNCTION-LUA_NUMBERTOCSTRING-375",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Fifteen indexed edge values including signed zero, extrema, subnormal and NaN, minimum integer, invalid/string slots, growth refusal and 20000 seeded binary64 spellings. Windows sample fingerprint is informative only.",
+      "named_c_cases": [
+        "c_api/tests/value_api_contract.c#number_text",
+        "c_api/tests/value_api_contract.c#refusal_number",
+        "c_api/tests/value_api_contract.c#seeded_number_text"
+      ],
+      "invariant": "Numeric text matches the independently compiled same-host C oracle while preserving input numeric type and making no selected allocator request.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkversion_",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKVERSION_-46",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Matching version and numeric sizes, version plus one and one-byte layout mismatch through actual protected callbacks.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkversion_accepts_matching_core",
+        "c_api/tests/auxiliary_api_contract.c#checkversion_rejects_version",
+        "c_api/tests/auxiliary_api_contract.c#checkversion_rejects_numeric_layout"
+      ],
+      "invariant": "The auxiliary version/layout check preserves stack height for matching ABI and raises the pinned protected diagnostic on version or numeric-layout mismatch.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkversion",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKVERSION-47",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Actual macro invocation in a registered protected callback with the matching compiled core; direct mismatch boundaries are separate function routes.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkversion_accepts_matching_core"
+      ],
+      "invariant": "The public checkversion macro passes its compiled version and numeric-layout constants to the actual auxiliary function without changing caller stack height.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_getmetafield",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_GETMETAFIELD-50",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Existing and absent fields, exact stack deltas and an index fallback that must remain unused.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#getmetafield_returns_raw_field",
+        "c_api/tests/auxiliary_api_contract.c#getmetafield_absent_pushes_nothing",
+        "c_api/tests/auxiliary_api_contract.c#getmetafield_ignores_index_fallback"
+      ],
+      "invariant": "Raw metafield lookup returns the original field type/value or absence without consulting index fallback.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_callmeta",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CALLMETA-51",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Present handler, absent metafield and relative stack index with exact stack/value assertions.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#callmeta_calls_metamethod_with_object",
+        "c_api/tests/auxiliary_api_contract.c#callmeta_absent_pushes_nothing",
+        "c_api/tests/auxiliary_api_contract.c#callmeta_resolves_relative_index"
+      ],
+      "invariant": "Auxiliary metamethod calls preserve object argument and result, return false without pushing on absence, and resolve relative object indices.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_tolstring",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_TOLSTRING-52",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Numbers, nil/booleans, embedded NUL strings, tostring results and rejection, name fields and nonstring name fallback.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#tolstring_renders_numbers",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_renders_nil_and_booleans",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_keeps_string_bytes",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_uses_tostring_metafield",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_rejects_nonstring_tostring",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_uses_name_field",
+        "c_api/tests/auxiliary_api_contract.c#tolstring_ignores_nonstring_name"
+      ],
+      "invariant": "Auxiliary text conversion follows numeric, primitive and metamethod rules and returns exact bytes and lengths.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_argerror",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_ARGERROR-53",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Plain argument, method nonself and bad self, host/global call and unavailable function name.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#argerror_names_plain_argument",
+        "c_api/tests/auxiliary_api_contract.c#argerror_method_adjusts_argument",
+        "c_api/tests/auxiliary_api_contract.c#argerror_method_bad_self",
+        "c_api/tests/auxiliary_api_contract.c#argerror_global_name_when_called_from_host",
+        "c_api/tests/auxiliary_api_contract.c#argerror_unknown_name_uses_question_mark"
+      ],
+      "invariant": "Protected argument diagnostics identify the actual Lua/C call and adjust method argument numbering without crossing the C guard.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_typeerror",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_TYPEERROR-54",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Name field, light userdata, absent slot and explicit nil with asserted diagnostic text.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#typeerror_uses_name_field",
+        "c_api/tests/auxiliary_api_contract.c#typeerror_light_userdata",
+        "c_api/tests/auxiliary_api_contract.c#typeerror_absent_and_nil"
+      ],
+      "invariant": "Protected type diagnostics use public type/name rules for the actual argument value.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checklstring",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKLSTRING-55",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Numeric conversion, embedded NUL length and rejected table.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checklstring_converts_numbers_and_keeps_length",
+        "c_api/tests/auxiliary_api_contract.c#checklstring_rejects_table"
+      ],
+      "invariant": "Checked strings preserve counted bytes and lengths, perform numeric conversion and raise protected errors for incompatible values.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_optlstring",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_OPTLSTRING-57",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Absent and nil arguments, real strings, numeric values and NULL default.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#optlstring_default_and_value",
+        "c_api/tests/auxiliary_api_contract.c#optlstring_null_default"
+      ],
+      "invariant": "Optional counted strings select defaults for nil/absence and preserve explicit values and NULL-default length semantics.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checknumber",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKNUMBER-59",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Numeric string, numeric value and nonnumeric argument.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checknumber_converts_numeric_string",
+        "c_api/tests/auxiliary_api_contract.c#checknumber_rejects_nonnumber"
+      ],
+      "invariant": "Checked numbers accept the pinned numeric-string conversion and reject incompatible values through protected diagnostics.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_optnumber",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_OPTNUMBER-60",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Absent/nil defaults, supplied number/numeric string and nonnumber failure.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#optnumber_default_and_value",
+        "c_api/tests/auxiliary_api_contract.c#optnumber_rejects_nonnumber"
+      ],
+      "invariant": "Optional numbers preserve defaults and explicit numeric values and reject incompatible provided arguments.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkinteger",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKINTEGER-62",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Integer, integral real, numeric string, fractional value and nonnumber.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkinteger_accepts_integral_values",
+        "c_api/tests/auxiliary_api_contract.c#checkinteger_rejects_fraction",
+        "c_api/tests/auxiliary_api_contract.c#checkinteger_rejects_nonnumber"
+      ],
+      "invariant": "Checked integers accept integral numeric values and preserve the distinction between missing conversion and fractional rejection.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_optinteger",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_OPTINTEGER-63",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Absent/nil defaults, supplied integral value and fractional rejection.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#optinteger_default_and_value",
+        "c_api/tests/auxiliary_api_contract.c#optinteger_rejects_fraction"
+      ],
+      "invariant": "Optional integers preserve default/explicit integral values and reject a provided fraction.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkstack",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKSTACK-66",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Successful reserve, oversized request with caller message and oversized request without one.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkstack_reserves_requested_slots",
+        "c_api/tests/auxiliary_api_contract.c#checkstack_overflow_names_message",
+        "c_api/tests/auxiliary_api_contract.c#checkstack_overflow_without_message"
+      ],
+      "invariant": "Auxiliary stack reservation preserves requested capacity or raises the pinned protected overflow diagnostic.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checktype",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKTYPE-67",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Matching string and incompatible value with asserted error text.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checktype_accepts_matching_type",
+        "c_api/tests/auxiliary_api_contract.c#checktype_rejects_other_type"
+      ],
+      "invariant": "Exact type checking accepts the matching public type and raises a protected argument diagnostic for another type.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkany",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKANY-68",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Explicit nil success and absent-slot protected diagnostic.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkany_accepts_nil",
+        "c_api/tests/auxiliary_api_contract.c#checkany_rejects_absent"
+      ],
+      "invariant": "Any-value checking accepts a present nil while distinguishing a missing argument.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_newmetatable",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_NEWMETATABLE-70",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "First registration and existing registry entries with exact identity/return flag.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#newmetatable_registers_once",
+        "c_api/tests/auxiliary_api_contract.c#newmetatable_returns_existing_value"
+      ],
+      "invariant": "Named metatables register once, set public name metadata and return the exact preexisting registry value on subsequent lookup.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_setmetatable",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_SETMETATABLE-71",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Exact registry identity and observed object metatable.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#setmetatable_attaches_registry_metatable"
+      ],
+      "invariant": "Named metatable assignment attaches the registry-owned metatable to the actual object.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_testudata",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_TESTUDATA-72",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Matching and other metatables, light userdata and nonuserdata without raising.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#testudata_matches_only_tagged_userdata"
+      ],
+      "invariant": "Userdata testing returns the real payload only for correctly tagged full userdata.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkudata",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKUDATA-73",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Matching payload and a distinct metatable with asserted diagnostic.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkudata_returns_payload",
+        "c_api/tests/auxiliary_api_contract.c#checkudata_rejects_other_metatable"
+      ],
+      "invariant": "Checked userdata returns its real payload or raises a protected named-type error.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_where",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_WHERE-75",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Lua caller line, level zero and unavailable stack level.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#where_reports_caller_line",
+        "c_api/tests/auxiliary_api_contract.c#where_level_zero_is_empty",
+        "c_api/tests/auxiliary_api_contract.c#where_missing_level_is_empty"
+      ],
+      "invariant": "Auxiliary position text reflects the selected actual caller source/line and is empty when no position exists.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_error",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_ERROR-76",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Lua caller prefix and protected host invocation without a source location.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#error_prefixes_caller_line",
+        "c_api/tests/auxiliary_api_contract.c#error_from_host_has_no_position"
+      ],
+      "invariant": "Formatted auxiliary errors include the actual Lua caller position and preserve the no-position host-call form.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_checkoption",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_CHECKOPTION-78",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Known alternatives, default, missing required argument and unknown name.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#checkoption_matches_and_defaults",
+        "c_api/tests/auxiliary_api_contract.c#checkoption_requires_argument_without_default",
+        "c_api/tests/auxiliary_api_contract.c#checkoption_rejects_unknown_name"
+      ],
+      "invariant": "Option lookup selects exact named entries/defaults and emits the pinned protected argument error when required or unknown.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_fileresult",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_FILERESULT-81",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Success, errno failure with/without filename and zero errno message behavior.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#fileresult_success_pushes_true",
+        "c_api/tests/auxiliary_api_contract.c#fileresult_failure_with_name",
+        "c_api/tests/auxiliary_api_contract.c#fileresult_failure_without_name",
+        "c_api/tests/auxiliary_api_contract.c#fileresult_zero_errno_message"
+      ],
+      "invariant": "File result tuples preserve success or actual errno-derived failure values and optional filename text.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_execresult",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_EXECRESULT-82",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Clean exit, errno-derived file error, nonzero exit status and signal status under matched platform compiler defines.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#execresult_clean_exit",
+        "c_api/tests/auxiliary_api_contract.c#execresult_errno_is_file_error",
+        "c_api/tests/auxiliary_api_contract.c#execresult_exit_status_platform",
+        "c_api/tests/auxiliary_api_contract.c#execresult_signal_platform"
+      ],
+      "invariant": "Execution result tuples match the native platform wait-status interpretation and errno failure precedence.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_ref",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_REF-92",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Nil sentinel, nonnil reference with exact stack pop and a released reference reused by an actual subsequent allocation.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#ref_nil_returns_refnil",
+        "c_api/tests/auxiliary_api_contract.c#ref_stores_value_and_pops",
+        "c_api/tests/auxiliary_api_contract.c#unref_reuses_released_reference"
+      ],
+      "invariant": "Registry references preserve nil sentinel behavior, stored value identity and released-slot reuse.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_unref",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_UNREF-93",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Released-slot reuse, LUA_NOREF and LUA_REFNIL.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#unref_reuses_released_reference",
+        "c_api/tests/auxiliary_api_contract.c#unref_ignores_sentinels"
+      ],
+      "invariant": "Releasing references recycles actual occupied slots while ignoring the public nonreference sentinels.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_len",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_LEN-108",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Binary strings and tables, public len handler and noninteger error.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#len_string_and_table",
+        "c_api/tests/auxiliary_api_contract.c#len_uses_len_metamethod",
+        "c_api/tests/auxiliary_api_contract.c#len_rejects_non_integer"
+      ],
+      "invariant": "Auxiliary length returns an integer for primitive/handler results and rejects nonintegral handler results through protection.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    },
+    {
+      "name": "luaL_setfuncs",
+      "proposed_classification": "runtime-behavior",
+      "review_status": "pending",
+      "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_SETFUNCS-115",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "boundaries": "Two shared upvalues and mutation, NULL function placeholders, zero upvalues, exact pop and oversized-upvalue protected error.",
+      "named_c_cases": [
+        "c_api/tests/auxiliary_api_contract.c#setfuncs_captures_upvalues_and_placeholders",
+        "c_api/tests/auxiliary_api_contract.c#setfuncs_zero_upvalues",
+        "c_api/tests/auxiliary_api_contract.c#setfuncs_rejects_excess_upvalues"
+      ],
+      "invariant": "Function registration creates real closures with retained upvalues and false placeholders and rejects excess upvalues.",
+      "coverage_authority": false,
+      "named_aunit_cases": []
+    }
+  ],
+  "kind": "additional-target-api-author-routes",
+  "coverage_authority": false
+}

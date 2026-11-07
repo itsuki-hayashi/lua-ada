@@ -140,6 +140,18 @@ Case 'actual C and AUnit build receipt libraries cannot point to a different fro
     $consumer.library_files[0].sha256='1'*64;$consumer.io_contract.reference_library_files[0].sha256='0'*64
     Reject {Assert-TargetBuildRuntimeBindings -Image $image -ConsumerReport $consumer} 'different frozen C oracle'
 }
+Case 'additional public consumers cannot borrow another frozen C oracle DLL'{
+    foreach($kind in @('value','auxiliary')){
+        $image=@{paths=@{ada_runtime='lib/validation/relocatable';c_runtime='build/conformance/default/lib'};
+            files=@(@{path='lib/validation/relocatable/liblua.dll';sha256=('1'*64)},
+                @{path='build/conformance/default/lib/libconformance_lua.dll';sha256=('2'*64)})}
+        $consumer=@{library_files=@(@{file='liblua.dll';sha256=('1'*64)})}
+        foreach($contract in @('gc','io','foreign',$kind)){$consumer["${contract}_contract"]=@{reference_library_files=@(@{file='libconformance_lua.dll';sha256=('2'*64)})}}
+        Assert-TargetBuildRuntimeBindings -Image $image -ConsumerReport $consumer
+        $consumer["${kind}_contract"].reference_library_files[0].sha256='0'*64
+        Reject {Assert-TargetBuildRuntimeBindings -Image $image -ConsumerReport $consumer} 'different frozen C oracle'
+    }
+}
 Case 'non-synthetic and clean labels cannot replace empty or fabricated image build witnesses'{
     $directory=Join-Path $temporary ([Guid]::NewGuid().ToString('N'));$files=@()
     foreach($path in @('tests/bin/static/conformance_runner.exe','build/conformance/default/bin/lua.exe',

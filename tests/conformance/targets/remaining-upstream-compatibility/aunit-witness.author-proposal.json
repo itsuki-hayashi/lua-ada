@@ -122,7 +122,7 @@
     },
     {
       "path": "tests/src/lua-collector_tests.adb",
-      "sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4"
+      "sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342"
     },
     {
       "path": "tests/src/lua-conformance_adapter_tests.adb",
@@ -150,29 +150,33 @@
     },
     {
       "path": "scripts/check.ps1",
-      "sha256": "8071c9872cc2244d59cc8de256b530262820e453cd802c5edbf6cee7db16c9e5"
+      "sha256": "81bc5fd6d8a6072d41ea630da2bdda6b2fc5cf291041a5195fa4e27d3b44e682"
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "87e9a5b46ae8028f9ba8fe41e7502c12af622382bf0e91a36e78ae06944d2258"
+      "sha256": "a85d4158a2f16ca3227deb435b979d919daeac0d88aed9264a8df32335d89965"
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "04b7d33770557c60e4340e58285ca4d85403b896a48b18ccec58792dec6bc861"
+      "sha256": "70fe3eebb3ceffd477d8c1b2570c82c9d3037ed3d7cd8c7d24691fda34fb110c"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
       "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
     },
     {
-      "sha256": "7ff9e34098a333affec5e09691cf117a5bd572b6a6540f9c6ba3e1262409250a",
-      "path": "tests/src/lua-formatter_tests.adb"
+      "path": "tests/src/lua-formatter_tests.adb",
+      "sha256": "ac2113fafef31c39f935a42b823d76dc492843e75549a0ffe3d8df20e9272f80"
+    },
+    {
+      "path": "tests/src/lua-scalar_text_tests.adb",
+      "sha256": "f49f4548f4841393556da4d7af51a239e0a215cfba880b09679cef730f323449"
     }
   ],
   "entries": [
     {
       "case": "tests/src/lua-collector_tests.adb#Larger_Debt_Payments",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: larger byte payments finish sooner",
       "required_stdout_line": "OK collector: larger byte payments finish sooner",
       "registration_procedure": "Larger_Case",
@@ -187,7 +191,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Minor_Multiplier_Debt",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: minormul changes minor byte debt",
       "required_stdout_line": "OK collector: minormul changes minor byte debt",
       "registration_procedure": "Minor_Debt_Case",
@@ -201,7 +205,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Parameter_Rounding",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: pinned parameter rounding",
       "required_stdout_line": "OK collector: pinned parameter rounding",
       "registration_procedure": "Rounding_Case",
@@ -215,7 +219,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Parameter_Saturation",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: saturated parameter arithmetic",
       "required_stdout_line": "OK collector: saturated parameter arithmetic",
       "registration_procedure": "Saturation_Case",
@@ -229,7 +233,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Positive_Step_Debt",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: positive steps pay byte debt",
       "required_stdout_line": "OK collector: positive steps pay byte debt",
       "registration_procedure": "Payment_Case",
@@ -243,7 +247,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Promotion_And_Major",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: real promotion and major cycle",
       "required_stdout_line": "OK collector: real promotion and major cycle",
       "registration_procedure": "Major_Case",
@@ -259,7 +263,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Remembered_Table",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: remembered old table graph",
       "required_stdout_line": "OK collector: remembered old table graph",
       "registration_procedure": "Remember_Case",
@@ -273,7 +277,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Zero_Forces_Work",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: zero forces real basic work",
       "required_stdout_line": "OK collector: zero forces real basic work",
       "registration_procedure": "Force_Case",
@@ -288,7 +292,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Zero_Major_Threshold",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: zero disables major threshold",
       "required_stdout_line": "OK collector: zero disables major threshold",
       "registration_procedure": "Threshold_Case",
@@ -302,7 +306,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Zero_Step_Size",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: zero stepsize completes cycles",
       "required_stdout_line": "OK collector: zero stepsize completes cycles",
       "registration_procedure": "Step_Case",
@@ -557,7 +561,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Refusing_Full",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: refusing allocator emergency GC",
       "required_stdout_line": "OK collector: refusing allocator emergency GC",
       "registration_procedure": "Refusal_Case",
@@ -573,7 +577,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Emergency_Queue",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: emergency queues without calls",
       "required_stdout_line": "OK collector: emergency queues without calls",
       "registration_procedure": "Emergency_Case",
@@ -590,7 +594,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Pending_Finalizer",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: queued finalizer graph ownership",
       "required_stdout_line": "OK collector: queued finalizer graph ownership",
       "registration_procedure": "Finalizer_Case",
@@ -607,7 +611,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Weak_Before_Finalizer",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: weak values before finalization",
       "required_stdout_line": "OK collector: weak values before finalization",
       "registration_procedure": "Ordering_Case",
@@ -706,7 +710,7 @@
     },
     {
       "case": "tests/src/lua-collector_tests.adb#Dead_Context_Cells",
-      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "source_sha256": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
       "registered_label": "collector: dead context cell sweep order",
       "required_stdout_line": "OK collector: dead context cell sweep order",
       "registration_procedure": "Dead_Context_Case",
@@ -1950,7 +1954,7 @@
       "registered_label": "C formatter: foreign scanning shares bounded work quota",
       "required_stdout_line": "OK C formatter: foreign scanning shares bounded work quota",
       "execution_evidence": [],
-      "source_sha256": "7ff9e34098a333affec5e09691cf117a5bd572b6a6540f9c6ba3e1262409250a"
+      "source_sha256": "ac2113fafef31c39f935a42b823d76dc492843e75549a0ffe3d8df20e9272f80"
     },
     {
       "runtime_acceptance": false,
@@ -1958,7 +1962,71 @@
       "registered_label": "C formatter: output obeys bounded string extent quota",
       "required_stdout_line": "OK C formatter: output obeys bounded string extent quota",
       "execution_evidence": [],
-      "source_sha256": "7ff9e34098a333affec5e09691cf117a5bd572b6a6540f9c6ba3e1262409250a"
+      "source_sha256": "ac2113fafef31c39f935a42b823d76dc492843e75549a0ffe3d8df20e9272f80"
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: positive even decimal tie",
+      "required_stdout_line": "OK scalar text: positive even decimal tie",
+      "case": "tests/src/lua-scalar_text_tests.adb#Positive_Even_Tie",
+      "runtime_acceptance": false,
+      "source_sha256": "f49f4548f4841393556da4d7af51a239e0a215cfba880b09679cef730f323449"
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: negative even decimal tie",
+      "required_stdout_line": "OK scalar text: negative even decimal tie",
+      "case": "tests/src/lua-scalar_text_tests.adb#Negative_Even_Tie",
+      "runtime_acceptance": false,
+      "source_sha256": "f49f4548f4841393556da4d7af51a239e0a215cfba880b09679cef730f323449"
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: large even decimal tie",
+      "required_stdout_line": "OK scalar text: large even decimal tie",
+      "case": "tests/src/lua-scalar_text_tests.adb#Large_Even_Tie",
+      "runtime_acceptance": false,
+      "source_sha256": "f49f4548f4841393556da4d7af51a239e0a215cfba880b09679cef730f323449"
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: fifteen digit subnormal",
+      "required_stdout_line": "OK scalar text: fifteen digit subnormal",
+      "case": "tests/src/lua-scalar_text_tests.adb#Subnormal_Fifteen_Digits",
+      "runtime_acceptance": false,
+      "source_sha256": "f49f4548f4841393556da4d7af51a239e0a215cfba880b09679cef730f323449"
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: maximum finite retry",
+      "required_stdout_line": "OK scalar text: maximum finite retry",
+      "case": "tests/src/lua-scalar_text_tests.adb#Maximum_Finite",
+      "runtime_acceptance": false,
+      "source_sha256": "f49f4548f4841393556da4d7af51a239e0a215cfba880b09679cef730f323449"
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "scalar text: negative real zero",
+      "required_stdout_line": "OK scalar text: negative real zero",
+      "case": "tests/src/lua-scalar_text_tests.adb#Negative_Zero",
+      "runtime_acceptance": false,
+      "source_sha256": "f49f4548f4841393556da4d7af51a239e0a215cfba880b09679cef730f323449"
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "C auxiliary: option prefix scanning shares host quota",
+      "required_stdout_line": "OK C auxiliary: option prefix scanning shares host quota",
+      "case": "tests/src/lua-formatter_tests.adb#Option_Prefix_Quota",
+      "runtime_acceptance": false,
+      "source_sha256": "ac2113fafef31c39f935a42b823d76dc492843e75549a0ffe3d8df20e9272f80"
+    },
+    {
+      "execution_evidence": [],
+      "registered_label": "C auxiliary: default length scanning shares host quota",
+      "required_stdout_line": "OK C auxiliary: default length scanning shares host quota",
+      "case": "tests/src/lua-formatter_tests.adb#Default_Length_Quota",
+      "runtime_acceptance": false,
+      "source_sha256": "ac2113fafef31c39f935a42b823d76dc492843e75549a0ffe3d8df20e9272f80"
     }
   ],
   "required_contexts": [

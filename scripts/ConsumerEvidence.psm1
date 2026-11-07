@@ -7,7 +7,8 @@ function Test-NamedConsumerEvidence {
           [string] $Revision, [string] $Context,
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
-          [switch] $RequireFormatContract)
+          [switch] $RequireFormatContract,
+          [ValidateSet('format','value','auxiliary')][string[]] $AdditionalContracts=@())
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
     $parts = $Context.Split('/')
@@ -35,9 +36,12 @@ function Test-NamedConsumerEvidence {
         $contractKinds += 'foreign'
         $consumerKinds += 'foreign-api'
     }
-    if($RequireFormatContract){
-        $markers['format-api']='PASS: public formatting contract';$markers['format-oracle']='PASS: public formatting contract'
-        $contractKinds+='format';$consumerKinds+='format-api'
+    $additional=@($AdditionalContracts)
+    if($RequireFormatContract){$additional+='format'}
+    $additionalMarkers=@{format='PASS: public formatting contract';value='PASS: public value operation contract';auxiliary='PASS: public auxiliary contract'}
+    foreach($kind in $additional|Sort-Object -Unique){
+        $markers["$kind-api"]=$additionalMarkers[$kind];$markers["$kind-oracle"]=$additionalMarkers[$kind]
+        $contractKinds+=$kind;$consumerKinds+="$kind-api"
     }
     foreach ($name in $markers.Keys) {
         $matches = @($Report.consumers | Where-Object { $_.name -ceq $name })
@@ -89,6 +93,25 @@ function Test-NamedConsumerEvidence {
         foreach ($pattern in $patterns) {
             if ([regex]::Matches($outputs[$case.consumer].text, $pattern).Count -ne 1) {
                 throw "Named consumer witness missing/duplicate: $key"
+            }
+        }
+        if($case.Contains('ordered_witness_patterns')){
+            # Some contracts emit a fixed sequence of indexed records before
+            # their case marker. Native spellings may vary across platforms;
+            # source-bound C/Ada byte equality above still binds every value.
+            # Checking each anchored position prevents missing/duplicate or
+            # reordered numeric records from hiding behind case completion.
+            if($case.ordered_witness_patterns -isnot [Array] -or @($case.ordered_witness_patterns).Count -eq 0){
+                throw "Invalid ordered named consumer witness: $key"
+            }
+            $position=-1
+            foreach($pattern in $case.ordered_witness_patterns){
+                if($pattern -isnot [string] -or -not $pattern.StartsWith('^') -or -not $pattern.EndsWith('$')){
+                    throw "Invalid ordered named consumer witness: $key"
+                }
+                $matches=[regex]::Matches($outputs[$case.consumer].text,'(?m)'+$pattern)
+                if($matches.Count -ne 1 -or $matches[0].Index -le $position){throw "Named consumer ordered witness missing/duplicate/reordered: $key"}
+                $position=$matches[0].Index
             }
         }
         $seen[$key] = $true

@@ -172,6 +172,8 @@ try {
     Invoke-Consumer 'conversion-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/conversion_api_contract$suffix") 'PASS: public numeric conversion contract'
     if($TargetPolicy -ne ''){
         Invoke-Consumer 'format-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/format_api_contract$suffix") 'PASS: public formatting contract'
+        Invoke-Consumer 'value-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/value_api_contract$suffix") 'PASS: public value operation contract'
+        Invoke-Consumer 'auxiliary-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/auxiliary_api_contract$suffix") 'PASS: public auxiliary contract'
     }
     Invoke-Consumer 'operator-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/operator_api_contract$suffix") 'PASS: public C operator contract'
     # Compile the identical public-header contract against the isolated pinned
@@ -231,6 +233,18 @@ try {
         Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
             '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/format_api_contract.c'),
             '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceFormatConsumer)
+        $referenceValueConsumer=Join-Path $reportDirectory "value-oracle$suffix"
+        Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/value_api_contract.c'),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceValueConsumer)
+        $referenceAuxiliaryConsumer=Join-Path $reportDirectory "auxiliary-oracle$suffix"
+        # The auxiliary contract asserts the public platform wait-status
+        # behavior. Compile it with the same platform selection as the root
+        # Ada/consumer projects and the independent C reference library.
+        $platformDefines=if($IsLinux){@('-DLUA_USE_LINUX')}elseif($IsMacOS){@('-DLUA_USE_MACOSX')}else{@()}
+        Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic')+$platformDefines+@(
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/auxiliary_api_contract.c'),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceAuxiliaryConsumer))
     }
     $referenceOperatorConsumer = Join-Path $reportDirectory "operator-oracle$suffix"
     Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
@@ -249,8 +263,12 @@ try {
         Invoke-Consumer 'builtin-oracle' $referenceBuiltinConsumer 'PASS: public builtin contract'
         Invoke-Consumer 'external-oracle' $referenceExternalConsumer 'PASS: public external string contract' $externalArguments
         Invoke-Consumer 'conversion-oracle' $referenceConversionConsumer 'PASS: public numeric conversion contract'
-        if($TargetPolicy -ne ''){Invoke-Consumer 'format-oracle' $referenceFormatConsumer 'PASS: public formatting contract'}
         Invoke-Consumer 'operator-oracle' $referenceOperatorConsumer 'PASS: public C operator contract'
+        if($TargetPolicy -ne ''){
+            Invoke-Consumer 'format-oracle' $referenceFormatConsumer 'PASS: public formatting contract'
+            Invoke-Consumer 'value-oracle' $referenceValueConsumer 'PASS: public value operation contract'
+            Invoke-Consumer 'auxiliary-oracle' $referenceAuxiliaryConsumer 'PASS: public auxiliary contract'
+        }
     } finally {
         $env:PATH = $adaExecutionPath
         $env:LD_LIBRARY_PATH = $adaExecutionLdPath
@@ -300,6 +318,11 @@ try {
         if([IO.File]::ReadAllText((Join-Path $reportDirectory 'format-api.stdout')) -cne
             [IO.File]::ReadAllText((Join-Path $reportDirectory 'format-oracle.stdout'))){throw 'C/Ada public formatting contract output differs'}
         Write-Output 'PASS: identical public formatting contract against C and Ada'
+        foreach($kind in @('value','auxiliary')){
+            if([IO.File]::ReadAllText((Join-Path $reportDirectory "$kind-api.stdout")) -cne
+                [IO.File]::ReadAllText((Join-Path $reportDirectory "$kind-oracle.stdout"))){throw "C/Ada public $kind contract output differs"}
+            Write-Output "PASS: identical public $kind contract against C and Ada"
+        }
     }
     if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'operator-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'operator-oracle.stdout'))) {
@@ -346,9 +369,15 @@ try {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
-    $formatSources=@()
+    $formatSources=@();$valueSources=@();$auxiliarySources=@()
     if($TargetPolicy -ne ''){
         $formatSources=@(foreach($name in @('format_api_contract.c','consumer_allocator.h')){
+            @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+        })
+        $valueSources=@(foreach($name in @('value_api_contract.c','consumer_allocator.h')){
+            @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+        })
+        $auxiliarySources=@(foreach($name in @('auxiliary_api_contract.c','consumer_allocator.h')){
             @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
         })
     }
@@ -370,7 +399,7 @@ try {
         throw 'Consumer execution changed the selected runtime image'
     }
     $consumerSourceNames=@('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'load_dump_contract.h', 'consumer_allocator.h')
-    if($TargetPolicy -ne ''){$consumerSourceNames+='format_api_contract.c'}
+    if($TargetPolicy -ne ''){$consumerSourceNames+=@('format_api_contract.c','value_api_contract.c','auxiliary_api_contract.c')}
     [ordered]@{ profile = $Profile; library_type = $LibraryType;
         repository_revision = $repositoryRevision;
         repository_dirty = ($repositoryChanges.Count -ne 0);
@@ -402,7 +431,9 @@ try {
             reference_library_files=$referenceLibraries };
         format_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$formatSources;reference_library_files=$referenceLibraries}}else{$null});
         operator_contract = [ordered]@{ matching_output=$true; sources=$operatorContractSources;
-            reference_library_files=$referenceLibraries } } | ConvertTo-Json -Depth 6 |
+            reference_library_files=$referenceLibraries };
+        value_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$valueSources;reference_library_files=$referenceLibraries}}else{$null});
+        auxiliary_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$auxiliarySources;platform_defines=$platformDefines;reference_library_files=$referenceLibraries}}else{$null}) } | ConvertTo-Json -Depth 6 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8
     Write-Output 'PASS: one production interpreter image; Ada/C state, pool, allocator and startup checks'
 }

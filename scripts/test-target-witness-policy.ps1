@@ -116,4 +116,37 @@ Case 'runtime functions cannot borrow declaration-only classification or invent 
         Reject {Read-Fixture $f -Review} 'function/type classification'
     }
 }
+function New-PublicProposals([string]$Routes){
+    $destination=Join-Path $temporary ([Guid]::NewGuid().ToString('N'))
+    & (Join-Path $PSScriptRoot 'new-target-witness-proposals.ps1') -OutputDirectory $destination `
+        -AdditionalConsumerCases (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/additional-public-consumer.author-cases.json') `
+        -AdditionalAUnitCases (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/additional-public-aunit.author-cases.json') `
+        -AdditionalApiRoutes $Routes|Out-Null
+    return $destination
+}
+Case 'new value auxiliary and scalar source routes remain proposals with no execution or approval authority'{
+    $path=New-PublicProposals (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/additional-public-api.author-routes.json')
+    $relative=[IO.Path]::GetRelativePath($root,(Join-Path $path 'witness-policy.author-proposal.json')).Replace('\','/')
+    $r=Read-TargetWitnessPolicy -Root $root -Path $relative
+    $new=@($r.global_api.entries|Where-Object{ $_.Contains('proposed_classification') })
+    Assert-True ($r.consumer.cases.Count -eq 187 -and $r.aunit.entries.Count -eq 104 -and $new.Count -eq 32 -and
+        @($new|Where-Object{ $_.classification -cne 'pending-semantic-review' -or $_.review_status -cne 'pending' -or
+            $_.runtime_acceptance -or $_.execution_evidence.Count }).Count -eq 0 -and -not $r.source_reviewed -and -not $r.runtime_acceptance) 'Source routes invented acceptance'
+    foreach($entry in $new){Assert-True ($entry.proposed_context_witnesses.Count -eq 26 -and -not $entry.Contains('context_witnesses')) 'A future route became an actual context observation'}
+    Reject {Read-TargetWitnessPolicy -Root $root -Path $relative -RequireReview} 'incomplete|independent review|function source'
+}
+Case 'API author routes reject invented witnesses declaration-only calls and smuggled passing metadata'{
+    $original=Get-Content (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/additional-public-api.author-routes.json') -Raw
+    foreach($change in @('unknown','declaration','approved','evidence')){
+        $routes=ConvertFrom-Json $original -AsHashtable -Depth 48
+        switch($change){
+            unknown{$routes.entries[0].named_c_cases=@('c_api/tests/missing.c#invented')}
+            declaration{$routes.entries[0].id='CAPI-LUA-H-MACRO-LUA_VERSION_MAJOR_N-20'}
+            approved{$routes.entries[0].review_status='accepted'}
+            evidence{$routes.entries[0].execution_evidence=@(@{result='passed'})}
+        }
+        $path=Join-Path $temporary ('invalid-route-'+$change+'.json');$null=Save $path $routes
+        Reject {New-PublicProposals $path} 'unknown actual C witness|Declaration-only|distinct pending actual named'
+    }
+}
 Write-Output "PASS: $script:Cases target witness policy regressions; synthetic source/capture objects only, no executed API acceptance"

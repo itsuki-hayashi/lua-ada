@@ -1,32 +1,32 @@
 {
-  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
-  "source_snapshot": {
-    "repository_dirty": true,
-    "revision": "ebe91438b46ad2758dfa929e8e5f198d690b5dab",
-    "kind": "repository-source-snapshot"
-  },
+  "coverage_authority": false,
   "consumer": {
-    "sha256": "2e422bb92bc8cf5ccd5a27d3ea34058d27b6538a37a11beeffac254308aa7e9a",
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json",
+    "sha256": "d07a05938e20d104c59287fc51de1fe7fd24e9a3b906028faeb71dcf577a1426"
   },
-  "kind": "target-witness-policy",
-  "aunit": {
-    "sha256": "2747318be2b699e4a18810dc87ca9cbe94fbe12395b733bf5c4c12699c6c3266",
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json"
-  },
-  "runtime_acceptance": false,
-  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
   "schema_version": 1,
-  "global_api": {
-    "sha256": "cc8641b802c8383960de435bdf856e9aa5f6a9a9784e6be66ed8fcbe9a7347ec",
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
+  "runtime_acceptance": false,
+  "source_snapshot": {
+    "revision": "957ffe69409e4181338b9bcf16b723d1d9d0ceae",
+    "kind": "repository-source-snapshot",
+    "repository_dirty": true
   },
+  "global_api": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json",
+    "sha256": "9eb8a1eb7db7996f3fec7ede5c6d887b3462831b9a3332a682edb95c99e837e9"
+  },
+  "target": "remaining-upstream-compatibility",
   "review": {
     "status": "pending",
     "reviewer": null,
-    "artifact": null,
     "artifact_sha256": null,
+    "artifact": null,
     "author": "Codex /root/validation_delivery"
   },
-  "coverage_authority": false
+  "kind": "target-witness-policy",
+  "aunit": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json",
+    "sha256": "df4da28e92243c1772e07bf70f039e6e95b047b6ac582b9bf8bb3242a77ed347"
+  }
 }
