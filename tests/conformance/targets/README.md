@@ -261,3 +261,9 @@ pending independent review, empty execution evidence and false authority flags.
 The old scope descriptors, mappings, approvals and contracts remain unchanged.
 Fresh full-target retained indices can reference independently reviewed successor
 mappings, with the original required names/protocols still enforced.
+
+Transform unit tests use content-verified frozen predecessor review/source
+fixtures rather than inheriting their authority onto changed production files.
+They deliberately reject a changed counterpart with an old approval. Current
+production replay applicability is reported separately; a frozen fixture pass
+does not clear a stale production source binding or establish runtime coverage.

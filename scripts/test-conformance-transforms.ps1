@@ -25,6 +25,52 @@ function Write-Json([string] $Path,[object] $Value) {
     [IO.File]::WriteAllText($Path,(ConvertTo-Json -InputObject $Value -Depth 64).Replace("`r`n","`n") + "`n",$utf8)
     return (Get-FileHash -LiteralPath $Path).Hash.ToLowerInvariant()
 }
+function Copy-FrozenInput([string] $Relative,[string] $ExpectedHash,[string] $DestinationRoot) {
+    $relativeFile = $Relative.Split('#')[0]
+    $current = Join-Path $root $relativeFile
+    $bytes = [IO.File]::ReadAllBytes($current)
+    if ((Get-ConformanceHash $bytes) -cne $ExpectedHash) {
+        # The accepted predecessor is historical test input, not approval of
+        # changed production code. Read its actual Git blob without shell
+        # text/newline conversion and verify every expected byte afterwards.
+        $start = [Diagnostics.ProcessStartInfo]::new()
+        $start.FileName = 'git'; $start.WorkingDirectory = $root
+        $start.UseShellExecute = $false; $start.RedirectStandardOutput = $true; $start.RedirectStandardError = $true
+        $start.ArgumentList.Add('show')
+        $start.ArgumentList.Add('d438f1fb2491006c1c248e0888637b4afa5ae0fc:' + $relativeFile)
+        $process = [Diagnostics.Process]::Start($start)
+        $buffer = [IO.MemoryStream]::new()
+        try {
+            $process.StandardOutput.BaseStream.CopyTo($buffer)
+            $diagnostic = $process.StandardError.ReadToEnd(); $process.WaitForExit()
+            if ($process.ExitCode -ne 0) { throw "Cannot read frozen predecessor input: $relativeFile`: $diagnostic" }
+            $bytes = $buffer.ToArray()
+        } finally { $buffer.Dispose(); $process.Dispose() }
+    }
+    if ((Get-ConformanceHash $bytes) -cne $ExpectedHash) { throw "Frozen predecessor input differs: $relativeFile" }
+    $target = Join-Path $DestinationRoot $relativeFile
+    [void][IO.Directory]::CreateDirectory((Split-Path -Parent $target))
+    [IO.File]::WriteAllBytes($target,$bytes)
+}
+$frozenRoot = Join-Path $temporary 'frozen-predecessor'
+[void][IO.Directory]::CreateDirectory((Join-Path $frozenRoot 'reports/generated'))
+foreach ($name in @('gc-ada-instrumented','files-windows-platform','files-macos-platform')) {
+    $relative = "tests/conformance/equivalents/$name.json"
+    $path = Join-Path $root $relative
+    Copy-FrozenInput $relative (Get-ConformanceHash ([IO.File]::ReadAllBytes($path))) $frozenRoot
+    $spec = Get-Content $path -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    Copy-FrozenInput $spec.source $spec.source_sha256 $frozenRoot
+    Copy-FrozenInput $spec.review.artifact $spec.review.artifact_sha256 $frozenRoot
+    $approval = Get-Content (Join-Path $frozenRoot $spec.review.artifact) -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    foreach ($decision in $approval.decisions) {
+        Copy-FrozenInput $decision.review_evidence.path $decision.review_evidence.sha256 $frozenRoot
+        foreach ($counterpart in $decision.counterparts) { Copy-FrozenInput $counterpart.path $counterpart.sha256 $frozenRoot }
+    }
+}
+foreach ($relative in @('scripts/New-ConformanceEquivalent.ps1','scripts/ConformanceReview.psm1')) {
+    $path = Join-Path $root $relative
+    Copy-FrozenInput $relative (Get-ConformanceHash ([IO.File]::ReadAllBytes($path))) $frozenRoot
+}
 function New-TFixture([string] $SourceName = 'sample.lua') {
     $directory = Join-Path $temporary ([Guid]::NewGuid().ToString('N'))
     [void][IO.Directory]::CreateDirectory((Join-Path $directory 'references/lua/testes'))
@@ -78,13 +124,13 @@ function Invoke-TFixture([Collections.IDictionary] $Fixture) {
         -ResolvedExclusions $Fixture.resolved
 }
 
-Case 'all three accepted equivalents reconstruct their reviewed bytes exactly' {
+Case 'all three frozen reviewed fixtures reconstruct their exact approved bytes' {
     foreach ($name in @('gc-ada-instrumented','files-windows-platform','files-macos-platform')) {
-        $manifest = Join-Path $root "tests/conformance/equivalents/$name.json"
+        $manifest = Join-Path $frozenRoot "tests/conformance/equivalents/$name.json"
         $spec = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json -AsHashtable -Depth 64
-        $replay = Get-ConformanceEquivalentReplay -Root $root -Specification $spec
-        $output = Join-Path $temporary "$name.lua"
-        $generated = & (Join-Path $PSScriptRoot 'New-ConformanceEquivalent.ps1') -Manifest $manifest -Output $output |
+        $replay = Get-ConformanceEquivalentReplay -Root $frozenRoot -Specification $spec
+        $output = Join-Path $frozenRoot "reports/generated/$name.lua"
+        $generated = & (Join-Path $frozenRoot 'scripts/New-ConformanceEquivalent.ps1') -Manifest $manifest -Output $output |
             ConvertFrom-Json -AsHashtable
         Assert-True ($replay.sha256 -ceq $generated.output_sha256 -and
             [Convert]::ToBase64String($replay.bytes) -ceq [Convert]::ToBase64String([IO.File]::ReadAllBytes($output))) `
@@ -92,16 +138,25 @@ Case 'all three accepted equivalents reconstruct their reviewed bytes exactly' {
     }
 }
 Case 'an unreviewed equivalent never becomes replay authority' {
-    $spec = Get-Content (Join-Path $root 'tests/conformance/equivalents/gc-ada-instrumented.json') -Raw |
+    $spec = Get-Content (Join-Path $frozenRoot 'tests/conformance/equivalents/gc-ada-instrumented.json') -Raw |
         ConvertFrom-Json -AsHashtable -Depth 64
     $spec.review.status = 'pending'
-    Reject { Get-ConformanceEquivalentReplay -Root $root -Specification $spec } 'independent and accepted'
+    Reject { Get-ConformanceEquivalentReplay -Root $frozenRoot -Specification $spec } 'independent and accepted'
 }
 Case 'equivalent reconstruction rejects wider or changed source spans' {
-    $spec = Get-Content (Join-Path $root 'tests/conformance/equivalents/gc-ada-instrumented.json') -Raw |
+    $spec = Get-Content (Join-Path $frozenRoot 'tests/conformance/equivalents/gc-ada-instrumented.json') -Raw |
         ConvertFrom-Json -AsHashtable -Depth 64
     $spec.replacements[0].length_bytes++
-    Reject { Get-ConformanceEquivalentReplay -Root $root -Specification $spec } 'original span hash differs'
+    Reject { Get-ConformanceEquivalentReplay -Root $frozenRoot -Specification $spec } 'original span hash differs'
+}
+Case 'changed production counterparts cannot inherit frozen review authority' {
+    $staleRoot = Join-Path $temporary 'deliberately-stale-current'
+    Copy-Item -LiteralPath $frozenRoot -Destination $staleRoot -Recurse
+    $counterpart = Join-Path $staleRoot 'tests/src/lua-conformance_adapter_tests.adb'
+    [IO.File]::AppendAllText($counterpart,"`n-- synthetic later source change`n",$utf8)
+    $spec = Get-Content (Join-Path $staleRoot 'tests/conformance/equivalents/gc-ada-instrumented.json') -Raw |
+        ConvertFrom-Json -AsHashtable -Depth 64
+    Reject { Get-ConformanceEquivalentReplay -Root $staleRoot -Specification $spec } 'Review file hash differs'
 }
 Case 'T private reconstruction preserves checkR and unrelated public assertions' {
     $f = New-TFixture code.lua; $replay = Invoke-TFixture $f
@@ -216,25 +271,25 @@ Case 'matrix reconstructs derived T bytes instead of trusting their reported has
 }
 Case 'matrix replays existing Ada equivalence and protects the separate C oracle' {
     $manifest = 'tests/conformance/equivalents/gc-ada-instrumented.json'
-    $spec = Get-Content (Join-Path $root $manifest) -Raw | ConvertFrom-Json -AsHashtable -Depth 64
-    $replay = Get-ConformanceEquivalentReplay -Root $root -Specification $spec
-    $manifestHash = (Get-FileHash (Join-Path $root $manifest)).Hash.ToLowerInvariant()
+    $spec = Get-Content (Join-Path $frozenRoot $manifest) -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    $replay = Get-ConformanceEquivalentReplay -Root $frozenRoot -Specification $spec
+    $manifestHash = (Get-FileHash (Join-Path $frozenRoot $manifest)).Hash.ToLowerInvariant()
     $report = @{execution_disposition='ada-internal-equivalent';target='Ada';requested_configuration='default';
         equivalent=@{manifest_path=$manifest;manifest_sha256=$manifestHash;diagnostic_only=$false;review_status='accepted';
-            output=(Join-Path $temporary 'gc-ada-instrumented.lua');output_sha256=$replay.sha256}}
+            output=(Join-Path $frozenRoot 'reports/generated/gc-ada-instrumented.lua');output_sha256=$replay.sha256}}
     $entry = @{operation='file:gc.lua'}
     $contract = @{equivalent_manifest_sha256=$manifestHash;executed_sha256=$replay.sha256;disposition='ada-internal-equivalent'}
-    Invoke-MatrixTransform $root $root $report $entry $contract @{}
+    Invoke-MatrixTransform $frozenRoot $frozenRoot $report $entry $contract @{}
     $report.target = 'ReferenceC'
-    Reject { Invoke-MatrixTransform $root $root $report $entry $contract @{} } 'cannot replace original C execution'
+    Reject { Invoke-MatrixTransform $frozenRoot $frozenRoot $report $entry $contract @{} } 'cannot replace original C execution'
 }
 Case 'matrix cannot accept a platform mapping without original C applicability' {
     $manifest = 'tests/conformance/equivalents/files-windows-platform.json'
-    $manifestHash = (Get-FileHash (Join-Path $root $manifest)).Hash.ToLowerInvariant()
+    $manifestHash = (Get-FileHash (Join-Path $frozenRoot $manifest)).Hash.ToLowerInvariant()
     $report = @{execution_disposition='native-platform-equivalent';target='Ada';requested_configuration='default';
         host=@{platform='windows'};native_applicability_verified=$false;
         equivalent=@{manifest_path=$manifest;manifest_sha256=$manifestHash;diagnostic_only=$false;review_status='accepted'}}
-    Reject { Invoke-MatrixTransform $root $root $report @{operation='file:files.lua'} @{} @{} $true } 'source-linked original C applicability'
+    Reject { Invoke-MatrixTransform $frozenRoot $frozenRoot $report @{operation='file:files.lua'} @{} @{} $true } 'source-linked original C applicability'
 }
 
 function New-NativeFixture {
@@ -323,4 +378,15 @@ Case 'native applicability source context and independent review cannot drift' {
 }
 
 Write-Output "PASS: $script:Cases exact-byte transform regressions; synthetic approval fixtures, no runtime conformance claim"
+$productionBlockers = @()
+foreach ($name in @('gc-ada-instrumented','files-windows-platform','files-macos-platform')) {
+    $spec = Get-Content (Join-Path $root "tests/conformance/equivalents/$name.json") -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    try { $null = Get-ConformanceEquivalentReplay -Root $root -Specification $spec }
+    catch { $productionBlockers += @{id=$name;error=$_.Exception.Message} }
+}
+$null = Write-Json (Join-Path $temporary 'production-applicability.json') @{
+    schema_version=1;unit_fixtures_only=$true;runtime_acceptance=$false;current_production_blockers=$productionBlockers}
+foreach ($blocker in $productionBlockers) {
+    Write-Output "PRODUCTION REPLAY BLOCKED: $($blocker.id): $($blocker.error); frozen unit fixtures do not clear this integration blocker"
+}
 exit 0
