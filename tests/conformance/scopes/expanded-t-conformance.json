@@ -233,9 +233,9 @@
     "status": "reviewed",
     "author": "Codex /root/conformance_scope",
     "reviewer": "Codex /root/draft_assessment",
-    "artifact": "tests/conformance/reviews/expanded-t-conformance.scope-selection-profile.cross-review.json",
-    "artifact_sha256": "b68d418ab4ebbece49150dddb8b4f02db2e2eed83af335eed55540add7c2720f",
-    "rationale": "Independent current producer-source applicability and unchanged13/helper/159selection review. Installed3107runtime/data decisions retain their original evidence. Fresh final-head execution remains a separate gate."
+    "artifact": "tests/conformance/reviews/expanded-t-conformance.scope-selection-status.cross-review.json",
+    "artifact_sha256": "7668b70f4526869798722bb11b9eb2eb632890f4ee8f69718b79939c9a94b58f",
+    "rationale": "Exact selected identity/current status-witness source routing only. Historical runtime projections remain dated; the strengthened refusal-status case13 must freshly execute in all26 C/AUnit contexts."
   },
   "api_coverage_file": "scopes/expanded-t-conformance.api.jsonl",
   "source_classification_review": {
@@ -243,7 +243,7 @@
     "sha256": "0a50a7963747d8f3c8622f9d2f8db7f92ae09375f3441ee6ca2c63b06b328888"
   },
   "api_semantic_review": {
-    "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-profile.cross-review.json",
-    "sha256": "a0df45f9934cca9992861d6bc98a84d7b11d58f30bb0d11b8ba0e969755b1fe2"
+    "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-status.cross-review.json",
+    "sha256": "8a4047db129df08a3f444b0a26c1d0da69b15572c7d04babbd9b0ad7c1ffd979"
   }
 }

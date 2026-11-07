@@ -27,6 +27,15 @@ CLI, binary, consumer and seeded differential campaigns also pass. All hosts
 select Alire 2.1.1, stable native GNAT 16.1.0 and GPRbuild package 26.0.1;
 the GPRBUILD executable banner is 26.0.0. Required flags and checks stay enabled.
 
+The automatic review of [PR #10](https://github.com/itsuki-hayashi/lua-ada/pull/10)
+identified a retained coroutine-status mismatch after allocation refusal.
+The correction preserves the memory/error-handler classes already transported
+by resume when lua_status queries a failed coroutine. The existing separately
+named refusal witness now checks that status both immediately and after scalar
+stack access. Its catalog counts stay unchanged. The corrected implementation
+requires fresh 26-context execution and independent acceptance on its own head;
+the earlier accepted certificate remains dated evidence for its original tree.
+
 Independent decisions bind all 1,009 exact source/API projections, fresh
 collector/platform applicability and the final bytes of all 338 execution
 contracts. Candidate adjudication and installation do not establish final-head

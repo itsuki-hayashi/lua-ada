@@ -1,0 +1,361 @@
+{
+  "schema_version": 1,
+  "kind": "reviewed-retained-status-api-binding-installation",
+  "author": "Codex /root/expanded_source_audit",
+  "base_revision": "c209b8a918dc114d6fb2b6f3f8c887634a2dde8c",
+  "author_packet": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.status-binding-delta-author-proposal.json",
+    "sha256": "669762db2bb6e48e0a0202b8c25e9c10d8a098fe2ba4c4a695f77ce48f187b06"
+  },
+  "independent_review": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.status-bindings.cross-review.json",
+    "sha256": "1d511fe8ff64477d393d0da05ee29909c713c02865b0afe8b4ad57526b4f6a2f"
+  },
+  "ledger": {
+    "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
+    "before_sha256": "a4d07f35549c095e264082cf41ae9edb7a543e65e71bfa55103421f537ece065",
+    "sha256": "1333a0525d601bb6c88c32bff5443ee6a0beb05d90c09bc53b0f8d59123e7b27"
+  },
+  "outputs": [
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.status-binding-delta-author-proposal.json",
+      "before_sha256": null,
+      "sha256": "669762db2bb6e48e0a0202b8c25e9c10d8a098fe2ba4c4a695f77ce48f187b06"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-status-author-proposal.json",
+      "before_sha256": null,
+      "sha256": "2b96035cd32a6b0a062e8e2bc98374e9b5ef45df59a23422e3ad90f209a1794f"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-status.cross-review.json",
+      "before_sha256": null,
+      "sha256": "8a4047db129df08a3f444b0a26c1d0da69b15572c7d04babbd9b0ad7c1ffd979"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-status-author-proposal.json",
+      "before_sha256": null,
+      "sha256": "61990a195b8b7f780ca3c569dccf6cddde5be1a09714bd475d999c9764100c7f"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-status.cross-review.json",
+      "before_sha256": null,
+      "sha256": "e0136b2fe84832748a057a7fe4894101940dd32ec30e7b6560afa504e9ad409e"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-status-author-proposal.json",
+      "before_sha256": null,
+      "sha256": "2af1163bc7cb7d556d23aaa3516dad54485bc4d5ab98aa5f204de5471e9db1e7"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-status.cross-review.json",
+      "before_sha256": null,
+      "sha256": "3e35977ba812a0e239e9fb45c914150470e4308a15d722a54502eed82562bf87"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.status-bindings.cross-review.json",
+      "before_sha256": null,
+      "sha256": "1d511fe8ff64477d393d0da05ee29909c713c02865b0afe8b4ad57526b4f6a2f"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
+      "before_sha256": "a4d07f35549c095e264082cf41ae9edb7a543e65e71bfa55103421f537ece065",
+      "sha256": "1333a0525d601bb6c88c32bff5443ee6a0beb05d90c09bc53b0f8d59123e7b27"
+    }
+  ],
+  "changed_api_rows": [
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_ERRMEM-52",
+      "projection_sha256": "f6cc954b10abb48a1892555a44b61089aba15c49fd0f9026de5fae98ca8180ec",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "9d8ddb7067a4181672e9f8ab9b092e721ed8524d25d865929281bd561324aec4"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_TNUMBER-67",
+      "projection_sha256": "6df54803d2e1bfb49de0bc4f1f811156e1fc95d5f6db2cba07a0ce87d184641b",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "4e02ac751690646b3f319045bb3b43b12ed92eac995200334df165c46f9b54de"
+    },
+    {
+      "id": "CAPI-LUA-H-TYPE-LUA_DEBUG-137",
+      "projection_sha256": "2dc06e4c22e5c06d00e8cc002f669563335094149052e4d0559914f390536f75",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "b5b266200576f3e6d58a78a04a054ac4ce2bbee172e7307af7ab72587a5a12fe"
+    },
+    {
+      "id": "CAPI-LUA-H-TYPE-LUA_HOOK-143",
+      "projection_sha256": "64e4d261af59376375882e39b0fb57c3f99223484a8adf26460baba8983f3aa9",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "df4451418b3790145593186772cc7c1372fc36359adcb125b1c41afd6b7d4c91"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CLOSE-164",
+      "projection_sha256": "66a61d12b677996b512b7a7060076fb3dfbee49bafe937dfa419d99ba8f9990f",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "752b61af5ed30342b8d262fa9cf49244b3140dfa0d38816900fa31ff481fe430"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETTOP-179",
+      "projection_sha256": "bf5aaf39ea36c2ed871909c1e6d734f4c2cad1af9ca2a1abaa71e8f0601e28c4",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "6ea5339c67b742418adb6f52d6e143ac4e1d67aab4b81719f85e478240da5052"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETTABLE-263",
+      "projection_sha256": "1182787430b9b27a8f95550d9d91b000f96e14100e12852501eb4efaf96ea357",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "bc8b75f549e314f22e59c64d5ad6338a811c2baff49ed69384a81d98bb106c38"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETFIELD-264",
+      "projection_sha256": "f7d58b9157469848476d6c5db0f951a6bf4f739c59864ea4433d4bef4bda023e",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "3296094eb03c941374a338166fc2b65112b6b17f55e605ad17434fd7d72dc127"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETTABLE-280",
+      "projection_sha256": "6892d86227a598da4991a8299f84b96ce5ddc7a8bc9321823afa2c1172a422b9",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "10d62166a387afabfe21e0572602050c721b88575d3bdf3fffdd9a7a60765ecc"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETFIELD-281",
+      "projection_sha256": "81f14ebb2c80545d96e0ce1129c83d21fc219fa346f955f1101972461b6f6ae0",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "71c3516426c0955cc96a54d270d9334eb1088846fd07819d00fae0c9ec143e73"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RESUME-312",
+      "projection_sha256": "50373c54fe3a0e5825a265e159f84505bcd8c38f61faa5cb176211258e68c137",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "aa03dd96cc37ab1afe3bdad859f20a708bfd99575848a5b90a23c6abd5c99ee9"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_STATUS-314",
+      "projection_sha256": "4cd46f50dc266fc9f879da4f30de285fc8163f347513910fe290e5407ee79a3a",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "16a7331e9a17de25f78d7bcfc1f02478e96176768c6cbd7060201b0ac88e23d9"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TOCLOSE-381",
+      "projection_sha256": "dbfcc987acd67d122d70f80b5c4650e29aec5a753734d7368bec10568df01201",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "188f4a48793f8b7308b28c0ce8469c7c3c5e18bbb98bfc11d87abfd1333fc530"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CLOSESLOT-382",
+      "projection_sha256": "559ed7a2bbfd123179b02649b93ffe45f4e5ad3ad0499ec2c7b45a3beaec1142",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "2216ef50afa472835fc2541023410093d226645dd64b76d6a3e0d28164f2d2b5"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_POP-396",
+      "projection_sha256": "de30bee1b96f0bf5dcdaab5e1d8e715a11200d6ad7f693c2083ae4c392fc4489",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "df7d3f415fd783ad24a08d14714ad1e616bf666424822376f216d18a7cc55999"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKCALL-454",
+      "projection_sha256": "6cc251b36175090aff6ac3d67524af594e5088ccbc0187c2a1f690731055f481",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "5455b6daca7919c0e4c77fc12bd2817871847dbad121e465760966e063c76dc9"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKRET-455",
+      "projection_sha256": "07d506e6786cb09cea6c3579e4202762b548c6901d748d2f691a04d9424802d5",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "3bf1456fc20c0955167903ef7461a1a0ce96195be8cde5d24bece1e8ba6795b3"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKLINE-456",
+      "projection_sha256": "a2d26ae50deb67831dd10c28c8b66319d70fa26aab1250c04598bd546fb14497",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "f8c57debeb0dd2f972339dfd02e4426a8a7b1e8d34b90b5b00b19db3587d764e"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKCOUNT-457",
+      "projection_sha256": "55fb04bb88a912d26df963d612e41652ebb2a0538d9361392a9149ab01d75c7b",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "bd512dcacf8d4eb791986ca2a2810fc6a16e4b9ff53a9232b380e6e309597646"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKTAILCALL-458",
+      "projection_sha256": "9c8434777d1221885569e6405b5b99cf97380c56dfb102f18547ee328074e257",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "bd8b7a92b36c71bc8f5b7a3422559fe2ed041d7064a30a467b229dbe694a1700"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_MASKCALL-464",
+      "projection_sha256": "89db33fc1fd798633b8b1e523596fb24cf95985860816975a0c983e97d48252d",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "829671ec960631b7f638145184eab8b893d89556cea18e11d2a768187ae2f614"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_MASKRET-465",
+      "projection_sha256": "493de79ea0bd68041fc22b29cb37f812ff2bd47ff1b1269487ba75a1b63c4022",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "b0e1de8f29c6ae7d7eea1d776c30089923ad8949abbebe396c1ee375cd3529ec"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_MASKLINE-466",
+      "projection_sha256": "5f78d30af753d36a017da73630700beb3175eda02153200c9e47bf1589e5ffda",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "eb4c249efe963018a726ca5ff37ec394636f03448210078828be729f91eda207"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_MASKCOUNT-467",
+      "projection_sha256": "56dc5f3184e61649c4fdfcfab0d051c9579430a78395f0295d6982269e3080a4",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "273954a1d990ab6d0150a2c29a382f8cbb5e3149d638f002c9b6afe3b9a7ff03"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETSTACK-470",
+      "projection_sha256": "d3a1ac5eb4e4c37b8a9e7a18945b4f89fcdfd6bf637e266a87684c9149c5fa80",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "50371b65839c89d91284535cd1c577a7c6217a34016ab09d5655714a44bee92b"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETINFO-471",
+      "projection_sha256": "345ca0a273823f0ccae78da4b3dee168d1aeb8ccc05bc9bb2c18081965d7d0c3",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "7b671359f3607d71c57f40ab06c9475f37da92e28638f415a02b00b261d4e499"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETHOOK-481",
+      "projection_sha256": "aa0ddce2d259470148983ef46cb32d99272b2a83534743b51a6847ad9c468dd7",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "2eb34cbd89777366d9499c7596407decb8e6d71b022a97f66cda6dc005ce533a"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETHOOK-482",
+      "projection_sha256": "bfea6e163d6be1ed7849cb545794e550a04c248324f72498b21f728dc2c39785",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "bb468fca96c86ff07d4499db47c8cc3489d4cfed729ece6561208b5921312c3a"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETHOOKMASK-483",
+      "projection_sha256": "7c4accb4fcb3939f08ce6259398f1173b976a1b043df2156ccae71169b674bc2",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "9380a8de658e2a01e5a8861d236ea98f020c3bcd82b1f46d9c94e1289756d2da"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETHOOKCOUNT-484",
+      "projection_sha256": "10642e92c94ed5f4d56beabea2490c2975444b436cef8518a65f563740d7c17c",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "0210180f0b1a8c90a8638c6e3a0854e1dddb0dc2059ea386f0c5485b25a3d2b9"
+    },
+    {
+      "id": "CAPI-LUA-H-TYPE-LUA_DEBUG-487",
+      "projection_sha256": "9422d53e48e99ee75a2c36d4efefb9926816086687a2e7d3c8423d4fa74a87e4",
+      "changed_fields": [
+        "named_cases",
+        "named_aunit_cases"
+      ],
+      "installed_record_sha256": "1d007486bd22db6dcdd4c92fba14fe8e855df095c3da5587d8316d7b40c9d6b0"
+    }
+  ],
+  "catalog_counts": {
+    "api": 159,
+    "c": 100,
+    "aunit": 94
+  },
+  "historical_execution_status_evidence_review_unchanged": true,
+  "original_installation_certificate_unchanged": true,
+  "current_head_runtime_acceptance": false,
+  "fresh_status_execution_requirement": {
+    "contexts": 26,
+    "c_case": "tests/c/foreign_hook_contract.c#foreign-hook-13",
+    "aunit_case": "tests/src/lua-foreign_hook_tests.adb#C_Refusal_Reuse",
+    "historical_evidence_sufficient": false
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "kind": "independent-retained-status-static-routing-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "base_revision": "c209b8a918dc114d6fb2b6f3f8c887634a2dde8c",
+  "author": "Codex /root/conformance_scope",
+  "reviewer": "Codex /root/draft_assessment",
+  "decision": "accepted-current-status-witness-source-routing",
+  "proposal": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.status-scope-harness-author-proposal.json",
+    "sha256": "6911dc7cc3f7c55fb760770d047247b7a6be3dbf9b6582f3b676f61c3f58070c"
+  },
+  "source_fix_review": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.retained-status-runtime.cross-review.json",
+    "sha256": "9fc2c3527d0a481512c0d4a48cc65449ea1e8429d3403e43d1046fda540125c1"
+  },
+  "API_binding_installation": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.status-api-binding-installation.json",
+    "sha256": "b1b2fad51a21f3929b03af7086f8e5d203390a310df1bd2098bd80e1d42693b5"
+  },
+  "selection_review": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-status.cross-review.json",
+    "sha256": "7668b70f4526869798722bb11b9eb2eb632890f4ee8f69718b79939c9a94b58f"
+  },
+  "approved_inputs": [
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.status-binding-delta-author-proposal.json",
+      "before_sha256": null,
+      "sha256": "669762db2bb6e48e0a0202b8c25e9c10d8a098fe2ba4c4a695f77ce48f187b06",
+      "input_path": "tests/conformance/reviews/expanded-t-conformance.status-binding-delta-author-proposal.json",
+      "role": "independently-approved-status-API-binding-output"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-status-author-proposal.json",
+      "before_sha256": null,
+      "sha256": "2b96035cd32a6b0a062e8e2bc98374e9b5ef45df59a23422e3ad90f209a1794f",
+      "input_path": "tests/conformance/reviews/expanded-t-conformance.api-witness-status-author-proposal.json",
+      "role": "independently-approved-status-API-binding-output"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-status.cross-review.json",
+      "before_sha256": null,
+      "sha256": "8a4047db129df08a3f444b0a26c1d0da69b15572c7d04babbd9b0ad7c1ffd979",
+      "input_path": "tests/conformance/reviews/expanded-t-conformance.api-witness-status.cross-review.json",
+      "role": "independently-approved-status-API-binding-output"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-status-author-proposal.json",
+      "before_sha256": null,
+      "sha256": "61990a195b8b7f780ca3c569dccf6cddde5be1a09714bd475d999c9764100c7f",
+      "input_path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-status-author-proposal.json",
+      "role": "independently-approved-status-API-binding-output"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-status.cross-review.json",
+      "before_sha256": null,
+      "sha256": "e0136b2fe84832748a057a7fe4894101940dd32ec30e7b6560afa504e9ad409e",
+      "input_path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-status.cross-review.json",
+      "role": "independently-approved-status-API-binding-output"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-status-author-proposal.json",
+      "before_sha256": null,
+      "sha256": "2af1163bc7cb7d556d23aaa3516dad54485bc4d5ab98aa5f204de5471e9db1e7",
+      "input_path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-status-author-proposal.json",
+      "role": "independently-approved-status-API-binding-output"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-status.cross-review.json",
+      "before_sha256": null,
+      "sha256": "3e35977ba812a0e239e9fb45c914150470e4308a15d722a54502eed82562bf87",
+      "input_path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-status.cross-review.json",
+      "role": "independently-approved-status-API-binding-output"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.status-bindings.cross-review.json",
+      "before_sha256": null,
+      "sha256": "1d511fe8ff64477d393d0da05ee29909c713c02865b0afe8b4ad57526b4f6a2f",
+      "input_path": "tests/conformance/reviews/expanded-t-conformance.status-bindings.cross-review.json",
+      "role": "independently-approved-status-API-binding-output"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
+      "before_sha256": "a4d07f35549c095e264082cf41ae9edb7a543e65e71bfa55103421f537ece065",
+      "sha256": "1333a0525d601bb6c88c32bff5443ee6a0beb05d90c09bc53b0f8d59123e7b27",
+      "input_path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
+      "role": "independently-approved-status-API-binding-output"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.status-api-binding-installation.json",
+      "sha256": "b1b2fad51a21f3929b03af7086f8e5d203390a310df1bd2098bd80e1d42693b5",
+      "before_sha256": null,
+      "input_path": "tests/conformance/reviews/expanded-t-conformance.status-api-binding-installation.json",
+      "role": "API-binding-installation-certificate"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.retained-status-runtime.cross-review.json",
+      "input_path": "reports/expanded-t-conformance/status-source-refresh/reviews/expanded-t-conformance.retained-status-runtime.cross-review.json",
+      "sha256": "9fc2c3527d0a481512c0d4a48cc65449ea1e8429d3403e43d1046fda540125c1",
+      "before_sha256": null,
+      "role": "independent-production-status-repair-review"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-status-author-proposal.json",
+      "input_path": "reports/expanded-t-conformance/status-source-refresh/proposals/expanded-t-conformance.scope-selection-status-author-proposal.json",
+      "sha256": "e5380312c1cd669da1a5c78c1add058fe50bfb41ff1815681779abe8a76f4087",
+      "before_sha256": null,
+      "role": "selection-author-proposal"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-status.cross-review.json",
+      "input_path": "reports/expanded-t-conformance/status-source-refresh/reviews/expanded-t-conformance.scope-selection-status.cross-review.json",
+      "sha256": "7668b70f4526869798722bb11b9eb2eb632890f4ee8f69718b79939c9a94b58f",
+      "before_sha256": null,
+      "role": "independent-selection-approval"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "input_path": "reports/expanded-t-conformance/status-source-refresh/scope-status-staged.json",
+      "sha256": "9df8642d10238abaa48c97184ed2345be7106d4c2c74668954e43bc0cb6ecdc1",
+      "before_sha256": "e06748810e94fd633684b0f5b4c321d95cd8d96afcdbabc6286bf83c319e37ea",
+      "role": "two-field-scope-review-routing"
+    }
+  ],
+  "verified_counts": {
+    "exact_inputs": 14,
+    "scope_fields_changed": 2,
+    "preserved_original_installation_outputs": 359,
+    "primary_files": 13,
+    "helpers": 1,
+    "api_entries": 159,
+    "c_cases": 100,
+    "aunit_cases": 94
+  },
+  "reviewed_properties": [
+    "All fourteen proposed metadata inputs independently match exact bytes and c209 preimages. The approved API installation matches its exact independently reviewed target ledger.",
+    "Only api_semantic_review and review change in the scope definition. Membership, helper identity, all159 API IDs, source conditions and prerequisites remain exact.",
+    "All original source coverage rows and execution contracts remain unchanged. Every other original execution-installation output was independently rehashed successfully.",
+    "The runtime source review, selection proposal and selection approval are exact independently accepted bytes; historical approvals and certificates are preserved.",
+    "No first-party harness, GPR, workflow or manifest code changes are authorized by this static routing decision.",
+    "Current descriptor review changes do not certify newly strengthened assertions. Both C case13 and its AUnit wrapper must freshly pass all26 applicable contexts at the corrected clean revision."
+  ],
+  "findings": [],
+  "runtime_evidence_rewritten": false,
+  "execution_evidence_added": false,
+  "current_head_execution_acceptance": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false
+}

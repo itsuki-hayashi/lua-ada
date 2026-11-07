@@ -16,6 +16,12 @@ final scoped completion evidence; candidate success alone does not establish
 it. Merge is authorized after current-head CI, independent final reconciliation
 and review fixes pass. All broader M3 obligations retain their separate gates.
 
+PR #10's automatic review adds an explicit retained-memory-status assertion to
+the existing allocation-refusal C/AUnit witness. Its lua_status/LUA_ERRMEM links
+and producer hashes are independently reviewed with the correction. The final
+certificate must follow fresh 26-context execution of the corrected head;
+neither the preceding head's acceptance nor its partial PR workflow closes it.
+
 The preceding 2026-11-07 bounded follow-up was `gc-io-events` on
 `codex/m3-gc-io-conformance`, based on merged PR #8. It covers events.lua,
 gc.lua, gengc.lua and files.lua, including T and all 26 applicable contexts.

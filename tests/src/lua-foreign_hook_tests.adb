@@ -118,7 +118,8 @@ package body Lua.Foreign_Hook_Tests is
    procedure C_Refusal_Reuse is
    begin
       --  Sweep real provider refusal points during resume. The healthy parent
-      --  supports protected calls; the failed child still permits stack
+      --  supports protected calls; the failed child retains public ERRMEM
+      --  status both while allocation is refused and after scalar stack
       --  access. Physical close balances all counted provider allocations.
       Assert (Contract (13) = 0, "C resume refusal restores reusable owners");
    end C_Refusal_Reuse;

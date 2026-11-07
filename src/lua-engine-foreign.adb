@@ -1167,9 +1167,17 @@ package body Lua.Engine.Foreign is
             Foreign_Hooks.Handle
               (Owner.Universe.all, Context, Input.all, Output.all);
          when Get_Status =>
+            --  Resume retains the failure category after its public result
+            --  window is inspected or cleared. Report the same public status
+            --  as the driver, rather than treating every retained error as a
+            --  language failure. Suspended execution still takes precedence.
             Output.Integer_Data :=
               (if Context.Status = Suspended_Context then 1
-               elsif Context.Has_Failure_Value then 2 else 0);
+               elsif Context.Has_Failure_Value then
+                 (if Context.Failure_Class = Memory_Failure then 4
+                  elsif Context.Failure_Class = Handling_Failure then 5
+                  else 2)
+               else 0);
          when Prepare_Index =>
             declare
                Target : constant Value := Get_Value (Input.Index);

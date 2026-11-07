@@ -111,6 +111,13 @@ static int refusal_reuse_contract(void) {
         if (status != LUA_OK) { lua_close(L); return 51; }
         counts.fail_after = counts.growths + (size_t)offset;
         status = lua_resume(co, L, 0, &count);
+        /* A failed resume retains its precise public error class. Query it
+         * before restoring allocation: lua_status is a scalar observation,
+         * not a new allocation or a request to restart the failed thread. */
+        if (status == LUA_ERRMEM && lua_status(co) != LUA_ERRMEM) {
+            counts.fail_after = 0;
+            lua_close(L); return 58;
+        }
         counts.fail_after = 0;
         if (status == LUA_ERRMEM) ++refusals;
         else if (status == LUA_YIELD) {
@@ -129,6 +136,11 @@ static int refusal_reuse_contract(void) {
         lua_pushinteger(co, 31);
         if (lua_tointeger(co, -1) != 31) {
             lua_close(L); return 55;
+        }
+        /* Clearing/reusing the public stack must not erase the retained
+         * memory failure or reclassify it as an ordinary runtime error. */
+        if (status == LUA_ERRMEM && lua_status(co) != LUA_ERRMEM) {
+            lua_close(L); return 59;
         }
         lua_close(L);
         if (counts.bytes != 0 || counts.blocks != 0) return 56;

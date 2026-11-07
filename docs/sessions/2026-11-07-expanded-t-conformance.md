@@ -1,6 +1,7 @@
 # Expanded T conformance delivery
 
-Date: 2026-11-07, Asia/Tokyo. Status: implementation in progress; not accepted.
+Date: 2026-11-07, Asia/Tokyo. Status: dated implementation/review checkpoints;
+the tested head's Git note owns final scoped acceptance.
 
 The maintainer approved one delivery on `codex/m3-expanded-t-conformance`,
 starting at merged PR #9 (`b87c58f`). Preserve and complete the existing draft.
@@ -366,3 +367,54 @@ bindings preserve all 159 API descriptors, 100 C cases, 94 AUnit cases and the
 historical execution projections. A corrected clean revision must receive a
 fresh complete matrix and independent reconciliation, including all seven T
 profile-regression receipts, before PR publication and merge.
+
+## Accepted publication and automatic-review correction
+
+Clean c209b8a918dc114d6fb2b6f3f8c887634a2dde8c passes all 24 jobs/26 contexts in
+[workflow 42357893786](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42357893786).
+Both corrected complete local pipelines also pass. Independent reconciliation
+accepts 338 primary pairs, 26 supplemental constructs pairs, 728 process reports,
+364 Ada operations, 26 warning indices/170 processes and seven profile receipts.
+The exact accepted replay is SHA-256
+39d9947349a0f454d0dbd14b574b58547c3683cc629a85509608241438424526;
+the independent matrix approval is
+1eabf292c8baeb6e40b32992790c5e5eae7346b14b6834dd1d1e920ec0fefc86.
+
+The 94-member immutable package is published under
+refs/notes/expanded-t-conformance, notes commit
+3582eef0642406a9552b4947692f0930cf5f8ecd, package SHA-256
+b9c8f41061cd815d97c8ab3b1269a4d76a66d27d5f414332beb0a9202a1b55bf.
+Its 42 archive indices and all seven raw profile receipts are included. Root
+verifies every selected hash, the automatic fresh unpack/byte comparison and
+the exact Git blob before publication. The original large-base64 regex hits
+V8's recursion limit; a versioned linear serialization validator preserves the
+encoding/hash/provenance rules and passes 53 existing packer, 19 selector and
+17 focused tests. Independent review reruns the suites, compares 65,536 grammar
+inputs and validates the actual 5.8 MB payload. This changes no tested source.
+
+[PR #10](https://github.com/itsuki-hayashi/lua-ada/pull/10) opens non-draft against
+master and automatically triggers Codex review. Its initial PR workflow is
+42362551242. The review completes on c209b8a with one
+[P2 finding](https://github.com/itsuki-hayashi/lua-ada/pull/10#discussion_r4501247969):
+lua_resume can return LUA_ERRMEM after provider refusal while lua_status maps
+every retained failure to LUA_ERRRUN. The retained failure class already holds
+the correct distinction.
+
+The repair makes lua_status use the same memory/error-handler class mapping as
+resume. The separately named refusal/reuse C/AUnit case remains one focused
+witness: it requires real memory refusal, checks the status immediately and
+after scalar stack access, exercises parent recovery, and balances shutdown.
+Its source bindings and the selected lua_status/LUA_ERRMEM API links receive
+fresh independent review. No upstream source/header or submodule pins, API IDs or named
+catalog counts change. The preceding accepted note is preserved for c209b8a;
+the corrected implementation requires a new clean 26-context run and independent
+certificate before review resolution and merge. Results of those final gates
+belong to that later tested head's immutable note, not this earlier checkpoint.
+
+The strengthened real case 13 fails with code 58 against a preserved copy of
+the original Ada SAL, then passes with the fixed SAL. Separate pinned C default
+and upstream-test processes also pass. The strict default validation/static
+build and complete AUnit suite pass 1,390/1,390 with zero assertion failures or
+unexpected errors. The known file-abort finalizer warning remains visible and
+expected. These targeted observations establish the regression and repair;
+they do not replace the corrected clean-head full pipelines or final matrix.

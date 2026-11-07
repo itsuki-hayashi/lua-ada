@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "kind": "independent-expanded-consumer-semantic-witness-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "base_revision": "c209b8a918dc114d6fb2b6f3f8c887634a2dde8c",
+  "author": "Codex /root/expanded_source_audit",
+  "reviewer": "Codex /root/draft_assessment",
+  "decision": "accepted-semantic-witness-mapping",
+  "proposal": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-status-author-proposal.json",
+    "sha256": "61990a195b8b7f780ca3c569dccf6cddde5be1a09714bd475d999c9764100c7f"
+  },
+  "predecessor_proposal": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-profile-author-proposal.json",
+    "sha256": "d0bf642d87f6f55a70de9dbd92ac02662afa8a11e289d1317f9c8b787baeb38a"
+  },
+  "predecessor_review": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-profile.cross-review.json",
+    "sha256": "aeaafe2b3f2dd58d861f3c4315633e18835299e2cb5334ae0d41a6fbf51f0ddc"
+  },
+  "author_packet": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.status-binding-delta-author-proposal.json",
+    "sha256": "669762db2bb6e48e0a0202b8c25e9c10d8a098fe2ba4c4a695f77ce48f187b06"
+  },
+  "producer_source_review": {
+    "path": "reports/expanded-t-conformance/status-source-refresh/reviews/expanded-t-conformance.retained-status-runtime.cross-review.json",
+    "sha256": "9fc2c3527d0a481512c0d4a48cc65449ea1e8429d3403e43d1046fda540125c1"
+  },
+  "source_bindings": [
+    {
+      "path": "tests/src/lua-foreign_continuation_tests.adb",
+      "sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d"
+    },
+    {
+      "path": "tests/c/foreign_continuation_contract.c",
+      "sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c"
+    },
+    {
+      "path": "tests/src/lua-foreign_hook_tests.adb",
+      "sha256": "c698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6"
+    },
+    {
+      "path": "tests/c/foreign_hook_contract.c",
+      "sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929"
+    },
+    {
+      "path": "tests/src/lua-math_reopen_tests.adb",
+      "sha256": "d268c079f5c31d9d093e5447a2bb77cd0c25208bca14f124cbeaf985faf59d7d"
+    },
+    {
+      "path": "tests/c/math_reopen_contract.c",
+      "sha256": "a2f702157d5a5b755f93bd594f929602ea8d3cc9a0612bddd11ee740c5085119"
+    },
+    {
+      "path": "tests/src/lua-library_opener_tests.adb",
+      "sha256": "2c6719b2b44561737dc0e691949ce05917d6a345ab0db1d0459f2c2f5a256890"
+    },
+    {
+      "path": "tests/c/library_opener_contract.c",
+      "sha256": "295a74a92127ea99f9fad99f307d70e45d8150722e0fbcc4c105ddc178eca426"
+    },
+    {
+      "path": "c_api/tests/foreign_api_contract.c",
+      "sha256": "aac33164afc2f48007b9b919eece945b47606cc0bee4019dcc59dea42e457431"
+    },
+    {
+      "path": "c_api/tests/consumer_allocator.h",
+      "sha256": "c888b195716ea9ea6023b01d06e9b21eb82035f6ee5beca1cf2bb7095749268c"
+    },
+    {
+      "path": "tests/c/conformance_api.c",
+      "sha256": "50e583644a8bd4345dd1ad6f237ee3ad8a7be40488ee1c2573c95ead820eade5"
+    },
+    {
+      "path": "tests/c/conformance_api.h",
+      "sha256": "c2069b39b0114a22c24ef1679932951bf535f54fe0723e5ea7fc9157f6f2e683"
+    },
+    {
+      "path": "tests/c/conformance_adapter.c",
+      "sha256": "f7ee6817ba2acbb3fcbf53192dd1e15781becb85e838755ad3a86bac9de92842"
+    },
+    {
+      "path": "references/lua/testes/coroutine.lua",
+      "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.adb",
+      "sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.ads",
+      "sha256": "e6fded8c7879538fd53fb4a92896d32158c85d2f783fb35a6e1a0466ffbb1c62"
+    },
+    {
+      "path": "references/lua/testes/closure.lua",
+      "sha256": "d03b641a7a7c4cb395762321200532f786e1554395e8499838e702b56d21880a"
+    },
+    {
+      "path": "tests/lua/condition_while_root.lua",
+      "sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9"
+    },
+    {
+      "path": "tests/lua/condition_if_root.lua",
+      "sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476"
+    },
+    {
+      "path": "tests/lua/condition_repeat_value_root.lua",
+      "sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228"
+    },
+    {
+      "path": "tests/lua/condition_repeat_root.lua",
+      "sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c"
+    },
+    {
+      "path": "tests/lua/condition_short_circuit_root.lua",
+      "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.adb",
+      "sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.ads",
+      "sha256": "49449173d1f133c1cdd3b86220afa307663d16cfb54766b36b7ab75e8e3b767d"
+    },
+    {
+      "path": "tests/lua/collector_scalar_weak_progress.lua",
+      "sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90"
+    },
+    {
+      "path": "c_api/tests/c_api_consumer.c",
+      "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
+    },
+    {
+      "path": "c_api/tests/io_contract.h",
+      "sha256": "9553a625db792889399df3aa246594018aed850a90404659fe189c0835c47f86"
+    },
+    {
+      "path": "c_api/tests/gc_contract.h",
+      "sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6"
+    },
+    {
+      "path": "tests/src/lua-collector_tests.adb",
+      "sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter_tests.adb",
+      "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+    },
+    {
+      "path": "tests/src/lua-physical_stack_tests.adb",
+      "sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd"
+    },
+    {
+      "path": "tests/src/lua-gc_control_tests.adb",
+      "sha256": "9e5a1dd3d16abe4e58d5fde4cfcd1f54d8f284458ca14b6d3a68492b63e4e1c8"
+    },
+    {
+      "path": "tests/src/lua-finalizer_runtime_tests.adb",
+      "sha256": "fa5110c03d1fe5d2d6fc21ddc40e08ac654c2c8b75f807c050e91ebff7ae9ff8"
+    },
+    {
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json",
+      "sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e"
+    },
+    {
+      "path": "tests/conformance/reviews/gc-parameter-api.mapping-proposal.json",
+      "sha256": "af5d3cf818dd164d073cdcf74dd89c03ef1f8390e73be34e1bb0021233fa02c4"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "8071c9872cc2244d59cc8de256b530262820e453cd802c5edbf6cee7db16c9e5"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "87e9a5b46ae8028f9ba8fe41e7502c12af622382bf0e91a36e78ae06944d2258"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8"
+    },
+    {
+      "path": "scripts/check-aunit-evidence.ps1",
+      "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
+    },
+    {
+      "path": "scripts/check-core-image.ps1",
+      "sha256": "401684a1b7d3f5561b40ccf2d6ec72db1b9d40c17282b6a52ec0a6fbe1ce0759"
+    },
+    {
+      "path": "scripts/test-prebuilt-runtime-profile.ps1",
+      "sha256": "2dc07e876ce062c213d100bf9ea228af946e49bb78459b71e20cbdda0b2518c6"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "sha256": "8274675cd1668f041e32100a7e9106ba6ecc65871da8ba0f0660df27878b4313"
+    }
+  ],
+  "verified_counts": {
+    "api_entries": 159,
+    "c_cases": 100,
+    "aunit_cases": 94,
+    "changed_api_descriptor_rows": 31,
+    "current_source_bindings": 42
+  },
+  "review_scope": "Exact current-source applicability and strengthened refusal-status semantics only; IDs/labels/catalog sizes, all unrelated invariants/boundaries, and historical execution observations remain unchanged.",
+  "reviewed_invariants": [
+    "Every bound file matches current bytes; proposal bindings cover source and producer inputs.",
+    "API descriptor changes are confined to existing hook/wrapper source hashes, dispatcher location, the same refusal-case relationship and the two direct lua_status/LUA_ERRMEM references.",
+    "The C dispatcher body is byte-identical; helper assertions shift its start to line278. Existing selector13 and registered C_Refusal_Reuse labels remain unchanged.",
+    "The focused test genuinely triggers allocator refusal and queries the same failed coroutine before recovery and after scalar stack reuse; the new code agrees with native C."
+  ],
+  "findings": [],
+  "limitations": [
+    "Preserved historical pass/evidence/review fields do not certify the new memory-status assertions. Final reconciliation must require fresh strengthened case13 C and AUnit observations in all26 applicable contexts at the corrected clean head, bound to C source01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929 and wrapperc698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6, or separately reviewed exact derivatives. Existing850 source obligations are not reclassified.",
+    "No global API, complete M3 or new-head runtime acceptance is conferred."
+  ],
+  "current_head_execution_acceptance": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false
+}

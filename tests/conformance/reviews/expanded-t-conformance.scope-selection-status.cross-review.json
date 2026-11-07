@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "kind": "scope-definition-semantic-approval",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "base_revision": "c209b8a918dc114d6fb2b6f3f8c887634a2dde8c",
+  "author": "Codex /root/conformance_scope",
+  "reviewer": "Codex /root/draft_assessment",
+  "decision": "accepted",
+  "proposal": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-status-author-proposal.json",
+    "sha256": "e5380312c1cd669da1a5c78c1add058fe50bfb41ff1815681779abe8a76f4087"
+  },
+  "predecessor_proposal": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-profile-author-proposal.json",
+    "sha256": "ba6280114ff31e63bee3d962bb9bcb688218a1bcadfac24ba539fb54367286be"
+  },
+  "predecessor_review": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-profile.cross-review.json",
+    "sha256": "b68d418ab4ebbece49150dddb8b4f02db2e2eed83af335eed55540add7c2720f"
+  },
+  "approved_identity": {
+    "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+    "files": [
+      {
+        "path": "bitwise.lua",
+        "sha256": "ea36f2c261483e85a65dffe41b0674fb92869a6372ac744ed7fea8304e6a8a19"
+      },
+      {
+        "path": "closure.lua",
+        "sha256": "d03b641a7a7c4cb395762321200532f786e1554395e8499838e702b56d21880a"
+      },
+      {
+        "path": "constructs.lua",
+        "sha256": "fd4eeece596bf53ee3a8ed015960dd34f34abcc9991a332e3c4b83a374cb5514"
+      },
+      {
+        "path": "coroutine.lua",
+        "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9"
+      },
+      {
+        "path": "events.lua",
+        "sha256": "90449c1607a12a7c1841123a68237e0d23b7d6e109b8c445937fcd99306897c9"
+      },
+      {
+        "path": "files.lua",
+        "sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86"
+      },
+      {
+        "path": "gc.lua",
+        "sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99"
+      },
+      {
+        "path": "gengc.lua",
+        "sha256": "5a7a6e525752c97221fbabc4ea4374692e59b3167f6f836d10ceffef16574e03"
+      },
+      {
+        "path": "goto.lua",
+        "sha256": "2e5168bba512878d4874398ba43d411741db0a68400a49818ec7b52ba62dc7cf"
+      },
+      {
+        "path": "math.lua",
+        "sha256": "24b1e2a94ab2e5f70d1fca0820e0c2746deca27d7e1a6152499b033de1b463b1"
+      },
+      {
+        "path": "pm.lua",
+        "sha256": "f1413157b8dc0979f9cda8b2551cc9a953a719e5b14d2b84f375462e56355dc5"
+      },
+      {
+        "path": "tpack.lua",
+        "sha256": "43984831af8269b9f9c1be90d39880863b395e835bf094e5dc5be2025674a246"
+      },
+      {
+        "path": "utf8.lua",
+        "sha256": "ba41997fb956fcd4a48d07c31c0b9e404cb88f0e2ea99ddf4a5cdcf48eb09696"
+      }
+    ],
+    "helpers": [
+      {
+        "path": "bwcoercion.lua",
+        "sha256": "e74cea2bb42125daca7f5536df31bb2684b74ffcbeb3b1198e31cc257aa659f6"
+      }
+    ],
+    "api_ids": [
+      "CAPI-LUA-H-MACRO-LUA_MULTRET-35",
+      "CAPI-LUA-H-MACRO-LUA_REGISTRYINDEX-43",
+      "CAPI-LUA-H-MACRO-LUA_UPVALUEINDEX-44",
+      "CAPI-LUA-H-MACRO-LUA_OK-48",
+      "CAPI-LUA-H-MACRO-LUA_YIELD-49",
+      "CAPI-LUA-H-MACRO-LUA_ERRRUN-50",
+      "CAPI-LUA-H-MACRO-LUA_ERRMEM-52",
+      "CAPI-LUA-H-MACRO-LUA_ERRERR-53",
+      "CAPI-LUA-H-TYPE-LUA_STATE-56",
+      "CAPI-LUA-H-MACRO-LUA_TNIL-64",
+      "CAPI-LUA-H-MACRO-LUA_TBOOLEAN-65",
+      "CAPI-LUA-H-MACRO-LUA_TNUMBER-67",
+      "CAPI-LUA-H-MACRO-LUA_TTABLE-69",
+      "CAPI-LUA-H-MACRO-LUA_TFUNCTION-70",
+      "CAPI-LUA-H-MACRO-LUA_TUSERDATA-71",
+      "CAPI-LUA-H-MACRO-LUA_RIDX_GLOBALS-84",
+      "CAPI-LUA-H-MACRO-LUA_RIDX_MAINTHREAD-85",
+      "CAPI-LUA-H-TYPE-LUA_NUMBER-90",
+      "CAPI-LUA-H-TYPE-LUA_INTEGER-94",
+      "CAPI-LUA-H-TYPE-LUA_KCONTEXT-100",
+      "CAPI-LUA-H-TYPE-LUA_CFUNCTION-106",
+      "CAPI-LUA-H-TYPE-LUA_KFUNCTION-111",
+      "CAPI-LUA-H-TYPE-LUA_ALLOC-125",
+      "CAPI-LUA-H-TYPE-LUA_WARNFUNCTION-131",
+      "CAPI-LUA-H-TYPE-LUA_DEBUG-137",
+      "CAPI-LUA-H-TYPE-LUA_HOOK-143",
+      "CAPI-LUA-H-FUNCTION-LUA_NEWSTATE-163",
+      "CAPI-LUA-H-FUNCTION-LUA_CLOSE-164",
+      "CAPI-LUA-H-FUNCTION-LUA_NEWTHREAD-165",
+      "CAPI-LUA-H-FUNCTION-LUA_ABSINDEX-177",
+      "CAPI-LUA-H-FUNCTION-LUA_GETTOP-178",
+      "CAPI-LUA-H-FUNCTION-LUA_SETTOP-179",
+      "CAPI-LUA-H-FUNCTION-LUA_PUSHVALUE-180",
+      "CAPI-LUA-H-FUNCTION-LUA_ROTATE-181",
+      "CAPI-LUA-H-FUNCTION-LUA_CHECKSTACK-183",
+      "CAPI-LUA-H-FUNCTION-LUA_XMOVE-185",
+      "CAPI-LUA-H-FUNCTION-LUA_ISSTRING-193",
+      "CAPI-LUA-H-FUNCTION-LUA_ISUSERDATA-196",
+      "CAPI-LUA-H-FUNCTION-LUA_TYPE-197",
+      "CAPI-LUA-H-FUNCTION-LUA_TONUMBERX-200",
+      "CAPI-LUA-H-FUNCTION-LUA_TOINTEGERX-201",
+      "CAPI-LUA-H-FUNCTION-LUA_TOBOOLEAN-202",
+      "CAPI-LUA-H-FUNCTION-LUA_TOLSTRING-203",
+      "CAPI-LUA-H-FUNCTION-LUA_RAWLEN-204",
+      "CAPI-LUA-H-FUNCTION-LUA_TOUSERDATA-206",
+      "CAPI-LUA-H-FUNCTION-LUA_TOTHREAD-207",
+      "CAPI-LUA-H-FUNCTION-LUA_RAWEQUAL-236",
+      "CAPI-LUA-H-FUNCTION-LUA_PUSHNIL-243",
+      "CAPI-LUA-H-FUNCTION-LUA_PUSHNUMBER-244",
+      "CAPI-LUA-H-FUNCTION-LUA_PUSHINTEGER-245",
+      "CAPI-LUA-H-FUNCTION-LUA_PUSHLSTRING-246",
+      "CAPI-LUA-H-FUNCTION-LUA_PUSHSTRING-249",
+      "CAPI-LUA-H-FUNCTION-LUA_PUSHCCLOSURE-253",
+      "CAPI-LUA-H-FUNCTION-LUA_PUSHBOOLEAN-254",
+      "CAPI-LUA-H-FUNCTION-LUA_PUSHLIGHTUSERDATA-255",
+      "CAPI-LUA-H-FUNCTION-LUA_GETGLOBAL-262",
+      "CAPI-LUA-H-FUNCTION-LUA_GETTABLE-263",
+      "CAPI-LUA-H-FUNCTION-LUA_GETFIELD-264",
+      "CAPI-LUA-H-FUNCTION-LUA_RAWGET-266",
+      "CAPI-LUA-H-FUNCTION-LUA_RAWGETI-267",
+      "CAPI-LUA-H-FUNCTION-LUA_CREATETABLE-270",
+      "CAPI-LUA-H-FUNCTION-LUA_NEWUSERDATAUV-271",
+      "CAPI-LUA-H-FUNCTION-LUA_GETMETATABLE-272",
+      "CAPI-LUA-H-FUNCTION-LUA_GETIUSERVALUE-273",
+      "CAPI-LUA-H-FUNCTION-LUA_SETGLOBAL-279",
+      "CAPI-LUA-H-FUNCTION-LUA_SETTABLE-280",
+      "CAPI-LUA-H-FUNCTION-LUA_SETFIELD-281",
+      "CAPI-LUA-H-FUNCTION-LUA_RAWSET-283",
+      "CAPI-LUA-H-FUNCTION-LUA_RAWSETI-284",
+      "CAPI-LUA-H-FUNCTION-LUA_RAWSETP-285",
+      "CAPI-LUA-H-FUNCTION-LUA_SETMETATABLE-286",
+      "CAPI-LUA-H-FUNCTION-LUA_SETIUSERVALUE-287",
+      "CAPI-LUA-H-FUNCTION-LUA_CALLK-293",
+      "CAPI-LUA-H-MACRO-LUA_CALL-295",
+      "CAPI-LUA-H-FUNCTION-LUA_PCALLK-297",
+      "CAPI-LUA-H-MACRO-LUA_PCALL-299",
+      "CAPI-LUA-H-FUNCTION-LUA_YIELDK-310",
+      "CAPI-LUA-H-FUNCTION-LUA_RESUME-312",
+      "CAPI-LUA-H-FUNCTION-LUA_STATUS-314",
+      "CAPI-LUA-H-FUNCTION-LUA_ISYIELDABLE-315",
+      "CAPI-LUA-H-MACRO-LUA_YIELD-317",
+      "CAPI-LUA-H-FUNCTION-LUA_SETWARNF-323",
+      "CAPI-LUA-H-FUNCTION-LUA_WARNING-324",
+      "CAPI-LUA-H-MACRO-LUA_GCSTOP-331",
+      "CAPI-LUA-H-MACRO-LUA_GCRESTART-332",
+      "CAPI-LUA-H-MACRO-LUA_GCCOLLECT-333",
+      "CAPI-LUA-H-MACRO-LUA_GCCOUNT-334",
+      "CAPI-LUA-H-MACRO-LUA_GCCOUNTB-335",
+      "CAPI-LUA-H-MACRO-LUA_GCSTEP-336",
+      "CAPI-LUA-H-MACRO-LUA_GCISRUNNING-337",
+      "CAPI-LUA-H-MACRO-LUA_GCGEN-338",
+      "CAPI-LUA-H-MACRO-LUA_GCINC-339",
+      "CAPI-LUA-H-MACRO-LUA_GCPARAM-340",
+      "CAPI-LUA-H-MACRO-LUA_GCPMINORMUL-347",
+      "CAPI-LUA-H-MACRO-LUA_GCPMAJORMINOR-348",
+      "CAPI-LUA-H-MACRO-LUA_GCPMINORMAJOR-349",
+      "CAPI-LUA-H-MACRO-LUA_GCPPAUSE-352",
+      "CAPI-LUA-H-MACRO-LUA_GCPSTEPMUL-353",
+      "CAPI-LUA-H-MACRO-LUA_GCPSTEPSIZE-354",
+      "CAPI-LUA-H-MACRO-LUA_GCPN-357",
+      "CAPI-LUA-H-FUNCTION-LUA_GC-360",
+      "CAPI-LUA-H-FUNCTION-LUA_ERROR-367",
+      "CAPI-LUA-H-FUNCTION-LUA_GETALLOCF-378",
+      "CAPI-LUA-H-FUNCTION-LUA_SETALLOCF-379",
+      "CAPI-LUA-H-FUNCTION-LUA_TOCLOSE-381",
+      "CAPI-LUA-H-FUNCTION-LUA_CLOSESLOT-382",
+      "CAPI-LUA-H-MACRO-LUA_TONUMBER-393",
+      "CAPI-LUA-H-MACRO-LUA_TOINTEGER-394",
+      "CAPI-LUA-H-MACRO-LUA_POP-396",
+      "CAPI-LUA-H-MACRO-LUA_NEWTABLE-398",
+      "CAPI-LUA-H-MACRO-LUA_PUSHCFUNCTION-402",
+      "CAPI-LUA-H-MACRO-LUA_ISTABLE-405",
+      "CAPI-LUA-H-MACRO-LUA_ISNIL-407",
+      "CAPI-LUA-H-MACRO-LUA_ISTHREAD-409",
+      "CAPI-LUA-H-MACRO-LUA_ISNONEORNIL-411",
+      "CAPI-LUA-H-MACRO-LUA_PUSHLITERAL-413",
+      "CAPI-LUA-H-MACRO-LUA_PUSHGLOBALTABLE-415",
+      "CAPI-LUA-H-MACRO-LUA_TOSTRING-418",
+      "CAPI-LUA-H-MACRO-LUA_REMOVE-423",
+      "CAPI-LUA-H-MACRO-LUA_HOOKCALL-454",
+      "CAPI-LUA-H-MACRO-LUA_HOOKRET-455",
+      "CAPI-LUA-H-MACRO-LUA_HOOKLINE-456",
+      "CAPI-LUA-H-MACRO-LUA_HOOKCOUNT-457",
+      "CAPI-LUA-H-MACRO-LUA_HOOKTAILCALL-458",
+      "CAPI-LUA-H-MACRO-LUA_MASKCALL-464",
+      "CAPI-LUA-H-MACRO-LUA_MASKRET-465",
+      "CAPI-LUA-H-MACRO-LUA_MASKLINE-466",
+      "CAPI-LUA-H-MACRO-LUA_MASKCOUNT-467",
+      "CAPI-LUA-H-FUNCTION-LUA_GETSTACK-470",
+      "CAPI-LUA-H-FUNCTION-LUA_GETINFO-471",
+      "CAPI-LUA-H-FUNCTION-LUA_SETHOOK-481",
+      "CAPI-LUA-H-FUNCTION-LUA_GETHOOK-482",
+      "CAPI-LUA-H-FUNCTION-LUA_GETHOOKMASK-483",
+      "CAPI-LUA-H-FUNCTION-LUA_GETHOOKCOUNT-484",
+      "CAPI-LUA-H-TYPE-LUA_DEBUG-487",
+      "CAPI-LAUXLIB-H-MACRO-LUA_LOADED_TABLE-31",
+      "CAPI-LAUXLIB-H-MACRO-LUA_PRELOAD_TABLE-35",
+      "CAPI-LAUXLIB-H-FUNCTION-LUAL_LOADBUFFERX-100",
+      "CAPI-LAUXLIB-H-FUNCTION-LUAL_LOADSTRING-102",
+      "CAPI-LAUXLIB-H-FUNCTION-LUAL_NEWSTATE-104",
+      "CAPI-LAUXLIB-H-FUNCTION-LUAL_GETSUBTABLE-117",
+      "CAPI-LAUXLIB-H-FUNCTION-LUAL_REQUIREF-122",
+      "CAPI-LAUXLIB-H-MACRO-LUA_FILEHANDLE-236",
+      "CAPI-LAUXLIB-H-TYPE-LUAL_STREAM-239",
+      "CAPI-LUALIB-H-MACRO-LUA_GLIBK-17",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_BASE-18",
+      "CAPI-LUALIB-H-MACRO-LUA_LOADLIBK-21",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_PACKAGE-22",
+      "CAPI-LUALIB-H-MACRO-LUA_COLIBK-26",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_COROUTINE-27",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_DEBUG-31",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_IO-35",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_MATH-39",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_OS-43",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_STRING-47",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_TABLE-51",
+      "CAPI-LUALIB-H-FUNCTION-LUAOPEN_UTF8-55",
+      "CAPI-LUALIB-H-FUNCTION-LUAL_OPENSELECTEDLIBS-59",
+      "CAPI-LUALIB-H-MACRO-LUAL_OPENLIBS-62"
+    ],
+    "prerequisites": [
+      "subprocess",
+      "stdio",
+      "temporary-files",
+      "native-platform-counterparts"
+    ],
+    "api_coverage_file": "scopes/expanded-t-conformance.api.jsonl",
+    "source_classification_review": {
+      "path": "tests/conformance/reviews/expanded-t-conformance.source-cross-review.json",
+      "sha256": "0a50a7963747d8f3c8622f9d2f8db7f92ae09375f3441ee6ca2c63b06b328888"
+    },
+    "api_semantic_review": {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-status.cross-review.json",
+      "sha256": "8a4047db129df08a3f444b0a26c1d0da69b15572c7d04babbd9b0ad7c1ffd979"
+    }
+  },
+  "source_selection": {
+    "acceptance_contexts": 26,
+    "added_primary_files": [
+      "constructs.lua",
+      "closure.lua",
+      "pm.lua",
+      "math.lua"
+    ],
+    "api_entries": 159,
+    "helpers": [
+      "bwcoercion.lua"
+    ],
+    "preserved_primary_files": [
+      "bitwise.lua",
+      "coroutine.lua",
+      "events.lua",
+      "files.lua",
+      "gc.lua",
+      "gengc.lua",
+      "goto.lua",
+      "tpack.lua",
+      "utf8.lua"
+    ],
+    "primary_files": 13
+  },
+  "rationale": [
+    "Only the immutable current API semantic-review route changes from the independently approved profile predecessor. All thirteen primary-file identities, bwcoercion helper, 159 selected header identities, source-classification approval, predicates and prerequisites remain exact.",
+    "The new API source review accepts the bounded retained coroutine error-status correction and strengthened existing refusal case13 relationship. It approves no new catalog IDs or broader execution claim.",
+    "Default T-absent omissions remain provenance linked to applicable instrumented obligations; measured inactive source alternatives remain applicability references. Both constructs templates remain required.",
+    "Historical source/API execution decisions retain their original revision and boundaries. Preserved historical pass fields cannot certify the new memory-status assertions; fresh strengthened C and AUnit case13 observations are required in all26 applicable contexts at the corrected clean head."
+  ],
+  "findings": [],
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "scope_of_decision": "Exact source selection and current semantic-review routing only. No runtime obligation, API execution, contract or final matrix is passed by this decision.",
+  "newline_identity": "UTF-8 without BOM, LF, exactly one final newline."
+}
