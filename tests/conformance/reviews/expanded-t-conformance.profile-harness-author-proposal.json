@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-profile-harness-source-binding-author-proposal",
+  "scope": "expanded-t-conformance",
+  "author": "Codex /root/conformance_scope",
+  "predecessor": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.harness.cross-review.json",
+    "sha256": "8f5608dbf6129ceced976350296608d2bc2d639e39e0b2fd064d2094496d3182"
+  },
+  "producer_delta_packet": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.producer-profile-delta-author-proposal.json",
+    "sha256": "0b554710ff1353576191ac23179f99b6f1d4848463e93f53d381077ade5ea2f6"
+  },
+  "files": [
+    {
+      "path": "scripts/check-core-image.ps1",
+      "input_path": "scripts/check-core-image.ps1",
+      "sha256": "401684a1b7d3f5561b40ccf2d6ec72db1b9d40c17282b6a52ec0a6fbe1ce0759",
+      "role": "source"
+    },
+    {
+      "path": "scripts/test-prebuilt-runtime-profile.ps1",
+      "input_path": "scripts/test-prebuilt-runtime-profile.ps1",
+      "sha256": "2dc07e876ce062c213d100bf9ea228af946e49bb78459b71e20cbdda0b2518c6",
+      "role": "source"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "input_path": "scripts/check-instrumented.ps1",
+      "sha256": "87e9a5b46ae8028f9ba8fe41e7502c12af622382bf0e91a36e78ae06944d2258",
+      "role": "source"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-profile-author-proposal.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/proposals/expanded-t-conformance.api-witness-profile-author-proposal.json",
+      "sha256": "65e29e80c5b2c1410ef4a454cd6a292478da42acae39e84573a72154c1eb6158",
+      "role": "versioned-semantic-author-proposal"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-profile.cross-review.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/reviews/expanded-t-conformance.api-witness-profile.cross-review.json",
+      "sha256": "a0df45f9934cca9992861d6bc98a84d7b11d58f30bb0d11b8ba0e969755b1fe2",
+      "role": "versioned-independent-producer-review"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-profile-author-proposal.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/proposals/expanded-t-conformance.consumer-witness-profile-author-proposal.json",
+      "sha256": "d0bf642d87f6f55a70de9dbd92ac02662afa8a11e289d1317f9c8b787baeb38a",
+      "role": "versioned-semantic-author-proposal"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-profile.cross-review.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/reviews/expanded-t-conformance.consumer-witness-profile.cross-review.json",
+      "sha256": "aeaafe2b3f2dd58d861f3c4315633e18835299e2cb5334ae0d41a6fbf51f0ddc",
+      "role": "versioned-independent-producer-review"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-profile-author-proposal.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/proposals/expanded-t-conformance.aunit-witness-profile-author-proposal.json",
+      "sha256": "2fd5f1e33dc27f40328c08894a0a3df94fb8e591bb1487a5e08cbb2c61dbe915",
+      "role": "versioned-semantic-author-proposal"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-profile.cross-review.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/reviews/expanded-t-conformance.aunit-witness-profile.cross-review.json",
+      "sha256": "4465bda6e76868b6882bbcc5c3d656add51bbce2ea0df746ab464b8c7d301727",
+      "role": "versioned-independent-producer-review"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-profile-author-proposal.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/proposals/expanded-t-conformance.scope-selection-profile-author-proposal.json",
+      "sha256": "ba6280114ff31e63bee3d962bb9bcb688218a1bcadfac24ba539fb54367286be",
+      "role": "versioned-selection"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-profile.cross-review.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/reviews/expanded-t-conformance.scope-selection-profile.cross-review.json",
+      "sha256": "b68d418ab4ebbece49150dddb8b4f02db2e2eed83af335eed55540add7c2720f",
+      "role": "versioned-selection"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/proposals/expanded-t-conformance.profile-scope-definition.json",
+      "sha256": "e06748810e94fd633684b0f5b4c321d95cd8d96afcdbabc6286bf83c319e37ea",
+      "role": "minimal-current-review-routing"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.prebuilt-profile-harness.cross-review.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/reviews/expanded-t-conformance.prebuilt-profile-harness.normalized.json",
+      "sha256": "59b8ae7da406321cccb5f3e39d07485ea26db3586be50829a4ab00dbe9598ee8",
+      "role": "independent-real-source-fix-review"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.producer-profile-delta-author-proposal.json",
+      "input_path": "reports/expanded-t-conformance/profile-source-refresh/producer-binding-delta-author-proposal.json",
+      "sha256": "0b554710ff1353576191ac23179f99b6f1d4848463e93f53d381077ade5ea2f6",
+      "role": "binding-delta-provenance"
+    },
+    {
+      "path": "reports/expanded-t-conformance/BindExpandedProfileMatrix.psm1",
+      "input_path": "reports/expanded-t-conformance/BindExpandedProfileMatrix.psm1",
+      "sha256": "3abf8a7caf719804064665f6557be8fd53182255abedaff7e448f869cfc8f7b2",
+      "role": "reports-only-explicit-mapping-binder"
+    },
+    {
+      "path": "reports/expanded-t-conformance/test-bind-final-profile-matrix.ps1",
+      "input_path": "reports/expanded-t-conformance/test-bind-final-profile-matrix.ps1",
+      "sha256": "461c60175907ba500f99d24f7f6477e04851f956cdf7647ddfd285a215ab0c1c",
+      "role": "reports-only-explicit-mapping-binder"
+    },
+    {
+      "path": "reports/expanded-t-conformance/bind-final-profile-matrix.ps1",
+      "input_path": "reports/expanded-t-conformance/bind-final-profile-matrix.ps1",
+      "sha256": "9d13ae5e6a056cf35f90ce0b6794b2bb47b065aec55b03115a1ec5015b55324a",
+      "role": "reports-only-explicit-mapping-binder"
+    }
+  ],
+  "verified_semantic_counts": {
+    "api": 159,
+    "c_cases": 100,
+    "aunit_cases": 94,
+    "primary_pairs": 338,
+    "supplemental_pairs": 26,
+    "process_reports": 728
+  },
+  "binder_regressions": {
+    "path": "reports/expanded-t-conformance/profile-source-refresh/binder-test-result-v2.json",
+    "sha256": "abc2c67a571549faa4a3f1f1e40462191acd95b01ef64e9d85335f79cf143c19",
+    "passed": 17,
+    "conformance_evidence": false
+  },
+  "preserved_installation": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.execution-installation.json",
+    "sha256": "84b9280852d45fae2287113bfe3da819f5308b89e82efca26e015f65262958c2",
+    "outputs": 361
+  },
+  "source_fix": "Generation-only root profile selection, deliberate wrong-profile setup and actual same-SAL consumers. No runtime/Ada/C/Lua case behavior changes.",
+  "review_routing_delta": "Only expanded scope API semantic approval and selection review point to independently reviewed producer-source derivative proposals. Historical proposals/reviews, all installed projections and338contracts remain byte-identical.",
+  "future_gate": "A new clean head must execute all26contexts. SevenTcontexts must additionally retain matching actual prebuilt-profile regression receipts; those are supporting evidence, never extra primaries/C/AUnit catalog cases.",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence_added": false,
+  "independent_review_status": "pending",
+  "predecessor_pending_proposal": {
+    "path": "reports/expanded-t-conformance/profile-source-refresh/profile-harness-author-proposal-v2.json",
+    "sha256": "f414ed37ba3ff663d93321259c545d0d89a64ec2b46ca70c60506cb214f1d491"
+  },
+  "resolved_findings": [
+    {
+      "id": "binder-owned-write-rollback",
+      "reviewer": "Codex /root/draft_assessment",
+      "resolution": "Each successful CreateNew is recorded before writing; stream,postwrite snapshot or output verification failures remove only this call owned files, preserving exact preexisting snapshots/output. Four focused injected-failure/preservation regressions pass."
+    }
+  ],
+  "normalization_delta": {
+    "historical_source_review": {
+      "path": "reports/expanded-t-conformance/prebuilt-profile-harness.cross-review.json",
+      "sha256": "3657314443b4eb87475d5ba3f601144a96a25af146f35ffd2f4559b2835b0658"
+    },
+    "normalized_source_review": {
+      "path": "tests/conformance/reviews/expanded-t-conformance.prebuilt-profile-harness.cross-review.json",
+      "sha256": "59b8ae7da406321cccb5f3e39d07485ea26db3586be50829a4ab00dbe9598ee8"
+    },
+    "change": "Remove one redundant terminal LF only; identical parsed JSON and unchanged three-script source bindings. Preserve original historical artifact bytes."
+  }
+}

@@ -144,10 +144,12 @@ try {
         -Configuration upstream-test `
         -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
         -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
-    # Exercise the real public C consumers in this configuration too. Keep
-    # Alire invocations serialized with the test and oracle builds above.
-    & "$PSScriptRoot/check-core-image.ps1" -Profile validation `
-        -LibraryType $LibraryType -Configuration upstream-test -UseExistingRuntime
+    # Exercise the real public C consumers exactly once after deliberately
+    # selecting a different remembered root profile. The regression selects
+    # configuration only, preserves the existing SAL and owns no second build.
+    # Keep Alire invocations serialized with the test and oracle builds above.
+    & "$PSScriptRoot/test-prebuilt-runtime-profile.ps1" -Profile validation `
+        -LibraryType $LibraryType -Configuration upstream-test
     if ($LASTEXITCODE -ne 0) { throw 'Instrumented C consumer checks failed' }
     Write-Output "PASS: instrumented validation/$LibraryType regressions; scope acceptance remains pending"
 } finally {

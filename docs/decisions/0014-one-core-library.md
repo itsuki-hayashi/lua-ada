@@ -84,6 +84,33 @@ installation/runtime search paths and complete public C exports retain separate
 acceptance obligations. This decision claims neither complete C ABI parity nor
 successful execution of the full upstream suite.
 
+## Prebuilt profile selection (2026-11-07)
+
+Alire records the root crate's last profile separately from a nested test
+crate's dependency overrides. A validation dependency build can therefore leave
+the root's remembered profile at development. A later root alr exec regenerates
+that profile and makes a prebuilt consumer import the wrong archive directory.
+The clean 13df577 local instrumented run exposed this after all selected Lua
+operations had passed; its full pipeline remains a failed observation.
+
+The prebuilt path explicitly selects the requested root profile through
+alr build --<profile> --stop-after=generation. In Alire 2.1.1, that stage saves
+the selected profile and generates configuration before returning, without
+traversing source builds or invoking GPRbuild. This changes no hand-written
+project input, compiler pin or runtime interface. The driver checks the
+requested existing library's hash before and after generation, then retains
+the existing checks
+around prebuilt consumer linking and execution. It never substitutes a library
+from a different profile to conceal a missing image.
+
+A separately named real regression first establishes the wrong remembered and
+generated profile, executes the normal consumer campaign once, and verifies
+requested-profile restoration and unchanged library bytes. The old driver
+reproduces the missing-development-archive failure. Independent local Windows
+static execution of the repaired driver passes all nine consumers, including
+the real Ada/C identity and matching native contracts. Fresh platform evidence
+remains part of the final scoped matrix, separately from these local results.
+
 ## Windows partial-link unwind metadata
 
 Adding another narrow C platform unit exposed a GNU x64 BigObj partial-link

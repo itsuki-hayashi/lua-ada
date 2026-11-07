@@ -217,6 +217,19 @@ Within a combined campaign, the runtime-producing build explicitly selects
 with `LUA_ADA_PREBUILT=true`; they must not rebind a second image. The core
 image driver verifies the selected library hash before and after consumer
 linking and execution. Standalone invocation still builds the runtime first.
+Prebuilt invocation also explicitly selects the requested root profile with
+Alire's generation-only stage. A nested test dependency's profile does not
+replace the root crate's separately remembered build profile. The requested
+library must exist before this selection and retain the same bytes afterward;
+generation never compiles or rebinds it.
+
+scripts/test-prebuilt-runtime-profile.ps1 requires an already built matching
+runtime, deliberately selects a different remembered/generated root profile,
+then executes the actual core-image consumers once. It requires restoration of
+the requested profile and identical runtime hashes. The instrumented pipeline
+uses this regression in place of its former direct consumer invocation, so
+each T context still owns one real consumer campaign. Its receipt under
+reports/instrumented/prebuilt-profile is separate from the named consumer index.
 [The validation owner](validation-one-core.md) records executed configurations.
 scripts/check.ps1 invokes this campaign per job; a missing platform run is not
 implied by the workflow. Native module loading and full C exports remain separate.

@@ -108,16 +108,26 @@ try {
         $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $runtime.Directory
         $adaRuntimeDirectory = $runtime.Directory + [IO.Path]::PathSeparator
     }
-    # Select the requested generated profile through Alire, never by editing
-    # generated configuration. All subsequent projects import this same root.
+    # A dependency build in tests/ can generate the requested root profile
+    # without selecting the root crate's own remembered profile. Select that
+    # profile explicitly even when importing an existing SAL. Alire's generation
+    # stop precedes all compiler/linker/binder work; never edit generated files.
     $runtimeDirectory = Join-Path $projectRoot "lib/$configurationPart$Profile/$LibraryType"
-    if (-not $UseExistingRuntime) {
-        Invoke-Build (@('-n', 'build', "--$Profile", '--', '-XLUA_ADA_PREBUILT=false') + $scenarios)
-    }
     $imageName = if ($LibraryType -ne 'relocatable') { 'liblua.a' }
         elseif ($IsWindows) { 'liblua.dll' } elseif ($IsMacOS) { 'liblua.dylib' } else { 'liblua.so' }
     $imagePath = Join-Path $runtimeDirectory $imageName
-    $inputHash = (Get-FileHash -LiteralPath $imagePath).Hash
+    if ($UseExistingRuntime) {
+        # Capture before generation as well as before the consumer campaign:
+        # configuration selection must preserve the exact prebuilt image too.
+        $inputHash = (Get-FileHash -LiteralPath $imagePath).Hash
+        Invoke-Build @('-n', 'build', "--$Profile", '--stop-after=generation')
+        if ((Get-FileHash -LiteralPath $imagePath).Hash -cne $inputHash) {
+            throw 'Profile generation changed the selected runtime image'
+        }
+    } else {
+        Invoke-Build (@('-n', 'build', "--$Profile", '--', '-XLUA_ADA_PREBUILT=false') + $scenarios)
+        $inputHash = (Get-FileHash -LiteralPath $imagePath).Hash
+    }
     # The consumers import the already compiled SAL. A fresh gprlib bind would
     # give the C cases another archive/shared object even at the same revision.
     $consumerScenarios = $scenarios + @('-XLUA_ADA_PREBUILT=true')

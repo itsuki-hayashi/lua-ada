@@ -329,3 +329,40 @@ workflow results are recorded separately against the merge revision, preserving
 the accepted head certificate. No candidate or installation receipt replaces
 these final gates. Other upstream files, all.lua, heavy.lua, full M3 and global
 public ABI completion remain outside this delivery.
+
+## Prebuilt profile regression after the first publication freeze
+
+The reviewed installation and owning documents are committed in clean
+13df577db1014a83a235a3f21b6031ba77763b96. All 1,124 regular tracked files match
+their staged bytes exactly, including the 39 MB author packet. Workflow
+42353343145 starts fresh accepted-contract execution; its completed contexts
+on all three OSes report 14 accepted Ada operations and zero AUnit failures.
+Those observations do not establish this revision as final acceptance.
+
+The complete local instrumented run at that head accepts all 13 primary files
+and the second constructs template, then fails its final prebuilt consumer
+build. Root Alire settings remember development, while the nested test build
+selects validation for its lua_ada dependency. The later root alr exec restores
+development and GPRbuild tries a nonexistent development archive. The log
+final-head-instrumented-full-check.log is failed/incomplete, not a passing full
+pipeline. Successful CI with different ambient profile history does not excuse
+this standalone defect.
+
+The real test-prebuilt-runtime-profile regression reproduces the old failure
+after verifying both wrong-profile states. The repair uses Alire's documented
+generation-only stage to select the requested root profile before importing
+the existing SAL. Its hash is checked before/after generation and after real
+consumer linking/execution. No generated input is edited by hand and no runtime
+build or rebind is requested. The instrumented caller substitutes this regression
+for its one existing consumer campaign rather than adding another image/run.
+
+Author and independent reviewer each pass the repaired Windows validation/
+upstream-test/static regression: nine actual consumers, matching native GC/IO/
+foreign contracts, requested profile restored and exact SAL bytes preserved.
+The three-script review is prebuilt-profile-harness.cross-review.json, SHA
+3657314443b4eb87475d5ba3f601144a96a25af146f35ffd2f4559b2835b0658.
+Local results do not infer other profiles, libraries or OSes. Versioned producer
+bindings preserve all 159 API descriptors, 100 C cases, 94 AUnit cases and the
+historical execution projections. A corrected clean revision must receive a
+fresh complete matrix and independent reconciliation, including all seven T
+profile-regression receipts, before PR publication and merge.
