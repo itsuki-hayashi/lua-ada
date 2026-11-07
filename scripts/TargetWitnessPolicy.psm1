@@ -309,7 +309,7 @@ function Test-TargetNamedContextEvidence {
     $privateBufferRequired=$Context.StartsWith('upstream-test/',[StringComparison]::Ordinal)
     if($privateBufferRequired){$additional+='buffer-private-t'}
     $driverNames=@{format='format_api_contract.c';value='value_api_contract.c';auxiliary='auxiliary_api_contract.c';
-        'load-dump'='load_dump_api_contract.c';debug='debug_api_contract.c';external='external_string_contract.c';
+        'load-dump'='load_dump_api_contract.c';debug='debug_api_contract.c';builtin='builtin_api_contract.c';traceback='traceback_api_contract.c';external='external_string_contract.c';
         conversion='conversion_api_contract.c';operator='operator_api_contract.c';'index-type'='index_type_api_contract.c';
         'base-closing'='base_closing_api_contract.c';'native-module'='native_module_contract.c';buffer='buffer_api_contract.c';'buffer-private-t'='buffer_private_t_contract.c';
         allocator='allocator_api_contract.c';substitution='substitution_api_contract.c';loadfile='loadfile_api_contract.c';
@@ -323,6 +323,7 @@ function Test-TargetNamedContextEvidence {
         if($kind -ceq 'load-dump'){$names+='c_api/tests/load_dump_contract.h'}
         if($kind -ceq 'macro-compat'){$names+='c_api/tests/macro_api_contract.c'}
         if($kind -ceq 'buffer-private-t'){$names+=@('c_api/tests/buffer_api_contract.c','references/lua/ltests.h','c_api/include/lua_ada_runtime_configuration.h')}
+        if($kind -ceq 'builtin'){$names+='tests/c/argument_registry_callbacks.h'}
         foreach($name in $names){
             $source=@($consumer[$kind.Replace('-','_')+'_contract'].sources|Where-Object file -CEQ $name)
             if($source.Count -ne 1){throw 'Target additional oracle source binding is missing or duplicated'}

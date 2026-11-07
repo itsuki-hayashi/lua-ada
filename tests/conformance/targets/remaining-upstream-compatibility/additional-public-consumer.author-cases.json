@@ -6305,6 +6305,650 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "exposed-functions",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-exposed-functions"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "stateless-roundtrip",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-stateless-roundtrip"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "repeated-opener-identity",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-repeated-opener-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-host-call",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-host-call"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-c-call",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-c-call"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-callback-frame",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-callback-frame"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "captured-roundtrip",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-captured-roundtrip"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "iterator-identity",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-iterator-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "pointer-formats",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-pointer-formats"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-error-identity",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-error-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-protected-results",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-protected-results"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-yield-continuation",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-yield-continuation"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-callback-yield",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-callback-yield"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "scalar-refusal",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-scalar-refusal"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "captured-refusal-recovery",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-captured-refusal-recovery"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-argument-owner",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-argument-owner"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-extra-argument-owner",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-extra-argument-owner"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-method-argument-owner",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-method-argument-owner"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "direct-closure-argument-owner",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-direct-closure-argument-owner"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "registry-callback-original-owner",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-registry-callback-original-owner"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "registry-callback-original-roots",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-registry-callback-original-roots"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "registry-callback-error-guard",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-registry-callback-error-guard"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "registry-callback-original-captures",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-registry-callback-original-captures"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/builtin_api_contract.c",
+      "case_id": "registry-callback-extra-temporaries",
+      "consumer": "builtin-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: builtin-registry-callback-extra-temporaries"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "no-message",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-no-message"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "host-message",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-host-message"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "empty-message",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-empty-message"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "nul-message",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-nul-message"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "negative-level",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-negative-level"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "nested-frames",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-nested-frames"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "skip-current",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-skip-current"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "out-of-stack",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-out-of-stack"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "stack-prefix",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-stack-prefix"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "inactive-thread",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-inactive-thread"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "suspended-thread",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-suspended-thread"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "independent-destination",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-independent-destination"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "shared-lua-renderer",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-shared-lua-renderer"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "refusal-and-retry",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-refusal-and-retry"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "lua-nul-message",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-lua-nul-message"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "lua-numeric-message",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-lua-numeric-message"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "lua-message-identity",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-lua-message-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "lua-level-cast",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-lua-level-cast"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "deep-stack",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-deep-stack"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "shortening-boundary",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-shortening-boundary"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "hook-origin",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-hook-origin"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/traceback_api_contract.c",
+      "case_id": "closed-thread",
+      "consumer": "traceback-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: traceback-closed-thread"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
     }
   ],
   "source_measurements": {

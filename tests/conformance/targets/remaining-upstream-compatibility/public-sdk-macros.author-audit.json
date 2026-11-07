@@ -26,11 +26,11 @@
     },
     {
       "path": "scripts/ConsumerEvidence.psm1",
-      "sha256": "5ca94f5c5d1ed7d58294bb7a9a07b6a081d99dda037a40fd6b3e77a443ed4f38"
+      "sha256": "e015aef19c9c65e55699101ed7b29f65643ba6da6c305ecb3b14cb9215c2151f"
     },
     {
       "path": "c_api/consumer.gpr",
-      "sha256": "72dbae5de30c9792089ad506616151ad2c54b2e23a9ae448d917b60f0e203c5f"
+      "sha256": "687a01b8e407f3b8cd184d57121aafa28db732535daf8981ca39af48912933c2"
     },
     {
       "path": "c_api/include/api/lua.h",

@@ -200,6 +200,7 @@ try {
     Invoke-Consumer 'foreign-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/foreign_api_contract$suffix") 'PASS: public foreign contract'
     Invoke-Consumer 'load-dump-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/load_dump_api_contract$suffix") 'PASS: public reader/writer contract'
     Invoke-Consumer 'debug-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/debug_api_contract$suffix") 'PASS: public debug contract'
+    Invoke-Consumer 'traceback-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/traceback_api_contract$suffix") 'PASS: public traceback contract'
     Invoke-Consumer 'builtin-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/builtin_api_contract$suffix") 'PASS: public builtin contract'
     # The pinned T lock instrumentation itself aborts deallocator API reentry.
     # Keep that observed native limit explicit: ownership/refusal still run in
@@ -283,6 +284,10 @@ try {
         '-I', (Join-Path $projectRoot 'c_api/include/api'),
         (Join-Path $projectRoot 'c_api/tests/debug_api_contract.c'),
         '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceDebugConsumer)
+    $referenceTracebackConsumer=Join-Path $reportDirectory "traceback-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/traceback_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceTracebackConsumer)
     $adaExecutionDyldPath = $env:DYLD_LIBRARY_PATH
     $referenceBuiltinConsumer = Join-Path $reportDirectory "builtin-oracle$suffix"
     Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
@@ -394,6 +399,7 @@ try {
         Invoke-Consumer 'foreign-oracle' $referenceForeignConsumer 'PASS: public foreign contract'
         Invoke-Consumer 'load-dump-oracle' $referenceLoadDumpConsumer 'PASS: public reader/writer contract'
         Invoke-Consumer 'debug-oracle' $referenceDebugConsumer 'PASS: public debug contract'
+        Invoke-Consumer 'traceback-oracle' $referenceTracebackConsumer 'PASS: public traceback contract'
         Invoke-Consumer 'builtin-oracle' $referenceBuiltinConsumer 'PASS: public builtin contract'
         Invoke-Consumer 'external-oracle' $referenceExternalConsumer 'PASS: public external string contract' $externalArguments
         Invoke-Consumer 'conversion-oracle' $referenceConversionConsumer 'PASS: public numeric conversion contract'
@@ -469,6 +475,11 @@ try {
         throw 'C/Ada public builtin contract output differs'
     }
     Write-Output 'PASS: identical public builtin contract against C and Ada'
+    foreach($stream in @('stdout','stderr')){
+        if((Get-FileHash (Join-Path $reportDirectory "traceback-api.$stream")).Hash -cne
+            (Get-FileHash (Join-Path $reportDirectory "traceback-oracle.$stream")).Hash){throw "C/Ada public traceback $stream differs"}
+    }
+    Write-Output 'PASS: identical public traceback contract against C and Ada'
     if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'external-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'external-oracle.stdout'))) {
         throw 'C/Ada public external string contract output differs'
@@ -572,6 +583,10 @@ try {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
+    $builtinContractSources+=@{file='tests/c/argument_registry_callbacks.h';sha256=(Get-FileHash (Join-Path $projectRoot 'tests/c/argument_registry_callbacks.h')).Hash.ToLowerInvariant()}
+    $tracebackContractSources=@(foreach($name in @('traceback_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
     $externalContractSources = @(foreach ($name in @('external_string_contract.c', 'consumer_allocator.h')) {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
@@ -661,7 +676,7 @@ try {
         consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $privateBufferSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources + $pointerContractSources + $concatContractSources + $macroContractSources + @($macroCompatSource));
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $tracebackContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $privateBufferSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources + $pointerContractSources + $concatContractSources + $macroContractSources + @($macroCompatSource));
         configuration = $Configuration; consumers = $records.ToArray();
         reference_compiler_defines=$referenceCompilerDefines;
         library_files = $libraries;
@@ -676,7 +691,8 @@ try {
         debug_contract = [ordered]@{ matching_output=$true; sources=$debugContractSources;
             reference_library_files=$referenceLibraries };
         builtin_contract = [ordered]@{ matching_output=$true; sources=$builtinContractSources;
-            reference_library_files=$referenceLibraries };
+            matched_cases=24;reference_library_files=$referenceLibraries };
+        traceback_contract=@{matching_output=$true;sources=$tracebackContractSources;matched_cases=22;reference_library_files=$referenceLibraries};
         external_contract = [ordered]@{ matching_output=$true; sources=$externalContractSources;
             matched_cases=$(if ($Configuration -eq 'upstream-test') { 13 } else { 18 });
             skipped_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 5 } else { 0 });

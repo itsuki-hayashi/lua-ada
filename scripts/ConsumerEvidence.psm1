@@ -10,7 +10,7 @@ function Test-NamedConsumerEvidence {
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
           [switch] $RequireFormatContract,
-          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','buffer-private-t','allocator','substitution','loadfile','pointer-identity','concat','thread-reset','macro','macro-compat')]
+          [ValidateSet('format','value','auxiliary','load-dump','debug','builtin','traceback','external','conversion','operator','index-type','base-closing','native-module','buffer','buffer-private-t','allocator','substitution','loadfile','pointer-identity','concat','thread-reset','macro','macro-compat')]
           [string[]] $AdditionalContracts=@(),
           [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy='')
     # This replay checks actual observations, not review authority. Its caller
@@ -45,7 +45,7 @@ function Test-NamedConsumerEvidence {
     if($TargetPolicy -ceq 'remaining-upstream-compatibility' -and $parts[0] -ceq 'upstream-test' -and
         'buffer-private-t' -cnotin $additional){$additional+='buffer-private-t'}
     $additionalMarkers=@{format='PASS: public formatting contract';value='PASS: public value operation contract';auxiliary='PASS: public auxiliary contract';
-        'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';external='PASS: public external string contract';
+        'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';builtin='PASS: public builtin contract';traceback='PASS: public traceback contract';external='PASS: public external string contract';
         conversion='PASS: public numeric conversion contract';operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract';
         'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external';buffer='PASS: public luaL_Buffer contract';'buffer-private-t'='PASS: public luaL_Buffer contract';
         allocator='PASS: public allocator contract';substitution='PASS: public luaL_addgsub and luaL_gsub contract';loadfile='PASS: public luaL_loadfilex contract';
@@ -161,8 +161,20 @@ function Test-NamedConsumerEvidence {
             }
         }
     }}
-    foreach($kind in @('allocator','substitution','loadfile','pointer-identity','concat')){if($kind -cin $additional){
-        $names=if($kind -ceq 'allocator'){
+    foreach($kind in @('allocator','substitution','loadfile','pointer-identity','concat','builtin','traceback')){if($kind -cin $additional){
+        $names=if($kind -ceq 'builtin'){
+            @('exposed-functions','stateless-roundtrip','repeated-opener-identity','direct-host-call','direct-c-call',
+                'direct-callback-frame','captured-roundtrip','iterator-identity','pointer-formats','direct-error-identity',
+                'direct-protected-results','direct-yield-continuation','direct-callback-yield','scalar-refusal',
+                'captured-refusal-recovery','direct-argument-owner','direct-extra-argument-owner','direct-method-argument-owner',
+                'direct-closure-argument-owner','registry-callback-original-owner','registry-callback-original-roots',
+                'registry-callback-error-guard','registry-callback-original-captures','registry-callback-extra-temporaries')
+        }elseif($kind -ceq 'traceback'){
+            @('no-message','host-message','empty-message','nul-message','negative-level','nested-frames','skip-current',
+                'out-of-stack','stack-prefix','inactive-thread','suspended-thread','independent-destination',
+                'shared-lua-renderer','refusal-and-retry','lua-nul-message','lua-numeric-message','lua-message-identity',
+                'lua-level-cast','deep-stack','shortening-boundary','hook-origin','closed-thread')
+        }elseif($kind -ceq 'allocator'){
             @('null-block-ignores-old-size','zero-size-frees-and-returns-null','grow-preserves-prefix','shrink-preserves-prefix',
                 'fresh-allocation-after-free','numeric-userdata-alignment','huge-refusal-preserves-old-block','public-allocator-identity-and-use',
                 'default-state-allocator-identity','makeseed-live-state-is-inert','makeseed-accepts-null','counted-state-closes-balanced','close-with-live-stack-balances')

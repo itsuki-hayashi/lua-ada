@@ -421,6 +421,48 @@ Run-Case 'T reset count cannot promote the skipped warning to actual execution' 
 } 'native-lock mode' -Foreign -Additional thread-reset
 $context='default/windows/validation/static'
 $mapping.cases=$defaultMappedCases
+foreach($kind in @('builtin','traceback')){
+    # Synthetic counterparts validate the exact complete protocol; the source
+    # author packet separately records real native compiler/process captures.
+    $names=if($kind -ceq 'builtin'){
+        @('exposed-functions','stateless-roundtrip','repeated-opener-identity','direct-host-call','direct-c-call',
+            'direct-callback-frame','captured-roundtrip','iterator-identity','pointer-formats','direct-error-identity',
+            'direct-protected-results','direct-yield-continuation','direct-callback-yield','scalar-refusal',
+            'captured-refusal-recovery','direct-argument-owner','direct-extra-argument-owner','direct-method-argument-owner',
+            'direct-closure-argument-owner','registry-callback-original-owner','registry-callback-original-roots',
+            'registry-callback-error-guard','registry-callback-original-captures','registry-callback-extra-temporaries')
+    }else{
+        @('no-message','host-message','empty-message','nul-message','negative-level','nested-frames','skip-current',
+            'out-of-stack','stack-prefix','inactive-thread','suspended-thread','independent-destination',
+            'shared-lua-renderer','refusal-and-retry','lua-nul-message','lua-numeric-message','lua-message-identity',
+            'lua-level-cast','deep-stack','shortening-boundary','hook-origin','closed-thread')
+    }
+    $completion=if($kind -ceq 'builtin'){'PASS: public builtin contract'}else{'PASS: public traceback contract'}
+    $text=(@($names|ForEach-Object{'PASS: '+$kind+'-'+$_}) -join "`n")+"`n$completion`n"
+    $moreProtocols[$kind]=$text
+    $baseline[$kind+'_contract']=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=$names.Count}
+    foreach($name in @("$kind-api","$kind-oracle")){
+        $record=$records[0].Clone();$record.name=$name;$record.arguments=@();$out=Join-Path $directory "$name.stdout"
+        [IO.File]::WriteAllText($out,$text);$record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant()
+        $baseline.consumers+=$record
+    }
+}
+Run-Case 'builtin24 and traceback22 retain both complete actual operation protocols' {} '' -Foreign -Format -Additional ($extended+@('builtin','traceback'))
+Run-Case 'traceback completion cannot replace its native source-thread counterpart' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE traceback-oracle)
+} 'missing/duplicate' -Foreign -Format -Additional ($extended+@('traceback'))
+Run-Case 'matching traceback outputs cannot omit the actual level cast operation' {param($r)
+    foreach($name in @('traceback-api','traceback-oracle')){Replace-Capture $r $name stdout ($moreProtocols.traceback.Replace("PASS: traceback-lua-level-cast`n",''))}
+} 'complete ordered protocol' -Foreign -Format -Additional ($extended+@('traceback'))
+Run-Case 'traceback cannot borrow a different case behind an unchanged completion count' {param($r)
+    foreach($name in @('traceback-api','traceback-oracle')){Replace-Capture $r $name stdout ($moreProtocols.traceback.Replace('PASS: traceback-hook-origin','PASS: traceback-invented'))}
+} 'complete ordered protocol' -Foreign -Format -Additional ($extended+@('traceback'))
+Run-Case 'builtin registry callbacks must retain their actual original C prefix operation' {param($r)
+    foreach($name in @('builtin-api','builtin-oracle')){Replace-Capture $r $name stdout ($moreProtocols.builtin.Replace("PASS: builtin-registry-callback-extra-temporaries`n",''))}
+} 'complete ordered protocol' -Foreign -Format -Additional ($extended+@('builtin'))
+Run-Case 'builtin and traceback operation counts must be measured integers' {param($r)
+    $r.traceback_contract.matched_cases='22'
+} 'all 22 actual' -Foreign -Format -Additional ($extended+@('traceback'))
 $privateBuffer="BUFFER-RECEIVER: private-t-c LUAL_BUFFERSIZE=23 SIZEOF_BUFFER=64 LUA_EXTRASPACE=16`n"+$bufferFull
 $baseline.buffer_private_t_contract=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=17}
 foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){

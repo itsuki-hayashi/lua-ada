@@ -50,15 +50,15 @@
     },
     {
       "path": "tests/c/conformance_api.c",
-      "sha256": "0769559abe02aa97538928f290b801a152361ca313eaf4817f4da9ed475764aa"
+      "sha256": "25b686533c1ab313139966603c5edff9a1f3d36113a1be2abe9f5b5db9c17cf3"
     },
     {
       "path": "tests/c/conformance_api.h",
-      "sha256": "c2069b39b0114a22c24ef1679932951bf535f54fe0723e5ea7fc9157f6f2e683"
+      "sha256": "97b6bedf80c7c9a7784c63176f686dbc0dc6cc6a0213be81a917df5d004388f7"
     },
     {
       "path": "tests/c/conformance_adapter.c",
-      "sha256": "47d9639057816b364da9ac9f854d9014491f078837ba24cdca14cafcaaf6e843"
+      "sha256": "0fefa983a21fc5fca9a0d7a77064e9b7eebfabbe859a0f5b3b989e889e9032f8"
     },
     {
       "path": "references/lua/testes/coroutine.lua",
@@ -158,7 +158,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "a9fb19ad1f9109e92abf24f06370ade965bbb97219ff6a7c6eda33815ed659b4"
+      "sha256": "9f3e71d920c92baaca2633308c8f7ba541ebba67081be4b2a1df66a6f3c1fa15"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -207,6 +207,26 @@
     {
       "sha256": "e17f397d980c3a45b41a79644876d67b33539c5bd983b82078af62d50cd44d5b",
       "path": "tests/src/lua-c_thread_reset_tests.adb"
+    },
+    {
+      "path": "tests/src/io_write_error_tests.adb",
+      "sha256": "1a2289ac2f906f9b662ea3a460397ee0f5a12f9a5b158089c335087a9e3b74cd"
+    },
+    {
+      "path": "tests/src/collector_error_tests.adb",
+      "sha256": "af6441ae2d21a56629a92f819a2075106b329a51ed43e93b2251a1023a8a3865"
+    },
+    {
+      "path": "tests/src/traceback_api_tests.adb",
+      "sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "path": "tests/src/argument_registry_tests.adb",
+      "sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "path": "tests/src/lua-api_command_tests.adb",
+      "sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
     }
   ],
   "entries": [
@@ -3623,6 +3643,636 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "source_sha256": "e17f397d980c3a45b41a79644876d67b33539c5bd983b82078af62d50cd44d5b"
+    },
+    {
+      "case": "tests/src/io_write_error_tests.adb#Unknown_Origin",
+      "registered_label": "I/O write: unknown call origin",
+      "required_stdout_line": "OK I/O write: unknown call origin",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "1a2289ac2f906f9b662ea3a460397ee0f5a12f9a5b158089c335087a9e3b74cd"
+    },
+    {
+      "case": "tests/src/io_write_error_tests.adb#Direct_Global",
+      "registered_label": "I/O write: direct global call",
+      "required_stdout_line": "OK I/O write: direct global call",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "1a2289ac2f906f9b662ea3a460397ee0f5a12f9a5b158089c335087a9e3b74cd"
+    },
+    {
+      "case": "tests/src/io_write_error_tests.adb#Method_First",
+      "registered_label": "I/O write: method first argument",
+      "required_stdout_line": "OK I/O write: method first argument",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "1a2289ac2f906f9b662ea3a460397ee0f5a12f9a5b158089c335087a9e3b74cd"
+    },
+    {
+      "case": "tests/src/io_write_error_tests.adb#Method_Second",
+      "registered_label": "I/O write: method second preserves bytes",
+      "required_stdout_line": "OK I/O write: method second preserves bytes",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "1a2289ac2f906f9b662ea3a460397ee0f5a12f9a5b158089c335087a9e3b74cd"
+    },
+    {
+      "case": "tests/src/io_write_error_tests.adb#Named_Type",
+      "registered_label": "I/O write: raw named argument type",
+      "required_stdout_line": "OK I/O write: raw named argument type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "1a2289ac2f906f9b662ea3a460397ee0f5a12f9a5b158089c335087a9e3b74cd"
+    },
+    {
+      "case": "tests/src/io_write_error_tests.adb#No_Arguments",
+      "registered_label": "I/O write: zero arguments",
+      "required_stdout_line": "OK I/O write: zero arguments",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "1a2289ac2f906f9b662ea3a460397ee0f5a12f9a5b158089c335087a9e3b74cd"
+    },
+    {
+      "case": "tests/src/collector_error_tests.adb#Unknown_Origin",
+      "registered_label": "collector argument: unknown call origin",
+      "required_stdout_line": "OK collector argument: unknown call origin",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "af6441ae2d21a56629a92f819a2075106b329a51ed43e93b2251a1023a8a3865"
+    },
+    {
+      "case": "tests/src/collector_error_tests.adb#Boolean_Argument",
+      "registered_label": "collector argument: boolean option type",
+      "required_stdout_line": "OK collector argument: boolean option type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "af6441ae2d21a56629a92f819a2075106b329a51ed43e93b2251a1023a8a3865"
+    },
+    {
+      "case": "tests/src/collector_error_tests.adb#Named_Argument",
+      "registered_label": "collector argument: raw named option type",
+      "required_stdout_line": "OK collector argument: raw named option type",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "af6441ae2d21a56629a92f819a2075106b329a51ed43e93b2251a1023a8a3865"
+    },
+    {
+      "case": "tests/src/collector_error_tests.adb#Default_Option",
+      "registered_label": "collector argument: nil and absent default",
+      "required_stdout_line": "OK collector argument: nil and absent default",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "af6441ae2d21a56629a92f819a2075106b329a51ed43e93b2251a1023a8a3865"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#No_Message",
+      "registered_label": "public traceback: no message",
+      "required_stdout_line": "OK public traceback: no message",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Host_Message",
+      "registered_label": "public traceback: host message",
+      "required_stdout_line": "OK public traceback: host message",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Empty_Message",
+      "registered_label": "public traceback: empty message",
+      "required_stdout_line": "OK public traceback: empty message",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Nul_Message",
+      "registered_label": "public traceback: nul message",
+      "required_stdout_line": "OK public traceback: nul message",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Negative_Level",
+      "registered_label": "public traceback: negative level",
+      "required_stdout_line": "OK public traceback: negative level",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Nested_Frames",
+      "registered_label": "public traceback: nested frames",
+      "required_stdout_line": "OK public traceback: nested frames",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Skip_Current",
+      "registered_label": "public traceback: skip current",
+      "required_stdout_line": "OK public traceback: skip current",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Out_Of_Stack",
+      "registered_label": "public traceback: out of stack",
+      "required_stdout_line": "OK public traceback: out of stack",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Stack_Prefix",
+      "registered_label": "public traceback: stack prefix",
+      "required_stdout_line": "OK public traceback: stack prefix",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Inactive_Thread",
+      "registered_label": "public traceback: inactive thread",
+      "required_stdout_line": "OK public traceback: inactive thread",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Suspended_Thread",
+      "registered_label": "public traceback: suspended thread",
+      "required_stdout_line": "OK public traceback: suspended thread",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Independent_Destination",
+      "registered_label": "public traceback: independent destination",
+      "required_stdout_line": "OK public traceback: independent destination",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Shared_Lua_Renderer",
+      "registered_label": "public traceback: shared lua renderer",
+      "required_stdout_line": "OK public traceback: shared lua renderer",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Refusal_And_Retry",
+      "registered_label": "public traceback: refusal and retry",
+      "required_stdout_line": "OK public traceback: refusal and retry",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Lua_Nul_Message",
+      "registered_label": "public traceback: lua nul message",
+      "required_stdout_line": "OK public traceback: lua nul message",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Lua_Numeric_Message",
+      "registered_label": "public traceback: lua numeric message",
+      "required_stdout_line": "OK public traceback: lua numeric message",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Lua_Message_Identity",
+      "registered_label": "public traceback: lua message identity",
+      "required_stdout_line": "OK public traceback: lua message identity",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Lua_Level_Cast",
+      "registered_label": "public traceback: lua level cast",
+      "required_stdout_line": "OK public traceback: lua level cast",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Deep_Stack",
+      "registered_label": "public traceback: deep stack",
+      "required_stdout_line": "OK public traceback: deep stack",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Shortening_Boundary",
+      "registered_label": "public traceback: shortening boundary",
+      "required_stdout_line": "OK public traceback: shortening boundary",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Hook_Origin",
+      "registered_label": "public traceback: hook origin",
+      "required_stdout_line": "OK public traceback: hook origin",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Closed_Thread",
+      "registered_label": "public traceback: closed thread",
+      "required_stdout_line": "OK public traceback: closed thread",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Message_Work_Quota",
+      "registered_label": "public traceback: message work quota",
+      "required_stdout_line": "OK public traceback: message work quota",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/traceback_api_tests.adb#Result_Extent_Quota",
+      "registered_label": "public traceback: result extent quota",
+      "required_stdout_line": "OK public traceback: result extent quota",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "abbd4e7628fee7488682e9d6934d31c8f45f0382a597f3ac297b1c344f05a74b"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Callback_Loaded",
+      "registered_label": "argument registry: callback loaded",
+      "required_stdout_line": "OK argument registry: callback loaded",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Plain_Temporaries",
+      "registered_label": "argument registry: plain temporaries",
+      "required_stdout_line": "OK argument registry: plain temporaries",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Named_Temporaries",
+      "registered_label": "argument registry: named temporaries",
+      "required_stdout_line": "OK argument registry: named temporaries",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Error_Identity",
+      "registered_label": "argument registry: error identity",
+      "required_stdout_line": "OK argument registry: error identity",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Empty_Result",
+      "registered_label": "argument registry: empty result",
+      "required_stdout_line": "OK argument registry: empty result",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Nested_Errors",
+      "registered_label": "argument registry: nested errors",
+      "required_stdout_line": "OK argument registry: nested errors",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Table_Forwarding",
+      "registered_label": "argument registry: table forwarding",
+      "required_stdout_line": "OK argument registry: table forwarding",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Cannot_Yield",
+      "registered_label": "argument registry: cannot yield",
+      "required_stdout_line": "OK argument registry: cannot yield",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Nul_Module_Name",
+      "registered_label": "argument registry: nul module name",
+      "required_stdout_line": "OK argument registry: nul module name",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Operand_Collection",
+      "registered_label": "argument registry: operand collection",
+      "required_stdout_line": "OK argument registry: operand collection",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Known_Name_Bypass",
+      "registered_label": "argument registry: known name bypass",
+      "required_stdout_line": "OK argument registry: known name bypass",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Non_Table_Modules",
+      "registered_label": "argument registry: non table modules",
+      "required_stdout_line": "OK argument registry: non table modules",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Returned_Modules",
+      "registered_label": "argument registry: returned modules",
+      "required_stdout_line": "OK argument registry: returned modules",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Third_Argument",
+      "registered_label": "argument registry: third argument",
+      "required_stdout_line": "OK argument registry: third argument",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Representation_Temporaries",
+      "registered_label": "argument registry: representation temporaries",
+      "required_stdout_line": "OK argument registry: representation temporaries",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Callback_Budget",
+      "registered_label": "argument registry: owning host budget",
+      "required_stdout_line": "OK argument registry: owning host budget",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Direct_C_Owner",
+      "registered_label": "argument registry: direct C owner",
+      "required_stdout_line": "OK argument registry: direct C owner",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Direct_C_Roots",
+      "registered_label": "argument registry: direct C roots",
+      "required_stdout_line": "OK argument registry: direct C roots",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Direct_C_Guard",
+      "registered_label": "argument registry: direct C guard",
+      "required_stdout_line": "OK argument registry: direct C guard",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Direct_C_Captures",
+      "registered_label": "argument registry: direct C captures",
+      "required_stdout_line": "OK argument registry: direct C captures",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/argument_registry_tests.adb#Direct_C_Prefix",
+      "registered_label": "argument registry: direct C extra temporaries",
+      "required_stdout_line": "OK argument registry: direct C extra temporaries",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "a8adcf5a961fc7306fa297cec5132d286bb461b0a92fe0a5fd6371f3caefb7eb"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_Trivial",
+      "registered_label": "Panic: actual selected callback",
+      "required_stdout_line": "OK Panic: actual selected callback",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_Status",
+      "registered_label": "Panic: retained thread status",
+      "required_stdout_line": "OK Panic: retained thread status",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_Stack",
+      "registered_label": "Panic: actual usable child stack",
+      "required_stdout_line": "OK Panic: actual usable child stack",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_Argument",
+      "registered_label": "Panic: argument error without frames",
+      "required_stdout_line": "OK Panic: argument error without frames",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_Memory",
+      "registered_label": "Panic: shared provider memory error",
+      "required_stdout_line": "OK Panic: shared provider memory error",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_Closing",
+      "registered_label": "Panic: closes before callback",
+      "required_stdout_line": "OK Panic: closes before callback",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_Close_Error",
+      "registered_label": "Panic: failing closer replaces error",
+      "required_stdout_line": "OK Panic: failing closer replaces error",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_Closing_Status",
+      "registered_label": "Panic: status after successful close walk",
+      "required_stdout_line": "OK Panic: status after successful close walk",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_No_Error",
+      "registered_label": "Panic: no-error cleanup",
+      "required_stdout_line": "OK Panic: no-error cleanup",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Count_Restores_Stack",
+      "registered_label": "API driver: count preserves actual stack",
+      "required_stdout_line": "OK API driver: count preserves actual stack",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Child_Byte_Limit",
+      "registered_label": "Test provider: child byte ceiling",
+      "required_stdout_line": "OK Test provider: child byte ceiling",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Child_Count_Limit",
+      "registered_label": "Test provider: child growth countdown",
+      "required_stdout_line": "OK Test provider: child growth countdown",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Loaded_File",
+      "registered_label": "API driver: public file load",
+      "required_stdout_line": "OK API driver: public file load",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Oversized_Userdata",
+      "registered_label": "API driver: oversized userdata diagnostic",
+      "required_stdout_line": "OK API driver: oversized userdata diagnostic",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
+    },
+    {
+      "case": "tests/src/lua-api_command_tests.adb#Panic_Refusal_Sweep",
+      "registered_label": "Panic: provider refusal cleanup sweep",
+      "required_stdout_line": "OK Panic: provider refusal cleanup sweep",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "7f4cd532a6a02429ece6099aabfef1ac7aeaf93b1a3baccf1739ed6df809b4ed"
     }
   ],
   "required_contexts": [

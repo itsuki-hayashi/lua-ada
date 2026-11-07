@@ -101,7 +101,7 @@ if ($AdditionalConsumerCases -ne '') {
         $key = $case.source + '#' + $case.case_id
         if (@($consumer.cases | Where-Object { ($_.source + '#' + $_.case_id) -ceq $key }).Count -ne 0 -or
             $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api','value-api','auxiliary-api',
-                'load-dump-api','debug-api','external-api','conversion-api','operator-api','index-type-api','base-closing-api','native-module-api','buffer-api',
+                'load-dump-api','debug-api','builtin-api','traceback-api','external-api','conversion-api','operator-api','index-type-api','base-closing-api','native-module-api','buffer-api',
                 'allocator-api','allocator-panic-string-api','allocator-panic-number-api','substitution-api','buffer-private-t-api',
                 'loadfile-api','loadfile-stdin-text-api','loadfile-stdin-binary-c-api','pointer-identity-api','concat-api','thread-reset-api','macro-api','macro-compat-api') -or
             $case.source -cnotmatch '^(?:c_api/tests/[a-zA-Z0-9_-]+\.(?:c|h)|tests/c/[a-zA-Z0-9_-]+\.c)$' -or
