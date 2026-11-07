@@ -39,6 +39,19 @@ package body Lua.Syntax_Trees is
       Compatible_Global : Boolean :=
         Lua.Runtime_Configuration.Compatible_Global)
    is
+      Input : Lua.Inputs.Source;
+   begin
+      Input.Borrow (Source'Address, Source'Length);
+      Parse (Unit, Input, Name, Limits, Memory, Compatible_Global);
+   end Parse;
+
+   procedure Parse
+     (Unit : in out Compilation_Unit; Source : in out Lua.Inputs.Source;
+      Name : String; Limits : Lua.Syntax.Check_Limits;
+      Memory : Lua.Storage.Owner_Access := null;
+      Compatible_Global : Boolean :=
+        Lua.Runtime_Configuration.Compatible_Global)
+   is
       Selected : constant not null Lua.Storage.Owner_Access :=
         (if Memory /= null then Memory
          else Lua.Storage.Reference (Unit.Default_Memory));
@@ -67,7 +80,9 @@ package body Lua.Syntax_Trees is
         (Unit.Texts.Equal (Left, Right));
       function Matches (Left : Text_Ref; Right : String) return Boolean is
         (Unit.Texts.Equal (Left, Right));
-      procedure Error (Message : String; Resource : Boolean := False);
+      procedure Error
+        (Message : String; Resource : Boolean := False;
+         Incomplete : Boolean := False);
       procedure Advance;
       function Peek return Token_Kind;
       function Take (Expected : Token_Kind) return Boolean;
@@ -108,7 +123,9 @@ package body Lua.Syntax_Trees is
       procedure Enter;
       procedure Leave;
 
-      procedure Error (Message : String; Resource : Boolean := False) is
+      procedure Error
+        (Message : String; Resource : Boolean := False;
+         Incomplete : Boolean := False) is
       begin
          --  Error text belongs to the same unit as the failing token. Only
          --  the public checking wrapper materializes a host diagnostic; an
@@ -118,7 +135,10 @@ package body Lua.Syntax_Trees is
             else Lua.Syntax.Syntax_Error);
          Unit.Result.Error.Line := Current.After.Line;
          Unit.Result.Error.Column := Here.Column;
-         Unit.Result.Error.Message := Own (Message);
+         Unit.Result.Incomplete_Input := Incomplete and then not Resource;
+         Unit.Result.Error.Message := Own
+           (Message & (if Unit.Result.Incomplete_Input then
+                         " near <eof>" else ""));
          raise Abandon;
       end Error;
 
@@ -142,6 +162,7 @@ package body Lua.Syntax_Trees is
             Unit.Result.Error.Line := Step.Location.Line;
             Unit.Result.Error.Column := Step.Location.Column;
             Unit.Result.Error.Message := Step.Message;
+            Unit.Result.Incomplete_Input := Step.Incomplete_Input;
             raise Abandon;
          end if;
          return Step.Item;
@@ -181,7 +202,8 @@ package body Lua.Syntax_Trees is
       procedure Expect (Expected : Token_Kind) is
       begin
          if not Take (Expected) then
-            Error (Token_Kind'Image (Expected) & " expected");
+            Error (Token_Kind'Image (Expected) & " expected",
+                   Incomplete => Kind = End_Of_Input);
          end if;
       end Expect;
 
@@ -516,7 +538,7 @@ package body Lua.Syntax_Trees is
             Child (Result, Expression);
             Expect (Right_Paren);
          else
-            Error ("expression expected");
+            Error ("expression expected", Incomplete => Kind = End_Of_Input);
             return No_Node;
          end if;
          Remember_End (Result);
@@ -566,7 +588,8 @@ package body Lua.Syntax_Trees is
                                           Value => Current, others => <>)));
                         Advance;
                      else
-                        Error ("function arguments expected");
+                        Error ("function arguments expected",
+                               Incomplete => Kind = End_Of_Input);
                      end if;
                      Child (Next, Args);
                   end;
@@ -1074,8 +1097,9 @@ package body Lua.Syntax_Trees is
       Unit.Texts.Clear;
       Unit.Result := (Status => Lua.Syntax.Success,
                       Error => (Source => Own (Name),
-                                others => <>));
-      if Source'Length > Limits.Source_Bytes then
+                                others => <>),
+                      Incomplete_Input => False);
+      if Source.Available > Limits.Source_Bytes then
          Error ("source byte limit exceeded", Resource => True);
       end if;
       Unit.Tree.Clear;

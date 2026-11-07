@@ -45,16 +45,24 @@ allocator and are released on every callback/error/refusal path. Binary
 reading stops at the decoded graph without an extra EOF read; documented
 whole-buffer `B` inputs are copied into owned canonical storage. The Lua
 library's `load` continues to reject `B`, as pinned C Lua does.
-Text reader acquisition currently buffers through EOF; matching native early
-syntax-failure reader counts remains an explicit follow-up. This checkpoint
-therefore does not establish complete public reader compatibility.
+The shared scanner/parser and binary decoder now drive acquisition on actual
+byte demand, including native current-byte prefetch before token delivery.
+They consume one frontend pass, without gathering text to EOF first or
+reconstructing binary prefixes. A C-owned refill checkpoint above suspended
+Ada returns actual errors/yields as typed outcomes; explicit user API reentry
+retains the same driver, roots, allocator and work budget. See
+[ADR 0019](../docs/decisions/0019-demand-driven-input.md).
 
 Dumping serializes the selected actual canonical subtree and preserves the
 writer's stack between callbacks. It sends Lua 5.5's terminal NULL/zero call,
 returns a nonzero writer status unchanged, and releases its owned snapshot
 before propagating a writer error through the caller's C guard. The shared
-reader/writer consumer has fifteen separately named, native-matched cases;
+reader/writer consumer has twenty-eight separately named cases;
 `check-core-image.ps1` runs and compares that same source against both images.
+The demand-driven checkpoint passes the full local Windows/default/static
+consumer and 1,412 AUnit cases. Its standalone output matches the pinned native
+default and instrumented C runs; integrated Ada instrumented and complete
+platform acceptance remain separate final-delivery evidence.
 Full auxiliaries, debug APIs, builtin C trampolines and
 remaining exports are pending. In particular, `lua_tocfunction` currently exposes
 real foreign callbacks; Ada native-library functions need their own stable C

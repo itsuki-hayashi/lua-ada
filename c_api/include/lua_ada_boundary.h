@@ -27,8 +27,9 @@ enum lua_ada_operation {
     ADA_COLLECTOR_CONTROL, ADA_PUSH_COLLECTOR_DRAIN,
     ADA_YIELD_CALL = 58, ADA_GET_STATUS, ADA_BEGIN_RESUME,
     ADA_OPEN_STANDARD_MODULE, ADA_PREPARE_INDEX, ADA_MARK_CLOSE, ADA_CLOSE_SLOT,
-    ADA_RESIZE_LOAD_BUFFER, ADA_RELEASE_BUFFER, ADA_DUMP_FUNCTION,
+    ADA_RELEASE_BUFFER = 66, ADA_DUMP_FUNCTION,
     ADA_READER_BARRIER, ADA_RESTORE_LOAD_STACK, ADA_PREPARE_READER_ERROR,
+    ADA_LOAD_READER,
     ADA_SET_HOOK = 80, ADA_GET_HOOK, ADA_GET_HOOK_MASK, ADA_GET_HOOK_COUNT,
     ADA_GET_DEBUG_FRAME, ADA_GET_DEBUG_LINE
 };
@@ -62,6 +63,7 @@ struct lua_ada_request {
     int warning_continuation;
     lua_KFunction continuation;
     lua_KContext kcontext;
+    lua_Reader reader;
 };
 
 struct lua_ada_response {
@@ -118,6 +120,8 @@ size_t lua_ada_extra_space(void);
 int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
                             const struct lua_ada_response *pending,
                             struct lua_ada_response *completion);
+int lua_ada_read_guarded(lua_State *state, lua_Reader reader, void *data,
+                         struct lua_ada_response *completion);
 
 /* Test-only C guard probe. It demonstrates that a failing exported operation
  * returned through Ada before C unwinds. It is not a lua_pcall replacement. */

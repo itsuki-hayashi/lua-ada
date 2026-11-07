@@ -10,6 +10,20 @@ source/token/node/nesting limits. It returns Success, Syntax_Error, or
 Resource_Error. Lexical and static-semantic rejection are syntax failures.
 It exposes no trees or runtime objects and has no Lua side effects.
 
+`Check_Result.Incomplete_Input` reports an unfinished quoted/long token or a
+grammar expectation at actual EOF. Interactive hosts can request more input
+from this structured fact, without inspecting diagnostic wording or introducing
+another grammar. Successful chunks, resource failures, malformed numerals or
+escapes, and static-semantic/resolver errors return false. In particular, an
+unresolved goto stays a final error even though label resolution happens after
+the scanner reaches EOF.
+
+Whole-buffer and foreign-reader loading share the same scanner, parser and
+checked binary decoder through the private demand-driven input boundary. See
+[ADR 0019](decisions/0019-demand-driven-input.md) for ownership, guarded refill
+and work-budget rules; the final delivery's runtime/platform evidence remains
+separate from that implementation decision.
+
 The CLI accepts --check with files, stdin, repeated -e, and --. Each source is
 a separate chunk. It stops on the first failure, prints errors on stderr, and
 emits no normal output. Script arguments are accepted but unused. File inputs

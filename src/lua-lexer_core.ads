@@ -1,4 +1,5 @@
 with Lua.Frontend_Text;
+with Lua.Inputs;
 with Lua.Lexers;
 with Lua.Numbers;
 with Lua.Runtime_Configuration;
@@ -19,6 +20,9 @@ private package Lua.Lexer_Core is
       Item : Token;
       Location : Lua.Lexers.Source_Location;
       Message : Lua.Frontend_Text.Text_Ref;
+      Incomplete_Input : Boolean := False;
+      --  Only an unfinished quoted/long token at actual EOF can request
+      --  another interactive line. Invalid numerals/escapes remain final.
    end record;
    type Scanner_State is record
       Cursor : Lua.Lexers.Source_Location;
@@ -34,7 +38,12 @@ private package Lua.Lexer_Core is
    function Next
      (Source : String; Self : in out Scanner_State;
       Texts : in out Lua.Frontend_Text.Arena) return Scan_Result;
+   function Next
+     (Source : in out Lua.Inputs.Source; Self : in out Scanner_State;
+      Texts : in out Lua.Frontend_Text.Arena) return Scan_Result;
    --  Retain one-token lookahead in the parser, never by scanning all input.
    --  Allocation refusal propagates for the owning runtime's memory policy;
    --  only language/explicit frontend limits become returned scan failures.
+   --  The streaming overload refills only on the same scanner's actual byte
+   --  demand. Guarded reader errors remain typed exceptions for its owner.
 end Lua.Lexer_Core;

@@ -314,77 +314,53 @@ static void release_buffer(lua_State *state, void *buffer) {
     dispatch(state, input);
 }
 
+int lua_ada_read_guarded(lua_State *state, lua_Reader reader, void *data,
+                         struct lua_ada_response *completion) {
+    struct lua_ada_guard guard;
+    int status;
+    memset(completion, 0, sizeof *completion);
+    guard.previous = state->guard;
+    guard.error_handled = 0;
+    state->guard = &guard;
+    /* This checkpoint is ABOVE the suspended shared Ada frontend. A reader
+     * can call the public API recursively, but its error/yield jumps only to
+     * this live C frame and returns a typed status to that frontend. No saved
+     * C stack or nonlocal transfer crosses the waiting Ada parser/decoder. */
+    status = setjmp(guard.target);
+    if (status == 0) {
+        size_t length = 0;
+        completion->pointer = (void *)reader(state, data, &length);
+        completion->length = length;
+    }
+    state->guard = guard.previous;
+    completion->error_handled = guard.error_handled;
+    return status;
+}
+
 int lua_load(lua_State *state, lua_Reader reader, void *data,
              const char *name, const char *mode) {
     struct lua_ada_guard guard;
     struct lua_ada_response output;
-    void *volatile buffer = NULL;
-    volatile size_t length = 0;
-    volatile size_t capacity = 0;
     volatile int barrier_active = 0;
     int top = lua_gettop(state);
     int status;
-    /* Source storage is allocated through the actual Ada universe, while
-     * reader calls run only above this C checkpoint. A reader may call back
-     * into Lua, trigger collection, or raise; no controlled Ada temporary
-     * lives across that foreign call. Volatile ownership survives longjmp. */
     guard.previous = state->guard;
     guard.error_handled = 0;
     state->guard = &guard;
     status = setjmp(guard.target);
     if (status == 0) {
-        struct lua_ada_request enter = request(ADA_READER_BARRIER);
-        enter.index = 1;
-        dispatch(state, enter);
+        struct lua_ada_request input = request(ADA_READER_BARRIER);
+        input.index = 1;
+        dispatch(state, input);
         barrier_active = 1;
-        for (;;) {
-            size_t part_size = 0;
-            const char *part = reader(state, data, &part_size);
-            size_t needed;
-            if (part == NULL || part_size == 0) {
-                status = luaL_loadbufferx(state, buffer, length, name, mode);
-                break;
-            }
-            if (length == 0 && (unsigned char)part[0] == 0x1b &&
-                mode != NULL && strchr(mode, 'B') != NULL) {
-                /* B's documented reader contract supplies the entire binary
-                 * in its first stable block. Decode it synchronously without
-                 * an extra EOF read; owned canonical storage may safely copy
-                 * that block rather than exposing borrowed native words. */
-                status = luaL_loadbufferx(state, part, part_size, name, mode);
-                break;
-            }
-            if (part_size > (size_t)-1 - length) {
-                struct lua_ada_request input = request(ADA_RESIZE_LOAD_BUFFER);
-                input.index = 1; /* Report actual size overflow as ERRMEM. */
-                dispatch(state, input);
-            }
-            needed = length + part_size;
-            if (needed > capacity) {
-                struct lua_ada_request input = request(ADA_RESIZE_LOAD_BUFFER);
-                input.pointer = buffer;
-                input.length = needed;
-                output = dispatch(state, input);
-                buffer = output.pointer;
-                capacity = output.length;
-            }
-            memcpy((char *)buffer + length, part, part_size);
-            length = needed;
-            if ((unsigned char)((char *)buffer)[0] == 0x1b ||
-                (mode != NULL && strchr(mode, 't') == NULL)) {
-                struct lua_ada_request input = request(ADA_LOAD_BUFFER);
-                input.pointer = buffer;
-                input.length = length;
-                input.name = name;
-                input.mode = mode;
-                input.count = 1; /* An incomplete binary can request more. */
-                output = dispatch(state, input);
-                if (output.integer_data != -1) {
-                    status = (int)output.integer_data;
-                    break;
-                }
-            }
-        }
+        input = request(ADA_LOAD_READER);
+        input.reader = reader;
+        input.pointer = data;
+        input.name = name;
+        input.mode = mode;
+        output = dispatch(state, input);
+        status = (int)output.integer_data;
+        guard.error_handled = output.error_handled;
     }
     if (status == LUA_ERRRUN && !guard.error_handled) {
         /* lua_error in the reader uses the nearest surrounding message
@@ -397,11 +373,10 @@ int lua_load(lua_State *state, lua_Reader reader, void *data,
         if (output.integer_data != 0)
             status = lua_pcall(state, 1, 1, lua_gettop(state) - 2);
     }
-    /* Release ownership before restoring the stack. The restore is a direct,
-     * allocation-free top adjustment, matching protectedparser rather than
-     * lua_settop (which can run arbitrary to-be-closed handlers). */
+    /* The dispatcher has finalized the source and any partial graph before
+     * returning. Restore the scalar top directly, without invoking arbitrary
+     * lua_settop closing handlers, after removing the parser yield barrier. */
     state->guard = guard.previous;
-    release_buffer(state, buffer);
     if (barrier_active) dispatch(state, request(ADA_READER_BARRIER));
     if (status == ADA_ACTION_ABORT) {
         memset(&output, 0, sizeof output);

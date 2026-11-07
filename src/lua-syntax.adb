@@ -17,7 +17,8 @@ package body Lua.Syntax is
                  Error => (Source =>
                    Ada.Strings.Unbounded.To_Unbounded_String (Name),
                    Message => Ada.Strings.Unbounded.To_Unbounded_String
-                     ("source byte limit exceeded"), others => <>));
+                     ("source byte limit exceeded"), others => <>),
+                 Incomplete_Input => False);
       end if;
       Syntax_Trees.Parse (Unit, Source, Name, Limits);
       --  Public diagnostics deliberately own ordinary Ada strings. The
@@ -31,13 +32,15 @@ package body Lua.Syntax is
             Message => Ada.Strings.Unbounded.To_Unbounded_String
               (Syntax_Trees.Text (Unit, Unit.Result.Error.Message)),
             Line => Unit.Result.Error.Line,
-            Column => Unit.Result.Error.Column));
+            Column => Unit.Result.Error.Column),
+         Incomplete_Input => Unit.Result.Incomplete_Input);
    exception
       when Storage_Error | Lua.Storage.Allocation_Error =>
          return (Status => Resource_Error,
                  Error => (Source =>
                    Ada.Strings.Unbounded.To_Unbounded_String (Name),
                    Message => Ada.Strings.Unbounded.To_Unbounded_String
-                     ("frontend storage exhausted"), others => <>));
+                     ("frontend storage exhausted"), others => <>),
+                 Incomplete_Input => False);
    end Check;
 end Lua.Syntax;

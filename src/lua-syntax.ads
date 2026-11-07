@@ -15,6 +15,10 @@ package Lua.Syntax is
    type Check_Result is record
       Status : Check_Status := Success;
       Error : Lua.Diagnostics.Diagnostic;
+      Incomplete_Input : Boolean := False;
+      --  A grammar expectation or unfinished literal at actual EOF can be
+      --  completed by more interactive input. False for success, resources,
+      --  malformed numerals/escapes and static-semantic/resolver errors.
    end record;
    function Check
      (Source : String; Name : String := "(source)";

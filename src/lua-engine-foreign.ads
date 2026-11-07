@@ -21,6 +21,11 @@ package Lua.Engine.Foreign is
       Context : Interfaces.C.ptrdiff_t) return Interfaces.C.int
      with Convention => C;
 
+   type C_Reader is access function
+     (State, Data : System.Address;
+      Size : not null access Interfaces.C.size_t) return System.Address
+     with Convention => C;
+
    type IO_Close_Kind is
      (Regular_File_Close, Pipe_File_Close, Borrowed_File_Close);
    function IO_Close_Handler (Kind : IO_Close_Kind) return C_Function;
@@ -46,8 +51,9 @@ package Lua.Engine.Foreign is
       Open_IO_Module, Open_OS_Module, Collector_Control, Push_Collector_Drain,
       Yield_Call, Get_Status, Begin_Resume, Open_Standard_Module,
       Prepare_Index, Mark_Close, Close_Slot,
-      Resize_Load_Buffer, Release_Buffer, Dump_Function,
+      Release_Buffer, Dump_Function,
       Reader_Barrier, Restore_Load_Stack, Prepare_Reader_Error,
+      Load_Reader,
       Set_Hook, Get_Hook, Get_Hook_Mask, Get_Hook_Count,
       Get_Debug_Frame, Get_Debug_Line);
    for Operation_Code use
@@ -76,9 +82,9 @@ package Lua.Engine.Foreign is
       Yield_Call => 58, Get_Status => 59, Begin_Resume => 60,
       Open_Standard_Module => 61,
       Prepare_Index => 62, Mark_Close => 63,
-      Close_Slot => 64, Resize_Load_Buffer => 65, Release_Buffer => 66,
+      Close_Slot => 64, Release_Buffer => 66,
       Dump_Function => 67, Reader_Barrier => 68, Restore_Load_Stack => 69,
-      Prepare_Reader_Error => 70,
+      Prepare_Reader_Error => 70, Load_Reader => 71,
       Set_Hook => 80, Get_Hook => 81, Get_Hook_Mask => 82,
       Get_Hook_Count => 83, Get_Debug_Frame => 84, Get_Debug_Line => 85);
    for Operation_Code'Size use Interfaces.C.int'Size;
@@ -106,6 +112,7 @@ package Lua.Engine.Foreign is
       Warning_Continuation : Interfaces.C.int := 0;
       Continuation : C_Continuation := null;
       KContext : Interfaces.C.ptrdiff_t := 0;
+      Reader : C_Reader := null;
    end record with Convention => C;
 
    type Response is record

@@ -14,6 +14,7 @@ with Lua.Engine.Library_Openers;
 with Lua.Engine.Operating_System;
 with Lua.Engine.Warnings;
 with Lua.Prototypes;
+with Lua.Inputs;
 with Lua.Runtime_Configuration;
 with Lua.Syntax;
 with Lua.Syntax_Trees;
@@ -35,7 +36,6 @@ package body Lua.Engine.Foreign is
    use type C.unsigned_long_long;
    use type System.Address;
    use type Lua.Prototypes.Prototype_Access;
-   use type Lua.Chunks.Error_Kind;
 
    function Close_Regular (State : System.Address) return C.int
      with Import, Convention => C,
@@ -121,6 +121,79 @@ package body Lua.Engine.Foreign is
       Completion : not null access Response) return C.int
      with Import, Convention => C,
           External_Name => "lua_ada_invoke_borrowed";
+   function C_Read_Guarded
+     (State : System.Address; Reader : C_Reader; Data : System.Address;
+      Completion : not null access Response) return C.int
+     with Import, Convention => C, External_Name => "lua_ada_read_guarded";
+
+   type Reader_Capture is record
+      State : System.Address;
+      Universe : World_View;
+      Reader : C_Reader;
+      Data : System.Address;
+      Status : C.int := 0;
+      Error_Handled : C.int := 0;
+   end record;
+   package Reader_Captures is new
+     System.Address_To_Access_Conversions (Reader_Capture);
+   function Read_Piece (Context : System.Address) return Lua.Inputs.Piece;
+   function Retry_Input
+     (Context : System.Address; Retried : in out Boolean) return Boolean;
+
+   function Read_Piece (Context : System.Address) return Lua.Inputs.Piece is
+      Capture : Reader_Capture renames
+        Reader_Captures.To_Pointer (Context).all;
+      Result : aliased Response;
+      procedure Charge (Amount : Natural);
+      procedure Charge (Amount : Natural) is
+         State : World renames Capture.Universe.all;
+      begin
+         if State.Policy = Bounded then
+            if State.Steps > State.Bounds.Instructions or else
+              Amount > State.Bounds.Instructions - State.Steps
+            then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Amount;
+         end if;
+      end Charge;
+   begin
+      --  The checkpoint lives in C above this suspended Ada frontend. Every
+      --  reader API error/yield returns a typed status here; it never jumps
+      --  through parser/decoder frames or abandons their controlled storage.
+      Charge (1);
+      pragma Assert (Capture.Universe.Operation_Roots.Is_Empty and then
+        Capture.Universe.Operation_Programs.Is_Empty);
+      Capture.Status := C_Read_Guarded
+        (Capture.State, Capture.Reader, Capture.Data, Result'Access);
+      --  Reentrant API calls own their own short transient operation lease.
+      --  At a refill the waiting frontend owns raw managed syntax/model
+      --  storage, never an unrooted runtime Value or adopted wrapper. Renew
+      --  its empty lease after C returns, retiring the callback's allocation
+      --  epoch rather than retaining all of its discarded weak temporaries.
+      --  This does not restart execution, counters or the selected policy.
+      Begin_Operation (Capture.Universe.all);
+      Capture.Error_Handled := Result.Error_Handled;
+      if Capture.Status /= 0 then
+         raise Lua.Inputs.Reader_Error;
+      elsif Result.Pointer = System.Null_Address or else Result.Length = 0
+      then
+         return (others => <>);
+      elsif Result.Length > C.size_t (Natural'Last) then
+         raise Memory.Allocation_Error;
+      end if;
+      Charge (Natural (Result.Length));
+      return (Result.Pointer, Natural (Result.Length));
+   end Read_Piece;
+
+   function Retry_Input
+     (Context : System.Address; Retried : in out Boolean) return Boolean
+   is
+      Capture : Reader_Capture renames
+        Reader_Captures.To_Pointer (Context).all;
+   begin
+      return Retry_Allocation (Capture.Universe.all, Retried);
+   end Retry_Input;
 
    function Characters is new Ada.Unchecked_Conversion
      (System.Address, Interfaces.C.Strings.chars_ptr);
@@ -2412,65 +2485,6 @@ package body Lua.Engine.Foreign is
             else
                Context.Non_Yieldable := Context.Non_Yieldable - 1;
             end if;
-         when Resize_Load_Buffer =>
-            declare
-               Block : System.Address := Input.Pointer;
-               Capacity : Memory.Byte_Count := 0;
-               Needed : Memory.Byte_Count;
-               Retried : Boolean := False;
-            begin
-               --  The C-owned reader guard holds only this byte address.
-               --  Its storage still belongs to the real universe provider,
-               --  so callback allocation limits and accounting include the
-               --  complete source while foreign callbacks run without Ada
-               --  activations on their nonlocal-transfer path.
-               if Input.Index /= 0 or else
-                 Input.Length > C.size_t (Memory.Byte_Count'Last)
-               then
-                  raise Memory.Allocation_Error;
-               elsif Input.Length >
-                 C.size_t (Owner.Universe.Bounds.Source_Bytes)
-               then
-                  Fail (Owner.Universe.all, "source byte limit exceeded",
-                        Resource => True);
-               end if;
-               if Block /= System.Null_Address and then not
-                 Memory.Owns (Owner.Universe.Memory, Block)
-               then
-                  raise Foreign_Error with "invalid loading buffer";
-               end if;
-               if Block /= System.Null_Address then
-                  Capacity := Memory.Allocation_Size (Block);
-               end if;
-               Needed := Memory.Byte_Count (Input.Length);
-               if Needed > Capacity then
-                  --  Geometric reserve avoids quadratic copying for small
-                  --  reader pieces. Clamp spare capacity to the actual
-                  --  source bound so a valid last piece never fails solely
-                  --  because of speculative growth beyond that bound.
-                  Capacity := Memory.Byte_Count'Max
-                    (Needed, Memory.Byte_Count'Min
-                       (Memory.Byte_Count
-                          (Owner.Universe.Bounds.Source_Bytes),
-                        Memory.Byte_Count'Max (4_096, Capacity * 2)));
-                  loop
-                     begin
-                        Memory.Reallocate
-                          (Owner.Universe.Memory, Block, Capacity);
-                        exit;
-                     exception
-                        when Memory.Allocation_Error =>
-                           if not Retry_Allocation
-                             (Owner.Universe.all, Retried)
-                           then
-                              raise;
-                           end if;
-                     end;
-                  end loop;
-               end if;
-               Output.Pointer := Block;
-               Output.Length := C.size_t (Capacity);
-            end;
          when Release_Buffer =>
             declare
                Block : System.Address := Input.Pointer;
@@ -2525,16 +2539,37 @@ package body Lua.Engine.Foreign is
                   Memory.Release (Owner.Universe.Memory, Block);
                   raise;
             end;
-         when Load_Buffer =>
+         when Load_Buffer | Load_Reader =>
             declare
-               Source : constant String := Read_Bytes
-                 (Input.Pointer, Input.Length);
+               Source : Lua.Inputs.Source;
+               Capture : aliased Reader_Capture :=
+                 (State => State, Universe => Owner.Universe,
+                  Reader => Input.Reader, Data => Input.Pointer,
+                  others => <>);
                Name : constant String := Read_Name (Input.Name, "?");
                Mode : constant String := Read_Name (Input.Mode, "bt");
-               Binary : constant Boolean := Source'Length > 0 and then
-                 Source (Source'First) = Character'Val (27);
+               Binary : Boolean;
                Callee : Value;
             begin
+               if Input.Operation = Load_Reader then
+                  if Input.Reader = null then
+                     raise Foreign_Error with "reader function expected";
+                  end if;
+                  Source.Open
+                    (Memory.Reference (Owner.Universe.Memory),
+                     Read_Piece'Access, Capture'Address,
+                     Owner.Universe.Bounds.Source_Bytes, Retry_Input'Access);
+               else
+                  if Input.Length > C.size_t (Natural'Last) or else
+                    (Input.Length > 0 and then
+                     Input.Pointer = System.Null_Address)
+                  then
+                     raise Foreign_Error with "invalid C string extent";
+                  end if;
+                  Source.Borrow (Input.Pointer, Natural (Input.Length));
+               end if;
+               Binary := Source.Ensure (1) and then
+                 Source.Element (1) = Character'Val (27);
                --  Loading validates and owns code but never executes it.
                --  The binary decoder and text frontend both produce the real
                --  canonical graph, adopted into this session's actual heap.
@@ -2553,7 +2588,9 @@ package body Lua.Engine.Foreign is
                        (Source, Memory.Reference (Owner.Universe.Memory),
                         (Input_Bytes => Owner.Universe.Bounds.Source_Bytes,
                          Depth => Owner.Universe.Bounds.Syntax_Depth,
-                         others => <>));
+                         others => <>),
+                        Fixed_Buffer =>
+                          Ada.Strings.Fixed.Index (Mode, "B") /= 0);
                   begin
                      case Decoded.Outcome is
                         when Lua.Chunks.Succeeded =>
@@ -2562,20 +2599,9 @@ package body Lua.Engine.Foreign is
                               Global_Environment (Owner.Universe.all));
                            Push (Owner.Universe.all, Context, Callee);
                         when Lua.Chunks.Bad_Format =>
-                           if Input.Count /= 0 and then
-                             Decoded.Error = Lua.Chunks.Truncated
-                           then
-                              --  A foreign reader can provide another piece.
-                              --  Do not publish an error or a partial closure;
-                              --  the caller retries the owned decoder when
-                              --  more bytes arrive. A complete binary ends
-                              --  reading without an extra EOF callback.
-                              Output.Integer_Data := -1;
-                           else
-                              Error_Result (Name & ": bad binary format (" &
-                                Lua.Chunks.Message (Decoded.Error) & ")");
-                              Output.Integer_Data := 3;
-                           end if;
+                           Error_Result (Name & ": bad binary format (" &
+                             Lua.Chunks.Message (Decoded.Error) & ")");
+                           Output.Integer_Data := 3;
                         when Lua.Chunks.Resource_Limit =>
                            Fail (Owner.Universe.all,
                              "binary loading resource limit", True);
@@ -2634,6 +2660,15 @@ package body Lua.Engine.Foreign is
                   end;
                end if;
             exception
+               when Lua.Inputs.Reader_Error =>
+                  --  The source/partial frontend graph is finalized before
+                  --  this actual foreign status reaches C. Its error object
+                  --  already belongs to the reader's traced public stack.
+                  Output.Integer_Data := C.long_long (Capture.Status);
+                  Output.Error_Handled := Capture.Error_Handled;
+               when Lua.Inputs.Input_Limit =>
+                  Fail (Owner.Universe.all, "source byte limit exceeded",
+                        Resource => True);
                when Memory.Allocation_Error =>
                   Memory_Result;
                   Output.Integer_Data := 4;

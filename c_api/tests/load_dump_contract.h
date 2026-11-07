@@ -470,6 +470,336 @@ static void test_binary_reader_failure_boundaries(lua_State *state) {
     puts("C API PASS: binary reader mode malformed and truncated boundaries");
 }
 
+struct scripted_reader {
+    const char *pieces[8];
+    size_t sizes[8];
+    int count;
+    int calls;
+    int raise_at;
+};
+
+static const char *read_scripted_chunk(lua_State *state, void *data,
+                                       size_t *size) {
+    struct scripted_reader *reader = (struct scripted_reader *)data;
+    int index = reader->calls++;
+    assert(!lua_isyieldable(state));
+    if (reader->raise_at > 0 && index == reader->raise_at) {
+        lua_pushliteral(state, "reader should not have been called again");
+        lua_error(state);
+    }
+    if (index >= reader->count) {
+        *size = 0;
+        return NULL;
+    }
+    *size = reader->sizes[index];
+    return reader->pieces[index];
+}
+
+static void test_reader_stops_at_definitive_syntax(lua_State *state) {
+    /* A rejected punctuation token is complete in the first piece. Asking
+     * for a later piece would run unrelated side effects and replace native
+     * syntax rejection with the later reader's runtime error. */
+    struct scripted_reader reader = {0};
+    lua_settop(state, 0);
+    reader.pieces[0] = ") ";
+    reader.sizes[0] = 2;
+    reader.count = 1;
+    reader.raise_at = 1;
+    assert(lua_load(state, read_scripted_chunk, &reader, "=early-token", "t") == LUA_ERRSYNTAX);
+    assert(reader.calls == 1 && lua_gettop(state) == 1);
+    puts("C API PASS: reader stops before unrelated syntax-error side effects");
+}
+
+static void test_reader_punctuation_prefetch(lua_State *state) {
+    /* Native llex fetches its next current byte before returning a single
+     * punctuation token. A reader failure at that exact boundary therefore
+     * precedes the parser's later rejection of the punctuation itself. */
+    struct scripted_reader reader = {0};
+    lua_settop(state, 0);
+    reader.pieces[0] = ")"; reader.sizes[0] = 1;
+    reader.count = 1;
+    reader.raise_at = 1;
+    assert(lua_load(state, read_scripted_chunk, &reader, "=punctuation-prefetch", "t") == LUA_ERRRUN);
+    assert(reader.calls == 2);
+    assert(strstr(lua_tostring(state, -1), "should not have been called"));
+    puts("C API PASS: reader preserves native punctuation prefetch errors");
+}
+
+static void test_reader_stops_at_invalid_escape(lua_State *state) {
+    /* The shared lexer must reject an invalid escape in a supplied token
+     * without observing artificial EOF or invoking the next failing read. */
+    const char source[] = "return '\\q'";
+    struct scripted_reader reader = {0};
+    lua_settop(state, 0);
+    reader.pieces[0] = source;
+    reader.sizes[0] = sizeof(source) - 1;
+    reader.count = 1;
+    reader.raise_at = 1;
+    assert(lua_load(state, read_scripted_chunk, &reader, "=early-escape", "t") == LUA_ERRSYNTAX);
+    assert(reader.calls == 1);
+    assert(strstr(lua_tostring(state, -1), "invalid escape sequence"));
+    puts("C API PASS: reader invalid escape precedes later callback errors");
+}
+
+static void test_reader_keyword_boundaries(lua_State *state) {
+    /* An unfinished keyword is not an actual EOF. Its real next piece must
+     * complete the same token before the parser classifies the statement. */
+    struct scripted_reader reader = {0};
+    lua_settop(state, 0);
+    reader.pieces[0] = "ret"; reader.sizes[0] = 3;
+    reader.pieces[1] = "urn 23"; reader.sizes[1] = 6;
+    reader.count = 2;
+    assert(lua_load(state, read_scripted_chunk, &reader, "=split-keyword", "t") == LUA_OK);
+    assert(reader.calls == 3);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 23);
+    puts("C API PASS: reader preserves split keyword tokens");
+}
+
+static void test_reader_number_boundaries(lua_State *state) {
+    /* A split hexadecimal exponent must continue scanning the same numeral,
+     * preserving its floating classification after the actual final EOF. */
+    struct scripted_reader reader = {0};
+    lua_settop(state, 0);
+    reader.pieces[0] = "ret"; reader.sizes[0] = 3;
+    reader.pieces[1] = "urn 0x"; reader.sizes[1] = 6;
+    reader.pieces[2] = "1p+"; reader.sizes[2] = 3;
+    reader.pieces[3] = "2"; reader.sizes[3] = 1;
+    reader.count = 4;
+    assert(lua_load(state, read_scripted_chunk, &reader, "=split-number", "t") == LUA_OK);
+    assert(reader.calls == 5);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_tonumber(state, -1) == 4 && !lua_isinteger(state, -1));
+    puts("C API PASS: reader preserves split numeral tokens");
+}
+
+static void test_reader_escape_boundaries(lua_State *state) {
+    /* Refill while decoding escapes. Retained offsets and diagnostic spans
+     * must survive managed-buffer relocation without snapshot reparsing. */
+    struct scripted_reader reader = {0};
+    lua_settop(state, 0);
+    reader.pieces[0] = "return \"A\\"; reader.sizes[0] = 10;
+    reader.pieces[1] = "x4"; reader.sizes[1] = 2;
+    reader.pieces[2] = "2\\u{"; reader.sizes[2] = 4;
+    reader.pieces[3] = "43}\""; reader.sizes[3] = 4;
+    reader.count = 4;
+    assert(lua_load(state, read_scripted_chunk, &reader, "=split-escape", "t") == LUA_OK);
+    assert(reader.calls == 5);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(strcmp(lua_tostring(state, -1), "ABC") == 0);
+    puts("C API PASS: reader preserves split escape boundaries");
+}
+
+static void test_reader_delimiter_boundaries(lua_State *state) {
+    /* Both long-comment delimiters cross a piece boundary. This exercises
+     * real scanner lookahead, including the reader lifetime of older bytes. */
+    struct scripted_reader reader = {0};
+    lua_settop(state, 0);
+    reader.pieces[0] = "--["; reader.sizes[0] = 3;
+    reader.pieces[1] = "=[ comment ]"; reader.sizes[1] = 12;
+    reader.pieces[2] = "=]"; reader.sizes[2] = 2;
+    reader.pieces[3] = " return 23"; reader.sizes[3] = 10;
+    reader.count = 4;
+    assert(lua_load(state, read_scripted_chunk, &reader, "=split-comment", "t") == LUA_OK);
+    assert(reader.calls == 5);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 23);
+    puts("C API PASS: reader preserves long-delimiter boundaries");
+}
+
+struct reentrant_reader {
+    struct chunk_reader source;
+    int nested_calls;
+};
+
+static const char *read_reentrant_chunk(lua_State *state, void *data,
+                                        size_t *size) {
+    struct reentrant_reader *reader = (struct reentrant_reader *)data;
+    int top = lua_gettop(state);
+    /* Compile and execute in this same actual universe while the outer
+     * frontend waits below the C-owned reader checkpoint. */
+    assert(luaL_loadstring(state, "return 37") == LUA_OK);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 37);
+    lua_pop(state, 1);
+    assert(lua_gettop(state) == top);
+    lua_gc(state, LUA_GCCOLLECT);
+    reader->nested_calls++;
+    return read_chunk(state, &reader->source, size);
+}
+
+static void test_reader_recursive_api_reentry(lua_State *state) {
+    /* Each reader call reenters loading and the iterative execution portal.
+     * The waiting frontend retains its own tokens/input and shared roots. */
+    const char source[] = "return function(x) return x + 9 end";
+    struct reentrant_reader reader = {0};
+    lua_settop(state, 0);
+    reader.source.bytes = source;
+    reader.source.size = sizeof(source) - 1;
+    reader.source.piece = 3;
+    assert(lua_load(state, read_reentrant_chunk, &reader, "=recursive-reader", "t") == LUA_OK);
+    assert(reader.nested_calls == reader.source.calls && reader.nested_calls > 2);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    lua_pushinteger(state, 33);
+    assert(lua_pcall(state, 1, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 42);
+    puts("C API PASS: reader recursive loading execution and collection");
+}
+
+struct recursive_source_reader {
+    int depth;
+    int phase;
+    int *calls;
+};
+
+static const char *read_recursive_source(lua_State *state, void *data,
+                                         size_t *size) {
+    struct recursive_source_reader *reader =
+        (struct recursive_source_reader *)data;
+    (*reader->calls)++;
+    if (reader->phase++ != 0) {
+        *size = 0;
+        return NULL;
+    }
+    if (reader->depth > 0) {
+        struct recursive_source_reader child =
+            {reader->depth - 1, 0, reader->calls};
+        assert(lua_load(state, read_recursive_source, &child, "=nested-source", "t") == LUA_OK);
+        assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+        assert(lua_tointeger(state, -1) == 31);
+        lua_pop(state, 1);
+    }
+    *size = 9;
+    return "return 31";
+}
+
+static void test_reader_nested_guarded_sources(lua_State *state) {
+    /* Explicit C-host recursion creates distinct source owners and live
+     * reader checkpoints. Each one must finish its own parser and preserve
+     * its parent's retained bytes, stack window and caller-owned context. */
+    int calls = 0;
+    struct recursive_source_reader reader = {8, 0, &calls};
+    lua_settop(state, 0);
+    assert(lua_load(state, read_recursive_source, &reader, "=nested-source-root", "t") == LUA_OK);
+    assert(calls == 18);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 31);
+    puts("C API PASS: nested guarded readers retain independent source owners");
+}
+
+static void test_binary_reader_every_split(lua_State *state) {
+    /* Execute the same actual binary after every possible two-piece split.
+     * One decoder must consume both pieces exactly once, without an EOF read
+     * or repeated prefix reconstruction of partial canonical graphs. */
+    struct chunk_writer writer = {0};
+    size_t split;
+    lua_settop(state, 0);
+    assert(luaL_loadstring(state, "return 64") == LUA_OK);
+    assert(lua_dump(state, write_chunk, &writer, 0) == 0);
+    for (split = 1; split < writer.size; split++) {
+        struct scripted_reader reader = {0};
+        lua_settop(state, 1);
+        reader.pieces[0] = writer.bytes; reader.sizes[0] = split;
+        reader.pieces[1] = writer.bytes + split;
+        reader.sizes[1] = writer.size - split;
+        reader.count = 2;
+        assert(lua_load(state, read_scripted_chunk, &reader, "=binary-split", "b") == LUA_OK);
+        assert(reader.calls == 2);
+        assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+        assert(lua_tointeger(state, -1) == 64);
+    }
+    free(writer.bytes);
+    puts("C API PASS: binary reader preserves every split and exact end count");
+}
+
+static void test_fixed_binary_piece_requirements(lua_State *state) {
+    /* B mode permits ordinary header reads across pieces but cannot assemble
+     * a fixed code array from separate tiny blocks. Reject that split at the
+     * actual block request instead of consuming the entire later stream. */
+    struct chunk_writer writer = {0};
+    struct scripted_reader reader = {0};
+    struct chunk_reader tiny = {0};
+    lua_settop(state, 0);
+    assert(luaL_loadstring(state, "return 86") == LUA_OK);
+    assert(lua_dump(state, write_chunk, &writer, 0) == 0);
+    reader.pieces[0] = writer.bytes; reader.sizes[0] = 1;
+    reader.pieces[1] = writer.bytes + 1;
+    reader.sizes[1] = writer.size - 1;
+    reader.count = 2;
+    assert(lua_load(state, read_scripted_chunk, &reader, "=fixed-header-split", "B") == LUA_OK);
+    assert(reader.calls == 2);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 86);
+    tiny.bytes = writer.bytes; tiny.size = writer.size; tiny.piece = 1;
+    assert(lua_load(state, read_chunk, &tiny, "=fixed-code-split", "B") == LUA_ERRSYNTAX);
+    assert(tiny.calls > 1 && tiny.calls < (int)writer.size);
+    assert(strstr(lua_tostring(state, -1), "truncated fixed buffer"));
+    lua_settop(state, 0);
+    lua_gc(state, LUA_GCCOLLECT);
+    free(writer.bytes);
+    puts("C API PASS: fixed binary reader enforces actual piece boundaries");
+}
+
+static void test_partial_binary_reader_error_cleanup(lua_State *state) {
+    /* Fail after almost the whole real graph has been decoded. Repeating
+     * the failure must release partial code/input and preserve the actual
+     * reader error instead of converting it to a truncation observation. */
+    struct chunk_writer writer = {0};
+    int attempt;
+    lua_settop(state, 0);
+    assert(luaL_loadstring(state, "return function(x) return x+1 end") == LUA_OK);
+    assert(lua_dump(state, write_chunk, &writer, 0) == 0);
+    for (attempt = 0; attempt < 3; attempt++) {
+        struct scripted_reader reader = {0};
+        lua_settop(state, 1);
+        reader.pieces[0] = writer.bytes;
+        reader.sizes[0] = writer.size - 1;
+        reader.count = 1;
+        reader.raise_at = 1;
+        assert(lua_load(state, read_scripted_chunk, &reader, "=partial-binary-error", "b") == LUA_ERRRUN);
+        assert(reader.calls == 2);
+        assert(strstr(lua_tostring(state, -1), "should not have been called"));
+    }
+    free(writer.bytes);
+    puts("C API PASS: partial binary reader errors preserve cleanup and recovery");
+}
+
+static const char *read_many_single_bytes(lua_State *state, void *data,
+                                         size_t *size) {
+    size_t *position = (size_t *)data;
+    static const char space = ' ';
+    (void)state;
+    if ((*position)++ < 16384) {
+        *size = 1;
+        return &space;
+    }
+    if (*position == 16385) {
+        *size = 9;
+        return "return 57";
+    }
+    *size = 0;
+    return NULL;
+}
+
+static void test_reader_avoids_prefix_reconstruction(void) {
+    /* Thousands of pieces still describe one simple chunk. A broad measured
+     * allocation bound rejects recreating a parser/model for each prefix;
+     * it does not require C and Ada to share layouts or exact byte counts. */
+    struct allocation_counts counts = {0};
+    lua_State *state = lua_newstate(counted_allocator, &counts, 733U);
+    size_t position = 0, before;
+    assert(state != NULL);
+    before = counts.growths;
+    assert(lua_load(state, read_many_single_bytes, &position, "=many-pieces", "t") == LUA_OK);
+    assert(position == 16386);
+    assert(counts.growths - before < 512);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_tointeger(state, -1) == 57);
+    lua_close(state);
+    assert(counts.bytes == 0 && counts.blocks == 0);
+    puts("C API PASS: many reader pieces avoid prefix reconstruction");
+}
+
 static void test_load_dump_contract(lua_State *state) {
     test_reader_piece_lifetime(state);
     test_reader_preserves_stack(state);
@@ -486,6 +816,19 @@ static void test_load_dump_contract(lua_State *state) {
     test_reader_allocation_refusal();
     test_fixed_binary_reader_count(state);
     test_binary_reader_failure_boundaries(state);
+    test_reader_stops_at_definitive_syntax(state);
+    test_reader_punctuation_prefetch(state);
+    test_reader_stops_at_invalid_escape(state);
+    test_reader_keyword_boundaries(state);
+    test_reader_number_boundaries(state);
+    test_reader_escape_boundaries(state);
+    test_reader_delimiter_boundaries(state);
+    test_reader_recursive_api_reentry(state);
+    test_reader_nested_guarded_sources(state);
+    test_binary_reader_every_split(state);
+    test_fixed_binary_piece_requirements(state);
+    test_partial_binary_reader_error_cleanup(state);
+    test_reader_avoids_prefix_reconstruction();
 }
 
 #endif

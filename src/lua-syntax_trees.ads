@@ -1,4 +1,5 @@
 with Lua.Frontend_Text;
+with Lua.Inputs;
 with Lua.Lexer_Core;
 with Lua.Lexers;
 with Lua.Runtime_Configuration;
@@ -65,6 +66,9 @@ private package Lua.Syntax_Trees is
    type Parse_Result is record
       Status : Lua.Syntax.Check_Status := Lua.Syntax.Success;
       Error : Diagnostic;
+      Incomplete_Input : Boolean := False;
+      --  Grammar expectations opt in only at the actual EOF token. Static
+      --  name/label/attribute errors remain final even when their scan ended.
    end record;
    type Compilation_Unit is limited record
       Default_Memory : aliased Lua.Storage.Owner;
@@ -85,6 +89,12 @@ private package Lua.Syntax_Trees is
       Memory : Lua.Storage.Owner_Access := null;
       Compatible_Global : Boolean :=
         Lua.Runtime_Configuration.Compatible_Global);
+   procedure Parse
+     (Unit : in out Compilation_Unit; Source : in out Lua.Inputs.Source;
+      Name : String; Limits : Lua.Syntax.Check_Limits;
+      Memory : Lua.Storage.Owner_Access := null;
+      Compatible_Global : Boolean :=
+        Lua.Runtime_Configuration.Compatible_Global);
    --  Build fully resolved owned syntax or a structured error. No World,
    --  VM register or prototype participates in parsing. An explicit allocator
    --  routes all retained syntax/text storage through its owning universe;
@@ -92,6 +102,8 @@ private package Lua.Syntax_Trees is
    --  A previously bound unit can be reused only with the same owner.
    --  Compatible_Global follows the pinned default LUA_COMPAT_GLOBAL=1;
    --  false reserves the keyword for configuration-sensitive C consumers.
+   --  Both overloads use the same parser. A streaming source requests pieces
+   --  through its guarded owner only when lexical lookahead needs more bytes.
    function Text (Unit : Compilation_Unit; Item : Text_Ref) return String;
    procedure Query_Text
      (Unit : in out Compilation_Unit; Item : Text_Ref;
