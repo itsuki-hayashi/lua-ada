@@ -2,6 +2,13 @@
 
 ## Active remaining-suite delivery
 
+Public identities have [local evidence](sessions/2026-11-08-public-value-identities.md):
+1,993 AUnit cases in each configuration, native-paired pointer/rendering,
+actual first-surface refusal, retry and balanced shutdown. Fix the next
+unchanged errors.lua io.write argument-name failure and complete traceback,
+remaining T drivers and final same-head platform acceptance.
+
+
 Metamethod request packets now have [actual ownership evidence](sessions/2026-11-08-metamethod-argument-roots.md):
 seven before/after weak-lifetime cases, 1,935 passing local AUnit cases and
 twenty-one passing public C consumers. Complete actual C concatenation

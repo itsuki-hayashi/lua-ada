@@ -11,6 +11,14 @@ The installable headers under include/api are unchanged pinned copies with
 per-file hashes and retained notices; production include paths do not enter
 the reference-only tree.
 
+The [public identity checkpoint](../docs/sessions/2026-11-08-public-value-identities.md)
+uses the same real identities for lua_topointer, default Lua rendering and
+format p. Ada-only coroutine rendering remains stable across a later first
+C callback. Native-width/null spelling and returned string identity have
+local default/T evidence; full ABI/target acceptance remains open. See
+[ADR 0031](../docs/decisions/0031-public-value-identities.md).
+
+
 The [public file checkpoint](../docs/sessions/2026-11-08-public-file-loading.md)
 implements luaL_loadfilex and exercises its convenience macro through owned
 shared file/stdin input. Native errno, text/binary reopening, source/debug

@@ -1269,6 +1269,20 @@ private package Lua.Engine is
                    Item : Value) return String;
    function Image (Item : Value) return String;
    --  Host/test convenience wrapper; runtime callers provide Memory.
+   function Pointer_Of
+     (State : in out World; Item : Value) return System.Address;
+   --  Actual public lua_topointer identity, shared by C and Lua rendering.
+   --  The returned borrow is valid while Item remains traced. Thread
+   --  identities may first reserve their C surface in an Ada-only world.
+   function Pointer_Image
+     (Pointer : System.Address; Width : Natural := 0;
+      Left_Aligned : Boolean := False) return String
+     with Pre => Width <= 99;
+   --  Bounded native %p spelling, with no selected-allocator request.
+   procedure Describe_Value
+     (State : in out World; Item : Value; Output : in out Owned_Buffer);
+   --  Default luaL_tolstring representation only, without invoking handlers.
+   --  Named output remains selected-owner storage; raw __name ends at NUL.
    function Get (Table : Value; Key : Value) return Value;
    procedure Set (State : in out World; Table, Key, Item : Value);
    function Table_Length (Table : Value) return Natural;

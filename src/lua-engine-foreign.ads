@@ -230,6 +230,12 @@ package Lua.Engine.Foreign is
    --  its first borrowed C entry prepares existing threads before invocation.
    --  Public thread-pointer queries subsequently borrow without allocation.
 
+   function Thread_Identity
+     (State : in out World; Context : Context_Id) return System.Address;
+   --  Borrow the actual stable C thread pointer. An Ada-only world lazily
+   --  materializes its main/selected surfaces before publishing an identity,
+   --  so a later first C callback cannot change a saved Lua %p/tostring.
+
    procedure Release_Context_Control (State : in out World;
                                       Context : not null Context_Access);
    --  Release reserved idle reset-driver/record ownership before freeing the

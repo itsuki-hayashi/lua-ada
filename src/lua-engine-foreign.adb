@@ -603,6 +603,31 @@ package body Lua.Engine.Foreign is
       end if;
    end Prepare_Thread_Surface;
 
+   function Thread_Identity
+     (State : in out World; Context : Context_Id) return System.Address
+   is
+      Universe : constant World_View :=
+        World_View (World_Views.To_Pointer (State'Address));
+      Main : System.Address;
+   begin
+      if State.Contexts (Positive (Context)).Foreign_State /=
+        System.Null_Address
+      then
+         return State.Contexts (Positive (Context)).Foreign_State;
+      end if;
+      --  The surface borrows this world's existing lifetime. Ordinary
+      --  context teardown releases its reserved metadata and raw C blocks;
+      --  no additional thread or driver is created merely for formatting.
+      Main := Create_Surface
+        (Universe, Context_Id (State.Main_Thread.Context_Index),
+         Storage_Count (C_Extra_Space), 0, System.Null_Address,
+         Owns_Universe => False);
+      Prepare_Thread_Surface (State, Context);
+      return (if Context = Context_Id (State.Main_Thread.Context_Index)
+              then Main else
+                State.Contexts (Positive (Context)).Foreign_State);
+   end Thread_Identity;
+
    function New_State (Input : Request) return System.Address is
       State : World_Access;
       Result : System.Address;
@@ -2720,26 +2745,14 @@ package body Lua.Engine.Foreign is
             declare
                Item : constant Value := Get_Value (Input.Index);
             begin
-               if Item.Kind = Thread_Kind then
+               if Input.Operation = To_Pointer then
+                  Output.Pointer := Pointer_Of (Owner.Universe.all, Item);
+               elsif Item.Kind = Thread_Kind then
                   Output.Pointer := Owner.Universe.Contexts
                     (Item.Reference.Context_Index).Foreign_State;
                   if Output.Pointer = System.Null_Address then
                      raise Program_Error with "unprepared C thread query";
                   end if;
-               elsif Input.Operation = To_Pointer then
-                  case Item.Kind is
-                     when Light_Identity_Kind | Foreign_Function_Kind =>
-                        Output.Pointer := Item.Identity;
-                     when Native_Kind_Value =>
-                        Output.Pointer := Lua.Builtin_Registry.Handler_Address
-                          (Item.Native_Data);
-                     when Userdata_Kind =>
-                        Output.Pointer := Userdata_Address (Item);
-                     when String_Kind | Table_Kind | Closure_Kind |
-                       Native_Closure_Kind =>
-                        Output.Pointer := Item.Reference.all'Address;
-                     when others => null;
-                  end case;
                end if;
             end;
          when Push_Nil => Push (Owner.Universe.all, Context, Nil_Value);

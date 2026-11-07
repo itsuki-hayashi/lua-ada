@@ -791,10 +791,12 @@ int main(int argc, char **argv) {
         assert(luaL_loadfilex(L, NULL, "bt") == LUA_OK);
         check_source(L, -1, "=stdin", "stdin");
         assert(lua_pcall(L, 0, LUA_MULTRET, 0) == LUA_OK);
-        assert(lua_gettop(L) == 3 && lua_tointeger(L, 1) == 17);
+        assert(lua_gettop(L) == 3 && lua_isinteger(L, 1));
+        assert(lua_tointeger(L, 1) == 17);
+        assert(lua_type(L, 2) == LUA_TSTRING);
         bytes = lua_tolstring(L, 2, &size);
         assert(size == 13 && memcmp(bytes, "input\0payload", size) == 0);
-        assert(lua_toboolean(L, 3));
+        assert(lua_type(L, 3) == LUA_TBOOLEAN && lua_toboolean(L, 3));
         lua_close(L);
         assert(counts.bytes == 0 && counts.blocks == 0);
         puts("PASS: public loadfile stdin");

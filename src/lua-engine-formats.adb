@@ -5,7 +5,6 @@ with Interfaces.C;
 with Lua.Big_Naturals;
 with Lua.Engine.Strings;
 with Lua.Platform_Numerics;
-with System.Storage_Elements;
 
 package body Lua.Engine.Formats is
    package Managed renames Lua.Storage.Buffers;
@@ -662,30 +661,23 @@ package body Lua.Engine.Formats is
                Fail (State, "value has no literal form");
             end if;
          when 'p' =>
-            if Item.Kind = String_Kind then
-               Text.Set_Value ("0x" & Unsigned_Image
-                 (Interfaces.Unsigned_64 (System.Storage_Elements.To_Integer
-                    (Item.Reference.all'Address)), 16));
-            elsif Item.Kind in Table_Kind | Closure_Kind |
-                Native_Closure_Kind | Thread_Kind | Userdata_Kind
-            then
-               Text.Set_Value ("0x" & Unsigned_Image
-                 (Interfaces.Unsigned_64 (Item.Reference.Serial), 16));
-            elsif Item.Kind = Native_Kind_Value then
-               Text.Set_Value ("0x" & Unsigned_Image
-                 (Interfaces.Unsigned_64 (System.Storage_Elements.To_Integer
-                   (Lua.Builtin_Registry.Handler_Address
-                     (Item.Native_Data))), 16));
-            elsif Item.Kind in Foreign_Function_Kind | Light_Identity_Kind
-              and then Item.Identity /= System.Null_Address
-            then
-               Text.Set_Value ("0x" & Unsigned_Image
-                 (Interfaces.Unsigned_64
-                   (System.Storage_Elements.To_Integer (Item.Identity)),
-                  16));
-            else
-               Text.Set_Value ("(null)");
-            end if;
+            declare
+               Pointer : constant System.Address := Pointer_Of (State, Item);
+            begin
+               --  lua_topointer identity and native libc spelling are public
+               --  observations. Object serials are collector bookkeeping,
+               --  never an alternative pointer namespace. Null is the
+               --  library's explicit string spelling, unlike raw C %p.
+               if Pointer = System.Null_Address then
+                  Text.Set_Value ("(null)");
+               else
+                  --  Native %p field rules can differ from padding its
+                  --  default pointer token as a string. Delegate the bounded
+                  --  literal-width spelling to the same host C facility.
+                  Text.Set_Value (Pointer_Image (Pointer, Width, Left));
+                  Width := 0;
+               end if;
+            end;
             Zero := False;
          when others => Fail (State, "invalid conversion specification");
       end case;

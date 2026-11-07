@@ -67,3 +67,6 @@ cleanup before compilation and shared file/stdin/preamble policy.
 
 ADR 0030 records [cross-context C entry](0030-cross-context-c-entry.md),
 actual scalar driver ownership and typed routing to a genuine C caller guard.
+
+ADR 0031 records [public value identities](0031-public-value-identities.md),
+returned-string identity and selected-owner default rendering.

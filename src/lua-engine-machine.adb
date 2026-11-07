@@ -23,6 +23,7 @@ with Lua.Engine.Pattern_Drivers;
 with Lua.Engine.Loaders;
 with Lua.Engine.Native_Modules;
 with Lua.Engine.Format_Drivers;
+with Lua.Engine.Diagnostics;
 with Lua.Engine.Table_Drivers;
 with Lua.Engine.Sorting;
 with Lua.Engine.Inspection;
@@ -3925,24 +3926,33 @@ package body Lua.Engine.Machine is
          end if;
       elsif Name = "base.tostring" then
          if Activation.Native_Arguments.Is_Empty then
-            Fail (State, "value expected");
+            Diagnostics.Argument_Error (State, 1, "value expected");
          end if;
          if Activation.Native_Stage = 1 then
             Handler := First (Activation.Native_Results);
             if Handler.Kind not in String_Kind | Integer_Kind | Real_Kind
             then
-               Fail (State, "__tostring must return a string");
+               Fail (State, "'__tostring' must return a string");
             end if;
-            Return_Native
-              (New_String (State, Image (State.Current.Memory, Handler)));
+            if Handler.Kind = String_Kind then
+               --  The handler's existing string is the result, including a
+               --  long string's identity. Only numbers need a conversion.
+               Return_Native (Handler);
+            else
+               Return_Native
+                 (New_String (State, Image (State.Current.Memory, Handler)));
+            end if;
          else
             Handler := Metafield (State, Left, "__tostring");
             if Handler.Kind /= Nil_Kind then
                Packet.Append (Left);
                Invoke (Handler, Packet);
+            elsif Left.Kind = String_Kind then
+               Return_Native (Left);
             else
+               Describe_Value (State, Left, Activation.Native_Buffer);
                Return_Native
-                 (New_String (State, Image (State.Current.Memory, Left)));
+                 (New_String (State, Activation.Native_Buffer));
             end if;
          end if;
       elsif Name = "base.print" then

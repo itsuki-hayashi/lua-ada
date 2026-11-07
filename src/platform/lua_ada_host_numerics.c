@@ -13,6 +13,27 @@
 
 double lua_ada_host_divide(double left, double right);
 int lua_ada_host_general_carry_zeroes(void);
+size_t lua_ada_host_pointer_text(const void *pointer, char *bytes,
+                                size_t capacity, int width, int left);
+
+size_t lua_ada_host_pointer_text(const void *pointer, char *bytes,
+                                size_t capacity, int width, int left)
+{
+    char format[8];
+    int length;
+    /* MinGW's %*p and a literal-width %20p have different default zero
+     * padding. Construct the bounded literal field used by Lua instead of
+     * replacing it with a star argument. Width is validated in Ada (0..99). */
+    if (width == 0)
+        strcpy(format, left ? "%-p" : "%p");
+    else {
+        length = snprintf(format, sizeof format, "%%%s%dp", left ? "-" : "",
+                          width);
+        if (length < 0 || (size_t)length >= sizeof format) return 0;
+    }
+    length = snprintf(bytes, capacity, format, (void *)pointer);
+    return length < 0 || (size_t)length >= capacity ? 0 : (size_t)length;
+}
 
 double lua_ada_host_divide(double left, double right)
 {

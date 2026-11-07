@@ -95,6 +95,7 @@ with Lua.C_Buffer_Tests;
 with Lua.C_Allocator_Tests;
 with Lua.C_Substitution_Tests;
 with Lua.C_Loadfile_Tests;
+with Lua.Pointer_Identity_Tests;
 with Library_Runtime_Tests;
 with Native_Tests;
 with Message_Handler_Tests;
@@ -205,6 +206,7 @@ procedure Test_Runner is
       Lua.C_Allocator_Tests.Register (Result);
       Lua.C_Substitution_Tests.Register (Result);
       Lua.C_Loadfile_Tests.Register (Result);
+      Lua.Pointer_Identity_Tests.Register (Result);
       Library_Runtime_Tests.Register (Result);
       Native_Tests.Register (Result);
       Message_Handler_Tests.Register (Result);

@@ -10,6 +10,7 @@ with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
 with Lua.Number_Parsing;
 with Lua.Platform_Locales;
+with Lua.Platform_Numerics;
 with Ada.Exceptions;
 with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
@@ -2233,6 +2234,107 @@ package body Lua.Engine is
       --  provide the universe instead of allocating hidden numeric scratch.
       return Image (Lua.Storage.Reference (Memory), Item);
    end Image;
+
+   function Pointer_Of
+     (State : in out World; Item : Value) return System.Address
+   is
+   begin
+      case Item.Kind is
+         when Thread_Kind =>
+            return Lua.Engine.Foreign.Thread_Identity
+              (State, Context_Id (Item.Reference.Context_Index));
+         when Light_Identity_Kind | Foreign_Function_Kind =>
+            return Item.Identity;
+         when Native_Kind_Value =>
+            return Lua.Builtin_Registry.Handler_Address (Item.Native_Data);
+         when Userdata_Kind => return Userdata_Address (Item);
+         when String_Kind | Table_Kind | Closure_Kind | Native_Closure_Kind =>
+            return Item.Reference.all'Address;
+         when others => return System.Null_Address;
+      end case;
+   end Pointer_Of;
+
+   function Pointer_Image
+     (Pointer : System.Address; Width : Natural := 0;
+      Left_Aligned : Boolean := False) return String
+   is
+      Text : aliased String (1 .. 128);
+      Size : constant Interfaces.C.size_t := Lua.Platform_Numerics.Pointer_Text
+        (Pointer, Text'Address, Text'Length, Interfaces.C.int (Width),
+         Boolean'Pos (Left_Aligned));
+   begin
+      if Size = 0 then
+         raise Program_Error with "native pointer text exceeded fixed bound";
+      end if;
+      return Text (1 .. Natural (Size));
+   end Pointer_Image;
+
+   procedure Describe_Value
+     (State : in out World; Item : Value; Output : in out Owned_Buffer)
+   is
+      Name : Value;
+      procedure Append_Name (Text : String);
+      procedure Work (Count : Natural);
+
+      procedure Work (Count : Natural) is
+      begin
+         if State.Policy = Bounded then
+            if Count > State.Bounds.Instructions - State.Steps then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Count;
+         end if;
+      end Work;
+
+      procedure Append_Name (Text : String) is
+         Size : Natural := 0;
+         Pending : Natural := 0;
+      begin
+         --  Borrow the counted bytes only while scanning/copying their C
+         --  prefix. A short name before NUL never copies the huge suffix to
+         --  an Ada String temporary. Scan and owned copy charge separately.
+         for Byte of Text loop
+            Pending := Pending + 1;
+            exit when Byte = Character'Val (0);
+            Size := Size + 1;
+            if Pending = 4_096 then
+               Work (Pending);
+               Pending := 0;
+            end if;
+         end loop;
+         Work (Pending);
+         Work (Size);
+         Output.Append (Text (Text'First .. (Text'First - 1) + Size));
+      end Append_Name;
+   begin
+      Output.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Output.Clear;
+      if Item.Kind in Nil_Kind | Boolean_Kind | Integer_Kind | Real_Kind then
+         Output.Set_Value (Image (State.Current.Memory, Item));
+      elsif Item.Kind = String_Kind then
+         declare
+            Text : String (1 .. Item.Reference.Bytes.Size)
+              with Import, Address => Item.Reference.Bytes.Address;
+         begin
+            Work (Text'Length);
+            Output.Set_Value (Text);
+         end;
+      else
+         Name := Metafield (State, Item, "__name");
+         if Name.Kind = String_Kind then
+            declare
+               Text : String (1 .. Name.Reference.Bytes.Size)
+                 with Import, Address => Name.Reference.Bytes.Address;
+            begin
+               Append_Name (Text);
+            end;
+         else
+            Output.Append (Type_Name (Item));
+         end if;
+         Output.Append (": ");
+         Output.Append (Pointer_Image (Pointer_Of (State, Item)));
+      end if;
+   end Describe_Value;
 
    function Get (Table : Value; Key : Value) return Value is
       Index : Natural;
