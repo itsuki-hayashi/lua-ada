@@ -527,7 +527,7 @@ All thirty-six retained four-way cases also pass after the final changes.
 The C consumer was not relinked/re-executed for this compiler/hook followup;
 its earlier checkpoint result is not newly attributed to this source head.
 
-The unchanged db.lua diagnostic still stops at line603: the second comparison
+The unchanged db.lua diagnostic still stops at line 603: the second comparison
 in its live-hook assertion executes additional boolean materialization words
 before reading the counter. Conditional lowering remains a separate measured
 followup. No assertion was relaxed, no hook was selectively suppressed, no
@@ -573,3 +573,35 @@ checks, then finds a yieldability mismatch after a normal closer raises an
 error and a remaining closer tries to yield. This remains the next real
 lifecycle issue; neither the complete file nor full-upstream acceptance is
 claimed. Pinned reference bytes and revisions remain unchanged.
+
+## 2026-11-08 real comparison branches
+
+Comparison operands now share one lowering helper with their real conditional
+jump. A comparison used on the left of and/or branches directly to its selected
+boolean path instead of materializing a temporary boolean and testing it
+again. Noncomparison left operands retain their original scalar values.
+Standalone comparisons use LFALSESKIP/LOADTRUE for actual boolean results.
+The transformation follows lcode.c:luaK_goiftrue/luaK_goiffalse and infix/posfix
+conditional descriptors; it preserves ordinary opcode execution, source
+attribution, metamethod ordering and suspended comparison continuations.
+
+Sixteen named regressions preserve six predicates, swapped operands, both
+branch results, table/nil RHS identity, skipped effects, NaN, handler ordering,
+handler failure, yielding/collection and the live count assertions. Native
+default/T source execution passes; the prior Ada binary fails the live
+period-one assertion while passing the fifteen other regression setups.
+Strict default root/tests builds pass all 1,623 AUnit cases with zero failed
+assertions/errors. Both producers' complete fixture chunks pass on both
+default runtimes, with empty stderr and stdout SHA256
+664E39F6254FFD3BC48C9FC79737183522B0CBD64F5D15816A2EA75BB209E032.
+All thirty-six retained four-way cases also pass; whitespace is clean.
+
+The unchanged full db.lua still stops at line 603. A stripped copy used only
+for native disassembly proves an additional actual code-shape dependency:
+the repeated string key assert is appended at constant index 709, so lookup emits
+LOADK/GETUPVAL/GETTABLE instead of a reused small GETTABUP key. Those extra
+executed words exceed its live count bound. Managed per-function hashed
+string-constant reuse is approved next; no whole-pool linear scan or sparse
+vector indexed by global string IDs is justified. This measured observation
+is separate from the earlier withdrawn big.lua complexity attribution.
+Neither private pool ordering nor full db.lua acceptance is claimed here.

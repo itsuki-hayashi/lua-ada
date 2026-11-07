@@ -706,6 +706,35 @@ package body Lua.Canonical_Compiler is
                end if;
                Targets.Append (Item);
             end Add_Target;
+            function Is_Comparison (Id : Node_Id) return Boolean is
+              (Fetch (Id).Kind = Binary_Expression and then
+               Fetch (Id).Operator in Equal | Not_Equal | Less |
+                 Less_Equal | Greater | Greater_Equal);
+            function Comparison_Jump
+              (Fn : in out Function_State; Id : Node_Id;
+               When_True : Boolean) return Positive;
+            function Comparison_Jump
+              (Fn : in out Function_State; Id : Node_Id;
+               When_True : Boolean) return Positive
+            is
+               Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+               Left : constant Natural := Register_Operand
+                 (Fn, Item.Children (1), Item.Site.Line);
+               Right : constant Natural := Register_Operand
+                 (Fn, Item.Children (2), End_Line (Item.Children (2)));
+               Op : constant Opcode :=
+                 (case Item.Operator is when Equal | Not_Equal => Op_EQ,
+                    when Less | Greater => Op_LT, when others => Op_LE);
+            begin
+               Site := Item.Site;
+               Put (Fn, ABC (Op,
+                 (if Item.Operator in Greater | Greater_Equal then Right
+                  else Left),
+                 (if Item.Operator in Greater | Greater_Equal then Left
+                  else Right),
+                 Flag => When_True xor (Item.Operator = Not_Equal)));
+               return Jump (Fn);
+            end Comparison_Jump;
             procedure Expression
               (Fn : in out Function_State; Id : Node_Id;
                Destination : Natural; Wanted : Integer := 1;
@@ -794,13 +823,37 @@ package body Lua.Canonical_Compiler is
                         --  Keep the original operand, not a booleanized copy.
                         --  Only the selected RHS executes, and each operand
                         --  is scalar-adjusted before its truth is inspected.
-                        Expression (Fn, Item.Children (1), Destination,
-                                    At_Line => Item.Site.Line);
-                        Put (Fn, ABC (Op_TEST, Destination,
-                          Flag => Item.Operator = Or_Word));
-                        Branch := Jump (Fn);
-                        Expression (Fn, Item.Children (2), Destination);
+                        if Is_Comparison (Item.Children (1)) then
+                           --  Comparisons already describe a conditional
+                           --  transfer. Thread their real branch into and/or
+                           --  instead of materializing a boolean only to test
+                           --  it again. A selected left comparison contributes
+                           --  precisely true/false; other operands still keep
+                           --  their original value through the path below.
+                           Branch := Comparison_Jump
+                             (Fn, Item.Children (1),
+                              When_True => Item.Operator = Or_Word);
+                           Expression (Fn, Item.Children (2), Destination);
+                           Finish := Jump (Fn);
+                           Patch (Fn, Branch, PC (Fn));
+                           Put (Fn, ABC
+                             ((if Item.Operator = Or_Word then Op_LOADTRUE
+                               else Op_LOADFALSE), Destination));
+                           Patch (Fn, Finish, PC (Fn));
+                        else
+                           Expression (Fn, Item.Children (1), Destination,
+                                       At_Line => Item.Site.Line);
+                           Put (Fn, ABC (Op_TEST, Destination,
+                             Flag => Item.Operator = Or_Word));
+                           Branch := Jump (Fn);
+                           Expression (Fn, Item.Children (2), Destination);
+                           Patch (Fn, Branch, PC (Fn));
+                        end if;
+                     elsif Is_Comparison (Id) then
+                        Branch := Comparison_Jump (Fn, Id, When_True => True);
+                        Put (Fn, ABC (Op_LFALSESKIP, Destination));
                         Patch (Fn, Branch, PC (Fn));
+                        Put (Fn, ABC (Op_LOADTRUE, Destination));
                      else
                         if Item.Operator = Concatenate then
                            Reserve (Fn, Destination + 2);
@@ -832,26 +885,7 @@ package body Lua.Canonical_Compiler is
                               End_Line (Item.Children (2)));
                         end if;
                         Site := Item.Site;
-                        if Item.Operator in Equal | Not_Equal | Less |
-                          Less_Equal | Greater | Greater_Equal
-                        then
-                           Op := (case Item.Operator is
-                             when Equal | Not_Equal => Op_EQ,
-                             when Less | Greater => Op_LT,
-                             when others => Op_LE);
-                           Put (Fn, ABC (Op,
-                             (if Item.Operator in Greater | Greater_Equal
-                              then Right else Left),
-                             (if Item.Operator in Greater | Greater_Equal
-                              then Left else Right),
-                             Flag => Item.Operator /= Not_Equal));
-                           Branch := Jump (Fn);
-                           Put (Fn, ABC (Op_LOADFALSE, Destination));
-                           Finish := Jump (Fn);
-                           Patch (Fn, Branch, PC (Fn));
-                           Put (Fn, ABC (Op_LOADTRUE, Destination));
-                           Patch (Fn, Finish, PC (Fn));
-                        elsif Immediate_Add then
+                        if Immediate_Add then
                            Put (Fn, ABC (Op_ADDI, Destination, Left, Right));
                            Put (Fn, ABC (Op_MMBINI, Left, Right, 6));
                         elsif Item.Operator = Concatenate then
