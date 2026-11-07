@@ -244,3 +244,70 @@ checkpoint must implement its actual weak-key callback storage, including
 public registry mutation and coroutine lifetime semantics; an unused shape
 placeholder would not establish that behavior. This is component evidence,
 not full debug-file or final instrumented Ada/platform acceptance.
+
+## 2026-11-08 hook registry and inherited controls checkpoint
+
+Lua hooks now use the actual weak-key `registry._HOOKKEY` callback mapping,
+lazily created with its own `__mode='k'` self-metatable. The context records the
+installed dispatcher controls independently and holds no hidden strong copy of
+a Lua callback. Event dispatch and gethook raw-read the actual entry, including
+replacement, removal and non-function entries. Lookup allocates no temporary
+key string. A running callback becomes a rooted activation before constructing
+event arguments, so replacing its own registry entry cannot collect it early.
+Invalid replacement arguments and failed mapping growth precede installation
+control changes. Valid disabled installations still store their callback as
+the pinned debug library does.
+
+New threads inherit their addressed parent's hook dispatcher, mask and base
+count, with a reset countdown and no Lua callback mapping. The private
+New_Thread optional Parent argument defaults to State.Current; the dependent C
+boundary checkpoint supplies its addressed context explicitly. The actual low
+byte mask is retained for both C and Lua installations. The original C int
+mask controls removal, preserving a hook pointer for a nonzero mask whose
+stored low byte is zero. The coordinated C boundary protocol exposes the real
+callable Lua dispatcher and recognizes its restoration without replacing the
+callback table; that new C glue is a separate dependent checkpoint.
+
+An immutable marker identifies each actual C hook transport activation,
+including after a hook replaces or removes itself. Frame enumeration and lazy
+caller inference exclude that scheduler transport by its origin, rather than
+comparing against the mutable current callback. Cached frame reuse clears the
+marker. Calls from the actual C hook to Lua carry `hook '?'` across the explicit
+C-owned boundary, as observed by the C boundary agent's pinned native probe;
+nested ordinary C calls carry their own origin. Explicit origin names also
+receive a frame-owned NUL-terminated buffer at activation construction for
+allocation-free C debug borrowing. The dependent C consumer validates these
+new C-facing paths after integration; they are not called passing here.
+
+Inspection additionally accepts an optional already-validated borrowed target
+frame, letting the C get/setlocal path reuse the actual Lua debug algorithms
+without creating a synthetic runtime activation. The caller must validate its
+frame token in the addressed context before using this private query path.
+
+Thirteen newly named public-session regressions and `hook_registry_phases.lua`
+cover actual registry identity, callback replacement/removal, non-functions,
+disabled storage, replaced-closure collection, thread/callback ephemeron
+cycles, active-frame rooting, inherited controls/mappings, invalid replacement
+and independent thread entries. Final local evidence:
+
+- Strict default Windows validation/static root and test builds pass on their
+  first attempt with GNAT 16.1.0 and required switches/checks.
+- All 1,463 AUnit cases pass with zero failed assertions or unexpected errors.
+- The fixture passes pinned native default and instrumented C configurations.
+- C/Ada source executions have byte-identical stdout and empty stderr; both
+  producers' chunks also pass on both runtimes with that same output.
+- `git diff --check` reports no whitespace errors.
+
+A capped read-only Haiku review alleged that Pin accumulates hook callbacks
+for an entire run. Source inspection rejects that finding: Machine.Step wraps
+each individual scheduler phase in Begin_Operation/End_Operation, clearing the
+temporary roots after the rooted activation is published. The focused active
+and replaced callback collection tests pass. That review is not independent PR
+approval and does not replace the pending real C consumer checks.
+
+The unchanged-source `@db.lua` diagnostic now passes registry mode, collecting
+hooks, source names and live-local mutation checks through line 414. Its next
+failure is line 416: a function reads its caller's pending `(a+1)+f()` temporary
+register, which must contain one. Compiler temporary placement and frame live
+extent are the next measured debug task. Full db.lua, instrumented Ada and
+platform/upstream acceptance remain open.

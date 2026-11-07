@@ -25,6 +25,7 @@ with Lua.Engine.Format_Drivers;
 with Lua.Engine.Table_Drivers;
 with Lua.Engine.Sorting;
 with Lua.Engine.Inspection;
+with Lua.Engine.Hooks;
 with Lua.Engine.Canonical;
 with Lua.Engine.Call_Names;
 with Lua.Engine.Stacks;
@@ -1052,7 +1053,21 @@ package body Lua.Engine.Machine is
      (Self : Driver; Event : String; Line : Natural := 0) is
       State : World renames Self.Universe.all;
       Args : Values.Vector := Owned_Values (State);
+      Callback : constant Value := Hooks.Callback (State, State.Current);
+      Is_Foreign : constant Boolean :=
+        State.Current.Foreign_Hook /= System.Null_Address;
    begin
+      --  A Lua hook installation and its callback mapping are independent.
+      --  Public registry edits may remove/replace the entry, or leave a
+      --  non-function there. Pinned hookf ignores those non-functions without
+      --  disabling the actual mask/count controls. Root a callable before
+      --  constructing any argument that can trigger collection.
+      if Callback.Kind not in Closure_Kind | Native_Closure_Kind |
+        Native_Kind_Value | Foreign_Function_Kind
+      then
+         return;
+      end if;
+      Pin (State, Callback);
       --  The continuation suppresses hooks until the entire callback
       --  returns. Its owned arguments and function remain collector roots.
       Args.Append (New_String (State, Event));
@@ -1065,8 +1080,7 @@ package body Lua.Engine.Machine is
       State.Current.Hook_Active := True;
       Schedule (Self, "@hook", Values.Empty_Vector, 0);
       State.Current.Stack.Last_Element.Blocks_Yield :=
-        State.Current.Foreign_Hook = System.Null_Address or else
-        State.Current.Hook_Transfer;
+        not Is_Foreign or else State.Current.Hook_Transfer;
       if State.Current.Stack.Last_Element.Blocks_Yield then
          State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
       end if;
@@ -1076,16 +1090,17 @@ package body Lua.Engine.Machine is
       --  across our explicit @hook continuation instead of inferring a name
       --  from the interrupted opcode.
       Dispatch
-        (Self, State.Current.Hook, Args, 0,
+        (Self, Callback, Args, 0,
          Call_Name => To_Unbounded_String ("?"),
          Name_Kind => To_Unbounded_String ("hook"));
+      State.Current.Stack.Last_Element.Is_C_Hook_Transport := Is_Foreign;
    end Hook_Event;
 
    function Before_Step (Self : Driver) return Boolean is
       State : World renames Self.Universe.all;
       Item : constant Frame_Access := State.Current.Stack.Last_Element;
       function Wants (Mask : Character) return Boolean is
-        (State.Current.Hook.Kind /= Nil_Kind and then
+        (Hooks.Enabled (State.Current) and then
          (if State.Current.Foreign_Hook /= System.Null_Address then
              (State.Current.Foreign_Hook_Mask /
                 (case Mask is when 'c' => 1, when 'r' => 2,
@@ -1119,7 +1134,7 @@ package body Lua.Engine.Machine is
       then
          if Item.Hook_PC /= Item.PC then
             Item.Hook_PC := Item.PC;
-            if State.Current.Hook.Kind /= Nil_Kind and then
+            if Hooks.Enabled (State.Current) and then
               State.Current.Hook_Count > 0
             then
                if State.Current.Hook_Remaining > 1 then
@@ -1592,7 +1607,7 @@ package body Lua.Engine.Machine is
       if not State.Current.Hook_Active and then
         State.Current.Finalizer_Hook_Suppression = 0 and then
         not Activation.Return_Hook_Done and then
-        State.Current.Hook.Kind /= Nil_Kind and then
+        Hooks.Enabled (State.Current) and then
         (if State.Current.Foreign_Hook /= System.Null_Address then
             (State.Current.Foreign_Hook_Mask / 2) mod 2 /= 0
          else Ada.Strings.Fixed.Index
@@ -1797,6 +1812,14 @@ package body Lua.Engine.Machine is
                Function_Item, Args, Effective_Base, Use_Window);
          end if;
          if not Tail or else Native_Tail then
+            if Length (Call_Name) > 0 then
+               --  The real activation owns the C debug borrow before its
+               --  origin is published. Canonical inferred names continue to
+               --  borrow their immutable prototype bytes instead; ordinary
+               --  calls with no explicit origin allocate no mirror buffer.
+               State.Current.Stack.Last_Element.Call_Name_Bytes.Set_Value
+                 (To_String (Call_Name));
+            end if;
             State.Current.Stack.Last_Element.Call_Name := Call_Name;
             State.Current.Stack.Last_Element.Name_Kind := Name_Kind;
          end if;
@@ -4531,6 +4554,13 @@ package body Lua.Engine.Machine is
       State : World renames Self.Universe.all;
       Original_Depth : constant Natural :=
         Natural (State.Current.Stack.Length);
+      Hook_Origin : constant Boolean :=
+        State.Current.Foreign_Activation /= null and then
+        State.Current.Foreign_Activation.Is_C_Hook_Transport;
+      --  A C hook that calls Lua borrows the interrupted CIST_HOOKED caller,
+      --  even after removing its own installation. Transfer that actual
+      --  activation origin across the C-owned boundary; a nested ordinary C
+      --  activation has no marker and cannot inherit the hook's name.
    begin
       if not Needs_Foreign_Call (Self) and then
         (State.Warning_Head = null or else
@@ -4563,6 +4593,10 @@ package body Lua.Engine.Machine is
       end if;
       begin
          Dispatch (Self, Callee, Arguments, 0,
+                   Call_Name => (if Hook_Origin then
+                     To_Unbounded_String ("?") else Null_Unbounded_String),
+                   Name_Kind => (if Hook_Origin then
+                     To_Unbounded_String ("hook") else Null_Unbounded_String),
                    Call_Base => Call_Base,
                    Has_Call_Window => Has_Call_Window);
       exception

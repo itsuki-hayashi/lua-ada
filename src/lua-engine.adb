@@ -1025,12 +1025,15 @@ package body Lua.Engine is
       return Cell;
    end New_Cell;
 
-   function New_Thread (State : in out World; Entry_Function : Value)
-                        return Value
+   function New_Thread
+     (State : in out World; Entry_Function : Value;
+      Parent : Context_Access := null) return Value
    is
       Id : constant Context_Id := Create_Context (State);
       Thread : Object_Access;
       Context : constant Context_Access := State.Contexts (Positive (Id));
+      Origin : constant Context_Access :=
+        (if Parent = null then State.Current else Parent);
    begin
       Thread := Allocate (State, Thread_Object);
       Thread.Context_Index := Positive (Id);
@@ -1038,6 +1041,20 @@ package body Lua.Engine is
       Root_Barrier (State, Entry_Function);
       Context.Entry_Function := Entry_Function;
       Context.Host_Owned := False;
+      --  lstate.c:lua_newthread copies the actual hook dispatcher pointer,
+      --  mask and base count, then resets the countdown. A Lua dispatcher is
+      --  inherited without its thread-keyed callback entry: gethook can
+      --  therefore return nil plus the inherited mask/count, and registering
+      --  a mapping later activates those same controls. Foreign dispatchers
+      --  retain their non-owning scalar trampoline/callback identities.
+      Context.Hook := Origin.Hook;
+      Context.Lua_Hook_Installed := Origin.Lua_Hook_Installed;
+      Context.Hook_Mask := Origin.Hook_Mask;
+      Context.Foreign_Hook := Origin.Foreign_Hook;
+      Context.Foreign_Hook_Mask := Origin.Foreign_Hook_Mask;
+      Context.Hook_Count := Origin.Hook_Count;
+      Context.Hook_Reported_Count := Origin.Hook_Reported_Count;
+      Context.Hook_Remaining := Origin.Hook_Count;
       return (Thread_Kind, Thread);
    exception
       when others =>
@@ -1075,6 +1092,7 @@ package body Lua.Engine is
       Item.Error_Packet.Clear;
       Item.Native_Captures.Clear;
       Item.Native_Buffer.Clear;
+      Item.Call_Name_Bytes.Clear;
       for Index in Item.Slots.First_Index .. Item.Slots.Last_Index loop
          Item.Slots.Update_Element (Index, Clear_Packet'Access);
       end loop;
@@ -1174,6 +1192,7 @@ package body Lua.Engine is
       Item.Unwind_Charge := False;
       Item.Blocks_Yield := False;
       Item.Callee := Nil_Value;
+      Item.Is_C_Hook_Transport := False;
       Item.Is_Tail_Call := False;
       Item.Call_Metamethod_Count := 0;
       Item.Native_Tail_State := No_Native_Tail;
@@ -1233,6 +1252,7 @@ package body Lua.Engine is
       Item.Context := Context;
       Item.Memory := Context.Memory;
       Item.Native_Buffer.Set_Owner (Item.Memory);
+      Item.Call_Name_Bytes.Set_Owner (Item.Memory);
       Item.Native_Arguments.Set_Owner (Item.Memory);
       Item.Native_Results.Set_Owner (Item.Memory);
       Item.Error_Packet.Set_Owner (Item.Memory);

@@ -3,7 +3,12 @@ private package Lua.Engine.Inspection is
    --  Format the pinned bounded Lua chunk identifier used by debug metadata
    --  and error prefixes. The result owns at most 59 display bytes.
    function Inspect
-     (State : in out World; Activation : Frame_Access) return Values.Vector;
+     (State : in out World; Activation : Frame_Access;
+      Target_Frame : Frame_Access := null) return Values.Vector;
    --  Implement synchronous debug queries over owned logical activations.
    --  Returned identities refer to real stable cells, never movable vectors.
+   --  A C debug query may provide its already-validated active frame instead
+   --  of resolving a Lua stack level. The caller must establish membership
+   --  in the addressed context before passing Target_Frame; it is borrowed
+   --  for this synchronous operation and never becomes a new activation.
 end Lua.Engine.Inspection;

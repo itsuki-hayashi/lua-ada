@@ -524,6 +524,10 @@ private package Lua.Engine is
       Unwind_Charge : Boolean := False;
       Blocks_Yield : Boolean := False;
       Callee : Value;
+      Is_C_Hook_Transport : Boolean := False;
+      --  A native hook borrows the interrupted frame. This actual scheduler
+      --  wrapper is transport even if the callback replaces/removes its hook
+      --  while running; mutable callback identity cannot identify the frame.
       Is_Tail_Call : Boolean := False;
       Call_Metamethod_Count : Natural range 0 .. 15 := 0;
       --  Receivers inserted on entry to this logical frame, independently
@@ -531,6 +535,11 @@ private package Lua.Engine is
       --  retain this count; a separate native tail frame gets its own count.
       Native_Tail_State : Native_Tail_Phase := No_Native_Tail;
       Call_Name : Unbounded_String;
+      Call_Name_Bytes : Owned_Buffer;
+      --  Owned, trailing-NUL view of an explicit call origin for C debug
+      --  inspection. Publish it when the activation is constructed, never
+      --  allocate scratch bytes during a read-only lua_getinfo query. The
+      --  borrow is valid until this activation is retired/reused.
       Name_Kind : Unbounded_String;
       Transfer_Count : Natural := 0;
       Entry_Hook_Done : Boolean := False;
@@ -641,9 +650,18 @@ private package Lua.Engine is
       --  retained geometric capacity and the current real frame's ci.top.
       Native_Depth : Natural := 0;
       Hook : Value;
+      --  Only a foreign trampoline lives here. Lua callbacks belong to the
+      --  weak-key registry table, so replacing a public entry releases its
+      --  former callback instead of keeping a hidden strong context copy.
+      Lua_Hook_Installed : Boolean := False;
+      --  Installation is independent of the table entry, which Lua code may
+      --  replace or remove. A new thread inherits this flag/mask/count, but
+      --  receives no callback mapping until it is explicitly registered.
       Hook_Mask : Unbounded_String;
       Foreign_Hook : System.Address := System.Null_Address;
       Foreign_Hook_Mask : Interfaces.C.int := 0;
+      --  Actual low-byte installation mask, including Lua-dispatcher
+      --  installations queried/restored through the public C hook API.
       Hook_Count : Natural := 0;
       Hook_Reported_Count : Integer_Value := 0;
       Hook_Remaining : Natural := 0;
@@ -948,9 +966,12 @@ private package Lua.Engine is
      (State : in out World; Emergency : Boolean := False);
    --  Mark/sweep sees globals, frames, packets, captures, and current failure.
 
-   function New_Thread (State : in out World; Entry_Function : Value)
-                        return Value;
-   --  Allocate a Lua-owned context and its unique thread object.
+   function New_Thread
+     (State : in out World; Entry_Function : Value;
+      Parent : Context_Access := null) return Value;
+   --  Allocate a Lua-owned context and its unique thread object. Inherit the
+   --  addressed parent's hook controls (State.Current when Parent is null),
+   --  with a fresh countdown but no Lua callback registry entry.
 
    function New_Frame
      (State : in out World; Context : not null Context_Access)

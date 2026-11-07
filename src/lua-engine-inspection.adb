@@ -1,4 +1,5 @@
 with Lua.Engine.Call_Names;
+with Lua.Engine.Hooks;
 with Lua.Engine.Canonical;
 with Lua.Engine.Stacks;
 with Lua.Prototypes;
@@ -44,7 +45,8 @@ package body Lua.Engine.Inspection is
    end Short_Source;
 
    function Inspect
-     (State : in out World; Activation : Frame_Access) return Values.Vector
+     (State : in out World; Activation : Frame_Access;
+      Target_Frame : Frame_Access := null) return Values.Vector
    is
       Name : constant String := To_String (Activation.Native_Name);
       Args : constant Values.Vector := Activation.Native_Arguments;
@@ -100,9 +102,7 @@ package body Lua.Engine.Inspection is
       end Integer_Arg;
 
       function Public_Frame (Item : Frame_Access) return Boolean is
-        (not (Context.Hook_Active and then
-              Context.Foreign_Hook /= System.Null_Address and then
-              Item.Is_Native and then Item.Callee = Context.Hook) and then
+        (not Item.Is_C_Hook_Transport and then
          (not Item.Is_Native or else
           (Length (Item.Native_Name) > 0 and then
            Element (Item.Native_Name, 1) /= '@')));
@@ -148,11 +148,7 @@ package body Lua.Engine.Inspection is
          for Item of reverse Context.Stack loop
             if Item = Callee then
                Found := True;
-            elsif Found and then
-              (not Item.Is_Native or else
-               (Length (Item.Native_Name) > 0 and then
-                Element (Item.Native_Name, 1) /= '@'))
-            then
+            elsif Found and then Public_Frame (Item) then
                return Item;
             end if;
          end loop;
@@ -210,69 +206,83 @@ package body Lua.Engine.Inspection is
          Base := 2;
       end if;
       if Name = "debug.sethook" then
-         --  A Lua hook replaces the actual C hook installed on this same
-         --  coroutine. Keep the public callback identity/mask from surviving
-         --  a replacement or an explicit removal through the debug library.
-         Context.Foreign_Hook := System.Null_Address;
-         Context.Foreign_Hook_Mask := 0;
-         if Arg (Base).Kind = Nil_Kind then
-            Context.Hook := Nil_Value;
-            Context.Hook_Mask := Null_Unbounded_String;
-            Context.Hook_Count := 0;
-            Context.Hook_Reported_Count := 0;
-         else
-            if Arg (Base).Kind not in Closure_Kind | Native_Closure_Kind |
-              Native_Kind_Value | Foreign_Function_Kind
-            then
-               Fail (State, "function expected");
-            end if;
-            if Arg (Base + 1).Kind /= String_Kind then
-               Fail (State, "string expected");
-            end if;
-            if Arg (Base + 2).Kind /= Nil_Kind and then
-              (Integer_Arg (Base + 2) > Integer_Value (Natural'Last) or else
-               Integer_Arg (Base + 2) < Integer_Value (Integer'First))
-            then
-               Fail (State, "hook count out of range");
-            end if;
-            Context.Hook := Arg (Base);
-            Root_Barrier (State, Context.Hook);
-            Context.Hook_Mask := Null_Unbounded_String;
-            for Mask of String'("crl") loop
-               if Ada.Strings.Fixed.Index
-                 (C_Option (Image (State.Current.Memory, Arg (Base + 1))),
-                  "" & Mask) /= 0
+         declare
+            Callback : constant Value := Arg (Base);
+            Mask : Unbounded_String;
+            Flags : constant String := "crl";
+            Reported : Integer_Value := 0;
+            Count : Natural := 0;
+         begin
+            --  Validate first, then publish callback storage, then commit the
+            --  installation controls. A bad argument or failed table growth
+            --  must not remove an existing C/Lua hook. The registry entry is
+            --  retained even for a valid zero-mask installation, as in
+            --  ldblib.c:db_sethook followed by ldebug.c:lua_sethook.
+            if Callback.Kind /= Nil_Kind then
+               if Callback.Kind not in Closure_Kind | Native_Closure_Kind |
+                 Native_Kind_Value | Foreign_Function_Kind
                then
-                  Append (Context.Hook_Mask, Mask);
+                  Fail (State, "function expected");
+               end if;
+               if Arg (Base + 1).Kind /= String_Kind then
+                  Fail (State, "string expected");
+               end if;
+               if Arg (Base + 2).Kind /= Nil_Kind then
+                  Reported := Integer_Arg (Base + 2);
+                  if Reported > Integer_Value (Natural'Last) or else
+                    Reported < Integer_Value (Integer'First)
+                  then
+                     Fail (State, "hook count out of range");
+                  end if;
+                  Count := Natural (Integer_Value'Max (0, Reported));
+               end if;
+               for Flag of Flags loop
+                  if Ada.Strings.Fixed.Index
+                    (C_Option (Image (State.Current.Memory, Arg (Base + 1))),
+                     "" & Flag) /= 0
+                  then
+                     Append (Mask, Flag);
+                  end if;
+               end loop;
+            end if;
+            Hooks.Store_Callback (State, Context, Callback);
+            Context.Foreign_Hook := System.Null_Address;
+            Context.Foreign_Hook_Mask := 0;
+            for Bit in 0 .. 2 loop
+               if Ada.Strings.Fixed.Index
+                 (To_String (Mask), "" & Flags (Bit + 1)) /= 0
+               then
+                  Context.Foreign_Hook_Mask := Context.Foreign_Hook_Mask +
+                    2 ** Bit;
                end if;
             end loop;
+            if Count > 0 then
+               Context.Foreign_Hook_Mask := Context.Foreign_Hook_Mask + 8;
+            end if;
+            Context.Hook := Nil_Value;
+            Context.Hook_Mask := Mask;
+            Context.Lua_Hook_Installed := Callback.Kind /= Nil_Kind and then
+              (Length (Mask) > 0 or else Count > 0);
             --  Reflection preserves a signed requested count, while only a
             --  positive interval enables instruction-count events.
-            Context.Hook_Reported_Count :=
-              (if Arg (Base + 2).Kind = Nil_Kind then 0
-               else Integer_Arg (Base + 2));
-            Context.Hook_Count :=
-              (if Arg (Base + 2).Kind = Nil_Kind then 0 else
-                 Natural (Integer_Value'Max (0, Integer_Arg (Base + 2))));
-            Context.Hook_Remaining := Context.Hook_Count;
-            if Length (Context.Hook_Mask) = 0 and then
-              Context.Hook_Count = 0
-            then
-               Context.Hook := Nil_Value;
-            end if;
-         end if;
+            Context.Hook_Reported_Count := Reported;
+            Context.Hook_Count := Count;
+            Context.Hook_Remaining := Count;
+         end;
       elsif Name = "debug.gethook" then
          --  Pinned debug.gethook reports an externally installed C callback
          --  with this string, rather than exposing an uncallable proxy or
          --  treating the C callback pointer as a Lua hook function.
-         Append
-           ((if Context.Foreign_Hook /= System.Null_Address then
-                 New_String (State, "external hook") else Context.Hook));
          --  With no hook, C Lua returns one nil, not a padded triple. Result
          --  counts remain observable through select, varargs and table.pack.
-         if Context.Hook.Kind = Nil_Kind then
+         if not Hooks.Enabled (Context) then
+            Append (Nil_Value);
             return Result;
          end if;
+         Append
+           ((if Context.Foreign_Hook /= System.Null_Address then
+                 New_String (State, "external hook")
+             else Hooks.Callback (State, Context)));
          if Context.Foreign_Hook /= System.Null_Address then
             declare
                Mask : Unbounded_String;
@@ -438,8 +448,8 @@ package body Lua.Engine.Inspection is
                Append (Nil_Value);
                return Result;
             end if;
-            Selected := Logical_Frame
-              (Natural (Function_Value.Integer_Data));
+            Selected := (if Target_Frame /= null then Target_Frame else
+              Logical_Frame (Natural (Function_Value.Integer_Data)));
             if Selected = null then
                Append (Nil_Value);
                return Result;
@@ -648,7 +658,8 @@ package body Lua.Engine.Inspection is
             if Level < 0 or else Level > Integer_Value (Natural'Last) then
                Fail (State, "level out of range");
             end if;
-            Selected := Logical_Frame (Natural (Level));
+            Selected := (if Target_Frame /= null then Target_Frame else
+              Logical_Frame (Natural (Level)));
             if Selected = null then
                Fail (State, "level out of range");
             end if;
