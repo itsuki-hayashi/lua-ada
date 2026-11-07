@@ -9,6 +9,11 @@ operand diagnostics, actual public C concat windows, the locals.lua progress
 output policy, T paths and final-head matrices; component results do not
 complete these obligations.
 
+The followup in that record adds twenty-one primitive diagnostic cases within
+1,787 passing AUnit cases, with native-default/T and complete default four-way
+witnesses. Indexing diagnostics are the next unchanged errors.lua failure.
+Actual C concat windows, T file obligations and final matrices remain required.
+
 Eight public buffer exports have [local ownership evidence](sessions/2026-11-08-auxiliary-buffer-ownership.md),
 including seventeen native-default/T matched C cases and 1,738 passing
 AUnit cases. Finish file/trace/substitution/default-allocator helpers,

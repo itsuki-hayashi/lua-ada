@@ -272,6 +272,270 @@ package body Operation_Error_Tests is
          "r' and table.concat(events,',')=='ab,c,rc')");
    end Parenthesized_Left_Order;
 
+   procedure Arithmetic_Field;
+   procedure Arithmetic_Field is
+   begin
+      --  A missing named-vararg field reports the field and its actual
+      --  arithmetic source.
+      Check
+        ("  local f=assert(load([=[local function foo (..." &
+         "t) return t.xx+1 end;foo()]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform arithmetic on a nil" &
+         " value (field 'xx')]=],tostring(e))");
+   end Arithmetic_Field;
+
+   procedure Arithmetic_Global;
+   procedure Arithmetic_Global is
+   begin
+      --  A numeric left operand selects the wrong right global binding.
+      Check
+        ("  local f=assert(load([=[bad_arith={};return 3.3" &
+         "/bad_arith]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform arithmetic on a tab" &
+         "le value (global 'bad_arith')]=],tostring(e))");
+   end Arithmetic_Global;
+
+   procedure Arithmetic_Local;
+   procedure Arithmetic_Local is
+   begin
+      --  A table local is the first invalid arithmetic operand.
+      Check
+        ("  local f=assert(load([=[local x={};return x+1]=" &
+         "],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform arithmetic on a tab" &
+         "le value (local 'x')]=],tostring(e))");
+   end Arithmetic_Local;
+
+   procedure Arithmetic_Upvalue;
+   procedure Arithmetic_Upvalue is
+   begin
+      --  A captured nil remains an upvalue in the nested arithmetic frame.
+      Check
+        ("  local f=assert(load([=[local x;return(function" &
+         "()return x+1 end)()]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform arithmetic on a nil" &
+         " value (upvalue 'x')]=],tostring(e))");
+   end Arithmetic_Upvalue;
+
+   procedure Arithmetic_Right;
+   procedure Arithmetic_Right is
+   begin
+      --  A numeric left operand leaves the failing local on the right.
+      Check
+        ("  local f=assert(load([=[local x={};return 1+x]=" &
+         "],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform arithmetic on a tab" &
+         "le value (local 'x')]=],tostring(e))");
+   end Arithmetic_Right;
+
+   procedure Arithmetic_Both;
+   procedure Arithmetic_Both is
+   begin
+      --  Two invalid operands explain the left binding before the right.
+      Check
+        ("  local f=assert(load([=[local x={};local y=fals" &
+         "e;return x+y]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform arithmetic on a tab" &
+         "le value (local 'x')]=],tostring(e))");
+   end Arithmetic_Both;
+
+   procedure Arithmetic_Named;
+   procedure Arithmetic_Named is
+   begin
+      --  Raw string __name changes the diagnostic type without losing its
+      --  binding.
+      Check
+        ("  local f=assert(load([=[local x=setmetatable({}" &
+         ",{__name='Box'});return x+1]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform arithmetic on a Box" &
+         " value (local 'x')]=],tostring(e))");
+   end Arithmetic_Named;
+
+   procedure Bitwise_Local;
+   procedure Bitwise_Local is
+   begin
+      --  A bitwise handler miss explains the actual right table local.
+      Check
+        ("  local f=assert(load([=[local x={};return 3|x]=" &
+         "],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform bitwise operation o" &
+         "n a table value (local 'x')]=],tostring(e))");
+   end Bitwise_Local;
+
+   procedure Bitwise_Left;
+   procedure Bitwise_Left is
+   begin
+      --  Two wrong bitwise operands explain the left local first.
+      Check
+        ("  local f=assert(load([=[local x={};return x|tru" &
+         "e]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform bitwise operation o" &
+         "n a table value (local 'x')]=],tostring(e))");
+   end Bitwise_Left;
+
+   procedure Bitwise_String;
+   procedure Bitwise_String is
+   begin
+      --  A numeric string stays invalid for primitive bitwise operators.
+      Check
+        ("  local f=assert(load([=[local x='3';return x|1]" &
+         "=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform bitwise operation o" &
+         "n a string value (local 'x')]=],tostring(e))");
+   end Bitwise_String;
+
+   procedure Integer_Left;
+   procedure Integer_Left is
+   begin
+      --  An invalid left conversion inserts the binding before its
+      --  explanation.
+      Check
+        ("  local f=assert(load([=[local x=1.1;return x<<2" &
+         "]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: number (local 'x') has no integer repr" &
+         "esentation]=],tostring(e))");
+   end Integer_Left;
+
+   procedure Integer_Right;
+   procedure Integer_Right is
+   begin
+      --  An invalid right conversion retains its own binding and source.
+      Check
+        ("  local f=assert(load([=[local x=1.1;return 2<<x" &
+         "]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: number (local 'x') has no integer repr" &
+         "esentation]=],tostring(e))");
+   end Integer_Right;
+
+   procedure Integer_Both;
+   procedure Integer_Both is
+   begin
+      --  Two nonintegral values attribute failed conversion to the first
+      --  operand.
+      Check
+        ("  local f=assert(load([=[local x=1.1;local y=2.2" &
+         ";return x|y]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: number (local 'x') has no integer repr" &
+         "esentation]=],tostring(e))");
+   end Integer_Both;
+
+   procedure Unary_Arithmetic;
+   procedure Unary_Arithmetic is
+   begin
+      --  Unary minus explains its real source local after a handler miss.
+      Check
+        ("  local f=assert(load([=[local x={};return -x]=]" &
+         ",'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform arithmetic on a tab" &
+         "le value (local 'x')]=],tostring(e))");
+   end Unary_Arithmetic;
+
+   procedure Unary_Bitwise;
+   procedure Unary_Bitwise is
+   begin
+      --  Unary bitwise rejects numeric strings using its actual source
+      --  binding.
+      Check
+        ("  local f=assert(load([=[local x='3';return ~x]=" &
+         "],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform bitwise operation o" &
+         "n a string value (local 'x')]=],tostring(e))");
+   end Unary_Bitwise;
+
+   procedure Unary_Integer;
+   procedure Unary_Integer is
+   begin
+      --  Unary integer conversion explains the original nonintegral local.
+      Check
+        ("  local f=assert(load([=[local x=1.1;return ~x]=" &
+         "],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: number (local 'x') has no integer repr" &
+         "esentation]=],tostring(e))");
+   end Unary_Integer;
+
+   procedure Unary_Length;
+   procedure Unary_Length is
+   begin
+      --  Length reports its primitive boolean type and original local.
+      Check
+        ("  local f=assert(load([=[local x=false;return #x" &
+         "]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to get length of a boolean val" &
+         "ue (local 'x')]=],tostring(e))");
+   end Unary_Length;
+
+   procedure Compare_Local;
+   procedure Compare_Local is
+   begin
+      --  Ordering failure attributes only source and the two compared
+      --  types.
+      Check
+        ("  local f=assert(load([=[local x={};return x<1]=" &
+         "],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to compare table with number]=" &
+         "],tostring(e))");
+   end Compare_Local;
+
+   procedure Zero_Division;
+   procedure Zero_Division is
+   begin
+      --  Integer division by zero retains its actual Lua operation source.
+      Check
+        ("  local f=assert(load([=[local x=0;return 1//x]=" &
+         "],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to divide by zero]=],tostring(" &
+         "e))");
+   end Zero_Division;
+
+   procedure Boolean_Name_Ignored;
+   procedure Boolean_Name_Ignored is
+   begin
+      --  A primitive metatable name cannot replace its boolean diagnostic
+      --  type.
+      Check
+        ("  local f=assert(load([=[debug.setmetatable(fals" &
+         "e,{__name='Flag'});local ok,e=pcall(function()lo" &
+         "cal x=false;return #x end);debug.setmetatable(fa" &
+         "lse,nil);error(e,0)]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to get length of a boolean val" &
+         "ue (local 'x')]=],tostring(e))");
+   end Boolean_Name_Ignored;
+
+   procedure Number_Name_Ignored;
+   procedure Number_Name_Ignored is
+   begin
+      --  Ordering retains the primitive number type despite its shared
+      --  metatable name.
+      Check
+        ("  local f=assert(load([=[debug.setmetatable(0,{_" &
+         "_name='Num'});local ok,e=pcall(function()return " &
+         "1<{} end);debug.setmetatable(0,nil);error(e,0)]=" &
+         "],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to compare number with table]=" &
+         "],tostring(e))");
+   end Number_Name_Ignored;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -334,5 +598,68 @@ package body Operation_Error_Tests is
       Test_Support.Add
         (Suite, "operation error: Parenthesized_Left_Order",
          Parenthesized_Left_Order'Access);
+      Test_Support.Add
+        (Suite, "operation error: Arithmetic_Field",
+         Arithmetic_Field'Access);
+      Test_Support.Add
+        (Suite, "operation error: Arithmetic_Global",
+         Arithmetic_Global'Access);
+      Test_Support.Add
+        (Suite, "operation error: Arithmetic_Local",
+         Arithmetic_Local'Access);
+      Test_Support.Add
+        (Suite, "operation error: Arithmetic_Upvalue",
+         Arithmetic_Upvalue'Access);
+      Test_Support.Add
+        (Suite, "operation error: Arithmetic_Right",
+         Arithmetic_Right'Access);
+      Test_Support.Add
+        (Suite, "operation error: Arithmetic_Both",
+         Arithmetic_Both'Access);
+      Test_Support.Add
+        (Suite, "operation error: Arithmetic_Named",
+         Arithmetic_Named'Access);
+      Test_Support.Add
+        (Suite, "operation error: Bitwise_Local",
+         Bitwise_Local'Access);
+      Test_Support.Add
+        (Suite, "operation error: Bitwise_Left",
+         Bitwise_Left'Access);
+      Test_Support.Add
+        (Suite, "operation error: Bitwise_String",
+         Bitwise_String'Access);
+      Test_Support.Add
+        (Suite, "operation error: Integer_Left",
+         Integer_Left'Access);
+      Test_Support.Add
+        (Suite, "operation error: Integer_Right",
+         Integer_Right'Access);
+      Test_Support.Add
+        (Suite, "operation error: Integer_Both",
+         Integer_Both'Access);
+      Test_Support.Add
+        (Suite, "operation error: Unary_Arithmetic",
+         Unary_Arithmetic'Access);
+      Test_Support.Add
+        (Suite, "operation error: Unary_Bitwise",
+         Unary_Bitwise'Access);
+      Test_Support.Add
+        (Suite, "operation error: Unary_Integer",
+         Unary_Integer'Access);
+      Test_Support.Add
+        (Suite, "operation error: Unary_Length",
+         Unary_Length'Access);
+      Test_Support.Add
+        (Suite, "operation error: Compare_Local",
+         Compare_Local'Access);
+      Test_Support.Add
+        (Suite, "operation error: Zero_Division",
+         Zero_Division'Access);
+      Test_Support.Add
+        (Suite, "operation error: Boolean_Name_Ignored",
+         Boolean_Name_Ignored'Access);
+      Test_Support.Add
+        (Suite, "operation error: Number_Name_Ignored",
+         Number_Name_Ignored'Access);
    end Register;
 end Operation_Error_Tests;

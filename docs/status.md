@@ -10,6 +10,12 @@ assertions and stdout pass with an explicit collection-progress stderr
 difference. Arithmetic diagnostics, actual C concat windows and full target
 acceptance remain open.
 
+The primitive diagnostic followup in that record adds twenty-one cases and
+passes all 1,787 local AUnit cases plus both complete forty-one-case default
+four-way fixtures. Arithmetic/bitwise/length operand names, integer conversion
+word order and actual Lua source attribution now match focused C witnesses.
+Full errors.lua next fails indexing diagnostics; T and final matrices remain.
+
 The [auxiliary buffer checkpoint](sessions/2026-11-08-auxiliary-buffer-ownership.md)
 completes eight exports locally: seventeen identical-source C cases match
 both native configurations, and strict local builds pass 1,738 AUnit cases

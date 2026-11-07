@@ -368,7 +368,7 @@ package body Lua.Engine.Call_Names is
                if (Operand_Index = 1) = (Part (Instruction, K) = 0) then
                   return Resolve (Part (Instruction, A), PC, True);
                end if;
-            when Op_BNOT | Op_UNM =>
+            when Op_BNOT | Op_UNM | Op_LEN =>
                return Resolve (Part (Instruction, B), PC, True);
             when Op_CONCAT =>
                if Caller.Canonical_Pending = Concat_Canonical_Result and then

@@ -198,10 +198,13 @@ package body Lua.Engine.Machine is
    function Diagnostic_Type (State : in out World; Item : Value)
                             return String
    is
-      Name : constant Value := Metafield (State, Item, "__name");
+      Name : constant Value :=
+        (if Item.Kind in Table_Kind | Userdata_Kind then
+            Metafield (State, Item, "__name") else Nil_Value);
    begin
       --  type() remains the language's primitive category. Error wording
-      --  alone honors a raw string __name supplied by the object's owner.
+      --  alone honors a table/userdata owner's raw string __name. Pinned
+      --  luaT_objtypename ignores names on shared primitive metatables.
       if Name.Kind = String_Kind then
          declare
             Text : constant String := Image (State.Current.Memory, Name);
@@ -220,20 +223,28 @@ package body Lua.Engine.Machine is
       return Type_Name (Item);
    end Diagnostic_Type;
 
-   procedure Operand_Error
-     (State : in out World; Item : Value; Operation : String;
-      Operand_Index : Call_Names.Arithmetic_Operand);
-   procedure Operand_Error
-     (State : in out World; Item : Value; Operation : String;
-      Operand_Index : Call_Names.Arithmetic_Operand)
+   procedure Operation_Error
+     (State : in out World; Message : String; Operand_Index : Natural := 0;
+      Following : String := "");
+   procedure Operation_Error
+     (State : in out World; Message : String; Operand_Index : Natural := 0;
+      Following : String := "")
    is
-      Description : Unbounded_String := To_Unbounded_String
-        ("attempt to " & Operation & " a " &
-         Diagnostic_Type (State, Item) & " value");
+      Description : Unbounded_String := To_Unbounded_String (Message);
       Caller : Frame_Access;
       use type Call_Names.Name_Kind;
    begin
-      if State.Current.Stack.Length >= 2 then
+      --  Pinned ldebug.c inserts operand varinfo into the message and then
+      --  luaG_runerror attributes only its actual Lua CI. Synthetic operation
+      --  phases borrow that immediate owner; a primitive fault can also
+      --  arise directly in the current canonical Lua activation (integer
+      --  division by zero). C/library operations never search older Lua
+      --  frames for a convenient binding or source line.
+      if not State.Current.Stack.Is_Empty and then
+        not State.Current.Stack.Last_Element.Is_Native
+      then
+         Caller := State.Current.Stack.Last_Element;
+      elsif State.Current.Stack.Length >= 2 then
          declare
             Helper : constant Frame_Access := State.Current.Stack.Last_Element;
          begin
@@ -245,19 +256,22 @@ package body Lua.Engine.Machine is
             end if;
          end;
       end if;
+      if Caller /= null and then Operand_Index /= 0 and then
+        Caller.Code.Canonical_Node /= null
+      then
+         declare
+            Name : constant Call_Names.Borrowed_Identity :=
+              Call_Names.View_From_Operand (State, Caller, Operand_Index);
+         begin
+            if Name.Kind /= Call_Names.Unknown then
+               Append (Description, " (" &
+                 Call_Names.Kind_Image (Name.Kind) & " '" &
+                 To_String (Name.Item) & "')");
+            end if;
+         end;
+      end if;
+      Append (Description, Following);
       if Caller /= null then
-         if Caller.Code.Canonical_Node /= null then
-            declare
-               Name : constant Call_Names.Borrowed_Identity :=
-                 Call_Names.View_From_Operand (State, Caller, Operand_Index);
-            begin
-               if Name.Kind /= Call_Names.Unknown then
-                  Append (Description, " (" &
-                    Call_Names.Kind_Image (Name.Kind) & " '" &
-                    To_String (Name.Item) & "')");
-               end if;
-            end;
-         end if;
          declare
             Line : constant Natural := Line_At
               (Caller, Positive'Max (1, Caller.PC - 1));
@@ -274,6 +288,18 @@ package body Lua.Engine.Machine is
       --  A native caller must not borrow a binding or location from an older
       --  Lua frame. luaG_runerror adds source only to its actual Lua CI.
       Fail (State, To_String (Description));
+   end Operation_Error;
+
+   procedure Operand_Error
+     (State : in out World; Item : Value; Operation : String;
+      Operand_Index : Call_Names.Arithmetic_Operand);
+   procedure Operand_Error
+     (State : in out World; Item : Value; Operation : String;
+      Operand_Index : Call_Names.Arithmetic_Operand) is
+   begin
+      Operation_Error
+        (State, "attempt to " & Operation & " a " &
+         Diagnostic_Type (State, Item) & " value", Operand_Index);
    end Operand_Error;
 
    function Numeric (State : in out World; Item : Value)
@@ -311,39 +337,12 @@ package body Lua.Engine.Machine is
       if Real /= Real or else Real < -2.0 ** 63 or else Real >= 2.0 ** 63
         or else Real_Value'Truncation (Real) /= Real
       then
-         if Operand_Index /= 0 and then State.Current.Stack.Length >= 2 then
-            --  The native arithmetic phase has already tried the applicable
-            --  metamethod. Explain a failed conversion using the real Lua
-            --  caller's reaching definition, never a value-based guess (two
-            --  different bindings can hold the same infinity or NaN).
-            declare
-               Top : constant Positive := State.Current.Stack.Last_Index;
-               Helper : constant Frame_Access := State.Current.Stack (Top);
-               Caller : constant Frame_Access :=
-                 State.Current.Stack (Top - 1);
-            begin
-               --  Only a helper directly requested by Lua can attribute its
-               --  operands to that caller. A nested C/library arithmetic
-               --  request must not borrow a name from an older Lua frame.
-               if Helper.Is_Native and then not Caller.Is_Native and then
-                 To_String (Helper.Native_Name) in "@binary" | "@unary"
-               then
-                  declare
-                     Name : constant Call_Names.Identity :=
-                       Call_Names.From_Operand
-                         (State, Caller, Operand_Index);
-                     use type Call_Names.Name_Kind;
-                  begin
-                     if Name.Kind /= Call_Names.Unknown then
-                        Fail (State, "number has no integer representation (" &
-                          Call_Names.Kind_Image (Name.Kind) & " '" &
-                          Image (State.Current.Memory, Name.Item) & "')");
-                     end if;
-                  end;
-               end if;
-            end;
-         end if;
-         Fail (State, "number has no integer representation");
+         --  luaG_tointerror inserts varinfo after "number", before the
+         --  conversion explanation. The native phase has already tried the
+         --  applicable handler; resolve the actual failed operand only.
+         Operation_Error
+           (State, "number", Operand_Index,
+            Following => " has no integer representation");
       end if;
       return Integer_Value (Real);
    end Integral;
@@ -379,7 +378,7 @@ package body Lua.Engine.Machine is
             --  Native order errors distinguish two values with the same
             --  diagnostic name from two different named categories. This
             --  also honors a table/userdata's actual raw __name spelling.
-            Fail (State, "attempt to compare " &
+            Operation_Error (State, "attempt to compare " &
               (if A_Type = B_Type then "two " & A_Type & " values"
                else A_Type & " with " & B_Type));
          end;
@@ -505,7 +504,7 @@ package body Lua.Engine.Machine is
       when Lua.Integers.Arithmetic_Error =>
          --  Both integer primitives reject zero, but their Lua diagnostics
          --  identify the operation separately (lvm.c:775 and lvm.c:795).
-         Fail (State, (if Operator = Floor_Divide then
+         Operation_Error (State, (if Operator = Floor_Divide then
                  "attempt to divide by zero" else
                  "attempt to perform 'n%0'"));
          return Nil_Value;
@@ -526,7 +525,7 @@ package body Lua.Engine.Machine is
             elsif Item.Kind = Table_Kind then
                return (Integer_Kind, Integer_Value (Table_Length (Item)));
             end if;
-            Fail (State, "attempt to get length of a " & Type_Name (Item));
+            Operand_Error (State, Item, "get length of", 1);
          when Minus =>
             Number := Numeric (State, Item);
             if Number.Kind = Lua.Numbers.Integer_Number then
@@ -4069,11 +4068,12 @@ package body Lua.Engine.Machine is
                --  as luaG_opinterror does, including a wrong right operand.
                Handler := (if Left.Kind in Integer_Kind | Real_Kind then
                              Right else Left);
-               Fail (State, "attempt to perform " &
-                 (if Operator in Bit_And | Bit_Or | Bit_Xor | Shift_Left |
-                     Shift_Right then "bitwise operation"
-                  else "arithmetic") & " on a " &
-                 Diagnostic_Type (State, Handler) & " value");
+               Operand_Error
+                 (State, Handler, "perform " &
+                  (if Operator in Bit_And | Bit_Or | Bit_Xor | Shift_Left |
+                      Shift_Right then "bitwise operation"
+                   else "arithmetic") & " on",
+                  (if Left.Kind in Integer_Kind | Real_Kind then 2 else 1));
             end if;
          end if;
          Return_Native ((if Name = "@unary"

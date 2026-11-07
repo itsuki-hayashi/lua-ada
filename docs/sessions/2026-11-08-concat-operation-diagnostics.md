@@ -74,3 +74,31 @@ original actual C window, mutations of an earlier operand must affect later
 folds, and overwritten/consumed weak operands must die at the proper fold.
 Those witnesses are preparation for a separate actual-window repair, not
 passing Ada evidence for that behavior. Reference trees and pins are unchanged.
+
+## Primitive arithmetic diagnostic followup
+
+The same borrowed formatter now covers arithmetic/bitwise handler misses,
+length failures, ordering and direct integer division-by-zero faults. It
+attributes a direct primitive fault to the current actual Lua activation,
+or a synthetic operation to its immediate Lua owner. It never searches past
+a C activation. `luaG_tointerror` places operand varinfo between `number`
+and `has no integer representation`; the previous spelling placed it last
+and materialized a Lua string merely to inspect the binding. The new query
+borrows immutable metadata. Raw `__name` is now honored only on tables and
+userdata, following `ltm.c:luaT_objtypename`; primitive metatable names are
+ignored.
+
+Twenty-one more separately named cases cover left/right/first-invalid
+selection, named varargs, global/local/upvalue/field origins, nonintegral
+conversion, unary operators, comparison/division source and primitive-name
+exclusion. Native default and T pass all forty-one combined cases. Strict
+root/tests/C builds pass, as do all 1,787 AUnit cases, both complete forty-one
+case four-way fixtures, thirty-six retained four-way cases and seventeen
+retained C consumers. The first run's division case correctly caught the
+direct canonical path lacking a synthetic helper; it passed after that
+actual owner was included. No assertion was weakened.
+
+Full unchanged default errors.lua now reaches indexing diagnostics. Its next
+failure is `aaa.bbb:ddd(9)`: expected `global 'aaa'`, actual
+`attempt to index a nil`. Index operand/source attribution, actual C concat
+windows and full-file/T/final-matrix acceptance remain open.
