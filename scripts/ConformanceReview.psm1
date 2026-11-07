@@ -15,8 +15,9 @@ function Resolve-ReviewedFile {
         [IO.Path]::IsPathRooted($relative) -or -not (Test-Path -LiteralPath $file -PathType Leaf)) {
         throw 'Review file is missing or outside repository'
     }
-    if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant() -cne $Sha256) {
-        throw 'Review file hash differs'
+    $observedHash = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($observedHash -cne $Sha256) {
+        throw "Review file hash differs: $relative (expected $Sha256; observed $observedHash)"
     }
     if(-not $relative.Replace('\','/').StartsWith('references/',[StringComparison]::Ordinal) -and
         [IO.Path]::GetExtension($file) -cin @('.json','.jsonl','.lua','.ps1','.psm1','.adb','.ads','.c','.h','.md')) {
