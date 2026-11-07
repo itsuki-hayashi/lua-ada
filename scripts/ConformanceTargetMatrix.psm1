@@ -6,6 +6,70 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceMatrix.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
+
+function Assert-TargetTransformReplay {
+    param([string] $Root, [string] $ArtifactRoot,
+          [Collections.IDictionary] $Report, [Collections.IDictionary] $Entry,
+          [Collections.IDictionary] $Contract, [Collections.IDictionary] $ResolvedExclusions,
+          [switch] $RequireAcceptance)
+    if ($Report.execution_disposition -ceq 'unchanged') { return }
+    $sourceName = if ($Entry.operation -ceq 'aggregate') { 'all.lua' }
+        elseif ($Entry.operation -ceq 'heavy') { 'heavy.lua' } else { $Entry.operation.Substring(5) }
+    $adapted = $Report.execution_disposition -ceq 'reviewed-t-adapted'
+    $identity = if ($adapted) { $Report.t_adaptation } else { $Report.equivalent }
+    if ($identity.diagnostic_only -ne $false -or $identity.review_status -cne 'accepted') {
+        throw 'Full-target transform is not independently accepted'
+    }
+    $path = Resolve-ReviewedFile -Root $Root -Path $identity.manifest_path -Sha256 $identity.manifest_sha256
+    $specification = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    if ($specification.source -cne "references/lua/testes/$sourceName" -or
+        $specification.configuration -cnotin @($Report.requested_configuration,'default-and-upstream-test')) {
+        throw 'Full-target transform identifies another original source or configuration'
+    }
+    if ($adapted) {
+        if ($Report.target -cne 'Ada' -or $Report.requested_configuration -cne 'upstream-test') {
+            throw 'T transformation cannot replace default or original C execution'
+        }
+        $replay = Get-ConformanceTReplay -Root $Root -Specification $specification `
+            -PolicySha256 $Report.exclusion_policy_sha256 -ResolvedExclusions $ResolvedExclusions
+        if ((@($replay.excluded_obligations | Sort-Object) -join '|') -cne
+            (@($Report.excluded_obligations | Sort-Object) -join '|') -or
+            $Contract.t_transform_manifest_sha256 -cne $identity.manifest_sha256 -or
+            $Contract.exclusion_policy_sha256 -cne $Report.exclusion_policy_sha256) {
+            throw 'Full-target T contract or excluded transform set differs'
+        }
+    } else {
+        $replay = Get-ConformanceEquivalentReplay -Root $Root -Specification $specification
+        if ($replay.disposition -ceq 'ada-internal-equivalent' -and $Report.target -cne 'Ada') {
+            throw 'Ada internal transformation cannot replace original C execution'
+        }
+        if ($replay.disposition -ceq 'native-platform-equivalent') {
+            if (-not $specification.Contains('platform') -or $specification.platform -cne $Report.host.platform) {
+                throw 'Native platform transformation identifies another host'
+            }
+            if ($RequireAcceptance -or $Report.native_applicability_verified) {
+                if ($Report.native_applicability_verified -ne $true) {
+                    throw 'Native transformation lacks source-linked original C applicability'
+                }
+                $null = Assert-ConformanceNativeApplicability -Root $Root -ArtifactRoot $ArtifactRoot `
+                    -Identity $Report.native_applicability -Specification $specification `
+                    -ManifestSha256 $identity.manifest_sha256 -Configuration $Report.requested_configuration `
+                    -Platform $Report.host.platform -Revision $Report.repository_revision `
+                    -RequireRuntimeEvidence:$RequireAcceptance
+            }
+        }
+        if ($Contract.equivalent_manifest_sha256 -cne $identity.manifest_sha256) {
+            throw 'Full-target equivalent contract manifest differs'
+        }
+    }
+    $output = Resolve-TargetCapture -Root $ArtifactRoot -Original $identity.output -Sha256 $identity.output_sha256
+    if ($identity.output_sha256 -cne $replay.sha256 -or $replay.disposition -cne $Report.execution_disposition -or
+        $Contract.executed_sha256 -cne $replay.sha256 -or $Contract.disposition -cne $replay.disposition -or
+        [Convert]::ToBase64String([IO.File]::ReadAllBytes($output)) -cne [Convert]::ToBase64String($replay.bytes)) {
+        throw 'Full-target executed transform bytes or reviewed contract differ'
+    }
+}
 
 function Assert-TargetMatrixIndex {
     param([Parameter(Mandatory)][Collections.IDictionary] $Manifest,
@@ -361,6 +425,8 @@ function Test-FullTargetMatrix {
             $observed = Test-TargetMatrixReport -Report $report -Entry $entry -Suite $suite `
                 -Revision $manifest.revision -ArtifactRoot $artifacts -Target $expectedTarget `
                 -ExclusionPolicySha256 $manifest.exclusion_policy.sha256 -Exclusions $inventory.Exclusions
+            Assert-TargetTransformReplay -Root $Root -ArtifactRoot $artifacts -Report $report -Entry $entry `
+                -Contract $contract -ResolvedExclusions $resolvedExclusions -RequireAcceptance:$RequireTargetAcceptance
             $imageKey = $entry.context + '/' + $target
             $signature = $observed.executable_sha256 + '|' + (@($observed.images.Keys | Sort-Object |
                 ForEach-Object { $_ + ':' + $observed.images[$_] }) -join '|')
@@ -389,12 +455,6 @@ function Test-FullTargetMatrix {
                             }
                         }
                     }
-                }
-                # Source adaptation needs a separate exact-byte replay. Until
-                # that producer/verifier exists, reject it explicitly rather
-                # than turn an exclusion decision into execution authority.
-                if ($report.execution_disposition -cne 'unchanged') {
-                    throw 'Full-target adapted execution replay is not implemented'
                 }
                 $outcome = Get-ConformanceOutcome -Process $report.process -Marker $contract.completion_marker
                 [void](Test-ConformanceAcceptance -Process $report.process -Outcome $outcome -Contract $contract `

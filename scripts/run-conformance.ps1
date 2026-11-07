@@ -19,6 +19,8 @@ param(
     [ValidatePattern('^[a-z0-9]+(?:-[a-z0-9]+)*$')][string] $Variant = 'primary',
     [ValidateSet(0,1)][int] $ConstructsBranch = 0,
     [string] $EquivalentManifest = '',
+    [string] $TAdaptationManifest = '',
+    [string] $NativeApplicability = '',
     [switch] $AllowUnreviewedEquivalent
 )
 
@@ -29,6 +31,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
 $root = Split-Path -Parent $PSScriptRoot
 $original = Get-Location
 $revision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
@@ -56,6 +59,10 @@ if ($TargetPolicy -ne '' -and $Mode -ceq 'File' -and $File -ceq 'constructs.lua'
 }
 $isolatedLauncher = $Scope -ne '' -or $TargetPolicy -ne ''
 $hasProfileWitness = $Scope -ceq 'expanded-t-conformance' -or ($TargetPolicy -ne '' -and $Mode -ceq 'File')
+$requiresCliPrerequisites = $TargetPolicy -eq '' -or $Mode -ceq 'Aggregate' -or
+    ($Mode -ceq 'File' -and $File -ceq 'main.lua')
+$requiresNativeFixtures = $TargetPolicy -eq '' -or $Mode -ceq 'Aggregate' -or
+    ($Mode -ceq 'File' -and $File -cin @('attrib.lua','main.lua'))
 if ($Scope -ne '') {
     $scopePolicy = Get-ConformanceScopePolicy -Scope $Scope
     if ($Mode -ne 'File' -or $File -cnotin $scopePolicy.Files) {
@@ -63,10 +70,17 @@ if ($Scope -ne '') {
     }
 }
 $acceptanceRequested = $RequireAcceptance -or $RequireScopedAcceptance -or $RequireTargetAcceptance
-if ($TargetPolicy -ne '' -and $EquivalentManifest -ne '') {
-    throw 'Full-target equivalent execution replay is not implemented'
+if ($TargetPolicy -ne '' -and $AllowUnreviewedEquivalent) {
+    throw 'Full-target execution never permits unreviewed equivalents'
 }
-if (($EquivalentManifest -ne '' -and $Scope -eq '') -or
+if ($TAdaptationManifest -ne '' -and ($TargetPolicy -eq '' -or $Target -cne 'Ada' -or
+    $Configuration -cne 'upstream-test' -or $Mode -cne 'File' -or $EquivalentManifest -ne '')) {
+    throw 'T adaptation requires an explicit instrumented Ada File target and cannot combine mappings'
+}
+if ($TargetPolicy -ne '' -and $EquivalentManifest -ne '' -and $Mode -cne 'File') {
+    throw 'Single-file equivalent manifests require full-target File mode'
+}
+if (($EquivalentManifest -ne '' -and $Scope -eq '' -and $TargetPolicy -eq '') -or
     ($AllowUnreviewedEquivalent -and ($EquivalentManifest -eq '' -or $acceptanceRequested))) {
     throw 'Unreviewed equivalents are scoped observations only, never acceptance'
 }
@@ -130,6 +144,9 @@ $evidence = [ordered]@{
     constructs_branch = $(if ($File -ceq 'constructs.lua' -and $hasProfileWitness) { $ConstructsBranch } else { $null })
     execution_disposition = 'unchanged'
     equivalent = $null
+    t_adaptation = $null
+    native_applicability = $null
+    native_applicability_verified = $false
     repl_preflight_process = $null
     reference_source_records = @()
     harness_source_records = @()
@@ -269,6 +286,7 @@ try {
     foreach ($relative in @('scripts/run-conformance.ps1', 'scripts/ConformanceRunner.psm1',
         'scripts/ConformanceInventory.psm1', 'scripts/ConformanceScope.psm1',
         'scripts/ManagedTelemetry.psm1', 'scripts/ConformanceReview.psm1',
+        'scripts/ConformanceTransforms.psm1','scripts/New-ConformanceTTransform.ps1',
         'scripts/New-ConformanceEquivalent.ps1', 'tests/conformance/suite.json')) {
         $evidence.harness_source_records += [ordered]@{
             path = $relative
@@ -301,8 +319,8 @@ try {
                 ($Mode -ceq 'Heavy' -and $_.source -ceq 'heavy.lua') -or
                 ($Mode -ceq 'File' -and $_.source -ceq $File)
             } | ForEach-Object id | Sort-Object)
-            if ($evidence.excluded_obligations.Count -gt 0) {
-                throw 'Full-target T adaptation execution replay is not implemented'
+            if ($evidence.excluded_obligations.Count -gt 0 -and $TAdaptationManifest -eq '') {
+                throw 'Full-target excluded obligations require an independently reviewed exact T transformation'
             }
         }
         if ($RequireTargetAcceptance) {
@@ -424,7 +442,7 @@ try {
         # A missing host library must fail setup, rather than masquerade as a
         # native-platform difference when main.lua enables warnings with -E.
         # Closed stdin makes this a bounded REPL initialization/cleanup probe.
-        if ($Scope -eq '') {
+        if ($Scope -eq '' -and $requiresCliPrerequisites) {
         $repl = Invoke-ConformanceProcess -Executable $Interpreter -Arguments @('-E', '-W', '-i') `
             -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'repl-preflight') `
             -TimeoutSeconds 30 -Environment $environment
@@ -433,7 +451,9 @@ try {
             $repl.capture_exceeded -or $repl.pipe_drain_failed -or $repl.process_tree_kill_error) {
             throw "Default C REPL prerequisite failed; see $($repl.stderr_path)"
         }
-        Build-Fixtures -Directory $fixtureDirectory -LibraryDirectory $libraryDirectory
+        }
+        if ($Scope -eq '' -and $requiresNativeFixtures) {
+            Build-Fixtures -Directory $fixtureDirectory -LibraryDirectory $libraryDirectory
         }
     }
     else {
@@ -489,7 +509,7 @@ try {
                 [IO.File]::ReadAllText($probe.stdout_path).Trim()) {
             throw 'Bare lua child does not retain the selected Ada configuration/allocator ceiling'
         }
-        if ($Scope -eq '') {
+        if ($Scope -eq '' -and $requiresCliPrerequisites) {
         $repl = Invoke-ConformanceProcess -Executable $Interpreter -Arguments @('-E', '-W', '-i') `
             -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'repl-preflight') `
             -TimeoutSeconds 30 -Environment $environment
@@ -498,13 +518,13 @@ try {
             $repl.capture_exceeded -or $repl.pipe_drain_failed -or $repl.process_tree_kill_error) {
             throw 'Default Ada REPL prerequisite failed'
         }
-        if ($NativeLibraryDirectory -ne '') {
+        }
+        if ($Scope -eq '' -and $requiresNativeFixtures -and $NativeLibraryDirectory -ne '') {
             Build-Fixtures -Directory $fixtureDirectory `
                 -LibraryDirectory (Resolve-Path -LiteralPath $NativeLibraryDirectory).Path -LibraryName lua
         }
-        elseif ($RequireAcceptance -or $RequireTargetAcceptance) {
+        elseif ($Scope -eq '' -and $requiresNativeFixtures -and ($RequireAcceptance -or $RequireTargetAcceptance)) {
             throw 'Ada acceptance needs NativeLibraryDirectory for actual upstream C fixture modules'
-        }
         }
     }
     if ($isolatedLauncher) {
@@ -580,6 +600,32 @@ try {
         $equivalent['manifest_sha256'] = (Get-FileHash -LiteralPath $EquivalentManifest -Algorithm SHA256).Hash.ToLowerInvariant()
         $evidence.equivalent = $equivalent
         $evidence.execution_disposition = $equivalent.disposition
+        if ($TargetPolicy -ne '') {
+            $reviewedMapping = Get-Content -LiteralPath $EquivalentManifest -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+            $replay = Get-ConformanceEquivalentReplay -Root $root -Specification $reviewedMapping
+            if ($replay.sha256 -cne $equivalent.output_sha256 -or
+                [Convert]::ToBase64String($replay.bytes) -cne [Convert]::ToBase64String([IO.File]::ReadAllBytes($generated))) {
+                throw 'Equivalent producer bytes differ from exact full-target replay'
+            }
+            $evidence.equivalent.manifest_path = [IO.Path]::GetRelativePath($root,(Resolve-Path $EquivalentManifest).Path).Replace('\','/')
+            if ($replay.disposition -ceq 'ada-internal-equivalent' -and $Target -cne 'Ada') {
+                throw 'Ada internal equivalents cannot replace the original C oracle'
+            }
+            if ($replay.disposition -ceq 'native-platform-equivalent') {
+                if ($NativeApplicability -ne '') {
+                    $evidence.native_applicability = @{path=(Resolve-Path $NativeApplicability).Path;
+                        sha256=(Get-FileHash -LiteralPath $NativeApplicability).Hash.ToLowerInvariant()}
+                    $nativeProof = Assert-ConformanceNativeApplicability -Root $root -ArtifactRoot $root `
+                        -Identity $evidence.native_applicability -Specification $reviewedMapping `
+                        -ManifestSha256 $evidence.equivalent.manifest_sha256 -Configuration $Configuration `
+                        -Platform $evidence.host.platform -Revision $evidence.repository_revision `
+                        -RequireRuntimeEvidence:$RequireTargetAcceptance
+                    $evidence.native_applicability_verified = $nativeProof.runtime_verified
+                } elseif ($RequireTargetAcceptance) {
+                    throw 'Native platform acceptance requires matching source-linked original C applicability evidence'
+                }
+            }
+        }
         $arguments = @($generated)
         if ($File -eq 'files.lua' -and $IsWindows -and $mapping.id -ceq 'files-windows-platform') {
             Build-WindowsFileFixtures -Directory $fixtureDirectory -LibraryDirectory $libraryDirectory
@@ -637,6 +683,20 @@ try {
                 source_sha256=(Get-FileHash $counterpart).Hash.ToLowerInvariant(); artifact=$counterpartCopy;
                 artifact_sha256=(Get-FileHash $counterpartCopy).Hash.ToLowerInvariant()}
         }
+    }
+    if ($TAdaptationManifest -ne '') {
+        $specification = Get-Content -LiteralPath $TAdaptationManifest -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+        if ($specification.source -cne "references/lua/testes/$File") { throw 'T transform identifies another primary source' }
+        $generated = Join-Path $runRoot "equivalent-t-$File"
+        $adapted = & "$PSScriptRoot/New-ConformanceTTransform.ps1" -Manifest $TAdaptationManifest `
+            -Output $generated | ConvertFrom-Json -AsHashtable -Depth 32
+        if ((@($adapted.excluded_obligations | Sort-Object) -join '|') -cne
+            (@($evidence.excluded_obligations | Sort-Object) -join '|')) {
+            throw 'T transformation does not replace exactly the approved source obligations'
+        }
+        $evidence.t_adaptation = $adapted
+        $evidence.execution_disposition = 'reviewed-t-adapted'
+        $arguments = @($generated)
     }
     if ($isolatedLauncher -and $File -eq 'files.lua') {
         # Upstream's read-only no-buffer example ignores its write result. The
@@ -825,6 +885,13 @@ try {
                  $contract.executed_sha256 -cne $evidence.equivalent.output_sha256 -or
                  $contract.disposition -cne $evidence.execution_disposition)) {
                 throw 'Execution contract does not identify the reviewed equivalent'
+            }
+            if ($TAdaptationManifest -ne '' -and
+                ($contract.t_transform_manifest_sha256 -cne $evidence.t_adaptation.manifest_sha256 -or
+                 $contract.executed_sha256 -cne $evidence.t_adaptation.output_sha256 -or
+                 $contract.exclusion_policy_sha256 -cne $evidence.exclusion_policy_sha256 -or
+                 $contract.disposition -cne 'reviewed-t-adapted')) {
+                throw 'Execution contract does not identify the exact reviewed T transformation'
             }
             $telemetryPath = $environment.LUA_ADA_CONFORMANCE_TELEMETRY +
                 '.' + $evidence.process.process_id + '.json'

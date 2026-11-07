@@ -138,11 +138,15 @@ never grant target acceptance. Exclusions are separately listed and counted;
 `original_suite_unchanged_pass` requires original strict completeness and only
 unchanged execution. `full_m3_acceptance` remains false for this target.
 
-The matrix infrastructure checkpoint deliberately rejects non-unchanged final
-execution until exact-byte equivalent/adaptation replay is connected. This is
-an explicit incomplete acceptance facility, not evidence that those programs
-failed or passed. The follow-up execution producer/replay must close that gate
-before any full-target acceptance claim.
+File execution can replay independently reviewed Ada/internal and native-platform
+equivalent manifests and approved T-private transformations. The matrix rebuilds
+the expected bytes from the original source, rechecks the independent approval,
+and compares the actual generated artifact and execution-contract identity.
+Native-platform acceptance additionally needs current original-C applicability
+observations for every changed invariant. A narrative alone or an Ada-only
+failure cannot establish a platform exception. Aggregate transformation bundles
+remain an explicit pending facility; selecting an aggregate affected by T
+exclusions cannot silently run its original private checks or hide them.
 
 ## Explicit execution producer
 
@@ -166,6 +170,94 @@ coverage or an exclusion already validated by the selected inventory policy.
 The latter is returned separately as `excluded_omissions`, with no pass
 evidence attached to the omitted invariant. This route is unavailable to strict
 callers, instrumented T-absence messages, ordinary omissions, public behavior,
-or mixed obligations. Actual instrumented source adaptation and full-target
-equivalent replay remain explicitly blocked until their exact-byte execution
-replay is implemented; the new selector alone does not establish coverage.
+or mixed obligations. The selector alone does not establish coverage.
+
+## Exact-byte transformations
+
+`New-ConformanceTTransform.ps1 -Manifest <path> -Output <reports artifact>`
+loads the actual validated target exclusion overlay and accepts only an
+independently approved transformation. `run-conformance.ps1` selects it with
+`-TAdaptationManifest`; it is restricted to an instrumented Ada File operation,
+and cannot combine with an ordinary equivalent manifest. Every applicable
+source exclusion must be named exactly once by its actual transformation.
+
+A T manifest has schema version 1, `kind: t-private-transform`, unique `id`,
+exact `target`, pinned `reference_revision`, original `source` and
+`source_sha256`, `configuration: upstream-test`, `exclusion_policy_sha256`,
+`output_sha256`, and `replacements`. Each replacement has `id`, `exclusion_id`,
+`start_byte`, `length_bytes`, `source_sha256`, and literal `replacement` text.
+Its original span must match the corresponding approved exclusion exactly;
+overlapping, duplicate or wider patches fail. Untouched bytes are copied
+verbatim, including the original reference line endings.
+
+Replacement text is limited to empty text, safe complete line comments, and
+punctuation preserving an enclosing expression. New calls, identifiers,
+assignments, T/flag overrides, returns and block comments are unavailable.
+Comments must terminate before untouched source. `code.lua`'s entire `checkR`
+helper is additionally protected against replacement so its real function
+execution and result/type assertions remain present.
+
+`review` names accepted distinct author/reviewer and an actual hash-bound
+approval artifact. A `t-private-transform-approval` binds every manifest identity
+field, final output hash and policy hash, and exactly one decision per patch.
+Each decision binds its ID, exclusion ID, original span and replacement hash,
+has a rationale, and explicitly accepts `private_only` and
+`preserves_public_assertions`. A hashed reviewer narrative names the transform
+ID and explains public-assertion preservation. Diagnostic author previews do
+not have production authority; the execution producer does not expose an
+unreviewed T-transform bypass. No production exclusions are installed merely
+by authoring a transform proposal.
+
+Existing equivalent manifests retain their own approved per-span counterpart
+protocol. The full-target producer records their repository-relative manifest
+path/hash in `equivalent`; T transformations use `t_adaptation`. Contracts bind
+the exact mapping and executed bytes. T contracts also bind the exclusion-policy
+hash. Actual references and historical manifests are never modified.
+
+## Native applicability observations
+
+A native-platform File observation can supply `-NativeApplicability <path>`.
+Without it an independently reviewed mapping can produce development
+observations, but cannot establish target acceptance. The hashed metadata has
+`kind: native-platform-applicability`, schema version 1, reference/implementation
+revisions, mapping ID/hash, original source/hash, platform/configuration,
+explicit `synthetic_fixture` and nonempty `observations`.
+
+Each observation identifies original source spans covering mapping replacements,
+an actual hashed `original_c_report`, the observed native limitation, expected
+exit code, counted anchored stdout witnesses and enumerated expected stderr.
+The original report must identify unchanged matching C Lua, original source
+bytes, current clean revision/configuration/platform and measured C ABI, with
+actual hashed streams and no timeout/crash/capture failure. All transformed
+invariants need coverage by these observations.
+
+A distinct accepted `native-platform-applicability-approval` binds these exact
+identities and the SHA-256 of compressed observations JSON, plus a hashed
+independent source-linked rationale. Synthetic proof/report fixtures are valid
+only for verifier tests and never set `runtime_verified`. Final acceptance
+requires actual runtime evidence; observed unsupported C assumptions cannot be
+inferred from an Ada failure.
+
+## Development observation and successor witnesses
+
+`observe-target-conformance.ps1` collects physical operations without consulting
+the old source-bound scoped acceptance policy. `-Selection Retained` schedules
+the 13 previously accepted primaries and both constructs templates: 28 C/Ada
+processes per context. `-Selection All` schedules 62 processes for all 30
+primaries plus that supplement. `-PlanOnly` validates selection without
+executables or builds. Actual collection retains the existing warning protocol,
+original streams and failures, and always reports `target_acceptance: false`.
+Failed observations produce a nonzero exit; they are not historical acceptance.
+Unrelated REPL/native-module prerequisites are deferred to the File operations
+that actually need them; main/attrib and Aggregate retain those requirements.
+
+`new-target-witness-proposals.ps1` creates separate author-only successor
+consumer/AUnit descriptors under this target or a disposable reports directory.
+It retains every existing 100 C / 94 AUnit identity and witness protocol, hashes
+current source bytes, and marks stale function-level bindings as historical
+pending review. Additional cases need explicit separate author inputs; new
+registrations are not inferred as passing tests. All successor proposals retain
+pending independent review, empty execution evidence and false authority flags.
+The old scope descriptors, mappings, approvals and contracts remain unchanged.
+Fresh full-target retained indices can reference independently reviewed successor
+mappings, with the original required names/protocols still enforced.

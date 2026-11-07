@@ -287,3 +287,7 @@ Write-Output "PASS: $script:cases matrix regressions; no executed conformance cl
 & (Join-Path $PSScriptRoot 'test-files-output.ps1')
 & (Join-Path $PSScriptRoot 'test-conformance-target-matrix.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Full-target matrix regressions failed' }
+& (Join-Path $PSScriptRoot 'test-conformance-transforms.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Exact-byte transform regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-development-observer.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Development observer regressions failed' }
