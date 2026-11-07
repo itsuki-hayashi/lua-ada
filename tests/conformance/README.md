@@ -5,6 +5,11 @@ for [M3](../../docs/milestones/m3.md), including accepted bounded scopes and
 unresolved obligations. It contains no second Lua implementation or altered
 upstream source. A completed scope does not establish full M3 acceptance.
 
+The separately authorized [remaining upstream compatibility target](targets/README.md)
+can resolve reviewed T-only private checks as explicit exclusions. Its overlay
+never changes the strict upstream completion rule or counts an exclusion as a
+pass. Existing scopes and source/API anchors retain their historical meaning.
+
 The baseline is Lua 5.5.1 commit
 `7579fc9d7ed90240487251dfb69168f8e64e9294`. The unchanged reference source is
 under `references/lua`; all offsets and hashes identify that checkout's bytes.

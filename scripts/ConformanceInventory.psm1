@@ -2,6 +2,12 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $script:ReferenceRevision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
 $script:Utf8 = [Text.UTF8Encoding]::new($false, $true)
+Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
+$script:ExclusionBaselines = @(
+    @{id='gc-io-events';path='tests/conformance/scopes/gc-io-events.json';
+        sha256='79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7'},
+    @{id='expanded-t-conformance';path='tests/conformance/scopes/expanded-t-conformance.json';
+        sha256='9df8642d10238abaa48c97184ed2345be7106d4c2c74668954e43bc0cb6ecdc1'})
 
 # This byte-oriented scanner is an inventory aid, not a second Lua parser.
 # It masks comments and quoted/long strings before looking for source anchors.
@@ -312,6 +318,238 @@ function Write-ConformanceJsonLines {
     [IO.File]::WriteAllText($Path, $contents, $script:Utf8)
 }
 
+function Get-ConformanceExclusionBaseline {
+    param([Parameter(Mandatory)][string] $Root)
+    # Freeze the accepted partition selection independently of mutable ledger
+    # statuses. Downgrading an accepted pass to pending must not make it newly
+    # eligible for exclusion. Descriptor hashes belong to this target's fixed
+    # baseline, not to whatever scope file a caller happens to supply later.
+    $sources = @{}
+    foreach ($identity in $script:ExclusionBaselines) {
+        try { $path = Resolve-ReviewedFile -Root $Root -Path $identity.path -Sha256 $identity.sha256 }
+        catch { throw "Protected acceptance descriptor missing or changed: $($identity.id): $($_.Exception.Message)" }
+        $descriptor = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 32
+        if ($descriptor.schema_version -ne 1 -or $descriptor.id -cne $identity.id -or
+            $descriptor.reference_revision -cne $script:ReferenceRevision) {
+            throw 'Protected acceptance descriptor identity differs'
+        }
+        $helpers = if ($descriptor.Contains('helpers')) { @($descriptor.helpers) } else { @() }
+        foreach ($file in (@($descriptor.files) + $helpers)) { $sources[$file.path] = $true }
+    }
+    return @{identities=$script:ExclusionBaselines;sources=$sources}
+}
+
+function Assert-ConformanceExclusionBaselineBinding {
+    param([AllowEmptyCollection()][object[]] $Bindings)
+    if (@($Bindings).Count -ne $script:ExclusionBaselines.Count) {
+        throw 'Exclusion protected descriptor bindings differ'
+    }
+    $seen = @{}
+    foreach ($identity in $Bindings) {
+        $expected = @($script:ExclusionBaselines | Where-Object { $_.id -ceq $identity.id })
+        if ($expected.Count -ne 1 -or $seen.ContainsKey($identity.id) -or
+            @($identity.Keys).Count -ne 3 -or $identity.path -cne $expected[0].path -or
+            $identity.sha256 -cne $expected[0].sha256) {
+            throw 'Exclusion protected descriptor bindings differ'
+        }
+        $seen[$identity.id] = $true
+    }
+}
+
+function Test-ConformanceTargetExclusion {
+    param([Parameter(Mandatory)][string] $Root,
+          [Parameter(Mandatory)][string] $Source,
+          [Parameter(Mandatory)][byte[]] $SourceBytes,
+          [Parameter(Mandatory)][Collections.IDictionary] $Record,
+          [Parameter(Mandatory)][Collections.IDictionary] $Exclusion)
+    # Exclusions belong to a separately authorized target, never to the pass
+    # ledger. Bind the review to the original bytes and the pending obligation
+    # before allowing it to discharge that target's coverage requirement.
+    if ($Record.kind -notin @('assert-call','reviewed-block') -or
+        $Record.id -cnotmatch '^LUA-[A-Z0-9]+-(ASSERT-CALL|REVIEWED-BLOCK)-[0-9]{4}$' -or
+        $Record.status -cne 'pending' -or $Record.disposition -cne 'pending') {
+        throw 'Only pending source runtime obligations can be excluded'
+    }
+    if (@($Record.evidence).Count -ne 0 -or @($Exclusion.evidence).Count -ne 0) {
+        throw 'An exclusion cannot contain execution or pass evidence'
+    }
+    $baseline = Get-ConformanceExclusionBaseline -Root $Root
+    if ($baseline.sources.ContainsKey($Source)) {
+        throw 'Previously accepted source partitions cannot be excluded'
+    }
+    foreach ($field in @('id','byte_offset','byte_length','anchor_sha256')) {
+        if ($Exclusion[$field] -cne $Record[$field]) { throw "Exclusion anchor differs: $field" }
+    }
+    $stem = [IO.Path]::GetFileNameWithoutExtension($Source).ToUpperInvariant()
+    if ($Source -cnotmatch '^[a-z0-9]+\.lua$' -or
+        $Record.id -cnotmatch ('^LUA-' + $stem + '-') -or
+        $Exclusion.source -cne $Source -or
+        $Exclusion.source_sha256 -cne (Get-ConformanceHash -Bytes $SourceBytes) -or
+        $Exclusion.status -cne 'excluded' -or
+        $Exclusion.disposition -cne 'reviewed-t-internal-exclusion') {
+        throw 'Exclusion source or disposition differs'
+    }
+    if ($Record.byte_offset -isnot [int] -and $Record.byte_offset -isnot [long]) {
+        throw 'Exclusion source span is not integral'
+    }
+    if ($Record.byte_length -isnot [int] -and $Record.byte_length -isnot [long]) {
+        throw 'Exclusion source span is not integral'
+    }
+    if ($Record.byte_offset -lt 0 -or $Record.byte_length -le 0 -or
+        $Record.byte_offset -gt $SourceBytes.Length -or
+        $Record.byte_length -gt $SourceBytes.Length - $Record.byte_offset) {
+        throw 'Exclusion source span is outside the source'
+    }
+    $span = [byte[]]::new($Record.byte_length)
+    [Array]::Copy($SourceBytes, $Record.byte_offset, $span, 0, $span.Length)
+    if ($Record.anchor_sha256 -cne (Get-ConformanceHash -Bytes $span)) {
+        throw 'Exclusion original span hash differs'
+    }
+    if (@($Exclusion.configurations).Count -ne 1 -or
+        $Exclusion.configurations[0] -cne 'upstream-test' -or
+        $Exclusion.eligibility -cne 't-only-private-invariant' -or
+        $Exclusion.public_api -isnot [bool] -or $Exclusion.public_api -or
+        $Exclusion.mixed_obligation -isnot [bool] -or $Exclusion.mixed_obligation -or
+        $Exclusion.module_observable -isnot [bool] -or $Exclusion.module_observable -or
+        [string]::IsNullOrWhiteSpace([string]$Exclusion.invariant) -or
+        [string]::IsNullOrWhiteSpace([string]$Exclusion.third_party_irrelevance)) {
+        throw 'Exclusion must identify a T-only private invariant without public or mixed behavior'
+    }
+    $guard = $Exclusion.t_guard
+    if ($null -eq $guard -or $guard.mode -cnotin @('positive-guard','absent-return') -or
+        ($guard.byte_offset -isnot [int] -and $guard.byte_offset -isnot [long]) -or
+        ($guard.byte_length -isnot [int] -and $guard.byte_length -isnot [long]) -or
+        $guard.byte_offset -lt 0 -or $guard.byte_length -le 0 -or
+        $guard.byte_offset -gt $SourceBytes.Length -or
+        $guard.byte_length -gt $SourceBytes.Length - $guard.byte_offset) {
+        throw 'Exclusion T guard span is invalid'
+    }
+    $guardBytes = [byte[]]::new($guard.byte_length)
+    [Array]::Copy($SourceBytes, $guard.byte_offset, $guardBytes, 0, $guardBytes.Length)
+    if ($guard.sha256 -cne (Get-ConformanceHash -Bytes $guardBytes)) {
+        throw 'Exclusion T guard hash differs'
+    }
+    $tokens = @(Get-ConformanceTokens -Bytes $guardBytes)
+    $sourceTokens = @(Get-ConformanceTokens -Bytes $SourceBytes)
+    $originalGuardTokens = @($sourceTokens | Where-Object {
+        $_.Offset -ge $guard.byte_offset -and $_.Offset + $_.Length -le $guard.byte_offset + $guard.byte_length
+    })
+    if ($tokens.Count -ne $originalGuardTokens.Count) { throw 'Exclusion T guard is not a source token span' }
+    for ($i = 0; $i -lt $tokens.Count; $i++) {
+        if ($tokens[$i].Offset + $guard.byte_offset -ne $originalGuardTokens[$i].Offset -or
+            $tokens[$i].Length -ne $originalGuardTokens[$i].Length -or
+            $tokens[$i].IsString -ne $originalGuardTokens[$i].IsString) {
+            throw 'Exclusion T guard is not a source token span'
+        }
+    }
+    $words = @($tokens | ForEach-Object { if ($_.IsString) { '<string>' } else { $_.Text } })
+    $guardEnd = $guard.byte_offset + $guard.byte_length
+    if ($guard.mode -ceq 'positive-guard') {
+        if ($words.Count -lt 4 -or ($words[0..2] -join ' ') -cne 'if T then' -or
+            $words[-1] -cne 'end' -or
+            $Record.byte_offset -lt $guard.byte_offset + $tokens[2].Offset + $tokens[2].Length -or
+            $Record.byte_offset + $Record.byte_length -gt $guard.byte_offset + $tokens[-1].Offset) {
+            throw 'Exclusion is not inside its positive T guard'
+        }
+        # A caller cannot extend the cited guard past its first matching end
+        # to swallow an adjacent public assertion. This is lexical block
+        # matching over the existing inventory tokens, not another Lua parser.
+        $blocks = [Collections.Generic.List[string]]::new()
+        for ($i = 0; $i -lt $words.Count; $i++) {
+            $word = $words[$i]
+            if ($word -cin @('if','function','do','repeat')) { $blocks.Add($word) }
+            elseif ($word -cin @('end','until')) {
+                if ($blocks.Count -eq 0 -or (($word -ceq 'until') -ne ($blocks[-1] -ceq 'repeat'))) {
+                    throw 'Exclusion T guard block nesting differs'
+                }
+                $blocks.RemoveAt($blocks.Count - 1)
+                if ($blocks.Count -eq 0 -and $i -ne $words.Count - 1) {
+                    throw 'Exclusion T guard extends into unguarded behavior'
+                }
+            }
+        }
+        if ($blocks.Count -ne 0) { throw 'Exclusion T guard block nesting differs' }
+    } else {
+        # The pinned T-only files use an unconditional return on T absence.
+        # Accept only the literal forms used for that check, with no nested
+        # block or early transfer in its reporting prefix. Semantic dominance
+        # and private/public separation still require the bound source review.
+        $prefix = if ($words.Count -ge 6 -and ($words[0..5] -join ' ') -ceq 'if T = = nil then') { 6 }
+            elseif ($words.Count -ge 4 -and ($words[0..3] -join ' ') -ceq 'if not T then') { 4 }
+            else { 0 }
+        $reportWords = if ($words.Count -gt $prefix + 2) { @($words[$prefix..($words.Count - 3)]) } else { @() }
+        if ($prefix -eq 0 -or $words.Count -lt $prefix + 2 -or
+            ($words[-2..-1] -join ' ') -cne 'return end' -or
+            $Record.byte_offset -lt $guardEnd -or
+            @($reportWords | Where-Object {
+                $_ -cin @('if','then','else','elseif','end','function','for','while','do','repeat','until','return','goto','break')
+            }).Count -ne 0) {
+            throw 'Exclusion lacks a literal T-absent unconditional return'
+        }
+        $depth = 0
+        foreach ($token in $sourceTokens) {
+            if ($token.Offset -ge $guard.byte_offset) { break }
+            if ($token.IsString) { continue }
+            if ($token.Text -cin @('if','function','do','repeat')) { $depth++ }
+            elseif ($token.Text -cin @('end','until')) { $depth-- }
+            if ($depth -lt 0) { throw 'Exclusion T-absent return has invalid enclosing blocks' }
+        }
+        if ($depth -ne 0) { throw 'Exclusion T-absent return must be at source top level' }
+    }
+    $review = $Exclusion.review
+    if ($null -eq $review -or $review.status -cne 'accepted' -or
+        [string]::IsNullOrWhiteSpace([string]$review.author) -or
+        [string]::IsNullOrWhiteSpace([string]$review.reviewer) -or
+        $review.author -ceq $review.reviewer) {
+        throw 'Exclusion requires accepted independent review'
+    }
+    $approvalPath = Resolve-ReviewedFile -Root $Root -Path $review.artifact -Sha256 $review.artifact_sha256
+    $approval = Get-Content -LiteralPath $approvalPath -Raw | ConvertFrom-Json -AsHashtable -Depth 32
+    if ($approval.schema_version -ne 1 -or $approval.kind -cne 't-exclusion-approval' -or
+        $approval.target -cne 'remaining-upstream-compatibility' -or
+        $approval.reference_revision -cne $script:ReferenceRevision -or
+        $approval.author -cne $review.author -or $approval.reviewer -cne $review.reviewer -or
+        $approval.decision -cne 'accepted') { throw 'Exclusion approval identity or decision differs' }
+    Assert-ConformanceExclusionBaselineBinding -Bindings @($approval.protected_scopes)
+    # Bind every semantic field, including false eligibility booleans. The
+    # approval omits only its own referring review metadata, avoiding a hash
+    # cycle while preventing an old approval from blessing a broadened span.
+    $fields = @('id','source','source_sha256','byte_offset','byte_length','anchor_sha256',
+        'status','disposition','configurations','eligibility','public_api','mixed_obligation',
+        'module_observable','invariant','third_party_irrelevance','t_guard','evidence')
+    if (@($Exclusion.Keys | Where-Object { $_ -cnotin ($fields + @('review')) }).Count -ne 0 -or
+        $null -eq $approval.exclusion -or @($approval.exclusion.Keys).Count -ne $fields.Count) {
+        throw 'Exclusion approval field set differs'
+    }
+    foreach ($field in $fields) {
+        # JSON object key order is irrelevant, including the nested guard.
+        $actual = $Exclusion[$field]; $approved = $approval.exclusion[$field]
+        if ($field -ceq 't_guard') {
+            if ((@($actual.Keys | Sort-Object) -join '|') -cne (@($approved.Keys | Sort-Object) -join '|')) {
+                throw 'Exclusion approved T guard fields differ'
+            }
+            foreach ($key in $actual.Keys) {
+                if ($actual[$key] -cne $approved[$key]) { throw 'Exclusion approved T guard differs' }
+            }
+        } elseif ((ConvertTo-Json -InputObject $actual -Depth 8 -Compress) -cne
+            (ConvertTo-Json -InputObject $approved -Depth 8 -Compress)) {
+            throw "Exclusion approved semantics differ: $field"
+        }
+    }
+    $narrative = $approval.review_evidence
+    if ($null -eq $narrative) { throw 'Exclusion lacks independent review evidence' }
+    $narrativePath = Resolve-ReviewedFile -Root $Root -Path $narrative.path -Sha256 $narrative.sha256
+    $decision = Get-Content -LiteralPath $narrativePath -Raw | ConvertFrom-Json -AsHashtable -Depth 32
+    if ($decision.reviewer -cne $review.reviewer -or $decision.exclusion_id -cne $Exclusion.id -or
+        $decision.decision -cne 'accepted' -or
+        [string]::IsNullOrWhiteSpace([string]$decision.t_dominance) -or
+        [string]::IsNullOrWhiteSpace([string]$decision.private_invariant) -or
+        [string]::IsNullOrWhiteSpace([string]$decision.third_party_irrelevance)) {
+        throw 'Exclusion independent source decision differs or lacks rationale'
+    }
+    return $Exclusion
+}
+
 function Test-ConformanceResolvedRecord {
     param([Parameter(Mandatory)][System.Collections.IDictionary] $Record,
           [Parameter(Mandatory)][string[]] $Contexts,
@@ -447,7 +685,13 @@ function Test-ConformanceResolvedRecord {
 }
 
 function Test-ConformanceSourceLinks {
-    param([Parameter(Mandatory)][object[]] $Records, [switch] $RequireComplete)
+    param([Parameter(Mandatory)][object[]] $Records, [switch] $RequireComplete,
+          [ValidateSet('strict-upstream','remaining-upstream-compatibility')]
+          [string] $TargetPolicy = 'strict-upstream',
+          [Collections.IDictionary] $ResolvedExclusions = @{})
+    if ($TargetPolicy -ceq 'strict-upstream' -and $ResolvedExclusions.Count -ne 0) {
+        throw 'Strict upstream coverage cannot use exclusions'
+    }
     # Resolve links only after all records in one pinned file are known.
     # Requiring direct edges to runtime obligations avoids reference cycles,
     # whole-file pass stamping and links into another file's successful suite.
@@ -464,6 +708,7 @@ function Test-ConformanceSourceLinks {
                 throw "Missing/self runtime obligation link: $($record.id)/$id"
             }
             $target = $indexed[$id]
+            $excluded = $TargetPolicy -ceq 'remaining-upstream-compatibility' -and $ResolvedExclusions.Contains($id)
             if (($record.id -split '-', 3)[1] -cne ($id -split '-', 3)[1]) {
                 throw "Runtime obligation link crosses source file: $($record.id)/$id"
             }
@@ -474,10 +719,11 @@ function Test-ConformanceSourceLinks {
             }
             # Foundation mode may record that review discovered still-pending
             # tests. Completion cannot count that discovery as their execution.
-            if ($RequireComplete -and $target.status -ne 'passed') {
+            if ($RequireComplete -and $target.status -ne 'passed' -and -not $excluded) {
                 throw "Linked runtime obligation remains pending: $($record.id)/$id"
             }
-            foreach ($configuration in $target.configurations) { $covered[$configuration] = $true }
+            $applicable = if ($excluded) { $ResolvedExclusions[$id].configurations } else { $target.configurations }
+            foreach ($configuration in $applicable) { $covered[$configuration] = $true }
         }
         foreach ($configuration in $record.configurations) {
             if (-not $covered.ContainsKey($configuration)) {
@@ -489,7 +735,9 @@ function Test-ConformanceSourceLinks {
 
 function Test-ConformanceInventory {
     param([Parameter(Mandatory)][string] $Root,
-          [string] $InventoryDirectory = '', [switch] $RequireComplete)
+          [string] $InventoryDirectory = '', [switch] $RequireComplete,
+          [ValidateSet('strict-upstream','remaining-upstream-compatibility')]
+          [string] $TargetPolicy = 'strict-upstream')
     if ($InventoryDirectory -eq '') { $InventoryDirectory = Join-Path $Root 'tests/conformance' }
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $InventoryDirectory 'suite.json') |
         ConvertFrom-Json -AsHashtable -Depth 32
@@ -541,6 +789,24 @@ function Test-ConformanceInventory {
             if ($configuration[$key] -cne $expectedSettings[$key]) { throw "Configuration drift: $($configuration.id)/$key" }
         }
     }
+    $exclusions = @{}; $resolvedExclusions = @{}
+    if ($TargetPolicy -ceq 'remaining-upstream-compatibility') {
+        # The selected target has an explicit, separately reviewed overlay.
+        # Old callers never read it and retain their strict completion rule.
+        $policyPath = Join-Path $InventoryDirectory 'targets/remaining-upstream-compatibility.exclusions.json'
+        $policy = Get-Content -LiteralPath $policyPath -Raw | ConvertFrom-Json -AsHashtable -Depth 32
+        if ($policy.schema_version -ne 1 -or $policy.target -cne $TargetPolicy -or
+            $policy.reference_revision -cne $script:ReferenceRevision -or
+            -not $policy.Contains('exclusions')) { throw 'Invalid target exclusion policy identity' }
+        $null = Get-ConformanceExclusionBaseline -Root $Root
+        Assert-ConformanceExclusionBaselineBinding -Bindings @($policy.protected_scopes)
+        foreach ($exclusion in $policy.exclusions) {
+            if ($exclusion.source -cnotin $expectedNames -or
+                $exclusion.id -cnotmatch '^LUA-[A-Z0-9]+-(ASSERT-CALL|REVIEWED-BLOCK)-[0-9]{4}$' -or
+                $exclusions.ContainsKey($exclusion.id)) { throw 'Unknown or duplicate source exclusion' }
+            $exclusions[$exclusion.id] = $exclusion
+        }
+    }
     $seenFiles = @{}; $seenUnits = @{}; $unitCount = 0; $pending = 0
     foreach ($file in $manifest.files) {
         if ($file.path -notin $expectedNames -or $seenFiles.ContainsKey($file.path)) { throw 'Unknown/duplicate suite file' }
@@ -575,7 +841,13 @@ function Test-ConformanceInventory {
             $seenUnits[$record.id] = $true; $indexed[$record.id] = $record
             $unitCount++
             if ($record.status -eq 'pending') { $pending++ }
-            Test-ConformanceResolvedRecord -Record $record -Contexts $contexts -RequireComplete:$RequireComplete
+            $excluded = $exclusions.ContainsKey($record.id)
+            Test-ConformanceResolvedRecord -Record $record -Contexts $contexts `
+                -RequireComplete:($RequireComplete -and -not $excluded)
+            if ($excluded) {
+                $resolvedExclusions[$record.id] = Test-ConformanceTargetExclusion -Root $Root `
+                    -Source $file.path -SourceBytes $bytes -Record $record -Exclusion $exclusions[$record.id]
+            }
         }
         # Comparing regenerated sites prevents deletion of an inconvenient
         # assertion from converting an incomplete ledger into a passing one.
@@ -608,9 +880,11 @@ function Test-ConformanceInventory {
                 throw "Manual block source line drift: $($record.id)"
             }
         }
-        Test-ConformanceSourceLinks -Records $records -RequireComplete:$RequireComplete
+        Test-ConformanceSourceLinks -Records $records -RequireComplete:$RequireComplete `
+            -TargetPolicy $TargetPolicy -ResolvedExclusions $resolvedExclusions
     }
     if ($seenFiles.Count -ne 34) { throw 'Missing suite files' }
+    if ($resolvedExclusions.Count -ne $exclusions.Count) { throw 'Exclusion names a missing source obligation' }
     foreach ($header in $manifest.headers) {
         if ($header.path -notin @('lua.h','lauxlib.h','lualib.h','luaconf.h','ltests.h')) { throw 'Unknown header path' }
         $bytes = [IO.File]::ReadAllBytes((Join-Path $Root "references/lua/$($header.path)"))
@@ -639,11 +913,15 @@ function Test-ConformanceInventory {
         }
     }
     [pscustomobject]@{ Files=34; SourceAnchors=$unitCount; PendingSourceAnchors=$pending;
-        ApiEntries=$api.Count; Complete=[bool]$RequireComplete }
+        ApiEntries=$api.Count; Complete=([bool]$RequireComplete -and $resolvedExclusions.Count -eq 0);
+        TargetPolicy=$TargetPolicy; TargetComplete=[bool]$RequireComplete;
+        ExcludedSourceObligations=$resolvedExclusions.Count;
+        RequiredPendingSourceAnchors=($pending - $resolvedExclusions.Count);
+        Exclusions=@($resolvedExclusions.Values | Sort-Object id) }
 }
 
 Export-ModuleMember -Function Get-ConformanceHash, Get-ConformanceTokens,
     Get-ConformanceCoverageUnits, Get-ConformanceApiInventory,
     Read-ConformanceJsonLines, Write-ConformanceJsonLines,
     Test-ConformanceReferenceTree, Test-ConformanceResolvedRecord,
-    Test-ConformanceSourceLinks, Test-ConformanceInventory
+    Test-ConformanceSourceLinks, Test-ConformanceTargetExclusion, Test-ConformanceInventory
