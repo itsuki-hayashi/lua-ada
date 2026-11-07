@@ -128,6 +128,7 @@ function Test-ScopedMatrix {
     $records = @()
     foreach ($entry in $manifest.operations) {
         $configuration = $entry.context.Split('/')[0]
+        $referenceNativeFacts = $null
         $contract = $null
         if ($RequireScopedAcceptance) {
             $contract = Read-MatrixHashedJson -Path (Join-Path $bundle $entry.contract.path) -Hash $entry.contract.sha256
@@ -204,6 +205,26 @@ function Test-ScopedMatrix {
             Assert-ScopedProcessCompletion -File $entry.file -Process $report.process -Telemetry $telemetry `
                 -RunId $report.run_id -Configuration $configuration -NativeOracle:($target -eq 'c')
             if ($entry.file -eq 'files.lua') {
+                $facts = Get-ScopedNativeBranchFacts -Output ([IO.File]::ReadAllText($report.process.stdout_path))
+                $encodedFacts = $facts | ConvertTo-Json -Compress
+                foreach ($key in $facts.Keys) {
+                    if ($report.native_branch_facts[$key] -cne $facts[$key]) {
+                        throw 'Matrix recorded native branch facts differ from capture'
+                    }
+                }
+                if ($target -eq 'c') { $referenceNativeFacts = $encodedFacts }
+                elseif ($encodedFacts -cne $referenceNativeFacts) {
+                    throw 'Matrix C/Ada native branch facts differ'
+                }
+                $sourcePath = 'tests/conformance/platform/files-native-branches.lua'
+                $native = @($report.native_fixture_records | Where-Object { $_.source -ceq $sourcePath })
+                $sourceHash = (Get-FileHash (Join-Path $Root $sourcePath)).Hash.ToLowerInvariant()
+                if ($native.Count -ne 1 -or $native[0].source_sha256 -cne $sourceHash -or
+                    $native[0].artifact_sha256 -cne $sourceHash -or
+                    $native[0].disposition -cne 'native-platform-equivalent') {
+                    throw 'Matrix native branch counterpart identity differs'
+                }
+                [void](Resolve-MatrixCapture -Original $native[0].artifact -ArtifactRoot $artifacts -Hash $sourceHash)
                 $seenChildren = @{}
                 foreach ($child in $report.child_allocator_telemetry) {
                     $path = Resolve-MatrixCapture -Original $child.path -ArtifactRoot $artifacts -Hash $child.sha256

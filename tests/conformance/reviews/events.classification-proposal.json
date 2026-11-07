@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "kind": "classification-proposal",
+  "file": "events.lua",
+  "source_sha256": "90449c1607a12a7c1841123a68237e0d23b7d6e109b8c445937fcd99306897c9",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "reviewed_revision": "2e9a14540b2d34af1e6e18c257a6d5f1c795fd6f",
+  "original_ledger_sha256": "08e6addfd5729cce2a0bf4888e75fd8af39d5e88234d57db9c9d66eab8bdac5e",
+  "proposal_sha256": "d5f6ba1600af8d3498d18d936c9aeec192122a0182085dbf34851d055eb0f4c5",
+  "original_anchor_count": 199,
+  "added_reviewed_blocks": 1,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "default_omissions": [
+    {
+      "guard_line": 328,
+      "obligations": [
+        "LUA-EVENTS-ASSERT-CALL-0110",
+        "LUA-EVENTS-ASSERT-CALL-0111",
+        "LUA-EVENTS-ASSERT-CALL-0112",
+        "LUA-EVENTS-ASSERT-CALL-0113",
+        "LUA-EVENTS-ASSERT-CALL-0114",
+        "LUA-EVENTS-ASSERT-CALL-0115"
+      ]
+    },
+    {
+      "guard_line": 387,
+      "obligations": [
+        "LUA-EVENTS-REVIEWED-BLOCK-0001"
+      ]
+    }
+  ],
+  "acceptance_requirements": [
+    "Parent independent cross-review of proposed classifications and every obligation link.",
+    "Actual default and instrumented final-revision evidence in all 26 applicable contexts, with immutable source/configuration/shutdown proofs.",
+    "Neither final OK nor syntactic candidate membership closes an obligation."
+  ],
+  "sections": [
+    {
+      "id": "environment-and-metatable-protection",
+      "first_line": 1,
+      "last_line": 40,
+      "invariant": "The loaded chunk can replace its environment while retaining global fallback. Writes shadow inherited fields, deletion restores fallback, protected metatables reject replacement, and tostring looks up the handler using current object data.",
+      "byte_offset": 0,
+      "byte_length": 921,
+      "span_sha256": "0477c037256a425222cece6047898b9f8b38196c5948789a68dafde92d837f93"
+    },
+    {
+      "id": "index-and-newindex-function-arguments",
+      "first_line": 41,
+      "last_line": 60,
+      "invariant": "Index callbacks receive exactly table and key and use only their first result. Existing fields bypass index handlers. Newindex callbacks receive the original value, and rawset bypasses handlers even when the metatable is its own metatable.",
+      "byte_offset": 921,
+      "byte_length": 460,
+      "span_sha256": "726ea3e6a0b1d221da241840afff43d4f08e47f1d9a92a0a31b1d5e01d9ac855"
+    },
+    {
+      "id": "table-delegation-and-growth",
+      "first_line": 61,
+      "last_line": 80,
+      "invariant": "Table-valued newindex delegates to the handler table safely during insertion and growth. Reads and writes through a common mirror retain all values while leaving the original table empty.",
+      "byte_offset": 1381,
+      "byte_length": 428,
+      "span_sha256": "7fa243d50b22bdb5823486c6f26658accb02b12d4e1a7e46d3f54f8777e118a5"
+    },
+    {
+      "id": "nested-index-and-nil-write-selection",
+      "first_line": 81,
+      "last_line": 107,
+      "invariant": "Multi-level table index delegation reaches a function and preserves recursive lookup results. Newindex runs only for absent keys, including a repeated nil assignment after deletion; existing numeric and string keys bypass it.",
+      "byte_offset": 1809,
+      "byte_length": 690,
+      "span_sha256": "da1dbaacbf38dfb8d75b30636bd2f938e7a52db392cbddb494b8d3c52e1b003b"
+    },
+    {
+      "id": "call-receiver-and-varargs",
+      "first_line": 108,
+      "last_line": 119,
+      "invariant": "Calling a table prepends its receiver exactly once, preserves argument order and empty argument lists, and preserves multiple results from the handler.",
+      "byte_offset": 2499,
+      "byte_length": 222,
+      "span_sha256": "f719855b44bb48c404e12c1c80e7ad9dc687e2318e61c68560b75f3f17127c31"
+    },
+    {
+      "id": "arithmetic-bitwise-and-unary-selection",
+      "first_line": 120,
+      "last_line": 184,
+      "invariant": "Each arithmetic, bitwise, shift, length and unary expression selects the named handler, passes operands in the correct order and preserves their Lua types, including numeric strings and integer versus float constants. Unary handlers receive the duplicated operand required by Lua. The dynamic checkcap helper validates every captured operand, not just the expression's result.",
+      "byte_offset": 2721,
+      "byte_length": 2136,
+      "span_sha256": "145263407960c4e7379988fc04351b4a8f1b1fbc45a6d81ab5543f34b08a14ed"
+    },
+    {
+      "id": "reversed-comparison-operands",
+      "first_line": 185,
+      "last_line": 191,
+      "invariant": "Greater-than and greater-or-equal reverse operands for lt/le dispatch; negative and floating constants retain their types.",
+      "byte_offset": 4857,
+      "byte_length": 216,
+      "span_sha256": "630c723501083e4187e9d98c89a6332f18626a6fa12d1806dc588d597e98ace3"
+    },
+    {
+      "id": "raw-length-and-real-stream-type",
+      "first_line": 192,
+      "last_line": 203,
+      "invariant": "rawlen bypasses table length handlers, handles short and long strings, and rejects numbers, absent arguments and real io.stdin userdata at the Lua-library boundary.",
+      "byte_offset": 5073,
+      "byte_length": 311,
+      "span_sha256": "b101f459c296b4767b48dee468d2cd5a13b5423b192d08fe0b0b125ea72f2b16"
+    },
+    {
+      "id": "comparison-results-roots-and-partial-order",
+      "first_line": 204,
+      "last_line": 297,
+      "invariant": "Comparison callbacks receive exactly two arguments and discard extra results. Objects survive collection inside lt callbacks. Numeric and string operands, reversed relations, false/nil results, equality and state-mutating set partial-order handlers retain the tested semantics. The test helper is actually called with three distinct objects.",
+      "byte_offset": 5384,
+      "byte_length": 2498,
+      "span_sha256": "36d0840ce1d56d046793e165025a1917d38712b57969b0f67299f527635107c1"
+    },
+    {
+      "id": "equality-identity-and-handler-invalidation",
+      "first_line": 298,
+      "last_line": 327,
+      "invariant": "Table equality can select a handler from one operand, while rawequal and table-key lookup retain identity semantics. Removing and replacing eq changes dispatch immediately rather than retaining stale absence flags.",
+      "byte_offset": 7882,
+      "byte_length": 682,
+      "span_sha256": "231647ce69aaea114c919c4501de21477594dacffe790b72b68eef4c94baf6d5"
+    },
+    {
+      "id": "full-userdata-equality-and-delegation",
+      "first_line": 328,
+      "last_line": 356,
+      "guard": "T present",
+      "required_adapter": [
+        "newuserdata"
+      ],
+      "invariant": "Three distinct zero-byte full userdata retain one uservalue each. Equality chooses the left available handler before falling back to the right, is type-restricted, and differs from raw identity. Userdata table-valued index/newindex delegates ten writes and reads. Default execution prints an omission and does not execute this obligation.",
+      "byte_offset": 8564,
+      "byte_length": 877,
+      "span_sha256": "85f7ca355105a83c5b630e81b988cdd7290339b374165564a4875c2872cab7c7"
+    },
+    {
+      "id": "concatenation-chains-and-result-types",
+      "first_line": 357,
+      "last_line": 381,
+      "invariant": "Concat receives exactly two operands and supports either string or metatable-bearing table results through mixed numeric/string/table chains, preserving right-associative grouping and result metatables.",
+      "byte_offset": 9441,
+      "byte_length": 549,
+      "span_sha256": "af8d9d583e593568e0bb13ce720b7820a3b8c18e46c0d6c4e6c5c0ae6323e502"
+    },
+    {
+      "id": "weak-delegation-under-allocation-refusal",
+      "first_line": 382,
+      "last_line": 393,
+      "guard": "The loop runs in both configurations; allocfailnext requires T",
+      "required_adapter": [
+        "allocfailnext"
+      ],
+      "invariant": "A weak-value metatable's table-valued newindex remains safe when insertion meets a real one-shot allocator refusal and emergency collection. All ten assignments complete without a stale delegate pointer. Absence of a printed skip here does not establish default fault-injection coverage.",
+      "byte_offset": 9990,
+      "byte_length": 217,
+      "span_sha256": "9ffa396810a0bf8781a8ff70413c47ace6a77065047edb94066b06fd8bf0495c"
+    },
+    {
+      "id": "delegated-write-collection-barrier",
+      "first_line": 394,
+      "last_line": 404,
+      "invariant": "A delegated write publishes a new table into an older parent. A following measured collection step retains that edge and the nested string value.",
+      "byte_offset": 10207,
+      "byte_length": 238,
+      "span_sha256": "85a79994bdccba76612a3865c55a1e8a1e3b89b4098ee79e1603b7c15da0faa3"
+    },
+    {
+      "id": "concat-numeric-operand-types",
+      "first_line": 405,
+      "last_line": 415,
+      "invariant": "Concat handlers see original numeric operands next to a table, and longer chains preserve the handler's table result rather than eagerly converting every number to a string.",
+      "byte_offset": 10445,
+      "byte_length": 288,
+      "span_sha256": "ae447647c6981dc080558abe4774c5f1d4d6139c15575cd306221d8f69ae2592"
+    },
+    {
+      "id": "comparison-metatable-compatibility",
+      "first_line": 416,
+      "last_line": 432,
+      "invariant": "Equality and ordering remain valid across distinct metatables sharing handlers, and absent le on one side selects the applicable handler from the other without changing the tested result.",
+      "byte_offset": 10733,
+      "byte_length": 383,
+      "span_sha256": "703154aca23a42395b51e14d0669672fa494e8e279b68913547b22535d4aec8f"
+    },
+    {
+      "id": "nested-call-environment-and-raw-extra-arguments",
+      "first_line": 433,
+      "last_line": 469,
+      "invariant": "Three callable table levels execute exactly three handlers and preserve varargs. Global isolation survives those calls, a function-valued environment fallback works, and rawget/rawset ignore surplus arguments.",
+      "byte_offset": 11116,
+      "byte_length": 552,
+      "span_sha256": "8647b98499e1e9a3a5f2da7e1e68cbbdfef7a6dc6b713adf7364902c7b9a2a34"
+    },
+    {
+      "id": "basic-type-metatables",
+      "first_line": 470,
+      "last_line": 500,
+      "invariant": "Debug-assigned number, boolean and nil metatables are shared by the corresponding basic type. Index, length and add handlers execute with their actual operands; clearing a basic-type metatable removes it for other values of that type.",
+      "byte_offset": 11668,
+      "byte_length": 838,
+      "span_sha256": "1776ce24fbcd005f53fb9c17023b0dd65c724b0f0cf516ccebac46c07e9e0a73"
+    },
+    {
+      "id": "delegation-cycles-and-terminal-receiver",
+      "first_line": 501,
+      "last_line": 524,
+      "invariant": "Cyclic index and newindex delegation terminate with catchable errors. A two-level newindex chain calls its final function with the delegated parent as receiver and the original key/value. The file reaches OK and returns 12 after these checks.",
+      "byte_offset": 12506,
+      "byte_length": 542,
+      "span_sha256": "f5a6a104afd2cef605a00e809a350d1dbcf9eb9f9de609dfad5ab8e8b5c451c6"
+    }
+  ]
+}

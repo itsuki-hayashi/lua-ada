@@ -118,6 +118,25 @@ function Assert-ScopedProbeTelemetry {
     }
 }
 
+function Get-ScopedNativeBranchFacts {
+    param([Parameter(Mandatory)][string] $Output)
+    # Exact, unique facts distinguish native guarded paths. A successful
+    # counterpart on one path cannot stand in for C choosing another path.
+    $patterns = [ordered]@{
+        widths='cint=[48] lua_integer=[48]'
+        time='time_2pow40=(?:representable|field-bound|representation)'
+        year='year4000=(?:representable|representation)'
+        dst='isdst=(?:absent|boolean)'
+    }
+    $facts = [ordered]@{}
+    foreach ($key in $patterns.Keys) {
+        $matches = [regex]::Matches($Output, '(?m)^native branch facts: (' + $patterns[$key] + ')\r?$')
+        if ($matches.Count -ne 1) { throw "Missing or duplicate native branch fact: $key" }
+        $facts[$key] = $matches[0].Groups[1].Value
+    }
+    return $facts
+}
+
 function Assert-ScopedProcessCompletion {
     param([ValidateSet('events.lua','files.lua','gc.lua','gengc.lua')][string] $File,
           [Parameter(Mandatory)][Collections.IDictionary] $Process,
@@ -149,6 +168,9 @@ function Assert-ScopedProcessCompletion {
             throw 'File execution omitted required IO obligations'
         }
         $markers = @('native unbuffered visibility counterpart OK',
+            'native C-int field boundary counterpart OK',
+            'native time range recovery counterpart OK',
+            'native DST inference counterpart OK',
             'testing i/o', 'testing flush', 'testing large files (> BUFSIZ)',
             'testing popen/pclose and execute', 'testing date/time')
         if ($Configuration -eq 'upstream-test') { $markers += 'testing failed write' }
@@ -157,6 +179,7 @@ function Assert-ScopedProcessCompletion {
                 throw "File IO completion witness missing: $marker"
             }
         }
+        [void](Get-ScopedNativeBranchFacts -Output $stdout)
     } elseif ($stdout -notmatch '(?m)^OK\r?$') {
         throw 'Scoped final OK witness missing'
     }
@@ -287,4 +310,4 @@ function Test-ConformanceScope {
         StructuralInventory=$inventory; Definition=$definition }
 }
 
-Export-ModuleMember -Function Test-ConformanceScope, Assert-ScopedProcessCompletion, Test-ScopedLauncher, Assert-ScopedBuildIdentity, Assert-ScopedProbeTelemetry
+Export-ModuleMember -Function Test-ConformanceScope, Assert-ScopedProcessCompletion, Test-ScopedLauncher, Assert-ScopedBuildIdentity, Assert-ScopedProbeTelemetry, Get-ScopedNativeBranchFacts

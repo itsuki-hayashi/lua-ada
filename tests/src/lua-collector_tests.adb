@@ -136,6 +136,7 @@ package body Lua.Collector_Tests is
    procedure Stopped_Manual_Step (State : in out World);
    procedure Exact_Allocation_Debt (State : in out World);
    procedure Extreme_Debt_Payment (State : in out World);
+   procedure Minor_Multiplier_Debt (State : in out World);
 
    procedure Partial_Mark (State : in out World) is
       Before : constant Natural := State.Collections;
@@ -677,6 +678,36 @@ package body Lua.Collector_Tests is
               "positive byte payment did not fabricate traversal work");
    end Positive_Step_Debt;
 
+   procedure Minor_Multiplier_Debt (State : in out World) is
+      Previous : Integer_Value;
+      Baseline : Byte_Count;
+      First_Debt : Long_Long_Integer;
+      Before : Natural;
+   begin
+      --  Keep the same real old population while changing only minormul.
+      --  Mode entry must apply the first value, and completing a real minor
+      --  cycle must apply the changed value to the next allocation countdown.
+      --  A parameter that merely round-trips but never affects scheduling
+      --  fails this comparison. The fixture also checks physical cleanup.
+      Previous := Collector_Parameter_Value (State, Minor_Multiplier, 100);
+      Assert (Previous > 0, "default minor multiplier was positive");
+      Set_Collector_Mode (State, Generational_Minor_Mode);
+      Baseline := State.GC.Major_Baseline_Bytes;
+      First_Debt := State.GC.Debt_Remaining;
+      Assert (Baseline > 0 and First_Debt > 0,
+              "mode entry established actual live storage and byte debt");
+      Previous := Collector_Parameter_Value (State, Minor_Multiplier, 200);
+      Assert (Previous = 100, "changed only the minor multiplier");
+      Before := State.Collections;
+      Minor (State);
+      Assert (State.Collections = Before + 1 and
+              State.GC.Mode = Generational_Minor_Mode,
+              "a real minor collection completed without changing mode");
+      Assert (State.GC.Major_Baseline_Bytes = Baseline and
+              State.GC.Debt_Remaining = 2 * First_Debt,
+              "doubling minormul doubles the next allocation countdown");
+   end Minor_Multiplier_Debt;
+
    procedure Zero_Forces_Work (State : in out World) is
       Work : constant Byte_Count := State.GC.Work_Units;
       Done : Boolean;
@@ -826,6 +857,7 @@ package body Lua.Collector_Tests is
    procedure Stopped_Case is new Fixture (Stopped_Manual_Step);
    procedure Allocation_Case is new Fixture (Exact_Allocation_Debt);
    procedure Extreme_Case is new Fixture (Extreme_Debt_Payment);
+   procedure Minor_Debt_Case is new Fixture (Minor_Multiplier_Debt);
 
    procedure Dead_Context_Cells (State : in out World);
    procedure Dead_Context_Cells (State : in out World) is
@@ -915,5 +947,7 @@ package body Lua.Collector_Tests is
                         Allocation_Case'Access);
       Test_Support.Add (Suite, "collector: saturating extreme debt payment",
                         Extreme_Case'Access);
+      Test_Support.Add (Suite, "collector: minormul changes minor byte debt",
+                        Minor_Debt_Case'Access);
    end Register;
 end Lua.Collector_Tests;

@@ -168,6 +168,54 @@ static void test_numeric_conversions(lua_State *state) {
     puts("C API PASS: numeric conversions");
 }
 
+static void test_number_macro_without_validity_output(lua_State *state) {
+    /* The public convenience macro passes a null isnum pointer. Exercise
+     * successful and failed conversion through that expansion, not merely
+     * the corresponding function with a writable validity output. */
+    lua_settop(state, 0);
+    lua_pushstring(state, "0x1.8p1");
+    assert(lua_tonumber(state, 1) == 3.0);
+    assert(lua_type(state, 1) == LUA_TSTRING);
+    lua_pushstring(state, "not a number");
+    assert(lua_tonumber(state, 2) == 0.0);
+    lua_pushnil(state);
+    assert(lua_tonumber(state, 3) == 0.0);
+    assert(lua_tonumber(state, 4) == 0.0);
+    assert(lua_gettop(state) == 3);
+    puts("C API PASS: number macro with null validity output");
+}
+
+static void test_none_or_nil_macro(lua_State *state) {
+    /* Optional arguments distinguish missing/nil from a supplied false or
+     * zero value. These checks run in the ordinary consumer in both builds. */
+    lua_settop(state, 0);
+    assert(lua_isnoneornil(state, 1));
+    lua_pushnil(state);
+    assert(lua_isnoneornil(state, 1));
+    lua_pushboolean(state, 0);
+    lua_pushinteger(state, 0);
+    assert(!lua_isnoneornil(state, 2));
+    assert(!lua_isnoneornil(state, -1));
+    assert(lua_isnoneornil(state, 4));
+    assert(lua_gettop(state) == 3);
+    puts("C API PASS: optional argument none or nil macro");
+}
+
+static void test_global_table_macro(lua_State *state) {
+    /* The macro pushes the registry-owned environment with exactly one new
+     * stack slot. Its identity must agree with the public registry lookup. */
+    const void *identity;
+    lua_settop(state, 0);
+    lua_pushglobaltable(state);
+    assert(lua_gettop(state) == 1 && lua_istable(state, 1));
+    identity = lua_topointer(state, 1);
+    assert(identity != NULL);
+    assert(lua_rawgeti(state, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS) == LUA_TTABLE);
+    assert(lua_gettop(state) == 2 && lua_topointer(state, 2) == identity);
+    lua_settop(state, 0);
+    puts("C API PASS: registry-owned global table macro");
+}
+
 static void test_binary_strings_and_stable_addresses(lua_State *state) {
     /* Hold the first byte pointer while later allocations grow storage.
      * Embedded NUL/high bytes, the terminator and numeric conversion matter. */
@@ -948,6 +996,9 @@ int main(void) {
     test_constructor_leaves_standard_libraries_closed(state);
     test_stack_rotation_copy_and_bounds(state);
     test_numeric_conversions(state);
+    test_number_macro_without_validity_output(state);
+    test_none_or_nil_macro(state);
+    test_global_table_macro(state);
     test_binary_strings_and_stable_addresses(state);
     test_raw_tables_and_pointer_identity(state);
     test_threads_registry_extra_space_and_moves(state);

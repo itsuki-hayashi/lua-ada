@@ -106,11 +106,11 @@
     "native-platform-counterparts"
   ],
   "review": {
-    "status": "pending",
+    "status": "reviewed",
     "author": "Codex",
-    "reviewer": null,
-    "artifact": null,
-    "rationale": "Four-file semantic inventory and directly exercised public collector, userdata, file and allocator contracts; independent scope review pending."
+    "reviewer": "Codex /root/review_events_harness",
+    "artifact": "tests/conformance/reviews/gc-io-events.scope-definition-approval.json",
+    "rationale": "Independent semantic approval of exact four source hashes, 77 API identities and scope-specific prerequisites; actual runtime coverage remains pending."
   },
   "api_coverage_file": "scopes/gc-io-events.api.jsonl"
 }

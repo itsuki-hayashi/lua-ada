@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "kind": "independent-semantic-review",
+  "reviewer": "Codex /root/review_events_harness",
+  "author": "Codex independent review agent /root/review_gc",
+  "decision": "mapping-accepted-with-explicit-sensitivity-gap",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "reviewed_artifact": {
+    "sha256": "35a24edbabb9bf7b6e01f564b9febfc534fbe6ca28193d0d0024cf2de46e7902",
+    "path": "tests/conformance/reviews/gc-parameter-api.mapping-proposal.json"
+  },
+  "source_bindings": [
+    {
+      "path": "references/lua/lua.h",
+      "sha256": "5e00319e803893f4310b1206394c80b82f03f42609b40ceb306d92a6740d828e"
+    },
+    {
+      "path": "src/lua-engine.ads",
+      "sha256": "b80610f6e03c17113aa25b5f09fddacab83a3b05896a8bff7032d191410728ca"
+    },
+    {
+      "path": "src/lua-engine-garbage_collection.adb",
+      "sha256": "82e8cf5c74124a3071aa3fb91f0173aa021494a7caaa754640d9dc106b1cc093"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "78c65de3905f577de905da998744c861cad59151929365f2f4864d267b982554"
+    },
+    {
+      "path": "tests/src/lua-collector_tests.adb",
+      "sha256": "8efe1cd4cdbe8fac43b5db82d47b8d1ee46b4d0f43afa973b75a39c482c48b4b"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter_tests.adb",
+      "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+    },
+    {
+      "path": "c_api/tests/gc_contract.h",
+      "sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6"
+    },
+    {
+      "path": "tests/conformance/reviews/gc-gengc.anchor-classification-proposal.json",
+      "sha256": "8165f338c8a64c2ac154673c0e26477f4dfabee7e0153b35c7eb1b9c87dfe963"
+    },
+    {
+      "path": "tests/conformance/reviews/api.mapping-proposal.json",
+      "sha256": "6d90221ce821a169d675d7df5ea03af60e6077a4bdeba10b322446b1aef6de2d"
+    }
+  ],
+  "accepted_findings": [
+    "All nine bound files match current SHA256. Pinned macro slots 0..5 match Collector_Parameter ordinal and Lua names; GCPARAM9 and GCPN6 dispatch/bounds match.",
+    "Production consumers use real bytes and encoded fractions: minor debt in Make_All_Old/Finish_Cycle; reclaimed/added major return; promoted-byte major trigger; post-cycle pause debt; step work scaling and size granularity.",
+    "Concrete GC/gengc reviewed-block IDs exist and retain their true configurations. GENGC blocks0002/0012 establish preserved data/ages, not threshold sensitivity; focused Promotion_And_Major and Zero_Major_Threshold supply threshold-specific assertions.",
+    "Zero_Step_Size asserts two real completed cycles. Codec roundtrip/saturation tests remain distinct from scheduling semantics."
+  ],
+  "limitations": [
+    "Minormul sensitivity remains an explicit gap: Remembered_Table and Promotion_And_Major do not vary this parameter and measure changed debt. Parent plans separately named regression; review its actual measured behavior before closing gap.",
+    "Pause and stepmul upstream grids exercise varied controls safely, while listed focused tests prove codec, real debt payments and work. They do not establish comparative sensitivity to those parameter slots; do not describe them as such.",
+    "Larger_Debt_Payments varies step payment, not Step_Multiplier. GC block0002 has the same distinction.",
+    "Final-revision runtime execution in every applicable context and approved equivalence binding remain required."
+  ],
+  "execution_evidence": []
+}

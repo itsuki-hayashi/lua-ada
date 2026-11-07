@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "kind": "independent-classification-review",
+  "reviewer": "Codex independent review agent /root/review_gc",
+  "author": "Codex independent review agent /root/review_files",
+  "decision": "changes-required",
+  "runtime_acceptance": false,
+  "ledger_changes": false,
+  "bindings": [
+    {
+      "path": "tests/conformance/reviews/files.classification-proposal.json",
+      "sha256": "969ae25d28259062bca77eabbe59101be9e6e6ffe374f31ec2820793fe51a0f4"
+    },
+    {
+      "path": "tests/conformance/coverage/files.jsonl",
+      "sha256": "d321b31ddc416054b197f34c032a3eb2a628b5694789b3f848733a987d754e6c"
+    },
+    {
+      "path": "references/lua/testes/files.lua",
+      "sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86"
+    }
+  ],
+  "structural_checks": {
+    "original_anchor_count": 344,
+    "proposed_runtime_block_count": 90,
+    "all_original_ids_preserved": true,
+    "all_434_span_hashes_verified": true,
+    "all_direct_targets_resolve": true,
+    "runtime_assertions": 313,
+    "guards": 20,
+    "references": 7,
+    "templates": 2,
+    "reports": 1,
+    "audits": 1
+  },
+  "semantic_review": [
+    "Reviewed all25 section invariants against pinned source, preserving individual assertion identities and separately named helper/dynamic obligations.",
+    "checkerr helper invocations36-74 preserve exact protected-call arguments and diagnostics, including multi-line native boundaries.",
+    "Generated dofile source26, reader source27-28, six loadfile helper invocations29, actual child30 and date-generated assertions32/75-80 require execution, not compilation.",
+    "Ten shell command rows81-90 preserve popen/execute comparison, known/nonzero status codes and configured child execution.",
+    "T/nonblock body719-747 correctly requires upstream-test execution; default controlled configurations describe omission linkage only and cannot establish an execution pass.",
+    "Lowercase t string/environment references are correctly distinguished from actual T.nonblock references.",
+    "No-buffer original deficiency is explicitly retained, with separately named additional visibility counterpart rather than false unchanged coverage.",
+    "Native inactive branches require reviewed counterparts and per-context facts; final date/version output alone does not certify preceding IO or shutdown."
+  ],
+  "findings": [
+    {
+      "id": "FILES-CLASS-001",
+      "line": 912,
+      "required_change": "Describe testerr selector as matching the literal out-of-bound diagnostic, not arbitrary probe rejection/success. Representation failures choose the else branch. Clarify C-int-only applicability for blocks71-73."
+    },
+    {
+      "id": "FILES-CLASS-002",
+      "line": 957,
+      "required_change": "Mark assertion307 applicable only when native isdst is nonnil. Link guard20 to full block24/native optional-field counterpart so inactive nil arm is explicitly resolved rather than inferred from else assertion."
+    },
+    {
+      "id": "FILES-CLASS-003",
+      "line": 88,
+      "required_change": "Include _port-unset applicability for assertion0021 beneath its explicit guard."
+    }
+  ],
+  "acceptance_limits": [
+    "Mapping review is not runtime acceptance.",
+    "No default T omission may be promoted as execution evidence.",
+    "Final platform/configuration contexts, native counterpart mapping/evidence, child shutdown and allocator evidence remain required."
+  ],
+  "revision_review": {
+    "decision": "accepted-semantic-classification",
+    "runtime_acceptance": false,
+    "proposal_path": "tests/conformance/reviews/files.classification-proposal.json",
+    "proposal_sha256": "4c120fa11290e274ebd4ef8aaf817a6eb52c5f02c7aea9a791d507661de66671",
+    "resolved_findings": [
+      "FILES-CLASS-001",
+      "FILES-CLASS-002",
+      "FILES-CLASS-003"
+    ],
+    "rationale": [
+      "Exact testerr diagnostic-match selector now distinguishes successful conversion and different-error else selection, including Windows representation errors.",
+      "Field-bound checks71-73 explicitly execute after either probe arm.",
+      "Assertion307 records nonnil isdst condition; guard20 links full block24 and native optional-field counterpart.",
+      "Assertion21 explicitly records _port-unset condition."
+    ],
+    "acceptance_boundary": "Classification and obligation semantics only; execution/whole-file/final-context acceptance remains pending and must preserve actual-versus-controlled configuration distinction."
+  },
+  "controlled_configuration_delta_review": {
+    "decision": "accepted-semantic-classification",
+    "reviewer": "Codex independent review agent /root/review_gc",
+    "proposal_path": "tests/conformance/reviews/files.classification-proposal.json",
+    "proposal_sha256": "6e0827ec162d703bc4a06abb5f022ec1d66e1443dc1c5f59cae45bb8ccc7455c",
+    "source_path": "references/lua/testes/files.lua",
+    "source_sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86",
+    "anchors": [
+      "LUA-FILES-CONDITIONAL-GUARD-0009",
+      "LUA-FILES-INTERNAL-REFERENCE-0006",
+      "LUA-FILES-GENERATED-TEMPLATE-0001",
+      "LUA-FILES-INTERNAL-REFERENCE-0007"
+    ],
+    "rationale": [
+      "The line718 enclosing conjunction is evaluated in both configurations; default T absence short-circuits it and does not execute T.nonblock member access or its body.",
+      "All four controlled operation links require upstream-test only, matching actual nonblocking driver and child obligations.",
+      "The generated receiver at729 and actual handle mutation at734 retain upstream-test-only execution configurations.",
+      "Inclusive proposal line endpoints and exclusive ledger byte-end lines are representation differences; source span bytes and hashes remain the authority."
+    ],
+    "runtime_acceptance": false,
+    "execution_evidence": [],
+    "ledger_changes": false
+  }
+}

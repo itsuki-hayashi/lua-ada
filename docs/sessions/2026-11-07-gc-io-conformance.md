@@ -709,3 +709,56 @@ or changing reference submodules. Parent review verified the two new actual
 Git checkout regressions: autocrlf preserves hashes with the rule and changes
 them when only that rule is removed. All 32 binding regressions pass locally.
 Fresh Windows CI must confirm the corrected checkout in the complete pipeline.
+
+Published c247afb run 42317626218 now passes both Linux instrumented jobs;
+static job 128234058782 supplies actual normal and shutdown warning-negative
+evidence for GNAT's exit-1 paths. Windows shared instrumented and static release
+also pass. Remaining jobs, including queued macOS contexts, are not accepted.
+
+Independent source classification review found and corrected the events silent
+default weak-delegation body, its single refusal before ten writes, direct
+multiple-result consumer mapping, and three missing public macro cases. The
+ordinary C consumer now separately tests lua_tonumber's null validity pointer,
+lua_isnoneornil and lua_pushglobaltable; all are unconditional in both builds.
+The new native calendar counterpart tests actual year 4000, exact C-int field
+errors and DST omission preserving the same instant. Its shared launcher
+records unique guard facts, retains hashed source copies and requires all
+counterpart markers. Matrix reconciliation rejects divergent C/Ada facts.
+Independent review accepts these semantics and diagnostic integration, not
+runtime acceptance or inactive original branches as unchanged execution.
+
+The local default validation/static pipeline passes in
+reports/review-native-macros-default.log, including 1,305 AUnit cases, the new
+C macro consumers and shared native counterpart executions. Forty-one scope,
+33 matrix and 32 binding regressions pass. An instrumented run captured a
+transitional ledger copy with inclusive proposal end lines before their
+conversion to the inventory's exclusive byte-end convention; that run failed
+and is not evidence. Final stable-ledger instrumented validation remains due.
+Reviewed classifications are being inserted while every runtime obligation
+retains pending status and empty evidence. Original anchors/bytes are retained;
+the added blocks expose dynamic and callback obligations rather than infer
+their execution from process success.
+
+The stable instrumented retry now passes all retained checks in
+reports/review-native-macros-instrumented-final-retry.log: 1,306 AUnit cases,
+all four C/Ada file observations, native calendar counterparts, actual warning
+negative cases, probe/allocator checks and public GC/IO contracts. The added
+minormul case changes 100 to 200 against the same measured old population and
+requires exactly one real minor cycle followed by doubled allocation debt.
+Independent source review accepts this sensitivity check. The default strict
+build and AUnit rerun also pass 1,306 cases in
+reports/review-minormul-default-build.log and
+reports/review-minormul-default-aunit.log. An initial 80-column comment failed
+strict style checking and was shortened; no flags were weakened.
+
+The final inserted classification has 899 entries: all 762 original anchors
+plus 137 explicit runtime blocks. Independent transformation review verifies
+every byte span and unchanged original identity. There are 191 reviewed lexical
+entries, 708 pending runtime/audit entries and 77 pending scoped API entries,
+with no fabricated execution evidence. The scope definition itself now has
+independent semantic approval. Negative tests explicitly construct missing
+invariant and pending-review fixtures rather than assume production metadata
+remains empty. All 41 scoped regressions pass after this metadata transition.
+At published c247afb, all 18 Windows/Linux contexts have passed; eight macOS
+contexts remain running/queued. Final-revision evidence for this new checkpoint
+and authoritative native-branch execution contracts are still outstanding.

@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "kind": "independent-native-counterpart-review",
+  "reviewer": "Codex independent review agent /root/review_gc",
+  "author": "Codex independent review agent /root/review_files",
+  "decision": "changes-required",
+  "runtime_acceptance": false,
+  "bindings": [
+    {
+      "path": "tests/conformance/platform/files-native-branches.lua",
+      "sha256": "df5f79a292f8978d5906915c253f69c11fe100041d29ce3ce1d9d51860360a96"
+    },
+    {
+      "path": "tests/conformance/reviews/files-native-branches.proposal.json",
+      "sha256": "d64c717b43b43a0c44365e61ea9adaa9b518fa1a70bc2ee6fcfe9b5cd313e780"
+    },
+    {
+      "path": "references/lua/testes/files.lua",
+      "sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86"
+    },
+    {
+      "path": "references/lua/loslib.c",
+      "sha256": "3ed70ea013b0c7a5a758db435f76fe5a99e87f07ea02ed19b2012fb728f8aa13"
+    },
+    {
+      "path": "docs/milestones/m3.md",
+      "sha256": "7183b97804f9403f6781c829c4f2a76e7bc942cfaf6ea4fc56fd0935bb94dec1"
+    },
+    {
+      "path": "reports/review-files-native-branches/index.json",
+      "sha256": "82bab9b663431ac7d76ccbad2f4b8a3578dac144bc7f7a3352ad2a62d867723a"
+    }
+  ],
+  "policy": "docs/milestones/m3.md:72-100 requires matching invariant and native C support evidence; false guards are not executed-body evidence.",
+  "accepted_design": [
+    "Separate named counterparts and printed actual guard facts preserve the distinction from unchanged upstream execution.",
+    "Actual C-int width detection and separate native time-range probe are appropriate.",
+    "Explicit pending all-context evidence and limited Windows observation claims are accurate."
+  ],
+  "findings": [
+    {
+      "id": "NATIVE-REVIEW-001",
+      "severity": "required",
+      "path": "tests/conformance/platform/files-native-branches.lua",
+      "line": 47,
+      "source_lines": "files.lua:912-928",
+      "invariant": "The actual year-4000 input is either representable and roundtrips, or specifically rejected as unrepresentable on the native platform.",
+      "finding": "The 2^40 os.date probe is only the upstream branch selector. Neither successful nor rejected probe tests os.time{year=4000,month=1,day=1}; range-error recovery at an ordinary year does not establish that assertion.",
+      "required_change": "Exercise actual year4000 with native C and Ada, requiring its exact representability rejection or date/instant roundtrip according to native support. Preserve separately reviewed native maximum/next-second boundary pair and huge-time rejection obligations."
+    },
+    {
+      "id": "NATIVE-REVIEW-002",
+      "severity": "required",
+      "path": "tests/conformance/platform/files-native-branches.lua",
+      "line": 71,
+      "source_lines": "files.lua:952-961",
+      "invariant": "Removing isdst from a native date table preserves the original represented instant.",
+      "finding": "Each omitted/false/true case self-roundtrips its own resulting instant, so an incorrect omitted-DST default can produce a different instant and still pass. This is weaker than upstream t==t1.",
+      "required_change": "Save os.time of an actual native date table, clear its isdst, and assert the resulting instant equals the saved instant. Retain explicit true/false normalization as supplemental coverage and report native output-field presence."
+    },
+    {
+      "id": "NATIVE-REVIEW-003",
+      "severity": "required",
+      "path": "tests/conformance/platform/files-native-branches.lua",
+      "line": 5,
+      "source_lines": "files.lua:880-891,931-940; loslib.c:254-268",
+      "invariant": "Out-of-C-int date fields fail during field conversion with the correct field-specific out-of-bound diagnostic.",
+      "finding": "rejected accepts either out-of-bound or represented for every operation. Thus a failure to enforce the year/day/month field boundary could fall through to mktime representation failure and still pass.",
+      "required_change": "Parameterize required diagnostic; require field year/day/month out-of-bound for those respective probes and cannot-be-represented for representation-only probes. Shared recovery can remain supplemental."
+    }
+  ],
+  "evidence_review": {
+    "path": "reports/review-files-native-branches/index.json",
+    "cases": 4,
+    "scope": "Existing default Windows C/Ada binaries in JST-9 and UTC0; output inspected, no cross-platform or instrumented acceptance inferred.",
+    "observed": "Cint4/LuaInteger8; 2^40 representation rejection; boolean isdst. These facts do not establish the missing assertions."
+  },
+  "pending": [
+    "Resolve all three semantic gaps and independently review revised hashes.",
+    "Bind source and mandatory markers through shared launchers.",
+    "Execute both configurations and all applicable final acceptance contexts."
+  ],
+  "ledger_changes": false,
+  "revision_review": {
+    "decision": "accepted-semantic-mapping",
+    "runtime_acceptance": false,
+    "bindings": [
+      {
+        "path": "tests/conformance/platform/files-native-branches.lua",
+        "sha256": "df5f79a292f8978d5906915c253f69c11fe100041d29ce3ce1d9d51860360a96"
+      },
+      {
+        "path": "tests/conformance/reviews/files-native-branches.proposal.json",
+        "sha256": "a4192503037b292722269b341f5c28c4a7e5bcdcecbfdc0fd1b6ef46a556fecd"
+      },
+      {
+        "path": "reports/review-files-native-branches/index.json",
+        "sha256": "7f8e1f6bdec7608d2d765d79b377aeb7f665d9adb3d831fea260cf926e352ee3"
+      }
+    ],
+    "resolved_findings": [
+      "NATIVE-REVIEW-001",
+      "NATIVE-REVIEW-002",
+      "NATIVE-REVIEW-003"
+    ],
+    "rationale": [
+      "Actual year4000 calendar input now exercises native representability or exact representation rejection followed by ordinary recovery.",
+      "Clearing isdst from a native date table must preserve its original instant, matching the omitted-field inference invariant.",
+      "Actual C-int field boundary probes now require their respective year/day/month out-of-bound diagnostics."
+    ],
+    "local_evidence": "Four fresh default Windows C/Ada observations at JST-9 and UTC0: capture hashes verified, empty stderr and exit0; matching printed facts reviewed.",
+    "integration_requirements": [
+      "Require equality of C/Ada guard facts including year4000 support; successful divergent branches are not equivalent native behavior.",
+      "Bind source and require every completion marker through the shared launcher.",
+      "Retain existing Windows native maximum/next-second counterpart and unchanged supported upstream assertions.",
+      "Obtain final-context default/instrumented C/Ada process and shutdown evidence before runtime acceptance."
+    ]
+  }
+}

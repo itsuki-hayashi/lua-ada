@@ -52,7 +52,9 @@ function Test-ApiRejected {
 Test-ApiRejected 'missing scoped API record' { param($e) $e | Select-Object -Skip 1 } 'coverage set changed'
 Test-ApiRejected 'duplicate scoped API record' { param($e) $e[1]=$e[0]; $e } 'Duplicate scoped API coverage'
 Test-ApiRejected 'scoped API header drift' { param($e) $e[0].declaration='invented'; $e } 'anchor drift'
-Test-ApiRejected 'scoped API needs behavioral invariant' { param($e) $e[0].status='passed'; $e } 'invariant missing'
+Test-ApiRejected 'scoped API needs behavioral invariant' { param($e)
+    $e[0].status='passed'; $e[0].invariant=$null; $e
+} 'invariant missing'
 Test-ApiRejected 'scoped API cannot self-review' { param($e)
     $e[0].status='passed'; $e[0].invariant='synthetic fixture'
     $e[0].review=@{author='same'; reviewer='same'; artifact='synthetic'; rationale='synthetic'; original_c_evidence='synthetic'}
@@ -65,7 +67,9 @@ Test-Rejected 'duplicate API obligation' { param($d) $d.api_ids += $d.api_ids[0]
 Test-Rejected 'invented API obligation' { param($d) $d.api_ids += 'CAPI-FAKE' } 'Unknown scoped API'
 Test-Rejected 'changed source hash' { param($d) $d.files[0].sha256 = '0' * 64 } 'source hash drift'
 Test-Rejected 'missing IO prerequisites' { param($d) $d.prerequisites = @('stdio') } 'prerequisites changed'
-Test-Rejected 'pending independent scope review' { param($d) } 'independent review' -Complete
+Test-Rejected 'pending independent scope review' { param($d)
+    $d.review.status='pending'
+} 'independent review' -Complete
 Test-Rejected 'self-reviewed scope' { param($d)
     $d.review.status='reviewed'; $d.review.reviewer=$d.review.author; $d.review.artifact='synthetic-fixture'
 } 'independent review'
@@ -116,6 +120,14 @@ Test-ProcessWitness 'files requires final version' files.lua "test done on 01/01
 Test-ProcessWitness 'balanced GC shutdown witness' gc.lua "OK`n>>> closing state <<<`n"
 $dateWitness = "test done on 01/01/2026, at 00:00:00`nLua 5.5`n"
 $ioWitness = "native unbuffered visibility counterpart OK`ntesting i/o`ntesting flush`ntesting failed write`ntesting large files (> BUFSIZ)`ntesting popen/pclose and execute`ntesting date/time`n"
+$nativeWitness = "native branch facts: cint=4 lua_integer=8`nnative branch facts: time_2pow40=representable`nnative branch facts: year4000=representable`nnative branch facts: isdst=boolean`nnative C-int field boundary counterpart OK`nnative time range recovery counterpart OK`nnative DST inference counterpart OK`n"
+$ioWitness += $nativeWitness
+Test-ProcessWitness 'files requires actual native year fact' files.lua `
+    ($ioWitness.Replace("native branch facts: year4000=representable`n", '') + $dateWitness) -Expected 'native branch fact: year'
+Test-ProcessWitness 'files rejects duplicate native branch fact' files.lua `
+    ("native branch facts: isdst=absent`n" + $ioWitness + $dateWitness) -Expected 'duplicate native branch fact'
+Test-ProcessWitness 'files requires native range counterpart completion' files.lua `
+    ($ioWitness.Replace("native time range recovery counterpart OK`n", '') + $dateWitness) -Expected 'native time range'
 Test-ProcessWitness 'files requires unbuffered visibility counterpart' files.lua `
     ($ioWitness.Replace("native unbuffered visibility counterpart OK`n", '') + $dateWitness) -Expected 'unbuffered visibility'
 Test-ProcessWitness 'date alone does not certify IO' files.lua $dateWitness -Expected 'IO completion witness'

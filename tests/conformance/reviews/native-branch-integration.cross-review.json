@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "independent-cross-review",
+  "reviewer": "Codex /root/review_events_harness",
+  "author": "Codex /root",
+  "decision": "accepted-diagnostic-integration-pending-authoritative-equivalent-approval",
+  "coverage_authority": false,
+  "source_bindings": [
+    {
+      "path": "scripts/run-conformance.ps1",
+      "sha256": "6446c34b524eca173753e71aa1781f24682d1465fbe743b69a872ca37865d126"
+    },
+    {
+      "path": "scripts/ConformanceScope.psm1",
+      "sha256": "f126875c609f56c950fde0fbe9cdc71636741475b0551195438ece5502e5899a"
+    },
+    {
+      "path": "scripts/ConformanceMatrix.psm1",
+      "sha256": "8a568de065108c9effd37658e76b9e6f6c8be9a2058afd2c20e13e6004de191f"
+    },
+    {
+      "path": "scripts/test-conformance-scope.ps1",
+      "sha256": "29634b15ba4ce920115499be4f1bfba748c80f022919cf0074ef6bde6ceae015"
+    },
+    {
+      "path": "scripts/test-conformance-matrix.ps1",
+      "sha256": "b33346031e07c84619928ac2700170dd71b01554ac536779dfcbfef38b85cba8"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "sha256": "9cc2222c8eb4a4eeaea6b47bae4c9497dac76346ecfc089eec4790786829e5d4"
+    },
+    {
+      "path": "tests/conformance/platform/files-native-branches.lua",
+      "sha256": "df5f79a292f8978d5906915c253f69c11fe100041d29ce3ce1d9d51860360a96"
+    }
+  ],
+  "findings": [],
+  "accepted_design": [
+    "Counterpart executes in same state before original files.lua, preserving copied bytes and distinct native-platform-equivalent fixture identity.",
+    "Unique anchored native facts and three required completion markers are independently reread from hashed stdout; C is processed before Ada and facts must match.",
+    "Matrix requires exact current source/artifact hash and resolves retained artifact bytes; CI upload globs retain equivalent-*.lua.",
+    "Negative cases cover omitted/duplicate facts, omitted range completion, recorded/captured disagreement, changed counterpart identity, and actual C/Ada divergence.",
+    "No source ledger is promoted by this integration; unchanged source execution remains distinct from the additional equivalent fixture."
+  ],
+  "acceptance_conditions": [
+    "Bind counterpart to explicit original source anchors and approved native equivalent mapping before acceptance; fixture disposition alone is not approval.",
+    "Require actual final-revision executions in every context, preserving C/Ada captures and shutdown evidence."
+  ],
+  "validation": [
+    "Independent source review only; parent reports 41 scoped regressions passed and matrix suite was running. No new runtime execution by this reviewer."
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "kind": "independent-cross-review",
+  "reviewer": "Codex independent review agent /root/review_files",
+  "author": "Codex /root/review_events_harness",
+  "decision": "changes-requested-before-ledger-promotion",
+  "coverage_authority": false,
+  "reviewed_artifacts": [
+    {
+      "path": "tests/conformance/reviews/events.classification-proposal.json",
+      "sha256": "84644bf2697c71b4ae29e2dd49e0c8846ec248c9fbd6bc4f2c5ece59531873c3"
+    },
+    {
+      "path": "tests/conformance/reviews/events.classification-proposal.jsonl",
+      "sha256": "7d23142c9be8e9f71695959c3028466a27eca3061aed695d3f8430b032f24bbb"
+    },
+    {
+      "path": "tests/conformance/reviews/api.mapping-proposal.json",
+      "sha256": "3b58ffe28ed5b7c7cc46206ff19388ac4bc03f871ba3bc34e87fdeb3fe91b35a"
+    }
+  ],
+  "source_bindings": [
+    {
+      "path": "references/lua/testes/events.lua",
+      "sha256": "90449c1607a12a7c1841123a68237e0d23b7d6e109b8c445937fcd99306897c9"
+    },
+    {
+      "path": "references/lua/lua.h",
+      "sha256": "5e00319e803893f4310b1206394c80b82f03f42609b40ceb306d92a6740d828e"
+    },
+    {
+      "path": "c_api/tests/c_api_consumer.c",
+      "sha256": "1ce475b2249dd4bc767396b09a923fa2bd994073d86281c607cdd629f6418b07"
+    },
+    {
+      "path": "c_api/tests/gc_contract.h",
+      "sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6"
+    },
+    {
+      "path": "tests/c/conformance_adapter.c",
+      "sha256": "bf6b12115bd9e97f2a3acdec21c291fce3649410eb5df8815c23c02010788c45"
+    }
+  ],
+  "verification": [
+    "Read pinned events.lua completely, including reusable checkcap/test/metamethod callbacks, both T guards, default silent weak-delegation loop, final OK and return12.",
+    "Verified all200 proposal source spans and direct obligation links resolve to actual runtime proposal IDs; verified source hashes and named-function declaration lines for all77 API entries.",
+    "Confirmed userdata assertion110–115 bodies are instrumented-only and lowercase t references are ordinary executable metamethod/table accesses, not T-adapter dependencies.",
+    "Reviewed consumer numeric conversions, stack/results/callback cells, public GC controls/parameter loop and adapter optional-argument/warning paths. No runtime tests/builds executed by this review."
+  ],
+  "accepted_design": [
+    "No passing evidence or coverage authority is asserted by either proposal.",
+    "Source-pinned runtime assertions preserve identity; helper predicates remain executable and their dynamic invocations are documented.",
+    "Silent allocation refusal gets an explicit reviewed-block identity; default userdata omission links to instrumented payload equality/delegation obligations.",
+    "API supporting cases are explicitly distinguished from direct token occurrences; parameters acknowledge that numeric roundtrip does not prove scheduling semantics."
+  ],
+  "findings": [
+    {
+      "id": "EVENTS-X1",
+      "severity": "P2",
+      "path": "tests/conformance/reviews/events.classification-proposal.jsonl",
+      "record": "LUA-EVENTS-REVIEWED-BLOCK-0001",
+      "source_lines": [
+        382,
+        393
+      ],
+      "problem": "Entire silent weak-delegation block runs in both configurations, but its only runtime identity is upstream-test-only. Default still creates weak-value delegation and executes ten writes; only allocation injection is guarded.",
+      "requested_change": "Represent default ordinary execution and instrumented one-shot refusal separately or use a both-config runtime block with explicit configuration-dependent invariant. Keep default absence of refusal linked to instrumented coverage; distinguish guard evaluation from controlled body applicability."
+    },
+    {
+      "id": "EVENTS-X2",
+      "severity": "P3",
+      "path": "tests/conformance/reviews/events.classification-proposal.jsonl",
+      "record": "LUA-EVENTS-REVIEWED-BLOCK-0001",
+      "source_lines": [
+        387,
+        390
+      ],
+      "problem": "dynamic_invocation says allocfailnext executes before each assignment. Source injects one refusal once before the ten-write loop.",
+      "requested_change": "Correct invocation wording to one injection followed by ten writes; do not infer ten refusals from this source."
+    },
+    {
+      "id": "API-X1",
+      "severity": "P2",
+      "path": "tests/conformance/reviews/api.mapping-proposal.json",
+      "record": "CAPI-LUA-H-MACRO-LUA_MULTRET-35",
+      "source_lines": [
+        376,
+        392
+      ],
+      "problem": "Only supporting stack cases are linked; actual consumer test_canonical_lua_calls_c invokes LUA_MULTRET and checks two results at385–387, but is absent. The proposed group invariant therefore lacks its available direct multiple-result witness.",
+      "requested_change": "Link the actual canonical call case and exact two-result assertions. Likewise prefer existing direct cases for lua_pushvalue/lua_pop and trace lua_upvalueindex through captured_counter to test_c_closure_cells, rather than only generic group support."
+    },
+    {
+      "id": "API-X2",
+      "severity": "P2",
+      "path": "tests/conformance/reviews/api.mapping-proposal.json",
+      "record": "CAPI-LUA-H-MACRO-LUA_TONUMBER-393",
+      "source_lines": [
+        149,
+        169
+      ],
+      "problem": "Mapped numeric test only invokes lua_tonumberx with nonnull validity output. The macro passes NULL, so current mappings do not establish its actual expanded null-output behavior. This must remain pending, despite broad group coverage.",
+      "requested_change": "Supply an actual named consumer macro invocation checking successful and unsuccessful numeric conversion with NULL isnum, or a reviewed direct existing counterpart exercising that same path. Do not promote based only on shared conversion implementation."
+    },
+    {
+      "id": "API-X3",
+      "severity": "P2",
+      "path": "tests/conformance/reviews/api.mapping-proposal.json",
+      "records": [
+        "CAPI-LUA-H-MACRO-LUA_ISNONEORNIL-411",
+        "CAPI-LUA-H-MACRO-LUA_PUSHGLOBALTABLE-415"
+      ],
+      "problem": "Explicitly identified actual macro exercise is in the T adapter, but entries require both configurations/all26 contexts. Supporting raw/type cases do not themselves execute the macro optional-argument/global-table contracts in default configuration.",
+      "requested_change": "Provide direct named C consumer counterparts available in default and instrumented configurations, or explicit reviewed per-configuration obligation mappings whose actual default witnesses demonstrate the macro expansion contract. Retain missing optional/nil argument behavior as pending until exercised."
+    }
+  ],
+  "limitations": [
+    "This is semantic mapping review only, not final-context runtime acceptance.",
+    "API parameter names still need source-slot correspondence plus concrete GC behavior obligation IDs; group labels/source hashes alone cannot close those semantics.",
+    "The warnings/native-files fixes reviewed elsewhere are outside this artifact decision."
+  ],
+  "semantic_delta_review": {
+    "reviewer": "Codex independent review agent /root/review_files",
+    "decision": "accepted-semantic-mappings",
+    "runtime_acceptance": false,
+    "resolved_findings": [
+      "EVENTS-X1",
+      "EVENTS-X2",
+      "API-X1",
+      "API-X2",
+      "API-X3"
+    ],
+    "reviewed_artifacts": [
+      {
+        "path": "tests/conformance/reviews/events.classification-proposal.json",
+        "sha256": "5fed7dc4e93f76e847fe1665e331dfc39140e14ce361974bee3c8dec6b502f31"
+      },
+      {
+        "path": "tests/conformance/reviews/events.classification-proposal.jsonl",
+        "sha256": "d5f6ba1600af8d3498d18d936c9aeec192122a0182085dbf34851d055eb0f4c5"
+      },
+      {
+        "path": "tests/conformance/reviews/api.mapping-proposal.json",
+        "sha256": "6d90221ce821a169d675d7df5ea03af60e6077a4bdeba10b322446b1aef6de2d"
+      },
+      {
+        "path": "c_api/tests/c_api_consumer.c",
+        "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
+      }
+    ],
+    "rationale": [
+      "Silent weak-delegation block has both configurations with explicit normal/default and one-shot-refusal/instrumented invariants. Guard evaluation and controlled applicability are distinguished; one injection precedes ten writes.",
+      "LUA_MULTRET maps actual canonical Lua-to-C call with two returned values42 and3. Closure cases explicitly trace pushvalue/pop/upvalueindex through captured_counter; duplicate case identities and stale embedded line number removed.",
+      "test_number_macro_without_validity_output executes the pinned convenience macro with successful numeric string preserving source type, invalid string/nil/absent conversion yielding0, and unchanged stack.",
+      "test_none_or_nil_macro distinguishes absent/nil from false/zero, includes negative index and unchanged stack.",
+      "test_global_table_macro checks exactly one pushed table, nonnull identity and agreement with registry global-table identity. All three new tests register unconditionally in main, supplying both-config counterparts."
+    ],
+    "verification": "Independently read the three test bodies and main registrations; rechecked proposal source hashes/function declaration locations and direct mappings. No build or execution was performed by this reviewer.",
+    "limitations": [
+      "Root reports new macro consumer checks passing within an ongoing default pipeline; this source review does not substitute for inspecting complete final-revision evidence.",
+      "Runtime acceptance remains false. All required platform contexts and actual GC parameter behavior obligation links remain independent pending requirements."
+    ]
+  }
+}

@@ -101,6 +101,7 @@ $evidence = [ordered]@{
     runtime_library_records = @()
     build_processes = @()
     native_fixture_records = @()
+    native_branch_facts = $null
     allocator_limit_bytes = if ($Mode -eq 'Heavy') { 67108864L } else { 2147483648L }
     timeout_seconds = if ($Mode -eq 'Aggregate') { 3600 } elseif ($Mode -eq 'Heavy') { 600 } else { 900 }
     fixture_records = @()
@@ -556,6 +557,19 @@ try {
         $evidence.native_fixture_records += [ordered]@{source='tests/conformance/platform/unbuffered-visibility.lua';
             source_sha256=$sourceHash; artifact=$counterpartCopy; artifact_sha256=$copyHash}
         $nativeSetup += "; dofile('unbuffered-visibility.lua')"
+        # Host-specific guards need an executed counterpart and explicit facts,
+        # not an inferred pass for an inactive original branch. Preserve this
+        # input in the artifact bundle separately from unchanged upstream.
+        $counterpart = Join-Path $root 'tests/conformance/platform/files-native-branches.lua'
+        $counterpartCopy = Join-Path $fixtureDirectory 'equivalent-files-native-branches.lua'
+        Copy-Item -LiteralPath $counterpart -Destination $counterpartCopy
+        $sourceHash = (Get-FileHash $counterpart -Algorithm SHA256).Hash.ToLowerInvariant()
+        $copyHash = (Get-FileHash $counterpartCopy -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($sourceHash -cne $copyHash) { throw 'Native branch counterpart copy changed bytes' }
+        $evidence.native_fixture_records += [ordered]@{source='tests/conformance/platform/files-native-branches.lua';
+            source_sha256=$sourceHash; artifact=$counterpartCopy; artifact_sha256=$copyHash;
+            disposition='native-platform-equivalent'}
+        $nativeSetup += "; dofile('equivalent-files-native-branches.lua')"
     }
     if ($Scope -ne '') {
         # Enable normal warnings before upstream execution, including close-time
@@ -589,6 +603,7 @@ try {
         $evidence.allocator_telemetry = [ordered]@{ path=$telemetryPath;
             sha256=(Get-FileHash -LiteralPath $telemetryPath -Algorithm SHA256).Hash.ToLowerInvariant(); data=$telemetry }
         if ($File -eq 'files.lua') {
+            $evidence.native_branch_facts = Get-ScopedNativeBranchFacts -Output ([IO.File]::ReadAllText($evidence.process.stdout_path))
             foreach ($sidecar in Get-ChildItem -LiteralPath $runRoot -Filter 'allocator.*.json') {
                 $childId = [int]($sidecar.BaseName.Split('.')[-1])
                 if ($childId -eq $evidence.process.process_id) { continue }

@@ -45,12 +45,26 @@ completion and per-operation acceptance commands remain fail-closed on pending
 reviews/coverage. The actual launcher supplies measured configuration reports
 for parent, bare-lua and arg-selected child checks. Both matrices now schedule
 all four selected files; this does not replace final-revision evidence or review.
+Independent classification review has now expanded those 762 original anchors
+with 137 source-hashed runtime blocks for generated code, helper invocations,
+callbacks and shutdown. All original identities and bytes are preserved.
+The ledger has 191 reviewed lexical entries and 708 pending runtime/audit
+entries; all 77 scoped API entries retain pending execution evidence. Native
+calendar counterparts record actual C/Ada guard facts separately from unchanged
+source execution. New direct C macro tests close identified mapping gaps, and
+a focused minormul regression checks actual minor collection debt sensitivity.
+These additions do not establish scoped completion or full M3 acceptance.
 File equivalents now use the same scoped operation/report path, with native
 counterpart tests retained separately. Platform launchers verify measured
 parent/bare-child/arg-child settings and balanced probe/main-child telemetry.
 Full local default and instrumented validation/static pipelines retain 1,305
 AUnit cases. Shared harness regressions total 40, scope regressions 38, plus
 two actual launcher-isolation regressions in each configuration.
+The subsequent reviewed macro/native-branch checkpoint passes the full local
+instrumented pipeline with 1,306 AUnit cases and a default AUnit rerun at the
+same count. Scope regressions are now 41, matrix regressions 33 and review
+binding regressions 32. All 18 Windows/Linux contexts passed at c247afb;
+macOS and the later checkpoint's complete matrix remain pending.
 The matrix reconciliation command requires all 104 file/context pairs and
 paired C/Ada reports. It rehashes captures, replays completion/acceptance checks,
 and verifies compiled runtime/launcher profiles and library type against each

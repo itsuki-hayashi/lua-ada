@@ -109,3 +109,22 @@ source/span/generated-source, counterpart and matrix-operation rejection
 with synthetic fixtures. It is also invoked by the retained matrix selftest
 entrypoint in default and instrumented CI. These fixtures are not real review
 authority or execution evidence.
+
+## Source classification checkpoints
+
+The per-file classification proposals are independently reviewed inputs to the
+coverage ledgers. Their reviewed byte spans remain immutable; inclusive source
+line descriptions are converted to the ledger's exclusive byte-end line
+convention when inserting new blocks. `ledger-transformation.cross-review.json`
+records the independent comparison of all original anchors and added blocks.
+Lexical guard/reference/template review is distinct from runtime acceptance:
+runtime entries remain pending with empty evidence until their required actual
+contexts and equivalent mappings have been reconciled.
+
+`files-native-branches.lua` supplies separately named native calendar
+counterparts. Its source and review artifacts identify the original conditional
+spans; the launcher retains a hashed copy and requires unique guard facts plus
+all completion markers. C and Ada must report identical native branch facts.
+An inactive original branch is never reported as an unchanged assertion pass.
+The semantic mapping and diagnostic integration reviews do not by themselves
+provide an execution acceptance contract.

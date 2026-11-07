@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "kind": "gc-parameter-api-mapping-proposal",
+  "author": "Codex independent review agent /root/review_gc",
+  "review_status": "pending-independent-cross-review",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "bindings": [
+    {
+      "path": "references/lua/lua.h",
+      "sha256": "5e00319e803893f4310b1206394c80b82f03f42609b40ceb306d92a6740d828e"
+    },
+    {
+      "path": "src/lua-engine.ads",
+      "sha256": "b80610f6e03c17113aa25b5f09fddacab83a3b05896a8bff7032d191410728ca"
+    },
+    {
+      "path": "src/lua-engine-garbage_collection.adb",
+      "sha256": "82e8cf5c74124a3071aa3fb91f0173aa021494a7caaa754640d9dc106b1cc093"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "78c65de3905f577de905da998744c861cad59151929365f2f4864d267b982554"
+    },
+    {
+      "path": "tests/src/lua-collector_tests.adb",
+      "sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter_tests.adb",
+      "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+    },
+    {
+      "path": "c_api/tests/gc_contract.h",
+      "sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6"
+    },
+    {
+      "path": "tests/conformance/reviews/gc-gengc.anchor-classification-proposal.json",
+      "sha256": "8165f338c8a64c2ac154673c0e26477f4dfabee7e0153b35c7eb1b9c87dfe963"
+    },
+    {
+      "path": "tests/conformance/reviews/api.mapping-proposal.json",
+      "sha256": "6d90221ce821a169d675d7df5ea03af60e6077a4bdeba10b322446b1aef6de2d"
+    }
+  ],
+  "dispatch": "Control operation9 validates index0..5 and uses Collector_Parameter ordinal. Enumeration order matches pinned macro slots. Lua parameter names select the same enumeration. GCPN=6 bounds C loop; GCPARAM=9 chooses production control.",
+  "shared_api_names": [
+    "LUA_GCPARAM",
+    "LUA_GCPN",
+    "lua_gc"
+  ],
+  "entries": [
+    {
+      "api_id": "CAPI-LUA-H-MACRO-LUA_GCPMINORMUL-347",
+      "macro": "LUA_GCPMINORMUL",
+      "slot": 0,
+      "lua_name": "minormul",
+      "ada_parameter": "Minor_Multiplier",
+      "production_consumer": {
+        "path": "src/lua-engine-collector.adb",
+        "lines": [
+          976,
+          1025
+        ]
+      },
+      "runtime_obligation_ids": [
+        "LUA-GENGC-REVIEWED-BLOCK-0002",
+        "LUA-GENGC-REVIEWED-BLOCK-0012"
+      ],
+      "focused_cases": [
+        "tests/src/lua-collector_tests.adb#Minor_Multiplier_Debt",
+        "tests/src/lua-collector_tests.adb#Remembered_Table",
+        "tests/src/lua-collector_tests.adb#Promotion_And_Major"
+      ],
+      "invariant": "Sets actual allocation debt after making all objects old and completing minor cycles. Minor_Multiplier_Debt changes minormul100 to200 with unchanged measured major baseline, completes one actual minor, and requires doubled next allocation countdown.",
+      "codec_obligation": "LUA-GENGC-REVIEWED-BLOCK-0010",
+      "codec_case": "tests/src/lua-conformance_adapter_tests.adb#Parameters",
+      "public_api_case": "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+      "public_case_limit": "Iterates numeric slots0..5 for no-allocation set/query/saturation/restoration; does not itself demonstrate parameter scheduling or directly spell every named constant.",
+      "evidence": [],
+      "runtime_acceptance": false,
+      "focused_case_locations": [
+        {
+          "case": "tests/src/lua-collector_tests.adb#Minor_Multiplier_Debt",
+          "line": 681
+        },
+        {
+          "case": "tests/src/lua-collector_tests.adb#Remembered_Table",
+          "line": 388
+        },
+        {
+          "case": "tests/src/lua-collector_tests.adb#Promotion_And_Major",
+          "line": 629
+        }
+      ]
+    },
+    {
+      "api_id": "CAPI-LUA-H-MACRO-LUA_GCPMAJORMINOR-348",
+      "macro": "LUA_GCPMAJORMINOR",
+      "slot": 1,
+      "lua_name": "majorminor",
+      "ada_parameter": "Major_To_Minor",
+      "production_consumer": {
+        "path": "src/lua-engine-collector.adb",
+        "lines": [
+          1017
+        ]
+      },
+      "runtime_obligation_ids": [
+        "LUA-GENGC-REVIEWED-BLOCK-0002"
+      ],
+      "focused_cases": [
+        "tests/src/lua-collector_tests.adb#Promotion_And_Major"
+      ],
+      "invariant": "Reclaimed bytes above the encoded fraction of added bytes return major mode to real minors. Focused test sets zero and checks actual major reclamation and mode return.",
+      "codec_obligation": "LUA-GENGC-REVIEWED-BLOCK-0010",
+      "codec_case": "tests/src/lua-conformance_adapter_tests.adb#Parameters",
+      "public_api_case": "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+      "public_case_limit": "Iterates numeric slots0..5 for no-allocation set/query/saturation/restoration; does not itself demonstrate parameter scheduling or directly spell every named constant.",
+      "evidence": [],
+      "runtime_acceptance": false,
+      "focused_case_locations": [
+        {
+          "case": "tests/src/lua-collector_tests.adb#Promotion_And_Major",
+          "line": 629
+        }
+      ]
+    },
+    {
+      "api_id": "CAPI-LUA-H-MACRO-LUA_GCPMINORMAJOR-349",
+      "macro": "LUA_GCPMINORMAJOR",
+      "slot": 2,
+      "lua_name": "minormajor",
+      "ada_parameter": "Minor_To_Major",
+      "production_consumer": {
+        "path": "src/lua-engine-collector.adb",
+        "lines": [
+          1151
+        ]
+      },
+      "runtime_obligation_ids": [
+        "LUA-GENGC-REVIEWED-BLOCK-0002",
+        "LUA-GENGC-REVIEWED-BLOCK-0012"
+      ],
+      "focused_cases": [
+        "tests/src/lua-collector_tests.adb#Zero_Major_Threshold",
+        "tests/src/lua-collector_tests.adb#Promotion_And_Major"
+      ],
+      "invariant": "Promoted actual bytes trigger a major above the encoded baseline threshold; zero disables automatic major switching. Focused tests distinguish zero and one percent.",
+      "codec_obligation": "LUA-GENGC-REVIEWED-BLOCK-0010",
+      "codec_case": "tests/src/lua-conformance_adapter_tests.adb#Parameters",
+      "public_api_case": "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+      "public_case_limit": "Iterates numeric slots0..5 for no-allocation set/query/saturation/restoration; does not itself demonstrate parameter scheduling or directly spell every named constant.",
+      "evidence": [],
+      "runtime_acceptance": false,
+      "focused_case_locations": [
+        {
+          "case": "tests/src/lua-collector_tests.adb#Zero_Major_Threshold",
+          "line": 467
+        },
+        {
+          "case": "tests/src/lua-collector_tests.adb#Promotion_And_Major",
+          "line": 629
+        }
+      ]
+    },
+    {
+      "api_id": "CAPI-LUA-H-MACRO-LUA_GCPPAUSE-352",
+      "macro": "LUA_GCPPAUSE",
+      "slot": 3,
+      "lua_name": "pause",
+      "ada_parameter": "Pause_Ratio",
+      "production_consumer": {
+        "path": "src/lua-engine-collector.adb",
+        "lines": [
+          1030
+        ]
+      },
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0001",
+        "LUA-GC-REVIEWED-BLOCK-0002"
+      ],
+      "focused_cases": [
+        "tests/src/lua-collector_tests.adb#Parameter_Saturation",
+        "tests/src/lua-collector_tests.adb#Positive_Step_Debt",
+        "tests/src/lua-collector_tests.adb#Larger_Debt_Payments"
+      ],
+      "invariant": "Completed full cycles derive next debt from encoded fraction of current bytes minus current bytes. Extreme upstream values exercise actual steps; focused tests assert real debt payments and overflow-safe encoding.",
+      "codec_obligation": "LUA-GENGC-REVIEWED-BLOCK-0010",
+      "codec_case": "tests/src/lua-conformance_adapter_tests.adb#Parameters",
+      "public_api_case": "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+      "public_case_limit": "Iterates numeric slots0..5 for no-allocation set/query/saturation/restoration; does not itself demonstrate parameter scheduling or directly spell every named constant.",
+      "evidence": [],
+      "runtime_acceptance": false,
+      "focused_case_locations": [
+        {
+          "case": "tests/src/lua-collector_tests.adb#Parameter_Saturation",
+          "line": 520
+        },
+        {
+          "case": "tests/src/lua-collector_tests.adb#Positive_Step_Debt",
+          "line": 666
+        },
+        {
+          "case": "tests/src/lua-collector_tests.adb#Larger_Debt_Payments",
+          "line": 725
+        }
+      ]
+    },
+    {
+      "api_id": "CAPI-LUA-H-MACRO-LUA_GCPSTEPMUL-353",
+      "macro": "LUA_GCPSTEPMUL",
+      "slot": 4,
+      "lua_name": "stepmul",
+      "ada_parameter": "Step_Multiplier",
+      "production_consumer": {
+        "path": "src/lua-engine-collector.adb",
+        "lines": [
+          1281
+        ]
+      },
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0001",
+        "LUA-GC-REVIEWED-BLOCK-0002"
+      ],
+      "focused_cases": [
+        "tests/src/lua-collector_tests.adb#Parameter_Rounding",
+        "tests/src/lua-collector_tests.adb#Zero_Forces_Work",
+        "tests/src/lua-collector_tests.adb#Larger_Debt_Payments"
+      ],
+      "invariant": "Encoded multiplier scales actual traversal work budget. Upstream extreme grid executes collection steps; focused rounding proves codec and forced steps prove physical work, not comparative speed for every setting.",
+      "codec_obligation": "LUA-GENGC-REVIEWED-BLOCK-0010",
+      "codec_case": "tests/src/lua-conformance_adapter_tests.adb#Parameters",
+      "public_api_case": "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+      "public_case_limit": "Iterates numeric slots0..5 for no-allocation set/query/saturation/restoration; does not itself demonstrate parameter scheduling or directly spell every named constant.",
+      "evidence": [],
+      "runtime_acceptance": false,
+      "focused_case_locations": [
+        {
+          "case": "tests/src/lua-collector_tests.adb#Parameter_Rounding",
+          "line": 502
+        },
+        {
+          "case": "tests/src/lua-collector_tests.adb#Zero_Forces_Work",
+          "line": 711
+        },
+        {
+          "case": "tests/src/lua-collector_tests.adb#Larger_Debt_Payments",
+          "line": 725
+        }
+      ]
+    },
+    {
+      "api_id": "CAPI-LUA-H-MACRO-LUA_GCPSTEPSIZE-354",
+      "macro": "LUA_GCPSTEPSIZE",
+      "slot": 5,
+      "lua_name": "stepsize",
+      "ada_parameter": "Step_Size",
+      "production_consumer": {
+        "path": "src/lua-engine-collector.adb",
+        "lines": [
+          1279,
+          1380
+        ]
+      },
+      "runtime_obligation_ids": [
+        "LUA-GENGC-REVIEWED-BLOCK-0009"
+      ],
+      "focused_cases": [
+        "tests/src/lua-collector_tests.adb#Zero_Step_Size",
+        "tests/src/lua-collector_tests.adb#Zero_Forces_Work"
+      ],
+      "invariant": "Encoded size supplies basic step/debt granularity; zero requests genuine complete cycles, verified twice by upstream and focused regression.",
+      "codec_obligation": "LUA-GENGC-REVIEWED-BLOCK-0010",
+      "codec_case": "tests/src/lua-conformance_adapter_tests.adb#Parameters",
+      "public_api_case": "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+      "public_case_limit": "Iterates numeric slots0..5 for no-allocation set/query/saturation/restoration; does not itself demonstrate parameter scheduling or directly spell every named constant.",
+      "evidence": [],
+      "runtime_acceptance": false,
+      "focused_case_locations": [
+        {
+          "case": "tests/src/lua-collector_tests.adb#Zero_Step_Size",
+          "line": 533
+        },
+        {
+          "case": "tests/src/lua-collector_tests.adb#Zero_Forces_Work",
+          "line": 711
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "No API/ledger promotion or runtime passes claimed. T codec and zero-step upstream obligations need instrumented evidence; full matrix remains required.",
+    "Broad generational source blocks support real transitions but focused Promotion_And_Major and Zero_Major_Threshold establish threshold-specific invariants."
+  ],
+  "execution_evidence": [],
+  "minor_multiplier_source_review": {
+    "decision": "accepted-source-regression",
+    "reviewer": "Codex independent review agent /root/review_gc",
+    "implementation_author": "Codex /root",
+    "source": "tests/src/lua-collector_tests.adb",
+    "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+    "procedure": "Minor_Multiplier_Debt",
+    "procedure_line": 681,
+    "registration_line": 950,
+    "fixture_instantiation_line": 860,
+    "invariant": "With measured nonzero baseline unchanged, doubling the configured minor multiplier must double real debt after exactly one completed minor; a stored-but-unused setting fails.",
+    "review_notes": [
+      "Both code paths consume the same production parameter: Make_All_Old on mode entry and Finish_Cycle after a real minor.",
+      "Collection count and remaining minor mode prevent a forged debt-only setter from satisfying completion.",
+      "Fixture initializes/collects actual world, finalizes on normal and exceptional paths, and checks zero live managed blocks after success.",
+      "Registered unconditionally as collector: minormul changes minor byte debt."
+    ],
+    "build_status": "pending",
+    "runtime_acceptance": false,
+    "execution_evidence": []
+  }
+}

@@ -10,6 +10,11 @@ $captureDirectory = Join-Path $bundle 'reports/synthetic'
 [void][IO.Directory]::CreateDirectory($captureDirectory)
 $script:serial = 0
 $script:cases = 0
+$nativeWitness = "native branch facts: cint=4 lua_integer=8`nnative branch facts: time_2pow40=representable`nnative branch facts: year4000=representable`nnative branch facts: isdst=boolean`nnative C-int field boundary counterpart OK`nnative time range recovery counterpart OK`nnative DST inference counterpart OK`n"
+$nativeSource = 'tests/conformance/platform/files-native-branches.lua'
+$nativeCopy = Join-Path $captureDirectory 'equivalent-files-native-branches.lua'
+Copy-Item -LiteralPath (Join-Path $root $nativeSource) -Destination $nativeCopy
+$nativeHash = (Get-FileHash $nativeCopy).Hash.ToLowerInvariant()
 function Write-Json([string] $Path, $Value) {
     [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 32) + "`n")
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -81,6 +86,10 @@ foreach ($context in $suite.acceptance_contexts) {
                 $report.launcher_probe_telemetry += New-Telemetry "$runId/probes" $configuration $probePid
             }
             if ($file -eq 'files.lua') {
+                $report.process = New-Process ($nativeWitness + $output) 103 900
+                $report.native_branch_facts = Get-ScopedNativeBranchFacts -Output $nativeWitness
+                $report.native_fixture_records = @(@{source=$nativeSource; source_sha256=$nativeHash;
+                    artifact=$nativeCopy; artifact_sha256=$nativeHash; disposition='native-platform-equivalent'})
                 $windows = $context.Split('/')[1] -eq 'windows'
                 $count = if($windows){4}else{2}
                 if(-not $windows -and $instrumented){$count++}
@@ -178,6 +187,32 @@ $hash=Write-Json $adaReportPath $adaReport
 Reject 'Ada probe lacks physical shutdown' {param($m) $m.operations[0].ada.sha256=$hash} 'Missing shutdown' -Full
 [IO.File]::WriteAllText($adaProbePath,$savedAdaProbe)
 [IO.File]::WriteAllText($adaReportPath,$savedAdaReport)
+$fileEntry = @($manifest.operations | Where-Object { $_.file -eq 'files.lua' })[0]
+$filePath = Join-Path $temporary $fileEntry.ada.report
+$savedFile = [IO.File]::ReadAllText($filePath)
+foreach ($case in @('facts','identity','divergence')) {
+    $r = $savedFile | ConvertFrom-Json -AsHashtable -Depth 64
+    $savedOutput = [IO.File]::ReadAllText($r.process.stdout_path)
+    $expected = switch ($case) {
+        'facts' { $r.native_branch_facts.year='year4000=representation'; 'facts differ from capture' }
+        'identity' { $r.native_fixture_records[0].source_sha256='0'*64; 'counterpart identity differs' }
+        'divergence' {
+            $changed = $savedOutput.Replace('year4000=representable','year4000=representation')
+            [IO.File]::WriteAllText($r.process.stdout_path,$changed)
+            $r.process.stdout_sha256=(Get-FileHash $r.process.stdout_path).Hash.ToLowerInvariant()
+            $r.process.stdout_bytes=(Get-Item $r.process.stdout_path).Length
+            $r.native_branch_facts.year='year4000=representation'
+            'C/Ada native branch facts differ'
+        }
+    }
+    $hash = Write-Json $filePath $r
+    Reject "native branch $case" {param($m)
+        $entry = @($m.operations | Where-Object { $_.file -eq 'files.lua' })[0]
+        $entry.ada.sha256=$hash
+    } $expected -Full
+    [IO.File]::WriteAllText($r.process.stdout_path,$savedOutput)
+    [IO.File]::WriteAllText($filePath,$savedFile)
+}
 $r=$savedReport | ConvertFrom-Json -AsHashtable -Depth 64
 [IO.File]::AppendAllText($r.process.stdout_path,'tamper')
 Reject 'changed captured output' {param($m)} 'capture hash mismatch' -Full
