@@ -360,6 +360,33 @@ Case 'omission requires a resolved executed invariant in another context' {
         evidence=@([ordered]@{result='passed'})}}
     Assert-True (Test-ConformanceAcceptance @fixture).gate_acceptance 'executed omission invariant rejected'
 }
+Case 'T omission rejects evidence from a default execution' {
+    $fixture = New-AcceptanceFixture 'default-t-skip' 'Write-Output ">>> testC not active: skipping API tests <<<"; Write-Output "DONE"'
+    $id='LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips=@([ordered]@{message=$fixture.Outcome.skip_messages[0];
+        coverage_ids=@($id); review_artifact='fixture review'; original_c_evidence='fixture baseline'})
+    $fixture.CoverageRecords=@{$id=[ordered]@{status='passed';kind='reviewed-block';
+        evidence=@([ordered]@{result='passed';context='default/windows/validation/static'})}}
+    Assert-AcceptanceRejected $fixture 'default evidence discharged T omission'
+}
+Case 'T omission accepts an instrumented runtime witness' {
+    $fixture = New-AcceptanceFixture 'instrumented-t-skip' 'Write-Output ">>> testC not active: skipping API tests <<<"; Write-Output "DONE"'
+    $id='LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips=@([ordered]@{message=$fixture.Outcome.skip_messages[0];
+        coverage_ids=@($id); review_artifact='fixture review'; original_c_evidence='fixture baseline'})
+    $fixture.CoverageRecords=@{$id=[ordered]@{status='passed';kind='reviewed-block';
+        evidence=@([ordered]@{result='passed';context='upstream-test/windows/validation/static'})}}
+    Assert-True (Test-ConformanceAcceptance @fixture).gate_acceptance 'instrumented T witness rejected'
+}
+Case 'T omission rejects an unsupported instrumented context' {
+    $fixture = New-AcceptanceFixture 'invalid-context-t-skip' 'Write-Output ">>> testC not active: skipping API tests <<<"; Write-Output "DONE"'
+    $id='LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips=@([ordered]@{message=$fixture.Outcome.skip_messages[0];
+        coverage_ids=@($id); review_artifact='fixture review'; original_c_evidence='fixture baseline'})
+    $fixture.CoverageRecords=@{$id=[ordered]@{status='passed';kind='reviewed-block';
+        evidence=@([ordered]@{result='passed';context='upstream-test/linux/validation/static-pic'})}}
+    Assert-AcceptanceRejected $fixture 'unsupported context discharged T omission'
+}
 Case 'a child refusal cannot certify parent allocator telemetry' {
     # Inherited environments create several sidecars. Bind the report to its PID
     # rather than accepting whichever child happened to write a result last.

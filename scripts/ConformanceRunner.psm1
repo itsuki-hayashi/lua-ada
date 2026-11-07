@@ -341,6 +341,17 @@ function Test-ConformanceAcceptance {
                 @($record.evidence | Where-Object { $_.result -ceq 'passed' }).Count -eq 0) {
                 throw "Omission lacks executed runtime coverage: $id"
             }
+            # A T-absent process cannot discharge another T-absent process's
+            # omission. Require actual instrumented evidence for the linked
+            # invariant; exact omitted-body membership remains independently
+            # reviewed in the source-bound execution contract.
+            if ($skip.message -match 'testC not active' -and
+                @($record.evidence | Where-Object {
+                    $_.result -ceq 'passed' -and
+                    $_.context -cmatch '^upstream-test/(?:(?:windows|linux|macos)/validation/(?:static|shared)|windows/validation/static-pic)$'
+                }).Count -eq 0) {
+                throw "T omission lacks instrumented runtime coverage: $id"
+            }
         }
     }
     # Only the process owning this report can certify its allocator events.

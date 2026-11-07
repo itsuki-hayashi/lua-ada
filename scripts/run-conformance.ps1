@@ -561,6 +561,14 @@ try {
                 source_sha256=(Get-FileHash $counterpart).Hash.ToLowerInvariant(); artifact=$counterpartCopy;
                 artifact_sha256=(Get-FileHash $counterpartCopy).Hash.ToLowerInvariant()}
             $nativeSetup += "; dofile('equivalent-macos-shell-status.lua')"
+            # The equivalent invokes this counterpart exactly at the original
+            # calendar boundary check, preserving the surrounding test order.
+            $counterpart = Join-Path $root 'tests/conformance/platform/macos-calendar-boundary.lua'
+            $counterpartCopy = Join-Path $fixtureDirectory 'equivalent-macos-calendar-boundary.lua'
+            Copy-Item -LiteralPath $counterpart -Destination $counterpartCopy
+            $evidence.native_fixture_records += [ordered]@{source='tests/conformance/platform/macos-calendar-boundary.lua';
+                source_sha256=(Get-FileHash $counterpart).Hash.ToLowerInvariant(); artifact=$counterpartCopy;
+                artifact_sha256=(Get-FileHash $counterpartCopy).Hash.ToLowerInvariant()}
         }
     }
     if ($Scope -ne '' -and $File -eq 'files.lua') {
@@ -610,6 +618,17 @@ try {
         } else { 'assert(T==nil)' }
         if ($File -eq 'files.lua' -and $Configuration -eq 'upstream-test' -and -not $IsWindows) {
             $setup += "; assert(type(T.nonblock)=='function')"
+        }
+        if ($File -eq 'events.lua') {
+            $wrapper = Join-Path $root 'tests/conformance/events-return-witness.lua'
+            $wrapperCopy = Join-Path $runRoot 'equivalent-events-return-witness.lua'
+            Copy-Item -LiteralPath $wrapper -Destination $wrapperCopy
+            $sourceHash = (Get-FileHash $wrapper).Hash.ToLowerInvariant()
+            $copyHash = (Get-FileHash $wrapperCopy).Hash.ToLowerInvariant()
+            if ($sourceHash -cne $copyHash) { throw 'Events return wrapper copy changed bytes' }
+            $evidence.native_fixture_records += [ordered]@{source='tests/conformance/events-return-witness.lua';
+                source_sha256=$sourceHash; artifact=$wrapperCopy; artifact_sha256=$copyHash}
+            $arguments = @($wrapperCopy)
         }
         $arguments = @('-e', ($setup + $nativeSetup)) + $arguments
         if ($File -ne 'files.lua') { $marker = 'OK' }

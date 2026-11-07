@@ -13,9 +13,14 @@ $script:cases = 0
 $nativeWitness = "native branch facts: cint=4 lua_integer=8`nnative branch facts: time_2pow40=representable`nnative branch facts: year4000=representable`nnative branch facts: isdst=boolean`nnative C-int field boundary counterpart OK`nnative time range recovery counterpart OK`nnative DST inference counterpart OK`n"
 $nativeSource = 'tests/conformance/platform/files-native-branches.lua'
 $nativeWitness += "native macOS nested shell status counterpart OK`n"
+$nativeWitness += "native macOS calendar boundary counterpart OK`n"
 $nativeCopy = Join-Path $captureDirectory 'equivalent-files-native-branches.lua'
 Copy-Item -LiteralPath (Join-Path $root $nativeSource) -Destination $nativeCopy
 $nativeHash = (Get-FileHash $nativeCopy).Hash.ToLowerInvariant()
+$eventsSource = 'tests/conformance/events-return-witness.lua'
+$eventsCopy = Join-Path $captureDirectory 'equivalent-events-return-witness.lua'
+Copy-Item -LiteralPath (Join-Path $root $eventsSource) -Destination $eventsCopy
+$eventsHash = (Get-FileHash $eventsCopy).Hash.ToLowerInvariant()
 $nativeMappingPath = 'tests/conformance/reviews/files-native-branches.proposal.json'
 $nativeReviewPath = 'tests/conformance/reviews/files-native-branches.gc-cross-review.json'
 $nativeReview = @{mapping=$nativeMappingPath; review=$nativeReviewPath;
@@ -70,7 +75,7 @@ foreach ($context in $suite.acceptance_contexts) {
                 'gc.lua' { "OK`n>>> closing state <<<`n" }
                 'gengc.lua' { "testing stop-the-world collection`nOK`n" }
                 'files.lua' { "native unbuffered visibility counterpart OK`ntesting i/o`ntesting flush`ntesting large files (> BUFSIZ)`ntesting popen/pclose and execute`ntesting date/time`ntesting failed write`ntest done on 01/01/2026, at 00:00:00`nLua 5.5`n" }
-                default { "OK`n" }
+                default { "OK`nevents return witness OK`n" }
             }
             $runId = "$context/$file/$target"
             $report = @{repository_revision=$manifest.revision; repository_dirty=$false;
@@ -90,6 +95,10 @@ foreach ($context in $suite.acceptance_contexts) {
             $probePids = if ($target -eq 'ada') { @(100,101,102,104,105) } else { @(101,102) }
             foreach ($probePid in $probePids) {
                 $report.launcher_probe_telemetry += New-Telemetry "$runId/probes" $configuration $probePid
+            }
+            if ($file -eq 'events.lua') {
+                $report.native_fixture_records = @(@{source=$eventsSource; source_sha256=$eventsHash;
+                    artifact=$eventsCopy; artifact_sha256=$eventsHash})
             }
             if ($file -eq 'files.lua') {
                 $report.process = New-Process ($nativeWitness + $output) 103 900
@@ -146,6 +155,8 @@ $reportPath = Join-Path $temporary $first.report
 $savedReport = [IO.File]::ReadAllText($reportPath)
 foreach ($case in @(
     @{Name='dirty execution'; Field='repository_dirty'; Value=$true; Expected='identity, policy'},
+    @{Name='missing events return wrapper'; Field='native_fixture_records'; Value=@(); Expected='events return wrapper differs'},
+    @{Name='tampered events return wrapper'; Field='native_fixture_records'; Value=@(@{source=$eventsSource;source_sha256=$eventsHash;artifact=$nativeCopy;artifact_sha256=$eventsHash}); Expected='capture hash mismatch'},
     @{Name='wrong revision'; Field='repository_revision'; Value=('b'*40); Expected='identity, policy'},
     @{Name='wrong host'; Field='host'; Value=@{platform='unknown'}; Expected='identity, policy'},
     @{Name='unknown disposition'; Field='execution_disposition'; Value='skipped'; Expected='identity, policy'},

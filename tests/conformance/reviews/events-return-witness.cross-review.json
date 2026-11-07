@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "kind": "independent-events-return-witness-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-scoped-invocation-and-artifact-replay",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "path": "tests/conformance/events-return-witness.lua",
+      "sha256": "1c432f22b279cf6d4df530435345176cf093f63dd88725dbb42fbb0f2ab967c9"
+    },
+    {
+      "path": "scripts/run-conformance.ps1",
+      "sha256": "50b70c3c42af4a2d98584560325f23cb5bfdd7cbc3adaac1e7bc52455a2546fa"
+    },
+    {
+      "path": "scripts/ConformanceScope.psm1",
+      "sha256": "ab50bd3e59ccd23032bec865983821e4ae96c0f118de3c511bd9ce89bb3d4372"
+    },
+    {
+      "path": "scripts/test-conformance-scope.ps1",
+      "sha256": "7f7dc6b72ac7444d600ec3fe66c20d57ac02a803a1250c48cab4af61e5a06aaf"
+    },
+    {
+      "path": "tests/conformance/reviews/events.execution-obligation-packet.proposal.json",
+      "sha256": "fa7b292d23631394ef1fd1765bceceda4bf3147ee267cc6eb6811579c2a43f00"
+    }
+  ],
+  "accepted": [
+    "Real dofile executes original source once; loaded chunk local environment changes do not alter wrapper assertion/print.",
+    "Source has no arg or debug-frame assertions invalidated by caller; extra activation/roots are genuine dofile behavior, as required by all.lua return check.",
+    "Exactly one ordered terminal OK/return witness pair prevents old plain OK execution from certifying return12."
+  ],
+  "findings": [
+    "Require matrix replay of exactly one current wrapper fixture source/hash and retained copied bytes; current native fixture replay is files-only.",
+    "Runner should compare source/copy wrapper hashes immediately."
+  ],
+  "execution_evidence": [],
+  "revision_review": {
+    "decision": "accepted",
+    "bindings": [
+      {
+        "path": "scripts/run-conformance.ps1",
+        "sha256": "22b8efc8048f74313c0ef8e2158c806a4596596927f3878edd947cdd9b4f8ff4"
+      },
+      {
+        "path": "scripts/ConformanceMatrix.psm1",
+        "sha256": "c1b5705949f0ea671152931b0ac1f0201cce6f4e2d057410a97a426c49e3198e"
+      },
+      {
+        "path": "scripts/test-conformance-matrix.ps1",
+        "sha256": "e790110bf312474e77752aba3803f82f54d536c899c3cfe9f2952216b081059c"
+      },
+      {
+        "path": "tests/conformance/reviews/events.execution-obligation-packet.proposal.json",
+        "sha256": "19af1b81cf5edd17f0cee0a9d2b65bc0383cffce9064d5294b4f70188b1689f3"
+      },
+      {
+        "path": "reports/review-events-return-instrumented.log",
+        "sha256": "a4e4d53bbb731375e1db672c093b2b7eaa45bf2b3f17f00cd796951fcf2f668f"
+      }
+    ],
+    "rationale": "The runner compares copy and source hashes before launching. For each C and Ada target the matrix requires exactly one wrapper identity, compares both recorded hashes to the current source, then rehashes retained artifact bytes. Two negative cases exercise missing and substituted artifacts.",
+    "observations": "Windows instrumented ReferenceC and Ada reports in a69a088d2c56408ba3da045517c756c9 both recorded passed and ended with the ordered OK and events return witness OK lines. Final acceptance remains pending."
+  }
+}

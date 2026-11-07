@@ -48,5 +48,40 @@
     "Strict future evidence replay must enforce each peranchor/configuration/native/equivalent requirement and expected source-bound stderr.",
     "Corrected complete Mac C/Ada runs and final26context evidence remain pending."
   ],
-  "execution_evidence": []
+  "execution_evidence": [],
+  "five_span_delta": {
+    "decision": "accepted-proposal-semantics",
+    "bindings": [
+      {
+        "sha256": "165810ad8ded1acfbe96829a9b77ae07a6d2f21574eb392f046a494f49b1cc52",
+        "path": "tests/conformance/reviews/files.execution-obligation-packet.proposal.json"
+      },
+      {
+        "sha256": "ce950f0bbc4d6608397815e508f9085de4ef49495ac6c23d4290500aae5a36d1",
+        "path": "tests/conformance/equivalents/files-macos-platform.json"
+      },
+      {
+        "sha256": "54698efa32099f7450d0344ce6deb767a9923060719083247cd576650c3d40c9",
+        "path": "tests/conformance/reviews/files-macos.equivalent-approval.json"
+      },
+      {
+        "sha256": "f6ada4bf2603fd7b976f177192d76ececb940ffa7347d0776a959bae66655c96",
+        "path": "tests/conformance/reviews/files-macos.semantic-cross-review.json"
+      },
+      {
+        "sha256": "204aabc2f5b86f0b99f6ca679e079ea62391b52280e5334f7e7761289e5b97a2",
+        "path": "tests/conformance/platform/macos-calendar-boundary.lua"
+      }
+    ],
+    "source_span": "files.lua lines 926 and 927, byte offset 25410, length 119",
+    "applies_to": [
+      "LUA-FILES-MANUAL-AUDIT-0001",
+      "LUA-FILES-REVIEWED-BLOCK-0023",
+      "LUA-FILES-REVIEWED-BLOCK-0070"
+    ],
+    "review": "The fifth replacement invokes a named counterpart at the original overflow check. It tests seconds 59, 60 and 61 at maximum tm_year, exact normalized calendar fields and timestamps, reverse conversion, direct next-year field rejection and ordinary recovery. Both C and Ada must emit the required calendar marker in each macOS context.",
+    "generated_sha256": "7834b8f4a18cfd151f8ed895b0a36f1fa9805d05e8e682e8cbda472e43e94731",
+    "runtime_acceptance": false,
+    "execution_evidence": []
+  }
 }

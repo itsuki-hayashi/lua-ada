@@ -8,7 +8,7 @@
   "runtime_acceptance": false,
   "proposal": {
     "path": "tests/conformance/reviews/gc-execution-obligations.proposal.json",
-    "sha256": "1f39db965cff5d4ac71f1dd07370eeb28a7dca38ccbf07e5c1dc8667c7753855"
+    "sha256": "309af98713b8a6d7cca76b6a90a20c64369fbf2249e059a4d613e640280a830f"
   },
   "source_bindings": [
     {
@@ -41,7 +41,7 @@
     },
     {
       "path": "tests/conformance/reviews/gc-shutdown-counter.cross-review.json",
-      "sha256": "779a7a96eec40f76370e5c28b605bb83f8a44f37ed0b5177e79251338885eab3"
+      "sha256": "2292f607fecfc002f0faf78742788a10a38b331c132bd4c626e5316573dc7cd9"
     }
   ],
   "verification": [
@@ -96,5 +96,15 @@
       "sha256": "779a7a96eec40f76370e5c28b605bb83f8a44f37ed0b5177e79251338885eab3"
     },
     "runtime_acceptance": false
+  },
+  "binding_refresh": {
+    "prior_proposal": "1f39db965cff5d4ac71f1dd07370eeb28a7dca38ccbf07e5c1dc8667c7753855",
+    "prior_bindings": [
+      {
+        "path": "tests/conformance/reviews/gc-shutdown-counter.cross-review.json",
+        "sha256": "2292f607fecfc002f0faf78742788a10a38b331c132bd4c626e5316573dc7cd9"
+      }
+    ],
+    "basis": "The two packet changes refresh the scope and shutdown review hashes only. Same-process instrumented count must still be exactly ten; no context execution evidence added."
   }
 }

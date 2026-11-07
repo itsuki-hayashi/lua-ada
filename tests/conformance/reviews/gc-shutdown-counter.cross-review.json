@@ -94,11 +94,11 @@
       "path": "experiments/conformance/c/conformance_cli.c"
     },
     {
-      "sha256": "b7004226e10dbc533a1df0bec6569e02247a215530bbcdcbd8786f31abe3ee2f",
+      "sha256": "ab50bd3e59ccd23032bec865983821e4ae96c0f118de3c511bd9ce89bb3d4372",
       "path": "scripts/ConformanceScope.psm1"
     },
     {
-      "sha256": "44bc15e74449231c64bb41763c8e51860ee1fbc28a050608d7d635ff9c09f559",
+      "sha256": "7f7dc6b72ac7444d600ec3fe66c20d57ac02a803a1250c48cab4af61e5a06aaf",
       "path": "scripts/test-conformance-scope.ps1"
     },
     {
@@ -144,5 +144,16 @@
       "path": "references/lua/ltests.c"
     }
   ],
-  "binding_refresh_note": "Scope and negative-scope script changes add macOS shell marker handling; counter integer10 guard and missing/9/11/string negatives remain intact. No runtime claims."
+  "binding_refresh_note": "Scope and negative-scope script changes add macOS shell marker handling; counter integer10 guard and missing/9/11/string negatives remain intact. No runtime claims.",
+  "previous_scope_bindings": [
+    {
+      "path": "scripts/ConformanceScope.psm1",
+      "sha256": "b7004226e10dbc533a1df0bec6569e02247a215530bbcdcbd8786f31abe3ee2f"
+    },
+    {
+      "path": "scripts/test-conformance-scope.ps1",
+      "sha256": "44bc15e74449231c64bb41763c8e51860ee1fbc28a050608d7d635ff9c09f559"
+    }
+  ],
+  "scope_delta_review": "Inspected events return and macOS calendar witness changes. The instrumented GC integer count guard and negative cases still require ten complete shutdown warning deliveries."
 }

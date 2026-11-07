@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "kind": "independent-t-omission-provenance-review",
+  "reviewer": "Codex independent review agent /root/review_gc",
+  "author": "Codex primary agent /root",
+  "decision": "changes-required",
+  "runtime_acceptance": false,
+  "bindings": [
+    {
+      "sha256": "f0e76a8398d23244dd57dd4ab8e20acab89747b005342cb815533701ad814414",
+      "path": "scripts/ConformanceRunner.psm1"
+    },
+    {
+      "sha256": "d03fc72d89b793e27639a0a73c99ce2c5d1d1c852bf4540200a799585818ab8e",
+      "path": "scripts/test-conformance-runner.ps1"
+    },
+    {
+      "sha256": "8165f338c8a64c2ac154673c0e26477f4dfabee7e0153b35c7eb1b9c87dfe963",
+      "path": "tests/conformance/reviews/gc-gengc.anchor-classification-proposal.json"
+    }
+  ],
+  "accepted_invariants": [
+    "testC-not-active omission requires a passed direct runtime record plus at least one passed instrumented context, preventing default execution from discharging another default T omission.",
+    "Generic non-T omission behavior remains unchanged.",
+    "Complete scoped ledger supplies every applicable context; this local check is additional provenance validation, not a replacement for scoped completeness."
+  ],
+  "finding": {
+    "required_change": "Restrict static-pic context to Windows. Current regex accepts nonexistent upstream-test/linux/validation/static-pic and macos equivalent. Add negative for invalid context.",
+    "id": "T-OMISSION-CONTEXT"
+  },
+  "evidence_schema": [
+    "context",
+    "revision",
+    "case_id",
+    "artifact",
+    "result"
+  ],
+  "exact_source_message_mappings": [
+    {
+      "source": "gc.lua:401",
+      "coverage_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0014"
+      ],
+      "message": ">>> testC not active: skipping userdata GC tests <<<"
+    },
+    {
+      "source": "gengc.lua:127-128",
+      "coverage_ids": [
+        "LUA-GENGC-REVIEWED-BLOCK-0008",
+        "LUA-GENGC-REVIEWED-BLOCK-0009",
+        "LUA-GENGC-REVIEWED-BLOCK-0010",
+        "LUA-GENGC-REVIEWED-BLOCK-0011"
+      ],
+      "message": ">>> testC not active: skipping some generational tests <<<"
+    }
+  ],
+  "limits": [
+    "Exact omission-message membership/exhaustiveness remains independently reviewed contract responsibility; substring detection does not establish it.",
+    "Other T-only GC blocks and pre-return generational metadata remain separately required scoped obligations.",
+    "No runtime evidence or acceptance claimed by review."
+  ],
+  "execution_evidence": [],
+  "revision_review": {
+    "decision": "accepted-source-and-focused-harness-validation",
+    "resolved_finding": "T-OMISSION-CONTEXT",
+    "bindings": [
+      {
+        "path": "scripts/ConformanceRunner.psm1",
+        "sha256": "14c5528004b9b574954b653ccb9492e8bd6292e88ebe97d22113562829febf2f"
+      },
+      {
+        "path": "scripts/test-conformance-runner.ps1",
+        "sha256": "e0acaeecb287a0f948543b4998cc191ad46676b965a81867636448d265309bd9"
+      },
+      {
+        "path": "reports/review-t-omission-provenance-final.log",
+        "sha256": "4a55ca72378f8280d3761fd11a220cdc8efab3c92375087835421ad2f7e731de"
+      }
+    ],
+    "rationale": "Regex now enumerates six ordinary instrumented validation contexts plus Windows static-pic only. Unsupported Linux static-pic negative added. Reviewed final43case log reports0failed, including default rejection, validinstrumented acceptance and invalidcontext rejection.",
+    "runtime_acceptance": false,
+    "final_context_acceptance": false,
+    "scope_limit": "Focused harness validation only; exact omitted-set review and actual instrumented obligation evidence remain required."
+  }
+}

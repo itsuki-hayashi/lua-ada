@@ -30,7 +30,7 @@
       "path": "tests/conformance/reviews/gc-aunit-context-replay.proposal.json"
     },
     {
-      "sha256": "b7004226e10dbc533a1df0bec6569e02247a215530bbcdcbd8786f31abe3ee2f",
+      "sha256": "ab50bd3e59ccd23032bec865983821e4ae96c0f118de3c511bd9ce89bb3d4372",
       "path": "scripts/ConformanceScope.psm1"
     },
     {
@@ -4629,7 +4629,7 @@
   "execution_evidence": [],
   "shutdown_count_candidate": {
     "review": "tests/conformance/reviews/gc-shutdown-counter.cross-review.json",
-    "review_sha256": "779a7a96eec40f76370e5c28b605bb83f8a44f37ed0b5177e79251338885eab3",
+    "review_sha256": "2292f607fecfc002f0faf78742788a10a38b331c132bd4c626e5316573dc7cd9",
     "resolution": "Actual complete warning deliveries observed after underlying test handler succeeds, required exactly10 in same-process post-close telemetry for instrumentedgc.",
     "status": "source-reviewed including integer-schema hardening; actual final-context replay pending",
     "runtime_acceptance": false

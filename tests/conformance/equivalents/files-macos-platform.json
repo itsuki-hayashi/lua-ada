@@ -11,7 +11,7 @@
     "author": "Codex",
     "reviewer": "/root/review_files",
     "artifact": "tests/conformance/reviews/files-macos.equivalent-approval.json",
-    "artifact_sha256": "fe6af9557b6b06ecd60e82805af12cd508c64b21f63b84edb714e6c843e686e8"
+    "artifact_sha256": "54698efa32099f7450d0344ce6deb767a9923060719083247cd576650c3d40c9"
   },
   "replacements": [
     {
@@ -65,6 +65,19 @@
         "tests/conformance/platform/macos-shell-status.lua"
       ],
       "start_line": 801
+    },
+    {
+      "length_bytes": 119,
+      "id": "macos-calendar-carry-boundary",
+      "source_sha256": "50ded0e203ecb3abb45f9fd4d84e7ecab7fbd9db57270873e93e2f0f6088ff0d",
+      "end_line": 927,
+      "replacement": "        dofile('equivalent-macos-calendar-boundary.lua')\n",
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-calendar-boundary.lua"
+      ],
+      "invariant": "Verify observed Darwin seconds-carry normalization at maximum tm_year, direct next-year field rejection, reverse conversion and ordinary conversion recovery.",
+      "start_line": 926,
+      "start_byte": 25410
     }
   ]
 }

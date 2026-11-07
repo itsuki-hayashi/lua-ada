@@ -8,7 +8,7 @@
   "runtime_acceptance": false,
   "proposal": {
     "path": "tests/conformance/reviews/events.execution-obligation-packet.proposal.json",
-    "sha256": "26db79a99b321221f12862be1d4262ea8f6087c817bbee22ec27c7407c4e2f74"
+    "sha256": "19af1b81cf5edd17f0cee0a9d2b65bc0383cffce9064d5294b4f70188b1689f3"
   },
   "source_bindings": [
     {
@@ -105,5 +105,10 @@
     "This is source/control-flow mapping review, not final execution acceptance.",
     "Real standard streams, strict warning rejection, balanced physical shutdown and correct executable/library/configuration provenance remain required.",
     "Actual final26contexts and independent per-obligation evidence replay remain pending; all final_evidence arrays stay empty."
-  ]
+  ],
+  "return_witness_delta": {
+    "prior_proposal": "26db79a99b321221f12862be1d4262ea8f6087c817bbee22ec27c7407c4e2f74",
+    "decision": "accepted-semantic-invocation",
+    "basis": "The hash-bound wrapper executes the immutable events.lua once with dofile, asserts returned value 12, then prints its unique terminal witness. Scope checks both exact adjacent terminal lines and counts each once; matrix verifies copied wrapper identity. Earlier direct execution captures do not establish this result."
+  }
 }

@@ -123,7 +123,8 @@ $ioWitness = "native unbuffered visibility counterpart OK`ntesting i/o`ntesting 
 $nativeWitness = "native branch facts: cint=4 lua_integer=8`nnative branch facts: time_2pow40=representable`nnative branch facts: year4000=representable`nnative branch facts: isdst=boolean`nnative C-int field boundary counterpart OK`nnative time range recovery counterpart OK`nnative DST inference counterpart OK`n"
 $ioWitness += $nativeWitness
 Test-ProcessWitness 'macOS requires nested shell counterpart' files.lua ($ioWitness+$dateWitness) -Platform macos -Expected 'nested shell status'
-Test-ProcessWitness 'macOS nested shell counterpart observed' files.lua ("native macOS nested shell status counterpart OK`n"+$ioWitness+$dateWitness) -Platform macos
+Test-ProcessWitness 'macOS native counterparts observed' files.lua ("native macOS nested shell status counterpart OK`nnative macOS calendar boundary counterpart OK`n"+$ioWitness+$dateWitness) -Platform macos
+Test-ProcessWitness 'macOS calendar counterpart missing' files.lua ("native macOS nested shell status counterpart OK`n"+$ioWitness+$dateWitness) -Platform macos -Expected 'File IO completion witness missing'
 Test-ProcessWitness 'files requires actual native year fact' files.lua `
     ($ioWitness.Replace("native branch facts: year4000=representable`n", '') + $dateWitness) -Expected 'native branch fact: year'
 Test-ProcessWitness 'files rejects duplicate native branch fact' files.lua `
@@ -142,7 +143,7 @@ Test-ProcessWitness 'instrumented generational early return fails' gengc.lua "OK
 Test-ProcessWitness 'instrumented generational tail witness' gengc.lua "testing stop-the-world collection`nOK`n"
 Test-ProcessWitness 'successful output cannot hide timeout' events.lua "OK`n" { param($p,$t) $p.timed_out=$true } 'complete cleanly'
 Test-ProcessWitness 'instrumented events requires real refusal' events.lua "OK`n" { param($p,$t) $t.managed_refusals=0 } 'actual allocator refusal'
-Test-ProcessWitness 'C oracle T refusal is below wrapper accounting' events.lua "OK`n" `
+Test-ProcessWitness 'C oracle T refusal is below wrapper accounting' events.lua "OK`nevents return witness OK`n" `
     { param($p,$t) $t.managed_refusals=0 } -NativeOracle
 Test-ProcessWitness 'missing physical shutdown fails' events.lua "OK`n" { param($p,$t) $t.shutdown_complete=$false } 'shutdown'
 Test-ProcessWitness 'missing last GC close callback fails' gc.lua "OK`n>>> closing state <<<`n" {param($p,$t) $t.expected_finalizer_warnings=9} 'delivery count'
@@ -151,4 +152,8 @@ Test-ProcessWitness 'duplicate GC close callback fails' gc.lua "OK`n>>> closing 
 Test-ProcessWitness 'text GC close count fails' gc.lua "OK`n>>> closing state <<<`n" {param($p,$t) $t.expected_finalizer_warnings='10'} 'delivery count'
 Test-ProcessWitness 'leaked blocks fail scoped completion' events.lua "OK`n" { param($p,$t) $t.outstanding_blocks=1 } 'unbalanced'
 Test-ProcessWitness 'wrong child configuration fails' events.lua "OK`n" { param($p,$t) $t.configuration='default' } 'Mismatched'
+Test-ProcessWitness 'events return witness observed' events.lua "OK`nevents return witness OK`n"
+Test-ProcessWitness 'events return witness missing' events.lua "OK`n" -Expected 'Events return witness'
+Test-ProcessWitness 'events return witness duplicated' events.lua "OK`nevents return witness OK`nevents return witness OK`n" -Expected 'Events return witness'
+Test-ProcessWitness 'events return witness precedes completion' events.lua "events return witness OK`nOK`n" -Expected 'Events return witness'
 Write-Output "PASS: $script:Cases scoped inventory/process regressions"

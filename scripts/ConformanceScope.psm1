@@ -158,6 +158,12 @@ function Assert-ScopedProcessCompletion {
         throw 'Instrumented events lacks actual allocator refusal'
     }
     $stdout = [IO.File]::ReadAllText($Process.stdout_path)
+    if ($File -eq 'events.lua' -and
+        ([regex]::Matches($stdout, '(?m)^OK\r?$').Count -ne 1 -or
+         [regex]::Matches($stdout, '(?m)^events return witness OK\r?$').Count -ne 1 -or
+         $stdout -notmatch '(?m)^OK\r?\nevents return witness OK\r?\n\z')) {
+        throw 'Events return witness missing, duplicate or out of order'
+    }
     if ($File -eq 'files.lua') {
         if ($stdout -notmatch '(?m)^test done on \d{2}/\d{2}/\d+, at \d{2}:\d{2}:\d{2}\r?\nLua 5\.5\r?\n\z') {
             throw 'File date/version completion witness missing'
@@ -175,7 +181,10 @@ function Assert-ScopedProcessCompletion {
             'testing i/o', 'testing flush', 'testing large files (> BUFSIZ)',
             'testing popen/pclose and execute', 'testing date/time')
         if ($Configuration -eq 'upstream-test') { $markers += 'testing failed write' }
-        if ($Platform -eq 'macos') { $markers += 'native macOS nested shell status counterpart OK' }
+        if ($Platform -eq 'macos') {
+            $markers += 'native macOS nested shell status counterpart OK'
+            $markers += 'native macOS calendar boundary counterpart OK'
+        }
         foreach ($marker in $markers) {
             if ($stdout -notmatch ('(?m)^' + [regex]::Escape($marker) + '\r?$')) {
                 throw "File IO completion witness missing: $marker"

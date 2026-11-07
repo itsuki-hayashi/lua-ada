@@ -27,15 +27,19 @@
     },
     {
       "path": "scripts/ConformanceScope.psm1",
-      "sha256": "b7004226e10dbc533a1df0bec6569e02247a215530bbcdcbd8786f31abe3ee2f"
+      "sha256": "ab50bd3e59ccd23032bec865983821e4ae96c0f118de3c511bd9ce89bb3d4372"
     },
     {
       "path": "scripts/ConformanceMatrix.psm1",
-      "sha256": "1422bca694859abc2659627ef4eb0adab397043664fa793d112591b4e2bbc1ba"
+      "sha256": "c1b5705949f0ea671152931b0ac1f0201cce6f4e2d057410a97a426c49e3198e"
     },
     {
       "path": "scripts/run-conformance.ps1",
-      "sha256": "c0e9afaf7a7700fb5605097dc6de2421110bd841726f2c2c25cd932159a20e91"
+      "sha256": "22b8efc8048f74313c0ef8e2158c806a4596596927f3878edd947cdd9b4f8ff4"
+    },
+    {
+      "path": "tests/conformance/events-return-witness.lua",
+      "sha256": "1c432f22b279cf6d4df530435345176cf093f63dd88725dbb42fbb0f2ab967c9"
     }
   ],
   "required_contexts": [
@@ -134,10 +138,11 @@
   "common_protocol": [
     "Fresh immutable fixture, _soft/_port unset,900-second file limit,2GiB allocation ceiling; launcher and child/probe configuration verified.",
     "Distinct hashed C/Ada reports for every applicable context, current clean revision, correct executable/library identity and immutable source.",
-    "Expected stdout starts with upstream events banner and ends with unique OK; exact default omission text comes from source329 and must link to instrumented obligations. Instrumented run has no such omission.",
-    "The source return12 follows final OK; ordinary CLI completion does not separately expose this return value. Do not claim a measured return-value witness unless an actual launcher capture provides it.",
     "Require exact reviewed stderr contract, physical shutdown and balanced telemetry; no outcome is accepted solely because enclosing process exited0.",
-    "Final approval binds report/contract hashes and named C/AUnit evidence; full-M3 remains false."
+    "Final approval binds report/contract hashes and named C/AUnit evidence; full-M3 remains false.",
+    "Hashed events-return-witness.lua replaces direct script argument and executes unchanged events.lua exactly once through real dofile. This is a scoped invocation protocol, not full all.lua execution.",
+    "Require exactly one upstream OK immediately followed by exactly one events return witness OK as terminal output. The latter prints only after returned value equals12.",
+    "Retain and verify wrapper source/copy hashes and actual artifact bytes in final matrix, separately from unchanged upstream source identity."
   ],
   "obligations": [
     {
@@ -243,7 +248,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -303,7 +308,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -363,7 +368,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -423,7 +428,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -483,7 +488,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -543,7 +548,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -603,7 +608,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -663,7 +668,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -723,7 +728,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -783,7 +788,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -843,7 +848,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -903,7 +908,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -963,7 +968,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1023,7 +1028,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1083,7 +1088,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1143,7 +1148,7 @@
       "guard": "none",
       "dynamic_invocation": "Index callback f invoked by reads at line 50.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1203,7 +1208,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1263,7 +1268,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1323,7 +1328,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1383,7 +1388,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1443,7 +1448,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1503,7 +1508,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1563,7 +1568,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1623,7 +1628,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1683,7 +1688,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1743,7 +1748,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1803,7 +1808,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1863,7 +1868,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1923,7 +1928,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -1983,7 +1988,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2043,7 +2048,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2103,7 +2108,7 @@
       "guard": "none",
       "dynamic_invocation": "checkcap helper invoked after every operator expression at lines 156-189.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2163,7 +2168,7 @@
       "guard": "none",
       "dynamic_invocation": "checkcap helper invoked after every operator expression at lines 156-189.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2223,7 +2228,7 @@
       "guard": "none",
       "dynamic_invocation": "checkcap helper invoked after every operator expression at lines 156-189.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2283,7 +2288,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2343,7 +2348,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2403,7 +2408,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2463,7 +2468,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2523,7 +2528,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2583,7 +2588,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2643,7 +2648,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2703,7 +2708,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2763,7 +2768,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2823,7 +2828,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2883,7 +2888,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -2943,7 +2948,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3003,7 +3008,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3063,7 +3068,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3123,7 +3128,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3183,7 +3188,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3243,7 +3248,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3303,7 +3308,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3363,7 +3368,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3423,7 +3428,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3483,7 +3488,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3543,7 +3548,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3603,7 +3608,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3663,7 +3668,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3723,7 +3728,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3783,7 +3788,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3843,7 +3848,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3903,7 +3908,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -3963,7 +3968,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4023,7 +4028,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4083,7 +4088,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4143,7 +4148,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4203,7 +4208,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4263,7 +4268,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4323,7 +4328,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4383,7 +4388,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4443,7 +4448,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4503,7 +4508,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4563,7 +4568,7 @@
       "guard": "none",
       "dynamic_invocation": "Comparison callback invoked by test(a,b,c), called at line 248; collector runs inside callbacks.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4623,7 +4628,7 @@
       "guard": "none",
       "dynamic_invocation": "Comparison callback invoked by test(a,b,c), called at line 248; collector runs inside callbacks.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4683,7 +4688,7 @@
       "guard": "none",
       "dynamic_invocation": "Comparison callback invoked by test(a,b,c), called at line 248; collector runs inside callbacks.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4743,7 +4748,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4803,7 +4808,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4863,7 +4868,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4923,7 +4928,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -4983,7 +4988,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5043,7 +5048,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5103,7 +5108,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5163,7 +5168,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5223,7 +5228,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5283,7 +5288,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5343,7 +5348,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5403,7 +5408,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5463,7 +5468,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5523,7 +5528,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5583,7 +5588,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5643,7 +5648,7 @@
       "guard": "none",
       "dynamic_invocation": "test(a,b,c) explicitly called at line 248 with three distinct Op instances.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5703,7 +5708,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5763,7 +5768,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5823,7 +5828,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5883,7 +5888,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -5943,7 +5948,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6003,7 +6008,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6063,7 +6068,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6123,7 +6128,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6183,7 +6188,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6243,7 +6248,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6303,7 +6308,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6363,7 +6368,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6423,7 +6428,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6483,7 +6488,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6543,7 +6548,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6603,7 +6608,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6663,7 +6668,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6723,7 +6728,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -6763,7 +6768,7 @@
       "guard": "T present; full userdata created through actual exports",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor.",
         "Instrumented configuration and real T availability before line328; execute six userdata comparison/delegation assertions, never default skip."
       ],
@@ -6808,7 +6813,7 @@
       "guard": "T present; full userdata created through actual exports",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor.",
         "Instrumented configuration and real T availability before line328; execute six userdata comparison/delegation assertions, never default skip."
       ],
@@ -6853,7 +6858,7 @@
       "guard": "T present; full userdata created through actual exports",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor.",
         "Instrumented configuration and real T availability before line328; execute six userdata comparison/delegation assertions, never default skip."
       ],
@@ -6898,7 +6903,7 @@
       "guard": "T present; full userdata created through actual exports",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor.",
         "Instrumented configuration and real T availability before line328; execute six userdata comparison/delegation assertions, never default skip."
       ],
@@ -6943,7 +6948,7 @@
       "guard": "T present; full userdata created through actual exports",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor.",
         "Instrumented configuration and real T availability before line328; execute six userdata comparison/delegation assertions, never default skip."
       ],
@@ -6988,7 +6993,7 @@
       "guard": "T present; full userdata created through actual exports",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor.",
         "Instrumented configuration and real T availability before line328; execute six userdata comparison/delegation assertions, never default skip."
       ],
@@ -7053,7 +7058,7 @@
       "guard": "none",
       "dynamic_invocation": "Concatenation callback invoked by chained assertions at lines 371-379.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7113,7 +7118,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7173,7 +7178,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7233,7 +7238,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7293,7 +7298,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7353,7 +7358,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7413,7 +7418,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7473,7 +7478,7 @@
       "guard": "none",
       "dynamic_invocation": "Numeric operand concatenation callback invoked at lines 412-413.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7533,7 +7538,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7593,7 +7598,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7653,7 +7658,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7713,7 +7718,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7773,7 +7778,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7833,7 +7838,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7893,7 +7898,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -7953,7 +7958,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8013,7 +8018,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8073,7 +8078,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8133,7 +8138,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8193,7 +8198,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8253,7 +8258,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8313,7 +8318,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8373,7 +8378,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8433,7 +8438,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8493,7 +8498,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8553,7 +8558,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8613,7 +8618,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8673,7 +8678,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8733,7 +8738,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8793,7 +8798,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8853,7 +8858,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8913,7 +8918,7 @@
       "guard": "none",
       "dynamic_invocation": "Top-level statement or its enclosing executable loop.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor."
       ],
       "supporting_api_ids": [
@@ -8973,7 +8978,7 @@
       "guard": "Block executes in both configurations; only one-shot refusal is T guarded",
       "dynamic_invocation": "T.allocfailnext at line 387 injects once before the ten-write loop at line 390, not before each assignment. Default executes that loop without injection. Ada instrumented evidence requires actual managed refusal >=1; C ltests refuses below the outer allocator wrapper.",
       "observation_requirements": [
-        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact final OK, no unexpected warnings, complete balanced physical shutdown.",
+        "Same pinned source bytes, real assert implementation, zero exit/no timeout, exact upstream OK followed by the terminal return witness, no unexpected warnings, complete balanced physical shutdown.",
         "Independent control-flow review must establish the actual predicate/callback path; file marker alone does not certify this anchor.",
         "Default: normal weak-value delegation executes ten writes. Instrumented: inject exactly one refusal before the same loop, not ten injections.",
         "Ada instrumented parent telemetry managed_refusals>=1 in this run; isolated launcher probes cannot satisfy this. C ltests refusal occurs below wrapper counter and may leave wrapper count zero."
@@ -9000,6 +9005,11 @@
     {
       "pattern": "(?m)^OK\\r?$",
       "count": 1
+    },
+    {
+      "pattern": "(?m)^events return witness OK\\r?$",
+      "count": 1
     }
-  ]
+  ],
+  "wrapper_validation": "Source-reviewed invocation; actual final-context evidence pending."
 }

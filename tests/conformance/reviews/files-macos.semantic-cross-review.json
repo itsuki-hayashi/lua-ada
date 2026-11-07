@@ -3,14 +3,14 @@
   "kind": "independent-native-equivalent-review",
   "author": "Codex",
   "reviewer": "/root/review_files",
-  "decision": "accepted-semantic-four-span-mapping",
+  "decision": "accepted-semantic-five-span-mapping",
   "coverage_authority": false,
   "runtime_acceptance": false,
   "source": {
     "path": "references/lua/testes/files.lua",
     "sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86"
   },
-  "generated_sha256": "32c93f26bd5b4d04bbcb33b61715d75405d5b4b8e9c9407f586aa246b1aea0bf",
+  "generated_sha256": "7834b8f4a18cfd151f8ed895b0a36f1fa9805d05e8e682e8cbda472e43e94731",
   "counterparts": [
     {
       "path": "tests/conformance/platform/macos-buffered-failure.lua",
@@ -23,6 +23,10 @@
     {
       "path": "tests/c/conformance_platform.c",
       "sha256": "b41ed6260c0f37d1890ce7edd85ba05866873b88f50b31d132bfc21c5d0ab88b"
+    },
+    {
+      "path": "tests/conformance/platform/macos-calendar-boundary.lua",
+      "sha256": "204aabc2f5b86f0b99f6ca679e079ea62391b52280e5334f7e7761289e5b97a2"
     }
   ],
   "observations": {
@@ -63,13 +67,55 @@
       "id": "macos-nested-shell-wait",
       "decision": "accepted",
       "rationale": "Actual C diagnostic reports directHUP=nil,signal,1 and directKILL=nil,signal,9 for both APIs; original nestedHUP returns signal1, whereas explicit outer-shell wait returns exit129. Trailing status/exit keeps outer shell alive, preserving intended nested-child-exit distinction. Three counterpart checks enforce exact triples; no dynamic expected value or broad skip."
+    },
+    {
+      "id": "macos-calendar-carry-boundary",
+      "decision": "accepted",
+      "rationale": "Observed Darwin max-tm_year seconds60/61 discard day carry and normalize to December31 midnight/00:00:01 instead of rejecting. Counterpart checks exact relative timestamps (-86399/-86398), all normalized/reverse calendar fields, reverse os.time identity, direct next-year exact field rejection and ordinary conversion recovery. This is an explicit native divergence, never an unchanged upstream error-test pass."
     }
   ],
-  "integration_review": "Launcher copies/hashes/runs shell counterpart for C and Ada within Mac equivalent setup. Scope validator requires its exact marker when Platform=macos; both invocation sites supply actual evidence.host.platform. Source is unchanged outside four exact replacement spans.",
+  "integration_review": "Shell counterpart executes in Mac setup; fifth calendar counterpart executes at the original date assertion position. Both are source/copy-hashed and require exact Mac completion markers. Source bytes are unchanged outside five reviewed spans.",
   "limitations": [
     "Corrected complete Mac C/Ada executions remain pending in default and instrumented contexts.",
     "Recorded native status triples establish observed behavior; shell tail-exec is the explanatory inference, not independently instrumented process tracing.",
     "This semantic approval does not convert failed historical run to passing or establish final26context acceptance.",
     "The unbuffered failure fixture has C preflight evidence; remaining guarded T.nonblock receiver path still requires actual complete instrumented Mac execution."
-  ]
+  ],
+  "previous_generated_sha256": "32c93f26bd5b4d04bbcb33b61715d75405d5b4b8e9c9407f586aa246b1aea0bf",
+  "calendar_delta": {
+    "reviewer": "/root/review_files",
+    "author": "Codex",
+    "decision": "accepted-native-calendar-counterpart",
+    "report": {
+      "path": "reports/ci-artifacts/e028dae-mac-instrumented/scoped-files/3db868941c0847c986b0b5b584fb8748/ReferenceC-files.lua.json",
+      "sha256": "8e191dc415384bb080a789c88857e81b4b637145f8fd16e495997b998f82eb51"
+    },
+    "stdout": {
+      "path": "reports/ci-artifacts/e028dae-mac-instrumented/conformance/8c9fcb2c6b0446be8df5e81bbd267325/execution.stdout",
+      "sha256": "37fffa75fd539460d746d23d7c3d951a473f0cf18f84ee2c05287b9568ac4a12"
+    },
+    "stderr": {
+      "path": "reports/ci-artifacts/e028dae-mac-instrumented/conformance/8c9fcb2c6b0446be8df5e81bbd267325/execution.stderr",
+      "sha256": "4bc46969564913007d50eeea8aa4e2c3cebe5d73bcfe1e1635d6a7e4fec48ca7"
+    },
+    "observed": {
+      "target": "ReferenceC",
+      "revision": "e028daeb1ca05540ec7cf695120d4b6e61628902",
+      "status": "failed",
+      "sec59": "67768036191676799;2147485547/12/31 23:59:59",
+      "sec60": "67768036191590400;same date00:00:00",
+      "sec61": "67768036191590401;same date00:00:01",
+      "nextyear": "field year out-of-bound"
+    },
+    "invariant": "Observed Darwin max-tm_year seconds60/61 discard day carry and normalize to December31 midnight/00:00:01 instead of rejecting. Counterpart checks exact relative timestamps (-86399/-86398), all normalized/reverse calendar fields, reverse os.time identity, direct next-year exact field rejection and ordinary conversion recovery. This is an explicit native divergence, never an unchanged upstream error-test pass.",
+    "integration": "Fifth exact source span invokes the copied/hashed counterpart at original boundary position; it is not eagerly run in setup. Mac completion requires its marker. Original preceding seconds59 success and following direct field-bound checks remain intact.",
+    "diagnostic_disposition": "Retaining date diagnostics is acceptable: fresh local tables, protected native calls and flushed observations do not change expected values, environment, modes or source replacements; they add no Lua subprocess or shell stderr. They remain diagnostic-only and cannot discharge the assertion counterpart.",
+    "diagnostic_source": {
+      "path": "tests/conformance/platform/macos-shell-diagnostic.lua",
+      "sha256": "de3592d9c933ec08ab15cbde2737af411f41e00dfc74af6f3a07f38e9c268dd8"
+    },
+    "runtime_acceptance": false,
+    "limits": "Native facts are from prior C-only failed execution; corrected Ada/C complete runs and final26contexts remain pending."
+  },
+  "four_span_integration_history": "Launcher copies/hashes/runs shell counterpart for C and Ada within Mac equivalent setup. Scope validator requires its exact marker when Platform=macos; both invocation sites supply actual evidence.host.platform. Source is unchanged outside four exact replacement spans."
 }

@@ -890,3 +890,24 @@ pass. No obligations are promoted here and full-M3 acceptance remains false.
 The latest complete local default/instrumented validation-static pipelines each
 pass1306 AUnit cases and four-file observations, but include uncommitted review
 work and therefore are not clean final-revision acceptance evidence.
+
+Mac instrumented static job128257278051 at e028dae supplied archive13555241106,
+SHA12a4b98e2acef482212941e2fd69ad1eec88b3d7f114cb0a5acc5c28b673ca19.
+The native C oracle normalizes maximum-year seconds60/61 to midnight on the
+same December31, with matching reverse conversions. Direct next-year input
+raises the expected field error. The fifth Mac replacement calls its named
+counterpart at original lines926-927, verifies the observed timestamp deltas,
+both normalized calendars, the actual field refusal and ordinary recovery.
+The generated source hash is
+7834b8f4a18cfd151f8ed895b0a36f1fa9805d05e8e682e8cbda472e43e94731.
+This native C observation does not certify the corrected equivalent on Ada.
+
+The scoped events launcher now verifies the unchanged file's return12 in one
+real `dofile` call, with exactly one upstream OK followed by the wrapper's
+terminal witness. Matrix replay verifies the retained wrapper bytes for each
+target. Instrumented Windows C/Ada observations are in
+reports/gc-events/a69a088d2c56408ba3da045517c756c9. A T-absence omission
+now requires linked passing evidence in a supported instrumented context;
+the reviewed execution contract still determines the exact omitted IDs.
+Local regressions pass 43 runner, 52 scope and 35 matrix cases. Semantic
+review, observed executions and final acceptance remain distinct.

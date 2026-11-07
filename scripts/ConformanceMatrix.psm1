@@ -332,6 +332,14 @@ function Test-ScopedMatrix {
             $telemetry = Get-Content -LiteralPath $telemetryPath -Raw | ConvertFrom-Json -AsHashtable
             Assert-ScopedProcessCompletion -File $entry.file -Process $report.process -Telemetry $telemetry `
                 -RunId $report.run_id -Configuration $configuration -Platform $report.host.platform -NativeOracle:($target -eq 'c')
+            if ($entry.file -eq 'events.lua') {
+                $wrapperPath = 'tests/conformance/events-return-witness.lua'
+                $wrapper = @($report.native_fixture_records | Where-Object { $_.source -ceq $wrapperPath })
+                $hash = (Get-FileHash (Join-Path $Root $wrapperPath)).Hash.ToLowerInvariant()
+                if ($wrapper.Count -ne 1 -or $wrapper[0].source_sha256 -cne $hash -or
+                    $wrapper[0].artifact_sha256 -cne $hash) { throw 'Matrix events return wrapper differs' }
+                [void](Resolve-MatrixCapture -Original $wrapper[0].artifact -ArtifactRoot $artifacts -Hash $hash)
+            }
             if ($entry.file -eq 'files.lua') {
                 $nativeMapping = Assert-NativeBranchReviewBinding -Root $Root -Identity $report.native_branch_review
                 if ($nativeMapping.source -cne 'references/lua/testes/files.lua' -or

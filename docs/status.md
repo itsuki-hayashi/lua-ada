@@ -11,13 +11,16 @@ instrumented validation/static AUnit runs pass 1,306 cases. Reviewed GC and
 Windows file equivalents execute against the actual Ada runtime; unchanged
 Linux file observations pass in both configurations. The C-specific GC byte
 allowance remains an explicitly reviewed Ada equivalent, never an unchanged pass.
-Mac instrumented static at 4c00054 passes eight warning regressions and matching
-C/Ada events, GC and generational observations. Its file run fails the nested
-shell-status assumption after passing native IO and nonblocking stages.
-Captured C diagnostics show direct HUP/KILL signal statuses and an explicit
-outer-shell wait returning exit129. The four-span Mac mapping now has independent
-semantic approval and a named shell counterpart; corrected complete Mac runs
-remain pending. The test warning observer also measures all ten instrumented
+All Windows and Linux jobs at 04b9968 passed, including both Windows static-PIC
+steps. Mac C/Ada GC and events observations passed, and the Mac file oracle
+passed the repaired shell counterpart before reaching a calendar difference.
+At e028dae, the Mac C oracle normalized seconds 60 and 61 at maximum `tm_year`
+to midnight on the same date; direct input of the next year was rejected.
+The fifth Mac equivalent span now checks those native results, reverse conversion
+and recovery. Complete corrected Mac C/Ada file runs remain pending.
+The scoped events launcher also verifies the unchanged file returns 12 through
+`dofile`, matching the check in upstream `all.lua`. The test warning observer
+measures all ten instrumented
 GC shutdown errors after their original ordering assertions; actual local C
 and Ada runs report ten with balanced storage. Independent semantic reviews
 are recorded separately from final-revision execution acceptance.
