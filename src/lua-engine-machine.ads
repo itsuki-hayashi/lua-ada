@@ -25,7 +25,7 @@ package Lua.Engine.Machine is
    procedure Concatenate_Primitives
      (State : in out World; First : Positive; Last : in out Natural);
    --  Fold the convertible suffix of an actual C operand interval. Publish
-   --  each result in its left slot and consume the right slot. Stop at the
+   --  each run in its first slot and consume its other slots. Stop at the
    --  first handler-requiring pair; First=Last means a complete result.
    --  The current addressed C/borrowed window owns all input/result roots.
 

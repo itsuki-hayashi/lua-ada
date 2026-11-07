@@ -13,9 +13,11 @@ acceptance, remaining T drivers and traceback remain open.
 
 The [public C concat component](sessions/2026-11-08-c-concat-windows.md)
 folds original C scalar slots, preserving handler mutation and weak lifetimes.
-Eighteen identical C cases match both native configurations and both Ada
-configurations; both local Ada configurations pass 1,979 AUnit cases. The
-independently measured borrowed-Lua-CI scalar view and final acceptance remain.
+Twenty-one identical C cases match both native configurations and both Ada
+configurations; both local Ada configurations pass 1,983 AUnit cases. Grouped
+primitive construction fits an independently native-proven provider bound.
+The independently measured borrowed-Lua-CI scalar view and final acceptance
+remain open.
 
 The [metamethod argument ownership prerequisite](sessions/2026-11-08-metamethod-argument-roots.md)
 retires copied request inputs after the next activation owns them. Seven

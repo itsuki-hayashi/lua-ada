@@ -26,6 +26,7 @@ package body Lua.C_Concat_Tests is
    procedure Primitive_Quota;
    procedure Extent_Quota;
    procedure Handler_Quota;
+   procedure Byte_Quota;
    procedure Caller_Mutation;
    procedure Weak_Operand_Lifetime;
    procedure Retained_Prefix;
@@ -44,6 +45,9 @@ package body Lua.C_Concat_Tests is
    procedure Empty_Handler_Result;
    procedure Number_Before_Handler;
    procedure Number_After_Handler;
+   procedure Grouped_Storage;
+   procedure Transient_Growth_Retry;
+   procedure Binary_Run;
 
    --  The C fixture documents setup/action/results and is independently
    --  run against pinned native default/T. Each named call creates and
@@ -139,6 +143,21 @@ package body Lua.C_Concat_Tests is
       Assert (Check (17) = 1, "right numeric handler argument is unconverted");
    end Number_After_Handler;
 
+   procedure Grouped_Storage is
+   begin
+      Assert (Check (18) = 1, "whole run fits a constant growth allowance");
+   end Grouped_Storage;
+
+   procedure Transient_Growth_Retry is
+   begin
+      Assert (Check (19) = 1, "one actual refused growth is retried");
+   end Transient_Growth_Retry;
+
+   procedure Binary_Run is
+   begin
+      Assert (Check (20) = 1, "grouped binary bytes and numeric conversion");
+   end Binary_Run;
+
    procedure Check_Budget
      (Choice : Interfaces.C.int; Bounds : Limits; Source : String)
    is
@@ -188,6 +207,12 @@ package body Lua.C_Concat_Tests is
         "pcall(concat,t,t);error('handler quota was caught')");
    end Handler_Quota;
 
+   procedure Byte_Quota is
+   begin
+      Check_Budget (3, (Instructions => 500, others => <>),
+                    "pcall(concat);error('byte quota was caught')");
+   end Byte_Quota;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "C concat: caller operand mutation",
@@ -226,11 +251,19 @@ package body Lua.C_Concat_Tests is
                         Number_Before_Handler'Access);
       Test_Support.Add (Suite, "C concat: right number reaches handler",
                         Number_After_Handler'Access);
+      Test_Support.Add (Suite, "C concat: whole run bounded growth",
+                        Grouped_Storage'Access);
+      Test_Support.Add (Suite, "C concat: transient growth retry",
+                        Transient_Growth_Retry'Access);
+      Test_Support.Add (Suite, "C concat: grouped binary bytes",
+                        Binary_Run'Access);
       Test_Support.Add (Suite, "C concat: primitive fold host quota",
                         Primitive_Quota'Access);
       Test_Support.Add (Suite, "C concat: result extent host quota",
                         Extent_Quota'Access);
       Test_Support.Add (Suite, "C concat: handler shares host quota",
                         Handler_Quota'Access);
+      Test_Support.Add (Suite, "C concat: byte copy host quota",
+                        Byte_Quota'Access);
    end Register;
 end Lua.C_Concat_Tests;

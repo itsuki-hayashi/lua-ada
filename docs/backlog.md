@@ -10,10 +10,11 @@ remaining T drivers and final same-head platform acceptance.
 
 
 Public C concat has [original-slot component evidence](sessions/2026-11-08-c-concat-windows.md):
-eighteen native/Ada default/T paired cases and three bounded cases within
-1,979 passing AUnit cases in each configuration. Complete the independently
-measured borrowed-Lua-CI scalar view, grouped primitive suffixes and registry
-fallback callback continuation, then all remaining source/T/final matrices.
+twenty-one native/Ada default/T paired cases and four bounded cases within
+1,983 passing AUnit cases in each configuration. Grouped primitive suffixes
+fit a native-proven provider allowance. Complete the independently measured
+borrowed-Lua-CI scalar view and registry fallback callback continuation, then
+all remaining source/T/final matrices.
 
 Metamethod request packets now have [actual ownership evidence](sessions/2026-11-08-metamethod-argument-roots.md):
 seven before/after weak-lifetime cases, 1,935 passing local AUnit cases and

@@ -69,6 +69,37 @@ clears vacated slots, New_Native copies its captures, and host abort tests
 exercise retirement-before-error. The review did not execute tests and is
 not GitHub/final approval.
 
+## Grouped primitive followup
+
+A separately native-proven real-provider case established that pairwise
+materialization was also a public storage problem. It supplies 4,096 already
+existing string slots, then permits thirty-two further growth requests.
+Native default/T succeed; the original Ada pairwise path fails with the
+actual `not enough memory` error after the first eighteen cases pass. This
+is a bounded construction allowance, not an assertion of native pool order,
+capacity or exact allocation counts.
+
+Primitive runs now convert original scalar operands from right to left and
+publish each number conversion immediately, matching `luaV_concat`. A managed
+builder collects the whole convertible suffix and publishes one result.
+Immutable borrowed byte views avoid input-sized Ada String temporaries; the
+original actual slots own all operand roots throughout emergency collection
+and result allocation. Ordinary empty-string shortcuts still require no
+growth. The builder uses the existing one-emergency-collection retry policy,
+and both operand scans and actual copied bytes charge the owning driver.
+
+The new growth-bound case passes Ada default/T. A separate actual one-shot
+provider refusal succeeds after retry in all four native/Ada configurations,
+and another named case checks NUL-bearing runs with numeric conversion and
+an untouched prefix. A fourth new bounded case proves byte-copy work itself
+can stop a two-operand concat and preserve host recovery/complete cleanup.
+
+All **1,983 AUnit cases** pass in each local Ada configuration. Strict
+default/T runtime, tests and C builds pass with no policy/flag relaxation.
+All twenty-one identical public concat C cases pass native default/T and
+Ada default/T, and all twenty-two retained public C consumers pass in each
+Ada configuration. The borrowed Lua CI gap below remains independently open.
+
 ## Remaining boundaries
 
 An independent same-C-source external deallocator probe now demonstrates a
@@ -82,9 +113,6 @@ for a private-internals exclusion. No passing borrowed-Lua-CI claim is made.
 Native T's lock rejects external allocator API reentry, as recorded by the
 existing external-string fixture's explicit instrumentation skip.
 
-Primitive suffixes currently fold pairwise. Pinned C groups convertible runs
-into one builder; a separately measured bounded/performance followup should
-retain real slot/number conversion ordering without copied operand roots.
 The registry `_LOADED` fallback callback continuation, remaining source/T
 files, locals.lua progress output policy, full shared/platform matrices and
 immutable final-head acceptance remain open. Reference bytes and pins are

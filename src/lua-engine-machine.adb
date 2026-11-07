@@ -523,30 +523,119 @@ package body Lua.Engine.Machine is
      (State : in out World; First : Positive; Last : in out Natural)
    is
       Context : constant Context_Access := State.Current;
-      Left, Right, Result : Value;
+      Builder : Owned_Buffer;
+      Left, Right, Result, Item : Value;
+      Lower, Total : Natural;
+      Retried : Boolean;
+      procedure Charge (Count : Natural := 1);
+      function Convert (Index : Positive) return Value;
+      function Short_Empty (Item : Value) return Boolean;
+
+      procedure Charge (Count : Natural := 1) is
+      begin
+         if State.Policy = Bounded then
+            if Count > State.Bounds.Instructions -
+              Natural'Min (State.Steps, State.Bounds.Instructions)
+            then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Count;
+         end if;
+      end Charge;
+
+      function Convert (Index : Positive) return Value is
+         Item : Value := Stacks.Read (Context, Index);
+      begin
+         if Item.Kind in Integer_Kind | Real_Kind then
+            Item := New_String (State, Image (Context.Memory, Item));
+            --  Native tostring updates this actual operand before trying
+            --  the next one. Publish immediately: emergency collection or
+            --  a later refusal must not observe an invented copied packet.
+            Stacks.Write (State, Context, Index, Item);
+         end if;
+         return Item;
+      end Convert;
+
+      function Short_Empty (Item : Value) return Boolean is
+        (Item.Kind = String_Kind and then Item.Reference.Bytes.Size = 0
+         and then not Item.Reference.External_String);
    begin
       if First > Last or else Last > Context.Foreign_Top then
          raise Program_Error with "invalid C concatenation interval";
       end if;
+      Builder.Set_Owner (Lua.Storage.Reference (State.Memory));
       while Last > First loop
          Left := Stacks.Read (Context, Last - 1);
          Right := Stacks.Read (Context, Last);
          exit when
            Left.Kind not in String_Kind | Integer_Kind | Real_Kind or else
            Right.Kind not in String_Kind | Integer_Kind | Real_Kind;
-         if State.Policy = Bounded then
-            if State.Steps >= State.Bounds.Instructions then
-               Fail (State, "instruction limit exceeded", Resource => True);
-            end if;
-            State.Steps := State.Steps + 1;
+         Charge;
+         Right := Convert (Last);
+         Lower := Last - 1;
+         if Short_Empty (Right) then
+            Result := Convert (Lower);
+         elsif Short_Empty (Left) then
+            Result := Right;
+         else
+            --  Pinned luaV_concat collects the whole convertible suffix.
+            --  Pairwise materialization creates quadratically many bytes
+            --  and one string object per operand. Keep only the real input
+            --  slots, convert from right to left and build one final value.
+            Total := Right.Reference.Bytes.Size;
+            Lower := Last;
+            loop
+               Item := Stacks.Read (Context, Lower - 1);
+               exit when Item.Kind not in
+                 String_Kind | Integer_Kind | Real_Kind;
+               if Lower /= Last then Charge; end if;
+               Item := Convert (Lower - 1);
+               if Total > State.Bounds.String_Bytes or else
+                 Item.Reference.Bytes.Size > State.Bounds.String_Bytes -
+                   Total
+               then
+                  Fail (State, "string byte limit exceeded",
+                        Resource => True);
+               end if;
+               Total := Total + Item.Reference.Bytes.Size;
+               Lower := Lower - 1;
+               exit when Lower = First;
+            end loop;
+            Builder.Clear;
+            Retried := False;
+            loop
+               begin
+                  Builder.Reserve_Capacity (Total);
+                  exit;
+               exception
+                  when Lua.Storage.Allocation_Error =>
+                     if not Retry_Allocation (State, Retried) then
+                        raise;
+                     end if;
+               end;
+            end loop;
+            for Index in Lower .. Last loop
+               Item := Stacks.Read (Context, Index);
+               Charge (Item.Reference.Bytes.Size);
+               declare
+                  --  Immutable bytes remain rooted by their actual scalar
+                  --  slots throughout managed builder/result allocation.
+                  --  This borrowed view avoids an input-sized Ada String
+                  --  temporary and never escapes this synchronous append.
+                  Text : constant String (1 .. Item.Reference.Bytes.Size)
+                    with Import, Address => Item.Reference.Bytes.Address;
+               begin
+                  Append (Builder, Text);
+               end;
+            end loop;
+            Result := New_String (State, Builder);
          end if;
-         Result := Binary_Value (State, Concatenate, Left, Right);
          --  Publish the result before removing the consumed right edge.
          --  Any later handler reads the remaining original slots afresh;
          --  debug.setlocal mutations cannot be hidden by an old snapshot.
-         Stacks.Write (State, Context, Last - 1, Result);
-         Foreign.Set_Concatenation_Top (State, Last - 1);
-         Last := Last - 1;
+         Stacks.Write (State, Context, Lower, Result);
+         Foreign.Set_Concatenation_Top (State, Lower);
+         Last := Lower;
       end loop;
    end Concatenate_Primitives;
 

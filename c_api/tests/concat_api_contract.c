@@ -21,6 +21,20 @@
 #endif
 
 static struct allocation_counts counts;
+static int refuse_once;
+static unsigned transient_refusals;
+
+static void *concat_allocator(void *data, void *block,
+                              size_t old_size, size_t new_size) {
+    if (refuse_once && (block == NULL || new_size > old_size) && new_size > 0) {
+        refuse_once = 0;
+        transient_refusals++;
+        counts.calls++;
+        counts.growths++;
+        return NULL;
+    }
+    return counted_allocator(data, block, old_size, new_size);
+}
 
 static int concat_all(lua_State *L) {
     lua_concat(L, lua_gettop(L));
@@ -196,6 +210,31 @@ static int empty_shortcut(lua_State *L) {
     return 1;
 }
 
+static int concat_storage(lua_State *L) {
+    int i;
+    assert(lua_gettop(L) == 0 && lua_checkstack(L, 4100));
+    lua_pushliteral(L, "x");
+    for (i = 1; i < 4096; i++) lua_pushvalue(L, 1);
+    /* Input slots already exist. Permit ample constant construction growth,
+     * while rejecting thousands of intermediate prefix/suffix objects. This
+     * checks a real provider limit, not native pool order or exact counts. */
+    counts.fail_after = counts.growths + 32;
+    lua_concat(L, 4096);
+    counts.fail_after = 0;
+    assert(lua_gettop(L) == 1 && lua_rawlen(L, 1) == 4096);
+    return 1;
+}
+
+static int concat_transient(lua_State *L) {
+    assert(lua_gettop(L) == 3);
+    transient_refusals = 0;
+    refuse_once = 1;
+    lua_concat(L, 3);
+    assert(refuse_once == 0 && transient_refusals == 1);
+    assert(lua_gettop(L) == 1 && lua_rawlen(L, 1) == 600);
+    return 1;
+}
+
 static void empty_right_refusal(lua_State *L) {
     run(L, "local long=string.rep('r',200);"
         "assert(empty_shortcut(long,'',1)==long)");
@@ -260,6 +299,30 @@ static void number_after_handler(lua_State *L) {
         "assert(concat_all(t,37)=='joined')");
 }
 
+static void grouped_storage(lua_State *L) {
+    run(L, "local s=concat_storage();assert(#s==4096 and "
+        "s==string.rep('x',4096))");
+}
+
+static void transient_growth_retry(lua_State *L) {
+    run(L, "local a,b,c=string.rep('a',200),string.rep('b',200),"
+        "string.rep('c',200);local s=concat_transient(a,b,c);"
+        "assert(s==a..b..c)");
+}
+
+static void binary_run(lua_State *L) {
+    static const char expected[] = {'a', 0, 'b', '3', '7', 0, 'c'};
+    lua_pushliteral(L, "prefix");
+    lua_pushlstring(L, "a\0b", 3);
+    lua_pushinteger(L, 37);
+    lua_pushlstring(L, "\0c", 2);
+    lua_concat(L, 3);
+    assert(lua_gettop(L) == 2 && lua_rawlen(L, 2) == sizeof expected);
+    assert(strcmp(lua_tostring(L, 1), "prefix") == 0);
+    assert(memcmp(lua_tostring(L, 2), expected, sizeof expected) == 0);
+    lua_pop(L, 2);
+}
+
 static void handler_error_identity(lua_State *L) {
     run(L, "local marker={};local t=setmetatable({},"
         "{__concat=function()error(marker)end});"
@@ -295,7 +358,10 @@ static const struct { const char *name; concat_case body; } cases[] = {
     {"external-empty-left-copy", external_empty_left_copy},
     {"empty-handler-result", empty_handler_result},
     {"number-before-handler", number_before_handler},
-    {"number-after-handler", number_after_handler}
+    {"number-after-handler", number_after_handler},
+    {"grouped-storage", grouped_storage},
+    {"transient-growth-retry", transient_growth_retry},
+    {"binary-run", binary_run}
 };
 
 #define CONCAT_CASE_COUNT (sizeof cases / sizeof cases[0])
@@ -304,13 +370,17 @@ int lua_ada_test_concat(unsigned which) {
     lua_State *L;
     assert(which < CONCAT_CASE_COUNT);
     memset(&counts, 0, sizeof counts);
-    L = lua_newstate(counted_allocator, &counts, 317U);
+    refuse_once = 0;
+    transient_refusals = 0;
+    L = lua_newstate(concat_allocator, &counts, 317U);
     assert(L != NULL);
     luaL_openlibs(L);
     lua_register(L, "concat_all", concat_all);
     lua_register(L, "concat_prefix", concat_prefix);
     lua_register(L, "concat_seed", concat_seed);
     lua_register(L, "empty_shortcut", empty_shortcut);
+    lua_register(L, "concat_storage", concat_storage);
+    lua_register(L, "concat_transient", concat_transient);
     cases[which].body(L);
     assert(lua_gettop(L) == 0);
     counts.refuse = 0;
