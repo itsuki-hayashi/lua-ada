@@ -626,7 +626,7 @@ try {
                     $nativeProof = Assert-ConformanceNativeApplicability -Root $root -ArtifactRoot $root `
                         -Identity $evidence.native_applicability -Specification $reviewedMapping `
                         -ManifestSha256 $evidence.equivalent.manifest_sha256 -Configuration $Configuration `
-                        -Platform $evidence.host.platform -Revision $evidence.repository_revision `
+                        -Platform $evidence.host.platform -Revision $evidence.repository_revision -ExpectedContext $Context `
                         -RequireRuntimeEvidence:$RequireTargetAcceptance
                     $evidence.native_applicability_verified = $nativeProof.runtime_verified
                 } elseif ($RequireTargetAcceptance) {

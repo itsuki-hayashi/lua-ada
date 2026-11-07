@@ -307,16 +307,17 @@ function New-NativeFixture {
     [IO.File]::WriteAllText($stdout,"native condition unsupported`n",$utf8); [IO.File]::WriteAllText($stderr,'',$utf8)
     $report = @{target='ReferenceC';synthetic_fixture=$true;execution_disposition='unchanged';
         reference_revision=$f.spec.reference_revision;repository_revision=('b'*40);repository_dirty=$false;
-        host=@{platform='windows'};requested_configuration='default';reference_tree_verified=$true;
+        host=@{platform='windows'};requested_configuration='default';reference_tree_verified=$true;acceptance_context='default/windows/validation/static';
         configuration_verified=$true;setup_error=$null;allocator_limit_bytes=2147483648L;observed_configuration=$settings;
-        fixture_records=@(@{path='sample.lua';sha256=$f.spec.source_sha256});process=@{executable_sha256=('c'*64);
+        reference_library_records=@(@{path='C:/synthetic/libconformance_lua.a';sha256=('e'*64)});
+        fixture_records=@(@{path='sample.lua';sha256=$f.spec.source_sha256});process=@{executable='C:/synthetic/lua.exe';executable_sha256=('c'*64);
             exit_code=0;timed_out=$false;capture_exceeded=$false;pipe_drain_failed=$false;process_tree_kill_error=$null;
             abnormal_exit_kind=$null;stdout_path=$stdout;stderr_path=$stderr;stdout_bytes=(Get-Item $stdout).Length;stderr_bytes=0;
             stdout_sha256=(Get-FileHash $stdout).Hash.ToLowerInvariant();stderr_sha256=(Get-FileHash $stderr).Hash.ToLowerInvariant()}}
     $proof = @{schema_version=1;kind='native-platform-applicability';synthetic_fixture=$true;
         reference_revision=$f.spec.reference_revision;repository_revision=('b'*40);mapping_id=$mapping.id;
         mapping_sha256=('d'*64);source=$mapping.source;source_sha256=$mapping.source_sha256;
-        configuration='default';platform='windows';observations=@(@{id='original-native';native_limitation='Synthetic native mismatch';
+        configuration='default';platform='windows';acceptance_context='default/windows/validation/static';observations=@(@{id='original-native';native_limitation='Synthetic native mismatch';
             source_spans=@(@{replacement_id='native-span';start_byte=$mapping.replacements[0].start_byte;
                 length_bytes=$mapping.replacements[0].length_bytes;source_sha256=$mapping.replacements[0].source_sha256});
             original_c_report=@{path='reports/native/original.json';sha256=''};expected_exit_code=0;
@@ -330,20 +331,20 @@ function Set-NativeApproval([Collections.IDictionary] $Fixture) {
     $proof = $Fixture.proof
     $proof.observations[0].original_c_report.sha256 = Write-Json (Join-Path $Fixture.root 'reports/native/original.json') $Fixture.native_report
     $narrative = Write-Json (Join-Path $Fixture.root 'native-narrative.json') @{reviewer=$proof.review.reviewer;
-        decision='accepted';source_linked_c_applicability='Synthetic original C source condition only'}
-    $approval = @{schema_version=1;kind='native-platform-applicability-approval';decision='accepted';
+        decision='accepted';synthetic_fixture=$true;source_linked_c_applicability='Synthetic original C source condition only'}
+    $approval = @{schema_version=1;kind='native-platform-applicability-approval';decision='accepted';synthetic_fixture=$true;
         author=$proof.review.author;reviewer=$proof.review.reviewer;review_evidence=@{path='native-narrative.json';sha256=$narrative};
         observations_sha256=(Get-ConformanceHash ($utf8.GetBytes((ConvertTo-Json -InputObject @($proof.observations) -Compress -Depth 64))))}
-    foreach ($field in @('reference_revision','repository_revision','mapping_id','mapping_sha256','source','source_sha256','configuration','platform')) {
+    foreach ($field in @('reference_revision','repository_revision','mapping_id','mapping_sha256','source','source_sha256','configuration','platform','acceptance_context')) {
         $approval[$field] = $proof[$field]
     }
     $proof.review.artifact_sha256 = Write-Json (Join-Path $Fixture.root 'native-approval.json') $approval
     $Fixture.native_identity = @{path='reports/native/proof.json';sha256=(Write-Json (Join-Path $Fixture.root 'reports/native/proof.json') $proof)}
 }
-function Invoke-NativeFixture([Collections.IDictionary] $Fixture,[switch] $Runtime) {
+function Invoke-NativeFixture([Collections.IDictionary] $Fixture,[switch] $Runtime,[string] $Context='') {
     Assert-ConformanceNativeApplicability -Root $Fixture.root -ArtifactRoot $Fixture.root -Identity $Fixture.native_identity `
         -Specification $Fixture.mapping -ManifestSha256 ('d'*64) -Configuration default -Platform windows `
-        -Revision ('b'*40) -RequireRuntimeEvidence:$Runtime
+        -Revision ('b'*40) -RequireRuntimeEvidence:$Runtime -ExpectedContext $Context
 }
 Case 'native applicability binds original C facts without synthetic runtime authority' {
     $f = New-NativeFixture; $proof = Invoke-NativeFixture $f
@@ -375,6 +376,38 @@ Case 'native applicability source context and independent review cannot drift' {
     Reject { Invoke-NativeFixture $f } 'not matching original C execution'
     $f = New-NativeFixture; $f.proof.review.reviewer = $f.proof.review.author; Set-NativeApproval $f
     Reject { Invoke-NativeFixture $f } 'independent semantic review'
+}
+Case 'native applicability cannot borrow another profile or library context baseline' {
+    $f=New-NativeFixture
+    $null=Invoke-NativeFixture $f -Context default/windows/validation/static
+    Reject {Invoke-NativeFixture $f -Context default/windows/release/static} 'another acceptance context'
+    $f.native_report.acceptance_context='default/windows/validation/shared';Set-NativeApproval $f
+    Reject {Invoke-NativeFixture $f -Context default/windows/validation/static} 'Original C native observation identifies another acceptance context'
+}
+Case 'actual-labelled native facts cannot gain runtime authority from synthetic review artifacts' {
+    $f=New-NativeFixture;$f.proof.synthetic_fixture=$false;$f.native_report.synthetic_fixture=$false;Set-NativeApproval $f
+    Reject {Invoke-NativeFixture $f -Runtime -Context default/windows/validation/static} 'actual independent approval'
+    $approval=Get-Content (Join-Path $f.root 'native-approval.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    $approval.synthetic_fixture=$false
+    $f.proof.review.artifact_sha256=Write-Json (Join-Path $f.root 'native-approval.json') $approval
+    $f.native_identity.sha256=Write-Json (Join-Path $f.root 'reports/native/proof.json') $f.proof
+    Reject {Invoke-NativeFixture $f -Runtime -Context default/windows/validation/static} 'actual independent narrative'
+}
+Case 'original C applicability cannot borrow a different frozen host runtime or context image' {
+    $f=New-NativeFixture
+    $image=@{revision=('b'*40);context='default/windows/validation/static';launcher_basename='lua.exe';
+        paths=@{c_oracle='build/conformance/default/bin/lua.exe';c_runtime='build/conformance/default/lib'};
+        files=@(@{path='build/conformance/default/bin/lua.exe';sha256=('c'*64)},
+            @{path='build/conformance/default/lib/libconformance_lua.a';sha256=('e'*64)})}
+    function Replay-NativeImage([Collections.IDictionary]$Fixture,[Collections.IDictionary]$Image){
+        &$targetModule {param($r,$p,$i) Assert-TargetNativeOriginalImageBindings -ArtifactRoot $r -Proof $p -ContextImage $i} $Fixture.root $Fixture.proof $Image
+    }
+    Replay-NativeImage $f $image
+    foreach($change in @('host','runtime','context','missing')){
+        $altered=ConvertFrom-Json (ConvertTo-Json $image -Depth 32) -AsHashtable -Depth 32
+        switch($change){host{$altered.files[0].sha256='0'*64};runtime{$altered.files[1].sha256='0'*64};context{$altered.context='default/windows/release/static'};missing{$altered=$null}}
+        Reject {Replay-NativeImage $f $altered} 'frozen|context image identity'
+    }
 }
 
 Write-Output "PASS: $script:Cases exact-byte transform regressions; synthetic approval fixtures, no runtime conformance claim"

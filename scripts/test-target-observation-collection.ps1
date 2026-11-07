@@ -55,7 +55,17 @@ foreach($partition in $plan.partitions){
         $hash=Save (Join-Path $directory $relative) @{deliberate_nonexecution_fixture=$true}
         $warning=@{path=('/original/'+$relative);sha256=$hash}
     }
+    $nativeOriginal=@()
+    $platform=$partition.context.Split('/')[1]
+    if('files.lua' -cin $partition.files -and $platform -cin @('windows','macos')){
+        $relative='reports/target-partitions/'+$partition.id+'/'+$partition.partition+'/ReferenceC-file-files.lua-native-original.json'
+        $hash=Save (Join-Path $directory $relative) @{deliberate_nonexecution_fixture=$true;runtime_acceptance=$false;status='failed'}
+        $mapping='tests/conformance/equivalents/files-'+$platform+'-platform.json'
+        $nativeOriginal+=@{operation='file:files.lua';variant='native-original';target='ReferenceC';report=('/original/'+$relative);sha256=$hash;
+            source_mapping=@{path=$mapping;sha256=(Get-FileHash (Join-Path $root $mapping)).Hash.ToLowerInvariant()}}
+    }
     $index=@{revision=$revision;context=$partition.context;partition=$partition.partition;runtime_acceptance=$false;coverage_authority=$false;
+        native_original_observations=$nativeOriginal;
         completed=$true;failures=@();observations=$observations;warning_observations=$warning;image=@{sha256=(Get-FileHash $imagePath).Hash.ToLowerInvariant()}}
     $null=Save (Join-Path $directory ('reports/target-partitions/'+$partition.id+'/'+$partition.partition+'/index.json')) $index
 }
@@ -75,6 +85,20 @@ Case 'all synthetic transport rows assemble without acquiring acceptance or sema
         $matrix.review.status -ceq 'pending') 'Collector promoted incomplete fixture semantics'
     $contract=Get-Content (Join-Path $r.output $matrix.operations[0].contract.path) -Raw|ConvertFrom-Json -AsHashtable
     Assert-True ($contract.stdout_required.Count -eq 0 -and $null -eq $contract.review.reviewer) 'Collector inferred a passing stdout protocol'
+    $retained=Get-Content (Join-Path $r.output 'retained-evidence.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    Assert-True ($index.native_original_observations -gt 0 -and $retained.native_original_observations.Count -eq $index.native_original_observations -and
+        @($retained.native_original_observations|Where-Object{ $_.runtime_acceptance -or $_.coverage_authority }).Count -eq 0) 'Native baseline was lost or counted as passing target evidence'
+}
+Case 'original C baseline transport requires its original bytes and cannot duplicate a context operation'{
+    $p=@($plan.partitions|Where-Object{'files.lua' -cin $_.files -and $_.context.Split('/')[1] -ceq 'windows'})[0]
+    $path=Join-Path $artifacts ('target-observations-'+$p.id+'-'+$p.partition+'/reports/target-partitions/'+$p.id+'/'+$p.partition+'/index.json')
+    $value=Get-Content $path -Raw|ConvertFrom-Json -AsHashtable -Depth 32;$original=[IO.File]::ReadAllText($path)
+    $value.native_original_observations[0].sha256='0'*64;$null=Save $path $value
+    $r=Collect;Assert-True ($r.process.exit_code -ne 0 -and [IO.File]::ReadAllText($r.process.stderr_path) -match 'Original C applicability report bytes differ') 'Changed original C baseline bytes were accepted'
+    [IO.File]::WriteAllText($path,$original,$utf8);$value=Get-Content $path -Raw|ConvertFrom-Json -AsHashtable -Depth 32
+    $value.native_original_observations+=@($value.native_original_observations[0]);$null=Save $path $value
+    $r=Collect;Assert-True ($r.process.exit_code -ne 0 -and [IO.File]::ReadAllText($r.process.stderr_path) -match 'duplicate original C applicability') 'Duplicated original baseline was accepted'
+    [IO.File]::WriteAllText($path,$original,$utf8)
 }
 Case 'duplicate raw implementation observations cannot replace an absent counterpart'{
     $p=$plan.partitions[0];$path=Join-Path $artifacts ('target-observations-'+$p.id+'-'+$p.partition+'/reports/target-partitions/'+$p.id+'/'+$p.partition+'/index.json')

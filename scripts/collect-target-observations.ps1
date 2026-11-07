@@ -17,7 +17,7 @@ function Rebase([string]$ArtifactRoot,[string]$Original){
     if($offset -lt 0){throw 'Observation artifact is outside reports'}
     return Resolve-TargetImagePath -Root $ArtifactRoot -Relative $normalized.Substring($offset+1)
 }
-$images=@();$pairs=@{};$warnings=@();$namedC=@();$namedUnit=@();$compiled=@();$policies=@{};$failures=@()
+$images=@();$pairs=@{};$warnings=@();$namedC=@();$namedUnit=@();$compiled=@();$nativeOriginal=@();$nativeKeys=@{};$policies=@{};$failures=@()
 foreach($context in $plan.contexts){
     $source=Join-Path $ArtifactDirectory ('target-image-'+$context.id)
     $image=Assert-TargetContextImage -ImageDirectory $source -Context $context.context -Revision $revision -RequireActual
@@ -49,6 +49,18 @@ foreach($partition in $plan.partitions){
     if(@($index.failures).Count -ne 0){$failures+=@($index.failures|ForEach-Object{$partition.context+'/'+$_})}
     $image=@($images|Where-Object context -CEQ $partition.context)[0]
     if($index.image.sha256 -cne $image.sha256){throw 'Partitions did not consume their one frozen context image'}
+    if($index.Contains('native_original_observations')){foreach($observation in $index.native_original_observations){
+        $key=$partition.context+'/'+$observation.operation
+        if($observation.target -cne 'ReferenceC' -or $observation.variant -cne 'native-original' -or $nativeKeys.ContainsKey($key)){
+            throw 'Invalid or duplicate original C applicability observation'
+        }
+        $nativeKeys[$key]=$true
+        $actual=Rebase $destination $observation.report
+        if((Get-FileHash -LiteralPath $actual).Hash.ToLowerInvariant() -cne $observation.sha256){throw 'Original C applicability report bytes differ'}
+        $nativeOriginal+=@{context=$partition.context;operation=$observation.operation;target='ReferenceC';variant='native-original';
+            report=[IO.Path]::GetRelativePath($output,$actual).Replace('\','/');sha256=$observation.sha256;artifact_root=$relative;
+            source_mapping=$observation.source_mapping;runtime_acceptance=$false;coverage_authority=$false}
+    }}
     foreach($observation in $index.observations){
         $key=$partition.context+'/'+$observation.operation+'/'+$observation.variant
         if(-not $pairs.ContainsKey($key)){$pairs[$key]=@{context=$partition.context;operation=$observation.operation;
@@ -89,6 +101,7 @@ foreach($pair in $pairs.Values|Sort-Object context,operation,variant){
 if($operations.Count -ne 832 -or $supplements.Count -ne 26 -or $warnings.Count -ne 26){throw 'Observation collection lacks all primaries Aggregate Heavy constructs variants or warning contexts'}
 $retained=@{scope='expanded-t-conformance';revision=$revision;operations=$retainedOperations;warning_regressions=$warnings;
     named_consumers=$namedC;named_aunit=$namedUnit;compiled_observations=$compiled;
+    native_original_observations=$nativeOriginal;
     witness_policy=$(if($policies.Count -eq 1){@($policies.Values)[0]}else{$null});
     diagnostic_witness_policies=@($policies.Values);runtime_acceptance=$false;coverage_authority=$false}
 $retainedHash=Save (Join-Path $output 'retained-evidence.json') $retained
@@ -100,8 +113,9 @@ $matrix=@{schema_version=1;kind='full-target-matrix';target=$plan.target;revisio
 $matrixHash=Save (Join-Path $output 'matrix.author-proposal.json') $matrix
 $summary=@{schema_version=1;kind='target-observation-bundle';revision=$revision;context_images=$images.Count;
     primary_pairs=$operations.Count;supplemental_pairs=$supplements.Count;warning_contexts=$warnings.Count;
+    native_original_observations=$nativeOriginal.Count;
     failures=$failures;matrix=@{path='matrix.author-proposal.json';sha256=$matrixHash};runtime_acceptance=$false;coverage_authority=$false}
 $null=Save (Join-Path $output 'observation-index.json') $summary
-Write-Output "COLLECTED: $($images.Count) images, $($operations.Count) primary pairs, $($supplements.Count) supplements; independent protocol/envelope/global review pending; acceptance=False"
+Write-Output "COLLECTED: $($images.Count) images, $($operations.Count) primary pairs, $($supplements.Count) supplements, $($nativeOriginal.Count) original C native baselines; independent protocol/envelope/global review pending; acceptance=False"
 if($failures.Count -ne 0){exit 1}
 exit 0

@@ -418,6 +418,17 @@ The raw `report_only` and `target_operation_acceptance` flags remain unchanged.
 Source transformation/exclusion review still precedes adapted execution;
 native-platform applicability may independently review the exact original C
 baseline capture afterward. The envelope can bind that post-capture review.
+For each selected native-platform equivalent, the partition captures an
+additional unchanged `ReferenceC` run with variant `native-original` before
+the equivalent. Its exit/status is preserved separately from primary pairs:
+an expected native failure supplies observations for review and never counts
+as a passing source obligation. The collector retains these raw reports and
+their mapping/image identities in `native_original_observations`.
+The independently reviewed applicability proof, approval and every original
+C report must identify the exact acceptance context, including profile and
+library type. Final replay also checks the original C host and runtime files
+against the same immutable context image as the C/Ada primary pair. Labelled
+synthetic applicability approvals or narratives cannot supply runtime proof.
 Runtime/harness changes require fresh captures at their real revision; there
 is no revision relabeling or implicit tree-diff waiver.
 

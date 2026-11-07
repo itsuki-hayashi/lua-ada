@@ -12,11 +12,22 @@ Import-Module (Join-Path $PSScriptRoot 'TargetObservationEnvelope.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetCompiledWitnesses.psm1')
 
+function Assert-TargetNativeOriginalImageBindings {
+    param([string] $ArtifactRoot,[Collections.IDictionary] $Proof,[Collections.IDictionary] $ContextImage)
+    if($null -eq $ContextImage){throw 'Native applicability lacks its actual frozen context image'}
+    foreach($observation in $Proof.observations){
+        $originalPath=Resolve-ConformanceObservation -Root $ArtifactRoot -Identity $observation.original_c_report
+        $original=Get-Content -LiteralPath $originalPath -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+        Assert-TargetReportImageBinding -Image $ContextImage -Report $original
+    }
+}
+
 function Assert-TargetTransformReplay {
     param([string] $Root, [string] $ArtifactRoot,
           [Collections.IDictionary] $Report, [Collections.IDictionary] $Entry,
           [Collections.IDictionary] $Contract, [Collections.IDictionary] $ResolvedExclusions,
           [Collections.IDictionary] $ReviewedNativeApplicability = $null,
+          [Collections.IDictionary] $ContextImage = $null,
           [switch] $RequireAcceptance)
     if ($Report.execution_disposition -ceq 'unchanged') { return }
     $sourceName = if ($Entry.operation -ceq 'aggregate') { 'all.lua' }
@@ -58,11 +69,15 @@ function Assert-TargetTransformReplay {
                     throw 'Native transformation lacks source-linked original C applicability'
                 }
                 $nativeIdentity=if($null -ne $ReviewedNativeApplicability){$ReviewedNativeApplicability}else{$Report.native_applicability}
-                $null = Assert-ConformanceNativeApplicability -Root $Root -ArtifactRoot $ArtifactRoot `
+                $proof = Assert-ConformanceNativeApplicability -Root $Root -ArtifactRoot $ArtifactRoot `
                     -Identity $nativeIdentity -Specification $specification `
                     -ManifestSha256 $identity.manifest_sha256 -Configuration $Report.requested_configuration `
                     -Platform $Report.host.platform -Revision $Report.repository_revision `
+                    -ExpectedContext $(if($RequireAcceptance){$Report.acceptance_context}else{''}) `
                     -RequireRuntimeEvidence:$RequireAcceptance
+                if($RequireAcceptance){
+                    Assert-TargetNativeOriginalImageBindings -ArtifactRoot $ArtifactRoot -Proof $proof -ContextImage $ContextImage
+                }
             }
         }
         if ($Contract.equivalent_manifest_sha256 -cne $identity.manifest_sha256) {
@@ -476,7 +491,8 @@ function Test-FullTargetMatrix {
             }
             Assert-TargetTransformReplay -Root $Root -ArtifactRoot $artifacts -Report $report -Entry $entry `
                 -Contract $contract -ResolvedExclusions $resolvedExclusions -RequireAcceptance:$RequireTargetAcceptance `
-                -ReviewedNativeApplicability $reviewedNative
+                -ReviewedNativeApplicability $reviewedNative `
+                -ContextImage $(if($RequireTargetAcceptance){$verifiedBuilds[$entry.context].image.manifest}else{$null})
             if ($entry.operation.StartsWith('file:',[StringComparison]::Ordinal) -and
                 $null -ne (Get-TargetFileProtocolDefinition -File $entry.operation.Substring(5))) {
                 if (-not $report.Contains('file_completion_protocol') -or $null -eq $report.file_completion_protocol) {

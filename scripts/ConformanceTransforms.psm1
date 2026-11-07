@@ -222,6 +222,7 @@ function Assert-ConformanceNativeApplicability {
           [Parameter(Mandatory)][string] $Configuration,
           [Parameter(Mandatory)][string] $Platform,
           [Parameter(Mandatory)][string] $Revision,
+          [string] $ExpectedContext = '',
           [switch] $RequireRuntimeEvidence)
     $path = Resolve-ConformanceObservation -Root $ArtifactRoot -Identity $Identity
     $proof = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 64
@@ -233,6 +234,9 @@ function Assert-ConformanceNativeApplicability {
         $proof.synthetic_fixture -isnot [bool] -or
         @($proof.observations).Count -eq 0) { throw 'Native applicability identity differs or lacks C observations' }
     if ($RequireRuntimeEvidence -and $proof.synthetic_fixture) { throw 'Synthetic native applicability is not runtime evidence' }
+    if($ExpectedContext -ne '' -and (-not $proof.Contains('acceptance_context') -or $proof.acceptance_context -cne $ExpectedContext)){
+        throw 'Native applicability identifies another acceptance context'
+    }
     $runtimeVerified = -not $proof.synthetic_fixture
     $review = $proof.review
     if ($review.status -cne 'accepted' -or [string]::IsNullOrWhiteSpace([string]$review.author) -or
@@ -241,11 +245,18 @@ function Assert-ConformanceNativeApplicability {
     }
     $approvalPath = Resolve-ReviewedFile -Root $Root -Path $review.artifact -Sha256 $review.artifact_sha256
     $approval = Get-Content -LiteralPath $approvalPath -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    if($RequireRuntimeEvidence -and (-not $approval.Contains('synthetic_fixture') -or
+        $approval.synthetic_fixture -isnot [bool] -or $approval.synthetic_fixture)){
+        throw 'Native applicability requires an actual independent approval'
+    }
     if ($approval.schema_version -ne 1 -or $approval.kind -cne 'native-platform-applicability-approval' -or
         $approval.decision -cne 'accepted' -or $approval.author -cne $review.author -or
         $approval.reviewer -cne $review.reviewer) { throw 'Native applicability approval identity differs' }
     foreach ($field in @('reference_revision','repository_revision','mapping_id','mapping_sha256','source','source_sha256','configuration','platform')) {
         if ($approval[$field] -cne $proof[$field]) { throw 'Native applicability approved source or context differs' }
+    }
+    if($ExpectedContext -ne '' -and (-not $approval.Contains('acceptance_context') -or $approval.acceptance_context -cne $ExpectedContext)){
+        throw 'Native applicability approved acceptance context differs'
     }
     $encoded = (ConvertTo-Json -InputObject @($proof.observations) -Depth 64 -Compress)
     if ($approval.observations_sha256 -cne (Get-ConformanceHash ([Text.Encoding]::UTF8.GetBytes($encoded)))) {
@@ -269,6 +280,9 @@ function Assert-ConformanceNativeApplicability {
         }
         $reportPath = Resolve-ConformanceObservation -Root $ArtifactRoot -Identity $observation.original_c_report
         $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+        if($ExpectedContext -ne '' -and (-not $report.Contains('acceptance_context') -or $report.acceptance_context -cne $ExpectedContext)){
+            throw 'Original C native observation identifies another acceptance context'
+        }
         if ($report.synthetic_fixture -isnot [bool] -or ($RequireRuntimeEvidence -and $report.synthetic_fixture)) {
             throw 'Synthetic or unidentified native C observation is not runtime evidence'
         }
@@ -317,6 +331,10 @@ function Assert-ConformanceNativeApplicability {
     $narrative = $approval.review_evidence
     $narrativePath = Resolve-ReviewedFile -Root $Root -Path $narrative.path -Sha256 $narrative.sha256
     $decision = Get-Content -LiteralPath $narrativePath -Raw | ConvertFrom-Json -AsHashtable -Depth 32
+    if($RequireRuntimeEvidence -and (-not $decision.Contains('synthetic_fixture') -or
+        $decision.synthetic_fixture -isnot [bool] -or $decision.synthetic_fixture)){
+        throw 'Native applicability requires an actual independent narrative'
+    }
     if ($decision.reviewer -cne $review.reviewer -or $decision.decision -cne 'accepted' -or
         [string]::IsNullOrWhiteSpace([string]$decision.source_linked_c_applicability)) {
         throw 'Native applicability lacks independent source-linked rationale'
