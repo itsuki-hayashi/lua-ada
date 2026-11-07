@@ -161,7 +161,7 @@ function Assert-TargetBuildRuntimeBindings {
         }
     }
     $kinds=@('gc','io','foreign')
-    foreach($kind in @('format','value','auxiliary','load_dump','debug','builtin','external','conversion')){
+    foreach($kind in @('format','value','auxiliary','load_dump','debug','builtin','external','conversion','operator','index_type')){
         if($ConsumerReport.Contains("${kind}_contract") -and $null -ne $ConsumerReport["${kind}_contract"]){$kinds+=$kind}
     }
     foreach($kind in $kinds){

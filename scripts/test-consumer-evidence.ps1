@@ -177,4 +177,56 @@ Run-Case 'target indexed number records cannot be duplicated in both equal outpu
 Run-Case 'target indexed number records retain their source order in both equal outputs' {param($r)
     foreach($name in @('value-api','value-oracle')){Replace-Capture $r $name stdout "value-number-1: another native spelling`nvalue-number-0: native spelling`nvalue actual case`nPASS: public value operation contract`n"}
 } 'ordered witness' -Foreign -Format -Additional value,auxiliary
+$extended=@('value','auxiliary','load-dump','debug','conversion','operator','index-type')
+$completions=@{'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';conversion='PASS: public numeric conversion contract';
+    operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract'}
+foreach($kind in $completions.Keys){
+    $mapping.cases+=@{source="$kind.c";case_id="$kind-case";source_sha256=$hash;consumer="$kind-api";
+        expected_count=1;exact_witnesses=@("$kind actual case");pattern_witness=$null}
+    $baseline.consumer_sources+=@{file="$kind.c";sha256=$hash}
+    $baseline[$kind.Replace('-','_')+'_contract']=@{matching_output=$true;reference_library_files=@(@{sha256=$hash})}
+    foreach($name in @("$kind-api","$kind-oracle")){
+        $record=$records[0].Clone();$record.name=$name;$out=Join-Path $directory "$name.stdout"
+        [IO.File]::WriteAllText($out,("$kind actual case`n"+$completions[$kind]+"`n"))
+        $record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$baseline.consumers+=$record
+    }
+}
+Run-Case 'current reader debug conversion operator and integer-index contracts keep their own native comparisons' {} '' -Foreign -Format -Additional $extended
+Run-Case 'new integer-index completion cannot replace a missing actual C process' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE index-type-oracle)
+} 'missing/duplicate' -Foreign -Format -Additional $extended
+Run-Case 'reader driver oracle bytes cannot be borrowed from another source contract' {param($r)
+    Replace-Capture $r load-dump-oracle stdout "different reader results`nPASS: public reader/writer contract`n"
+} 'oracle bytes differ' -Foreign -Format -Additional $extended
+$externalNames=@('ordinary-short-identity','short-lookup-refusal','empty-buffer','short-buffer','long-buffer','embedded-zero','borrowed-buffer',
+    'short-key-normalization','long-key-retention','existing-key-update','weak-value-string','allocation-refusal-recovery','state-close-lifetime',
+    'callback-lua-reentry','callback-nested-collection','callback-interrupted-frame','callback-closure-lifetime','callback-close-reentry')
+$externalFull=(@($externalNames|ForEach-Object{'PASS: external-'+$_}) -join "`n")+"`nPASS: public external string contract`n"
+$externalOwned=(@($externalNames[0..12]|ForEach-Object{'PASS: external-'+$_}) -join "`n")+"`nSKIP: 5 release reentry cases (instrumented C lock rejects reentry)`nPASS: public external string contract`n"
+$mapping.cases+=@{source='external.c';case_id='external-common';source_sha256=$hash;consumer='external-api';
+    expected_count=1;exact_witnesses=@('PASS: external-empty-buffer');pattern_witness=$null}
+$baseline.consumer_sources+=@{file='external.c';sha256=$hash}
+$baseline.external_contract=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=18;skipped_reentry_cases=0}
+foreach($name in @('external-api','external-oracle')){
+    $record=$records[0].Clone();$record.name=$name;$out=Join-Path $directory "$name.stdout";[IO.File]::WriteAllText($out,$externalFull)
+    $record.arguments=@();$record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$baseline.consumers+=$record
+}
+$extended+='external'
+Run-Case 'default external string mode retains all five actual release-reentry witnesses' {} '' -Foreign -Format -Additional $extended
+Run-Case 'default external mode cannot borrow the instrumented ownership-only argument vector' {param($r)
+    foreach($name in @('external-api','external-oracle')){@($r.consumers|Where-Object name -CEQ $name)[0].arguments=@('--ownership-only')}
+} 'actual arguments or case set' -Foreign -Format -Additional $extended
+Run-Case 'a summary count cannot replace a missing default release-reentry witness' {param($r)
+    foreach($name in @('external-api','external-oracle')){Replace-Capture $r $name stdout ($externalFull.Replace('PASS: external-callback-close-reentry','PASS: external-invented-case'))}
+} 'actual release-reentry witnesses' -Foreign -Format -Additional $extended
+$context='upstream-test/windows/validation/static'
+Run-Case 'instrumented external mode records its exact native lock omission without inventing five passes' {param($r)
+    $r.configuration='upstream-test';foreach($record in $r.consumers){$record.configuration='upstream-test'}
+    $r.external_contract.matched_cases=13;$r.external_contract.skipped_reentry_cases=5
+    foreach($name in @('external-api','external-oracle')){
+        @($r.consumers|Where-Object name -CEQ $name)[0].arguments=@('--ownership-only')
+        Replace-Capture $r $name stdout $externalOwned
+    }
+} '' -Foreign -Format -Additional $extended
+$context='default/windows/validation/static'
 Write-Output "PASS: $count named consumer evidence regressions; synthetic observations only"

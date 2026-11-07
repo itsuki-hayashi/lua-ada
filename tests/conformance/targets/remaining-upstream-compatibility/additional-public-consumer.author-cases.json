@@ -1235,6 +1235,1798 @@
       "source": "c_api/tests/auxiliary_api_contract.c",
       "independent_review_status": "pending",
       "function_source_review": "pending"
+    },
+    {
+      "case_id": "primitive_arithmetic",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-primitive-arithmetic"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "unary_and_wrap",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-unary-wrap"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "primitive_comparison",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-primitive-comparison"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "primitive_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-primitive-refusal"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "string_handlers",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-string-handlers"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "metamethod_arithmetic",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-metamethod-arithmetic"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "numeric_bitwise_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-numeric-bitwise-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "arbitrary_handler_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-arbitrary-handler-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "arithmetic_diagnostics",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-arithmetic-diagnostics"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "bare_string_no_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-bare-string-no-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "comparison_handlers",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-comparison-handlers"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "arithmetic_caller_window",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-arithmetic-caller-window"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "unary_caller_fake_operand",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-unary-caller-fake-operand"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "comparison_caller_mutation",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-comparison-caller-mutation"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "comparison_error_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-comparison-error-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "comparison_type_errors",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-comparison-type-errors"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "handler_cannot_yield",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-handler-cannot-yield"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "version_null_state",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-version-null-state"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "version_live_state",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-version-live-state"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "builtin_type_names",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-builtin-type-names"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "absent_slot_type_name",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-absent-slot-type-name"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "type_name_ignores_metatable_label",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-type-name-ignores-metatable-label"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_existing_integer_value",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-existing-integer-value"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_absent_integer_value",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-absent-integer-value"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_numeric_key_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-numeric-key-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_signed_integer_extremes",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-signed-integer-extremes"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_relative_index_before_push",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-relative-index-before-push"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_index_handler_operands",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-index-handler-operands"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_index_table_chain",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-index-table-chain"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_existing_key_bypasses_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-existing-key-bypasses-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_raw_bypasses_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-raw-bypasses-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_error_identity_and_recovery",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-error-identity-and-recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_nonyieldable_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-nonyieldable-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "get_nonindexable_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-nonindexable-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_integer_value_and_pop",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-integer-value-and-pop"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_signed_integer_extremes",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-signed-integer-extremes"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_relative_index_before_pop",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-relative-index-before-pop"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_newindex_handler_operands",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-newindex-handler-operands"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_newindex_table_chain",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-newindex-table-chain"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_existing_key_bypasses_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-existing-key-bypasses-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_raw_bypasses_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-raw-bypasses-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_error_identity_and_recovery",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-error-identity-and-recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_nonyieldable_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-nonyieldable-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "set_nonindexable_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-nonindexable-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "function_information",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-function-information"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "selector_protocol",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-selector-protocol"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "native_information",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-native-information"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "borrowed_lifetime_and_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-borrowed-lifetime-and-refusal"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "inactive_parameter_names",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-inactive-parameter-names"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "active_c_locals",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-active-c-locals"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "active_lua_locals",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-active-lua-locals"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "upvalue_values",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-upvalue-values"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "joined_upvalue_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-joined-upvalue-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "c_upvalue_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-c-upvalue-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "lua_hook_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-lua-hook-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "hook_mutation_frame_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-hook-mutation-frame-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "call_metamethod_metadata",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-call-metamethod-metadata"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "hook_transfer_metadata",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-hook-transfer-metadata"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "lines_refusal_and_recovery",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-lines-refusal-and-recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "stripped_metadata",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-stripped-metadata"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "c_return_transfer_metadata",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-c-return-transfer-metadata"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "suspended_capture_local",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-suspended-capture-local"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "caller_temporary_extent",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-caller-temporary-extent"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "suspended_pending_temporary",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-suspended-pending-temporary"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "arithmetic_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-arithmetic-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "index_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-index-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "close_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-close-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "error_close_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-error-close-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "coroutine_close_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-coroutine-close-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "finalizer_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-finalizer-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "hooked_finalizer_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-hooked-finalizer-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "direct_gc_no_transport_events",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-direct-gc-no-transport-events"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "protected_nil_call_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-protected-nil-call-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "removed_c_slot_call_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-removed-c-slot-call-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "invalid_finalizer_call_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-invalid-finalizer-call-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "stripped_first_c_line",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-stripped-first-c-line"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "identity_data",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-identity-data"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "decimal_integers",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-decimal-integers"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "hexadecimal_integers",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-hexadecimal-integers"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "floating_syntax",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-floating-syntax"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "extreme_floats",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-extreme-floats"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "failure_preserves_stack",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-failure-preserves-stack"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "c_string_extent",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-c-string-extent"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "refusal_no_growth",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-refusal-no-growth"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "long_cancellation",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-long-cancellation"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "remote_midpoint",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-remote-midpoint"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "seeded_roundtrips",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-seeded-roundtrips"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "ordinary_short_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-ordinary-short-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "short_lookup_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-short-lookup-refusal"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "empty_external",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-empty-buffer"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "short_external",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-short-buffer"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "long_external",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-long-buffer"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "embedded_zero",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-embedded-zero"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "borrowed_external",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-borrowed-buffer"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "short_key_normalization",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-short-key-normalization"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "long_key_retention",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-long-key-retention"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "existing_key_update",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-existing-key-update"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "weak_value_string",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-weak-value-string"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "allocation_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-allocation-refusal-recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "state_close_lifetime",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-state-close-lifetime"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_piece_lifetime",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader piece lifetime and deferred execution"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_preserves_stack",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader stack preservation and result adjustment"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_error_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader protected error identity and recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_end_conditions",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader null and zero-sized EOF"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_yield_barrier",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader non-yieldable region restores caller policy"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_inherits_message_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader inherits surrounding message handler once"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_syntax_and_mode_errors",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader syntax and mode failures"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_dump_round_trip",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: canonical subtree dump and binary reader round trip"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_dump_writer_stack_and_terminal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: writer stack preservation and terminal callback"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_dump_writer_stops_on_status",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: writer nonzero status stops further callbacks"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_dump_terminal_status",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: writer terminal status is returned verbatim"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_dump_writer_error_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: writer protected error object identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_allocation_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader allocation refusal cleanup and recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_fixed_binary_reader_count",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: fixed binary reader consumes one stable block"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_binary_reader_failure_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: binary reader mode malformed and truncated boundaries"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_stops_at_definitive_syntax",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader stops before unrelated syntax-error side effects"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_punctuation_prefetch",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves native punctuation prefetch errors"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_stops_at_invalid_escape",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader invalid escape precedes later callback errors"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_keyword_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves split keyword tokens"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_number_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves split numeral tokens"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_escape_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves split escape boundaries"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_delimiter_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves long-delimiter boundaries"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_recursive_api_reentry",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader recursive loading execution and collection"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_nested_guarded_sources",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: nested guarded readers retain independent source owners"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_binary_reader_every_split",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: binary reader preserves every split and exact end count"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_fixed_binary_piece_requirements",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: fixed binary reader enforces actual piece boundaries"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_partial_binary_reader_error_cleanup",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: partial binary reader errors preserve cleanup and recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
+    },
+    {
+      "case_id": "test_reader_avoids_prefix_reconstruction",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: many reader pieces avoid prefix reconstruction"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false
     }
   ],
   "source_measurements": {

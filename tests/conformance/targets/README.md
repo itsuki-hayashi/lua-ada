@@ -331,11 +331,13 @@ The successor witness producer also emits `global-api.author-proposal.json` for
 all 473 global header inventory entries. It preserves the 159 retained semantic
 routes and original 100 C/94 AUnit identities, and leaves every classification
 pending for fresh independent review. Explicit additional source proposals add
-32 routes for the 31 value/auxiliary exports and the actually invoked
-`luaL_checkversion` macro. Their `proposed_classification` and
+63 source routes for actual public functions, the invoked
+`luaL_checkversion`/`lua_getextraspace`/`lua_isfunction` macros, and the linked
+`lua_ident` data read. Their `proposed_classification` and
 `proposed_context_witnesses` are future evidence obligations; they do not carry
 an observed disposition, accepted review or execution evidence. The remaining
-282 unretained entries still have empty routes. The producer rejects invented
+251 unretained entries still have empty routes, including 15 functions without
+a registered source route. The producer rejects invented
 named cases, passing metadata and runtime routes for declaration-only entries;
 it does not guess that a macro is a function call or that compilation
 of a declaration checks runtime behavior. Appropriate compiled ABI, layout or
@@ -369,12 +371,15 @@ their prior behavior. `-TargetDevelopmentObservation` permits author-only
 source mappings for diagnostic collection; it does not authorize acceptance.
 
 Target builds include independently authored formatter, value and auxiliary
-consumers (4, 7 and 76 named C cases respectively) and 10 additional AUnit
+consumers (4, 7 and 76 named C cases respectively), the existing reader/writer
+(28), debug (32), numeric conversion (11) and common external-string (13)
+protocols, the operator contract (17), the integer-index/type contract (27),
+and 10 additional AUnit
 names: two formatter quotas, six scalar-text boundaries and two auxiliary
 quotas. They compare the same C source
 against the Ada SAL and the separate pinned C library, bind the actual source
 files and library images, and keep the original 100/94 witness identities and
-protocols. The staged successor proposals therefore contain 187 C and 104 AUnit
+protocols. The staged successor proposals therefore contain 315 C and 104 AUnit
 names. These are mapping proposals, not executed-case counts. The retained
 API projection's separately added foreign-hook-13 memory-status route is
 preserved alongside its older consumer-catalogue routes in the new successor.
@@ -387,6 +392,15 @@ lines and `90eb8de147d180eb` fingerprint without imposing a portable NaN spellin
 or establishing any matrix observation. `-AdditionalApiRoutes` only adds
 pending source-linked routes; final classification and every actual context
 remain independent review and execution obligations.
+Reader/writer routes bind both the standalone driver and shared test header;
+writer-only cases are separate from the 24 actual reader-loading witnesses.
+Each additional consumer requires its own source-bound original-C process and
+matching complete bytes, including the integer-index/type and operator
+contracts. External strings additionally bind the exact argument vector,
+18 default versus 13 instrumented cases, the five named default release-reentry
+witnesses and the single instrumented C-lock omission marker. A summary count
+cannot substitute for those observations. The 13 common named external cases
+are not used to claim that the five omitted instrumented cases ran.
 
 `TargetWitnessPolicy.psm1` validates all 473 original declarations separately
 from the old 159-route projection. Accepted policies require an independent

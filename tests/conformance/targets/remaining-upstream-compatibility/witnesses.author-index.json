@@ -1,81 +1,81 @@
 {
-  "proposed_consumer_cases": 187,
-  "proposed_aunit_cases": 104,
-  "kind": "remaining-upstream-witness-successor-author-index",
+  "global_api": {
+    "sha256": "92884aa59de02dead07b0b17a48e1022dbfaa23bc1da656dd5bc86a18d91402a",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
+  },
+  "retained_api_routes": 159,
+  "schema_version": 1,
   "coverage_authority": false,
-  "source_snapshot": {
-    "revision": "957ffe69409e4181338b9bcf16b723d1d9d0ceae",
-    "kind": "repository-source-snapshot",
-    "repository_dirty": true
-  },
-  "retained_aunit_cases": 94,
-  "aunit": {
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json",
-    "sha256": "df4da28e92243c1772e07bf70f039e6e95b047b6ac582b9bf8bb3242a77ed347"
-  },
-  "runtime_acceptance": false,
+  "kind": "remaining-upstream-witness-successor-author-index",
   "predecessors": [
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-author-proposal.json",
-      "kind": "consumer",
-      "sha256": "f89fd3127e44266863dbf44e6e01863c2f590536a906325936a6f0bc1435813e"
+      "sha256": "f89fd3127e44266863dbf44e6e01863c2f590536a906325936a6f0bc1435813e",
+      "kind": "consumer"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-author-proposal.json",
-      "kind": "aunit",
-      "sha256": "21005e003734cd3419a84b8e61f87ff8458b22eab85f439744181e8c6f159de6"
+      "sha256": "21005e003734cd3419a84b8e61f87ff8458b22eab85f439744181e8c6f159de6",
+      "kind": "aunit"
     }
   ],
   "changed_source_bindings": {
     "tests/src/lua-foreign_hook_tests.adb": {
-      "current": "c698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6",
-      "previous": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce"
-    },
-    "scripts/check.ps1": {
-      "current": "81bc5fd6d8a6072d41ea630da2bdda6b2fc5cf291041a5195fa4e27d3b44e682",
-      "previous": "8071c9872cc2244d59cc8de256b530262820e453cd802c5edbf6cee7db16c9e5"
-    },
-    "tests/src/lua-collector_tests.adb": {
-      "current": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342",
-      "previous": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4"
+      "previous": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "current": "c698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6"
     },
     "c_api/tests/c_api_consumer.c": {
-      "current": "c6a50022389240ec8358fd0755ff8ec8ba29e4368fb7c6f343741533044cdd81",
-      "previous": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
+      "previous": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "current": "c6a50022389240ec8358fd0755ff8ec8ba29e4368fb7c6f343741533044cdd81"
+    },
+    "scripts/check.ps1": {
+      "previous": "8071c9872cc2244d59cc8de256b530262820e453cd802c5edbf6cee7db16c9e5",
+      "current": "81bc5fd6d8a6072d41ea630da2bdda6b2fc5cf291041a5195fa4e27d3b44e682"
     },
     "tests/c/foreign_hook_contract.c": {
-      "current": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929",
-      "previous": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b"
-    },
-    "scripts/check-instrumented.ps1": {
-      "current": "a85d4158a2f16ca3227deb435b979d919daeac0d88aed9264a8df32335d89965",
-      "previous": "ae2e8b732e37f09edd0477c862d99950f3c00293aeff39405958dea804fb0ec2"
-    },
-    "tests/src/lua-conformance_adapter_tests.adb": {
-      "current": "26e26e3c389384ebdf49740e80f6e83608a42b42c5dd0b847a633659a022a0e3",
-      "previous": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+      "previous": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+      "current": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929"
     },
     "tests/src/test_runner.adb": {
-      "current": "70fe3eebb3ceffd477d8c1b2570c82c9d3037ed3d7cd8c7d24691fda34fb110c",
-      "previous": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8"
+      "previous": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8",
+      "current": "ce424d701956d39845b8d27c0b6779e4360c46b718b000e2954e84ca43849530"
+    },
+    "tests/src/lua-collector_tests.adb": {
+      "previous": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "current": "9437f3a2af1ff69999d5789eec8f67839beeb5903cb5b444bccba12d022d9342"
+    },
+    "scripts/check-instrumented.ps1": {
+      "previous": "ae2e8b732e37f09edd0477c862d99950f3c00293aeff39405958dea804fb0ec2",
+      "current": "a85d4158a2f16ca3227deb435b979d919daeac0d88aed9264a8df32335d89965"
+    },
+    "tests/src/lua-conformance_adapter_tests.adb": {
+      "previous": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "current": "26e26e3c389384ebdf49740e80f6e83608a42b42c5dd0b847a633659a022a0e3"
     }
   },
+  "retained_consumer_cases": 100,
+  "proposed_aunit_cases": 104,
+  "consumer": {
+    "sha256": "0b9dc1ba772ee57d1b2466cd5830af1aeef14dc37d2aa8c487b6a7f80576d24c",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
+  },
+  "retained_aunit_cases": 94,
+  "proposed_consumer_cases": 315,
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "global_api_entries": 473,
   "witness_policy": {
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/witness-policy.author-proposal.json",
-    "sha256": "dfe1759b0b85c1f5db96505e44845e15a0ad7c4a048d6f0336cd07565dd2f1ff"
+    "sha256": "7eab83d5b5922a76122058e5ef8e3a3e5d8b7530d0fd621dd27698b3d2c7da18",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/witness-policy.author-proposal.json"
+  },
+  "source_snapshot": {
+    "revision": "e3ac387729bb5e0bd0979f33d75616823adb2a51",
+    "repository_dirty": true,
+    "kind": "repository-source-snapshot"
   },
   "target": "remaining-upstream-compatibility",
-  "schema_version": 1,
-  "consumer": {
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json",
-    "sha256": "d07a05938e20d104c59287fc51de1fe7fd24e9a3b906028faeb71dcf577a1426"
-  },
-  "global_api": {
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json",
-    "sha256": "9eb8a1eb7db7996f3fec7ede5c6d887b3462831b9a3332a682edb95c99e837e9"
-  },
-  "retained_consumer_cases": 100,
-  "independent_review_status": "pending",
-  "retained_api_routes": 159,
-  "global_api_entries": 473
+  "aunit": {
+    "sha256": "6f1e5c58f3e1c8ccb13719aeef17aabe1b5a47e9d3954b7a1e177ef4dbac4104",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json"
+  }
 }

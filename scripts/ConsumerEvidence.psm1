@@ -8,7 +8,8 @@ function Test-NamedConsumerEvidence {
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
           [switch] $RequireFormatContract,
-          [ValidateSet('format','value','auxiliary')][string[]] $AdditionalContracts=@())
+          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type')]
+          [string[]] $AdditionalContracts=@())
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
     $parts = $Context.Split('/')
@@ -38,7 +39,9 @@ function Test-NamedConsumerEvidence {
     }
     $additional=@($AdditionalContracts)
     if($RequireFormatContract){$additional+='format'}
-    $additionalMarkers=@{format='PASS: public formatting contract';value='PASS: public value operation contract';auxiliary='PASS: public auxiliary contract'}
+    $additionalMarkers=@{format='PASS: public formatting contract';value='PASS: public value operation contract';auxiliary='PASS: public auxiliary contract';
+        'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';external='PASS: public external string contract';
+        conversion='PASS: public numeric conversion contract';operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract'}
     foreach($kind in $additional|Sort-Object -Unique){
         $markers["$kind-api"]=$additionalMarkers[$kind];$markers["$kind-oracle"]=$additionalMarkers[$kind]
         $contractKinds+=$kind;$consumerKinds+="$kind-api"
@@ -63,7 +66,7 @@ function Test-NamedConsumerEvidence {
         $outputs[$name] = @{text=$stdout; hash=$record.stdout_sha256}
     }
     foreach ($kind in $contractKinds) {
-        $contract = $Report["${kind}_contract"]
+        $contract = $Report[$kind.Replace('-','_')+'_contract']
         if ($Report.reference_revision -cne '7579fc9d7ed90240487251dfb69168f8e64e9294' -or
             $null -eq $contract -or $contract.matching_output -ne $true -or
             @($contract.reference_library_files).Count -eq 0) {
@@ -74,6 +77,40 @@ function Test-NamedConsumerEvidence {
         }
         if ($outputs["$kind-api"].hash -cne $outputs["$kind-oracle"].hash) {
             throw "Named consumer oracle bytes differ: $kind"
+        }
+    }
+    if('external' -cin $additional){
+        # The five release-callback reentry cases are deliberately absent
+        # only in the instrumented C-lock mode. Bind the actual argument
+        # vector, complete emitted case set and measured omission marker so
+        # default coverage cannot quietly reuse the ownership-only process.
+        $instrumented=$parts[0] -ceq 'upstream-test'
+        $expectedArguments=if($instrumented){'--ownership-only'}else{''}
+        $expectedCount=if($instrumented){13}else{18}
+        $skipped=if($instrumented){5}else{0}
+        $external=$Report.external_contract
+        if(($external.matched_cases -isnot [int] -and $external.matched_cases -isnot [long]) -or
+            ($external.skipped_reentry_cases -isnot [int] -and $external.skipped_reentry_cases -isnot [long]) -or
+            $external.matched_cases -ne $expectedCount -or $external.skipped_reentry_cases -ne $skipped){
+            throw 'Named external consumer mode case counts differ'
+        }
+        foreach($name in @('external-api','external-oracle')){
+            $record=@($Report.consumers|Where-Object name -CEQ $name)[0]
+            if(-not $record.Contains('arguments') -or $record.arguments -isnot [Array] -or
+                (@($record.arguments)-join '|') -cne $expectedArguments -or
+                [regex]::Matches($outputs[$name].text,'(?m)^PASS: external-[a-z0-9-]+\r?$').Count -ne $expectedCount){
+                throw 'Named external consumer actual arguments or case set differs'
+            }
+            $skipLine='SKIP: 5 release reentry cases (instrumented C lock rejects reentry)'
+            if([regex]::Matches($outputs[$name].text,'(?m)^'+[regex]::Escape($skipLine)+'\r?$').Count -ne [int]$instrumented){
+                throw 'Named external consumer actual native-lock omission differs'
+            }
+            foreach($caseName in @('callback-lua-reentry','callback-nested-collection','callback-interrupted-frame',
+                'callback-closure-lifetime','callback-close-reentry')){
+                if([regex]::Matches($outputs[$name].text,'(?m)^PASS: external-'+$caseName+'\r?$').Count -ne [int](-not $instrumented)){
+                    throw 'Named external consumer actual release-reentry witnesses differ'
+                }
+            }
         }
     }
     $seen = @{}

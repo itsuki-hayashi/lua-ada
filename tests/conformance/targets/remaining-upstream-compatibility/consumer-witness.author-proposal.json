@@ -161,23 +161,47 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "70fe3eebb3ceffd477d8c1b2570c82c9d3037ed3d7cd8c7d24691fda34fb110c"
+      "sha256": "ce424d701956d39845b8d27c0b6779e4360c46b718b000e2954e84ca43849530"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
       "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
     },
     {
-      "path": "c_api/tests/format_api_contract.c",
-      "sha256": "4eb599a7ffde8dd13d5c723d1cda43cae7d31f4a4c29b0f0fb37a4bb157686e3"
+      "sha256": "4eb599a7ffde8dd13d5c723d1cda43cae7d31f4a4c29b0f0fb37a4bb157686e3",
+      "path": "c_api/tests/format_api_contract.c"
     },
     {
-      "path": "c_api/tests/value_api_contract.c",
-      "sha256": "dc9b168f64ff601b91a9afdc5c98fa6385321cadc1d8d2703b1d506185dc6fae"
+      "sha256": "dc9b168f64ff601b91a9afdc5c98fa6385321cadc1d8d2703b1d506185dc6fae",
+      "path": "c_api/tests/value_api_contract.c"
     },
     {
-      "path": "c_api/tests/auxiliary_api_contract.c",
-      "sha256": "fd681701adb108e6929c2bf9ae7e07e9ee8068a0c7bef63cec16b08ac35e7bbc"
+      "sha256": "fd681701adb108e6929c2bf9ae7e07e9ee8068a0c7bef63cec16b08ac35e7bbc",
+      "path": "c_api/tests/auxiliary_api_contract.c"
+    },
+    {
+      "sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874",
+      "path": "c_api/tests/operator_api_contract.c"
+    },
+    {
+      "sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47",
+      "path": "c_api/tests/index_type_api_contract.c"
+    },
+    {
+      "sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742",
+      "path": "c_api/tests/debug_api_contract.c"
+    },
+    {
+      "sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f",
+      "path": "c_api/tests/conversion_api_contract.c"
+    },
+    {
+      "sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4",
+      "path": "c_api/tests/external_string_contract.c"
+    },
+    {
+      "sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989",
+      "path": "c_api/tests/load_dump_contract.h"
     }
   ],
   "cases": [
@@ -195,8 +219,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 925,
-        "sha256": "9e334ec8952d8ede7240304e01b340591f74517d3620fdcdb704dce9a3f5e7dc"
+        "sha256": "9e334ec8952d8ede7240304e01b340591f74517d3620fdcdb704dce9a3f5e7dc",
+        "line": 925
       },
       "function_source_review": "pending"
     },
@@ -214,8 +238,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 239,
-        "sha256": "55d9a935472828c5ad2f363fda852ef313779a0ad3cb8ec0c7beb73e650016e4"
+        "sha256": "55d9a935472828c5ad2f363fda852ef313779a0ad3cb8ec0c7beb73e650016e4",
+        "line": 239
       },
       "function_source_review": "pending"
     },
@@ -233,8 +257,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 785,
-        "sha256": "794b8bb98087a295fe9ccabaf5ca04b777444fee3b88027ed6491371af0edfdf"
+        "sha256": "794b8bb98087a295fe9ccabaf5ca04b777444fee3b88027ed6491371af0edfdf",
+        "line": 785
       },
       "function_source_review": "pending"
     },
@@ -252,8 +276,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 832,
-        "sha256": "06e0ebef1f88f15cbd2fa1a1d054f00d81cb80c946060d3771db13f8f1da0371"
+        "sha256": "06e0ebef1f88f15cbd2fa1a1d054f00d81cb80c946060d3771db13f8f1da0371",
+        "line": 832
       },
       "function_source_review": "pending"
     },
@@ -271,8 +295,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 395,
-        "sha256": "685fbb416662bbde03c677d20b6f463ad45d1871a970f160e204639a97cea223"
+        "sha256": "685fbb416662bbde03c677d20b6f463ad45d1871a970f160e204639a97cea223",
+        "line": 395
       },
       "function_source_review": "pending"
     },
@@ -290,8 +314,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 267,
-        "sha256": "a31078e62b6a5059a00eb0076da11991772821482b57b00d23e07cb6dbd96ea4"
+        "sha256": "a31078e62b6a5059a00eb0076da11991772821482b57b00d23e07cb6dbd96ea4",
+        "line": 267
       },
       "function_source_review": "pending"
     },
@@ -309,8 +333,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 358,
-        "sha256": "5c5deba15105f9df0f2c616a6b77bb590c07087514e34dcb580fdfbfea5983f8"
+        "sha256": "5c5deba15105f9df0f2c616a6b77bb590c07087514e34dcb580fdfbfea5983f8",
+        "line": 358
       },
       "function_source_review": "pending"
     },
@@ -328,8 +352,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 845,
-        "sha256": "4360a01b2fa9ff0288c2a872665ce7eb7901958b9055453af1c68be09ba574a6"
+        "sha256": "4360a01b2fa9ff0288c2a872665ce7eb7901958b9055453af1c68be09ba574a6",
+        "line": 845
       },
       "function_source_review": "pending"
     },
@@ -347,8 +371,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 124,
-        "sha256": "16cf0a972fdc99e31985b7c93bf87a859697ae5adb264f1956557784968c1b14"
+        "sha256": "16cf0a972fdc99e31985b7c93bf87a859697ae5adb264f1956557784968c1b14",
+        "line": 124
       },
       "function_source_review": "pending"
     },
@@ -366,8 +390,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 964,
-        "sha256": "ef938adf65b52f0f0fcd4f6bb0bc963f61a3d22ca824a39567844231d3df7954"
+        "sha256": "ef938adf65b52f0f0fcd4f6bb0bc963f61a3d22ca824a39567844231d3df7954",
+        "line": 964
       },
       "function_source_review": "pending"
     },
@@ -385,8 +409,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 596,
-        "sha256": "b05a21aab97b647fdead3d3317b34d6c59871412625b725b315c220178da8ec7"
+        "sha256": "b05a21aab97b647fdead3d3317b34d6c59871412625b725b315c220178da8ec7",
+        "line": 596
       },
       "function_source_review": "pending"
     },
@@ -420,8 +444,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 946,
-        "sha256": "226eda49f43ae9c83a8dc000d13c972a256976b5730c92bbe0a068ac0b91378d"
+        "sha256": "226eda49f43ae9c83a8dc000d13c972a256976b5730c92bbe0a068ac0b91378d",
+        "line": 946
       },
       "function_source_review": "pending"
     },
@@ -455,8 +479,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 19,
-        "sha256": "135d547b2757e2c976722864ae28b8f9bda37f3c0658081caff3938b86d1a271"
+        "sha256": "135d547b2757e2c976722864ae28b8f9bda37f3c0658081caff3938b86d1a271",
+        "line": 19
       },
       "function_source_review": "pending"
     },
@@ -474,8 +498,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 743,
-        "sha256": "ac5acac209c12b30bf320c9a5bda037575c7c11679510e536259734683a1f7a6"
+        "sha256": "ac5acac209c12b30bf320c9a5bda037575c7c11679510e536259734683a1f7a6",
+        "line": 743
       },
       "function_source_review": "pending"
     },
@@ -493,8 +517,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 171,
-        "sha256": "9dae1da81de72ba636e7896b62259621cb392402d79bd4f52cea802a76e043af"
+        "sha256": "9dae1da81de72ba636e7896b62259621cb392402d79bd4f52cea802a76e043af",
+        "line": 171
       },
       "function_source_review": "pending"
     },
@@ -544,8 +568,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 767,
-        "sha256": "7e275ed5f19027d39afa6921e0cf586ba395b93030ed67dd81df220ddb4bf627"
+        "sha256": "7e275ed5f19027d39afa6921e0cf586ba395b93030ed67dd81df220ddb4bf627",
+        "line": 767
       },
       "function_source_review": "pending"
     },
@@ -563,8 +587,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 378,
-        "sha256": "d321655ef140fbd93b1ccb5e741e6ce292d3d17a46b779a7fd23e02855e2450c"
+        "sha256": "d321655ef140fbd93b1ccb5e741e6ce292d3d17a46b779a7fd23e02855e2450c",
+        "line": 378
       },
       "function_source_review": "pending"
     },
@@ -598,8 +622,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 425,
-        "sha256": "dbabeb511e6c406608782dbcf53087624d43ae5046aadcde8b589708686faa1c"
+        "sha256": "dbabeb511e6c406608782dbcf53087624d43ae5046aadcde8b589708686faa1c",
+        "line": 425
       },
       "function_source_review": "pending"
     },
@@ -617,8 +641,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 414,
-        "sha256": "92abb8ebc1b19c5ca8f0091829db575f48913f588bfe846799a33ec91a6aae41"
+        "sha256": "92abb8ebc1b19c5ca8f0091829db575f48913f588bfe846799a33ec91a6aae41",
+        "line": 414
       },
       "function_source_review": "pending"
     },
@@ -636,8 +660,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 805,
-        "sha256": "49eb7faf67e0e60a6d9023eedd59ee496a363bbbd109be2aaa3bb6a907dcfdb8"
+        "sha256": "49eb7faf67e0e60a6d9023eedd59ee496a363bbbd109be2aaa3bb6a907dcfdb8",
+        "line": 805
       },
       "function_source_review": "pending"
     },
@@ -655,8 +679,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 712,
-        "sha256": "af2c3c2ec3d322e4d906a8ebb8344f0e3e8f34d82b754a257a1584815a282c91"
+        "sha256": "af2c3c2ec3d322e4d906a8ebb8344f0e3e8f34d82b754a257a1584815a282c91",
+        "line": 712
       },
       "function_source_review": "pending"
     },
@@ -690,8 +714,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 858,
-        "sha256": "949eb9ed9697a06fc6d65036074a590ee38c30f03b4a70a945daa97135e29eb2"
+        "sha256": "949eb9ed9697a06fc6d65036074a590ee38c30f03b4a70a945daa97135e29eb2",
+        "line": 858
       },
       "function_source_review": "pending"
     },
@@ -709,8 +733,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 90,
-        "sha256": "1c0db968cf89ecfeafe036e04048dc5ad4d3a6c40f58e450cd870f87eae2c02d"
+        "sha256": "1c0db968cf89ecfeafe036e04048dc5ad4d3a6c40f58e450cd870f87eae2c02d",
+        "line": 90
       },
       "function_source_review": "pending"
     },
@@ -728,8 +752,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 204,
-        "sha256": "7ec8926b6b3c5894ae096957578ef186d3e112d7c0607bb1df3b0fcbcfd2b65e"
+        "sha256": "7ec8926b6b3c5894ae096957578ef186d3e112d7c0607bb1df3b0fcbcfd2b65e",
+        "line": 204
       },
       "function_source_review": "pending"
     },
@@ -763,8 +787,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 188,
-        "sha256": "09436346f2a22b61158852fbd1197aa5f8375e7d6d1cb684e0e8cca72f49ca7a"
+        "sha256": "09436346f2a22b61158852fbd1197aa5f8375e7d6d1cb684e0e8cca72f49ca7a",
+        "line": 188
       },
       "function_source_review": "pending"
     },
@@ -782,8 +806,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 897,
-        "sha256": "6615a64dbd7dd137b94f60ac57403272b24fa96545bfcdbe955b8120da571688"
+        "sha256": "6615a64dbd7dd137b94f60ac57403272b24fa96545bfcdbe955b8120da571688",
+        "line": 897
       },
       "function_source_review": "pending"
     },
@@ -801,8 +825,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 33,
-        "sha256": "d6d061ccffbede7376e580f351f9614a4fe1017e46504fdfad626ab99592bcec"
+        "sha256": "d6d061ccffbede7376e580f351f9614a4fe1017e46504fdfad626ab99592bcec",
+        "line": 33
       },
       "function_source_review": "pending"
     },
@@ -834,8 +858,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 48,
-        "sha256": "987f37827a1cb842bd70170b0a48f63164a0f1ba65c2f4f81fd7266009022a27"
+        "sha256": "987f37827a1cb842bd70170b0a48f63164a0f1ba65c2f4f81fd7266009022a27",
+        "line": 48
       },
       "function_source_review": "pending"
     },
@@ -853,8 +877,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 681,
-        "sha256": "5e5731ef47dd73a54031f4a88c59f24efd54ec8ae48869b539ea414ec05c995d"
+        "sha256": "5e5731ef47dd73a54031f4a88c59f24efd54ec8ae48869b539ea414ec05c995d",
+        "line": 681
       },
       "function_source_review": "pending"
     },
@@ -872,8 +896,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 149,
-        "sha256": "aa8d65b5107e7b953430dd03a045342fbafbfdd9c63e7b7c6d0197faa78e0b84"
+        "sha256": "aa8d65b5107e7b953430dd03a045342fbafbfdd9c63e7b7c6d0197faa78e0b84",
+        "line": 149
       },
       "function_source_review": "pending"
     },
@@ -907,8 +931,8 @@
       "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
       "gap": null,
       "historical_function_binding": {
-        "line": 219,
-        "sha256": "3dec3953ca9d6b67e4b6d6d28956f68348bc5092667464ebba45d29aa80fb8ee"
+        "sha256": "3dec3953ca9d6b67e4b6d6d28956f68348bc5092667464ebba45d29aa80fb8ee",
+        "line": 219
       },
       "function_source_review": "pending"
     },
@@ -942,8 +966,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 110,
-        "sha256": "892186c0dab78ecd73a5bd07bb3806c664c37b0518468e79c7ed0c030a136b46"
+        "sha256": "892186c0dab78ecd73a5bd07bb3806c664c37b0518468e79c7ed0c030a136b46",
+        "line": 110
       },
       "function_source_review": "pending"
     },
@@ -961,8 +985,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 299,
-        "sha256": "2809ea8e8551c8103e3fadb9ad3084118dcd159a4415d9a5f4a49d1a2de21ca5"
+        "sha256": "2809ea8e8551c8103e3fadb9ad3084118dcd159a4415d9a5f4a49d1a2de21ca5",
+        "line": 299
       },
       "function_source_review": "pending"
     },
@@ -980,8 +1004,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 345,
-        "sha256": "a682b6505d3f22f69123fe27410041328de6351e8e567d681554b95955b14e54"
+        "sha256": "a682b6505d3f22f69123fe27410041328de6351e8e567d681554b95955b14e54",
+        "line": 345
       },
       "function_source_review": "pending"
     },
@@ -999,8 +1023,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 443,
-        "sha256": "376451ea7ad70f7adf7aa1de10f7aadc83c18a92bd50b9f3e6bd9354752555be"
+        "sha256": "376451ea7ad70f7adf7aa1de10f7aadc83c18a92bd50b9f3e6bd9354752555be",
+        "line": 443
       },
       "function_source_review": "pending"
     },
@@ -1018,8 +1042,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 490,
-        "sha256": "00ddead6e61889f79c5971d373b8ff0f806ceaaed5f5519e9dc9f58ff30e112d"
+        "sha256": "00ddead6e61889f79c5971d373b8ff0f806ceaaed5f5519e9dc9f58ff30e112d",
+        "line": 490
       },
       "function_source_review": "pending"
     },
@@ -1037,8 +1061,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 515,
-        "sha256": "ea0d8afd132dc0a68b0e8ad320b42afa3ebadf5e4eebf62acf63f1428acad64e"
+        "sha256": "ea0d8afd132dc0a68b0e8ad320b42afa3ebadf5e4eebf62acf63f1428acad64e",
+        "line": 515
       },
       "function_source_review": "pending"
     },
@@ -1056,8 +1080,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 532,
-        "sha256": "a533b3215073eeeae31f4fcade660ba7d720613d4d70c7307e6e23e78f9519d7"
+        "sha256": "a533b3215073eeeae31f4fcade660ba7d720613d4d70c7307e6e23e78f9519d7",
+        "line": 532
       },
       "function_source_review": "pending"
     },
@@ -1075,8 +1099,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 557,
-        "sha256": "9e35efb876cf2d44a04ddc755a947fa6d3ca3c39cf1cc7b06b1fbfcef5305e2f"
+        "sha256": "9e35efb876cf2d44a04ddc755a947fa6d3ca3c39cf1cc7b06b1fbfcef5305e2f",
+        "line": 557
       },
       "function_source_review": "pending"
     },
@@ -1094,8 +1118,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 570,
-        "sha256": "5f917463f6e66bb16f76d238a2e4831910c2e49658eab6be17f5e5ab1a4789f4"
+        "sha256": "5f917463f6e66bb16f76d238a2e4831910c2e49658eab6be17f5e5ab1a4789f4",
+        "line": 570
       },
       "function_source_review": "pending"
     },
@@ -1113,8 +1137,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 627,
-        "sha256": "5b3d783d7133a1d28a1e60fbcfae48d308adceeac16b8b5c5771bcddc44e3345"
+        "sha256": "5b3d783d7133a1d28a1e60fbcfae48d308adceeac16b8b5c5771bcddc44e3345",
+        "line": 627
       },
       "function_source_review": "pending"
     },
@@ -1132,8 +1156,8 @@
       "semantic_basis": "The named unchanged bootstrap case executes its actual public API assertions before this unique terminal witness. Its specific assertions, rather than token occurrence, define coverage.",
       "gap": null,
       "historical_function_binding": {
-        "line": 657,
-        "sha256": "7c13faff38dddeb0970932fd7823ddbf914115b928e6bdd20b0e388777948e70"
+        "sha256": "7c13faff38dddeb0970932fd7823ddbf914115b928e6bdd20b0e388777948e70",
+        "line": 657
       },
       "function_source_review": "pending"
     },
@@ -1629,8 +1653,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1651,8 +1675,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1673,8 +1697,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1695,8 +1719,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1717,8 +1741,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1739,8 +1763,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1761,8 +1785,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1783,8 +1807,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1805,8 +1829,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1827,8 +1851,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1849,8 +1873,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1871,8 +1895,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1893,8 +1917,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -1915,8 +1939,8 @@
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer.",
       "historical_function_binding": {
-        "line": 266,
-        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6"
+        "sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "line": 266
       },
       "function_source_review": "pending"
     },
@@ -3407,6 +3431,1926 @@
       "independent_review_status": "pending",
       "function_source_review": "pending",
       "source_sha256": "fd681701adb108e6929c2bf9ae7e07e9ee8068a0c7bef63cec16b08ac35e7bbc"
+    },
+    {
+      "case_id": "primitive_arithmetic",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-primitive-arithmetic"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "unary_and_wrap",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-unary-wrap"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "primitive_comparison",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-primitive-comparison"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "primitive_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-primitive-refusal"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "string_handlers",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-string-handlers"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "metamethod_arithmetic",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-metamethod-arithmetic"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "numeric_bitwise_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-numeric-bitwise-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "arbitrary_handler_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-arbitrary-handler-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "arithmetic_diagnostics",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-arithmetic-diagnostics"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "bare_string_no_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-bare-string-no-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "comparison_handlers",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-comparison-handlers"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "arithmetic_caller_window",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-arithmetic-caller-window"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "unary_caller_fake_operand",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-unary-caller-fake-operand"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "comparison_caller_mutation",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-comparison-caller-mutation"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "comparison_error_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-comparison-error-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "comparison_type_errors",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-comparison-type-errors"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "handler_cannot_yield",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: operator-handler-cannot-yield"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/operator_api_contract.c",
+      "consumer": "operator-api",
+      "runtime_acceptance": false,
+      "source_sha256": "dbe53454d766bf51656958472c6f3b3d5bae6538574ddabef459598b2497a874"
+    },
+    {
+      "case_id": "version_null_state",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-version-null-state"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "version_live_state",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-version-live-state"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "builtin_type_names",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-builtin-type-names"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "absent_slot_type_name",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-absent-slot-type-name"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "type_name_ignores_metatable_label",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-type-name-ignores-metatable-label"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_existing_integer_value",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-existing-integer-value"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_absent_integer_value",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-absent-integer-value"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_numeric_key_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-numeric-key-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_signed_integer_extremes",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-signed-integer-extremes"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_relative_index_before_push",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-relative-index-before-push"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_index_handler_operands",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-index-handler-operands"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_index_table_chain",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-index-table-chain"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_existing_key_bypasses_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-existing-key-bypasses-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_raw_bypasses_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-raw-bypasses-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_error_identity_and_recovery",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-error-identity-and-recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_nonyieldable_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-nonyieldable-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "get_nonindexable_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-get-nonindexable-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_integer_value_and_pop",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-integer-value-and-pop"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_signed_integer_extremes",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-signed-integer-extremes"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_relative_index_before_pop",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-relative-index-before-pop"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_newindex_handler_operands",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-newindex-handler-operands"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_newindex_table_chain",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-newindex-table-chain"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_existing_key_bypasses_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-existing-key-bypasses-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_raw_bypasses_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-raw-bypasses-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_error_identity_and_recovery",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-error-identity-and-recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_nonyieldable_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-nonyieldable-handler"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "set_nonindexable_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: index-type-set-nonindexable-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/index_type_api_contract.c",
+      "consumer": "index-type-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b9f8e62d9a86ff8a1157ac642a1a548571c89c3b278e9f1eb21e6512053ce47"
+    },
+    {
+      "case_id": "function_information",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-function-information"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "selector_protocol",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-selector-protocol"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "native_information",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-native-information"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "borrowed_lifetime_and_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-borrowed-lifetime-and-refusal"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "inactive_parameter_names",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-inactive-parameter-names"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "active_c_locals",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-active-c-locals"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "active_lua_locals",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-active-lua-locals"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "upvalue_values",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-upvalue-values"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "joined_upvalue_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-joined-upvalue-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "c_upvalue_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-c-upvalue-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "lua_hook_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-lua-hook-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "hook_mutation_frame_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-hook-mutation-frame-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "call_metamethod_metadata",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-call-metamethod-metadata"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "hook_transfer_metadata",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-hook-transfer-metadata"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "lines_refusal_and_recovery",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-lines-refusal-and-recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "stripped_metadata",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-stripped-metadata"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "c_return_transfer_metadata",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-c-return-transfer-metadata"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "suspended_capture_local",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-suspended-capture-local"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "caller_temporary_extent",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-caller-temporary-extent"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "suspended_pending_temporary",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-suspended-pending-temporary"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "arithmetic_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-arithmetic-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "index_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-index-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "close_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-close-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "error_close_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-error-close-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "coroutine_close_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-coroutine-close-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "finalizer_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-finalizer-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "hooked_finalizer_call_origin",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-hooked-finalizer-call-origin"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "direct_gc_no_transport_events",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-direct-gc-no-transport-events"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "protected_nil_call_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-protected-nil-call-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "removed_c_slot_call_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-removed-c-slot-call-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "invalid_finalizer_call_error",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-invalid-finalizer-call-error"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "stripped_first_c_line",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: debug-stripped-first-c-line"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/debug_api_contract.c",
+      "consumer": "debug-api",
+      "runtime_acceptance": false,
+      "source_sha256": "6b9241cee8c3657a344665af9e3670e2751fcc4b6df3bee7f469c4cbafa4a742"
+    },
+    {
+      "case_id": "identity_data",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-identity-data"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "decimal_integers",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-decimal-integers"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "hexadecimal_integers",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-hexadecimal-integers"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "floating_syntax",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-floating-syntax"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "extreme_floats",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-extreme-floats"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "failure_preserves_stack",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-failure-preserves-stack"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "c_string_extent",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-c-string-extent"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "refusal_no_growth",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-refusal-no-growth"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "long_cancellation",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-long-cancellation"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "remote_midpoint",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-remote-midpoint"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "seeded_roundtrips",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: conversion-seeded-roundtrips"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/conversion_api_contract.c",
+      "consumer": "conversion-api",
+      "runtime_acceptance": false,
+      "source_sha256": "1b29b6f766d3651937920e622283d18f2420002fca3b496c7e40860925ac246f"
+    },
+    {
+      "case_id": "ordinary_short_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-ordinary-short-identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "short_lookup_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-short-lookup-refusal"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "empty_external",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-empty-buffer"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "short_external",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-short-buffer"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "long_external",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-long-buffer"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "embedded_zero",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-embedded-zero"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "borrowed_external",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-borrowed-buffer"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "short_key_normalization",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-short-key-normalization"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "long_key_retention",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-long-key-retention"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "existing_key_update",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-existing-key-update"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "weak_value_string",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-weak-value-string"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "allocation_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-allocation-refusal-recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "state_close_lifetime",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "PASS: external-state-close-lifetime"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/external_string_contract.c",
+      "consumer": "external-api",
+      "runtime_acceptance": false,
+      "source_sha256": "0a97a1ea97fbab7fd95c0dee950a2bb6babee4eb33db77b21ec091879223bde4"
+    },
+    {
+      "case_id": "test_reader_piece_lifetime",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader piece lifetime and deferred execution"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_preserves_stack",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader stack preservation and result adjustment"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_error_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader protected error identity and recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_end_conditions",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader null and zero-sized EOF"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_yield_barrier",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader non-yieldable region restores caller policy"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_inherits_message_handler",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader inherits surrounding message handler once"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_syntax_and_mode_errors",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader syntax and mode failures"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_dump_round_trip",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: canonical subtree dump and binary reader round trip"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_dump_writer_stack_and_terminal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: writer stack preservation and terminal callback"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_dump_writer_stops_on_status",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: writer nonzero status stops further callbacks"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_dump_terminal_status",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: writer terminal status is returned verbatim"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_dump_writer_error_identity",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: writer protected error object identity"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_allocation_refusal",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader allocation refusal cleanup and recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_fixed_binary_reader_count",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: fixed binary reader consumes one stable block"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_binary_reader_failure_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: binary reader mode malformed and truncated boundaries"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_stops_at_definitive_syntax",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader stops before unrelated syntax-error side effects"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_punctuation_prefetch",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves native punctuation prefetch errors"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_stops_at_invalid_escape",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader invalid escape precedes later callback errors"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_keyword_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves split keyword tokens"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_number_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves split numeral tokens"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_escape_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves split escape boundaries"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_delimiter_boundaries",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader preserves long-delimiter boundaries"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_recursive_api_reentry",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: reader recursive loading execution and collection"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_nested_guarded_sources",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: nested guarded readers retain independent source owners"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_binary_reader_every_split",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: binary reader preserves every split and exact end count"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_fixed_binary_piece_requirements",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: fixed binary reader enforces actual piece boundaries"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_partial_binary_reader_error_cleanup",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: partial binary reader errors preserve cleanup and recovery"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "case_id": "test_reader_avoids_prefix_reconstruction",
+      "function_source_review": "pending",
+      "independent_review_status": "pending",
+      "exact_witnesses": [
+        "C API PASS: many reader pieces avoid prefix reconstruction"
+      ],
+      "pattern_witness": null,
+      "execution_evidence": [],
+      "expected_count": 1,
+      "source": "c_api/tests/load_dump_contract.h",
+      "consumer": "load-dump-api",
+      "runtime_acceptance": false,
+      "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
     }
   ],
   "entries": [

@@ -72,7 +72,8 @@ if ($AdditionalConsumerCases -ne '') {
     foreach ($case in $additional.cases) {
         $key = $case.source + '#' + $case.case_id
         if (@($consumer.cases | Where-Object { ($_.source + '#' + $_.case_id) -ceq $key }).Count -ne 0 -or
-            $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api','value-api','auxiliary-api') -or
+            $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api','value-api','auxiliary-api',
+                'load-dump-api','debug-api','external-api','conversion-api','operator-api','index-type-api') -or
             $case.source -cnotmatch '^(?:c_api/tests/[a-zA-Z0-9_-]+\.(?:c|h)|tests/c/[a-zA-Z0-9_-]+\.c)$' -or
             (@($case.exact_witnesses).Count -eq 0 -and ($null -eq $case.pattern_witness -or
                 -not $case.pattern_witness.StartsWith('^') -or -not $case.pattern_witness.EndsWith('$'))) -or
@@ -172,7 +173,7 @@ if($AdditionalApiRoutes -ne ''){
             throw 'Additional API routes require distinct pending actual named behavioral witnesses'
         }
         $entry=$entry[0];$seenRoutes[$route.id]=$true
-        if($entry.kind -cne 'function' -and ($entry.kind -cne 'macro' -or
+        if($entry.kind -cnotin @('function','data') -and ($entry.kind -cne 'macro' -or
             $entry.declaration -cnotmatch ('^#define\s+'+[regex]::Escape($entry.name)+'\('))){
             throw 'Declaration-only entries cannot acquire invented runtime route proposals'
         }

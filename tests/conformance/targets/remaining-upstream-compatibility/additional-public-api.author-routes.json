@@ -537,6 +537,587 @@
       "invariant": "Function registration creates real closures with retained upvalues and false placeholders and rejects excess upvalues.",
       "coverage_authority": false,
       "named_aunit_cases": []
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Stack and upvalue copies preserve values and cell identity without changing stack height.",
+      "boundaries": "Positive/negative stack indices, movement around copied slots and an actually invoked C closure updating its captured upvalue.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_COPY-182",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_copy",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_stack_rotation_copy_and_bounds"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Integer classification distinguishes actual integer and real numeric values.",
+      "boundaries": "Integer-tagged and real-tagged values under the actual public conversion protocol.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ISINTEGER-195",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_isinteger",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public numeric classification accepts the actual pinned numeric-string form.",
+      "boundaries": "Hexadecimal numeric string in a named actual C conversion case; nonnumeric failures have separate auxiliary/conversion witnesses.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ISNUMBER-192",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_isnumber",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Pointer identity remains stable for actual tables, userdata and protected error objects across public API operations.",
+      "boundaries": "Registry-owned globals, raw table identity, aligned full userdata and exact error object recovery.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TOPOINTER-208",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_topointer",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_global_table_macro",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_warning_error_boundary"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Raw pointer-key lookup retrieves the exact stored value without handler dispatch.",
+      "boundaries": "Present light-pointer key and actual raw table identity/traversal in the named C frame.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RAWGETP-268",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_rawgetp",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public table traversal advances the real key/value iterator without inventing a stable order.",
+      "boundaries": "All three stored raw keys counted exactly once with frame height/identity assertions.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_NEXT-369",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_next",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Pushing the real secondary thread preserves object identity and reports nonmain status.",
+      "boundaries": "Registry-sharing secondary state, actual stack moves and copied extra-space data; no fabricated main-thread return claim.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHTHREAD-256",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_pushthread",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "C-function classification distinguishes an actual light C function from a Lua closure.",
+      "boundaries": "True C-function and false Lua message-handler classifications through public stack values.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ISCFUNCTION-194",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_iscfunction",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_light_c_function_identity",
+        "c_api/tests/c_api_consumer.c#test_lua_message_handler"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public C-function conversion returns the actual callable identity for light and captured C functions.",
+      "boundaries": "Light C function and C closure pointers, invoked captured-cell mutations.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TOCFUNCTION-205",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_tocfunction",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_light_c_function_identity"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "An installed panic handler runs after the public unprotected-call failure and the state recovers through the actual C guard.",
+      "boundaries": "Panic after Ada return, exact error object, restored handler and usable state; no unasserted previous-handler return claim.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ATPANIC-168",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_atpanic",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_panic_after_ada_returns"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Variadic formatting returns exact counted output and propagates actual protected memory error classes.",
+      "boundaries": "Scalar/binary/extended UTF8 formatting and refusal/rethrow recovery in separately named cases.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHFSTRING-252",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_pushfstring",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/format_api_contract.c#error_class",
+        "c_api/tests/format_api_contract.c#scalars"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "The va_list formatting entry preserves actual result bytes, native pointer spelling and measured growth refusal behavior.",
+      "boundaries": "Forwarded va_list, binary and scalar formats, platform pointer spelling and full growth refusal sweep; its measured NULL-on-refusal behavior remains distinct from variadic error propagation.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHVFSTRING-250",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_pushvfstring",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/format_api_contract.c#allocation_sweep",
+        "c_api/tests/format_api_contract.c#pointers",
+        "c_api/tests/format_api_contract.c#scalars"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public local inspection addresses the actual active/suspended function frame and its valid caller temporary extent.",
+      "boundaries": "Inactive parameter names, Lua/C slots, captured/suspended locals, temporary extent and stripped metadata.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETLOCAL-472",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_getlocal",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#active_c_locals",
+        "c_api/tests/debug_api_contract.c#active_lua_locals",
+        "c_api/tests/debug_api_contract.c#caller_temporary_extent",
+        "c_api/tests/debug_api_contract.c#inactive_parameter_names",
+        "c_api/tests/debug_api_contract.c#stripped_metadata",
+        "c_api/tests/debug_api_contract.c#suspended_capture_local",
+        "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public local mutation consumes its value and updates the actual selected active or suspended frame.",
+      "boundaries": "C/Lua locals, captures and suspended pending temporary slots with exact restored execution results.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETLOCAL-473",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_setlocal",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#active_c_locals",
+        "c_api/tests/debug_api_contract.c#active_lua_locals",
+        "c_api/tests/debug_api_contract.c#caller_temporary_extent",
+        "c_api/tests/debug_api_contract.c#suspended_capture_local",
+        "c_api/tests/debug_api_contract.c#suspended_pending_temporary"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Upvalue reads return actual captured values and the appropriate Lua/C naming protocol.",
+      "boundaries": "Lua and C captures, invalid index behavior and stripped-function metadata.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETUPVALUE-474",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_getupvalue",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#c_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#stripped_metadata",
+        "c_api/tests/debug_api_contract.c#upvalue_values"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Upvalue writes consume their replacement and update actual shared Lua/C captures.",
+      "boundaries": "Lua/C captured values, joined-cell visibility and exact function results.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETUPVALUE-475",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_setupvalue",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#c_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#joined_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#upvalue_values"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public capture identity reflects actual shared and distinct Lua/C upvalue cells.",
+      "boundaries": "Before/after Lua joins, distinct values and C closure cell identity.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_UPVALUEID-477",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_upvalueid",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#c_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#joined_upvalue_identity",
+        "c_api/tests/debug_api_contract.c#upvalue_values"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Joining Lua upvalues replaces actual cell identity and shares subsequent mutation.",
+      "boundaries": "Two independently created Lua closures, post-join pointer identity and changed observed closure result.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_UPVALUEJOIN-478",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_upvaluejoin",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/debug_api_contract.c#joined_upvalue_identity"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public reader loading retains streamed owners, stack/error policy and exact incremental callback consumption.",
+      "boundaries": "24 actual reader-loading cases: piece lifetime and EOF, recursive readers, syntax/mode errors, message/yield barriers, allocation refusal, binary splits/fixed pieces and linear piece accumulation. Writer-only cases remain separate dump witnesses.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_LOAD-301",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_load",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/load_dump_contract.h#test_binary_reader_every_split",
+        "c_api/tests/load_dump_contract.h#test_binary_reader_failure_boundaries",
+        "c_api/tests/load_dump_contract.h#test_dump_round_trip",
+        "c_api/tests/load_dump_contract.h#test_fixed_binary_piece_requirements",
+        "c_api/tests/load_dump_contract.h#test_fixed_binary_reader_count",
+        "c_api/tests/load_dump_contract.h#test_partial_binary_reader_error_cleanup",
+        "c_api/tests/load_dump_contract.h#test_reader_allocation_refusal",
+        "c_api/tests/load_dump_contract.h#test_reader_avoids_prefix_reconstruction",
+        "c_api/tests/load_dump_contract.h#test_reader_delimiter_boundaries",
+        "c_api/tests/load_dump_contract.h#test_reader_end_conditions",
+        "c_api/tests/load_dump_contract.h#test_reader_error_identity",
+        "c_api/tests/load_dump_contract.h#test_reader_escape_boundaries",
+        "c_api/tests/load_dump_contract.h#test_reader_inherits_message_handler",
+        "c_api/tests/load_dump_contract.h#test_reader_keyword_boundaries",
+        "c_api/tests/load_dump_contract.h#test_reader_nested_guarded_sources",
+        "c_api/tests/load_dump_contract.h#test_reader_number_boundaries",
+        "c_api/tests/load_dump_contract.h#test_reader_piece_lifetime",
+        "c_api/tests/load_dump_contract.h#test_reader_preserves_stack",
+        "c_api/tests/load_dump_contract.h#test_reader_punctuation_prefetch",
+        "c_api/tests/load_dump_contract.h#test_reader_recursive_api_reentry",
+        "c_api/tests/load_dump_contract.h#test_reader_stops_at_definitive_syntax",
+        "c_api/tests/load_dump_contract.h#test_reader_stops_at_invalid_escape",
+        "c_api/tests/load_dump_contract.h#test_reader_syntax_and_mode_errors",
+        "c_api/tests/load_dump_contract.h#test_reader_yield_barrier"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public dumping emits the actual canonical subtree through the real writer and preserves callback status/error protocol.",
+      "boundaries": "Executable binary round trip, writer stack and terminal calls, nonzero status/error identity, every split and fixed/truncated/malformed binary boundaries.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_DUMP-304",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_dump",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/load_dump_contract.h#test_binary_reader_every_split",
+        "c_api/tests/load_dump_contract.h#test_binary_reader_failure_boundaries",
+        "c_api/tests/load_dump_contract.h#test_dump_round_trip",
+        "c_api/tests/load_dump_contract.h#test_dump_terminal_status",
+        "c_api/tests/load_dump_contract.h#test_dump_writer_error_identity",
+        "c_api/tests/load_dump_contract.h#test_dump_writer_stack_and_terminal",
+        "c_api/tests/load_dump_contract.h#test_dump_writer_stops_on_status",
+        "c_api/tests/load_dump_contract.h#test_fixed_binary_piece_requirements",
+        "c_api/tests/load_dump_contract.h#test_fixed_binary_reader_count",
+        "c_api/tests/load_dump_contract.h#test_partial_binary_reader_error_cleanup"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "External string creation preserves byte identity, ownership, normalization, retention and actual release/refusal lifetimes.",
+      "boundaries": "Empty/short/long and embeddedNUL buffers, borrowed storage, string keys, weak values, allocation failure and state close. Default release-reentry cases remain checked in the full paired process; instrumented C lock omission stays explicit.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHEXTERNALSTRING-247",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_pushexternalstring",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/external_string_contract.c#allocation_refusal",
+        "c_api/tests/external_string_contract.c#borrowed_external",
+        "c_api/tests/external_string_contract.c#embedded_zero",
+        "c_api/tests/external_string_contract.c#empty_external",
+        "c_api/tests/external_string_contract.c#existing_key_update",
+        "c_api/tests/external_string_contract.c#long_external",
+        "c_api/tests/external_string_contract.c#long_key_retention",
+        "c_api/tests/external_string_contract.c#short_external",
+        "c_api/tests/external_string_contract.c#short_key_normalization",
+        "c_api/tests/external_string_contract.c#state_close_lifetime",
+        "c_api/tests/external_string_contract.c#weak_value_string"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public C-string numeric conversion matches exact original C values, consumed lengths, integer/real tags and failure stack preservation.",
+      "boundaries": "Decimal/hex integers, floating/extreme/long cancellation and remote midpoint forms, invalid strings, NUL extent, no-growth conversion and seeded round trips.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_STRINGTONUMBER-376",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_stringtonumber",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/conversion_api_contract.c#c_string_extent",
+        "c_api/tests/conversion_api_contract.c#decimal_integers",
+        "c_api/tests/conversion_api_contract.c#extreme_floats",
+        "c_api/tests/conversion_api_contract.c#failure_preserves_stack",
+        "c_api/tests/conversion_api_contract.c#floating_syntax",
+        "c_api/tests/conversion_api_contract.c#hexadecimal_integers",
+        "c_api/tests/conversion_api_contract.c#long_cancellation",
+        "c_api/tests/conversion_api_contract.c#refusal_no_growth",
+        "c_api/tests/conversion_api_contract.c#remote_midpoint",
+        "c_api/tests/conversion_api_contract.c#seeded_roundtrips"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public C arithmetic preserves primitive numeric types/wrap, original metamethod operands and the actual caller/error/yield boundary.",
+      "boundaries": "All binary/unary arithmetic and bitwise operations, coercions, handlers and diagnostics, C temporary mutation and nonyieldable recovery.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ARITH-230",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_arith",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/operator_api_contract.c#arbitrary_handler_error",
+        "c_api/tests/operator_api_contract.c#arithmetic_caller_window",
+        "c_api/tests/operator_api_contract.c#arithmetic_diagnostics",
+        "c_api/tests/operator_api_contract.c#bare_string_no_handler",
+        "c_api/tests/operator_api_contract.c#handler_cannot_yield",
+        "c_api/tests/operator_api_contract.c#metamethod_arithmetic",
+        "c_api/tests/operator_api_contract.c#numeric_bitwise_handler",
+        "c_api/tests/operator_api_contract.c#primitive_arithmetic",
+        "c_api/tests/operator_api_contract.c#primitive_refusal",
+        "c_api/tests/operator_api_contract.c#string_handlers",
+        "c_api/tests/operator_api_contract.c#unary_and_wrap",
+        "c_api/tests/operator_api_contract.c#unary_caller_fake_operand"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Public comparison preserves exact primitive ordering, handler/fallback operands, caller mutation and error identity.",
+      "boundaries": "Absent values, unequal integer/real precision, binary strings, comparison handlers/fallback, C caller windows, incompatible types and yield refusal.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_COMPARE-237",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_compare",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/operator_api_contract.c#comparison_caller_mutation",
+        "c_api/tests/operator_api_contract.c#comparison_error_identity",
+        "c_api/tests/operator_api_contract.c#comparison_handlers",
+        "c_api/tests/operator_api_contract.c#comparison_type_errors",
+        "c_api/tests/operator_api_contract.c#handler_cannot_yield",
+        "c_api/tests/operator_api_contract.c#primitive_comparison"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Type naming preserves all valid public tag labels and distinguishes absent from nil without consulting object name metadata.",
+      "boundaries": "All valid tag constants, borrowed-name stability, acceptable absent stack slot and userdata __name; out-of-range invalid enums are outside the pinned API precondition.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TYPENAME-198",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_typename",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#absent_slot_type_name",
+        "c_api/tests/index_type_api_contract.c#builtin_type_names",
+        "c_api/tests/index_type_api_contract.c#type_name_ignores_metatable_label"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Version queries return the compiled numeric version without consulting or allocating through a Lua state.",
+      "boundaries": "ExplicitNULL state and live state, unchanged stack and selected allocator call count.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_VERSION-171",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_version",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#version_live_state",
+        "c_api/tests/index_type_api_contract.c#version_null_state"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Ordinary integer lookup preserves numeric key identity, return type/stack growth and real index-handler/error/yield semantics.",
+      "boundaries": "Absent/existing values, real/integer versus string keys, signed64 extremes, relative indices, handler/table chains and raw bypass, exact error objects and nonyieldable C callbacks.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETI-265",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_geti",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#get_absent_integer_value",
+        "c_api/tests/index_type_api_contract.c#get_error_identity_and_recovery",
+        "c_api/tests/index_type_api_contract.c#get_existing_integer_value",
+        "c_api/tests/index_type_api_contract.c#get_existing_key_bypasses_handler",
+        "c_api/tests/index_type_api_contract.c#get_index_handler_operands",
+        "c_api/tests/index_type_api_contract.c#get_index_table_chain",
+        "c_api/tests/index_type_api_contract.c#get_nonindexable_error",
+        "c_api/tests/index_type_api_contract.c#get_nonyieldable_handler",
+        "c_api/tests/index_type_api_contract.c#get_numeric_key_identity",
+        "c_api/tests/index_type_api_contract.c#get_raw_bypasses_handler",
+        "c_api/tests/index_type_api_contract.c#get_relative_index_before_push",
+        "c_api/tests/index_type_api_contract.c#get_signed_integer_extremes"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Ordinary integer assignment consumes its value using the original table index and preserves actual newindex dispatch and barriers.",
+      "boundaries": "Exact pop, signed64 and relative indices, newindex operands/table chains, existing/raw bypass, error identity/recovery and nonyieldable/nonindexable cases.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETI-282",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_seti",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/index_type_api_contract.c#set_error_identity_and_recovery",
+        "c_api/tests/index_type_api_contract.c#set_existing_key_bypasses_handler",
+        "c_api/tests/index_type_api_contract.c#set_integer_value_and_pop",
+        "c_api/tests/index_type_api_contract.c#set_newindex_handler_operands",
+        "c_api/tests/index_type_api_contract.c#set_newindex_table_chain",
+        "c_api/tests/index_type_api_contract.c#set_nonindexable_error",
+        "c_api/tests/index_type_api_contract.c#set_nonyieldable_handler",
+        "c_api/tests/index_type_api_contract.c#set_raw_bypasses_handler",
+        "c_api/tests/index_type_api_contract.c#set_relative_index_before_pop",
+        "c_api/tests/index_type_api_contract.c#set_signed_integer_extremes"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "The exported public identity data contains the exact compiled Lua copyright/authors byte sequence.",
+      "boundaries": "An actual linked data-symbol read compared with the public header string literals; this is not a fabricated call to a preprocessor constant.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-DATA-LUA_IDENT-157",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_ident",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/conversion_api_contract.c#identity_data"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "The public pointer-arithmetic macro addresses real owned state extra-space bytes and preserves inherited child data.",
+      "boundaries": "Main/secondary state storage and a copied pointer-sized payload through actual public thread creation.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-MACRO-LUA_GETEXTRASPACE-391",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_getextraspace",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ]
+    },
+    {
+      "runtime_acceptance": false,
+      "proposed_classification": "runtime-behavior",
+      "invariant": "The public function-classification macro identifies the actual Lua message handler while the C classifier remains false.",
+      "boundaries": "Lua closure classifier through a real protected message-handler setup.",
+      "named_aunit_cases": [],
+      "id": "CAPI-LUA-H-MACRO-LUA_ISFUNCTION-404",
+      "coverage_authority": false,
+      "review_status": "pending",
+      "name": "lua_isfunction",
+      "execution_evidence": [],
+      "named_c_cases": [
+        "c_api/tests/c_api_consumer.c#test_lua_message_handler"
+      ]
     }
   ],
   "kind": "additional-target-api-author-routes",

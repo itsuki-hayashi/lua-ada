@@ -1,32 +1,32 @@
 {
-  "coverage_authority": false,
   "consumer": {
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json",
-    "sha256": "d07a05938e20d104c59287fc51de1fe7fd24e9a3b906028faeb71dcf577a1426"
+    "sha256": "0b9dc1ba772ee57d1b2466cd5830af1aeef14dc37d2aa8c487b6a7f80576d24c",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
+  },
+  "schema_version": 1,
+  "coverage_authority": false,
+  "source_snapshot": {
+    "revision": "e3ac387729bb5e0bd0979f33d75616823adb2a51",
+    "repository_dirty": true,
+    "kind": "repository-source-snapshot"
   },
   "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
-  "schema_version": 1,
-  "runtime_acceptance": false,
-  "source_snapshot": {
-    "revision": "957ffe69409e4181338b9bcf16b723d1d9d0ceae",
-    "kind": "repository-source-snapshot",
-    "repository_dirty": true
-  },
   "global_api": {
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json",
-    "sha256": "9eb8a1eb7db7996f3fec7ede5c6d887b3462831b9a3332a682edb95c99e837e9"
+    "sha256": "92884aa59de02dead07b0b17a48e1022dbfaa23bc1da656dd5bc86a18d91402a",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
   },
-  "target": "remaining-upstream-compatibility",
+  "runtime_acceptance": false,
   "review": {
-    "status": "pending",
-    "reviewer": null,
     "artifact_sha256": null,
     "artifact": null,
-    "author": "Codex /root/validation_delivery"
+    "reviewer": null,
+    "author": "Codex /root/validation_delivery",
+    "status": "pending"
+  },
+  "aunit": {
+    "sha256": "6f1e5c58f3e1c8ccb13719aeef17aabe1b5a47e9d3954b7a1e177ef4dbac4104",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json"
   },
   "kind": "target-witness-policy",
-  "aunit": {
-    "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json",
-    "sha256": "df4da28e92243c1772e07bf70f039e6e95b047b6ac582b9bf8bb3242a77ed347"
-  }
+  "target": "remaining-upstream-compatibility"
 }

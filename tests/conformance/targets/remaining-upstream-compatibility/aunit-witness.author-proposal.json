@@ -158,19 +158,19 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "70fe3eebb3ceffd477d8c1b2570c82c9d3037ed3d7cd8c7d24691fda34fb110c"
+      "sha256": "ce424d701956d39845b8d27c0b6779e4360c46b718b000e2954e84ca43849530"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
       "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
     },
     {
-      "path": "tests/src/lua-formatter_tests.adb",
-      "sha256": "ac2113fafef31c39f935a42b823d76dc492843e75549a0ffe3d8df20e9272f80"
+      "sha256": "ac2113fafef31c39f935a42b823d76dc492843e75549a0ffe3d8df20e9272f80",
+      "path": "tests/src/lua-formatter_tests.adb"
     },
     {
-      "path": "tests/src/lua-scalar_text_tests.adb",
-      "sha256": "f49f4548f4841393556da4d7af51a239e0a215cfba880b09679cef730f323449"
+      "sha256": "f49f4548f4841393556da4d7af51a239e0a215cfba880b09679cef730f323449",
+      "path": "tests/src/lua-scalar_text_tests.adb"
     }
   ],
   "entries": [
