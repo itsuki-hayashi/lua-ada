@@ -647,4 +647,28 @@ function Test-ScopedMatrix {
         warning_regressions=$warningResults;full_m3_acceptance=$false}
 }
 
-Export-ModuleMember -Function Assert-ScopedMatrixIndex, Test-ScopedMatrix
+function Test-RetainedMatrixWitnesses {
+    param([Parameter(Mandatory)][string] $Root,
+          [Parameter(Mandatory)][Collections.IDictionary] $Manifest,
+          [Parameter(Mandatory)][string] $Bundle,
+          [Parameter(Mandatory)][Collections.IDictionary] $Suite)
+    # Full-target reconciliation reuses the actual named C/AUnit and warning
+    # protocols from the retained expanded scope. Exposing this replay avoids
+    # weakening them to a set of successful primary-file process exits.
+    if ($Manifest.scope -cne 'expanded-t-conformance') { throw 'Unknown retained matrix witness scope' }
+    $seenWarnings = @{}
+    foreach ($identity in $Manifest.warning_regressions) {
+        if ($identity.context -cnotin $Suite.acceptance_contexts -or $seenWarnings.ContainsKey($identity.context)) {
+            throw 'Unknown or duplicate retained warning context'
+        }
+        $seenWarnings[$identity.context] = $true
+    }
+    foreach ($context in $Suite.acceptance_contexts) {
+        if (-not $seenWarnings.ContainsKey($context)) { throw "Missing retained warning context: $context" }
+    }
+    $consumers = Test-MatrixNamedEvidence -Root $Root -Manifest $Manifest -Bundle $Bundle -Suite $Suite
+    $warnings = @(Test-MatrixWarningEvidence -Root $Root -Manifest $Manifest -Bundle $Bundle)
+    return @{consumers=$consumers;warnings=$warnings}
+}
+
+Export-ModuleMember -Function Assert-ScopedMatrixIndex, Test-ScopedMatrix, Test-RetainedMatrixWitnesses

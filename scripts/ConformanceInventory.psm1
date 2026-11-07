@@ -919,7 +919,8 @@ function Test-ConformanceInventory {
         }
     }
     [pscustomobject]@{ Files=34; SourceAnchors=$unitCount; PendingSourceAnchors=$pending;
-        ApiEntries=$api.Count; Complete=([bool]$RequireComplete -and $resolvedExclusions.Count -eq 0);
+        ApiEntries=$api.Count; PendingApiEntries=@($api | Where-Object status -CEQ 'pending').Count;
+        Complete=([bool]$RequireComplete -and $resolvedExclusions.Count -eq 0);
         TargetPolicy=$TargetPolicy; TargetComplete=[bool]$RequireComplete;
         ExcludedSourceObligations=$resolvedExclusions.Count;
         RequiredPendingSourceAnchors=($pending - $resolvedExclusions.Count);
