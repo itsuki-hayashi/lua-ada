@@ -250,6 +250,8 @@ original streams and failures, and always reports `target_acceptance: false`.
 Failed observations produce a nonzero exit; they are not historical acceptance.
 Unrelated REPL/native-module prerequisites are deferred to the File operations
 that actually need them; main/attrib and Aggregate retain those requirements.
+`-GCEquivalentManifest` explicitly selects a separately reviewed successor GC
+mapping after its current-source approval; no stale mapping is silently rebound.
 
 `new-target-witness-proposals.ps1` creates separate author-only successor
 consumer/AUnit descriptors under this target or a disposable reports directory.
@@ -274,3 +276,13 @@ transformations and current counterpart bindings. Its approval and narrative
 remain separate from the historical mapping. The generated source hash is
 unchanged; its source review grants no runtime or coverage acceptance. Fresh
 GC and named counterpart execution must still bind the final runtime image.
+
+The target-owned `code-private-optimizer.author-proposal.json` and companion
+transform proposal are unapproved source-review inputs. They propose eight
+narrow private-inspection spans, preserve the exact `checkR` helper and 13 full
+static public assertion calls, and leave all actual execution/type assertions,
+successful source loads and the oversized-register diagnostic present. Ten
+private static assertion sites are linked to proposed obligations. These counts
+describe source inventory, not executed coverage. Constant-type and return-arity
+implications still require independent review and public runtime witnesses.
+The production exclusion overlay is not changed by these author packets.

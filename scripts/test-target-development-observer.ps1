@@ -33,6 +33,17 @@ Case 'all-file observer keeps 30 primaries and both constructs templates' {
         @($plan.planned_processes | Where-Object file -CEQ api.lua).Count -eq 2 -and
         @($plan.planned_processes | Where-Object file -CEQ constructs.lua).Count -eq 4) 'Full file selection was narrowed'
 }
+Case 'explicit successor GC mapping leaves original C observations unchanged' {
+    $successor = 'tests/conformance/targets/remaining-upstream-compatibility/gc-ada-equivalence.author-proposal.json'
+    $p = Invoke-Tool observe-target-conformance.ps1 @('-Interpreter','unused','-ReferenceInterpreter','unused',
+        '-RuntimeDirectory','unused','-GCEquivalentManifest',$successor,'-PlanOnly')
+    Assert-True ($p.exit_code -eq 0) 'Successor mapping plan failed'
+    $plan = Get-Content $p.stdout_path -Raw | ConvertFrom-Json -AsHashtable -Depth 32
+    $ada = @($plan.planned_processes | Where-Object { $_.file -ceq 'gc.lua' -and $_.target -ceq 'Ada' })[0]
+    $c = @($plan.planned_processes | Where-Object { $_.file -ceq 'gc.lua' -and $_.target -ceq 'ReferenceC' })[0]
+    Assert-True ($ada.equivalent_manifest -ceq $successor -and $c.equivalent_manifest -ceq '' -and
+        -not $plan.target_acceptance) 'Successor altered the C oracle or gained authority'
+}
 
 $consumerSource = Join-Path $root 'tests/conformance/reviews/expanded-t-conformance.consumer-witness-author-proposal.json'
 $unitSource = Join-Path $root 'tests/conformance/reviews/expanded-t-conformance.aunit-witness-author-proposal.json'

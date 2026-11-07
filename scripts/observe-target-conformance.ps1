@@ -3,6 +3,7 @@ param(
     [Parameter(Mandatory)][string] $ReferenceInterpreter,
     [Parameter(Mandatory)][string] $RuntimeDirectory,
     [string] $NativeLibraryDirectory = '',
+    [string] $GCEquivalentManifest = '',
     [ValidateSet('default','upstream-test')][string] $Configuration = 'default',
     [ValidateSet('development','validation','release')][string] $Profile = 'validation',
     [ValidateSet('static','static-pic','relocatable')][string] $LibraryType = 'static',
@@ -29,7 +30,10 @@ foreach ($file in $files) {
             $equivalent = if ($file -ceq 'gc.lua' -and $target -ceq 'Ada') { 'gc-ada-instrumented' }
                 elseif ($file -ceq 'files.lua' -and $platform -ceq 'windows') { 'files-windows-platform' }
                 elseif ($file -ceq 'files.lua' -and $platform -ceq 'macos') { 'files-macos-platform' } else { '' }
-            $plan += @{file=$file;target=$target;constructs_branch=$branch;equivalent=$equivalent;context=$context}
+            $manifest = if ($file -ceq 'gc.lua' -and $target -ceq 'Ada' -and $GCEquivalentManifest -ne '') {
+                $GCEquivalentManifest
+            } elseif ($equivalent -ne '') { Join-Path $root ('tests/conformance/equivalents/' + $equivalent + '.json') } else { '' }
+            $plan += @{file=$file;target=$target;constructs_branch=$branch;equivalent=$equivalent;equivalent_manifest=$manifest;context=$context}
         }
     }
 }
@@ -66,8 +70,8 @@ try {
             if ($NativeLibraryDirectory -ne '') { $arguments.NativeLibraryDirectory = $NativeLibraryDirectory }
         }
         if ($entry.file -ceq 'constructs.lua') { $arguments.ConstructsBranch = $entry.constructs_branch }
-        if ($entry.equivalent -ne '') {
-            $arguments.EquivalentManifest = Join-Path $root ('tests/conformance/equivalents/' + $entry.equivalent + '.json')
+        if ($entry.equivalent_manifest -ne '') {
+            $arguments.EquivalentManifest = $entry.equivalent_manifest
         }
         & (Join-Path $PSScriptRoot 'run-conformance.ps1') @arguments
         $code = $LASTEXITCODE
