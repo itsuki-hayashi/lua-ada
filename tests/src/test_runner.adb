@@ -20,6 +20,7 @@ with Assignment_Phase_Tests;
 with Debug_Traceback_Tests;
 with Hook_Registry_Tests;
 with Debug_Temporary_Tests;
+with Native_Return_Window_Tests;
 with Runtime_Inspection_Tests;
 with Lua.Opcode_Tests;
 with Lua.Context_Tests;
@@ -94,6 +95,7 @@ procedure Test_Runner is
       Debug_Traceback_Tests.Register (Result);
       Hook_Registry_Tests.Register (Result);
       Debug_Temporary_Tests.Register (Result);
+      Native_Return_Window_Tests.Register (Result);
       Runtime_Inspection_Tests.Register (Result);
       Lua.Opcode_Tests.Register (Result);
       Lua.Context_Tests.Register (Result);

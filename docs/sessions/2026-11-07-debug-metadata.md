@@ -397,3 +397,32 @@ result; Ada reports slot 1 and the original argument 3. The builtin boundary
 agent owns actual result-publication integration, including operations that
 reuse argument ranges. This agent owns focused native observations/regressions
 and subsequent debug/close metadata. No synthetic hook result is accepted.
+
+## 2026-11-08 native return-window regression checkpoint
+
+A 51-case native observation records actual first/count/result cells and the
+visible local top for representative builtin operations. It distinguishes
+appending a new result, reusing an argument suffix, replacing consumed keys or
+arguments, and protected status/result prefixes. Equal output/input values do
+not imply reuse: math.abs(4) still appends its result. Numeric tonumber reuses
+its argument while text conversion appends. Default Lua 5.5 pairs returns four
+values, retaining both nil results. The visible top during a Lua return hook
+also includes the real debug hook's table workspace; that private extra row
+must not be fabricated as an implementation result.
+
+Thirteen separately named AUnit wrappers and native_return_windows.lua turn
+the meaningful append/reuse/replace/protected/iterator cases into public Lua
+regressions. Their capture helper reads getinfo('fr') and actual getlocal
+cells, retains explicit nil counts and compares the captured packet with the
+independently received function results. Both pinned native default and
+instrumented configurations pass the fixture. The current Ada binary fails
+the unpublished result cases; these failures are retained as regression
+evidence under ignored reports/debug-metadata/return-baseline-* artifacts.
+
+This source-only regression checkpoint is an input to the coordinated builtin
+publication implementation. The new Ada wrappers have not yet been compiled
+or called passing during that agent's reserved window. That agent owns real
+scalar result publication, prefix/argument normalization, obsolete packet-root
+release and return-phase continuation handling. The completed implementation
+must compile and pass these cases before final acceptance; this checkpoint
+does not establish that result.
