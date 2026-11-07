@@ -14,6 +14,7 @@ $savedDyldPath = $env:DYLD_LIBRARY_PATH
 $savedArchive = $env:LUA_ADA_ABI_RUNTIME_ARCHIVE
 $savedTaskingArchive = $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE
 $savedRuntimeDirectory = $env:LUA_ADA_RUNTIME_LIBRARY_DIR
+$savedConfiguration = $env:LUA_ADA_CONFIGURATION
 Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 $scenario = '-XLUA_ADA_LIBRARY_TYPE=' + $LibraryType
 $profileArgument = '--' + $Profile
@@ -29,6 +30,7 @@ function Invoke-Alire {
 
 try {
     Set-Location $projectRoot
+    $env:LUA_ADA_CONFIGURATION = 'default'
     $adaRuntimeDirectory = ''
     if (-not $IsWindows) {
         $runtime = Get-SelectedAdaRuntime
@@ -61,7 +63,9 @@ try {
     $env:DYLD_LIBRARY_PATH = $runtimePath + [IO.Path]::PathSeparator + $adaRuntimeDirectory + $savedDyldPath
 
     Set-Location (Join-Path $projectRoot 'tests')
-    Invoke-Alire -Arguments @('exec', '--', "bin/$LibraryType/test_runner$suffix")
+    & (Join-Path $PSScriptRoot 'check-aunit-evidence.ps1') `
+        -Executable (Join-Path $projectRoot "tests/bin/$LibraryType/test_runner$suffix") `
+        -Profile $Profile -LibraryType $LibraryType
     Invoke-Alire -Arguments @('exec', '--', "bin/$LibraryType/syntax_consumer$suffix")
     $upstreamRunner = Join-Path (Get-Location).Path "bin/$LibraryType/upstream_runner$suffix"
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
@@ -154,6 +158,7 @@ finally {
     $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $savedArchive
     $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $savedTaskingArchive
     $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $savedRuntimeDirectory
+    $env:LUA_ADA_CONFIGURATION = $savedConfiguration
 }
 
 # The expected negative CLI test leaves the last native exit status nonzero.

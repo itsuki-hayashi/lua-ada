@@ -267,3 +267,4 @@ Write-Output "PASS: $script:cases matrix regressions; no executed conformance cl
 # Both default CI and instrumented campaigns call this retained entrypoint.
 & (Join-Path $PSScriptRoot 'test-conformance-review.ps1')
 & (Join-Path $PSScriptRoot 'test-consumer-evidence.ps1')
+& (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')

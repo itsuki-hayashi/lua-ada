@@ -824,3 +824,18 @@ pass in reports/review-consumer-context-bindings.log. Dirty diagnostic runs
 are not accepted evidence. Clean final-revision replay, matrix-level rejection
 fixtures, AUnit-equivalent evidence binding and all platform contexts remain
 pending; no coverage ledger entry was promoted by this checkpoint.
+
+At clean published e391ad8, the actual default Windows validation/static
+consumer report replay verified all 41 named cases; retained result is
+reports/core-image/92cc54981cb54bdcb88ab2b0fbc2e924/result.json and replay
+reports/review-consumer-clean-evidence.json. This is one context only.
+A shared AUnit capture now retains both configurations' process streams,
+source/executable/library identities and an observed compiled configuration
+probe. Default builds explicitly set/restore LUA_ADA_CONFIGURATION to prevent
+inheriting an instrumented selection. Actual default and instrumented static
+validation captures each pass 1306 tests. Seventeen named-case replay fixtures
+reject malformed identities, missing labels, stale captures and mismatched
+probes. Independent semantic review binds 14 collector/internal-equivalent
+labels. Named-case replay checks summary consistency; the retained whole-suite
+CI gate remains separate. Final-context and matrix-level acceptance fixtures
+remain outstanding, and no ledger obligations were promoted.

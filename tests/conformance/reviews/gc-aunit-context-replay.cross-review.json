@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "independent-aunit-replay-review",
+  "author": "Codex independent review agent /root/review_gc",
+  "reviewer": "Codex independent review agent /root/review_files",
+  "decision": "accepted-semantic-witness-mapping",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "proposal": {
+    "path": "tests/conformance/reviews/gc-aunit-context-replay.proposal.json",
+    "sha256": "dab45c62c54b32f90d1856a159dbcaad69a575c90990e1fe68ba09e5da197c31"
+  },
+  "source_bindings": [
+    {
+      "path": "tests/src/lua-conformance_adapter_tests.adb",
+      "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+    },
+    {
+      "path": "tests/src/lua-collector_tests.adb",
+      "sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4"
+    },
+    {
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json",
+      "sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e"
+    },
+    {
+      "path": "tests/conformance/reviews/gc-parameter-api.mapping-proposal.json",
+      "sha256": "af5d3cf818dd164d073cdcf74dd89c03ef1f8390e73be34e1bb0021233fa02c4"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "2a7fb8af7e502bdb0e3e603722e65e13e76d23ff59044a677a5883cff53877c0"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "9255360b864da57d85c0fe0ac84f8c7146865c261ee8b8b009827a13b1d7b622"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "43c7f58e5435290e7ac071446a195d7208d49864ce2ce73906aaf729a4d85416"
+    },
+    {
+      "path": "scripts/check-aunit-evidence.ps1",
+      "sha256": "b2854afcbe49536dd13d7423d345b0ca1d5e4473d8854b8522725fb190251a7e"
+    }
+  ],
+  "verification": [
+    "Verified all14 exact registered labels, matching OK lines, actual procedure bodies and generic Fixture wrappers. Both packages register unconditionally in test_runner.",
+    "Recomputed each test-source hash and every claimed historical exact-label occurrence. The new minormul-debt case is not credited with historical execution.",
+    "Private adapter Check explicitly installs the real test adapter and checks zero live storage after physical finalization, so these AUnit cases can execute in default as well as instrumented test builds without claiming production default T availability."
+  ],
+  "semantic_mapping": [
+    "Slots0..5 map to the production codec case plus focused state/debt/mode/phase assertions. minormul case changes100 to200 and requires doubled debt at unchanged measured baseline.",
+    "Promotion_And_Major exercises minor-to-major threshold and major-to-minor return with actual survivor promotion, resumed marking and reclaimed garbage. Zero_Major_Threshold separately disables major switching.",
+    "Pause/debt/step tests observe byte countdown, genuine traversal work and repeated zero-stepsize cycle completion. Rounding and saturation assert production compressed values. Supporting tests are not claimed to isolate every parameter setting or comparative scheduling speed.",
+    "Atomic_Orphan_Cell preserves the surviving closure value30 after collecting weak coroutine at atomic/sweep, while correctly using Ada forward-barrier gray color.",
+    "Measured_Emergency_Headroom performs200 allocations with actual measured storage, at least199 refusals/recovery cycles, memory invariant check and subsequent allocation.",
+    "Weak_String_Payloads provides focused64KiB graph/reclamation assertions for two payload-related spans. This does not replace the full equivalent runner with original4MiB operands."
+  ],
+  "capture_boundary": [
+    "Current shared wrapper adds retained process/capture/source/library metadata and preserves positive suite count, zero failures/errors, successful exit/completion and exact expected finalizer stderr.",
+    "Wrapper identity/configuration validation is a separate ongoing review; this artifact does not approve requested metadata as proof of compiled identity.",
+    "Current proposal binds the shared capture wrapper and callers; historical capture gaps are retained separately.",
+    "Final replay requires exact-once14labels plus complete successful suite evidence, clean final revision, correct compiled context/configuration and validated source/executable/library/capture hashes."
+  ],
+  "findings": [],
+  "execution_evidence": [],
+  "initial_proposal_observation": {
+    "path": "tests/conformance/reviews/gc-aunit-context-replay.proposal.json",
+    "sha256": "dab45c62c54b32f90d1856a159dbcaad69a575c90990e1fe68ba09e5da197c31"
+  },
+  "current_capture_delta_review": {
+    "decision": "accepted-source-mapping-update",
+    "rationale": "Current proposal distinguishes source-observed shared capture improvements from historical gaps, refreshes all active bindings and retains no final-runtime claim. All active hashes match. Fourteen case identities, exact labels and semantic mappings remain unchanged.",
+    "implementation_boundary": "Configuration-probe enforcement is separately reviewed by the parent/events reviewer. This decision accepts the semantic witness mapping and its current bindings, not unexecuted harness behavior.",
+    "runtime_acceptance": false
+  }
+}

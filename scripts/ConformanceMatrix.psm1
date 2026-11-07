@@ -6,6 +6,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConsumerEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'AUnitEvidence.psm1')
 
 function Assert-MatrixReview {
     param([Collections.IDictionary] $Review)
@@ -177,6 +178,45 @@ function Test-ScopedMatrix {
         }
         foreach ($context in $suite.acceptance_contexts) {
             if (-not $contexts.ContainsKey($context)) { throw "Missing named consumer context: $context" }
+        }
+        $identity = $manifest.aunit_mapping
+        $mappingPath = Resolve-ReviewedFile -Root $Root -Path $identity.path -Sha256 $identity.sha256
+        $reviewPath = Resolve-ReviewedFile -Root $Root -Path $identity.review -Sha256 $identity.review_sha256
+        $aunitMapping = Get-Content -LiteralPath $mappingPath -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+        $aunitReview = Get-Content -LiteralPath $reviewPath -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+        if ($aunitReview.decision -cne 'accepted-semantic-witness-mapping' -or
+            [string]::IsNullOrWhiteSpace($aunitReview.author) -or
+            [string]::IsNullOrWhiteSpace($aunitReview.reviewer) -or
+            $aunitReview.author -ceq $aunitReview.reviewer -or $aunitReview.author -cne $aunitMapping.author -or
+            $aunitReview.proposal.path -cne $identity.path -or $aunitReview.proposal.sha256 -cne $identity.sha256) {
+            throw 'AUnit mapping lacks independent review'
+        }
+        foreach ($binding in $aunitMapping.bindings) {
+            [void](Resolve-ReviewedFile -Root $Root -Path $binding.path -Sha256 $binding.sha256)
+        }
+        foreach ($entry in $aunitMapping.entries) {
+            if (@($aunitMapping.bindings | Where-Object {
+                $_.path -ceq $entry.case.Split('#')[0] -and $_.sha256 -ceq $entry.source_sha256
+            }).Count -ne 1) { throw 'Reviewed AUnit source binding incomplete' }
+        }
+        $aunitContexts = @{}
+        foreach ($unit in $manifest.named_aunit) {
+            if ($unit.context -cnotin $suite.acceptance_contexts -or $aunitContexts.ContainsKey($unit.context)) {
+                throw 'Unknown/duplicate AUnit context'
+            }
+            $unitReport = Read-MatrixHashedJson -Path (Join-Path $bundle $unit.report) -Hash $unit.sha256
+            $unitRoot = [IO.Path]::GetFullPath((Join-Path $bundle $unit.artifact_root))
+            $resolve = {param($path,$hash) Resolve-MatrixCapture -Original $path -ArtifactRoot $unitRoot -Hash $hash}
+            $aunitContexts[$unit.context] = Test-NamedAUnitEvidence -Report $unitReport -Mapping $aunitMapping `
+                -Revision $manifest.revision -Context $unit.context -ResolveCapture $resolve
+            foreach ($library in $unitReport.library_files) {
+                if (@($consumerReports[$unit.context].library_files | Where-Object {
+                    $_.file -ceq $library.file -and $_.sha256 -ceq $library.sha256
+                }).Count -ne 1) { throw 'AUnit and C consumer libraries differ' }
+            }
+        }
+        foreach ($context in $suite.acceptance_contexts) {
+            if (-not $aunitContexts.ContainsKey($context)) { throw "Missing AUnit context: $context" }
         }
     }
     $coverage = @{}

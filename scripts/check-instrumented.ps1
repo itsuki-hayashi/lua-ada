@@ -106,11 +106,8 @@ try {
         path=(Join-Path $library $libraryName);
         sha256=(Get-FileHash -LiteralPath (Join-Path $library $libraryName) -Algorithm SHA256).Hash })
     $bin = Join-Path $root "tests/bin/upstream-test/$LibraryType"
-    $unitOutput = Invoke-ObservedProcess -Name aunit -Executable "$bin/test_runner$suffix" `
-        -Arguments @() -Directory $root -Witness 'Failed Assertions:\s+0\s+Unexpected Errors:\s+0' `
-        -ExpectedError "Lua warning: error in __gc ((native):1: ordinary failure)`n"
-    if ($unitOutput -notmatch 'Total Tests Run:\s+([1-9][0-9]*)') { throw 'Missing AUnit case count' }
-    Write-Host "AUnit cases: $($Matches[1])"
+    & "$PSScriptRoot/check-aunit-evidence.ps1" -Executable "$bin/test_runner$suffix" `
+        -Configuration upstream-test -Profile validation -LibraryType $LibraryType
     $null = Invoke-ObservedProcess -Name configuration `
         -Executable "$bin/lua-configuration_probe$suffix" -Arguments @() `
         -Directory $root -Witness '"configuration":"upstream-test"'
