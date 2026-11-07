@@ -83,4 +83,30 @@ function Test-TargetCompiledWitnesses {
     return $result
 }
 
-Export-ModuleMember -Function Test-TargetCompiledWitnesses
+function Assert-TargetCompiledImageBinding {
+    param([Parameter(Mandatory)][Collections.IDictionary] $Image,
+          [Parameter(Mandatory)][Collections.IDictionary] $Report,
+          [Parameter(Mandatory)][string] $ReportSha256)
+    if($Report.context -cne $Image.context -or $Report.revision -cne $Image.revision -or
+        $Report.compiler_sha256 -cne $Image.toolchain.compiler_sha256){throw 'Compiled observations identify another frozen context/compiler'}
+    $index='reports/target-builds/'+$Image.context.Replace('/','-')+'/compiled/observations.json'
+    if(@($Image.files|Where-Object{ $_.path -ceq $index -and $_.sha256 -ceq $ReportSha256 }).Count -ne 1){
+        throw 'Compiled observation index is not the exact frozen context artifact'
+    }
+    foreach($case in $Report.cases){
+        $artifacts=@(@{path=$case.artifact.path;sha256=$case.artifact.sha256})
+        foreach($kind in @('compile','execution')){foreach($stream in @('stdout','stderr')){
+            $artifacts+=@{path=$case[$kind]["${stream}_path"];sha256=$case[$kind]["${stream}_sha256"]}
+        }}
+        foreach($artifact in $artifacts){
+            $original=$artifact.path.Replace('\','/');$offset=$original.LastIndexOf('/reports/',[StringComparison]::Ordinal)
+            if($offset -lt 0){throw 'Compiled context artifact is outside reports'}
+            $relative=$original.Substring($offset+1)
+            if(@($Image.files|Where-Object{ $_.path -ceq $relative -and $_.sha256 -ceq $artifact.sha256 }).Count -ne 1){
+                throw 'Compiled executable or capture is not part of its frozen context image'
+            }
+        }
+    }
+}
+
+Export-ModuleMember -Function Test-TargetCompiledWitnesses, Assert-TargetCompiledImageBinding

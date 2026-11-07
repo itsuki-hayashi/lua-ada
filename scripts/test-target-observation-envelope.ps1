@@ -35,21 +35,42 @@ function New-Fixture{
         context_image_sha256=$image.sha256;review_evidence=@{path=$narrativePath;sha256=$narrativeHash};synthetic_fixture=$true}
     $approvalPath=[IO.Path]::GetRelativePath($root,(Join-Path $directory 'approval.json')).Replace('\','/')
     $approvalHash=Save (Join-Path $root $approvalPath) $approval
-    $envelope=@{schema_version=1;kind='target-post-observation-envelope';claims=$claims;runtime_acceptance=$false;coverage_authority=$false;
+    $envelope=@{schema_version=1;kind='target-post-observation-envelope';claims=$claims;synthetic_fixture=$true;runtime_acceptance=$false;coverage_authority=$false;
         review=@{status='accepted';author='synthetic-author';reviewer='synthetic-reviewer';artifact=$approvalPath;artifact_sha256=$approvalHash}}
     $envelope=ConvertFrom-Json -InputObject (ConvertTo-Json -InputObject $envelope -Depth 64) -AsHashtable -Depth 64
     return @{directory=$directory;report=$report;raw_path=$rawPath;raw=$raw;contract=$contract;image=$image;
-        envelope=$envelope;approval=$approval;approval_path=$approvalPath}
+        envelope=$envelope;approval=$approval;approval_path=$approvalPath;narrative=$narrative;narrative_path=$narrativePath}
 }
-function Replay([Collections.IDictionary]$Fixture){
+function Replay([Collections.IDictionary]$Fixture,[switch]$ActualReview){
     Assert-TargetObservationEnvelope -Root $root -Envelope $Fixture.envelope -Report $Fixture.report -RawReportPath $Fixture.raw_path `
         -RawIdentity $Fixture.raw -ContractIdentity $Fixture.contract -ImageIdentity $Fixture.image `
-        -Revision ('a'*40) -Context default/windows/validation/static -Operation file:api.lua -Implementation Ada
+        -Revision ('a'*40) -Context default/windows/validation/static -Operation file:api.lua -Implementation Ada -AllowSynthetic:(-not $ActualReview)
+}
+function Save-Review([Collections.IDictionary]$Fixture){
+    $Fixture.approval.review_evidence.sha256=Save (Join-Path $root $Fixture.narrative_path) $Fixture.narrative
+    $Fixture.envelope.review.artifact_sha256=Save (Join-Path $root $Fixture.approval_path) $Fixture.approval
 }
 Case 'independent interpretation leaves the raw observation and acceptance flags unchanged'{
     $f=New-Fixture;$before=(Get-FileHash $f.raw_path).Hash;$r=Replay $f
     Assert-True ($r.review_verified -and -not $r.runtime_acceptance -and -not $r.coverage_authority -and
         $f.report.report_only -and -not $f.report.target_operation_acceptance -and (Get-FileHash $f.raw_path).Hash -ceq $before) 'Envelope rewrote or promoted the observation'
+}
+Case 'actual observations cannot borrow labelled synthetic envelope approval or narrative authority'{
+    foreach($part in @('envelope','approval','narrative')){
+        foreach($invalid in @($true,'false',$null)){
+            $f=New-Fixture
+            # These remain fabricated validator objects. Setting actual labels
+            # here tests the final consumer's rejection, never execution proof.
+            $f.report.synthetic_fixture=$false;$f.raw.sha256=Save $f.raw_path $f.report
+            $f.envelope.synthetic_fixture=$false;$f.approval.synthetic_fixture=$false;$f.narrative.synthetic_fixture=$false
+            $f.envelope.claims.raw_report.sha256=$f.raw.sha256
+            $f.approval.raw_report_sha256=$f.raw.sha256
+            $f.approval.claims_sha256=Get-TargetWitnessPayloadHash $f.envelope.claims
+            if($null -eq $invalid){[void]$f[$part].Remove('synthetic_fixture')}else{$f[$part].synthetic_fixture=$invalid}
+            Save-Review $f
+            Reject {Replay $f -ActualReview} 'actual review artifact'
+        }
+    }
 }
 Case 'raw byte mutation fails even if the envelope still names its old SHA'{
     $f=New-Fixture;[IO.File]::AppendAllText($f.raw_path,'changed',$utf8)

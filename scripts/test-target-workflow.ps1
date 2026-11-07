@@ -48,7 +48,8 @@ Case 'three File partitions keep every primary pair and the real constructs supp
     $observations=@()
     foreach($partition in @('files-1','files-2','files-3')){
         $result=Read-Result (Tool run-target-partition.ps1 @('-Context','default/windows/validation/static','-Partition',$partition,'-PlanOnly'))
-        Assert-True (-not $result.runtime_build_requested -and -not $result.runtime_acceptance) 'Plan claimed a runtime build or acceptance'
+        Assert-True (-not $result.runtime_build_requested -and -not $result.runtime_acceptance -and
+            $result.file_protocol_selection -ceq 'explicit-reviewed-manifest-required') 'Plan claimed a runtime build/acceptance or omitted explicit final protocols'
         $observations+=@($result.observations)
     }
     Assert-True ($observations.Count -eq 62 -and @($observations|Where-Object variant -CEQ primary).Count -eq 60 -and
@@ -56,6 +57,11 @@ Case 'three File partitions keep every primary pair and the real constructs supp
     foreach($target in @('Ada','ReferenceC')){
         Assert-True (@($observations|Where-Object{ $_.target -ceq $target -and $_.variant -ceq 'primary' }|ForEach-Object file|Sort-Object -Unique).Count -eq 30) 'A target lost one primary'
     }
+}
+Case 'development diagnostics explicitly select pending protocols and cannot masquerade as final reviewed selection'{
+    $result=Read-Result (Tool run-target-partition.ps1 @('-Context','default/windows/validation/static','-Partition','files-1','-PlanOnly','-DevelopmentObservation'))
+    Assert-True ($result.file_protocol_selection -ceq 'pending-author-proposal-for-diagnostics' -and
+        -not $result.runtime_acceptance -and -not $result.coverage_authority) 'Diagnostic plan hid its pending protocol authority'
 }
 Case 'Aggregate and Heavy have distinct paired observations and cannot become a File smoke subset'{
     foreach($partition in @('aggregate','heavy')){

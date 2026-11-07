@@ -170,8 +170,11 @@ jobs:
           path: reports/immutable-input/${{ matrix.id }}
       - name: Execute exact context image without rebuilding the runtime
         shell: pwsh
+        env:
+          TARGET_EXECUTION_POLICY: ${{ inputs.execution_policy || '' }}
         run: |
-          ./scripts/run-target-partition.ps1 -Context '${{ matrix.context }}' -Partition '${{ matrix.partition }}' -ImageDirectory "$PWD/reports/immutable-input/${{ matrix.id }}" -ExecutionPolicy '${{ inputs.execution_policy || '' }}'
+          $development = '${{ github.event_name == 'workflow_dispatch' && inputs.development_observations }}' -ceq 'true'
+          ./scripts/run-target-partition.ps1 -Context '${{ matrix.context }}' -Partition '${{ matrix.partition }}' -ImageDirectory "$PWD/reports/immutable-input/${{ matrix.id }}" -ExecutionPolicy $env:TARGET_EXECUTION_POLICY -DevelopmentObservation:$development
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Preserve complete raw observation subtree
         if: always()

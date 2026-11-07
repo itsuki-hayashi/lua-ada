@@ -311,6 +311,17 @@ Case 'execution contract source hashes cannot drift' {
     $fixture = New-AcceptanceFixture 'contract-hash'; $fixture.Contract.source_hashes['sample.lua']=('b' * 64)
     Assert-AcceptanceRejected $fixture 'stale contract source accepted'
 }
+Case 'Aggregate cannot borrow a file contract missing the other original source hashes' {
+    # The helper process is synthetic harness input. Even a reviewed successful
+    # observation must bind all 34 original files for Aggregate acceptance.
+    $fixture=New-AcceptanceFixture 'aggregate-incomplete-contract'
+    $fixture.Operation='aggregate';$fixture.Contract.operation='aggregate'
+    $fixture.Contract.source_hashes=[ordered]@{'all.lua'=('a'*64)}
+    $fixture.SourceRecords=@([ordered]@{path='all.lua';sha256=('a'*64)})
+    $failure=$null
+    try{[void](Test-ConformanceAcceptance @fixture)}catch{$failure=$_.Exception.Message}
+    Assert-True ($failure -ceq 'Aggregate contract must identify all 34 original Lua sources') 'Incomplete Aggregate contract was accepted or failed at an unrelated gate'
+}
 Case 'unexpected warning text fails reviewed execution acceptance' {
     # Unlike observation collection, acceptance enumerates every stderr line.
     # An unexpected warning cannot disappear behind a successful exit/marker.

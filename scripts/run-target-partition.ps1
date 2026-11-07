@@ -3,6 +3,7 @@ param(
     [Parameter(Mandatory)][ValidateSet('files-1','files-2','files-3','aggregate','heavy')][string] $Partition,
     [string] $ImageDirectory = '',
     [string] $ExecutionPolicy = '',
+    [switch] $DevelopmentObservation,
     [switch] $PlanOnly
 )
 Set-StrictMode -Version Latest
@@ -10,6 +11,7 @@ $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'TargetContext.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceFileProtocols.psm1')
 $plan=Get-TargetContextPlan -Root $root
 $entry=@($plan.partitions | Where-Object { $_.context -ceq $Context -and $_.partition -ceq $Partition })
 if($entry.Count -ne 1){throw 'Unknown target execution partition'}
@@ -27,6 +29,7 @@ if($entry.operation -ceq 'file'){
 }
 if($PlanOnly){
     @{context=$Context;partition=$Partition;observations=$operations;runtime_build_requested=$false;
+        file_protocol_selection=$(if($DevelopmentObservation){'pending-author-proposal-for-diagnostics'}else{'explicit-reviewed-manifest-required'});
         runtime_acceptance=$false;coverage_authority=$false}|ConvertTo-Json -Depth 12
     exit 0
 }
@@ -86,6 +89,13 @@ try{
             $arguments.EquivalentManifest=Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/gc-ada-equivalence.json'
         }elseif($operation.file -ceq 'files.lua' -and $parts[1] -cin @('windows','macos')){
             $arguments.EquivalentManifest=Join-Path $root ('tests/conformance/equivalents/files-'+$parts[1]+'-platform.json')
+        }
+        if($operation.file -ne '' -and $null -ne (Get-TargetFileProtocolDefinition -File $operation.file)){
+            if(-not $arguments.ContainsKey('FileProtocolManifest')){
+                if(-not $DevelopmentObservation){throw 'Remaining primary requires an explicit independently reviewed FileProtocolManifest selection'}
+                $arguments.FileProtocolManifest=Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/file-completion.author-proposal.json'
+            }
+            $null=Read-TargetFileProtocolManifest -Root $root -Path $arguments.FileProtocolManifest -RequireReview:(-not $DevelopmentObservation)
         }
         & (Join-Path $PSScriptRoot 'run-conformance.ps1') @arguments
         $exitCode=$LASTEXITCODE

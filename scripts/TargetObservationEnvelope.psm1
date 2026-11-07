@@ -40,10 +40,19 @@ function Assert-TargetObservationEnvelope {
           [Parameter(Mandatory)][Collections.IDictionary] $ImageIdentity,
           [Parameter(Mandatory)][string] $Revision,[Parameter(Mandatory)][string] $Context,
           [Parameter(Mandatory)][string] $Operation,[Parameter(Mandatory)][string] $Implementation,
-          [string] $Variant='primary')
+          [string] $Variant='primary',
+          [switch] $AllowSynthetic)
     if($Envelope.schema_version -ne 1 -or $Envelope.kind -cne 'target-post-observation-envelope' -or
         $Envelope.runtime_acceptance -isnot [bool] -or $Envelope.runtime_acceptance -or
         $Envelope.coverage_authority -isnot [bool] -or $Envelope.coverage_authority){throw 'Invalid post-observation envelope identity'}
+    # Validator fixtures are useful for exercising bindings, but their reviews
+    # must never discharge a real matrix obligation. Requiring explicit JSON
+    # booleans also prevents a missing flag or string "false" from gaining the
+    # authority of an actual independent review. Only unit tests opt in below.
+    foreach($record in @($Envelope,$Report)){
+        if(-not $record.Contains('synthetic_fixture') -or $record.synthetic_fixture -isnot [bool] -or
+            ($record.synthetic_fixture -and -not $AllowSynthetic)){throw 'Post-observation envelope and report require actual review artifacts'}
+    }
     if((Get-FileHash -LiteralPath $RawReportPath).Hash.ToLowerInvariant() -cne $RawIdentity.sha256){throw 'Envelope raw report bytes changed'}
     if($Report.repository_revision -cne $Revision -or $Report.acceptance_context -cne $Context -or
         $Report.operation -cne $Operation -or $Report.target -cne $Implementation -or $Report.variant -cne $Variant){
@@ -61,6 +70,8 @@ function Assert-TargetObservationEnvelope {
         $review.author -ceq $review.reviewer){throw 'Post-observation envelope requires accepted independent review'}
     $path=Resolve-ReviewedFile -Root $Root -Path $review.artifact -Sha256 $review.artifact_sha256
     $approval=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    if(-not $approval.Contains('synthetic_fixture') -or $approval.synthetic_fixture -isnot [bool] -or
+        ($approval.synthetic_fixture -and -not $AllowSynthetic)){throw 'Post-observation approval requires an actual review artifact'}
     if($approval.schema_version -ne 1 -or $approval.kind -cne 'target-observation-approval' -or
         $approval.decision -cne 'accepted' -or $approval.author -cne $review.author -or $approval.reviewer -cne $review.reviewer -or
         $approval.claims_sha256 -cne (Get-TargetWitnessPayloadHash $claims) -or
@@ -68,6 +79,8 @@ function Assert-TargetObservationEnvelope {
         $approval.context_image_sha256 -cne $ImageIdentity.sha256){throw 'Post-observation approval does not bind the exact observation'}
     $narrativePath=Resolve-ReviewedFile -Root $Root -Path $approval.review_evidence.path -Sha256 $approval.review_evidence.sha256
     $narrative=Get-Content -LiteralPath $narrativePath -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    if(-not $narrative.Contains('synthetic_fixture') -or $narrative.synthetic_fixture -isnot [bool] -or
+        ($narrative.synthetic_fixture -and -not $AllowSynthetic)){throw 'Post-observation narrative requires an actual review artifact'}
     if($narrative.reviewer -cne $review.reviewer -or $narrative.decision -cne 'accepted' -or
         $narrative.target -cne 'remaining-upstream-compatibility' -or $narrative.runtime_revision -cne $claims.runtime_revision){
         throw 'Post-observation independent narrative identifies another candidate'

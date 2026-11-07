@@ -391,6 +391,10 @@ them to the context's selected compiler hash and rejects source, argument,
 compiler, executable, capture, exit and output drift. No compiled probes are
 installed by the author catalogue generator: its unmapped declarations remain
 pending until meaningful source probes and independent review exist.
+Final reconciliation also requires the exact compiled observation index,
+executable and every compiler/execution capture in that context's frozen
+image file inventory. A report naming the same source/compiler/context without
+those immutable image entries cannot close a declaration route.
 
 `collect-target-observations.ps1` assembles raw images, 832 primary pairs, 26
 constructs supplements, all warning contexts and current build witnesses into
@@ -406,6 +410,10 @@ Final target reconciliation consumes a separately reviewed
 binds its raw SHA, runtime revision, context, source/fixture hashes, measured
 configuration, host/library image hashes, reviewed contract and immutable
 context image. Its independent approval and narrative are content-addressed.
+The envelope, raw report, approval and narrative each require an explicit JSON
+boolean `synthetic_fixture: false`. Missing flags, strings and labelled synthetic
+reviews fail final reconciliation. Binding unit tests alone may explicitly
+request `-AllowSynthetic`; the final matrix never supplies that switch.
 The raw `report_only` and `target_operation_acceptance` flags remain unchanged.
 Source transformation/exclusion review still precedes adapted execution;
 native-platform applicability may independently review the exact original C
@@ -421,6 +429,12 @@ and `repository_dirty: false` alone do not establish a build witness. Envelope
 validation alone also grants no runtime/coverage authority: the final matrix
 still requires complete source/global API review, every actual context route,
 all image/build/runtime protocols and every semantic execution contract.
+
+Each remaining primary in a final execution partition requires an explicitly
+selected independently reviewed `FileProtocolManifest` in its execution policy.
+The workflow's named `development_observations` input instead selects the
+pending author protocol proposal for diagnostics. This choice remains visible
+in partition planning and supplies no final source or execution authority.
 
 Artifact transport follows the official [upload-artifact v7 documentation](https://github.com/actions/upload-artifact/tree/v7.0.2)
 and [download-artifact v8 documentation](https://github.com/actions/download-artifact/tree/v8).

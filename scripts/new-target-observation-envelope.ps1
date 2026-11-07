@@ -25,6 +25,7 @@ if($NativeApplicability -ne ''){
 $claims=Get-TargetObservationClaims -Report $report -RawIdentity $rawIdentity -ContractIdentity (Identity $Contract) `
     -ImageIdentity (Identity $ContextImage) -NativeApplicability $native
 $envelope=@{schema_version=1;kind='target-post-observation-envelope';claims=$claims;
+    synthetic_fixture=$report.synthetic_fixture;
     runtime_acceptance=$false;coverage_authority=$false;
     review=@{status='pending';author='Codex /root/validation_delivery';reviewer=$null;artifact=$null;artifact_sha256=$null}}
 $destination=[IO.Path]::GetFullPath($Output)

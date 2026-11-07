@@ -111,6 +111,9 @@ Case 'OK plus exit zero without the terminal return observation fails' {
     $p = New-Capture "OK`n"
     Reject { Assert-TargetFileCompletion calls.lua upstream-test $p } 'terminal return witness'
 }
+Case 'a remaining primary raw report without its protocol cannot enter final replay'{
+    Reject {Assert-TargetFileProtocolBinding -Root $root -Report @{operation='file:api.lua'} -WrapperPath 'unused'} 'lacks its completion protocol'
+}
 Case 'missing wrong duplicate and reordered return phases fail' {
     foreach ($output in @(
         (Full-Output 'attrib.lua').Replace("target file phase attrib.lua: returned 27`n",''),

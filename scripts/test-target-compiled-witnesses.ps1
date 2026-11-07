@@ -71,4 +71,32 @@ Case 'a compiler success marker cannot replace the exact executed declaration as
     [IO.File]::WriteAllText($p.stdout_path,"different line`n",$utf8);$p.stdout_sha256=(Get-FileHash $p.stdout_path).Hash.ToLowerInvariant();$p.stdout_bytes=(Get-Item $p.stdout_path).Length
     Reject {Replay $f} 'exact observed assertion line'
 }
+Case 'compiled index executable and all captures must belong to the exact frozen context image'{
+    function New-Image([Collections.IDictionary]$Fixture){
+        $files=@(@{path='reports/target-builds/default-windows-validation-static/compiled/observations.json';sha256=('2'*64)})
+        $case=$Fixture.report.cases[0]
+        $artifacts=@(@{path=$case.artifact.path;sha256=$case.artifact.sha256})
+        foreach($kind in @('compile','execution')){foreach($stream in @('stdout','stderr')){
+            $artifacts+=@{path=$case[$kind]["${stream}_path"];sha256=$case[$kind]["${stream}_sha256"]}
+        }}
+        foreach($artifact in $artifacts){$original=$artifact.path.Replace('\','/');$offset=$original.LastIndexOf('/reports/',[StringComparison]::Ordinal)
+            $files+=@{path=$original.Substring($offset+1);sha256=$artifact.sha256}}
+        return @{context=$Fixture.report.context;revision=$Fixture.report.revision;toolchain=@{compiler_sha256=$Fixture.report.compiler_sha256};files=$files}
+    }
+    $f=New-Fixture;$image=New-Image $f
+    Assert-TargetCompiledImageBinding -Image $image -Report $f.report -ReportSha256 ('2'*64)
+    foreach($change in @('index','executable','compile-stdout','execution-stderr','compiler','context','revision')){
+        $f=New-Fixture;$image=New-Image $f
+        switch($change){
+            index{$image.files[0].sha256='0'*64}
+            executable{$image.files=@($image.files|Where-Object path -CNE $image.files[1].path)}
+            compile-stdout{$image.files[2].sha256='0'*64}
+            execution-stderr{$image.files=@($image.files|Where-Object path -CNE $image.files[5].path)}
+            compiler{$image.toolchain.compiler_sha256='0'*64}
+            context{$image.context='upstream-test/windows/validation/static'}
+            revision{$image.revision='b'*40}
+        }
+        Reject {Assert-TargetCompiledImageBinding -Image $image -Report $f.report -ReportSha256 ('2'*64)} 'frozen context|context image'
+    }
+}
 Write-Output "PASS: $script:Cases compiled witness validator regressions; fabricated process fixtures only, no compiler/runtime/API acceptance"

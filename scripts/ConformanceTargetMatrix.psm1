@@ -428,6 +428,7 @@ function Test-FullTargetMatrix {
                 $matches=@($retainedIndex.compiled_observations|Where-Object context -CEQ $identity.context)
                 if($matches.Count -ne 1){throw 'Full target compiled ABI/layout/header context evidence is missing'}
                 $compiledReport=Read-TargetHashedJson -Root $bundle -Identity $matches[0] -PathField report
+                Assert-TargetCompiledImageBinding -Image $verified.image.manifest -Report $compiledReport -ReportSha256 $matches[0].sha256
                 $compiledRoot=Resolve-TargetBundlePath -Root $bundle -Relative $matches[0].artifact_root
                 $compiled=Test-TargetCompiledWitnesses -Root $Root -Mapping $witnessPolicy.compiled -Report $compiledReport `
                     -ArtifactRoot $compiledRoot -Context $identity.context -Revision $manifest.revision `
