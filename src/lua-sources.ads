@@ -17,7 +17,8 @@ package Lua.Sources is
    function File_Preamble (Source : String) return String;
    --  Prepare file/stdin bytes for the shared frontend. Remove one leading
    --  UTF-8 byte-order mark and blank an initial interpreter line beginning
-   --  with '#', preserving its newline bytes and all subsequent source bytes.
+   --  with '#', ignoring lone CR bytes through LF and preserving a final
+   --  CRLF pair and all subsequent source bytes.
    --  For binary input, discard an initial interpreter line through its LF
    --  instead of blanking it, so the signature/alignment starts at byte one.
    --  Raw load strings and command-line snippets do not use this policy.

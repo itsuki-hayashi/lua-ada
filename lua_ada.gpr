@@ -111,6 +111,7 @@ library project Lua_Ada is
       "lua_ada_os.c",
       "lua_ada_locales.c",
       "lua-engine-external_releases.ads",
+      "lua-engine-file_inputs.ads",
       "lua-engine-c_operators.ads",
       "lua_ada_config.ads",
       "lua-c_api.ads",

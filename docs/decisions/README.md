@@ -61,3 +61,6 @@ and stack-reserved closing links without registration allocation.
 
 ADR 0027 records [protected error closing](0027-protected-error-closing.md),
 actual C guard acknowledgement and retained failed-coroutine scope ownership.
+
+ADR 0029 records [owned file input](0029-owned-file-input.md), native stream
+cleanup before compilation and shared file/stdin/preamble policy.

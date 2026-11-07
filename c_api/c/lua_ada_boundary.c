@@ -592,6 +592,23 @@ int luaL_loadstring(lua_State *state, const char *source) {
     return luaL_loadbufferx(state, source, strlen(source), source, "t");
 }
 
+int luaL_loadfilex(lua_State *state, const char *filename, const char *mode) {
+    int filename_index = lua_gettop(state) + 1;
+    struct lua_ada_request input = request(ADA_LOAD_FILE);
+    struct lua_ada_response output;
+    /* Match the public auxiliary stack owner before entering protected
+     * parsing. Ada owns file I/O and closes it before any later compilation
+     * action can return to this C frame, including host abort/refusal. */
+    if (filename == NULL) lua_pushliteral(state, "=stdin");
+    else lua_pushfstring(state, "@%s", filename);
+    input.pointer = (void *)filename;
+    input.name = lua_tostring(state, -1);
+    input.mode = mode;
+    output = dispatch(state, input);
+    lua_remove(state, filename_index);
+    return (int)output.integer_data;
+}
+
 lua_State *lua_newstate(lua_Alloc allocator, void *userdata, unsigned seed) {
     struct lua_ada_request input = request(ADA_CREATE_STATE);
     struct lua_ada_response output;

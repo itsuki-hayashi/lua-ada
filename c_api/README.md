@@ -11,6 +11,14 @@ The installable headers under include/api are unchanged pinned copies with
 per-file hashes and retained notices; production include paths do not enter
 the reference-only tree.
 
+The [public file checkpoint](../docs/sessions/2026-11-08-public-file-loading.md)
+implements luaL_loadfilex and exercises its convenience macro through owned
+shared file/stdin input. Native errno, text/binary reopening, source/debug
+metadata, actual-growth failures and immediate host-abort cleanup have local
+default/T evidence. The traceback helper and full target acceptance remain
+open. See [ADR 0029](../docs/decisions/0029-owned-file-input.md).
+
+
 The [literal auxiliary substitution checkpoint](../docs/sessions/2026-11-08-auxiliary-substitution.md)
 provides literal nonoverlapping substitution through the owned buffer API,
 with metered foreign scans/comparisons and public stack/result lifetimes.

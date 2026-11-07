@@ -14,6 +14,8 @@ package body Source_Tests is
    procedure Partial_BOM;
    procedure Interpreter_Line;
    procedure CRLF_Preserved;
+   procedure Lone_CR_Ignored;
+   procedure Interior_CR_With_CRLF;
    procedure No_Final_Newline;
    procedure BOM_Interpreter_Line;
    procedure Nonleading_Hash;
@@ -83,6 +85,24 @@ package body Source_Tests is
       Assert (File_Preamble ("#lua" & CR & LF & "x") =
               "    " & CR & LF & "x", "CRLF normalized by loader");
    end CRLF_Preserved;
+
+   procedure Lone_CR_Ignored is
+   begin
+      --  Pinned skipcomment ends only at LF. The lone CR belongs to the
+      --  ignored interpreter line and cannot expose following Lua tokens.
+      Assert (File_Preamble ("#lua" & CR & "x" & LF & "return 1") =
+                "      " & LF & "return 1",
+              "lone CR exposed interpreter-line bytes as Lua code");
+   end Lone_CR_Ignored;
+
+   procedure Interior_CR_With_CRLF is
+   begin
+      --  Ignore an interior lone CR while preserving the terminal CRLF
+      --  bytes promised by the existing pure source preparation interface.
+      Assert (File_Preamble ("#a" & CR & "x" & CR & LF & "return 1") =
+                "    " & CR & LF & "return 1",
+              "interior CR or terminal CRLF prepared incorrectly");
+   end Interior_CR_With_CRLF;
 
    procedure No_Final_Newline is
       --  A file consisting only of an interpreter line produces spaces
@@ -227,6 +247,10 @@ package body Source_Tests is
                         Interpreter_Line'Access);
       Test_Support.Add (Suite, "source CRLF preservation",
                         CRLF_Preserved'Access);
+      Test_Support.Add (Suite, "source interpreter lone CR ignored",
+                        Lone_CR_Ignored'Access);
+      Test_Support.Add (Suite, "source interior CR and terminal CRLF",
+                        Interior_CR_With_CRLF'Access);
       Test_Support.Add (Suite, "source no final newline",
                         No_Final_Newline'Access);
       Test_Support.Add (Suite, "source BOM interpreter composition",

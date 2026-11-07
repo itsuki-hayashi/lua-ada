@@ -2,15 +2,22 @@
 
 ## Active remaining-suite delivery
 
+Public file loading has [component evidence](sessions/2026-11-08-public-file-loading.md):
+twenty-one native-matched cases, actual-growth refusal/recovery and sixteen
+text/binary child processes. Both configurations pass 1,898 local AUnit cases.
+Complete traceback, relevant T drivers and final shared/platform matrices;
+none of these local observations closes the full source/API ledger.
+
+
 Literal substitution has [component evidence](sessions/2026-11-08-auxiliary-substitution.md):
 sixteen native-matched C cases and three bounded policy/cleanup witnesses.
-Complete public file/traceback helpers and final instrumented/shared/platform
+Complete the public traceback helper and final instrumented/shared/platform
 replay; these observations do not resolve the full source/API ledger.
 
 
 Public allocator/seed now have [component evidence](sessions/2026-11-08-public-auxiliary-allocator.md),
 including default-constructor identity, inert seed behavior and thirteen
-native-matched C cases. Finish file/traceback/substitution helpers and the
+native-matched C cases. Finish the traceback helper and the
 final allocator/lifecycle campaign across every required context.
 
 
@@ -24,7 +31,7 @@ complete these obligations.
 
 Eight public buffer exports have [local ownership evidence](sessions/2026-11-08-auxiliary-buffer-ownership.md),
 including seventeen native-default/T matched C cases and 1,738 passing
-AUnit cases. Finish file/trace/substitution/default-allocator helpers,
+AUnit cases. Finish the traceback helper,
 instrumented/shared/POSIX and immutable full-target replay.
 
 Public reset/self-close now has [scoped evidence](sessions/2026-11-08-thread-reset.md):

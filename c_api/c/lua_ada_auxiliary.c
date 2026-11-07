@@ -29,9 +29,9 @@
  *   luaL_checkoption, luaL_fileresult, luaL_execresult, luaL_ref, luaL_unref,
  *   luaL_len, luaL_setfuncs.
  *
- * Separate unfinished surface: luaL_traceback and luaL_loadfilex. Other
+ * Separate unfinished surface: luaL_traceback. Other
  * translation units provide buffers, literal substitution, allocator/seed,
- * buffer loading and luaL_getsubtable/luaL_requiref.
+ * file/buffer loading and luaL_getsubtable/luaL_requiref.
  */
 
 #include <errno.h>

@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [public file loading](2026-11-08-public-file-loading.md).
+
 Component: [literal auxiliary substitution](2026-11-08-auxiliary-substitution.md).
 
 Component: [public auxiliary allocator](2026-11-08-public-auxiliary-allocator.md).

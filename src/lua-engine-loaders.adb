@@ -1,7 +1,6 @@
 with Ada.Containers;
 with Ada.Directories;
 with Ada.Exceptions;
-with Ada.Streams;
 with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
@@ -9,7 +8,8 @@ with Lua.Engine.Compiler;
 with Lua.Engine.Call_Names;
 with Lua.Engine.Inspection;
 with Lua.Engine.Native_Modules;
-with Lua.Sources;
+with Lua.Engine.File_Inputs;
+with System;
 with Lua.Storage.Buffers;
 with Lua_Ada_Config;
 
@@ -18,9 +18,8 @@ package body Lua.Engine.Loaders is
    use type Ada.Containers.Count_Type;
    use type Ada.Exceptions.Exception_Id;
    use type Ada.Directories.File_Kind;
-   use type Ada.Streams.Stream_Element_Offset;
-   use type Ada.Streams.Stream_IO.Count;
    use type Native_Modules.Failure_Stage;
+   use type File_Inputs.Outcome;
 
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action
@@ -244,78 +243,36 @@ package body Lua.Engine.Loaders is
       end Call;
 
       procedure Read_File (Path : String; Output : in out Managed.Buffer) is
-         package Files renames Ada.Streams.Stream_IO;
-         File : Files.File_Type;
-         Data : Ada.Streams.Stream_Element_Array (1 .. 4_096);
-         Last : Ada.Streams.Stream_Element_Offset;
-         Text : String (1 .. 4_096);
+         Filename : Managed.Buffer;
+         Observed : File_Inputs.Result;
+         Terminator : constant Natural := Ada.Strings.Fixed.Index
+           (Path, "" & Character'Val (0));
+         Last : constant Natural :=
+           (if Terminator = 0 then Path'Last else Terminator - 1);
       begin
-         Files.Open (File, Files.In_File, Path);
-         if Files.Size (File) > Files.Count (State.Bounds.Source_Bytes) then
-            Files.Close (File);
-            Fail (State, "source byte limit exceeded", Resource => True);
+         Filename.Set_Owner (Lua.Storage.Reference (State.Memory));
+         Filename.Set_Value (Path);
+         File_Inputs.Read_All
+           (State, Filename.C_Address, Output, Observed);
+         if Observed.Status /= File_Inputs.Ready then
+            raise Ada.Text_IO.Name_Error with
+              File_Inputs.Message (Observed, Path (Path'First .. Last));
          end if;
-         Output.Clear;
-         --  File control records and this fixed transfer block are bounded
-         --  host I/O storage. Source-proportional bytes grow only in the
-         --  universe's managed buffer, including files that change after open.
-         while not Files.End_Of_File (File) loop
-            Files.Read (File, Data, Last);
-            if Natural (Last) > State.Bounds.Source_Bytes - Output.Length then
-               Fail (State, "source byte limit exceeded", Resource => True);
-            end if;
-            for Index in 1 .. Natural (Last) loop
-               Text (Index) := Character'Val
-                 (Data (Ada.Streams.Stream_Element_Offset (Index)));
-            end loop;
-            Output.Append (Text (1 .. Natural (Last)));
-         end loop;
-         Files.Close (File);
-      exception
-         when others =>
-            if Files.Is_Open (File) then
-               Files.Close (File);
-            end if;
-            raise;
       end Read_File;
 
       procedure Read_Input (Output : in out Managed.Buffer) is
-         Byte : Character;
+         Observed : File_Inputs.Result;
       begin
-         Output.Clear;
-         while not Ada.Text_IO.End_Of_File loop
-            Work;
-            if Output.Length >= State.Bounds.Source_Bytes then
-               Fail (State, "source byte limit exceeded", Resource => True);
-            end if;
-            if Ada.Text_IO.End_Of_Line then
-               Ada.Text_IO.Skip_Line;
-               Output.Append (Character'Val (10));
-            else
-               Ada.Text_IO.Get (Byte);
-               Output.Append (Byte);
-            end if;
-         end loop;
+         File_Inputs.Read_All (State, System.Null_Address, Output, Observed);
+         if Observed.Status /= File_Inputs.Ready then
+            raise Ada.Text_IO.Use_Error with
+              File_Inputs.Message (Observed, "stdin");
+         end if;
       end Read_Input;
 
       procedure Prepare_File (Source : in out Managed.Buffer) is
-         Info : Lua.Sources.File_Preamble_Info;
-         procedure Inspect (Text : String);
-         procedure Inspect (Text : String) is
-         begin
-            Info := Lua.Sources.Inspect_File_Preamble (Text);
-         end Inspect;
       begin
-         Source.Query (Inspect'Access);
-         --  Apply the shared pure policy after releasing the borrowed view.
-         --  Moving away the BOM and blanking the interpreter line preserve
-         --  every newline byte without creating another full source string.
-         if Info.Skipped_Bytes /= 0 then
-            Source.Delete (1, Info.Skipped_Bytes);
-         end if;
-         for Index in 1 .. Info.Blanked_Bytes loop
-            Source.Replace_Element (Index, ' ');
-         end loop;
+         File_Inputs.Prepare (Source);
       end Prepare_File;
 
       procedure Copy_Bytes

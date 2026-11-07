@@ -2,10 +2,18 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [public file checkpoint](sessions/2026-11-08-public-file-loading.md)
+completes the auxiliary file export through owned shared input. Twenty-one
+C cases match both native configurations; both default and T local builds
+pass 1,898 AUnit cases. Sixteen byte-preserving stdin children cover both
+directions of C/Ada binary loading. Traceback, remaining drivers and final
+shared/platform/full-target acceptance remain open.
+
+
 The [literal substitution checkpoint](sessions/2026-11-08-auxiliary-substitution.md)
 completes two more public auxiliary exports through owned buffers. Sixteen
 C cases match native default/T; all 1,858 combined local AUnit cases pass,
-including three bounded-work/cleanup witnesses. File/traceback helpers and
+including three bounded-work/cleanup witnesses. The traceback helper and
 full-target instrumented/platform acceptance remain open.
 
 
@@ -13,7 +21,7 @@ The [auxiliary allocator checkpoint](sessions/2026-11-08-public-auxiliary-alloca
 completes the public allocator/seed and default-constructor identity locally.
 Thirteen shared-source cases match native default/T; 1,822 AUnit and eighteen
 standalone C consumers pass. Final instrumented/shared/platform evidence and
-the remaining file/traceback/substitution auxiliaries remain pending.
+the remaining traceback helper remain pending.
 
 
 The [concatenation operation checkpoint](sessions/2026-11-08-concat-operation-diagnostics.md)

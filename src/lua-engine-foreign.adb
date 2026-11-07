@@ -15,6 +15,9 @@ with Lua.Engine.Library_Openers;
 with Lua.Engine.Operating_System;
 with Lua.Engine.Warnings;
 with Lua.Engine.External_Releases;
+with Lua.Engine.File_Inputs;
+with Lua.Engine.Inspection;
+with Lua.Storage.Buffers;
 with Lua.Prototypes;
 with Lua.Inputs;
 with Lua.Runtime_Configuration;
@@ -24,6 +27,7 @@ with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
 
 package body Lua.Engine.Foreign is
+   use type File_Inputs.Outcome;
    package C renames Interfaces.C;
    package Memory renames Lua.Storage;
    package VM renames Lua.Engine.Machine;
@@ -3306,9 +3310,12 @@ package body Lua.Engine.Foreign is
                   Memory.Release (Owner.Universe.Memory, Block);
                   raise;
             end;
-         when Load_Buffer | Load_Reader =>
+         when Load_Buffer | Load_Reader | Load_File =>
             declare
+               File_Buffer : Lua.Storage.Buffers.Buffer;
                Source : Lua.Inputs.Source;
+               File_Result : File_Inputs.Result;
+               File_Failed : Boolean := False;
                Capture : aliased Reader_Capture :=
                  (State => State, Universe => Owner.Universe,
                   Reader => Input.Reader, Data => Input.Pointer,
@@ -3318,7 +3325,22 @@ package body Lua.Engine.Foreign is
                Binary : Boolean;
                Callee : Value;
             begin
-               if Input.Operation = Load_Reader then
+               if Input.Operation = Load_File then
+                  File_Inputs.Read_All
+                    (Owner.Universe.all, Input.Pointer, File_Buffer,
+                     File_Result);
+                  File_Failed := File_Result.Status /= File_Inputs.Ready;
+                  if File_Failed then
+                     Error_Result
+                       (File_Inputs.Message
+                          (File_Result, Name (Name'First + 1 .. Name'Last)));
+                     Output.Integer_Data := 6;
+                  else
+                     File_Inputs.Prepare (File_Buffer);
+                     Source.Borrow
+                       (File_Buffer.Address, File_Buffer.Length);
+                  end if;
+               elsif Input.Operation = Load_Reader then
                   if Input.Reader = null then
                      raise Foreign_Error with "reader function expected";
                   end if;
@@ -3335,12 +3357,14 @@ package body Lua.Engine.Foreign is
                   end if;
                   Source.Borrow (Input.Pointer, Natural (Input.Length));
                end if;
-               Binary := Source.Ensure (1) and then
+               Binary := not File_Failed and then Source.Ensure (1) and then
                  Source.Element (1) = Character'Val (27);
                --  Loading validates and owns code but never executes it.
                --  The binary decoder and text frontend both produce the real
                --  canonical graph, adopted into this session's actual heap.
-               if (if Binary then
+               if File_Failed then
+                  null;
+               elsif (if Binary then
                      Ada.Strings.Fixed.Index (Mode, "b") = 0 and then
                      Ada.Strings.Fixed.Index (Mode, "B") = 0
                    else Ada.Strings.Fixed.Index (Mode, "t") = 0)
@@ -3366,7 +3390,14 @@ package body Lua.Engine.Foreign is
                               Global_Environment (Owner.Universe.all));
                            Push (Owner.Universe.all, Context, Callee);
                         when Lua.Chunks.Bad_Format =>
-                           Error_Result (Name & ": bad binary format (" &
+                           Error_Result
+                             ((if Name'Length > 0 and then
+                                  Name (Name'First) in '@' | '='
+                               then Name (Name'First + 1 .. Name'Last)
+                               elsif Name'Length > 0 and then
+                                 Name (Name'First) = Character'Val (27)
+                               then "binary string" else Name) &
+                              ": bad binary format (" &
                              Lua.Chunks.Message (Decoded.Error) & ")");
                            Output.Integer_Data := 3;
                         when Lua.Chunks.Resource_Limit =>
@@ -3392,7 +3423,9 @@ package body Lua.Engine.Foreign is
                         Fail (Owner.Universe.all,
                               "source loading resource limit", True);
                      elsif Unit.Result.Status /= Lua.Syntax.Success then
-                        Error_Result (Name & ":" & Ada.Strings.Fixed.Trim
+                        Error_Result
+                          (Inspection.Short_Source (Name) & ":" &
+                           Ada.Strings.Fixed.Trim
                           (Unit.Result.Error.Line'Image, Ada.Strings.Both) &
                           ": " & Lua.Syntax_Trees.Text
                             (Unit, Unit.Result.Error.Message));
