@@ -1198,15 +1198,14 @@ package body Runtime_Control_Tests is
    end Debug_Hook_Count_Range;
 
    procedure Debug_Traceback_Level_Range is
-      --  Oversized traceback levels cannot be represented safely.
-      --  Request an extreme level under pcall.
-      --  A controlled diagnostic replaces any Ada range exception.
+      --  The pinned wrapper narrows a valid Lua integer to C int. The
+      --  maximum Lua integer becomes -1 and suppresses frames; it must not
+      --  produce either a fabricated range error or an Ada exception.
    begin
       Check
         ("local ok,e=pcall(debug.traceback,'message'," &
          "math.maxinteger);" &
-         "assert(not ok and e:find('range') and not " &
-         "e:find('internal Ada'))");
+         "assert(ok and e=='message\nstack traceback:')");
    end Debug_Traceback_Level_Range;
 
    procedure Debug_Split_Function_Lines is

@@ -70,3 +70,6 @@ actual scalar driver ownership and typed routing to a genuine C caller guard.
 
 ADR 0031 records [public value identities](0031-public-value-identities.md),
 returned-string identity and selected-owner default rendering.
+
+ADR 0033 records [shared traceback rendering](0033-shared-traceback-rendering.md),
+destination-owned builders and metered borrowed-frame traversal.

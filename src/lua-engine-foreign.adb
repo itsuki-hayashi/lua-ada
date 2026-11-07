@@ -1866,6 +1866,24 @@ package body Lua.Engine.Foreign is
            Set_Upvalue | Upvalue_Id | Join_Upvalues =>
             Inspect_API
               (Owner.Universe.all, Context, Input.all, Output.all);
+         when Build_Traceback =>
+            declare
+               Source_Owner : constant Controls.Object_Pointer :=
+                 Controls.To_Pointer
+                   (Surfaces.To_Pointer (Input.Pointer).Owner);
+               Source_Context : constant Context_Access :=
+                 Context_Of (Source_Owner);
+               Text : constant Value := Inspection.Traceback
+                 (Owner.Universe.all, Source_Context,
+                  Byte_String'(Input.Name, Natural (Input.Length)),
+                  Input.Name /= System.Null_Address,
+                  Integer_Value (Input.Count));
+            begin
+               --  Borrowing another thread's frames does not switch its
+               --  executor or allocate from its provider. The destination
+               --  owns the scratch buffers and published diagnostic string.
+               Push (Owner.Universe.all, Context, Text);
+            end;
          when Get_Status =>
             --  Resume retains the failure category after its public result
             --  window is inspected or cleared. Report the same public status

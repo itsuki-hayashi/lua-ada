@@ -37,6 +37,23 @@ private package Lua.Engine.Inspection is
    --  no Lua objects are allocated. Retain the frame/prototype while using
    --  the immutable name bytes; Name_Image supplies rendered C text.
 
+   function Traceback
+     (State : in out World; Context : not null Context_Access;
+      Message : Value; Start_Level : Integer_Value) return Value;
+   --  Render the addressed context's actual logical frames. All temporary
+   --  storage and the returned Lua string belong to State's selected owner.
+   --  Context and Message are borrowed during this synchronous operation;
+   --  retain their owners throughout. A nil message omits the prefix and
+   --  a negative C-int level produces only the prefix and traceback heading.
+   --  Lua integer levels undergo the pinned wrapper's explicit C-int cast.
+   function Traceback
+     (State : in out World; Context : not null Context_Access;
+      Message : Byte_String; Has_Message : Boolean;
+      Start_Level : Integer_Value) return Value;
+   --  Borrow an already measured C message, without an intermediate Lua
+   --  string or unmanaged copy. Its bytes must survive this callback-free
+   --  query; a zero-length nonnull message still contributes a newline.
+
    function Inspect
      (State : in out World; Activation : Frame_Access;
       Target_Frame : Frame_Access := null) return Values.Vector;

@@ -600,6 +600,27 @@ int luaL_loadstring(lua_State *state, const char *source) {
     return luaL_loadbufferx(state, source, strlen(source), source, "t");
 }
 
+void luaL_traceback(lua_State *state, lua_State *source,
+                    const char *message, int level) {
+    struct lua_ada_request input = request(ADA_BUILD_TRACEBACK);
+    size_t size = 0;
+    /* A C caller retains its borrowed message through this callback-free
+     * operation. Measure in bounded charged groups; no Lua string or
+     * input-sized unmanaged temporary is needed before the Ada builder. */
+    if (message != NULL) {
+        while (message[size] != '\0') {
+            ++size;
+            if (size % 4096 == 0) lua_ada_aux_charge(state, 4096);
+        }
+        lua_ada_aux_charge(state, size % 4096);
+    }
+    input.pointer = source;
+    input.name = message;
+    input.length = size;
+    input.count = level;
+    (void)dispatch(state, input);
+}
+
 int luaL_loadfilex(lua_State *state, const char *filename, const char *mode) {
     int filename_index = lua_gettop(state) + 1;
     struct lua_ada_request input = request(ADA_LOAD_FILE);

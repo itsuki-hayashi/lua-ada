@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [shared traceback renderer](sessions/2026-11-08-shared-traceback.md) has
+twenty-two native-paired C cases and two host-policy regressions within 2,052
+passing AUnit cases per local configuration. Complete the retained registry
+metamethod callback path, integrate the independently checked registry/panic
+checkpoints, and continue original errors.lua and remaining suite campaigns.
+
 Continue the unchanged errors.lua campaign from the string-method `bad self`
 failure after the [I/O/collector argument checkpoint](sessions/2026-11-08-io-collector-arguments.md).
 Its ten native-paired regressions and 2,028 AUnit cases in each local

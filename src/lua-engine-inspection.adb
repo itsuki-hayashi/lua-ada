@@ -2,6 +2,7 @@ with Lua.Engine.Diagnostics;
 with Lua.Engine.Hooks;
 with Lua.Engine.Canonical;
 with Lua.Engine.Stacks;
+with Lua.Engine.Tables;
 with Lua.Prototypes;
 with Ada.Strings.Fixed;
 with Interfaces.C;
@@ -16,14 +17,18 @@ package body Lua.Engine.Inspection is
 
    function Short_Source (Source : String) return String is
       Newline : constant Natural :=
-        Ada.Strings.Fixed.Index (Source, "" & Character'Val (10));
+        Ada.Strings.Fixed.Index
+          (Source (Source'First ..
+             Natural'Min (Source'Last, Source'First + 44)),
+           "" & Character'Val (10));
       Size : Natural := Source'Length;
       Truncated : Boolean := False;
    begin
       --  A default debug identifier has 59 payload bytes plus its C NUL.
       --  File identifiers retain the tail; snippets retain the first
       --  line with a quoted prefix/suffix. No native record layout is
-      --  involved.
+      --  involved. Only the first 45 snippet bytes can contribute, so an
+      --  arbitrarily long source label never requires a full newline scan.
       if Source'Length > 0 and then Source (Source'First) in '=' | '@' then
          if Source'Length <= 60 or else Source (Source'First) = '=' then
             return Source (Source'First + 1 ..
@@ -194,6 +199,260 @@ package body Lua.Engine.Inspection is
       end if;
       return (others => <>);
    end Call_Identity;
+
+   function Traceback
+     (State : in out World; Context : not null Context_Access;
+      Message : Value; Start_Level : Integer_Value) return Value
+   is
+   begin
+      if Message.Kind = String_Kind then
+         return Traceback
+           (State, Context, Message.Reference.Bytes, True, Start_Level);
+      elsif Message.Kind in Integer_Kind | Real_Kind then
+         declare
+            --  Numeric conversion is bounded by the scalar formatter. The
+            --  borrowed local survives the entire synchronous renderer.
+            Text : constant String := Image (State.Current.Memory, Message);
+         begin
+            return Traceback
+              (State, Context, (Text'Address, Text'Length), True, Start_Level);
+         end;
+      end if;
+      return Traceback
+        (State, Context, (System.Null_Address, 0), False, Start_Level);
+   end Traceback;
+
+   function Traceback
+     (State : in out World; Context : not null Context_Access;
+      Message : Byte_String; Has_Message : Boolean;
+      Start_Level : Integer_Value) return Value
+   is
+      Text, Global_Name : Owned_Buffer;
+      Visible_Count : Natural := 0;
+      Walk_Level : Natural := 0;
+      Level : Natural := 0;
+      Shown : Natural := 0;
+      Shortened : Boolean;
+      C_Modulus : constant Integer_Value := 2 ** Interfaces.C.int'Size;
+      Reduced : constant Integer_Value := Start_Level mod C_Modulus;
+      Signed_Level : constant Integer_Value :=
+        (if Reduced >= C_Modulus / 2 then Reduced - C_Modulus else Reduced);
+      type Located_Name is record
+         First, Second : Value := Nil_Value;
+      end record;
+      function Find_Field
+        (Table : Object_Access; Target : Value; Depth : Natural)
+         return Located_Name;
+      procedure Put (Bytes : String);
+      procedure Put_Name (Bytes : Byte_String);
+      procedure Describe (Item : not null Frame_Access);
+      function Source (Item : not null Frame_Access) return String;
+      function Decimal (Number : Natural) return String is
+        (Ada.Strings.Fixed.Trim (Natural'Image (Number), Ada.Strings.Both));
+
+      procedure Put (Bytes : String) is
+      begin
+         --  Output construction is real work even when the same bytes are
+         --  already present in a prototype or module key. Charge before an
+         --  allocator request, without creating an unmanaged text snapshot.
+         if State.Policy = Bounded then
+            if Bytes'Length > State.Bounds.Instructions - State.Steps then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Bytes'Length;
+         end if;
+         Text.Append (Bytes);
+      end Put;
+
+      procedure Put_Name (Bytes : Byte_String) is
+         View : String (1 .. Bytes.Size)
+           with Import, Address => Bytes.Address;
+         Size : Natural := 0;
+      begin
+         --  Auxiliary diagnostics consume the C prefix. Long text after a
+         --  NUL remains borrowed and is neither scanned nor materialized.
+         for Byte of View loop
+            Query_Work (State);
+            exit when Byte = ASCII.NUL;
+            Size := Size + 1;
+         end loop;
+         Put (View (1 .. Size));
+      end Put_Name;
+
+      function Source (Item : not null Frame_Access) return String is
+      begin
+         if Item.Code.Canonical_Node /= null then
+            declare
+               Bytes : constant Byte_String :=
+                 Canonical.Source_Bytes (Item.Code);
+               View : String (1 .. Bytes.Size)
+                 with Import, Address => Bytes.Address;
+            begin
+               return Short_Source (View);
+            end;
+         end if;
+         return Short_Source (To_String (Item.Code.Name));
+      end Source;
+
+      function Find_Field
+        (Table : Object_Access; Target : Value; Depth : Natural)
+         return Located_Name
+      is
+      begin
+         if Table = null or else Depth = 0 then return (others => <>); end if;
+         --  Borrow at most two real string keys rather than building names
+         --  speculatively for every visited row. No callback or safe point
+         --  runs during traversal; the registry retains these table edges.
+         for Row of Table.Members loop
+            Query_Work (State);
+            if Row.Key.Kind = String_Kind and then
+              Row.Item.Kind /= Nil_Kind
+            then
+               if Equal (Row.Item, Target) then
+                  return (Row.Key, Nil_Value);
+               elsif Row.Item.Kind = Table_Kind and then Depth > 1 then
+                  declare
+                     Suffix : constant Located_Name :=
+                       Find_Field (Row.Item.Reference, Target, Depth - 1);
+                  begin
+                     if Suffix.First.Kind /= Nil_Kind then
+                        return (Row.Key, Suffix.First);
+                     end if;
+                  end;
+               end if;
+            end if;
+         end loop;
+         return (others => <>);
+      end Find_Field;
+
+      procedure Describe (Item : not null Frame_Access) is
+         Identity : constant Call_Names.Borrowed_Identity :=
+           Call_Identity (State, Context, Item);
+         Modules : Value;
+         Global : Located_Name;
+         use type Call_Names.Name_Kind;
+         procedure Add_Key (Key : Value);
+         procedure Add_Key (Key : Value) is
+            View : String (1 .. Key.Reference.Bytes.Size)
+              with Import, Address => Key.Reference.Bytes.Address;
+         begin
+            --  Joining keys preserves embedded NUL bytes until the final C
+            --  prefix is consumed, just as the public concatenation does.
+            for Byte of View loop
+               Query_Work (State);
+               Global_Name.Append (Byte);
+            end loop;
+         end Add_Key;
+      begin
+         if Identity.Kind /= Call_Names.Unknown then
+            Put (Call_Names.Kind_Image (Identity.Kind) & " '");
+            Put_Name (Identity.Item);
+            Put ("'");
+         elsif not Item.Is_Native and then
+           (if Item.Code.Canonical_Node /= null then
+               Item.Code.Canonical_Node.First_Line = 0
+            else Item.Code.Is_Main)
+         then
+            Put ("main chunk");
+         else
+            Modules := Tables.Raw_Field (State.Foreign_Registry, "_LOADED");
+            if Modules.Kind = Table_Kind then
+               Global := Find_Field (Modules.Reference, Item.Callee, 2);
+            end if;
+            if Global.First.Kind /= Nil_Kind then
+               Global_Name.Clear;
+               Add_Key (Global.First);
+               if Global.Second.Kind /= Nil_Kind then
+                  Global_Name.Append ('.');
+                  Add_Key (Global.Second);
+               end if;
+               if Global_Name.Length >= 3 and then
+                 Global_Name.Element (1) = '_' and then
+                 Global_Name.Element (2) = 'G' and then
+                 Global_Name.Element (3) = '.'
+               then
+                  Global_Name.Delete (1, 3);
+               end if;
+               Put ("function '");
+               Put_Name ((Global_Name.Address, Global_Name.Length));
+               Put ("'");
+            elsif Item.Is_Native then
+               Put ("?");
+            else
+               Put ("function <" & Source (Item) & ":" &
+                 Decimal (Item.Code.First_Line) & ">");
+            end if;
+         end if;
+      end Describe;
+   begin
+      Text.Set_Owner (State.Current.Memory);
+      Global_Name.Set_Owner (State.Current.Memory);
+      if Has_Message then
+         Put_Name (Message);
+         Put ("" & ASCII.LF);
+      end if;
+      Put ("stack traceback:");
+      --  The debug wrapper explicitly casts its Lua integer to C int. A
+      --  large accepted Lua integer can therefore wrap to a negative or
+      --  small level; it does not introduce a new range-error class.
+      if Signed_Level < 0 then return New_String (State, Text); end if;
+      Level := Natural (Signed_Level);
+      --  Count borrowed frames, then render in a second forward walk over
+      --  logical levels. A deep-stack error needs no stack-sized snapshot
+      --  allocation just to omit its middle frames. Failed_Owner meters
+      --  every comparison when retained cleanup owners must be excluded.
+      --  No callback or safe point can invalidate either traversal.
+      for Item of reverse Context.Stack loop
+         Query_Work (State);
+         if Published_Frame (Item) and then
+           not Failed_Owner (State, Context, Item)
+         then
+            Visible_Count := Visible_Count + 1;
+         end if;
+      end loop;
+      Shortened := Level < Visible_Count and then
+        Visible_Count - Level > 22;
+      for Item of reverse Context.Stack loop
+         Query_Work (State);
+         if Published_Frame (Item) and then
+           not Failed_Owner (State, Context, Item)
+         then
+            if Walk_Level >= Level and then Shortened and then Shown = 10
+            then
+               Put (ASCII.LF & ASCII.HT & "..." & ASCII.HT & "(skipping " &
+                 Decimal (Visible_Count - Walk_Level - 12) & " levels)");
+               Level := Visible_Count - 11;
+               Shortened := False;
+            end if;
+            if Walk_Level >= Level then
+               declare
+                  PC : constant Natural :=
+                    (if (Context.Hook_Active or else Context.Hook_Suspended)
+                       and then Item = Context.Hook_Frame
+                     then Item.PC - 1 else Natural'Max (1, Item.PC - 1) - 1);
+                  Line : constant Natural :=
+                    (if Item.Is_Native then 0
+                     elsif Item.Code.Canonical_Node /= null then
+                        Canonical.Source_Line (Item, PC)
+                     elsif PC + 1 <= Item.Code.Code.Last_Index then
+                        Item.Code.Code (PC + 1).Location.Line else 0);
+               begin
+                  Put (ASCII.LF & ASCII.HT &
+                    (if Item.Is_Native then "[C]" else Source (Item)));
+                  if Line > 0 then Put (":" & Decimal (Line)); end if;
+                  Put (": in ");
+                  Describe (Item);
+                  if Item.Is_Tail_Call then
+                     Put (ASCII.LF & ASCII.HT & "(...tail calls...)");
+                  end if;
+               end;
+               Shown := Shown + 1;
+            end if;
+            Walk_Level := Walk_Level + 1;
+         end if;
+      end loop;
+      return New_String (State, Text);
+   end Traceback;
 
    function Inspect
      (State : in out World; Activation : Frame_Access;
@@ -908,212 +1167,17 @@ package body Lua.Engine.Inspection is
             end if;
          end;
       elsif Name = "debug.traceback" then
-         declare
-            Text : Unbounded_String;
-            Level : Natural := (if Context = State.Current then 1 else 0);
-            No_Frames : Boolean := False;
-            Visible, Failed : Frames.Vector;
-            Shown : Natural := 0;
-            Shortened : Boolean := False;
-            type Located_Name is record
-               Found : Boolean := False;
-               Text : Unbounded_String;
-            end record;
-
-            function Decimal (Number : Natural) return String is
-              (Ada.Strings.Fixed.Trim
-                 (Natural'Image (Number), Ada.Strings.Both));
-
-            function Source (Item : Frame_Access) return String is
-              (Short_Source
-                 ((if Item.Code.Canonical_Node /= null then
-                     To_String (Canonical.Source_Bytes (Item.Code))
-                   else To_String (Item.Code.Name))));
-
-            function Find_Field
-              (Table : Object_Access; Target : Value; Depth : Natural)
-               return Located_Name;
-
-            function Find_Field
-              (Table : Object_Access; Target : Value; Depth : Natural)
-               return Located_Name
-            is
-            begin
-               if Table = null or else Depth = 0 then
-                  return (others => <>);
-               end if;
-               --  lauxlib.c:findfield searches only string keys, with raw
-               --  identity and two table levels. Use the actual loaded
-               --  modules registry; replaceable package.loaded fields and
-               --  metamethods must not affect this diagnostic traversal.
-               for Row of Table.Members loop
-                  Work;
-                  if Row.Key.Kind = String_Kind and then
-                    Row.Item.Kind /= Nil_Kind
-                  then
-                     if Equal (Row.Item, Target) then
-                        return (True, To_Unbounded_String
-                          (Image (State.Current.Memory, Row.Key)));
-                     elsif Row.Item.Kind = Table_Kind and then Depth > 1 then
-                        declare
-                           Suffix : constant Located_Name :=
-                             Find_Field
-                               (Row.Item.Reference, Target, Depth - 1);
-                        begin
-                           if Suffix.Found then
-                              return (True, To_Unbounded_String
-                                (Image (State.Current.Memory, Row.Key) &
-                                 "." & To_String (Suffix.Text)));
-                           end if;
-                        end;
-                     end if;
-                  end if;
-               end loop;
-               return (others => <>);
-            end Find_Field;
-
-            procedure Describe (Item : Frame_Access);
-
-            procedure Describe (Item : Frame_Access) is
-               Inferred : constant Call_Names.Identity :=
-                 Inferred_Name (Item);
-               use type Call_Names.Name_Kind;
-            begin
-               --  Prefer a real call-site name, then a main chunk, then a
-               --  loaded-module identity. Anonymous Lua functions retain
-               --  their definition location, while unknown native functions
-               --  remain '?'. Internal native dispatch labels are not public
-               --  function names (lauxlib.c:pushfuncname).
-               if Length (Item.Name_Kind) > 0 then
-                  Append (Text, To_String (Item.Name_Kind) & " '" &
-                    To_String (Item.Call_Name) & "'");
-               elsif Inferred.Kind /= Call_Names.Unknown then
-                  Append (Text, Call_Names.Kind_Image (Inferred.Kind) &
-                    " '" & Image (State.Current.Memory, Inferred.Item) & "'");
-               elsif not Item.Is_Native and then
-                 (if Item.Code.Canonical_Node /= null then
-                     Item.Code.Canonical_Node.First_Line = 0
-                  else Item.Code.Is_Main)
-               then
-                  Append (Text, "main chunk");
-               else
-                  declare
-                     Global : constant Located_Name :=
-                       Find_Field (State.Loaded_Modules, Item.Callee, 2);
-                  begin
-                     if Global.Found then
-                        Append (Text, "function '");
-                        if Length (Global.Text) >= 3 and then
-                          Slice (Global.Text, 1, 3) = "_G."
-                        then
-                           Append (Text, Slice
-                             (Global.Text, 4, Length (Global.Text)));
-                        else
-                           Append (Text, Global.Text);
-                        end if;
-                        Append (Text, "'");
-                     elsif Item.Is_Native then
-                        Append (Text, "?");
-                     else
-                        Append (Text, "function <" & Source (Item) & ":" &
-                          Decimal (Item.Code.First_Line) & ">");
-                     end if;
-                  end;
-               end if;
-            end Describe;
-         begin
-            if Arg (Base).Kind not in Nil_Kind | String_Kind |
-              Integer_Kind | Real_Kind
-            then
-               Append (Arg (Base));
-               return Result;
-            end if;
-            if Arg (Base).Kind /= Nil_Kind then
-               Text := To_Unbounded_String
-                 (Image (State.Current.Memory, Arg (Base)) &
-                 Character'Val (10));
-            end if;
-            if Arg (Base + 1).Kind /= Nil_Kind then
-               if Integer_Arg (Base + 1) > Integer_Value (Natural'Last) then
-                  Fail (State, "level out of range");
-               end if;
-               No_Frames := Integer_Arg (Base + 1) < 0;
-               if not No_Frames then
-                  Level := Natural (Integer_Arg (Base + 1));
-               end if;
-            end if;
-            Append (Text, "stack traceback:");
-            if not No_Frames then
-               --  Snapshot borrowed frame identities once. Their context
-               --  owns them throughout this synchronous, callback-free
-               --  operation; both temporary vectors use its storage owner.
-               --  Finding each level afresh would repeatedly traverse a deep
-               --  stack. Error owners are excluded just as in getinfo.
-               Frames.Set_Owner (Visible, Context.Memory);
-               Frames.Set_Owner (Failed, Context.Memory);
-               for Driver of Context.Stack loop
-                  Work;
-                  if Driver.Is_Native and then
-                    Driver.Native_Name = "@unwind" and then
-                    Driver.Unwind in Error_Exit | Coroutine_Exit
-                  then
-                     Failed.Append (Driver.Unwind_Owner);
-                  end if;
-               end loop;
-               for Item of reverse Context.Stack loop
-                  Work;
-                  if Public_Frame (Item) and then
-                    not Failed.Contains (Item)
-                  then
-                     Visible.Append (Item);
-                  end if;
-               end loop;
-               Shortened := Level < Visible.Last_Index and then
-                 Visible.Last_Index - Level > 22;
-               while Level < Visible.Last_Index loop
-                  Work;
-                  if Shortened and then Shown = 10 then
-                     declare
-                        Skipped : constant Natural :=
-                          Visible.Last_Index - Level - 12;
-                     begin
-                        --  Match the pinned lauxlib.c skip count, including
-                        --  its already-fetched eleventh frame. Resume at the
-                        --  final eleven actual frames, not synthetic entries.
-                        Append (Text, Character'Val (10) & Character'Val (9) &
-                          "..." & Character'Val (9) & "(skipping " &
-                          Decimal (Skipped) & " levels)");
-                        Level := Visible.Last_Index - 11;
-                        Shortened := False;
-                     end;
-                  else
-                     declare
-                        Item : constant Frame_Access := Visible (Level + 1);
-                        Line : constant Natural :=
-                          (if Item.Is_Native then 0 else
-                             Line_At (Item, Current_PC (Item) + 1));
-                     begin
-                        Append (Text, Character'Val (10) & Character'Val (9));
-                        Append (Text,
-                          (if Item.Is_Native then "[C]" else Source (Item)));
-                        if Line > 0 then
-                           Append (Text, ":" & Decimal (Line));
-                        end if;
-                        Append (Text, ": in ");
-                        Describe (Item);
-                        if Item.Is_Tail_Call then
-                           Append (Text,
-                             Character'Val (10) & Character'Val (9) &
-                             "(...tail calls...)");
-                        end if;
-                     end;
-                     Level := Level + 1;
-                     Shown := Shown + 1;
-                  end if;
-               end loop;
-            end if;
-            Append (New_String (State, To_String (Text)));
-         end;
+         if Arg (Base).Kind not in Nil_Kind | String_Kind |
+           Integer_Kind | Real_Kind
+         then
+            Append (Arg (Base));
+         else
+            Append (Traceback
+              (State, Context, Arg (Base),
+               (if Arg (Base + 1).Kind /= Nil_Kind then
+                   Integer_Arg (Base + 1)
+                elsif Context = State.Current then 1 else 0)));
+         end if;
       else
          Fail (State, "debug operation not implemented");
       end if;

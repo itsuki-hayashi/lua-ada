@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [traceback checkpoint](sessions/2026-11-08-shared-traceback.md) exports
+luaL_traceback through the same owned renderer as debug.traceback. Twenty-two
+C cases match both native and both Ada configurations; each local Ada
+configuration passes 2,052 AUnit cases, including two bounded-session cases.
+Registry metamethod continuation, remaining files/T paths and final platform
+acceptance remain open. See [ADR 0033](decisions/0033-shared-traceback-rendering.md).
+
 The [I/O and collector argument checkpoint](sessions/2026-11-08-io-collector-arguments.md)
 uses the shared argument diagnostic for invalid write operands and the first
 collector option. Ten focused Lua cases match both native configurations and

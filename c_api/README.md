@@ -11,6 +11,14 @@ The installable headers under include/api are unchanged pinned copies with
 per-file hashes and retained notices; production include paths do not enter
 the reference-only tree.
 
+The [traceback checkpoint](../docs/sessions/2026-11-08-shared-traceback.md)
+exports luaL_traceback using the existing Ada debug renderer and actual
+borrowed logical frames. Destination-owned buffers, suspended/closed threads,
+an independent output state, exact names/lines, deep-stack shortening and
+allocation refusal have focused native-paired evidence. Registry metamethod
+continuation and full C-surface acceptance remain open; see
+[ADR 0033](../docs/decisions/0033-shared-traceback-rendering.md).
+
 The [public identity checkpoint](../docs/sessions/2026-11-08-public-value-identities.md)
 uses the same real identities for lua_topointer, default Lua rendering and
 format p. Ada-only coroutine rendering remains stable across a later first
@@ -23,8 +31,8 @@ The [public file checkpoint](../docs/sessions/2026-11-08-public-file-loading.md)
 implements luaL_loadfilex and exercises its convenience macro through owned
 shared file/stdin input. Native errno, text/binary reopening, source/debug
 metadata, actual-growth failures and immediate host-abort cleanup have local
-default/T evidence. The traceback helper and full target acceptance remain
-open. See [ADR 0029](../docs/decisions/0029-owned-file-input.md).
+default/T evidence. Full target acceptance remains open. See
+[ADR 0029](../docs/decisions/0029-owned-file-input.md).
 
 
 The [literal auxiliary substitution checkpoint](../docs/sessions/2026-11-08-auxiliary-substitution.md)

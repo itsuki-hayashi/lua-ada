@@ -46,7 +46,8 @@ enum lua_ada_operation {
     ADA_RELEASE_FORMATTER, ADA_CHARGE_AUX_WORK,
     ADA_CREATE_AUX_BOX = 126, ADA_RESIZE_AUX_BOX,
     ADA_RELEASE_AUX_BOX, ADA_PUBLISH_AUX_BOX,
-    ADA_LOAD_FILE = 130
+    ADA_LOAD_FILE = 130,
+    ADA_BUILD_TRACEBACK = 131
 };
 
 /* Ordinary transport metadata, not a native private activation layout.
