@@ -3,7 +3,8 @@ param(
     [string] $OutputDirectory = '',
     [string] $AdditionalConsumerCases = '',
     [string] $AdditionalAUnitCases = '',
-    [string] $AdditionalApiRoutes = ''
+    [string] $AdditionalApiRoutes = '',
+    [string] $CompiledWitnessMapping = ''
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -226,6 +227,16 @@ $policy = @{schema_version=1;kind='target-witness-policy';target='remaining-upst
     reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';consumer=$consumerIdentity;aunit=$unitIdentity;global_api=$apiIdentity;
     source_snapshot=$sourceSnapshot;runtime_acceptance=$false;coverage_authority=$false;
     review=@{status='pending';author='Codex /root/validation_delivery';reviewer=$null;artifact=$null;artifact_sha256=$null}}
+if($CompiledWitnessMapping -ne ''){
+    $compiledFull=if([IO.Path]::IsPathRooted($CompiledWitnessMapping)){$CompiledWitnessMapping}else{Join-Path $root $CompiledWitnessMapping}
+    $compiledRelative=[IO.Path]::GetRelativePath($root,[IO.Path]::GetFullPath($compiledFull)).Replace('\','/')
+    if(-not $compiledRelative.StartsWith('tests/conformance/targets/remaining-upstream-compatibility/',[StringComparison]::Ordinal) -and
+        -not $compiledRelative.StartsWith('reports/',[StringComparison]::Ordinal)){throw 'Compiled source mapping must remain target-owned or disposable'}
+    $compiled=Get-Content $compiledFull -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+    Import-Module (Join-Path $PSScriptRoot 'HeaderDeclarationProbes.psm1')
+    Assert-HeaderDeclarationMapping -Root $SourceRoot -Mapping $compiled
+    $policy.compiled=@{path=$compiledRelative;sha256=(Get-FileHash $compiledFull).Hash.ToLowerInvariant()}
+}
 $policyIdentity = Save-Proposal 'witness-policy.author-proposal.json' $policy
 $summary = @{schema_version=1;kind='remaining-upstream-witness-successor-author-index';target='remaining-upstream-compatibility';
     predecessors=$predecessors;source_snapshot=$sourceSnapshot;changed_source_bindings=$changed;retained_consumer_cases=100;retained_aunit_cases=94;

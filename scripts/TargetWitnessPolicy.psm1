@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConsumerEvidence.psm1')
 Import-Module (Join-Path $PSScriptRoot 'AUnitEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'HeaderDeclarationProbes.psm1')
 
 function Read-TargetWitnessJson {
     param([string] $Root,[Collections.IDictionary] $Identity)
@@ -136,6 +137,10 @@ function Read-TargetWitnessPolicy {
         [void](Resolve-ReviewedFile -Root $Root -Path $binding.path -Sha256 $binding.sha256)
     }
     $compiledIds=@{}
+    if(@($compiled.cases|Where-Object{ $_.Contains('protocol') -and $_.protocol -ceq 'paired-header-profile-v1' }).Count){
+        Assert-HeaderDeclarationMapping -Root $Root -Mapping $compiled
+        if($RequireReview){$null=Assert-HeaderDeclarationSourceReview -Root $Root -Mapping $compiled}
+    }
     foreach($case in $compiled.cases){
         if($case.id -cnotmatch '^[A-Za-z0-9][A-Za-z0-9_-]*$' -or $compiledIds.ContainsKey($case.id) -or
             @($case.contexts).Count -eq 0 -or @($case.source_bindings).Count -eq 0 -or
@@ -189,9 +194,9 @@ function Read-TargetWitnessPolicy {
                     $route.disposition -cnotin @('runtime-observed','compiled-observed','compiled-not-applicable')) { throw 'Invalid global API context route' }
                 $contexts[$route.context] = $true
                 $runtime = @($route.named_c_cases).Count + @($route.named_aunit_cases).Count
-                $compiled = @($route.compiled_witnesses).Count
+                $compiledCount = @($route.compiled_witnesses).Count
                 if (($route.disposition -ceq 'runtime-observed' -and $runtime -lt 1) -or
-                    ($route.disposition -cne 'runtime-observed' -and $compiled -lt 1) -or
+                    ($route.disposition -cne 'runtime-observed' -and $compiledCount -lt 1) -or
                     ($entry.classification -ceq 'compiled-declaration' -and $route.disposition -ceq 'runtime-observed') -or
                     ($entry.classification -ceq 'runtime-behavior' -and $route.disposition -ceq 'compiled-observed') -or
                     ($entry.kind -ceq 'function' -and $route.disposition -ceq 'compiled-observed') -or
@@ -204,6 +209,15 @@ function Read-TargetWitnessPolicy {
                 foreach($case in $route.compiled_witnesses){
                     if(-not $compiledIds.ContainsKey($case) -or $route.context -cnotin $compiledIds[$case].contexts){
                         throw 'Global API context names unknown or inapplicable compiled witness'
+                    }
+                }
+                if($route.disposition -cne 'runtime-observed' -and
+                    @($compiledIds.Values|Where-Object{ $_.Contains('protocol') -and $_.protocol -ceq 'paired-header-profile-v1' }).Count){
+                    $required=@($compiledIds.Values|Where-Object{ $_.Contains('protocol') -and
+                        $_.protocol -ceq 'paired-header-profile-v1' -and $route.context -cin $_.contexts }|ForEach-Object id)
+                    foreach($case in $required){if($case -cnotin $route.compiled_witnesses){throw 'Global declaration/applicability route omits a required C++ or configuration probe'}}
+                    if($entry.id -cnotin @($compiled.api_anchors.id) -and $entry.id -cnotin @($compiled.applicability_anchors.id)){
+                        throw 'Global declaration route names an unmeasured original API anchor'
                     }
                 }
             }
@@ -333,6 +347,30 @@ function Assert-TargetGlobalApiRoutes {
                 $CompiledCases[$case].revision -cne $NamedEvidence.revision -or $CompiledCases[$case].runtime_observed -ne $true -or
                 $CompiledCases[$case].actual_evidence -ne $true -or $CompiledCases[$case].validation_kind -cne 'verified-compiled-context-witness') {
                 throw 'Global API actual compiled ABI/layout/header witness was not observed'
+            }
+        }
+        $paired=@($CompiledCases.Values|Where-Object{ $_.Contains('protocol') -and $_.protocol -ceq 'paired-header-profile-v1' -and $_.context -ceq $Context })
+        if($route[0].disposition -cne 'runtime-observed' -and $paired.Count){
+            $states=@()
+            foreach($case in $paired){
+                if(-not $case.api_anchor_states.ContainsKey($entry.id) -or
+                    $case.api_anchor_states[$entry.id].anchor_sha256 -cne $entry.anchor_sha256){throw 'Global compiled witness lacks its exact original declaration anchor'}
+                $states+=$case.api_anchor_states[$entry.id]
+            }
+            if($route[0].disposition -ceq 'compiled-observed'){
+                if(@($states|Where-Object{ -not $_.declaration_only }).Count -or
+                    @($states|Where-Object state -CNE not-selected).Count -eq 0){
+                    throw 'Global compiled declaration cannot certify callable behavior or an inactive definition'
+                }
+            }elseif($route[0].disposition -ceq 'compiled-not-applicable'){
+                # A selected callable macro stays a runtime obligation. An
+                # earlier definition overwritten before use is recorded as a
+                # source fact; its reviewed applicability cannot hide a mode
+                # where that same original definition remains effective.
+                if(@($states|Where-Object{ $_.state -cin @('measured-type','processed-effective') -or
+                    ($_.declaration_only -and $_.state -ceq 'processed-overridden') }).Count){
+                    throw 'Global not-applicable route hides an active C++ or configuration definition'
+                }
             }
         }
         $ids[$entry.id] = $true

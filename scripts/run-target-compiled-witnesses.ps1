@@ -6,6 +6,7 @@ $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
+Import-Module (Join-Path $PSScriptRoot 'HeaderDeclarationProbes.psm1')
 $policy=Read-TargetWitnessPolicy -Root $root -Path $WitnessPolicy -RequireReview:(-not $DevelopmentObservation)
 $cases=@($policy.compiled.cases|Where-Object{ $Context -cin $_.contexts })
 if($cases.Count -eq 0){Write-Output 'NOT RUN: no reviewed compiled declaration witnesses are installed; global API acceptance remains pending';exit 0}
@@ -16,6 +17,10 @@ $directory=Join-Path $root ('reports/target-builds/'+$Context.Replace('/','-')+'
 [void][IO.Directory]::CreateDirectory($directory)
 $records=@()
 foreach($case in $cases){
+    if($case.Contains('protocol') -and $case.protocol -ceq 'paired-header-profile-v1'){
+        $records+=Invoke-HeaderDeclarationPair -Root $root -Compiler $Compiler -Case $case
+        continue
+    }
     $source=Resolve-ReviewedFile -Root $root -Path $case.source.path -Sha256 $case.source.sha256
     if(($case.source.path -cnotmatch '\.c$') -or '-Werror' -cnotin $case.compile_arguments -or
         '-Wall' -cnotin $case.compile_arguments -or '-Wextra' -cnotin $case.compile_arguments -or

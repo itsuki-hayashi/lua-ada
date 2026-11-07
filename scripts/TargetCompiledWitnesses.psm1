@@ -1,6 +1,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
+Import-Module (Join-Path $PSScriptRoot 'HeaderDeclarationProbes.psm1')
 
 function Test-TargetCompiledWitnesses {
     param([Parameter(Mandatory)][string] $Root,[Parameter(Mandatory)][Collections.IDictionary] $Mapping,
@@ -19,12 +20,21 @@ function Test-TargetCompiledWitnesses {
     $expected=@($Mapping.cases|Where-Object{ $Context -cin $_.contexts })
     if($expected.Count -eq 0 -or @($Report.cases).Count -ne $expected.Count){throw 'Compiled witness case set is incomplete'}
     $seen=@{};$result=@{}
+    if(@($expected|Where-Object{ $_.Contains('protocol') -and $_.protocol -ceq 'paired-header-profile-v1' }).Count){
+        Assert-HeaderDeclarationMapping -Root $Root -Mapping $Mapping
+    }
     foreach($case in $expected){
         $matches=@($Report.cases|Where-Object id -CEQ $case.id)
         if($matches.Count -ne 1 -or $seen.ContainsKey($case.id) -or [string]::IsNullOrWhiteSpace([string]$case.required_stdout_line)){
             throw 'Compiled witness identity missing duplicated or without a reviewed observation'
         }
         $seen[$case.id]=$true;$actual=$matches[0]
+        if($case.Contains('protocol') -and $case.protocol -ceq 'paired-header-profile-v1'){
+            $verified=Test-HeaderDeclarationPair -Root $Root -ArtifactRoot $ArtifactRoot -SourceRoot $Report.source_root `
+                -CompilerSha256 $CompilerSha256 -Mapping $Mapping -Case $case -Record $actual
+            $verified.context=$Context;$verified.revision=$Revision;$result[$case.id]=$verified
+            continue
+        }
         if(@($case.source_bindings).Count -eq 0 -or @($actual.source_bindings).Count -ne @($case.source_bindings).Count){
             throw 'Compiled witness source/header binding set differs'
         }
@@ -94,10 +104,25 @@ function Assert-TargetCompiledImageBinding {
         throw 'Compiled observation index is not the exact frozen context artifact'
     }
     foreach($case in $Report.cases){
+        if($case.Contains('protocol') -and $case.protocol -ceq 'paired-header-profile-v1'){
+            $artifacts=@()
+            $frontendKind=if($case.sides.sdk.processes.compile.arguments[1] -ceq 'c++'){'cpp_frontend_sha256'}else{'c_frontend_sha256'}
+            if($case.frontend.sha256 -cne $Image.toolchain[$frontendKind]){throw 'Paired header frontend is not the exact frozen compiler component'}
+            foreach($stream in @('stdout','stderr')){
+                $artifacts+=@{path=$case.frontend.query["${stream}_path"];sha256=$case.frontend.query["${stream}_sha256"]}
+            }
+            foreach($side in @('sdk','native')){
+                $artifacts+=@{path=$case.sides[$side].artifact.path;sha256=$case.sides[$side].artifact.sha256}
+                foreach($operation in @('preprocessing','final_macros','compile','execution')){foreach($stream in @('stdout','stderr')){
+                    $p=$case.sides[$side].processes[$operation];$artifacts+=@{path=$p["${stream}_path"];sha256=$p["${stream}_sha256"]}
+                }}
+            }
+        }else{
         $artifacts=@(@{path=$case.artifact.path;sha256=$case.artifact.sha256})
         foreach($kind in @('compile','execution')){foreach($stream in @('stdout','stderr')){
             $artifacts+=@{path=$case[$kind]["${stream}_path"];sha256=$case[$kind]["${stream}_sha256"]}
         }}
+        }
         foreach($artifact in $artifacts){
             $original=$artifact.path.Replace('\','/');$offset=$original.LastIndexOf('/reports/',[StringComparison]::Ordinal)
             if($offset -lt 0){throw 'Compiled context artifact is outside reports'}

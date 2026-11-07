@@ -38,6 +38,10 @@ if ($WitnessPolicy -eq '') {
     if ($DevelopmentObservation) {
         $proposals = Join-Path $buildDirectory 'author-proposals'
         $proposalArguments=@{OutputDirectory=$proposals}
+        $compiledProposal=Join-Path $proposals 'compiled-witnesses.author-proposal.json'
+        & (Join-Path $PSScriptRoot 'new-target-header-probes.ps1') -Output $compiledProposal
+        if($LASTEXITCODE -ne 0){throw 'Header probe source mapping generation failed'}
+        $proposalArguments.CompiledWitnessMapping=$compiledProposal
         if((Test-Path -LiteralPath (Join-Path $root 'c_api/tests/value_api_contract.c')) -and
             (Test-Path -LiteralPath (Join-Path $root 'c_api/tests/auxiliary_api_contract.c'))){
             $proposalArguments.AdditionalConsumerCases='tests/conformance/targets/remaining-upstream-compatibility/additional-public-consumer.author-cases.json'
@@ -107,6 +111,15 @@ $directories = @((Split-Path -Parent $paths.ada_launcher).Replace('\','/'),
     ('reports/target-builds/' + $selected.id),$paths.compiler_support)
 $imageDirectory = Join-Path $root ('reports/target-images/' + $selected.id)
 $toolchain = @{compiler_sha256=(Get-FileHash -LiteralPath $compiler).Hash.ToLowerInvariant()}
+foreach($frontendName in @('cc1','cc1plus')){
+    $frontendOutput=& $compiler ('-print-prog-name='+$frontendName)
+    if($LASTEXITCODE -ne 0){throw 'Cannot identify selected C/C++ frontend'}
+    $frontendPath=($frontendOutput -join '').Trim()
+    if(-not [IO.Path]::IsPathRooted($frontendPath) -or -not (Test-Path -LiteralPath $frontendPath -PathType Leaf)){
+        throw 'Actual selected C/C++ frontend is missing'
+    }
+    $toolchain[$(if($frontendName -ceq 'cc1'){'c_frontend_sha256'}else{'cpp_frontend_sha256'})]=(Get-FileHash $frontendPath).Hash.ToLowerInvariant()
+}
 if ($IsWindows) {
     $dlltool = Join-Path (Split-Path -Parent $compiler) 'dlltool.exe'
     $toolchain.dlltool_sha256 = (Get-FileHash -LiteralPath $dlltool).Hash.ToLowerInvariant()

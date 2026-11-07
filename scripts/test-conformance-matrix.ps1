@@ -301,6 +301,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Target source witness regressions failed' }
 if ($LASTEXITCODE -ne 0) { throw 'Post-observation envelope regressions failed' }
 & (Join-Path $PSScriptRoot 'test-target-compiled-witnesses.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Compiled ABI/layout/header witness regressions failed' }
+& (Join-Path $PSScriptRoot 'test-header-declaration-probes.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Paired header declaration probe regressions failed' }
 & (Join-Path $PSScriptRoot 'test-target-workflow.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Target workflow planning/preflight regressions failed' }
 & (Join-Path $PSScriptRoot 'test-target-observation-collection.ps1')
