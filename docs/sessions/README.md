@@ -1,6 +1,8 @@
 # Session Records
 
-Current: [expanded T conformance](2026-11-07-expanded-t-conformance.md).
+Current: [remaining upstream compatibility](2026-11-07-remaining-upstream-compatibility.md).
+
+Previous: [expanded T conformance](2026-11-07-expanded-t-conformance.md).
 
 Previous: [four-file GC/IO conformance](2026-11-07-gc-io-conformance.md).
 

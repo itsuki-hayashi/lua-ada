@@ -24,6 +24,7 @@ package body Library_Runtime_Tests is
    procedure Binary_Load_Boundary;
    procedure Nested_Loads;
    procedure Preload_Cache;
+   procedure Binary_Lua_Module;
    procedure Preload_False_Reload;
    procedure Preload_Nil_Default;
    procedure Loaded_Registry_Identity;
@@ -258,6 +259,21 @@ package body Library_Runtime_Tests is
              "local b,e=require('test_module'); " &
              "assert(a==b and n==1 and d==':preload:' and e==nil)");
    end Preload_Cache;
+
+   procedure Binary_Lua_Module is
+      --  Write an actual dumped module to the search path, then require it.
+      --  The searcher must select the binary decoder, preserve loader data
+      --  and cache the result. Remove the file before reporting a failure.
+   begin
+      Check ("local path='lua_ada_binary_module_test.lc'; " &
+             "local f=assert(io.open(path,'wb')); " &
+             "f:write(string.dump(function() return {answer=42} end)); " &
+             "assert(f:close()); package.path=path; " &
+             "local ok,value,data=pcall(require,'binary_fixture'); " &
+             "assert(os.remove(path)); assert(ok,value); " &
+             "assert(value.answer==42 and data==path); " &
+             "assert(require('binary_fixture')==value)");
+   end Binary_Lua_Module;
 
    procedure Preload_False_Reload is
       --  False is a legitimate stored module result but does not satisfy
@@ -601,6 +617,8 @@ package body Library_Runtime_Tests is
                         Nested_Loads'Access);
       Test_Support.Add (Suite, "require preload cache",
                         Preload_Cache'Access);
+      Test_Support.Add (Suite, "require native binary Lua module",
+                        Binary_Lua_Module'Access);
       Test_Support.Add (Suite, "require false reload",
                         Preload_False_Reload'Access);
       Test_Support.Add (Suite, "require nil default",

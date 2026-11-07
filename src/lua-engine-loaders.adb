@@ -624,8 +624,11 @@ package body Lua.Engine.Loaders is
                begin
                   Read_File (Path, Buffer);
                   Prepare_File (Buffer);
+                  --  A Lua searcher accepts the same native binary chunks
+                  --  as loadfile. The path's suffix is not a format filter;
+                  --  package.path may deliberately select dumped modules.
                   Result.Results := Compile_Buffer
-                    (Buffer, Path, "t",
+                    (Buffer, Path, "bt",
                      Global_Environment (State));
                exception
                   when Error : Ada.Text_IO.Name_Error | Ada.Text_IO.Use_Error |

@@ -1,5 +1,19 @@
 # Project Status
 
+## Remaining upstream compatibility (2026-11-07)
+
+Implementation resumes from merged PR #10 on
+codex/m3-remaining-upstream-compatibility. The approved target includes all
+remaining primary files, aggregate, heavy case, helpers and native fixtures.
+Public C/Lua behavior remains mandatory; independently reviewed private T
+exclusions are reported separately under ADR 0018. Full acceptance, PR review
+and merge remain pending. See the
+[session](sessions/2026-11-07-remaining-upstream-compatibility.md).
+
+The first binary-module searcher repair passes the strict Windows validation/
+static build and 1,391 AUnit cases, with zero assertion failures or unexpected
+errors. This is component evidence, not a full upstream or platform pass.
+
 ## Expanded T conformance (2026-11-07)
 
 The delivery on codex/m3-expanded-t-conformance retains the nine previously

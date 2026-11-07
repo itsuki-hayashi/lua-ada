@@ -1,5 +1,18 @@
 # Backlog
 
+## Active remaining-suite delivery
+
+The 2026-11-07 approved remaining-upstream-compatibility delivery resumes from
+merged PR #10 on codex/m3-remaining-upstream-compatibility. It supersedes older
+pause and branch instructions below for this task. Complete the remaining 17
+primary files, aggregate/stress/helpers, native fixtures and relevant T paths,
+then review and merge one PR after all 26 contexts pass. ADR 0018 owns the
+reviewed private-T exclusion policy; exclusions never count as passing tests.
+The [session](sessions/2026-11-07-remaining-upstream-compatibility.md) records
+component progress. The binary Lua searcher now accepts native chunks and its
+focused caching/loader-data regression passes within 1,391 local AUnit cases.
+Full target and all original unfinished M3 gates remain open.
+
 IDs are stable. Completion requires evidence, including relevant platform gates.
 M1 is complete; [all five gates passed](validation.md).
 
