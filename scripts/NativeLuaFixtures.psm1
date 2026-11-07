@@ -99,8 +99,10 @@ function Build-NativeLuaFixtures {
     $sourceDirectory=Join-Path $Root 'references/lua/testes/libs'
     $libraries=Join-Path $FixtureDirectory 'libs'
     if(-not (Test-Path -LiteralPath $libraries)){$null=Copy-ConformanceFixtures -Source $sourceDirectory -Destination $libraries}
-    # Include every original support source, not only the five translation
-    # units (lib22.c includes lib2.c). Copied reference bytes remain evidence.
+    # Verify every original support source alongside the five translation
+    # units. lib22.c independently implements the alternate lib2-v2 module;
+    # lib11/lib21 refer to the separately linked fixture exports. None of
+    # these copied reference bytes is a generated implementation substitute.
     foreach($source in Get-ChildItem -LiteralPath $sourceDirectory -File -Recurse){
         $relative=[IO.Path]::GetRelativePath($sourceDirectory,$source.FullName)
         if((Get-FileHash (Join-Path $libraries $relative)).Hash -cne (Get-FileHash $source.FullName).Hash){throw 'Native fixture source copy differs from the pinned original'}

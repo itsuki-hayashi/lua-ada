@@ -4,6 +4,7 @@ $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'NativeModuleLinkage.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
 $directory=Join-Path $root ('reports/native-module-linkage-selftest/'+[Guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($directory)
 $utf8=[Text.UTF8Encoding]::new($false);$script:Cases=0;$script:Serial=0
@@ -123,6 +124,27 @@ Case 'transitive fixture imports must reach the same actual owner instead of tru
     Reject {Assert-PEModuleOwner -OwnerImage $owner -ModulePath $module.path -DependencyImages @($image) -OwnedNames fixture_function,fixture_data} 'dependency bytes changed'
     $image=Get-PEImageExports $dependency.path
     Reject {Assert-PEModuleOwner -OwnerImage $owner -ModulePath $module.path -DependencyImages @($image) -OwnedNames fixture_function,fixture_data} 'no actual direct or reviewed transitive'
+}
+Case 'fixture planning rejects a changed frozen compiler and shared archive fallback before a tool runs'{
+    $compilerPath=(Get-Command pwsh).Source;$image=Join-Path $directory 'unit-host.exe'
+    $runtime=Join-Path $directory 'archive-only';[void][IO.Directory]::CreateDirectory($runtime)
+    [IO.File]::WriteAllText((Join-Path $runtime 'liblua.a'),'synthetic archive is never executable evidence',$utf8)
+    Reject {New-NativeLuaFixturePlan -Root $root -HostPath $image -RuntimeDirectory $runtime -Compiler $compilerPath `
+        -Implementation Ada -LibraryType static -Platform windows -RecordDirectory (Join-Path $directory 'wrong-compiler') -CompilerSha256 ('0'*64)} 'differs from its frozen context'
+    Reject {New-NativeLuaFixturePlan -Root $root -HostPath $image -RuntimeDirectory $runtime -Compiler $compilerPath `
+        -Implementation Ada -LibraryType relocatable -Platform windows -RecordDirectory (Join-Path $directory 'archive-fallback')} 'actual shared runtime image; an archive is not a fallback'
+}
+Case 'fixture builder rejects changed copied C bytes and output paths outside reports before compilation'{
+    $fixtureDirectory=Join-Path $directory 'changed-c-source'
+    $null=Copy-ConformanceFixtures -Source (Join-Path $root 'references/lua/testes/libs') -Destination (Join-Path $fixtureDirectory 'libs')
+    [IO.File]::AppendAllText((Join-Path $fixtureDirectory 'libs/lib1.c'),"`n/* deliberately changed validator input */`n",$utf8)
+    $compilerPath=(Get-Command pwsh).Source;$image=Join-Path $directory 'unit-host.exe'
+    Reject {Build-NativeLuaFixtures -Root $root -HostPath $image -RuntimeDirectory $directory -Compiler $compilerPath `
+        -Implementation Ada -LibraryType static -Platform windows -Configuration default -FixtureDirectory $fixtureDirectory `
+        -RecordDirectory (Join-Path $directory 'changed-c-records')} 'source copy differs from the pinned original'
+    Reject {Build-NativeLuaFixtures -Root $root -HostPath $image -RuntimeDirectory $directory -Compiler $compilerPath `
+        -Implementation Ada -LibraryType static -Platform windows -Configuration default -FixtureDirectory (Join-Path $root 'tests/forbidden-fixture-output') `
+        -RecordDirectory (Join-Path $directory 'forbidden-records')} 'outputs must remain in disposable reports'
 }
 
 if($Compiler -ne ''){
