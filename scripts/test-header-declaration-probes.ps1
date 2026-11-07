@@ -15,12 +15,13 @@ function Clone($Value){return ($Value|ConvertTo-Json -Depth 64|ConvertFrom-Json 
 function Reject([scriptblock]$Action,[string]$Expected){$failure=$null;try{&$Action|Out-Null}catch{$failure=$_.Exception.Message};Assert-True ($null -ne $failure -and $failure -match $Expected) "Wrong failure: $failure; expected $Expected"}
 Case 'closed declaration schedule retains all contexts C++ DLL and distinct private T modes'{
     Assert-HeaderDeclarationMapping -Root $root -Mapping $mapping
-    Assert-True ($mapping.api_anchors.Count -eq 228 -and $mapping.applicability_anchors.Count -eq 28 -and $mapping.cases.Count -eq 106) 'Declaration/applicability context inventory narrowed'
+    Assert-True ($mapping.api_anchors.Count -eq 228 -and $mapping.applicability_anchors.Count -eq 28 -and $mapping.cases.Count -eq 132) 'Declaration/applicability context inventory narrowed'
     foreach($entry in $mapping.api_anchors){Assert-True ($entry.kind -ceq 'type' -or ($entry.kind -ceq 'macro' -and
         $entry.declaration -cnotmatch '^#define\s+[A-Za-z_][A-Za-z0-9_]*\(')) 'A function or callable macro acquired declaration-only classification'}
     foreach($context in @($mapping.cases.contexts|ForEach-Object{$_}|Sort-Object -Unique)){
         $selected=@($mapping.cases|Where-Object{ $context -cin $_.contexts })
         Assert-True ('public-cpp' -cin $selected.mode -and 'public-c' -cin $selected.mode) 'C++ was omitted from declaration applicability'
+        Assert-True ('facade-c' -cin $selected.mode) 'Implementation configuration projection was omitted'
         Assert-True (($context.StartsWith('upstream-test/')) -eq ('private-t-c' -cin $selected.mode)) 'Private T mode was omitted or substituted for ordinary SDK'
     }
 }
@@ -54,11 +55,55 @@ Case 'synthetic global reconciliation cannot hide a C++-active branch behind a C
     $cpp.api_anchor_states[$id].declaration_only=$true;$cpp.api_anchor_states[$id].anchor_sha256='0'*64
     Reject {Assert-TargetGlobalApiRoutes -Policy $policy -NamedEvidence $named -CompiledCases $compiled -Context $context} 'exact original declaration anchor'
 }
+function Write-ReviewFixture($Value,[bool]$ApprovalSynthetic=$true,[bool]$NarrativeSynthetic=$true){
+    # This fixture exercises content binding only. It is explicitly labelled
+    # synthetic and may never pass the final actual-review consumer.
+    $script:Serial++;$prefix=Join-Path $directory ('review-'+$script:Serial)
+    $claims=Get-HeaderProbePayloadHash (Get-HeaderDeclarationReviewClaims $Value)
+    $narrative=@{reviewer='synthetic independent reviewer';decision='accepted';claims_sha256=$claims;
+        synthetic_fixture=$NarrativeSynthetic;source_and_configuration_findings='Synthetic binding fixture only.';
+        behavioral_and_runtime_boundaries='No runtime execution, semantic classification or coverage authority.'}
+    $narrativePath=$prefix+'-narrative.json'
+    [IO.File]::WriteAllText($narrativePath,(ConvertTo-Json $narrative -Depth 16).Replace("`r`n","`n")+"`n",$utf8)
+    $approval=@{schema_version=1;kind='header-declaration-probe-source-approval';scope='header-probe-source-and-configuration';
+        decision='accepted';author=$Value.author;reviewer=$narrative.reviewer;synthetic_fixture=$ApprovalSynthetic;
+        global_api_classifications_accepted=$false;runtime_acceptance=$false;claims_sha256=$claims;
+        category_decisions=@{type_layout='eligible-compiled-candidate';object_macro='eligible-compiled-candidate';
+            callable_function='runtime-required';behavioral_macro='runtime-required';conditional_behavioral_applicability='not-runtime-evidence'};
+        review_evidence=@{path=[IO.Path]::GetRelativePath($root,$narrativePath).Replace('\','/');sha256=(Get-FileHash $narrativePath).Hash.ToLowerInvariant()}}
+    $approvalPath=$prefix+'-approval.json'
+    [IO.File]::WriteAllText($approvalPath,(ConvertTo-Json $approval -Depth 16).Replace("`r`n","`n")+"`n",$utf8)
+    $Value.review=@{status='accepted';author=$Value.author;reviewer=$narrative.reviewer;
+        artifact=[IO.Path]::GetRelativePath($root,$approvalPath).Replace('\','/');artifact_sha256=(Get-FileHash $approvalPath).Hash.ToLowerInvariant()}
+    return $Value
+}
+Case 'source review requires distinct actual artifacts and exact closed configuration claims'{
+    Reject {Assert-HeaderDeclarationSourceReview -Root $root -Mapping $mapping} 'accepted independent review'
+    $fixture=Write-ReviewFixture (Clone $mapping)
+    $value=Assert-HeaderDeclarationSourceReview -Root $root -Mapping $fixture -AllowSynthetic
+    Assert-True ($value.source_reviewed -and -not $value.global_api_classifications_accepted -and -not $value.runtime_acceptance) 'Binding review acquired semantic authority'
+    Reject {Assert-HeaderDeclarationSourceReview -Root $root -Mapping $fixture} 'approval scope'
+    $fixture=Write-ReviewFixture (Clone $mapping) $false $true
+    Reject {Assert-HeaderDeclarationSourceReview -Root $root -Mapping $fixture} 'actual independent source review narrative'
+    $fixture=Write-ReviewFixture (Clone $mapping)
+    $fixture.review.reviewer=$fixture.review.author
+    Reject {Assert-HeaderDeclarationSourceReview -Root $root -Mapping $fixture -AllowSynthetic} 'accepted independent review'
+    $fixture=Write-ReviewFixture (Clone $mapping)
+    $fixture.cases[0].sides.sdk.compile_arguments+='-DLUA_32BITS'
+    Reject {Assert-HeaderDeclarationSourceReview -Root $root -Mapping $fixture -AllowSynthetic} 'approval scope'
+    $fixture=Write-ReviewFixture (Clone $mapping)
+    $fixture.api_anchors[0].anchor_sha256='0'*64
+    Reject {Assert-HeaderDeclarationSourceReview -Root $root -Mapping $fixture -AllowSynthetic} 'approval scope'
+    $fixture=Write-ReviewFixture (Clone $mapping)
+    $fixture.review.artifact_sha256='0'*64
+    Reject {Assert-HeaderDeclarationSourceReview -Root $root -Mapping $fixture -AllowSynthetic} 'hash differs'
+}
 if($Compiler -ne ''){
     $platform=if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}
     $records=@();$selectedCases=@()
     foreach($selection in @(@{configuration='default';mode='public-c'},@{configuration='default';mode='public-cpp'},
-        @{configuration='upstream-test';mode='private-t-c'},@{configuration='upstream-test';mode='private-t-cpp'})){
+        @{configuration='upstream-test';mode='private-t-c'},@{configuration='upstream-test';mode='private-t-cpp'},
+        @{configuration='default';mode='facade-c'},@{configuration='upstream-test';mode='facade-c'})){
         $context=$selection.configuration+'/'+$platform+'/validation/static'
         $case=Clone (@($mapping.cases|Where-Object{ $context -cin $_.contexts -and $_.mode -ceq $selection.mode })[0])
         # An isolated author capture uses the same source/flags but a new
@@ -75,7 +120,7 @@ if($Compiler -ne ''){
     $compilerHash=(Get-FileHash $Compiler).Hash.ToLowerInvariant()
     function Replay($Record,$Case){Test-HeaderDeclarationPair -Root $root -ArtifactRoot $root -SourceRoot $root `
         -CompilerSha256 $compilerHash -Mapping $mapping -Case $Case -Record $Record}
-    Case 'actual C11 C++17 and private T counterparts agree on measured layouts tokens and definition histories'{
+    Case 'actual C99 C++17 private T and facade counterparts agree within each measured role'{
         for($i=0;$i -lt $records.Count;$i++){
             $value=Replay $records[$i] $selectedCases[$i]
             Assert-True ($value.measured_fields -eq 145 -and $value.api_anchor_states.Count -eq 256 -and -not $value.runtime_acceptance) 'Measured profile was narrowed or promoted to API acceptance'

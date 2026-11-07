@@ -13,7 +13,6 @@
 #include <limits.h>
 
 #ifdef __cplusplus
-#include <type_traits>
 extern "C" {
 #endif
 #include "lua.h"
@@ -23,11 +22,16 @@ extern "C" {
 }
 #define ALIGNOF(T) alignof(T)
 #define STATIC_ASSERT(c, m) static_assert(c, m)
-#define SAME_TYPE(v, T) (std::is_same<decltype(v), T>::value)
 #else
-#define ALIGNOF(T) _Alignof(T)
-#define STATIC_ASSERT(c, m) _Static_assert(c, m)
-#define SAME_TYPE(v, T) _Generic((v), T: 1, default: 0)
+/* Keep the implementation-configuration receiver in the actual strict C99
+ * language used by the facade. The containing-field offset measures natural
+ * ABI alignment without a C11 language extension. Each negative extent makes
+ * a failed constant assertion a compiler diagnostic under -Werror. */
+#define ALIGNOF(T) offsetof(struct { char prefix; T value; }, value)
+#define ASSERT_NAME_INNER(a, b) a##b
+#define ASSERT_NAME(a, b) ASSERT_NAME_INNER(a, b)
+#define STATIC_ASSERT(c, m) \
+    typedef char ASSERT_NAME(header_assertion_, __LINE__)[(c) ? 1 : -1]
 #endif
 
 /* Independent stable literals from the pinned public contract. These do not
@@ -66,13 +70,20 @@ typedef int (*expected_writer)(lua_State *, const void *, size_t, void *);
 typedef void *(*expected_allocator)(void *, void *, size_t, size_t);
 typedef void (*expected_warning)(void *, const char *, int);
 typedef void (*expected_hook)(lua_State *, lua_Debug *);
-STATIC_ASSERT(SAME_TYPE((lua_CFunction)0, expected_cfunction), "C callback");
-STATIC_ASSERT(SAME_TYPE((lua_KFunction)0, expected_kfunction), "continuation");
-STATIC_ASSERT(SAME_TYPE((lua_Reader)0, expected_reader), "reader callback");
-STATIC_ASSERT(SAME_TYPE((lua_Writer)0, expected_writer), "writer callback");
-STATIC_ASSERT(SAME_TYPE((lua_Alloc)0, expected_allocator), "allocator callback");
-STATIC_ASSERT(SAME_TYPE((lua_WarnFunction)0, expected_warning), "warning callback");
-STATIC_ASSERT(SAME_TYPE((lua_Hook)0, expected_hook), "debug hook callback");
+/* Strict compatible-pointer assignments work in C99 and C++17. These never
+ * invoke a callback: incompatible arguments/results fail compilation rather
+ * than being hidden by a cast to the independently declared signature. */
+static void callback_signatures(void) {
+    expected_cfunction c = (lua_CFunction)0;
+    expected_kfunction k = (lua_KFunction)0;
+    expected_reader reader = (lua_Reader)0;
+    expected_writer writer = (lua_Writer)0;
+    expected_allocator allocator = (lua_Alloc)0;
+    expected_warning warning = (lua_WarnFunction)0;
+    expected_hook hook = (lua_Hook)0;
+    (void)c; (void)k; (void)reader; (void)writer;
+    (void)allocator; (void)warning; (void)hook;
+}
 
 /* Emit one JSON object with values measured by this compiler. JSON escaping
  * preserves Windows paths and the ESC byte in LUA_SIGNATURE byte for byte;
@@ -109,6 +120,7 @@ static void text(const char *name, const char *value) {
 #define TOKENS(n) text("tokens." #n, TOKEN(n))
 
 int main(void) {
+    callback_signatures();
     if (memcmp(LUA_SIGNATURE, "\033Lua", 4) != 0 ||
         strcmp(LUA_VERSION, "Lua 5.5") != 0 ||
         strcmp(LUA_RELEASE, "Lua 5.5.1") != 0) return 1;

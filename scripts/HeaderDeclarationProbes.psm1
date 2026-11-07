@@ -39,6 +39,10 @@ function New-HeaderDeclarationMapping {
     $cases=@()
     foreach($context in $suite.acceptance_contexts){
         $parts=$context.Split('/');$modes=@(@{id='public-c';language='c';extra=@()},@{id='public-cpp';language='c++';extra=@()})
+        $facadeFlags=@('-include','{root}/c_api/include/lua_ada_runtime_configuration.h')
+        if($parts[0] -ceq 'upstream-test'){$facadeFlags+='-DLUA_ADA_AUXILIARY_BUFFER_BYTES=23'}
+        if($parts[1] -ceq 'windows'){$facadeFlags+=@('-DLUA_BUILD_AS_DLL','-DLUA_CORE','-DLUA_LIB')}
+        $modes+=@{id='facade-c';language='c';extra=$facadeFlags}
         if($parts[0] -ceq 'upstream-test'){$modes+=@(@{id='private-t-c';language='c';extra=@('-DLUA_USER_H=<ltests.h>')},
             @{id='private-t-cpp';language='c++';extra=@('-DLUA_USER_H=<ltests.h>')})}
         if($parts[1] -ceq 'windows'){foreach($language in @('c','c++')){foreach($role in @('import','export')){
@@ -48,7 +52,7 @@ function New-HeaderDeclarationMapping {
         foreach($mode in $modes){
             $id='header-'+$context.Replace('/','-')+'-'+$mode.id
             $directory='{root}/reports/target-builds/'+$context.Replace('/','-')+'/compiled/'+$id
-            $common=@('-x',$mode.language,('-std='+$(if($mode.language -ceq 'c'){'c11'}else{'c++17'})),
+            $common=@('-x',$mode.language,('-std='+$(if($mode.language -ceq 'c'){'c99'}else{'c++17'})),
                 '-Wall','-Wextra','-Werror','-pedantic')
             $common+=if($parts[1] -ceq 'linux'){@('-DLUA_USE_LINUX')}elseif($parts[1] -ceq 'macos'){@('-DLUA_USE_MACOSX')}else{@()}
             $common+=@($mode.extra)
@@ -63,6 +67,12 @@ function New-HeaderDeclarationMapping {
             }
             $sourceBindings=@($bindings)
             if($mode.id.StartsWith('private-t-')){$sourceBindings+=@{path='references/lua/ltests.h';sha256=(Get-FileHash (Join-Path $Root 'references/lua/ltests.h')).Hash.ToLowerInvariant()}}
+            if($mode.id -ceq 'facade-c'){
+                foreach($relative in @('c_api/include/lua_ada_runtime_configuration.h','lua_ada.gpr','runtime_configuration.gpr',
+                    ('src/configurations/'+$parts[0]+'/lua-runtime_configuration.ads'))){
+                    $sourceBindings+=@{path=$relative;sha256=(Get-FileHash (Join-Path $Root $relative)).Hash.ToLowerInvariant()}
+                }
+            }
             $cases+=@{id=$id;protocol='paired-header-profile-v1';contexts=@($context);mode=$mode.id;language=$mode.language;
                 source=@{path=$source;sha256=$hash};source_bindings=$sourceBindings;profile_fields=$fields;
                 profile_assertions=@{LUA_VERSION_NUM=505;LUA_VERSION_RELEASE_NUM=50501;
@@ -142,6 +152,7 @@ function Read-HeaderDefinitionProfile {
     foreach($anchor in $Anchors|Where-Object kind -CEQ macro){$wanted[$anchor.name]=$true}
     $history=@();$line=0;$file='';$sdk=$SourceRoot.Replace('\','/').TrimEnd('/')+'/c_api/include/api/'
     $native=$SourceRoot.Replace('\','/').TrimEnd('/')+'/references/lua/'
+    $facade=$SourceRoot.Replace('\','/').TrimEnd('/')+'/c_api/include/lua_ada_runtime_configuration.h'
     foreach($text in [IO.File]::ReadAllLines($Path)){
         if($text -cmatch '^#\s+([0-9]+)\s+"((?:\\.|[^"\\])*)"(?:\s+[0-9 ]+)?$'){
             $line=[int]$Matches[1]
@@ -151,7 +162,7 @@ function Read-HeaderDefinitionProfile {
         if($text -cmatch '^#(define|undef)\s+([A-Za-z_][A-Za-z0-9_]*)(.*)$'){
             $action=$Matches[1];$name=$Matches[2];$tail=$Matches[3]
             if($wanted.ContainsKey($name)){
-                $origin=if($file.StartsWith($sdk,[StringComparison]::Ordinal)){'sdk/'+$file.Substring($sdk.Length)}
+                $origin=if($file -ceq $facade){'facade/runtime-configuration.h'}elseif($file.StartsWith($sdk,[StringComparison]::Ordinal)){'sdk/'+$file.Substring($sdk.Length)}
                     elseif($file.StartsWith($native,[StringComparison]::Ordinal)){'native/'+$file.Substring($native.Length)}else{$file}
                 # Do not let an SDK compile silently use the oracle's public
                 # header (or the reverse) because an include guard masked it.
@@ -183,7 +194,8 @@ function Assert-HeaderDefinitionOrigins {
     foreach($event in $History){
         $relative=if($event.origin.StartsWith('public/')){
             $(if($Side -ceq 'sdk'){'c_api/include/api/'}else{'references/lua/'})+$event.origin.Substring(7)
-        }elseif($event.origin -ceq 'private/ltests.h'){'references/lua/ltests.h'}else{throw 'Header declaration has an unbound definition origin'}
+        }elseif($event.origin -ceq 'private/ltests.h'){'references/lua/ltests.h'}
+        elseif($event.origin -ceq 'facade/runtime-configuration.h'){'c_api/include/lua_ada_runtime_configuration.h'}else{throw 'Header declaration has an unbound definition origin'}
         if(-not $sources.ContainsKey($relative)){$sources[$relative]=[IO.File]::ReadAllLines((Join-Path $Root $relative))}
         $lines=$sources[$relative];$index=[int]$event.line-1
         if($index -lt 0 -or $index -ge $lines.Count){throw 'Header definition origin line is outside its bound source'}
@@ -315,9 +327,10 @@ function Read-HeaderProfileValues([string] $Path,[Collections.IDictionary] $Case
     $values=$json|ConvertFrom-Json -AsHashtable -Depth 8
     foreach($name in $Case.profile_assertions.Keys){if($values[$name] -cne $Case.profile_assertions[$name]){throw 'Paired header fixed public ABI/version assertion differs'}}
     if($values.cplusplus -ne $(if($Case.language -ceq 'c++'){201703}else{0}) -or
-        $values.stdc_version -ne $(if($Case.language -ceq 'c'){201112}else{0}) -or
+        $values.stdc_version -ne $(if($Case.language -ceq 'c'){199901}else{0}) -or
         $values.user_header -ne $(if($Case.mode.StartsWith('private-t-')){1}else{0}) -or
-        ($Case.mode.StartsWith('private-t-') -and $values.LUAL_BUFFERSIZE -ne 23)){
+        ($Case.mode.StartsWith('private-t-') -and $values.LUAL_BUFFERSIZE -ne 23) -or
+        ($Case.mode -ceq 'facade-c' -and $values.LUAL_BUFFERSIZE -ne $(if($Case.contexts[0].StartsWith('upstream-test/')){23}else{16*$values['sizeof.lua_State *']*$values['sizeof.lua_Number']}))){
         throw 'Paired header actual language or private/public role differs'
     }
     return $values

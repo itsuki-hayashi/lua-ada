@@ -161,7 +161,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "ad08ce1a9432b1bbc300150aee80d216d6185fece72529680966def3ed85ada6"
+      "sha256": "db3b36bb954a8a96626aae35bf76784f7bb67389f038ca5846f215693de325f3"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -213,7 +213,7 @@
     },
     {
       "path": "c_api/tests/buffer_api_contract.c",
-      "sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     }
   ],
   "cases": [
@@ -5707,7 +5707,7 @@
         "PASS: buffer-empty-result"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5722,7 +5722,7 @@
         "PASS: buffer-fixed-binary-nul"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5737,7 +5737,7 @@
         "PASS: buffer-zero-null-add"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5752,7 +5752,7 @@
         "PASS: buffer-addstring-terminator"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5767,7 +5767,7 @@
         "PASS: buffer-direct-prep-addsize"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5782,7 +5782,7 @@
         "PASS: buffer-buffinitsize-small"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5797,7 +5797,7 @@
         "PASS: buffer-buffinitsize-heap"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5812,7 +5812,7 @@
         "PASS: buffer-addvalue-growth-gc"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5827,7 +5827,7 @@
         "PASS: buffer-large-growth-prefix"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5842,7 +5842,7 @@
         "PASS: buffer-buffsub-addchar"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5857,7 +5857,7 @@
         "PASS: buffer-nested-buffers"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5872,7 +5872,7 @@
         "PASS: buffer-callback-result"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5887,7 +5887,7 @@
         "PASS: buffer-callback-error-closes"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5902,7 +5902,7 @@
         "PASS: buffer-abandoned-closeslot"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5917,7 +5917,7 @@
         "PASS: buffer-fault-sweep-growth"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5932,7 +5932,7 @@
         "PASS: buffer-pushresult-header-refusal"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     },
     {
       "execution_evidence": [],
@@ -5947,7 +5947,7 @@
         "PASS: buffer-captured-deallocator-pair"
       ],
       "runtime_acceptance": false,
-      "source_sha256": "0f2f2061bb71569beb671324e902c4237313ea55c8febbc78acc9740ab5f129a"
+      "source_sha256": "39921fd14d52499f8b4d2e7c33f6f1139c4cf64b4552750abd439ade4c4204e3"
     }
   ],
   "entries": [

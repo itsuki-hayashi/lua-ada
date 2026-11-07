@@ -638,9 +638,9 @@ approval. Fresh original C applicability captures, independent source review,
 and full paired File/Aggregate observations remain required in each context.
 
 `new-target-header-probes.ps1` installs a separate pending source mapping for
-106 executable SDK/native header pairs across all 26 contexts. The source
+132 executable SDK/native header pairs across all 26 contexts. The source
 measures 145 ABI/constant/configuration fields without linking Lua or calling
-its API. C11, C++17, Windows DLL import/export, and real private T include
+its API. Strict C99, C++17, Windows DLL import/export, and real private T include
 roles remain distinct. Preprocessing and final macro dumps retain the original
 definition/undef history; replay checks each event against its actual original
 source directive and compares both header trees. Callable behavior is never
@@ -650,6 +650,15 @@ review is required before a final source policy can use the mapping, and all
 selects and executes the probes instead of reporting a missing catalogue as
 compiled evidence. Generic historical compiled-witness callers retain their
 existing protocol.
+
+The implementation-facade projection additionally binds the committed private
+runtime configuration header, GPR inputs and selected Ada configuration source.
+It uses the real T-only `LUA_ADA_AUXILIARY_BUFFER_BYTES=23` flag after lua.h and
+before lauxlib.h. This measures a 23-byte C scratch extent without importing
+the C VM's ltests header into the implementation. Ordinary SDK, private T
+caller and implementation-facade profiles retain their distinct extraspace
+and buffer layouts. Agreement within a header pair does not establish safe
+extraspace mutation or runtime representation across different roles.
 
 Final image replay also binds the actual selected C/C++ frontend identities,
 the compiler/query processes, both executables and every capture. Declaration

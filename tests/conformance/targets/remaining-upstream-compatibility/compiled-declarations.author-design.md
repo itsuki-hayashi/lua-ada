@@ -54,13 +54,16 @@ claim their LUA_API definitions are interchangeable observations. The T profile
 also includes the pinned ltests.h through LUA_USER_H; capture its transitive
 inputs without substituting private C layouts for Ada runtime behavior.
 
-The current compiled-witness protocol accepts a source-bound C probe, exact
-compile/execution arguments and one independently reviewed output line. Before
-installing these families, it needs an explicit SDK/native pairing contract
-and a measured tuple protocol (or separate small probes with reviewed exact
-lines) that checks both counterpart processes. Source-origin applicability
-must bind actual native compiler captures and original directive spans. A
-successful compile or a fixed completion marker alone cannot close the queue.
+The executable successor is installed separately by
+`scripts/new-target-header-probes.ps1`. Its pending source mapping schedules
+132 SDK/native pairs across all 26 contexts, using strict C99, C++17, DLL
+import/export, real private T callers and the implementation-facade private
+configuration receiver. The measured tuple contains 145 fields; native
+preprocessing captures retain original directive history and final macro
+definitions. The verifier checks both actual compiler/executable processes,
+source origins and exact counterpart bytes. These installed operations do not
+give this source-only classification design execution or semantic authority.
+A successful compile or fixed completion marker cannot close the queue.
 
 Independent review must decide every one of the 473 semantic classifications,
 preserve the original 159 routes and 100 C/94 AUnit predecessor protocols, and
