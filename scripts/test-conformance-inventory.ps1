@@ -483,6 +483,7 @@ Case 'containing-file validation accepts reviewed links without changing source 
     # and add one pending, hash-cited block; the structural pass must preserve
     # pending runtime status and independently verify the original anchor set.
     $fixture = Copy-Fixture 'classified-file'
+    $before = Test-ConformanceInventory -Root $root -InventoryDirectory $fixture
     $path = Join-Path $fixture 'coverage/api.jsonl'
     $records = @(Read-ConformanceJsonLines $path)
     $candidate = @($records | Where-Object { $_.kind -eq 'conditional-guard' })[0]
@@ -496,7 +497,10 @@ Case 'containing-file validation accepts reviewed links without changing source 
     $candidate.obligations = @($block.id)
     Write-ConformanceJsonLines $path (@($records) + @($block))
     $result = Test-ConformanceInventory -Root $root -InventoryDirectory $fixture
-    Assert-True ($result.SourceAnchors -eq 4491 -and $result.PendingSourceAnchors -eq 4490) 'Review erased or passed a runtime obligation'
+    # One new pending block offsets the guard moved to reviewed status. Other
+    # files may gain reviewed blocks without changing this fixture's invariant.
+    Assert-True ($result.SourceAnchors -eq ($before.SourceAnchors + 1) -and
+        $result.PendingSourceAnchors -eq $before.PendingSourceAnchors) 'Review erased or passed a runtime obligation'
     Assert-True ($block.status -eq 'pending') 'Structural validation executed no runtime test'
 }
 

@@ -30,7 +30,7 @@ package body Lua.Managed_Runtime_Tests is
    procedure String_Reclamation (State : in out World);
    procedure Memory_Recovery (State : in out World);
    procedure Table_Buffer_Accounting (State : in out World);
-   procedure Mixed_Heap_Compaction (State : in out World);
+   procedure Mixed_Heap_Survivors (State : in out World);
    procedure Program_Operation_Root (State : in out World);
    procedure Raw_Metafield_Allocation (State : in out World);
    procedure Weak_Mode_Nul (State : in out World);
@@ -91,12 +91,12 @@ package body Lua.Managed_Runtime_Tests is
                 Before.Raw_Bytes, "table buffer collection balance");
    end Table_Buffer_Accounting;
 
-   procedure Mixed_Heap_Compaction (State : in out World) is
+   procedure Mixed_Heap_Survivors (State : in out World) is
       Held : constant Value := New_Table (State);
       Before : Natural;
    begin
       --  Interleave live and dead strings, retaining only even entries in a
-      --  global table. One compaction pass must release exactly the unrooted
+      --  global table. One real sweep must release exactly the unrooted
       --  half while preserving all object addresses and surviving contents.
       Set (State, Global_Environment (State),
            New_String (State, "keepers"), Held);
@@ -109,16 +109,17 @@ package body Lua.Managed_Runtime_Tests is
             end if;
          end;
       end loop;
-      Before := Natural (State.Heap.Length);
+      Before := State.Live_Objects;
       Collect (State);
-      Assert (Natural (State.Heap.Length) = Before - 500,
+      Assert (State.Live_Objects = Before - 500,
               "mixed heap survivor count");
       for Index in 1 .. 500 loop
          Assert (Get (Held, (Integer_Kind,
                    Integer_Value (Index * 2))).Reference.Bytes =
-                     Integer'Image (Index * 2), "compacted survivor changed");
+                     Integer'Image (Index * 2),
+                 "stable-slot survivor changed");
       end loop;
-   end Mixed_Heap_Compaction;
+   end Mixed_Heap_Survivors;
 
    procedure Program_Operation_Root (State : in out World) is
       Code : constant Prototype_Access :=
@@ -177,7 +178,7 @@ package body Lua.Managed_Runtime_Tests is
    procedure String_Case is new Fixture (String_Reclamation);
    procedure Recovery_Case is new Fixture (Memory_Recovery);
    procedure Table_Case is new Fixture (Table_Buffer_Accounting);
-   procedure Compact_Case is new Fixture (Mixed_Heap_Compaction);
+   procedure Survivor_Case is new Fixture (Mixed_Heap_Survivors);
 
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
@@ -193,7 +194,7 @@ package body Lua.Managed_Runtime_Tests is
                         Recovery_Case'Access);
       Test_Support.Add (Suite, "managed runtime: table buffer accounting",
                         Table_Case'Access);
-      Test_Support.Add (Suite, "managed runtime: mixed heap compaction",
-                        Compact_Case'Access);
+      Test_Support.Add (Suite, "managed runtime: mixed heap stable survivors",
+                        Survivor_Case'Access);
    end Register;
 end Lua.Managed_Runtime_Tests;

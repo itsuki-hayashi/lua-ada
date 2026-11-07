@@ -96,6 +96,14 @@ package Lua.Storage.Vectors is
    function Find_Index
      (Self : Vector; Item : Element_Type) return Extended_Index;
    function Copy (Self : Vector) return Vector;
+   function Copy_Prefix
+     (Self : Vector; Length, Capacity : Count_Type) return Vector;
+   --  Copy exactly Length existing elements into a separately owned buffer
+   --  with exactly Capacity slots. Both counts are explicit; Capacity must
+   --  cover Length, which must not exceed Self.Length. Copies inherit Self's
+   --  allocator, and failure leaves Self unchanged. An empty unowned source
+   --  cannot request positive capacity. No geometric growth is applied.
+
    procedure Move (Target, Source : in out Vector);
    --  Finalize Target's previous elements, then transfer Source's allocation,
    --  capacity and owner without copying or allocating. Source becomes empty

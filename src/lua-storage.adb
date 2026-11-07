@@ -10,15 +10,6 @@ package body Lua.Storage is
    --  Only this boundary interprets raw provider addresses. Everything above
    --  it deals in typed objects or owner-carrying buffers. The header is a
    --  trivially initialized record and contains no controlled Ada components.
-   type Header is record
-      Parent : Owner_Access;
-      Before, After : System.Address;
-      Raw : System.Address;
-      Raw_Size : Byte_Count;
-      User : System.Address;
-      Size : Byte_Count;
-      Alignment : Byte_Count;
-   end record;
    package Headers is new System.Address_To_Access_Conversions (Header);
    package Addresses is new
      System.Address_To_Access_Conversions (System.Address);
@@ -181,6 +172,8 @@ package body Lua.Storage is
      (Self : in out Owner; Old_Size, New_Size : Byte_Count)
    is
       Remaining : constant Byte_Count := Self.Counts.Raw_Bytes - Old_Size;
+      Ceiling : constant Byte_Count :=
+        Byte_Count'Min (Self.Ceiling, Self.Test_Ceiling);
    begin
       if Self.Closed then
          raise Program_Error with "closed storage owner";
@@ -191,9 +184,15 @@ package body Lua.Storage is
       if Self.Counts.Growth_Attempts < Byte_Count'Last then
          Self.Counts.Growth_Attempts := Self.Counts.Growth_Attempts + 1;
       end if;
+      if Self.Fail_Next then
+         --  Consume before raising: the engine's emergency retry must reach
+         --  the real allocator instead of repeating a one-shot refusal.
+         Self.Fail_Next := False;
+         Count_Refusal (Self);
+      end if;
       if New_Size > Byte_Count'Last - Remaining or else
-        Remaining > Self.Ceiling or else
-        New_Size > Self.Ceiling - Remaining or else
+        Remaining > Ceiling or else
+        New_Size > Ceiling - Remaining or else
         (Self.Injecting and then Self.Countdown = 0)
       then
          Count_Refusal (Self);
@@ -400,6 +399,11 @@ package body Lua.Storage is
       Self.Ceiling := Bytes;
    end Set_Ceiling;
 
+   procedure Set_Test_Ceiling (Self : in out Owner; Bytes : Byte_Count) is
+   begin
+      Self.Test_Ceiling := (if Bytes = 0 then Byte_Count'Last else Bytes);
+   end Set_Test_Ceiling;
+
    procedure Set_Failure_Countdown
      (Self : in out Owner; Successful_Growths : Byte_Count)
    is
@@ -412,6 +416,11 @@ package body Lua.Storage is
    begin
       Self.Injecting := False;
    end Clear_Failures;
+
+   procedure Fail_Next_Growth (Self : in out Owner) is
+   begin
+      Self.Fail_Next := True;
+   end Fail_Next_Growth;
 
    function Handle (Self : in out Owner) return not null Subpool_Handle is
    begin

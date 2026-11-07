@@ -1,0 +1,41 @@
+{
+  "review_id": "root-cross-review-harness-fixes-2026-11-07",
+  "schema_version": 1,
+  "limits": [
+    "Synthetic binding tests prove validator behavior, not semantic correctness or executed conformance.",
+    "The full 104-operation final matrix, source/API resolution and macOS native sequence remain pending.",
+    "This approves the events reviewer authored harness fixes only; it is not self-review of the original runtime or root-authored warning setup."
+  ],
+  "decision": "accepted-for-harness-behavior",
+  "coverage_authority": false,
+  "implementation_author": "Codex /root/review_events_harness",
+  "sources": [
+    {
+      "path": "scripts/ConformanceReview.psm1",
+      "sha256": "1fe34cd1240fdb85fb479573edf83906d65184a7d8fb36c7a42e877777b3f9b3"
+    },
+    {
+      "path": "scripts/New-ConformanceEquivalent.ps1",
+      "sha256": "8165ced886adfc44a6348846880ff45032783b2c736c36e4026b7ea7b7c6e8b2"
+    },
+    {
+      "path": "scripts/ConformanceMatrix.psm1",
+      "sha256": "b31db395b0e6e6fce3b9842e4737e884db33c5548db28d04af19c141a98526f4"
+    },
+    {
+      "path": "scripts/ConformanceScope.psm1",
+      "sha256": "e3ae80f9f78c33544295807b21e5d4ced11fb99f81efe3f60390a285b544b36e"
+    },
+    {
+      "path": "scripts/test-conformance-review.ps1",
+      "sha256": "5a7ad5a16c5ad1643835c0f92bd8b89b1f9c16bdadb73d07eee63297a0ac2829"
+    }
+  ],
+  "reviewer": "Codex /root",
+  "method": [
+    "Inspected the actual runner/module/matrix changes and negative tests, including exact file hashes, span/replacement/generated identities, independent per-span authorship and matrix report/contract binding.",
+    "Verified actual default and instrumented scoped executions retain distinct probe-run telemetry with five Ada/two C records; parent PID membership and physical shutdown are checked before main execution.",
+    "Caught and corrected the erroneous application of the Ada allocation-refusal counter to the C oracle; Ada events requires a measured refusal, while C retains its different allocator protocol.",
+    "Executed an accepted Windows mapping through the bound generator, independently checked the generated source hash, and inspected the passing synthetic regression outputs."
+  ]
+}

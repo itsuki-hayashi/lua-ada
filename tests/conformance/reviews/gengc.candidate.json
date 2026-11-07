@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "file": "gengc.lua",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_sha256": "5a7a6e525752c97221fbabc4ea4374692e59b3167f6f836d10ceffef16574e03",
+  "author": "Codex",
+  "review_status": "pending",
+  "reviewer": null,
+  "coverage_authority": false,
+  "notes": [
+    "Author analysis of the entire pinned source. No section is independently reviewed or promoted to passing coverage by this document.",
+    "The default early return omits userdata tests, zero-step-size incremental cycles, parameter codification and previous-mode restoration. It also bypasses the T operands of earlier short-circuit assertions.",
+    "Age and color assertions require actual collector inspection, not inferred labels from operation history. Successful preservation of a value does not alone prove its asserted age transition."
+  ],
+  "sections": [
+    {
+      "id": "running-state-and-mode-entry",
+      "first_line": 1,
+      "last_line": 14,
+      "invariant": "Collection is running on entry; explicit full collection succeeds and switching to generational mode returns the previous mode for later restoration.",
+      "byte_offset": 0,
+      "byte_length": 250,
+      "span_sha256": "a8f5c07ebd40d54e935324b1f4aeadcb24c1ef4a03ccac0423e4fedaceae24bc"
+    },
+    {
+      "id": "table-generational-barrier",
+      "first_line": 15,
+      "last_line": 39,
+      "required_adapter": [
+        "gcage"
+      ],
+      "guard": "Values execute in both configurations; exact ages require T",
+      "invariant": "Full collection makes the anchor old. Publishing a new child touches the anchor; two measured steps transition touched1 to touched2 to old and new to survival to old1, retaining the nested value 234.",
+      "byte_offset": 250,
+      "byte_length": 707,
+      "span_sha256": "c90a5c429fef186630fa0e909e984f24e460621fb9b27ffd3f49cfea6ddf53cf"
+    },
+    {
+      "id": "finalizer-enrollment-removes-old-list-member",
+      "first_line": 40,
+      "last_line": 55,
+      "required_adapter": [
+        "gcage"
+      ],
+      "guard": "Collection and enrollment execute in both configurations; exact ages require T",
+      "invariant": "Assigning a new metatable to an old object exercises the forward barrier (old0), then a step produces old1. Enrolling that metatable for finalization changes its collector-list ownership safely before another step. Ada must validate its own list invariants, not claim to possess the C firstold1 pointer layout.",
+      "byte_offset": 957,
+      "byte_length": 600,
+      "span_sha256": "a8bd70ddc7a50859af7ace2ce58088b30dd5c48d4a4f4d3f90d03642c1bb1f12"
+    },
+    {
+      "id": "old1-finalizer-resurrection",
+      "first_line": 56,
+      "last_line": 82,
+      "required_adapter": [
+        "gcage"
+      ],
+      "guard": "Finalizer executes in both configurations; age assertions require T",
+      "invariant": "A survival object with a new metatable is finalized as old1. Its finalizer resurrects it in an old anchor, drops its local reference, requests collection reentrantly and prints the retained metatable marker. Completion must include that callback output and its internal assertions.",
+      "byte_offset": 1557,
+      "byte_length": 951,
+      "span_sha256": "fc912c48fa15116e2e4cf7c000967d696480261b79e789b0965268a8d9f5800b"
+    },
+    {
+      "id": "coroutine-open-cell-and-old-table-barriers",
+      "first_line": 83,
+      "last_line": 108,
+      "invariant": "A captured coroutine cell survives one young collection, receives a new table through resume, and remains reachable through an exported closure after the coroutine reference is dropped. Two later collections preserve both its value 123 and a separately published child of an old table.",
+      "byte_offset": 2508,
+      "byte_length": 804,
+      "span_sha256": "cb25c10e4f8f788e3f9eac1bc9b9742ed0118392591e6c6eccd28bbb94ad6dd7"
+    },
+    {
+      "id": "all-weak-table-revisitation",
+      "first_line": 109,
+      "last_line": 125,
+      "required_adapter": [
+        "gcage",
+        "gccolor"
+      ],
+      "guard": "Weak clearing executes in both configurations; actual color/age assertions require T",
+      "invariant": "An old all-weak table becomes touched1/gray on publication, touched2/black after a minor step, and old after another. A subsequent weak child is collected by the next step, detecting a stale gray state that would prevent the required barrier.",
+      "byte_offset": 3312,
+      "byte_length": 749,
+      "span_sha256": "82925843f081b7a0d4a55abf08a525ff626164fdc27c4565c2434f0a4c4602f1"
+    },
+    {
+      "id": "default-early-return",
+      "first_line": 126,
+      "last_line": 133,
+      "guard": "T absent",
+      "invariant": "Default execution prints the exact omission and OK, then returns before every later section. This is an omission witness, never evidence for userdata, zero-step-size, parameter-codification or restoration obligations.",
+      "byte_offset": 4061,
+      "byte_length": 165,
+      "span_sha256": "a43fedb5179d09da967a64cb6dff344506639d29a26d698636051c3b035fbbec"
+    },
+    {
+      "id": "userdata-uservalue-barrier",
+      "first_line": 134,
+      "last_line": 160,
+      "guard": "Only reached with T",
+      "required_adapter": [
+        "newuserdata",
+        "gcage"
+      ],
+      "invariant": "A real zero-byte full userdata with one uservalue follows old to touched1 to touched2 to old while its newly installed table follows new to survival to old1. The nested value remains 234 after both measured steps.",
+      "byte_offset": 4226,
+      "byte_length": 795,
+      "span_sha256": "d679406e72823c090f523649590b1784c59388ffa09d8b5b0e6db8968de6c62f"
+    },
+    {
+      "id": "running-state-and-zero-step-size",
+      "first_line": 161,
+      "last_line": 179,
+      "guard": "Only reached with T, including statements without an explicit T guard",
+      "invariant": "Collection is still running. Setting stepsize to zero and entering incremental mode preserves the parameter; each of two steps completes a whole cycle. Restoring the saved stepsize returns the original measured parameter.",
+      "byte_offset": 5021,
+      "byte_length": 477,
+      "span_sha256": "1fd49ed334c0b2a90d4c4c42ace4b7c6ce3073e0fa83a2982abb1d1e73584373"
+    },
+    {
+      "id": "production-parameter-codification",
+      "first_line": 180,
+      "last_line": 192,
+      "guard": "T present and earlier early return not taken",
+      "required_adapter": [
+        "codeparam",
+        "applyparam"
+      ],
+      "invariant": "The real production encoding/application is exercised for all 8 percentages and 8 integer values (64 combinations), with absolute error bounded by ten percent of the integer exact result plus one.",
+      "byte_offset": 5498,
+      "byte_length": 534,
+      "span_sha256": "a4ee3284b8c14fcefbd7250e4df96d938db30776faa58abd6079e96fea8707b0"
+    },
+    {
+      "id": "previous-mode-restoration-and-completion",
+      "first_line": 193,
+      "last_line": 196,
+      "guard": "Only reached with T",
+      "invariant": "The saved previous mode is accepted for restoration before final OK. This final marker is distinct from the default early-return marker.",
+      "byte_offset": 6032,
+      "byte_length": 38,
+      "span_sha256": "16bfecefcb8f493baabc48c08ae9b91f1fce6a9da3fe8159d75267257741eb25"
+    }
+  ]
+}

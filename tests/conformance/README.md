@@ -159,6 +159,107 @@ Header guards do not qualify. A reason string alone cannot waive a public API.
 
 ## Checks
 
+Author semantic candidates are available for [events](reviews/events.candidate.json),
+[gc](reviews/gc.candidate.json), [gengc](reviews/gengc.candidate.json) and
+[files](reviews/files.candidate.json). Their contiguous hashed spans identify
+dynamic callbacks, generated code, silent T guards, early returns and shutdown
+obligations. They carry no coverage authority and are not independent reviews.
+Reviewers must reconcile these candidates with the original source, actual
+per-context observations and equivalent counterparts before resolving the ledger.
+
+The [scoped API author candidate](reviews/api.candidate.json) assigns all
+77 selected header anchors to 11 semantic groups, with source-hashed existing
+test cases and explicit review limits. In particular, synchronous callk/pcallk
+cases do not establish yieldable continuations, and parameter round-trip tests
+do not alone establish collector parameter semantics. This candidate has no
+coverage authority; independent review must connect actual execution evidence
+to each applicable invariant before resolving any scoped API record.
+
+The named scope [gc-io-events](scopes/gc-io-events.json) selects events.lua,
+files.lua, gc.lua and gengc.lua, including every original anchor and subsequent
+reviewed block in those partitions, plus 77 directly exercised public API
+entries. Their separate scoped API ledger preserves the original header anchors
+while requiring reviewed behavioral invariants; it does not promote the global
+C API records or certify unrelated continuation paths. Its selection review
+remains pending. Scope validation first runs
+the full structural inventory check; unrelated missing or corrupt entries
+cannot be hidden by choosing this scope. The scope requires subprocess, stdio,
+temporary-file and platform-counterpart facilities. Unrelated interactive CLI
+and native-module prerequisites remain full-M3 gates.
+
+```text
+pwsh -NoProfile -File scripts/check-conformance-scope.ps1
+pwsh -NoProfile -File scripts/test-conformance-scope.ps1
+pwsh -NoProfile -File scripts/check-conformance-scope.ps1 -RequireScopedComplete
+```
+
+The last command requires independent selection review and resolved coverage
+through all applicable contexts. It currently rejects incomplete coverage.
+It never sets full M3 completion. The 35 scoped inventory/process regressions
+also check out-of-scope corruption, missing files/APIs, self-review, unresolved
+runtime obligations, early returns, GC closure ordering, final files output,
+physical shutdown, leaked blocks and wrong configurations.
+The file completion gate requires IO, flush, large-file, subprocess and date
+witnesses in addition to the final date/version, rejects temporary-file skips,
+and requires the instrumented partial-write witness. Instrumented gengc must
+reach the stop-the-world tests after its default early-return boundary.
+
+run-conformance.ps1 accepts -Scope gc-io-events in File mode. The actual
+conformance launcher supports --conformance-config; both bare lua and the
+executable selected through arg must reproduce that measured handshake. Scoped
+runs retain the 900-second/2 GiB policy, upstream source hashes and balanced
+shutdown telemetry. -RequireScopedAcceptance requires an independently reviewed
+-AcceptanceContract and -Context, plus the complete scoped ledger. Its report
+sets scoped_operation_acceptance separately from gate_acceptance (full M3),
+which stays false. One accepted operation does not certify the other files or
+contexts: final batch acceptance still requires the complete matrix evidence.
+
+`scripts/check-conformance-matrix.ps1 -Manifest <matrix.json>` reconciles all
+104 file/context operations (four files times 26 contexts), with paired C and
+Ada reports. `-RequireScopedAcceptance` additionally requires the resolved
+scoped ledger, independently reviewed contracts and reconciliation, and a clean
+checkout at the reports' exact revision. It never sets full-M3 acceptance.
+Without that switch the result is diagnostic, even when every artifact validates.
+
+The matrix manifest has `schema_version: 1`, `scope: "gc-io-events"`, a full
+`revision`, a `review` object (`status: "accepted"`, `author`, `reviewer`, `artifact`,
+`rationale`), and `operations`. Each operation identifies `file`, `context`,
+`c` and `ada` report objects (`report`, `sha256`, `artifact_root`), and an
+acceptance `contract` (`path`, `sha256`). Paths are relative to the manifest.
+Each artifact root retains the CI `reports/` subtree. The verifier rebases
+captured paths across hosts, rehashes output, telemetry and equivalent sources,
+replays completion/acceptance checks, and rejects missing or duplicate pairs.
+The actual parent/bare-lua/arg-child configuration captures must agree. Compiled
+runtime and launcher profiles and launcher library type must match the context;
+the reported native host must also match. Recorded binary/library hashes remain
+part of the evidence reviewed for provenance.
+
+`scripts/test-conformance-matrix.ps1` uses explicitly synthetic bundles to test
+reconciliation and rejection. Those fixtures confer no execution or acceptance
+authority. No complete accepted real matrix has yet been recorded.
+
+scripts/check-files-scoped.ps1 runs files.lua through this same operation/report
+path in both configurations. POSIX selects the original source; Windows selects
+the explicit native-platform candidate and builds only its required native
+fixtures, recording source and artifact hashes. Parent and child allocator
+records are validated separately. Independent native-counterpart runners remain
+in the pipeline. macOS uses a separate native-platform candidate for its unavailable
+`/dev/full`. Its named buffered-failure counterpart runs before the equivalent
+in the same measured C/Ada state; the original POSIX nonblocking-write block
+still executes when T is present. This candidate is not reviewed acceptance.
+
+Both runners measure parent, bare-lua and arg-child settings;
+scripts/test-conformance-launcher.ps1 rejects a wrong requested configuration
+and a real C executable reached through ambient lookup from an Ada parent.
+The main runner also rejects Ada identity when a C baseline was requested.
+
+-EquivalentManifest identifies a source-hashed replacement execution and its
+disposition. -AllowUnreviewedEquivalent permits diagnostic observations only;
+it cannot be combined with acceptance. Accepted equivalent executions must
+identify their exact manifest and executed-source hashes in the review contract.
+Default T omissions remain explicit and require resolved instrumented coverage
+links before acceptance; matching observed omissions alone do not close them.
+
 Run from the repository root in PowerShell 7:
 
 ```text

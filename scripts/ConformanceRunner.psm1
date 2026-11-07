@@ -224,6 +224,14 @@ function Test-ConformanceConfiguration {
          $Observed.test_adapter -cne ($Configuration -eq 'upstream-test'))) {
         throw 'Ada configuration probe does not identify the actual runtime/test adapter'
     }
+      if ($Target -eq 'ReferenceC' -and
+          (-not $Observed.Contains('implementation') -or
+           $Observed.implementation -cne 'C Lua' -or
+           -not $Observed.Contains('test_adapter') -or
+           $Observed.test_adapter -isnot [bool] -or
+           $Observed.test_adapter -cne ($Configuration -eq 'upstream-test'))) {
+          throw 'C configuration probe does not identify the pinned oracle/test adapter'
+      }
     return $true
 }
 
@@ -332,6 +340,17 @@ function Test-ConformanceAcceptance {
                 $record.kind -notin @('assert-call','reviewed-block') -or
                 @($record.evidence | Where-Object { $_.result -ceq 'passed' }).Count -eq 0) {
                 throw "Omission lacks executed runtime coverage: $id"
+            }
+            # A T-absent process cannot discharge another T-absent process's
+            # omission. Require actual instrumented evidence for the linked
+            # invariant; exact omitted-body membership remains independently
+            # reviewed in the source-bound execution contract.
+            if ($skip.message -match 'testC not active' -and
+                @($record.evidence | Where-Object {
+                    $_.result -ceq 'passed' -and
+                    $_.context -cmatch '^upstream-test/(?:(?:windows|linux|macos)/validation/(?:static|shared)|windows/validation/static-pic)$'
+                }).Count -eq 0) {
+                throw "T omission lacks instrumented runtime coverage: $id"
             }
         }
     }

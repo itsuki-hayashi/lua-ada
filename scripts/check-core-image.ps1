@@ -4,7 +4,8 @@ param(
     [ValidateSet('development', 'validation', 'release')]
     [string] $Profile = 'validation',
     [ValidateSet('default', 'upstream-test')]
-    [string] $Configuration = 'default'
+    [string] $Configuration = 'default',
+    [switch] $UseExistingRuntime
 )
 
 $ErrorActionPreference = 'Stop'
@@ -66,6 +67,10 @@ function Invoke-Consumer {
     [IO.File]::WriteAllText((Join-Path $reportDirectory "$Name.stderr"), $stderr)
     $record = [ordered]@{ name = $Name; executable = $Executable;
         executable_sha256 = (Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant();
+        stdout = (Join-Path $reportDirectory "$Name.stdout");
+        stdout_sha256 = (Get-FileHash -LiteralPath (Join-Path $reportDirectory "$Name.stdout") -Algorithm SHA256).Hash.ToLowerInvariant();
+        stderr = (Join-Path $reportDirectory "$Name.stderr");
+        stderr_sha256 = (Get-FileHash -LiteralPath (Join-Path $reportDirectory "$Name.stderr") -Algorithm SHA256).Hash.ToLowerInvariant();
         exit_code = $process.ExitCode; timed_out = $timedOut;
         profile = $Profile; library_type = $LibraryType;
         configuration = $Configuration;
@@ -87,6 +92,14 @@ function Invoke-Consumer {
 
 try {
     Set-Location $projectRoot
+    # Bind captured cases to the source tree that produced this campaign.
+    # Dirty runs remain useful diagnostics but cannot supply final acceptance.
+    $repositoryRevision = (& git rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot identify consumer source revision' }
+    $repositoryChanges = @(& git -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal)
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect consumer source state' }
+    $referenceRevision = (& git -C references/lua rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot identify consumer reference revision' }
     $adaRuntimeDirectory = ''
     if ($IsMacOS) {
         $runtime = Get-SelectedAdaRuntime
@@ -97,11 +110,22 @@ try {
     }
     # Select the requested generated profile through Alire, never by editing
     # generated configuration. All subsequent projects import this same root.
-    Invoke-Build (@('-n', 'build', "--$Profile", '--') + $scenarios)
-    Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/consumer.gpr', '-p') + $scenarios)
-    Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/image_consumer.gpr', '-p') + $scenarios)
-
     $runtimeDirectory = Join-Path $projectRoot "lib/$configurationPart$Profile/$LibraryType"
+    if (-not $UseExistingRuntime) {
+        Invoke-Build (@('-n', 'build', "--$Profile", '--', '-XLUA_ADA_PREBUILT=false') + $scenarios)
+    }
+    $imageName = if ($LibraryType -ne 'relocatable') { 'liblua.a' }
+        elseif ($IsWindows) { 'liblua.dll' } elseif ($IsMacOS) { 'liblua.dylib' } else { 'liblua.so' }
+    $imagePath = Join-Path $runtimeDirectory $imageName
+    $inputHash = (Get-FileHash -LiteralPath $imagePath).Hash
+    # The consumers import the already compiled SAL. A fresh gprlib bind would
+    # give the C cases another archive/shared object even at the same revision.
+    $consumerScenarios = $scenarios + @('-XLUA_ADA_PREBUILT=true')
+    Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/consumer.gpr', '-p') + $consumerScenarios)
+    Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/image_consumer.gpr', '-p') + $consumerScenarios)
+    if ((Get-FileHash -LiteralPath $imagePath).Hash -cne $inputHash) {
+        throw 'Consumer build changed the selected runtime image'
+    }
     $env:PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $savedPath
     $env:LD_LIBRARY_PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $savedLdPath
     $env:DYLD_LIBRARY_PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $adaRuntimeDirectory + $savedDyldPath
@@ -118,6 +142,59 @@ try {
         Write-Output "PASS: shared lua PE unwind table ($($dllUnwind.Entries) entries)"
     }
     Invoke-Consumer 'c-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/c_api_consumer$suffix") 'PASS: real Ada C API bootstrap consumer'
+    Invoke-Consumer 'gc-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/gc_api_contract$suffix") 'PASS: public GC contract'
+    Invoke-Consumer 'io-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/io_api_contract$suffix") 'PASS: public IO/OS contract'
+    # Compile the identical public-header contract against the isolated pinned
+    # C library. No reference object is linked into either Ada consumer.
+    Invoke-Build @('exec', '--', 'gprbuild', '-P', 'experiments/conformance/reference.gpr', '-p', "-XLUA_CONFORMANCE_CONFIGURATION=$Configuration")
+    $referenceDirectory = Join-Path $projectRoot "build/conformance/$Configuration/lib"
+    $referenceConsumer = Join-Path $reportDirectory "gc-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/gc_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceConsumer)
+    $referenceIOConsumer = Join-Path $reportDirectory "io-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/io_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceIOConsumer)
+    $adaExecutionPath = $env:PATH
+    $adaExecutionLdPath = $env:LD_LIBRARY_PATH
+    $adaExecutionDyldPath = $env:DYLD_LIBRARY_PATH
+    try {
+        $env:PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:PATH
+        $env:LD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
+        $env:DYLD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:DYLD_LIBRARY_PATH
+        Invoke-Consumer 'gc-oracle' $referenceConsumer 'PASS: public GC contract'
+        Invoke-Consumer 'io-oracle' $referenceIOConsumer 'PASS: public IO/OS contract'
+    } finally {
+        $env:PATH = $adaExecutionPath
+        $env:LD_LIBRARY_PATH = $adaExecutionLdPath
+        $env:DYLD_LIBRARY_PATH = $adaExecutionDyldPath
+    }
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'gc-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'gc-oracle.stdout'))) {
+        throw 'C/Ada public GC contract output differs'
+    }
+    Write-Output 'PASS: identical public GC contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'io-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'io-oracle.stdout'))) {
+        throw 'C/Ada public IO/OS contract output differs'
+    }
+    Write-Output 'PASS: identical public IO/OS contract against C and Ada'
+    $referenceLibraries = @(Get-ChildItem -LiteralPath $referenceDirectory -File |
+        Where-Object { $_.Name -match '^libconformance_lua\.(dll|so(\.[0-9.]+)?|dylib)$' } |
+        ForEach-Object { [ordered]@{ file=$_.Name;
+            sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() } })
+    if ($referenceLibraries.Count -eq 0) { throw 'Reference GC library hash is missing' }
+    $contractSources = @(foreach ($name in @('gc_api_contract.c', 'gc_contract.h', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
+    $ioContractSources = @(foreach ($name in @('io_api_contract.c', 'io_contract.h', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
     Invoke-Consumer 'c-startup' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/c_image_client$suffix") 'CORE IMAGE C STARTUP OK'
     # Old ignored products can remain after the library rename. Hash only the
@@ -128,9 +205,24 @@ try {
         [ordered]@{ file = $_.Name; sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
     if ($libraries.Count -eq 0) { throw 'Selected root lua image is absent' }
+    if ((Get-FileHash -LiteralPath $imagePath).Hash -cne $inputHash) {
+        throw 'Consumer execution changed the selected runtime image'
+    }
     [ordered]@{ profile = $Profile; library_type = $LibraryType;
+        repository_revision = $repositoryRevision;
+        repository_dirty = ($repositoryChanges.Count -ne 0);
+        platform = $(if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' });
+        reference_revision = $referenceRevision;
+        consumer_sources = @(foreach ($name in @('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'consumer_allocator.h')) {
+            [ordered]@{ file="c_api/tests/$name";
+                sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+        });
         configuration = $Configuration; consumers = $records.ToArray();
-        library_files = $libraries } | ConvertTo-Json -Depth 6 |
+        library_files = $libraries;
+        gc_contract = [ordered]@{ matching_output=$true; sources=$contractSources;
+            reference_library_files=$referenceLibraries };
+        io_contract = [ordered]@{ matching_output=$true; sources=$ioContractSources;
+            reference_library_files=$referenceLibraries } } | ConvertTo-Json -Depth 6 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8
     Write-Output 'PASS: one production interpreter image; Ada/C state, pool, allocator and startup checks'
 }

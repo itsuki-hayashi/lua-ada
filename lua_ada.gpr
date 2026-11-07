@@ -5,6 +5,12 @@ library project Lua_Ada is
    type Library_Type is ("static", "static-pic", "relocatable");
    Library_Mode : Library_Type :=
      external ("LUA_ADA_LIBRARY_TYPE", "static");
+   --  A conformance campaign builds the runtime once before linking its
+   --  independent hosts. Imported projects must not rebind or replace that
+   --  image: executable and allocation evidence refers to its exact bytes.
+   type Build_Choice is ("false", "true");
+   Prebuilt : Build_Choice := external ("LUA_ADA_PREBUILT", "false");
+   for Externally_Built use Prebuilt;
    Configuration_Subdir := Runtime_Configuration.Artifact_Subdir;
    Tasking_Runtime_Archive :=
      external ("LUA_ADA_TASKING_RUNTIME_ARCHIVE", "");
@@ -71,6 +77,8 @@ library project Lua_Ada is
       "lua_ada_boundary.c",
       "lua_ada_host_numerics.c",
       "lua_ada_streams.c",
+      "lua_ada_os.c",
+      "lua_ada_locales.c",
       "lua_ada_config.ads",
       "lua-c_api.ads",
       "lua-big_naturals.ads",
@@ -83,17 +91,22 @@ library project Lua_Ada is
       "lua-engine-core_libraries.ads",
       "lua-engine-foreign.ads",
       "lua-engine-finalizers.ads",
+      "lua-engine-garbage_collection.ads",
       "lua-engine-format_drivers.ads",
+      "lua-engine-file_resources.ads",
       "lua-engine-formats.ads",
       "lua-engine-inspection.ads",
+      "lua-engine-io_libraries.ads",
       "lua-engine-loaders.ads",
       "lua-engine-machine.ads",
       "lua-engine-mathematics.ads",
+      "lua-engine-operating_system.ads",
       "lua-engine-packing.ads",
       "lua-engine-pattern_drivers.ads",
       "lua-engine-patterns.ads",
       "lua-engine-strings.ads",
       "lua-engine-stacks.ads",
+      "lua-engine-system_results.ads",
       "lua-engine-sorting.ads",
       "lua-engine-table_drivers.ads",
       "lua-engine-tables.ads",
@@ -108,6 +121,8 @@ library project Lua_Ada is
       "lua-number_parsing.ads",
       "lua-opcodes.ads",
       "lua-platform_mathematics.ads",
+      "lua-platform_locales.ads",
+      "lua-platform_os.ads",
       "lua-platform_numerics.ads",
       "lua-platform_streams.ads",
       "lua-prototypes.ads",

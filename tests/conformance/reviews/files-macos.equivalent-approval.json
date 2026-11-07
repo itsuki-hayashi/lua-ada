@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "kind": "equivalent-approval",
+  "date": "2026-11-07",
+  "author": "Codex",
+  "reviewer": "/root/review_files",
+  "decision": "accepted",
+  "scope_limit": "Semantic approval of five native replacement spans only; corrected complete Mac C/Ada and final contexts remain pending.",
+  "equivalent": {
+    "id": "files-macos-platform",
+    "source": "references/lua/testes/files.lua",
+    "source_sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86",
+    "configuration": "default-and-upstream-test",
+    "platform": "macos",
+    "disposition": "native-platform-equivalent",
+    "generated_sha256": "7834b8f4a18cfd151f8ed895b0a36f1fa9805d05e8e682e8cbda472e43e94731"
+  },
+  "decisions": [
+    {
+      "id": "macos-buffered-flush-failure",
+      "start_byte": 12613,
+      "length_bytes": 35,
+      "source_sha256": "48c1e51d8186351c111dc276508073d24cb07b63914ed3bf615708157ae638f3",
+      "replacement_sha256": "c24a32d368ee7d083ed42b3db45377418ce79572ba43e64b608a3cb01e492dd8",
+      "author": "Codex",
+      "reviewer": "/root/review_files",
+      "decision": "accepted",
+      "rationale": "Real readonly descriptor preserves the same public FILE/closer/default stream while causing repeated buffered flush failure. C captured native counterpart executes first write/flush/second write/flush/close and ownership checks.",
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/macos-buffered-failure.lua",
+          "sha256": "22136fa45b3968b8e18ce34954366347cc17aa82d33c340c6886f591274f3404"
+        }
+      ],
+      "review_evidence": {
+        "path": "tests/conformance/reviews/files-macos.semantic-cross-review.json",
+        "sha256": "f6ada4bf2603fd7b976f177192d76ececb940ffa7347d0776a959bae66655c96"
+      }
+    },
+    {
+      "id": "macos-buffered-close-error",
+      "start_byte": 12850,
+      "length_bytes": 20,
+      "source_sha256": "04b6b13c7f7f5a7c690456d62b558f986685082c563b463747259b5cf7f9aa83",
+      "replacement_sha256": "7efc5c5b666ad43fa418fc7ad9d5e901e4a7e648b714ef88cf10fead1f397a54",
+      "author": "Codex",
+      "reviewer": "/root/review_files",
+      "decision": "accepted",
+      "rationale": "Darwin native fclose retries pending buffered bytes and returns error while closing FILE. Replacement requires nil/message/positive errno and closed userdata identity, preserving physical cleanup rather than falsely requiring success.",
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/macos-buffered-failure.lua",
+          "sha256": "22136fa45b3968b8e18ce34954366347cc17aa82d33c340c6886f591274f3404"
+        }
+      ],
+      "review_evidence": {
+        "path": "tests/conformance/reviews/files-macos.semantic-cross-review.json",
+        "sha256": "f6ada4bf2603fd7b976f177192d76ececb940ffa7347d0776a959bae66655c96"
+      }
+    },
+    {
+      "id": "macos-unbuffered-write-refusal",
+      "start_byte": 18977,
+      "length_bytes": 38,
+      "source_sha256": "7fdb6bed4012a83a2546d7b2ec460192054136feae520ddcbb239c8faa842197",
+      "replacement_sha256": "4adb6d2b7a009e95bd12919abd7e7bba0d0245b720419113aafd7b28578b4691",
+      "author": "Codex",
+      "reviewer": "/root/review_files",
+      "decision": "accepted",
+      "rationale": "Same real descriptor supplies unbuffered zero-byte refusal; original following POSIX T.nonblock pipe/receiver path stays untouched. Counterpart checks zero transferred bytes, successful unbuffered close and closed identity.",
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/macos-buffered-failure.lua",
+          "sha256": "22136fa45b3968b8e18ce34954366347cc17aa82d33c340c6886f591274f3404"
+        }
+      ],
+      "review_evidence": {
+        "path": "tests/conformance/reviews/files-macos.semantic-cross-review.json",
+        "sha256": "f6ada4bf2603fd7b976f177192d76ececb940ffa7347d0776a959bae66655c96"
+      }
+    },
+    {
+      "id": "macos-nested-shell-wait",
+      "start_byte": 21302,
+      "length_bytes": 40,
+      "source_sha256": "9a74b20b8b70d7f371dc5e0b5e92875e3b8c1df64f96a3b057d885eeaf893794",
+      "replacement_sha256": "3608ef666319289c3622553ab15fc087cc0ecc74878223ec2f947d574def9127",
+      "author": "Codex",
+      "reviewer": "/root/review_files",
+      "decision": "accepted",
+      "rationale": "Actual C diagnostic reports directHUP=nil,signal,1 and directKILL=nil,signal,9 for both APIs; original nestedHUP returns signal1, whereas explicit outer-shell wait returns exit129. Trailing status/exit keeps outer shell alive, preserving intended nested-child-exit distinction. Three counterpart checks enforce exact triples; no dynamic expected value or broad skip.",
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/macos-shell-status.lua",
+          "sha256": "678fc7a282579e13e54b8d44ad45ae83fde50767878b6c597529cdf2b9b28f69"
+        }
+      ],
+      "review_evidence": {
+        "path": "tests/conformance/reviews/files-macos.semantic-cross-review.json",
+        "sha256": "f6ada4bf2603fd7b976f177192d76ececb940ffa7347d0776a959bae66655c96"
+      }
+    },
+    {
+      "id": "macos-calendar-carry-boundary",
+      "start_byte": 25410,
+      "length_bytes": 119,
+      "source_sha256": "50ded0e203ecb3abb45f9fd4d84e7ecab7fbd9db57270873e93e2f0f6088ff0d",
+      "replacement_sha256": "38cfa256932f4c3a84957977f8d50d6e386db825888e6a7080f7efbbed5c5458",
+      "author": "Codex",
+      "reviewer": "/root/review_files",
+      "decision": "accepted",
+      "rationale": "Observed Darwin max-tm_year seconds60/61 discard day carry and normalize to December31 midnight/00:00:01 instead of rejecting. Counterpart checks exact relative timestamps (-86399/-86398), all normalized/reverse calendar fields, reverse os.time identity, direct next-year exact field rejection and ordinary conversion recovery. This is an explicit native divergence, never an unchanged upstream error-test pass.",
+      "counterparts": [
+        {
+          "path": "tests/conformance/platform/macos-calendar-boundary.lua",
+          "sha256": "204aabc2f5b86f0b99f6ca679e079ea62391b52280e5334f7e7761289e5b97a2"
+        }
+      ],
+      "review_evidence": {
+        "path": "tests/conformance/reviews/files-macos.semantic-cross-review.json",
+        "sha256": "f6ada4bf2603fd7b976f177192d76ececb940ffa7347d0776a959bae66655c96"
+      }
+    }
+  ]
+}

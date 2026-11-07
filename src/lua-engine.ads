@@ -28,6 +28,9 @@ private package Lua.Engine is
    --  distinguishes subsequent uses of a cached frame's stable address.
 
    type Execution_Policy is (Bounded, Lua_Compatible);
+   type Process_Exit_Phase is
+     (No_Process_Exit, Exit_Requested, Closing_Main,
+      Draining_Exit_Finalizers, Exit_Complete);
 
    type Warning_Mode_Kind is
      (No_Warning_Handler, Default_Warnings_Off, Default_Warnings_On,
@@ -117,6 +120,53 @@ private package Lua.Engine is
    type Canonical_Program;
    type Canonical_Program_Access is access Canonical_Program;
    for Canonical_Program_Access'Storage_Pool use Lua.Storage.Pool;
+
+   type Object_Color is (White_0, White_1, Gray, Black);
+   subtype White_Color is Object_Color range White_0 .. White_1;
+   type Object_Age is
+     (New_Age, Survival_Age, Old_0_Age, Old_1_Age, Old_Age,
+      Touched_1_Age, Touched_2_Age);
+   type Gray_Membership is (Not_Queued, Primary_Gray, Revisit_Gray);
+   type Collector_Mode is
+     (Incremental_Mode, Generational_Minor_Mode, Generational_Major_Mode);
+   type Collector_Phase is
+     (Paused, Propagating, Enter_Atomic, Sweeping_Objects,
+      Sweeping_Programs, Finishing_Sweep, Finalizers_Ready);
+   type Collector_Parameter is
+     (Minor_Multiplier, Major_To_Minor, Minor_To_Major,
+      Pause_Ratio, Step_Multiplier, Step_Size);
+   type Collector_Parameters is array (Collector_Parameter) of
+     Interfaces.Unsigned_8;
+   type Age_Heads is array (Object_Age) of Object_Access;
+   type Collector_State is record
+      Mode : Collector_Mode := Incremental_Mode;
+      Phase : Collector_Phase := Paused;
+      Current_White : White_Color := White_0;
+      Gray_Head : Object_Access;
+      Gray_Again : Object_Access;
+      Code_Gray : Prototype_Access;
+      Remembered_Head : Object_Access;
+      Generations : Age_Heads := [others => null];
+      Sweep_Index : Natural := 0;
+      Sweep_End : Natural := 0;
+      Program_Index : Natural := 0;
+      Program_End : Natural := 0;
+      Young_Sweep : Object_Access;
+      Cycle_Is_Minor : Boolean := False;
+      Atomic_Completed : Boolean := False;
+      Emergency : Boolean := False;
+      Cycle_Started_Bytes : Lua.Storage.Byte_Count := 0;
+      Last_Completed_Bytes : Lua.Storage.Byte_Count := 0;
+      Last_Sampled_Bytes : Lua.Storage.Byte_Count := 0;
+      Promoted_Bytes : Lua.Storage.Byte_Count := 0;
+      Major_Baseline_Bytes : Lua.Storage.Byte_Count := 0;
+      Cycle_Marked_Bytes : Lua.Storage.Byte_Count := 0;
+      Work_Units : Lua.Storage.Byte_Count := 0;
+      Parameters : Collector_Parameters := [others => 0];
+      Parameters_Ready : Boolean := False;
+      Debt_Remaining : Long_Long_Integer := 0;
+   end record;
+
 
    type Native_Kind is
      (Print_Function, Assert_Function, Error_Function, Pcall_Function,
@@ -213,6 +263,15 @@ private package Lua.Engine is
       Finalizer_Registered : Boolean := False;
       --  Finalizer ownership links are independent of collector work lists.
       --  Registration is not reachability; pending/current targets are roots.
+      Color : Object_Color := White_0;
+      Age : Object_Age := New_Age;
+      Gray_List : Gray_Membership := Not_Queued;
+      Remembered : Boolean := False;
+      Remembered_Next, Remembered_Previous : Object_Access;
+      Generation_Next, Generation_Previous : Object_Access;
+      Registry_Slot : Natural := 0;
+      Allocation_Bytes : Lua.Storage.Byte_Count := 0;
+      Weak_Seen : Boolean := False;
       Serial : Positive := 1;
       case Kind is
          when Userdata_Object =>
@@ -296,6 +355,8 @@ private package Lua.Engine is
    package Symbol_Names is new Lua.Storage.Vectors (Symbol_Name);
 
    type Prototype is record
+      Color : Object_Color := White_0;
+      Registry_Slot : Natural := 0;
       Canonical_Node : Lua.Prototypes.Prototype_Access;
       Canonical_Owner : Canonical_Program_Access;
       Canonical_Constants : Scalar_Values.Vector;
@@ -318,6 +379,7 @@ private package Lua.Engine is
    end record;
 
    type Canonical_Program is record
+      Color : Object_Color := White_0;
       Model : Lua.Prototypes.Program;
       Wrappers : Canonical_Prototypes.Vector;
       References : Natural := 0;
@@ -500,7 +562,7 @@ private package Lua.Engine is
    type Execution_Phase is (Executing, Closing);
    type Transfer_Kind is
      (No_Transfer, Completed, Lua_Raised, Yielded, Resume_Requested,
-      Close_Requested, Host_Stopped);
+      Close_Requested, Host_Stopped, Process_Stopped);
    type Control_Transfer is record
       Kind : Transfer_Kind := No_Transfer;
       Results : Values.Vector;
@@ -580,6 +642,9 @@ private package Lua.Engine is
       Bounds       : Limits;
       Saved_Bounds : Limits;
       Policy : Execution_Policy := Bounded;
+      Exit_Phase : Process_Exit_Phase := No_Process_Exit;
+      Exit_Code : Interfaces.C.int := 0;
+      Exit_Close_State : Boolean := False;
       Random_Words : Random_State := [others => 0];
       Random_Seeded : Boolean := False;
       Random_Use_32_Bits : Boolean :=
@@ -594,6 +659,13 @@ private package Lua.Engine is
       Main_Context : Context_Access;
       Main_Thread : Object_Access;
       --  Current borrows a context owned by Contexts; it never owns it twice.
+      GC : Collector_State;
+      Heap_Free_Next : Table_Indexes.Vector;
+      Heap_Free_Head : Natural := 0;
+      Live_Objects : Natural := 0;
+      Program_Free_Next : Table_Indexes.Vector;
+      Program_Free_Head : Natural := 0;
+      Live_Programs : Natural := 0;
       Heap         : Objects.Vector;
       Programs     : Prototypes.Vector;
       Foreign_Registry : Object_Access;
@@ -751,6 +823,95 @@ private package Lua.Engine is
    --  Release physical ownership without executing Lua. Explicit Lua-state
    --  closing first drains its callbacks, then selects Lua_State_Close; host
    --  disposal can additionally reclaim first-party native resources.
+   procedure Advance_Collection
+     (State : in out World; Work : Positive; Finished : out Boolean);
+   procedure Step_Collection
+     (State : in out World; Extra_Bytes : Lua.Storage.Byte_Count;
+      Finished : out Boolean);
+   procedure Poll_Collection (State : in out World);
+   procedure Restart_Collection (State : in out World);
+   procedure Set_Collector_Mode
+     (State : in out World; Mode : Collector_Mode);
+   function Encode_Collector_Parameter
+     (Value : Lua.Storage.Byte_Count) return Interfaces.Unsigned_8;
+   function Apply_Collector_Parameter
+     (Encoded : Interfaces.Unsigned_8; Value : Lua.Storage.Byte_Count)
+      return Lua.Storage.Byte_Count;
+   --  Production parameter arithmetic, exposed only beneath private Engine
+   --  so test inspection exercises the same codec as collector controls.
+   function Collector_Parameter_Value
+     (State : in out World; Name : Collector_Parameter;
+      Value : Integer_Value := Integer_Value'First) return Integer_Value;
+   procedure Root_Barrier (State : in out World; Item : Value);
+   procedure Root_Barrier (State : in out World; Item : Object_Access);
+   procedure Root_Barrier (State : in out World; Items : Values.Vector);
+   procedure Root_Barrier
+     (State : in out World; Items : Scalar_Values.Vector);
+   procedure Root_Barrier (State : in out World; Items : Objects.Vector);
+   procedure Write_Barrier
+     (State : in out World; Owner : not null Object_Access; Item : Value);
+   procedure Write_Barrier
+     (State : in out World; Owner : not null Object_Access;
+      Item : Object_Access);
+   procedure Back_Barrier
+     (State : in out World; Owner : not null Object_Access);
+   procedure Code_Barrier
+     (State : in out World; Item : Prototype_Access);
+   procedure Store_Cell
+     (State : in out World; Cell : not null Object_Access; Item : Value);
+   --  Mutate the actual lexical/native upvalue with its forward barrier.
+   --  Explicit publication barriers preserve the active color/generation
+   --  invariant. Raw table writes bypass metamethods, never these barriers.
+   --  Allocation/deallocation has no implicit process-global active world.
+
+   procedure Release_Registered_Program
+     (State : in out World; Item : in out Prototype_Access);
+   --  Private constructor/adoption rollback only. The actual ownership slot
+   --  is detached before releasing the typed prototype and its shared model.
+
+   procedure Request_Process_Exit
+     (State : in out World; Code : Interfaces.C.int;
+      Close_State : Boolean);
+   --  Latch the latest exit request for the iterative scheduler. This
+   --  operation never executes Lua, raises an exit exception, or terminates
+   --  the host process while an Ada activation remains on the native stack.
+
+   procedure Append_Root
+     (State : in out World; Target : in out Values.Vector; Item : Value);
+   procedure Append_Root
+     (State : in out World; Target : in out Values.Vector;
+      Items : Values.Vector);
+   procedure Replace_Root
+     (State : in out World; Target : in out Values.Vector;
+      Index : Positive; Item : Value);
+   procedure Copy_Roots
+     (State : in out World; Target : in out Values.Vector;
+      Source : Values.Vector);
+   --  Publish strong root packets with explicit State and its matching
+   --  allocator. Copy_Roots reserves before clearing, retaining Target's
+   --  capacity/owner; actual self-copy is an allocation-free no-op.
+   procedure Move_Roots
+     (State : in out World; Target, Source : in out Values.Vector);
+   --  Shade before atomic ownership transfer. Source becomes empty and is
+   --  explicitly rebound to State's owner, ready for subsequent growth.
+   --  Buffers/values must belong to this universe; empty unbound inputs are
+   --  accepted only because this call supplies their explicit owner.
+   procedure Append_Object_Edge
+     (State : in out World; Owner : not null Object_Access;
+      Target : in out Objects.Vector; Item : Object_Access);
+   procedure Replace_Object_Edge
+     (State : in out World; Owner : not null Object_Access;
+      Target : in out Objects.Vector; Index : Positive;
+      Item : Object_Access);
+   --  Target is Owner's traced cell/capture vector. Forward ownership
+   --  barriers precede publication, including OLD0 generational promotion.
+
+   procedure Shrink_Context_Storage
+     (State : in out World; Context : not null Context_Access);
+   --  Optional normal-GC/protected-recovery maintenance. Physical arena and
+   --  cached-frame storage is really released through the chosen provider;
+   --  refusal retains the original arenas, bound and overflow phase.
+
    procedure Collect
      (State : in out World; Emergency : Boolean := False);
    --  Mark/sweep sees globals, frames, packets, captures, and current failure.
@@ -868,7 +1029,8 @@ private package Lua.Engine is
    function Read_Local (Scope : Object_Access; Symbol : Positive)
                         return Value;
    procedure Write_Local
-     (Scope : Object_Access; Symbol : Positive; Item : Value);
+     (State : in out World; Scope : Object_Access;
+      Symbol : Positive; Item : Value);
    procedure Declare_Local
      (State : in out World; Scope : Object_Access;
       Symbol : Positive; Item : Value);

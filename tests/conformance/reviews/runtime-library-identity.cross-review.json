@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "kind": "independent-runtime-library-identity-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-build-design-pending-real-context-replay",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "sha256": "12328a871792be77c878c291c6ef5705ef5ac180c3aee7a56a296c14e783c756",
+      "path": "lua_ada.gpr"
+    },
+    {
+      "sha256": "6ecaba2cb213e4eeaa0a4e18de74a676c1950927ea00d7b072f99a76b47b02de",
+      "path": "c_api/consumer.gpr"
+    },
+    {
+      "sha256": "cb44c0cfd951d7b5b7f8784a45492110a7ee1c99214322c151314fce1e3ba1d1",
+      "path": "c_api/image_consumer.gpr"
+    },
+    {
+      "sha256": "84cea400b26c24619c706ada585e76b1e126c943f3ba0bd065172e9358d96b31",
+      "path": "scripts/check-core-image.ps1"
+    },
+    {
+      "sha256": "3b7be34cb68bb3e59db6533e3317274e8013b4b320fca11e704c12dc0258e7f8",
+      "path": "scripts/check.ps1"
+    },
+    {
+      "sha256": "d4f0208208f1c48a1a8394bb200f365c15f5810236b8f638f53b794e8b67ef1c",
+      "path": "scripts/check-instrumented.ps1"
+    }
+  ],
+  "findings": [
+    "Both C consumer GPRs import the same root library project. The prebuilt scenario sets its Externally_Built attribute, leaving configuration/profile/link selection on the existing GPR paths.",
+    "Default pipeline builds root before linking C, CLI and nested tests with the prebuilt scenario. Instrumented pipeline builds the nested tests and their root dependency before linking C consumers with the same scenario.",
+    "Core-image check hashes the selected runtime image before linking, after building both consumer projects and after executing the consumers. Existing matrix replay still compares independently captured runtime names and hashes.",
+    "On 8196b80 both Linux instrumented contexts passed the oracle identity comparison. Each GC and IO C consumer and scoped C events report recorded libconformance_lua.so SHA256 38430b1f9b8084609494b667040999e39bb8b1c4ada886393296d7c346432d76.",
+    "Each runtime-producing command now explicitly selects LUA_ADA_PREBUILT=false. Default and instrumented owner builds and standalone core-image execution override inherited scenario values. Imported hosts select true for the subsequent link."
+  ],
+  "remaining_validation": [
+    "Refresh active API and AUnit review references to changed scripts, then replay fresh clean-context evidence.",
+    "Source inspection only. Serial platform builds and retained hash comparisons supply empirical verification."
+  ],
+  "execution_evidence": []
+}

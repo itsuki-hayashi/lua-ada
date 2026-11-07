@@ -248,6 +248,25 @@ Case 'instrumented configuration cannot omit its test adapter' {
         -Target Ada -AllocatorLimitBytes 67108864L) } catch { $caught = $true }
     Assert-True $caught 'missing adapter accepted'
 }
+Case 'Ada cannot masquerade as the C baseline' {
+    $record = New-Configuration
+    $failure = $null
+    try { [void](Test-ConformanceConfiguration -Observed $record -Configuration default `
+        -Target ReferenceC -AllocatorLimitBytes 67108864L) }
+    catch { $failure = $_.Exception.Message }
+    Assert-True ($failure -ceq 'C configuration probe does not identify the pinned oracle/test adapter') `
+        'Ada identity accepted as C baseline'
+}
+Case 'C instrumented baseline requires its real adapter' {
+    $record = New-Configuration 'upstream-test'
+    $record.implementation='C Lua'; $record.test_adapter=$false
+    $failure = $null
+    try { [void](Test-ConformanceConfiguration -Observed $record -Configuration upstream-test `
+        -Target ReferenceC -AllocatorLimitBytes 67108864L) }
+    catch { $failure = $_.Exception.Message }
+    Assert-True ($failure -ceq 'C configuration probe does not identify the pinned oracle/test adapter') `
+        'C baseline without T accepted as instrumented'
+}
 Case 'profile stack-limit drift fails configuration validation' {
     # An enlarged semantic stack must not be silently introduced just to make a
     # stress assertion pass. Check against the pinned profile's actual limit.
@@ -340,6 +359,33 @@ Case 'omission requires a resolved executed invariant in another context' {
     $fixture.CoverageRecords=@{$id=[ordered]@{status='passed';kind='reviewed-block';
         evidence=@([ordered]@{result='passed'})}}
     Assert-True (Test-ConformanceAcceptance @fixture).gate_acceptance 'executed omission invariant rejected'
+}
+Case 'T omission rejects evidence from a default execution' {
+    $fixture = New-AcceptanceFixture 'default-t-skip' 'Write-Output ">>> testC not active: skipping API tests <<<"; Write-Output "DONE"'
+    $id='LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips=@([ordered]@{message=$fixture.Outcome.skip_messages[0];
+        coverage_ids=@($id); review_artifact='fixture review'; original_c_evidence='fixture baseline'})
+    $fixture.CoverageRecords=@{$id=[ordered]@{status='passed';kind='reviewed-block';
+        evidence=@([ordered]@{result='passed';context='default/windows/validation/static'})}}
+    Assert-AcceptanceRejected $fixture 'default evidence discharged T omission'
+}
+Case 'T omission accepts an instrumented runtime witness' {
+    $fixture = New-AcceptanceFixture 'instrumented-t-skip' 'Write-Output ">>> testC not active: skipping API tests <<<"; Write-Output "DONE"'
+    $id='LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips=@([ordered]@{message=$fixture.Outcome.skip_messages[0];
+        coverage_ids=@($id); review_artifact='fixture review'; original_c_evidence='fixture baseline'})
+    $fixture.CoverageRecords=@{$id=[ordered]@{status='passed';kind='reviewed-block';
+        evidence=@([ordered]@{result='passed';context='upstream-test/windows/validation/static'})}}
+    Assert-True (Test-ConformanceAcceptance @fixture).gate_acceptance 'instrumented T witness rejected'
+}
+Case 'T omission rejects an unsupported instrumented context' {
+    $fixture = New-AcceptanceFixture 'invalid-context-t-skip' 'Write-Output ">>> testC not active: skipping API tests <<<"; Write-Output "DONE"'
+    $id='LUA-SAMPLE-REVIEWED-BLOCK-0001'
+    $fixture.Contract.expected_skips=@([ordered]@{message=$fixture.Outcome.skip_messages[0];
+        coverage_ids=@($id); review_artifact='fixture review'; original_c_evidence='fixture baseline'})
+    $fixture.CoverageRecords=@{$id=[ordered]@{status='passed';kind='reviewed-block';
+        evidence=@([ordered]@{result='passed';context='upstream-test/linux/validation/static-pic'})}}
+    Assert-AcceptanceRejected $fixture 'unsupported context discharged T omission'
 }
 Case 'a child refusal cannot certify parent allocator telemetry' {
     # Inherited environments create several sidecars. Bind the report to its PID

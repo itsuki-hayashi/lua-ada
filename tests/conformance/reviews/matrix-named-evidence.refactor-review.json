@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "independent-named-evidence-refactor-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-source-refactor-and-synthetic-fixtures",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "sha256": "c1e5f2d2866e7545cd7e0143ac3fe9e5bfec6cacb81ff4be7c72583ba3e33d5a",
+      "path": "scripts/ConformanceMatrix.psm1"
+    },
+    {
+      "sha256": "b17ce149ca35006bede7d32ad7545487f1aa081b37fc74fbc41ae4d344ccef3c",
+      "path": "scripts/test-matrix-named-evidence.ps1"
+    },
+    {
+      "sha256": "0e16c67934cc45ac40f33cb8e50014ccd651ac59e16cd5c44711ef208a13a9f2",
+      "path": "scripts/test-conformance-matrix.ps1"
+    }
+  ],
+  "findings": [],
+  "accepted_checks": [
+    "Private Test-MatrixNamedEvidence retains review identities, source completeness, exact API/case sets, capture replay, context completeness and AUnit/consumer library equality.",
+    "Production caller invokes helper only after full scoped completeness, independent matrix binding and clean final-revision checks. Extracting helper does not bypass those acceptance prerequisites.",
+    "Disposable fixtures copy current reviewed source/mapping inputs; rehashing deliberately mutated inner metadata tests substantive rejection rather than stale outer identity alone.",
+    "Twelve cases exercise positive named evidence and independent-review, mapped-source, API/case, oracle-driver, library and platform rejection paths.",
+    "Fixture emits synthetic captures and dummy binary hashes explicitly; no fixture is passed off as actual runtime acceptance. Tests are wired into retained matrix entrypoint."
+  ],
+  "limitations": [
+    "Parent reports12 synthetic cases passed; this reviewer performed source inspection only.",
+    "Per-file runtime/consumer library crosschecks remain in production outer matrix, outside this helper fixture.",
+    "Clean actual evidence and all26-context acceptance remain separate work."
+  ],
+  "execution_evidence": []
+}

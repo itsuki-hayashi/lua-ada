@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "id": "files-macos-platform",
+  "source": "references/lua/testes/files.lua",
+  "source_sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86",
+  "configuration": "default-and-upstream-test",
+  "platform": "macos",
+  "disposition": "native-platform-equivalent",
+  "review": {
+    "status": "accepted",
+    "author": "Codex",
+    "reviewer": "/root/review_files",
+    "artifact": "tests/conformance/reviews/files-macos.equivalent-approval.json",
+    "artifact_sha256": "54698efa32099f7450d0344ce6deb767a9923060719083247cd576650c3d40c9"
+  },
+  "replacements": [
+    {
+      "id": "macos-buffered-flush-failure",
+      "start_byte": 12613,
+      "length_bytes": 35,
+      "start_line": 474,
+      "end_line": 474,
+      "source_sha256": "48c1e51d8186351c111dc276508073d24cb07b63914ed3bf615708157ae638f3",
+      "invariant": "Preserve buffered write, failed native flush, repeated write/flush and close using a real non-writable descriptor; macOS does not provide /dev/full.",
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-buffered-failure.lua"
+      ],
+      "replacement": "  local f = io.output(_test_failing_stream(assert(io.tmpfile())))\n"
+    },
+    {
+      "id": "macos-buffered-close-error",
+      "start_byte": 12850,
+      "length_bytes": 20,
+      "start_line": 479,
+      "end_line": 479,
+      "source_sha256": "04b6b13c7f7f5a7c690456d62b558f986685082c563b463747259b5cf7f9aa83",
+      "invariant": "Darwin retries buffered bytes during fclose and reports the native error while physically closing the FILE; preserve the close result and verify closed ownership.",
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-buffered-failure.lua"
+      ],
+      "replacement": "  local ok, message, code = f:close()\n  assert(ok == nil and type(message) == \"string\" and code > 0)\n  assert(io.type(f) == \"closed file\")\n"
+    },
+    {
+      "id": "macos-unbuffered-write-refusal",
+      "start_byte": 18977,
+      "length_bytes": 38,
+      "start_line": 722,
+      "end_line": 722,
+      "source_sha256": "7fdb6bed4012a83a2546d7b2ec460192054136feae520ddcbb239c8faa842197",
+      "invariant": "Exercise the guarded T block with actual native unbuffered refusal and zero transferred bytes; retain the following real POSIX nonblocking pipe test unchanged.",
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-buffered-failure.lua"
+      ],
+      "replacement": "  local f = _test_failing_stream(assert(io.tmpfile()))\n"
+    },
+    {
+      "invariant": "Preserve direct HUP/KILL signal termination while keeping the outer shell alive to wait for a nested HUP and return exit status129; popen and execute must agree.",
+      "id": "macos-nested-shell-wait",
+      "replacement": "    {\"sh -c 'kill -s HUP $$'; result=$?; exit $result\", \"exit\"},\n",
+      "start_byte": 21302,
+      "length_bytes": 40,
+      "end_line": 801,
+      "source_sha256": "9a74b20b8b70d7f371dc5e0b5e92875e3b8c1df64f96a3b057d885eeaf893794",
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-shell-status.lua"
+      ],
+      "start_line": 801
+    },
+    {
+      "length_bytes": 119,
+      "id": "macos-calendar-carry-boundary",
+      "source_sha256": "50ded0e203ecb3abb45f9fd4d84e7ecab7fbd9db57270873e93e2f0f6088ff0d",
+      "end_line": 927,
+      "replacement": "        dofile('equivalent-macos-calendar-boundary.lua')\n",
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-calendar-boundary.lua"
+      ],
+      "invariant": "Verify observed Darwin seconds-carry normalization at maximum tm_year, direct next-year field rejection, reverse conversion and ordinary conversion recovery.",
+      "start_line": 926,
+      "start_byte": 25410
+    }
+  ]
+}

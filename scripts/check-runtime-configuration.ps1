@@ -29,6 +29,7 @@ $expected = [ordered]@{
     configuration=$Configuration
     configured_stack_slots=$(if ($instrumented) { 68000 } else { 1000000 })
     configured_c_calls=$(if ($instrumented) { 180 } else { 200 })
+    configured_aux_buffer_bytes=$(if ($instrumented) { 23 } else { 1024 })
     compatible_global=(-not $instrumented)
     world_random32=$instrumented
     world_compat_math=$instrumented

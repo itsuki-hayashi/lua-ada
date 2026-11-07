@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "independent-scoped-acceptance-policy-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-source-policy-and-wiring",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "sha256": "92a3b0d7b775d6c6f2771665be79bf727ceb72ac3aa329fecb2650c06f13a98d",
+      "path": "scripts/ScopedAcceptancePolicy.psm1"
+    },
+    {
+      "sha256": "54a3151780cc504eae872d7e4fda5920ec5db415fa930eafe417318bdcd559b4",
+      "path": "scripts/check-gc-events.ps1"
+    },
+    {
+      "sha256": "640b176129ebce5fe723492d5f99760980b1a594664b81354a6dbd5b6184033c",
+      "path": "scripts/check-files-scoped.ps1"
+    },
+    {
+      "sha256": "2908224074333eee4b9c7551ec134e6809a343749b1e32c4d7d3af4575610aac",
+      "path": "scripts/test-scoped-acceptance-policy.ps1"
+    }
+  ],
+  "accepted_checks": [
+    "Structural validation precedes mode selection; only actual pending source/API obligations select diagnostics. Complete candidate ledger must pass RequireScopedComplete and mandatory independently bound full contract index; errors are not caught as diagnostic fallback.",
+    "Contract index enforces unique known file/context pairs and complete cross product, actual contract hashes and approved per-entry identities. Operation/context/reference are checked immediately; full contract semantics are revalidated by runner acceptance.",
+    "Ada acceptance removes ReportOnly and passes selected contract plus RequireScopedAcceptance. C remains diagnostic; unreviewed equivalents are disallowed once acceptance policy activates.",
+    "Wrappers reject missing Ada operation acceptance, retain report/contract identities, and leave aggregate scope acceptance false.",
+    "No self-referential final commit needed: committed execution-contract approval has no own-HEAD dependency; final matrix approval can remain hash-bound under ignored reports."
+  ],
+  "limitations": [
+    "Eleven fixtures cover contract-index identity failures and current-ledger mode. They do not simulate a complete ledger with missing contracts; source inspection verifies that path fails without fallback.",
+    "No runtime execution performed by this reviewer; final26-context acceptance remains pending."
+  ],
+  "execution_evidence": [],
+  "cosmetic_and_diagnostic_delta": {
+    "notes": [
+      "Wrapper summaries now accurately distinguish accepted Ada operations from pending final matrix, and diagnostics from acceptance; flags/checks unchanged.",
+      "Three local calendar tables probe seconds59/60/61 at actual native year boundary through protected os.time. Output records success/error and mutated fields; it does not replace or suppress the subsequent original assertion.",
+      "Only flush is asserted in diagnostic code; no boundary success/failure is promoted to conformance. Fresh locals prevent calendar mutation from changing later source inputs.",
+      "Any prior hash binding to changed diagnostic source must be refreshed through its owning independent review; this delta does not silently alter other approvals.",
+      "Final diagnostic extension protects os.date decoding for each successful timestamp and separately observes direct next-year field input. It logs outcomes without asserting boundary acceptance or altering source assertions.",
+      "Search of equivalent manifests and reviews found no accepted equivalent binding to this diagnostic Lua file; macos-shell-diagnostic.cross-review.json retains historical source review rather than an equivalent approval dependency."
+    ],
+    "reviewer": "Codex /root/review_events_harness",
+    "decision": "accepted",
+    "runtime_acceptance": false,
+    "diagnostic_source": {
+      "path": "tests/conformance/platform/macos-shell-diagnostic.lua",
+      "sha256": "de3592d9c933ec08ab15cbde2737af411f41e00dfc74af6f3a07f38e9c268dd8"
+    }
+  }
+}

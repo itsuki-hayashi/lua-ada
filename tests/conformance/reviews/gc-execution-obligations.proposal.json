@@ -1,0 +1,4676 @@
+{
+  "schema_version": 1,
+  "kind": "gc-execution-obligation-packet-proposal",
+  "author": "Codex independent review agent /root/review_gc",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "bindings": [
+    {
+      "sha256": "90c868e396f05f1709271ae9238a4ade1f3c109154e0683762cb6b1d5fdb85cb",
+      "path": "tests/conformance/coverage/gc.jsonl"
+    },
+    {
+      "sha256": "9f1c9fc1182c5d5992eefa026bc0f4627173c6f25752de70ed7074a603334eeb",
+      "path": "tests/conformance/coverage/gengc.jsonl"
+    },
+    {
+      "sha256": "8165f338c8a64c2ac154673c0e26477f4dfabee7e0153b35c7eb1b9c87dfe963",
+      "path": "tests/conformance/reviews/gc-gengc.anchor-classification-proposal.json"
+    },
+    {
+      "sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e",
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json"
+    },
+    {
+      "sha256": "bf1668acb83299a3dc9107df9c54ecfd25e58dc1dbe524a02fff307b368547c6",
+      "path": "tests/conformance/reviews/gc-ada.equivalent-approval.json"
+    },
+    {
+      "sha256": "8653f8e6c8d73bde9202f507ebdad3911c2e3f5f22fae8415de1b8dd3d6d0f9f",
+      "path": "tests/conformance/reviews/gc-aunit-context-replay.proposal.json"
+    },
+    {
+      "sha256": "ab50bd3e59ccd23032bec865983821e4ae96c0f118de3c511bd9ce89bb3d4372",
+      "path": "scripts/ConformanceScope.psm1"
+    },
+    {
+      "sha256": "cda5cebf49c22e5b1f37560e776bc1506db66ba78a1f4217a59c45b3a9ff4f3e",
+      "path": "scripts/ManagedTelemetry.psm1"
+    },
+    {
+      "sha256": "9f97b86315630bff7fcffb4e95a440992b9f9d0e493572fa28672a32bec79a4b",
+      "path": "tests/c/conformance_adapter.c"
+    }
+  ],
+  "historical_report_bindings": [
+    {
+      "sha256": "4214ce366f94968128ed4f5ccb7117ff5f2c014a07de933dcd15692ebfec5311",
+      "path": "reports/ci-artifacts/810e254-linux-static/reports/gc-events/a1c5581e3b5e47e485a46e9535e2eeb6/Ada-gc.lua.json"
+    },
+    {
+      "sha256": "c508344c78d0c6d4715944d381985dc708272194144635e657e8d432447e3ff6",
+      "path": "reports/ci-artifacts/810e254-linux-static/reports/gc-events/a1c5581e3b5e47e485a46e9535e2eeb6/Ada-gengc.lua.json"
+    },
+    {
+      "sha256": "45678079aed7c42ae10c76a18cdeca5ad031b2f533dcbe82902dde4674ee5406",
+      "path": "reports/ci-artifacts/810e254-linux-static/reports/gc-events/a1c5581e3b5e47e485a46e9535e2eeb6/ReferenceC-gc.lua.json"
+    },
+    {
+      "sha256": "9febaab120750715fedc24701a421352c3dadbb4a5f8c8d9a133252e013a8e9b",
+      "path": "reports/ci-artifacts/810e254-linux-static/reports/gc-events/a1c5581e3b5e47e485a46e9535e2eeb6/ReferenceC-gengc.lua.json"
+    }
+  ],
+  "historical_limit": "810e254 report fields inspected as examples only: reported success with empty stderr is not final evidence; that revision predates scoped warn(@on) hardening.",
+  "common_contract": {
+    "id": "GC-CONTEXT",
+    "immutable_source": "Pinned source hash, generated equivalent hash and accepted replacement approval must match; unchanged C runs and Ada equivalents remain separately labelled.",
+    "configuration": "Actual probe matches requested default/T; _soft and _port unset; T adapter available instrumented, absent default; same implementation children where applicable.",
+    "process": "exit0, no timeout/capture overflow/pipe drain/tree kill failures; 900second limit; complete process exit and retained stdout/stderr hashes.",
+    "stderr": "Exactly empty in both configurations: deliberate T warnings are stored and consumed in _WARN; any emitted warning is a failure.",
+    "telemetry": "schema1; run_id/process_id/configuration match; allocator_limit_bytes2147483648; outstanding_bytes0/outstanding_blocks0; Ada shutdown_complete true/accounting_fault false; C outer allocator must balance.",
+    "default_gc_skip": "Exactly the source omission text: >>> testC not active: skipping userdata GC tests <<<. This never covers T-only blocks13/14/17/21-24/26/28.",
+    "default_gengc_skip": "Exactly the source omission text: >>> testC not active: skipping some generational tests <<<, then OK and return. Blocks8-11 and exact T metadata12-15 need instrumented evidence.",
+    "instrumented_skips": "No testC-not-active or other skip/omission output allowed.",
+    "gc_stdout": "Require entry marker, steps, creating many objects, functions with errors, long strings, clearing tables, weak tables, long list, self-referenced threads, exact OK then later exact >>> closing state <<<. Instrumented additionally emergency collections and testing stack issues when calling finalizers.",
+    "gengc_stdout": "Require testing generational garbage collection and exact OK; instrumented additionally testing stop-the-world collection. Callback metatable output and source-reachable assertions remain reviewed paths, not arbitrary process success.",
+    "instrumented_gc_shutdown_count": "Same-process post-close telemetry expected_finalizer_warnings must be numeric int/int64 exactly10 for both C and Ada instrumented gc.lua; require existing ordered OK/closing marker and balanced shutdown too."
+  },
+  "witness_class_rules": {
+    "measured-storage-or-AUnit": "Actual runtime measurement assertions and source-bound named AUnit evidence; aggregate case count insufficient.",
+    "warning-observed-callback": "Warnings enabled before source; intentional store phases and exact _WARN assertions reviewed; unexpected warning negative tests must pass.",
+    "T-only": "Instrumented actual adapter and no omission; default cannot promote this body.",
+    "Ada-equivalent-span": "Accepted mapping and exact replacement span/hash plus named counterpart AUnit replay; never classify as unchanged execution.",
+    "dynamic-invocations": "Execute every prescribed helper/loop/generated call including64parameter pairs and actual loaded chunks.",
+    "state-close": "OK alone insufficient; later closing marker plus complete shutdown and allocator balance, with closure-order/count evidence below.",
+    "whole-file-semantic-audit": "All child obligations resolved with per-context evidence and accepted crossreview; cannot promote via single process record.",
+    "source-path-assertions": "Source/control-flow review plus full successful witness contract, without early return bypassing anchor."
+  },
+  "packets": [
+    {
+      "id": "LUA-GC-MANUAL-AUDIT-0001",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 19650,
+        "sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+        "byte_offset": 0
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "inventory review only",
+        "upstream_test": "inventory review only",
+        "phase": "non-execution audit"
+      },
+      "invariant": "Review the entire pinned file including all original anchors, generated source, invoked helper bodies, nested callbacks, short-circuit T operands, early returns and shutdown obligations; runtime acceptance remains separate.",
+      "witness_classes": [
+        "whole-file-semantic-audit",
+        "Ada-equivalent-span",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [
+        "measure-live-payloads",
+        "reclaim-payloads",
+        "stable-cell-color",
+        "measured-emergency-headroom"
+      ],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0001",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 142
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection starts running; mode changes return the actual prior mode, including repeated requests. Pause and step multiplier controls accept the eight tested values through 0x7ffffffe across their nested combinations, perform requested steps safely, and restore saved controls. Original assertion site: assert(collectgarbage(\"isrunning\"))",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0002",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 290
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection starts running; mode changes return the actual prior mode, including repeated requests. Pause and step multiplier controls accept the eight tested values through 0x7ffffffe across their nested combinations, perform requested steps safely, and restore saved controls. Original assertion site: assert(collectgarbage(\"generational\") == \"incremental\")",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0003",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 346
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection starts running; mode changes return the actual prior mode, including repeated requests. Pause and step multiplier controls accept the eight tested values through 0x7ffffffe across their nested combinations, perform requested steps safely, and restore saved controls. Original assertion site: assert(collectgarbage(\"generational\") == \"generational\")",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0004",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 403
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection starts running; mode changes return the actual prior mode, including repeated requests. Pause and step multiplier controls accept the eight tested values through 0x7ffffffe across their nested combinations, perform requested steps safely, and restore saved controls. Original assertion site: assert(collectgarbage(\"incremental\") == \"generational\")",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0005",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 459
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection starts running; mode changes return the actual prior mode, including repeated requests. Pause and step multiplier controls accept the eight tested values through 0x7ffffffe across their nested combinations, perform requested steps safely, and restore saved controls. Original assertion site: assert(collectgarbage(\"incremental\") == \"incremental\")",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0006",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 808
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection starts running; mode changes return the actual prior mode, including repeated requests. Pause and step multiplier controls accept the eight tested values through 0x7ffffffe across their nested combinations, perform requested steps safely, and restore saved controls. Original assertion site: assert(collectgarbage(\"param\", \"pause\") == 100)",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0007",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 858
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection starts running; mode changes return the actual prior mode, including repeated requests. Pause and step multiplier controls accept the eight tested values through 0x7ffffffe across their nested combinations, perform requested steps safely, and restore saved controls. Original assertion site: assert(collectgarbage(\"param\", \"stepmul\") == 100)",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0008",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 1655
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "After allocating reachable and discarded tables, explicit steps complete a cycle and reduce actual live memory. With automatic collection stopped and _port unset, size 10 completes in fewer steps than size 2. Automatic collection is restarted. Original assertion site: assert(gcinfo() < x)",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0009",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 1768
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "After allocating reachable and discarded tables, explicit steps complete a cycle and reduce actual live memory. With automatic collection stopped and _port unset, size 10 completes in fewer steps than size 2. Automatic collection is restarted. Original assertion site: assert(dosteps(10) < dosteps(2))",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0010",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 2141
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "GC1 and GC2 each allocate tables, strings and closures until an unreachable table's finalizer runs. A neighboring live stack table remains intact. These helpers are invoked by later ephemeron tests; merely compiling their bodies is insufficient. Original assertion site: assert(b[1] == 34)   -- 'u' was collected, but 'b' was not",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0011",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 2360
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "GC1 and GC2 each allocate tables, strings and closures until an unreachable table's finalizer runs. A neighboring live stack table remains intact. These helpers are invoked by later ephemeron tests; merely compiling their bodies is insufficient. Original assertion site: assert(b[1] == 34)   -- 'u' was collected, but 'b' was not",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0012",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 2562
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "GC1 and GC2 each allocate tables, strings and closures until an unreachable table's finalizer runs. A neighboring live stack table remains intact. These helpers are invoked by later ephemeron tests; merely compiling their bodies is insufficient. Original assertion site: assert(b[1] == 34)   -- 'u' was collected, but 'b' was not",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0013",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 2796
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "GC1 and GC2 each allocate tables, strings and closures until an unreachable table's finalizer runs. A neighboring live stack table remains intact. These helpers are invoked by later ephemeron tests; merely compiling their bodies is insufficient. Original assertion site: assert(b[1] == 34)   -- 'u' was collected, but 'b' was not",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0014",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 3019
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "GC1 and GC2 each allocate tables, strings and closures until an unreachable table's finalizer runs. A neighboring live stack table remains intact. These helpers are invoked by later ephemeron tests; merely compiling their bodies is insufficient. Original assertion site: assert(b[1] == 34)   -- 'u' was collected, but 'b' was not",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0015",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 3225
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "GC1 and GC2 each allocate tables, strings and closures until an unreachable table's finalizer runs. A neighboring live stack table remains intact. These helpers are invoked by later ephemeron tests; merely compiling their bodies is insufficient. Original assertion site: assert(b[1] == 34)   -- 'u' was collected, but 'b' was not",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0016",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 3697
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Five thousand table/string iterations and five thousand dynamically loaded function definitions complete with the expected changing return values. Replaced prototypes, temporary strings and a function with no captures are collectible. Original assertion site: assert(temp() == string.format('a%d', i))",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0017",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4443
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Repeated concatenation and pattern substitution preserve exact lengths and match counts; a previously installed unusual global name remains rooted until explicit deletion. Original assertion site: assert(string.len(x)==80)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0018",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4595
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Repeated concatenation and pattern substitution preserve exact lengths and match counts; a previously installed unusual global name remains rooted until explicit deletion. Original assertion site: assert(string.len(s) == k*80)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0019",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4705
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Repeated concatenation and pattern substitution preserve exact lengths and match counts; a previously installed unusual global name remains rooted until explicit deletion. Original assertion site: assert(i==10000 // 4)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0020",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4730
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Repeated concatenation and pattern substitution preserve exact lengths and match counts; a previously installed unusual global name remains rooted until explicit deletion. Original assertion site: assert(_G[\"while\"] == 234)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0021",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4997
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Stopped automatic collection permits actual memory growth above three times baseline. Restart reports running and allocation-driven collection eventually reduces memory to at most twice baseline; no broad portability skip is allowed. Original assertion site: assert(collectgarbage(\"isrunning\"))",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0022",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5328
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Deleting collectable keys while iterating a separate retaining table and collecting each iteration keeps the iterator's live key valid. After dropping roots the first table is empty and remains reusable. Original assertion site: assert(type(n) == 'table' and next(n) == nil)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0023",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5512
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Deleting collectable keys while iterating a separate retaining table and collecting each iteration keeps the iterator's live key valid. After dropping roots the first table is empty and remains reusable. Original assertion site: for i=1,lim do assert(a[i] == i) end",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0024",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5843
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection. Original assertion site: for k,v in pairs(a) do assert(k==v or k..'#'==v); i=i+1 end",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0025",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5880
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection. Original assertion site: assert(i == 2*lim)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0026",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5985
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection. Original assertion site: assert(a[1])   -- strings are *values*",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0027",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 6328
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection. Original assertion site: for k,v in pairs(a) do assert(k==v or k-lim..'x' == v); i=i+1 end",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0028",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 6371
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection. Original assertion site: assert(i == 2*lim)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0029",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 6710
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection. Original assertion site: assert(next(a) ~= nil)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0030",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 6770
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection. Original assertion site: assert((k == 1 and v == x) or",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0031",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 6885
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection. Original assertion site: assert(i == 4)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0032",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 6927
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection. Original assertion site: assert(next(a) == string.rep('$', 11))",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0033",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 7347
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Advance the real collector from propagation to enteratomic, replace an already visited all-weak table's metatable, then finish the cycle. The newly published metatable remains valid. Original assertion site: assert(getmetatable(t).__mode == \"kv\")",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0034",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 7719
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "finalizer-callback"
+      },
+      "invariant": "A target reachable only through a finalizable object is removed from weak values before its callback but remains visible as a weak key during that callback. Both weak structures empty after subsequent collection. Original assertion site: assert(C.key == nil)",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0035",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 7766
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "finalizer-callback"
+      },
+      "invariant": "A target reachable only through a finalizable object is removed from weak values before its callback but remains visible as a weak key during that callback. Both weak structures empty after subsequent collection. Original assertion site: assert(type(next(C1)) == 'table')",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0036",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 7878
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A target reachable only through a finalizable object is removed from weak values before its callback but remains visible as a weak key during that callback. Both weak structures empty after subsequent collection. Original assertion site: assert(next(C) == nil and next(C1) == nil)",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0037",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 8159
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "One hundred ephemeron links remain traversable from a live terminal key, then disappear when its root is dropped while numeric-key values remain. A second graph distributes one hundred links across ten ephemeron tables and survives allocation-triggered GC; dropping its root permits collection. The commented-out final assertion is not an executed obligation. Original assertion site: assert(i == 100)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0038",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 8205
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "One hundred ephemeron links remain traversable from a live terminal key, then disappear when its root is dropped while numeric-key values remain. A second graph distributes one hundred links across ten ephemeron tables and survives allocation-triggered GC; dropping its root permits collection. The commented-out final assertion is not an executed obligation. Original assertion site: for i = 1, 4 do assert(a[i][1] == i * 10); a[i] = undef end",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0039",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 8249
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "One hundred ephemeron links remain traversable from a live terminal key, then disappear when its root is dropped while numeric-key values remain. A second graph distributes one hundred links across ten ephemeron tables and survives allocation-triggered GC; dropping its root permits collection. The commented-out final assertion is not an executed obligation. Original assertion site: assert(next(a) == nil)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0040",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 8582
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "One hundred ephemeron links remain traversable from a live terminal key, then disappear when its root is dropped while numeric-key values remain. A second graph distributes one hundred links across ten ephemeron tables and survives allocation-triggered GC; dropping its root permits collection. The commented-out final assertion is not an executed obligation. Original assertion site: assert(i == 100)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0041",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 8865
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "finalizer-callback"
+      },
+      "invariant": "Reverse enrollment order is observed through a weak-key index. An error at index eight produces the stored expected warning, later finalizers still progress, and a second collection handles new enrollments. Removing gc before later invocation suppresses that callback; warning mode returns to normal. Original assertion site: assert(not s[i - 1])   -- check proper finalization order",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0042",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 9134
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Reverse enrollment order is observed through a weak-key index. An error at index eight produces the stored expected warning, later finalizers still progress, and a second collection handles new enrollments. Removing gc before later invocation suppresses that callback; warning mode returns to normal. Original assertion site: assert(string.find(_WARN, \"error in __gc\"))",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0043",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 9180
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Reverse enrollment order is observed through a weak-key index. An error at index eight produces the stored expected warning, later finalizers still progress, and a second collection handles new enrollments. Removing gc before later invocation suppresses that callback; warning mode returns to normal. Original assertion site: assert(string.match(_WARN, \"@(.-)@\") == \"expected\"); _WARN = false",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0044",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 9266
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Reverse enrollment order is observed through a weak-key index. An error at index eight produces the stored expected warning, later finalizers still progress, and a second collection handles new enrollments. Removing gc before later invocation suppresses that callback; warning mode returns to normal. Original assertion site: for i = 8, 10 do assert(s[i]) end",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0045",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 9408
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Reverse enrollment order is observed through a weak-key index. An error at index eight produces the stored expected warning, later finalizers still progress, and a second collection handles new enrollments. Removing gc before later invocation suppresses that callback; warning mode returns to normal. Original assertion site: for i = 1, 10 do assert(s[i]) end",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0046",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 9964
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle. Original assertion site: for k in pairs(a) do assert(getmetatable(k) == getmetatable(u)) end",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0047",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 10121
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle. Original assertion site: for i =1,10 do assert(a[i]) end",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0048",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 10254
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "finalizer-callback"
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle. Original assertion site: assert(a[o] == 10-s)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0049",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 10281
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "finalizer-callback"
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle. Original assertion site: assert(a[10-s] == undef) -- udata already removed from weak table",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0050",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 10353
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "finalizer-callback"
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle. Original assertion site: assert(getmetatable(o) == getmetatable(u))",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0051",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 10400
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "finalizer-callback"
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle. Original assertion site: assert(getmetatable(o).a[o] == 10-s)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0052",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 10479
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle. Original assertion site: assert(next(a) ~= nil)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0053",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 10523
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle. Original assertion site: assert(s==11)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0054",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 10558
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle. Original assertion site: assert(next(a) == nil)  -- finalized keys are removed in two cycles",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0055",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 11049
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "finalizer-callback"
+      },
+      "invariant": "A gc function held only weakly is collected before invocation, so its os.exit sentinel never executes. All-weak content reachable from another finalizer's metatable is cleared before that finalizer reads it. Original assertion site: assert(next(getmetatable(o).x) == nil)",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0056",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 11129
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A gc function held only weakly is collected before invocation, so its os.exit sentinel never executes. All-weak content reachable from another finalizer's metatable is cleared before that finalizer reads it. Original assertion site: assert(m==10)",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0057",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 11617
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "String-key/number entries survive while collectable-value and collectable-key entries disappear. Deleting the last entry leaves safe dead-key lookup. Original C requires at most one KiB residual storage; the Ada candidate instead measures release of both real four-MiB payloads while allowing retained Ada table capacity. Original assertion site: assert(k == string.rep(\"a\", 2^22) and v == 25)",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0058",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 11666
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "String-key/number entries survive while collectable-value and collectable-key entries disappear. Deleting the last entry leaves safe dead-key lookup. Original C requires at most one KiB residual storage; the Ada candidate instead measures release of both real four-MiB payloads while allowing retained Ada table capacity. Original assertion site: assert(next(a, k) == nil)  -- everything else cleared",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0059",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 11722
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "String-key/number entries survive while collectable-value and collectable-key entries disappear. Deleting the last entry leaves safe dead-key lookup. Original C requires at most one KiB residual storage; the Ada candidate instead measures release of both real four-MiB payloads while allowing retained Ada table capacity. Original assertion site: assert(a[string.rep(\"b\", 2^22)] == undef)",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0060",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 11842
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "String-key/number entries survive while collectable-value and collectable-key entries disappear. Deleting the last entry leaves safe dead-key lookup. Original C requires at most one KiB residual storage; the Ada candidate instead measures release of both real four-MiB payloads while allowing retained Ada table capacity. Original assertion site: assert(next(a) == nil)",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0061",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 11920
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "String-key/number entries survive while collectable-value and collectable-key entries disappear. Deleting the last entry leaves safe dead-key lookup. Original C requires at most one KiB residual storage; the Ada candidate instead measures release of both real four-MiB payloads while allowing retained Ada table capacity. Original assertion site: assert(a[string.rep(\"b\", 100)] == undef)",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0062",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 11963
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "String-key/number entries survive while collectable-value and collectable-key entries disappear. Deleting the last entry leaves safe dead-key lookup. Original C requires at most one KiB residual storage; the Ada candidate instead measures release of both real four-MiB payloads while allowing retained Ada table capacity. Original assertion site: assert(collectgarbage(\"count\") <= m + 1)   -- everything collected",
+      "witness_classes": [
+        "source-path-assertions",
+        "Ada-equivalent-span",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [
+        "reclaim-payloads"
+      ],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0063",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 12195
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "An ordinary finalizer error is delivered through the real warning handler into _WARN and the stored expected text is checked before restoring normal warning mode. Original assertion site: assert(string.find(_WARN, \"@expected error\")); _WARN = false",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0064",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 13316
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "One thousand suspended self-referential coroutines export closures over open cells. A separate unreachable coroutine/function/table cycle containing a finalizer is reclaimed by explicit collection and sets its completion flag; rooted cells must remain safe during physical thread cleanup. Original assertion site: assert(type(f) == 'function' and type(param) == 'thread')",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0065",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 13561
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "One thousand suspended self-referential coroutines export closures over open cells. A separate unreachable coroutine/function/table cycle containing a finalizer is reclaimed by explicit collection and sets its completion flag; rooted cells must remain safe during physical thread cleanup. Original assertion site: assert(coroutine.resume(co, co))",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0066",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 13678
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "One thousand suspended self-referential coroutines export closures over open cells. A separate unreachable coroutine/function/table cycle containing a finalizer is reclaimed by explicit collection and sets its completion flag; rooted cells must remain safe during physical thread cleanup. Original assertion site: assert(collected)",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0067",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 14197
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge. Original assertion site: assert(a.x == 20)   -- 'a' is 'ok'",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0068",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 14278
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge. Original assertion site: assert(T.gccolor(a) == \"white\")   -- of course it is new...",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "Ada-equivalent-span"
+      ],
+      "equivalent_replacements": [
+        "stable-cell-color"
+      ],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0069",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 14720
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge. Original assertion site: assert(T.gcstate() == \"enteratomic\")",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0070",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 14759
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge. Original assertion site: assert(t.co() == 100)   -- resume coroutine, creating new table for 'a'",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0071",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 14833
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge. Original assertion site: assert(T.gccolor(t.co) == \"white\")  -- thread was not traversed",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0072",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 14973
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge. Original assertion site: assert(t.co == nil and f() == 30)   -- ensure correct access to 'a'",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0073",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 15354
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge. Original assertion site: assert(T.gccolor(u) == \"black\")   -- userdata is \"old\" (black)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0074",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 15419
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge. Original assertion site: assert(T.gccolor(x) == \"white\")   -- table is \"new\" (white)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0075",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 15536
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge. Original assertion site: assert(T.gccolor(u) == \"gray\")   -- userdata changed back to gray",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0076",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 15904
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Enrolling a newer userdata before an older one keeps color and actual allocator/collector ownership invariants valid under checkmemory. Original assertion site: assert(T.gccolor(y) == \"white\")",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0077",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 16144
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "An assignment delegated to a black parent at enteratomic cannot leave a black-to-white edge. The new child survives completion of the cycle and accepts a later field write. Original assertion site: assert(T.gccolor(sup) == \"black\")",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0078",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 16227
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "An assignment delegated to a black parent at enteratomic cannot leave a black-to-white edge. The new child survives completion of the cycle and accepts a later field write. Original assertion site: assert(not (T.gccolor(sup) == \"black\" and T.gccolor(sup.x) == \"white\"))",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0079",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 16662
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "The C fixed 200-byte headroom loop is replaced in the Ada candidate by 200 actual table allocations within one measured table of headroom, with at least 199 real refusals and recoveries. Limits are restored. Subsequent real table/function/thread counts increase by exactly four/one/one. Original assertion site: assert(T.totalmem(\"table\") == t + 4)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0080",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 16778
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "The C fixed 200-byte headroom loop is replaced in the Ada candidate by 200 actual table allocations within one measured table of headroom, with at least 199 real refusals and recoveries. Limits are restored. Subsequent real table/function/thread counts increase by exactly four/one/one. Original assertion site: assert(T.totalmem(\"function\") == t + 1)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0081",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 16915
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "The C fixed 200-byte headroom loop is replaced in the Ada candidate by 200 actual table allocations within one measured table of headroom, with at least 199 real refusals and recoveries. Limits are restored. Subsequent real table/function/thread counts increase by exactly four/one/one. Original assertion site: assert(T.totalmem(\"thread\") == t + 1)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0082",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 17170
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "state-close-after-top-level-OK"
+      },
+      "invariant": "A globally retained object is finalized during state close, validates its metatable, allocates, resurrects itself and creates another finalizable object. Closing terminates and emits the closing-state marker after top-level OK; newly enrolled objects must not cause infinite close-time finalization. Original assertion site: assert(getmetatable(o) == tt)",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0083",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 17776
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "state-close-after-top-level-OK"
+      },
+      "invariant": "Ten retained shutdown finalizers run in order one through ten, each raises the expected warning, and later callbacks validate the preceding stored warning and stable message text. Unexpected warnings or failure of any callback assertion must fail the run even after OK. Original assertion site: assert(n == o[1])",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0084",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 17862
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "state-close-after-top-level-OK"
+      },
+      "invariant": "Ten retained shutdown finalizers run in order one through ten, each raises the expected warning, and later callbacks validate the preceding stored warning and stable message text. Unexpected warnings or failure of any callback assertion must fail the run even after OK. Original assertion site: assert(find(_WARN, \"@expected warning\"))",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0085",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 17990
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "state-close-after-top-level-OK"
+      },
+      "invariant": "Ten retained shutdown finalizers run in order one through ten, each raises the expected warning, and later callbacks validate the preceding stored warning and stable message text. Unexpected warnings or failure of any callback assertion must fail the run even after OK. Original assertion site: assert(lastmsg == _WARN)  -- subsequent error messages are equal",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0086",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 18288
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Automatic collection remains running, a finalizer's attempt to collect returns false, and the saved previous collector mode is restored. Original assertion site: assert(collectgarbage'isrunning')",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0087",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 18508
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Automatic collection remains running, a finalizer's attempt to collect returns false, and the saved previous collector mode is restored. Original assertion site: assert(not res)",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0088",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 19114
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "After real frame-cache shrinking, persistent allocation refusal prevents a finalizer call and retains it pending; lifting refusal allows eventual progress. Repeat after physical stack shrinking with retained activation capacity. Both checks observe false before retry and true afterward, not merely logical capacity counters. Original assertion site: assert(X == false)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0089",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 19206
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "After real frame-cache shrinking, persistent allocation refusal prevents a finalizer call and retains it pending; lifting refusal allows eventual progress. Repeat after physical stack shrinking with retained activation capacity. Both checks observe false before retry and true afterward, not merely logical capacity counters. Original assertion site: assert(X == true)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0090",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 19522
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "After real frame-cache shrinking, persistent allocation refusal prevents a finalizer call and retains it pending; lifting refusal allows eventual progress. Repeat after physical stack shrinking with retained activation capacity. Both checks observe false before retry and true afterward, not merely logical capacity counters. Original assertion site: assert(X == false)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0091",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 19614
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "After real frame-cache shrinking, persistent allocation refusal prevents a finalizer call and retains it pending; lifting refusal allows eventual progress. Repeat after physical stack shrinking with retained activation capacity. Both checks observe false before retry and true afterward, not merely logical capacity counters. Original assertion site: assert(X == true)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0001",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 1292,
+        "sha256": "28922c9e6bdbdb7566acd11fe869607b258324f62b0c64aa5ccc078d6e324867",
+        "byte_offset": 0
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Exercise all 8 by 8 pause/stepmul combinations, including 0 and 0x7ffffffe; restore both parameters."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Collection starts running; mode changes return the actual prior mode, including repeated requests. Pause and step multiplier controls accept the eight tested values through 0x7ffffffe across their nested combinations, perform requested steps safely, and restore saved controls.",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Exercise all 8 by 8 pause/stepmul combinations, including 0 and 0x7ffffffe; restore both parameters.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0002",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 570,
+        "sha256": "fe72b2fb5dae5cc1500fcfa1c649d2419cf571c4c81d9da18eb58330984f104c",
+        "byte_offset": 1292
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "After allocating reachable and discarded tables, explicit steps complete a cycle and reduce actual live memory. With automatic collection stopped and _port unset, size 10 completes in fewer steps than size 2. Automatic collection is restarted.",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0003",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 1467,
+        "sha256": "49cf0e8f2055054ddf9eb904b7251769c2e7c15417e1d258291d406866e5d6b6",
+        "byte_offset": 1862
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Invoke GC1 and GC2 through all four GC() calls at original lines 333, 338, 352 and 357; six allocation/finalization loops and their retaining-stack assertions must execute. Compiling the helpers is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "GC1 and GC2 each allocate tables, strings and closures until an unreachable table's finalizer runs. A neighboring live stack table remains intact. These helpers are invoked by later ephemeron tests; merely compiling their bodies is insufficient.",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Invoke GC1 and GC2 through all four GC() calls at original lines 333, 338, 352 and 357; six allocation/finalization loops and their retaining-stack assertions must execute. Compiling the helpers is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0004",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 550,
+        "sha256": "feb3c8e9c9612ac9e502bc2b90dfc674ee74af14fb51d9e85a21722e4635a10e",
+        "byte_offset": 3329
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Five thousand table/string iterations and five thousand dynamically loaded function definitions complete with the expected changing return values. Replaced prototypes, temporary strings and a function with no captures are collectible.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0005",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 428,
+        "sha256": "70a38f5d62786dd4767a70b52d132b4cce84db95a5dcae142349811b391ccd4b",
+        "byte_offset": 3879
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "With _soft unset, every substring of the embedded source is passed through load and protected invocation. Parse failures, partial compiler ownership and runtime errors clean up without corrupting subsequent execution. Embedded source assertions/text are templates, not automatically executed anchors.",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0006",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 476,
+        "sha256": "034a3fad1d9a31c6ce1335bd474a6c26fdcc2e6130123bae09662cb7a2e1c503",
+        "byte_offset": 4307
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Repeated concatenation and pattern substitution preserve exact lengths and match counts; a previously installed unusual global name remains rooted until explicit deletion.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0007",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 308,
+        "sha256": "4713d758ec3124bb8b691c2dfd3dbb11fab7f2822377f11b236a7d82ae6a8716",
+        "byte_offset": 4783
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Stopped automatic collection permits actual memory growth above three times baseline. Restart reports running and allocation-driven collection eventually reduces memory to at most twice baseline; no broad portability skip is allowed.",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0008",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 445,
+        "sha256": "bdb8aaa7c139d0fecefed1fe323185d7e7fd0d3fcbaed5e95beb7a6e8a124b28",
+        "byte_offset": 5091
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Deleting collectable keys while iterating a separate retaining table and collecting each iteration keeps the iterator's live key valid. After dropping roots the first table is empty and remains reusable.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0009",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 1521,
+        "sha256": "c2ac0f96cd0299bff17838f2bdea269356045e0cf4ad25e73484dedfee33d00a",
+        "byte_offset": 5536
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Weak-key, weak-value and all-weak tables clear only eligible collectable entries across array/hash regions; numeric and string values retain Lua's semantics, externally rooted values survive, and a non-string weak mode does not corrupt collection.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0010",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 335,
+        "sha256": "809eb653ca2b4add1d34f6a233b9768f9e3eebd75d7c972b4ba0c22d47e96152",
+        "byte_offset": 7057
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "Advance the real collector from propagation to enteratomic, replace an already visited all-weak table's metatable, then finish the cycle. The newly published metatable remains valid.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0011",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 543,
+        "sha256": "dfa5a0b496907690082ab2175e856dbf8cb6f39bbc9fac8b1a3686ee9b94cdff",
+        "byte_offset": 7392
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "A target reachable only through a finalizable object is removed from weak values before its callback but remains visible as a weak key during that callback. Both weak structures empty after subsequent collection.",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0012",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 705,
+        "sha256": "b8508b3d515b5b457b076bd4640769795f802296f6f6326118e4b5f6b0703935",
+        "byte_offset": 7935
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "One hundred ephemeron links remain traversable from a live terminal key, then disappear when its root is dropped while numeric-key values remain. A second graph distributes one hundred links across ten ephemeron tables and survives allocation-triggered GC; dropping its root permits collection. The commented-out final assertion is not an executed obligation.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0013",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 850,
+        "sha256": "ea32a4cf26cc6b8fc03548020b33b9d4f1959840a170a8dc309b0ac37f626a5a",
+        "byte_offset": 8640
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "Reverse enrollment order is observed through a weak-key index. An error at index eight produces the stored expected warning, later finalizers still progress, and a second collection handles new enrollments. Removing gc before later invocation suppresses that callback; warning mode returns to normal.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0014",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 1142,
+        "sha256": "6c63f098efe009d1a261f4d5e6dea677b604dc305feed074ef4824f4d6600e3d",
+        "byte_offset": 9490
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "Eleven real userdata enroll when raw gc is non-nil even before it is callable. Invocation uses the later function, follows reverse enrollment, retains shared metatable state and clears weak values before callbacks. Finalized weak keys disappear after the second cycle.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0015",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 512,
+        "sha256": "249388f5fb6873736f01d91c10958d82ad37eead047d1f223a58b53e2841414d",
+        "byte_offset": 10632
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "A gc function held only weakly is collected before invocation, so its os.exit sentinel never executes. All-weak content reachable from another finalizer's metatable is cleared before that finalizer reads it.",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0016",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 892,
+        "sha256": "860213c73b5389ca702caaaba333e0a0486f28afaa0dd262bb0660723b784e80",
+        "byte_offset": 11144
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "String-key/number entries survive while collectable-value and collectable-key entries disappear. Deleting the last entry leaves safe dead-key lookup. Original C requires at most one KiB residual storage; the Ada candidate instead measures release of both real four-MiB payloads while allowing retained Ada table capacity.",
+      "witness_classes": [
+        "source-path-assertions",
+        "Ada-equivalent-span",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [
+        "measure-live-payloads",
+        "reclaim-payloads"
+      ],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0017",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 244,
+        "sha256": "f9817fb72f1816ef6557d9e464e3e5652742d4284973f77df7ef311eb2f0008e",
+        "byte_offset": 12036
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "An ordinary finalizer error is delivered through the real warning handler into _WARN and the stored expected text is checked before restoring normal warning mode.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0018",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 135,
+        "sha256": "fa11ed81b6c5e856f3d6108fb95a8281149f5092e1226fc2f56bceb2c168b290",
+        "byte_offset": 12280
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "A 200000-link table chain can be discarded and collected without exhausting host recursion or leaving retained storage.",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0019",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 1315,
+        "sha256": "392f4cc6456110d120eb978f0735ea81223216502c882be8f636edcd9f4d216b",
+        "byte_offset": 12415
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "One thousand suspended self-referential coroutines export closures over open cells. A separate unreachable coroutine/function/table cycle containing a finalizer is reclaimed by explicit collection and sets its completion flag; rooted cells must remain safe during physical thread cleanup.",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0020",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 287,
+        "sha256": "a3475540a3bb9692544d0c12cddbe15dbb196a63ad0846f4edd4e777a80d03ca",
+        "byte_offset": 13730
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "A step while automatic collection is stopped does not restart it. Subsequent allocation grows above twice measured live storage before explicit restart and root removal.",
+      "witness_classes": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0021",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 1629,
+        "sha256": "178809de1cb07a502d0e271ce44c6016ce038a2d2f0dfd7ed3e9e62a13dd1f2c",
+        "byte_offset": 14017
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "A weak coroutine creates and updates a cell referenced by an exported closure at enteratomic. The same cycle collects the coroutine but preserves the closure's final value 30. Ada's independently owned black cell marks its new child gray rather than the C white upvalue assumption. A separate sweep-phase userdata uservalue publication changes its black owner to gray and preserves the new edge.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "Ada-equivalent-span"
+      ],
+      "equivalent_replacements": [
+        "stable-cell-color"
+      ],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0022",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 342,
+        "sha256": "b67a6c0a8dff5cf1fbeff072aacf44671dd3386e98a0cef2b1670c0d39da5cfc",
+        "byte_offset": 15646
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "Enrolling a newer userdata before an older one keeps color and actual allocator/collector ownership invariants valid under checkmemory.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0023",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 407,
+        "sha256": "ff84a903ebde8b027113266f4f29c1ba8300536f5469618bd5a90808a69e0b94",
+        "byte_offset": 15988
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "An assignment delegated to a black parent at enteratomic cannot leave a black-to-white edge. The new child survives completion of the cycle and accepts a later field write.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0024",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 564,
+        "sha256": "2946e815a8a2a8a5a00a4c98273115daf9831e11771c47bd9f3643912d5c43ec",
+        "byte_offset": 16395
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "The C fixed 200-byte headroom loop is replaced in the Ada candidate by 200 actual table allocations within one measured table of headroom, with at least 199 real refusals and recoveries. Limits are restored. Subsequent real table/function/thread counts increase by exactly four/one/one.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "Ada-equivalent-span",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [
+        "measured-emergency-headroom"
+      ],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0025",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 579,
+        "sha256": "705b262f7e414b766535e0e55c25332e8e4bd3a6f52126366c3b348350926a55",
+        "byte_offset": 16959
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Callback runs during state closure after top-level OK; metatable assertion, allocation, resurrection and closing-state marker all complete."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "A globally retained object is finalized during state close, validates its metatable, allocates, resurrects itself and creates another finalizable object. Closing terminates and emits the closing-state marker after top-level OK; newly enrolled objects must not cause infinite close-time finalization.",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Callback runs during state closure after top-level OK; metatable assertion, allocation, resurrection and closing-state marker all complete.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0026",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 729,
+        "sha256": "3d71a6ad6da07aec5933c1edc8ba807640ff7a4ed3655a328439adf52d7625db",
+        "byte_offset": 17538
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Ten retained callbacks execute in reverse enrollment order after top-level OK; callback ordinals 1,2,3..10 exercise all warning-storage branches. Unexpected callback warnings fail the run."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "Ten retained shutdown finalizers run in order one through ten, each raises the expected warning, and later callbacks validate the preceding stored warning and stable message text. Unexpected warnings or failure of any callback assertion must fail the run even after OK.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Ten retained callbacks execute in reverse enrollment order after top-level OK; callback ordinals 1,2,3..10 exercise all warning-storage branches. Unexpected callback warnings fail the run.Same-process post-close telemetry expected_finalizer_warnings is numeric int/int64 exactly10; C and Ada each require actual completed delivery count plus original order/_WARN assertions.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0027",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 289,
+        "sha256": "312e91e3326fb8cbce8a591ad145117b81717805a58710a5521e8abb3b608e84",
+        "byte_offset": 18267
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Automatic collection remains running, a finalizer's attempt to collect returns false, and the saved previous collector mode is restored.",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0028",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 1081,
+        "sha256": "9fbd39d0ebe2c9bae5ad636cd1f9644a4657f1035e0678dc36b7a63acfb90ad6",
+        "byte_offset": 18556
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Two real refusal/recovery sequences: cache shrink plus recursion depth20, then stack shrink plus depth5. Finalizers remain false during refusal and become true afterward."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "After real frame-cache shrinking, persistent allocation refusal prevents a finalizer call and retains it pending; lifting refusal allows eventual progress. Repeat after physical stack shrinking with retained activation capacity. Both checks observe false before retry and true afterward, not merely logical capacity counters.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Two real refusal/recovery sequences: cache shrink plus recursion depth20, then stack shrink plus depth5. Finalizers remain false during refusal and become true afterward.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0029",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 13,
+        "sha256": "15804548a950e310c6d45895dd46c245e44af6217d6ec20ba27673a3e0cbdbaf",
+        "byte_offset": 19637
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Top-level OK is a completion marker only and cannot substitute for blocks0025/0026 or balanced state-close telemetry."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Top-level OK is required but does not certify close-time finalizers, warning delivery or physical allocator balance.",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Top-level OK is a completion marker only and cannot substitute for blocks0025/0026 or balanced state-close telemetry.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0030",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 173,
+        "sha256": "044c8bfe7169216ab5a7f51c7e916c24068c366b1e41ca95abfdf0f352b18d05",
+        "byte_offset": 3574
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Dynamically produced code must be invoked at the cited call sites. Keep _soft unset; retain actual cleanup/telemetry evidence."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Compile and execute all 5000 dynamically formatted temp definitions, then invoke each newly generated function and compare its 'a' plus iteration-number return. The constant source string is executable template input, even though the lexical inventory emits no generated-template anchor.",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Dynamically produced code must be invoked at the cited call sites. Keep _soft unset; retain actual cleanup/telemetry evidence.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0031",
+      "file": "gc.lua",
+      "source_span": {
+        "byte_length": 416,
+        "sha256": "14ebe7029327aecec8a8a882f2054638d60b965cdf04e6bd1a8d4e1f7bc59928",
+        "byte_offset": 3879
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Dynamically produced code must be invoked at the cited call sites. Keep _soft unset; retain actual cleanup/telemetry evidence."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "With _soft unset, submit every inclusive source substring to load and protected invocation. Syntax and runtime errors are deliberately protected; the obligation is cleanup and forward progress through the complete substring matrix, not success of every generated fragment.",
+      "witness_classes": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Dynamically produced code must be invoked at the cited call sites. Keep _soft unset; retain actual cleanup/telemetry evidence.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-MANUAL-AUDIT-0001",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6070,
+        "sha256": "5a7a6e525752c97221fbabc4ea4374692e59b3167f6f836d10ceffef16574e03",
+        "byte_offset": 0
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "inventory review only",
+        "upstream_test": "inventory review only",
+        "phase": "non-execution audit"
+      },
+      "invariant": "Review the entire pinned file including all original anchors, generated source, invoked helper bodies, nested callbacks, short-circuit T operands, early returns and shutdown obligations; runtime acceptance remains separate.",
+      "witness_classes": [
+        "whole-file-semantic-audit",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0001",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 146
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection is running on entry; explicit full collection succeeds and switching to generational mode returns the previous mode for later restoration. Original assertion site: assert(collectgarbage(\"isrunning\"))",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0006",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 926
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Full collection makes the anchor old. Publishing a new child touches the anchor; two measured steps transition touched1 to touched2 to old and new to survival to old1, retaining the nested value 234. Original assertion site: assert(U[1].x[1] == 234)",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0013",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 3118
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A captured coroutine cell survives one young collection, receives a new table through resume, and remains reachable through an exported closure after the coroutine reference is dropped. Two later collections preserve both its value 123 and a separately published child of an old table. Original assertion site: assert(f() == 123 and old[1][1] == \"hello\")",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0014",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 3262
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A captured coroutine cell survives one young collection, receives a new table through resume, and remains reachable through an exported closure after the coroutine reference is dropped. Two later collections preserve both its value 123 and a separately published child of an old table. Original assertion site: assert(f() == 123 and old[1][1] == \"hello\")",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0019",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4011
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "executed",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "An old all-weak table becomes touched1/gray on publication, touched2/black after a minor step, and old after another. A subsequent weak child is collected by the next step, detecting a stale gray state that would prevent the required barrier. Original assertion site: assert(t[1] == nil)   -- fails with the bug",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0020",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4367
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A real zero-byte full userdata with one uservalue follows old to touched1 to touched2 to old while its newly installed table follows new to survival to old1. The nested value remains 234 after both measured steps. Original assertion site: assert(T.gcage(U) == \"old\")",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0021",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4490
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A real zero-byte full userdata with one uservalue follows old to touched1 to touched2 to old while its newly installed table follows new to survival to old1. The nested value remains 234 after both measured steps. Original assertion site: assert(T.gcage(U) == \"touched1\" and",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0022",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4658
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A real zero-byte full userdata with one uservalue follows old to touched1 to touched2 to old while its newly installed table follows new to survival to old1. The nested value remains 234 after both measured steps. Original assertion site: assert(T.gcage(U) == \"touched2\" and",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0023",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4861
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A real zero-byte full userdata with one uservalue follows old to touched1 to touched2 to old while its newly installed table follows new to survival to old1. The nested value remains 234 after both measured steps. Original assertion site: assert(T.gcage(U) == \"old\" and",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0024",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 4974
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "A real zero-byte full userdata with one uservalue follows old to touched1 to touched2 to old while its newly installed table follows new to survival to old1. The nested value remains 234 after both measured steps. Original assertion site: assert(debug.getuservalue(U).x[1] == 234)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0025",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5042
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection is still running. Setting stepsize to zero and entering incremental mode preserves the parameter; each of two steps completes a whole cycle. Restoring the saved stepsize returns the original measured parameter. Original assertion site: assert(collectgarbage'isrunning')",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0026",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5212
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection is still running. Setting stepsize to zero and entering incremental mode preserves the parameter; each of two steps completes a whole cycle. Restoring the saved stepsize returns the original measured parameter. Original assertion site: assert(collectgarbage(\"param\", \"stepsize\") == 0)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0027",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5301
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection is still running. Setting stepsize to zero and entering incremental mode preserves the parameter; each of two steps completes a whole cycle. Restoring the saved stepsize returns the original measured parameter. Original assertion site: assert(collectgarbage(\"step\"))",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0028",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5334
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection is still running. Setting stepsize to zero and entering incremental mode preserves the parameter; each of two steps completes a whole cycle. Restoring the saved stepsize returns the original measured parameter. Original assertion site: assert(collectgarbage(\"step\"))",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0029",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5440
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "Collection is still running. Setting stepsize to zero and entering incremental mode preserves the parameter; each of two steps completes a whole cycle. Restoring the saved stepsize returns the original measured parameter. Original assertion site: assert(collectgarbage(\"param\", \"stepsize\") == step)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-ASSERT-CALL-0030",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 6,
+        "sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+        "byte_offset": 5965
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "default": "not-executed; T body omitted or early return taken",
+        "upstream_test": "executed",
+        "phase": "main-or-invoked-helper"
+      },
+      "invariant": "The real production encoding/application is exercised for all 8 percentages and 8 integer values (64 combinations), with absolute error bounded by ten percent of the integer exact result plus one. Original assertion site: assert(math.abs(aprox - exact) <= exact/10 + 1)",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": null,
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0001",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 250,
+        "sha256": "a8f5c07ebd40d54e935324b1f4aeadcb24c1ef4a03ccac0423e4fedaceae24bc",
+        "byte_offset": 0
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Collection is running on entry; explicit full collection succeeds and switching to generational mode returns the previous mode for later restoration.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0002",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 707,
+        "sha256": "c90a5c429fef186630fa0e909e984f24e460621fb9b27ffd3f49cfea6ddf53cf",
+        "byte_offset": 250
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Publishing a nested table to an old anchor and completing two steps preserves U[1].x[1]==234 in both configurations. Exact age observations are separate T-only block0012.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0003",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 600,
+        "sha256": "a8bd70ddc7a50859af7ace2ce58088b30dd5c48d4a4f4d3f90d03642c1bb1f12",
+        "byte_offset": 957
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Metatable publication, promotion and subsequent finalizer enrollment complete another step safely in both configurations. Actual age observations are separate T-only block0013; no C firstold1 pointer layout is claimed.",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0004",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 951,
+        "sha256": "fc912c48fa15116e2e4cf7c000967d696480261b79e789b0965268a8d9f5800b",
+        "byte_offset": 1557
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "A finalizer resurrects its object into the old anchor, drops its local reference, requests a collection step, and prints the retained metatable marker. Exact ages are separate T-only block0014. Callback warnings must be enabled.",
+      "witness_classes": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0005",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 804,
+        "sha256": "cb25c10e4f8f788e3f9eac1bc9b9742ed0118392591e6c6eccd28bbb94ad6dd7",
+        "byte_offset": 2508
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "A captured coroutine cell survives one young collection, receives a new table through resume, and remains reachable through an exported closure after the coroutine reference is dropped. Two later collections preserve both its value 123 and a separately published child of an old table.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0006",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 749,
+        "sha256": "82925843f081b7a0d4a55abf08a525ff626164fdc27c4565c2434f0a4c4602f1",
+        "byte_offset": 3312
+      },
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "default",
+          "upstream-test"
+        ]
+      },
+      "invariant": "Repeated minor collections and a later new weak value correctly clear the all-weak table. Exact age/color observations are separate T-only block0015.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0007",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 165,
+        "sha256": "a43fedb5179d09da967a64cb6dff344506639d29a26d698636051c3b035fbbec",
+        "byte_offset": 4061
+      },
+      "configurations": [
+        "default"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Default T=nil reports its omission and returns before sections8..11. This block certifies only the omission route, never the omitted tests."
+        ],
+        "configurations": [
+          "default"
+        ]
+      },
+      "invariant": "Default execution prints the exact omission and OK, then returns before every later section. This is an omission witness, never evidence for userdata, zero-step-size, parameter-codification or restoration obligations.",
+      "witness_classes": [
+        "source-path-assertions"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Default T=nil reports its omission and returns before sections8..11. This block certifies only the omission route, never the omitted tests.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0008",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 795,
+        "sha256": "d679406e72823c090f523649590b1784c59388ffa09d8b5b0e6db8968de6c62f",
+        "byte_offset": 4226
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "A real zero-byte full userdata with one uservalue follows old to touched1 to touched2 to old while its newly installed table follows new to survival to old1. The nested value remains 234 after both measured steps.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0009",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 477,
+        "sha256": "1fd49ed334c0b2a90d4c4c42ace4b7c6ce3073e0fa83a2982abb1d1e73584373",
+        "byte_offset": 5021
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "Collection is still running. Setting stepsize to zero and entering incremental mode preserves the parameter; each of two steps completes a whole cycle. Restoring the saved stepsize returns the original measured parameter.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0010",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 534,
+        "sha256": "a4ee3284b8c14fcefbd7250e4df96d938db30776faa58abd6079e96fea8707b0",
+        "byte_offset": 5498
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Execute all 64 combinations of the eight percentages and eight integer operands in the original nested loops. Each production encode/apply result satisfies its error bound."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "The real production encoding/application is exercised for all 8 percentages and 8 integer values (64 combinations), with absolute error bounded by ten percent of the integer exact result plus one.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only",
+        "dynamic-invocations"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Execute all 64 combinations of the eight percentages and eight integer operands in the original nested loops. Each production encode/apply result satisfies its error bound.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0011",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 38,
+        "sha256": "16bfecefcb8f493baabc48c08ae9b91f1fce6a9da3fe8159d75267257741eb25",
+        "byte_offset": 6032
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Successful execution of this particular behavior is required; enclosing process success alone is insufficient."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "The saved previous mode is accepted for restoration before final OK. This final marker is distinct from the default early-return marker.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Successful execution of this particular behavior is required; enclosing process success alone is insufficient.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0012",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 707,
+        "sha256": "c90a5c429fef186630fa0e909e984f24e460621fb9b27ffd3f49cfea6ddf53cf",
+        "byte_offset": 250
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Require actual adapter availability and evaluation of every metadata operand, not inferred age labels or default true short-circuit values."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "With real T available, evaluate every gcage/gccolor comparison in the selected original short-circuit assertions, reading actual object metadata. Default not-T short-circuit success does not execute this obligation.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Require actual adapter availability and evaluation of every metadata operand, not inferred age labels or default true short-circuit values.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0013",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 600,
+        "sha256": "a8bd70ddc7a50859af7ace2ce58088b30dd5c48d4a4f4d3f90d03642c1bb1f12",
+        "byte_offset": 957
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Require actual adapter availability and evaluation of every metadata operand, not inferred age labels or default true short-circuit values."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "With real T available, evaluate every gcage/gccolor comparison in the selected original short-circuit assertions, reading actual object metadata. Default not-T short-circuit success does not execute this obligation.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Require actual adapter availability and evaluation of every metadata operand, not inferred age labels or default true short-circuit values.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0014",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 951,
+        "sha256": "fc912c48fa15116e2e4cf7c000967d696480261b79e789b0965268a8d9f5800b",
+        "byte_offset": 1557
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Require actual adapter availability and evaluation of every metadata operand, not inferred age labels or default true short-circuit values."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "With real T available, evaluate every gcage/gccolor comparison in the selected original short-circuit assertions, reading actual object metadata. Default not-T short-circuit success does not execute this obligation.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Require actual adapter availability and evaluation of every metadata operand, not inferred age labels or default true short-circuit values.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    },
+    {
+      "id": "LUA-GENGC-REVIEWED-BLOCK-0015",
+      "file": "gengc.lua",
+      "source_span": {
+        "byte_length": 749,
+        "sha256": "82925843f081b7a0d4a55abf08a525ff626164fdc27c4565c2434f0a4c4602f1",
+        "byte_offset": 3312
+      },
+      "configurations": [
+        "upstream-test"
+      ],
+      "execution_applicability": {
+        "requirements": [
+          "Require actual adapter availability and evaluation of every metadata operand, not inferred age labels or default true short-circuit values."
+        ],
+        "configurations": [
+          "upstream-test"
+        ]
+      },
+      "invariant": "With real T available, evaluate every gcage/gccolor comparison in the selected original short-circuit assertions, reading actual object metadata. Default not-T short-circuit success does not execute this obligation.",
+      "witness_classes": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "equivalent_replacements": [],
+      "common_witness_contract": "GC-CONTEXT",
+      "additional_requirements": "Require actual adapter availability and evaluation of every metadata operand, not inferred age labels or default true short-circuit values.",
+      "status": "proposal-only",
+      "execution_evidence": []
+    }
+  ],
+  "missing_observable_invariants": [
+    {
+      "id": "GC-CLOSE-COUNT",
+      "obligation": "LUA-GC-REVIEWED-BLOCK-0026",
+      "finding": "Ten shutdown callbacks keep n local and only the later separate finalizer prints a marker. Skipping trailing callbacks could avoid their assertions while retaining OK/closing marker and balanced physical disposal.",
+      "required_resolution": "Provide independently reviewed exact shutdown callback count/order and expected stored-warning delivery evidence, e.g test-only observer of ten @expected warning deliveries plus existing ordinal assertions, or source-bound equivalent callback-count regression. Do not infer ten invocations from marker alone.",
+      "status": "historical gap: resolved at reviewed source level by real warning counter; actual final-context replay pending",
+      "resolution_review": "tests/conformance/reviews/gc-shutdown-counter.cross-review.json"
+    },
+    {
+      "id": "GC-PHYSICAL-REPLAY",
+      "finding": "Current whole-file telemetry balances storage but does not prove each physical cache/stack/refusal invariant separately.",
+      "required_resolution": "Replay required exact AUnit labels from gc-aunit-context-replay proposal and add relevant frame/stack/finalizer-refusal labels when promoting those specific obligations.",
+      "status": "Source mappings extended to 35 required AUnit labels. Actual final-context replay pending."
+    }
+  ],
+  "promotion_constraints": [
+    "No statuses changed by this packet.",
+    "All applicable26finalcontexts must provide source-bound execution evidence; this packet does not provide it.",
+    "Per-anchor byte overlap classification is an index into reviewed replacements, not an independent semantic approval.",
+    "Callback/dynamic path evidence must be reviewed; lexical anchor presence is insufficient."
+  ],
+  "execution_evidence": [],
+  "shutdown_count_candidate": {
+    "review": "tests/conformance/reviews/gc-shutdown-counter.cross-review.json",
+    "review_sha256": "2292f607fecfc002f0faf78742788a10a38b331c132bd4c626e5316573dc7cd9",
+    "resolution": "Actual complete warning deliveries observed after underlying test handler succeeds, required exactly10 in same-process post-close telemetry for instrumentedgc.",
+    "status": "source-reviewed including integer-schema hardening; actual final-context replay pending",
+    "runtime_acceptance": false
+  },
+  "historical_bindings": [
+    {
+      "sha256": "90c868e396f05f1709271ae9238a4ade1f3c109154e0683762cb6b1d5fdb85cb",
+      "path": "tests/conformance/coverage/gc.jsonl"
+    },
+    {
+      "sha256": "9f1c9fc1182c5d5992eefa026bc0f4627173c6f25752de70ed7074a603334eeb",
+      "path": "tests/conformance/coverage/gengc.jsonl"
+    },
+    {
+      "sha256": "8165f338c8a64c2ac154673c0e26477f4dfabee7e0153b35c7eb1b9c87dfe963",
+      "path": "tests/conformance/reviews/gc-gengc.anchor-classification-proposal.json"
+    },
+    {
+      "sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e",
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json"
+    },
+    {
+      "sha256": "bf1668acb83299a3dc9107df9c54ecfd25e58dc1dbe524a02fff307b368547c6",
+      "path": "tests/conformance/reviews/gc-ada.equivalent-approval.json"
+    },
+    {
+      "sha256": "dab45c62c54b32f90d1856a159dbcaad69a575c90990e1fe68ba09e5da197c31",
+      "path": "tests/conformance/reviews/gc-aunit-context-replay.proposal.json"
+    },
+    {
+      "sha256": "b7004226e10dbc533a1df0bec6569e02247a215530bbcdcbd8786f31abe3ee2f",
+      "path": "scripts/ConformanceScope.psm1"
+    },
+    {
+      "sha256": "cda5cebf49c22e5b1f37560e776bc1506db66ba78a1f4217a59c45b3a9ff4f3e",
+      "path": "scripts/ManagedTelemetry.psm1"
+    },
+    {
+      "sha256": "9f97b86315630bff7fcffb4e95a440992b9f9d0e493572fa28672a32bec79a4b",
+      "path": "tests/c/conformance_adapter.c"
+    }
+  ]
+}

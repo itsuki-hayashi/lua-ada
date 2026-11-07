@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "kind": "independent-execution-obligation-packet-review",
+  "author": "Codex independent review agent /root/review_files",
+  "reviewer": "Codex independent review agent /root/review_gc",
+  "decision": "accepted-proposal-semantics",
+  "runtime_acceptance": false,
+  "bindings": [
+    {
+      "path": "tests/conformance/reviews/files.execution-obligation-packet.proposal.json",
+      "sha256": "70111e359f4a47dfef8269569d1e87fdc26b42d7072ad976d7fa6a66ea88e5ac"
+    },
+    {
+      "path": "tests/conformance/reviews/files.classification-proposal.json",
+      "sha256": "6e0827ec162d703bc4a06abb5f022ec1d66e1443dc1c5f59cae45bb8ccc7455c"
+    },
+    {
+      "path": "tests/conformance/equivalents/files-windows-platform.json",
+      "sha256": "b914b4572a90c7ad1b88ac8f8233e8b205b8fe4ee0042a89bbb3b864ed313970"
+    },
+    {
+      "path": "tests/conformance/equivalents/files-macos-platform.json",
+      "sha256": "d739ccf5aead9d12d24c67d3d676a1faf648636b07eb60fe0e4648768a678501"
+    },
+    {
+      "path": "tests/conformance/reviews/files-macos.equivalent-approval.json",
+      "sha256": "fe6af9557b6b06ecd60e82805af12cd508c64b21f63b84edb714e6c843e686e8"
+    },
+    {
+      "path": "tests/conformance/reviews/files-macos.semantic-cross-review.json",
+      "sha256": "5c9be4dd901171ef26f285ac51af6ee4d93c77af781038657be64ef7a42b7cb6"
+    }
+  ],
+  "checks": [
+    "All434uniqueidentities match344originalanchors+90reviewedblocks; all original byte spans/hashes verified against pinned source.",
+    "All input file hashes match; all final_evidence_bindings empty and runtime_acceptance false.",
+    "Windows/macOS replacement byte hashes and counterpart hashes verified for each linked span. Assertion305 intentionally maps Windows-span10 although its lexical assert token precedes changed input; the complete asserted expression is semantically changed.",
+    "Four macOS spans preserve separate buffered failure/native close result, unbuffered zero-byte refusal, and explicit outer nested-shell wait. Actual POSIX nonblocking receiver remains required.",
+    "T guard evaluation vs instrumented-only body/default omission preserved; generated receiver729 and native handle734 cannot be certified by default.",
+    "Generated date template851 links actual eight-field assertions and six invocation contexts; loadfile/reader and ten shell rows retain concrete execution requirements.",
+    "Native C-int/time/year/DST facts must match C/Ada and source branch matching preserves exact out-of-bound selector.",
+    "Full process/configuration/shutdown/allocator witnesses and exact finaldate/version are joint requirements; no broad skip or finalprint alone closes IO.",
+    "Prior failed macOS diagnostics and accepted semantic mapping remain distinct from corrected fullrun/final26 evidence."
+  ],
+  "findings": [],
+  "acceptance_limits": [
+    "Review accepts packet semantics only.",
+    "Strict future evidence replay must enforce each peranchor/configuration/native/equivalent requirement and expected source-bound stderr.",
+    "Corrected complete Mac C/Ada runs and final26context evidence remain pending."
+  ],
+  "execution_evidence": [],
+  "five_span_delta": {
+    "decision": "accepted-proposal-semantics",
+    "bindings": [
+      {
+        "sha256": "165810ad8ded1acfbe96829a9b77ae07a6d2f21574eb392f046a494f49b1cc52",
+        "path": "tests/conformance/reviews/files.execution-obligation-packet.proposal.json"
+      },
+      {
+        "sha256": "ce950f0bbc4d6608397815e508f9085de4ef49495ac6c23d4290500aae5a36d1",
+        "path": "tests/conformance/equivalents/files-macos-platform.json"
+      },
+      {
+        "sha256": "54698efa32099f7450d0344ce6deb767a9923060719083247cd576650c3d40c9",
+        "path": "tests/conformance/reviews/files-macos.equivalent-approval.json"
+      },
+      {
+        "sha256": "f6ada4bf2603fd7b976f177192d76ececb940ffa7347d0776a959bae66655c96",
+        "path": "tests/conformance/reviews/files-macos.semantic-cross-review.json"
+      },
+      {
+        "sha256": "204aabc2f5b86f0b99f6ca679e079ea62391b52280e5334f7e7761289e5b97a2",
+        "path": "tests/conformance/platform/macos-calendar-boundary.lua"
+      }
+    ],
+    "source_span": "files.lua lines 926 and 927, byte offset 25410, length 119",
+    "applies_to": [
+      "LUA-FILES-MANUAL-AUDIT-0001",
+      "LUA-FILES-REVIEWED-BLOCK-0023",
+      "LUA-FILES-REVIEWED-BLOCK-0070"
+    ],
+    "review": "The fifth replacement invokes a named counterpart at the original overflow check. It tests seconds 59, 60 and 61 at maximum tm_year, exact normalized calendar fields and timestamps, reverse conversion, direct next-year field rejection and ordinary recovery. Both C and Ada must emit the required calendar marker in each macOS context.",
+    "generated_sha256": "7834b8f4a18cfd151f8ed895b0a36f1fa9805d05e8e682e8cbda472e43e94731",
+    "runtime_acceptance": false,
+    "execution_evidence": []
+  }
+}

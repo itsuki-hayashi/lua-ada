@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "kind": "equivalent-approval",
+  "author": "Codex",
+  "reviewer": "Codex independent review agent /root/review_gc",
+  "decision": "accepted",
+  "equivalent": {
+    "id": "gc-ada-instrumented",
+    "source": "references/lua/testes/gc.lua",
+    "source_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+    "configuration": "default-and-upstream-test",
+    "platform": null,
+    "disposition": "ada-internal-equivalent",
+    "generated_sha256": "059aaafb1068bc4245b23f56b2e10a75a66301b0bf05eede8ce3e7fd8a56b6dd"
+  },
+  "decisions": [
+    {
+      "id": "measure-live-payloads",
+      "start_byte": 11479,
+      "length_bytes": 49,
+      "source_sha256": "4bb49bacb1a6d2575ad3abbb475fd83ff2e7ad65102d29c93d02e7bdf43f700e",
+      "replacement_sha256": "833abcf9a2278f2a5cb3cd892f26de6e8af7cc426bdb718144234527dcd97d9d",
+      "author": "Codex",
+      "reviewer": "Codex independent review agent /root/review_gc",
+      "decision": "accepted",
+      "rationale": "The original C one-KiB residual allowance does not describe retained Ada table/index capacity. The replacement samples actual live managed bytes with both original 4-MiB string payloads present, then requires at least 8 MiB to be released. The untouched weak-value/key removal, last-entry deletion, empty traversal and safe dead-key lookup checks remain. Production New_String owns one real text buffer; the test does not substitute fabricated C-size counts. The focused 64-KiB case repeats three times and is present as OK in the instrumented Windows AUnit artifact.",
+      "review_evidence": {
+        "path": "tests/conformance/reviews/gc-gengc.independent-review.json",
+        "sha256": "32abf3a66dfa1d1da940442fea02cb72a082e757aaef9d560b1035aaa812dbf2"
+      },
+      "counterparts": [
+        {
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads",
+          "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+        }
+      ]
+    },
+    {
+      "id": "reclaim-payloads",
+      "start_byte": 11963,
+      "length_bytes": 40,
+      "source_sha256": "c520c19e1c58d291af4e63c84b5083a165dd416be4983767261653ccd569cbc6",
+      "replacement_sha256": "0244ab649f62283a93b423e4250bba43ea0c044bcaaf8f87334b520f94378b15",
+      "author": "Codex",
+      "reviewer": "Codex independent review agent /root/review_gc",
+      "decision": "accepted",
+      "rationale": "The original C one-KiB residual allowance does not describe retained Ada table/index capacity. The replacement samples actual live managed bytes with both original 4-MiB string payloads present, then requires at least 8 MiB to be released. The untouched weak-value/key removal, last-entry deletion, empty traversal and safe dead-key lookup checks remain. Production New_String owns one real text buffer; the test does not substitute fabricated C-size counts. The focused 64-KiB case repeats three times and is present as OK in the instrumented Windows AUnit artifact.",
+      "review_evidence": {
+        "path": "tests/conformance/reviews/gc-gengc.independent-review.json",
+        "sha256": "32abf3a66dfa1d1da940442fea02cb72a082e757aaef9d560b1035aaa812dbf2"
+      },
+      "counterparts": [
+        {
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads",
+          "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+        }
+      ]
+    },
+    {
+      "id": "stable-cell-color",
+      "start_byte": 14278,
+      "length_bytes": 31,
+      "source_sha256": "3368876c423554b8967a1fca42de51cf3fc6dc96f2dbe3bc3263b2f14b5aacdf",
+      "replacement_sha256": "8962292d95f5a292ba02ad38b282fe93d1f4a072994b8ec38fe55e7c65206ec6",
+      "author": "Codex",
+      "reviewer": "Codex independent review agent /root/review_gc",
+      "decision": "accepted",
+      "rationale": "The independently allocated Ada cell owns its value and applies the production forward barrier at the update. A black cell shades the new table gray, unlike the C open-upvalue white assumption. The replacement changes only that inspection assertion; the weak coroutine must still be white, disappear in the same cycle, and leave an exported closure returning 30. Dead context teardown clears cell associations without dereferencing already reclaimed cells before frame destruction.",
+      "review_evidence": {
+        "path": "tests/conformance/reviews/gc-gengc.independent-review.json",
+        "sha256": "32abf3a66dfa1d1da940442fea02cb72a082e757aaef9d560b1035aaa812dbf2"
+      },
+      "counterparts": [
+        {
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Orphan_Cell",
+          "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+        }
+      ]
+    },
+    {
+      "id": "measured-emergency-headroom",
+      "start_byte": 16478,
+      "length_bytes": 80,
+      "source_sha256": "342a5139c4c1d3792c706e27094019af1eb85691e390a7fafbca2ad2d3b75559",
+      "replacement_sha256": "acee89ad1dbc5dc0421b883804eadcb693bdaf5958114b874bf24b37e2b9ba4b",
+      "author": "Codex",
+      "reviewer": "Codex independent review agent /root/review_gc",
+      "decision": "accepted",
+      "rationale": "The test-only adapter measures the actual empty-table allocation cost, permits only one table of headroom, and performs 200 real New_Table operations under the production test ceiling. Construction serial roots are preserved; real allocation refusals invoke production emergency retry. Returned refusal and collection deltas must each be at least 199; the limit is removed on success and exceptions, and the independent 2-GiB host ceiling is untouched. Subsequent original exact table/closure/thread count assertions remain. No Lua finalizer is invoked by the emergency collection path.",
+      "review_evidence": {
+        "path": "tests/conformance/reviews/gc-gengc.independent-review.json",
+        "sha256": "32abf3a66dfa1d1da940442fea02cb72a082e757aaef9d560b1035aaa812dbf2"
+      },
+      "counterparts": [
+        {
+          "path": "tests/src/lua-conformance_adapter_tests.adb#Measured_Emergency_Headroom",
+          "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Approval covers the four representation-specific mappings only. It does not close whole-file runtime obligations, initial warning-state hardening, final-revision evidence, macOS contexts, or complete scoped acceptance."
+  ]
+}

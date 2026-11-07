@@ -4,6 +4,7 @@ with Ada.Numerics.Discrete_Random;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.Assertions; use AUnit.Assertions;
 with Lua.Lexers; use Lua.Lexers;
+with Lua.Test_Configuration;
 with Test_Support;
 
 package body Lexer_Tests is
@@ -79,7 +80,9 @@ package body Lexer_Tests is
       --  Each Lua keyword is recognized independently of ordinary names.
       Expected : constant Kind_Array :=
         [And_Word, Break_Word, Do_Word, Else_Word, Elseif_Word, End_Word,
-         False_Word, For_Word, Function_Word, Identifier, Goto_Word,
+         False_Word, For_Word, Function_Word,
+         (if Lua.Test_Configuration.Compatible_Global then Identifier
+          else Global_Word), Goto_Word,
          If_Word, In_Word, Local_Word, Nil_Word, Not_Word, Or_Word,
          Repeat_Word, Return_Word, Then_Word, True_Word, Until_Word,
          While_Word, End_Of_Input];

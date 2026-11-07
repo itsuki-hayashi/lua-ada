@@ -212,6 +212,11 @@ It checks real state/thread/stack/allocator identity and the actual pool address
 and GNAT elaboration counter; the latter two are compiler-specific test probes.
 No test observer is added to the interpreter library. Raw output, executable/
 library hashes and process results are retained under reports/core-image.
+Within a combined campaign, the runtime-producing build explicitly selects
+`LUA_ADA_PREBUILT=false`. Subsequent host builds import that existing library
+with `LUA_ADA_PREBUILT=true`; they must not rebind a second image. The core
+image driver verifies the selected library hash before and after consumer
+linking and execution. Standalone invocation still builds the runtime first.
 [The validation owner](validation-one-core.md) records executed configurations.
 scripts/check.ps1 invokes this campaign per job; a missing platform run is not
 implied by the workflow. Native module loading and full C exports remain separate.
@@ -268,6 +273,51 @@ proof normally and a clean measurement only when repeatability requires it.
 
 ## Language lifecycle acceptance
 
+The four-file follow-up also runs `scripts/check-instrumented.ps1 -LibraryType
+static` (or `relocatable` / `static-pic`). This builds the real upstream-test
+configuration, runs all AUnit cases, checks configuration and warning controls,
+and executes immutable copies of events.lua and gengc.lua plus the explicitly
+unreviewed GC equivalent candidate. Each process has a 900-second timeout;
+GC additionally requires the later state-close marker and successful shutdown.
+The launcher retains its independent 2 GiB managed-allocation ceiling. Reports
+under reports/instrumented retain raw output, source/executable hashes and
+`scope_accepted: false`; these regressions do not replace scoped acceptance,
+balanced allocator telemetry, equivalent review or the remaining files.lua
+obligations. CI runs six OS/link instrumented validation jobs plus Windows
+instrumented static-PIC alongside the existing default contexts.
+
+On Windows, `scripts/check-windows-buffered-failure.ps1` takes the Ada test
+launcher, C oracle and its library directory. It independently links the same
+public-API native driver to the oracle and executes the same buffered-write,
+failed-flush and close assertions against both implementations. Both pipelines
+run this counterpart and retain hashes/output in reports/windows-buffered-failure.
+This evidence supports a pending platform mapping; it is not an unchanged
+files.lua execution or an independent approval of that mapping. The command
+also executes named native file-contract and partial-write counterparts plus
+the ten-span files-windows-platform candidate, requiring the final date/version
+witness and the failed-write block in upstream-test configuration. Its
+Configuration argument must match both executables; ordinary runs require T
+absent and instrumented runs require the real adapter. Only the two expected
+missing-command diagnostics are permitted on stderr. The instrumented POSIX
+jobs separately run check-posix-files.ps1 over unchanged copies, retaining both
+C and Ada failures and requiring matching output outside the final timestamp.
+
+The test launcher writes PID-specific managed-allocation sidecars when
+LUA_ADA_CONFORMANCE_TELEMETRY and LUA_ADA_CONFORMANCE_RUN_ID are supplied.
+The former is a filename prefix; the latter is a lowercase hex/hyphen run ID.
+An actual allocator-provider observer counts existing bootstrap storage and
+subsequent allocations/releases. The Finish hook runs after physical disposal,
+including typed exits. check-conformance-telemetry.ps1 exercises normal closure,
+both exit modes, runtime failure and instrumented refusal recovery, then rejects
+ten mutations of actual sidecar evidence. It never substitutes process RSS for
+managed bytes. Both pipelines retain these process regressions.
+
+Selected instrumented executions require balanced parent telemetry. Windows
+file candidates additionally require all eight Ada Lua-child sidecars for their
+subprocess blocks. Four ordinary C-child sidecars are checked separately: the
+pinned C os.exit children bypass its main-return telemetry writer. That C
+observation is not treated as missing Ada cleanup or fabricated zero counters.
+
 Run scripts/check-lifecycle.ps1 -Interpreter <normal-cli> after building the C
 oracle. The runner uses unchanged hash-verified goto.lua and coroutine.lua in
 fresh C/Ada processes, compares raw same-host output and empty stderr, requires
@@ -284,6 +334,49 @@ named/commented cases for state transitions, close paths, cells, weak graphs,
 inspection, hooks, native callback yield restrictions and host-policy recovery.
 Seeded lifecycle campaigns preserve source and mismatch output as regressions;
 crashes, resource failures and timeouts never count as syntax rejection or skips.
+
+## Public collector C contract
+
+scripts/check-gc-events.ps1 runs events.lua, gengc.lua and gc.lua against the
+isolated C oracle and the actual Ada conformance launcher in both configurations.
+Default and instrumented matrices invoke it, alongside their platform files.lua
+runner. Each process gets immutable source copies, the same launcher named lua,
+parent/bare-child/arg-child configuration checks, and balanced allocator evidence.
+GC uses the explicitly labelled, pending-review Ada equivalent; C uses the
+unchanged original. Default T omissions must match exact pinned messages and
+remain unresolved coverage links. No successful diagnostic batch sets scoped
+or full-M3 acceptance. See the [scope contract](../tests/conformance/README.md).
+
+scripts/check-files-scoped.ps1 adds files.lua to that same scoped execution
+path, including the required Windows native fixtures and explicit equivalent
+disposition. The platform counterpart runners remain separate regressions.
+Their measured launcher preflights retain independently balanced telemetry
+without adding probe processes to the main file run's child count. Two real
+launcher isolation regressions reject the wrong configuration and an ambient
+C executable substituted for an Ada child. The shared runner has 40 negative
+and process checks; the scoped inventory/witness suite has 35 cases.
+
+The core-image pipeline also compiles the shared public GC contract against
+the actual Ada library and the isolated pinned C library. Seven named cases
+cover nonallocating controls and measured bytes, modes and stopped steps,
+finalizer ordering, allocator refusal/retry, state-close finalizers, cleanup
+under refusal and fragmented warning callbacks. Extreme C int parameters and
+size_t steps are exercised through the actual variadic export. Each owning
+allocator fixture requires zero remaining bytes/blocks. Identical stdout,
+empty stderr, process success, executable/library hashes and shared contract
+source hashes are retained in reports/core-image. Default and instrumented
+matrix jobs run this comparison; it does not complete unrelated C API exports.
+
+The same pipeline compiles `io_api_contract.c` against each real library and
+compares its three IO/OS cases. `io_contract.h` is shared with the retained
+ordinary C consumer: both executables test the identical FILE payload and
+closer, live metatable identity after reopening io, the unregistered os opener,
+and actual native close through the public callback. The standalone contract
+also verifies zero outstanding allocator bytes/blocks after state closure.
+Executable and source hashes, output, and unwind checks follow the GC contract's
+reporting path. Synthetic matrix regressions separately check review-status
+vocabulary and reject pending, self-authored or artifact-less review records;
+they confer no independent-review or executed-coverage authority.
 
 ## Output delivery regression consumer
 

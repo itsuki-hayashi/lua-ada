@@ -1,9 +1,11 @@
 with Ada.Exceptions;
 with Ada.Unchecked_Deallocation;
+with Lua.Engine.Machine;
 
 package body Lua.Sessions is
    use Ada.Strings.Unbounded;
    use type Lua.Engine.World_Access;
+   use type Lua.Engine.Process_Exit_Phase;
    procedure Free is new Ada.Unchecked_Deallocation
      (Lua.Engine.World, Lua.Engine.World_Access);
 
@@ -50,16 +52,31 @@ package body Lua.Sessions is
    end Initialize;
 
    procedure Close (Self : in out Session) is
+      Reason : Lua.Engine.Resource_Release_Reason :=
+        Lua.Engine.Lua_State_Close;
    begin
       if Self.State /= null then
-         Lua.Engine.Finalize (Self.State.all);
+         begin
+            Lua.Engine.Machine.Close_Lua_State (Self.State.all);
+         exception
+            when Lua.Engine.Language_Error | Storage_Error =>
+               --  An explicit host abort cannot run more Lua cleanup. The
+               --  remaining resources retain their host-disposal policy.
+               Reason := Lua.Engine.Host_Disposal;
+         end;
+         Lua.Engine.Finalize (Self.State.all, Reason);
          Free (Self.State);
       end if;
    end Close;
 
    overriding procedure Finalize (Self : in out Session) is
    begin
-      Self.Close;
+      --  Ada scope exit is physical host disposal, not a new Lua execution.
+      --  In particular it cannot restart callbacks after an exhausted quota.
+      if Self.State /= null then
+         Lua.Engine.Finalize (Self.State.all);
+         Free (Self.State);
+      end if;
    end Finalize;
 
    procedure Reset (Self : in out Session) is
@@ -123,11 +140,29 @@ package body Lua.Sessions is
       Self.State.Output_Used := 0;
       Self.State.Current.Failure_At := (others => 1);
       for Argument of Arguments loop
-         Self.State.Current.Arguments.Append
-           (Lua.Engine.New_String (Self.State.all, To_String (Argument)));
+         Lua.Engine.Append_Root
+           (Self.State.all, Self.State.Current.Arguments,
+            Lua.Engine.New_String (Self.State.all, To_String (Argument)));
       end loop;
       if Lua.Engine.Execute (Self.State.all, Source, Name) then
          Result.Output := Self.State.Output;
+         if Self.State.Exit_Phase = Lua.Engine.Exit_Complete then
+            Result.Status := Exit_Requested;
+            Result.Exit_Request :=
+              (Self.State.Exit_Code, Self.State.Exit_Close_State);
+            if Self.State.Exit_Close_State then
+               --  The scheduler has already drained main-thread TBC values
+               --  and finalizers. Snapshot the public result before physical
+               --  release; a C-owned pump follows the same ordering.
+               Lua.Engine.Finalize
+                 (Self.State.all, Lua.Engine.Lua_State_Close);
+               Free (Self.State);
+            else
+               Self.State.Exit_Phase := Lua.Engine.No_Process_Exit;
+               Self.State.Current := Self.State.Main_Context;
+               Self.State.Current.Status := Lua.Engine.Suspended_Context;
+            end if;
+         end if;
       else
          Result := Failure (Self, Name);
       end if;
@@ -200,7 +235,7 @@ package body Lua.Sessions is
       if Self.State = null then
          return (others => 0);
       end if;
-      return (Natural (Self.State.Heap.Length), Self.State.Entry_Count,
-              Natural (Self.State.Programs.Length), Self.State.Collections);
+      return (Self.State.Live_Objects, Self.State.Entry_Count,
+              Self.State.Live_Programs, Self.State.Collections);
    end Statistics;
 end Lua.Sessions;

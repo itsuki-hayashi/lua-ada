@@ -51,7 +51,9 @@ package body Lua.Engine.Table_Drivers is
 
       procedure Save (Index : Positive; Item : Value) is
       begin
-         Activation.Native_Captures.Replace_Element (Index, Item);
+         Replace_Root
+           (State, Activation.Native_Captures,
+            Index, Item);
       end Save;
 
       function Integral (Item : Value) return Integer_Value is
@@ -182,10 +184,16 @@ package body Lua.Engine.Table_Drivers is
          --  tables; 3..6 hold traversal indices; 7 retains a result/value;
          --  8 retains concat's separator. Unpack appends results after them.
          Activation.Native_Captures.Clear;
-         Activation.Native_Captures.Append (Item);
-         Activation.Native_Captures.Append (Destination);
+         Append_Root
+           (State, Activation.Native_Captures,
+            Item);
+         Append_Root
+           (State, Activation.Native_Captures,
+            Destination);
          for Index in 3 .. 8 loop
-            Activation.Native_Captures.Append (Nil_Value);
+            Append_Root
+              (State, Activation.Native_Captures,
+               Nil_Value);
          end loop;
          if Name = "table.move" then
             Check_Table (Item, True, False, False);
@@ -235,7 +243,9 @@ package body Lua.Engine.Table_Drivers is
                First := (if Arg (2).Kind = Nil_Kind then 1
                          else Integral (Arg (2)));
                if Arg (3).Kind /= Nil_Kind then
-                  Activation.Native_Results := One_Value (State, Arg (3), 1);
+                  Copy_Roots
+                    (State, Activation.Native_Results,
+                     One_Value (State, Arg (3), 1));
                else
                   return Request ("@length", One_Value (State, Item, 1));
                end if;
@@ -366,7 +376,9 @@ package body Lua.Engine.Table_Drivers is
                   Append (Activation.Native_Buffer, Part);
                end;
             else
-               Activation.Native_Captures.Append (Returned);
+               Append_Root
+                 (State, Activation.Native_Captures,
+                  Returned);
                --  Returned values are actual live native stack entries too.
                --  A subsequent __index callback starts above this accumulated
                --  prefix, not above unused future result capacity, and GC can

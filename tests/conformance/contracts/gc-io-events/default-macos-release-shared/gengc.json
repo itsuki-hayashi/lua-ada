@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "operation": "file:gengc.lua",
+  "context": "default/macos/release/shared",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_hashes": {
+    "gengc.lua": "5a7a6e525752c97221fbabc4ea4374692e59b3167f6f836d10ceffef16574e03"
+  },
+  "review": {
+    "author": "/root",
+    "reviewer": "/root/review_gc",
+    "artifact": "tests/conformance/reviews/gengc.execution-contracts.cross-review.json",
+    "rationale": "Scoped protocol and omission mapping; matrix replays separate named cases, native counterparts and physical shutdown.",
+    "original_c_evidence": "lifecycle-macOS-release-relocatable/reports/gc-events/c21d2592fe6f45039a1f49a2e8f4a969/ReferenceC-gengc.lua.json#sha256=d31a51cb5b573c375da7f5f4f4e8d20651053a4602525df0519fd02481335b78"
+  },
+  "completion_marker": "OK",
+  "stdout_required": [
+    {
+      "pattern": "(?m)^testing\\ generational\\ garbage\\ collection\\r?$",
+      "count": 1
+    }
+  ],
+  "stderr_expected": [],
+  "expected_skips": [
+    {
+      "message": ">>> testC not active: skipping some generational tests <<<",
+      "coverage_ids": [
+        "LUA-GENGC-REVIEWED-BLOCK-0008",
+        "LUA-GENGC-REVIEWED-BLOCK-0009",
+        "LUA-GENGC-REVIEWED-BLOCK-0010",
+        "LUA-GENGC-REVIEWED-BLOCK-0011"
+      ],
+      "review_artifact": "tests/conformance/reviews/gengc.execution-contracts.cross-review.json",
+      "original_c_evidence": "lifecycle-macOS-release-relocatable/reports/gc-events/c21d2592fe6f45039a1f49a2e8f4a969/ReferenceC-gengc.lua.json#sha256=d31a51cb5b573c375da7f5f4f4e8d20651053a4602525df0519fd02481335b78"
+    }
+  ],
+  "disposition": "unchanged"
+}

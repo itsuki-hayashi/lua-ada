@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "operation": "file:gengc.lua",
+  "context": "upstream-test/windows/validation/static-pic",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_hashes": {
+    "gengc.lua": "5a7a6e525752c97221fbabc4ea4374692e59b3167f6f836d10ceffef16574e03"
+  },
+  "review": {
+    "author": "/root",
+    "reviewer": "/root/review_gc",
+    "artifact": "tests/conformance/reviews/gengc.execution-contracts.cross-review.json",
+    "rationale": "Scoped protocol and omission mapping; matrix replays separate named cases, native counterparts and physical shutdown.",
+    "original_c_evidence": "instrumented-Windows-static/reports/gc-events/9d870e8b7e584e8db004307a211f9814/ReferenceC-gengc.lua.json#sha256=b66008e539b46968cef211a294d9aa867477317f0c8b47f9ad37ad4c131dcec6"
+  },
+  "completion_marker": "OK",
+  "stdout_required": [
+    {
+      "pattern": "(?m)^testing\\ generational\\ garbage\\ collection\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ stop-the-world\\ collection\\r?$",
+      "count": 1
+    }
+  ],
+  "stderr_expected": [],
+  "expected_skips": [],
+  "disposition": "unchanged"
+}

@@ -51,7 +51,12 @@ function Invoke-Case {
         }
         $output = $stdout.GetAwaiter().GetResult()
         $errorOutput = $stderr.GetAwaiter().GetResult()
-        if ($Case.Fail) {
+        if ($Case.ContainsKey('ExitCode')) {
+            if ($process.ExitCode -ne $Case.ExitCode -or $errorOutput -ne '') {
+                throw "CLI typed exit mismatch: $($Case.Title): $errorOutput"
+            }
+        }
+        elseif ($Case.Fail) {
             if ($process.ExitCode -eq 0 -or
                 -not $errorOutput.Contains($Case.Error)) {
                 throw "Expected CLI failure: $($Case.Title): $errorOutput"
@@ -72,6 +77,32 @@ function Invoke-Case {
 }
 
 $cases = @(
+    # Lua narrows lua_Integer to the native C int before process exit.
+    # Windows exposes the signed status; POSIX reports its lowest byte.
+    @{ Title = 'negative process exit retains native status';
+       ExitCode = $(if ($IsWindows) { -1 } else { 255 });
+       Args = @('-e', 'os.exit(-1,false)'); Output = '' },
+    @{ Title = 'oversized process exit retains low C int bits'; ExitCode = 0;
+       Args = @('-e', 'os.exit(4294967296,false); error("unreachable")'); Output = '' },
+    # The native unbuffered call ignores buffer capacity. A checked Ada
+    # range conversion must not reject the otherwise valid Lua integer.
+    @{ Title = 'unbuffered file accepts negative size_t input';
+       Args = @('-e', 'local f=assert(io.open("negative-size.tmp","w")); assert(f:setvbuf("no",-1)); assert(f:write("ok")); assert(f:close()); assert(os.remove("negative-size.tmp"))');
+       Output = '' },
+    @{ Title = 'typed exit without Lua close handlers'; ExitCode = 42;
+       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("finalized") end}); local x <close> = setmetatable({}, {__close=function() print("closed") end}); os.exit(42,false)', '-e', 'error("unreachable")');
+       Output = '' },
+    @{ Title = 'typed exit completes Lua close handlers'; ExitCode = 43;
+       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("finalized") end}); local x <close> = setmetatable({}, {__close=function() print("closed") end}); os.exit(43,true)', '-e', 'error("unreachable")');
+       Output = "closed${newline}finalized$newline" },
+    # A reachable finalizable object must run at explicit CLI state closure,
+    # after the chunk marker; physical Ada disposal alone cannot satisfy it.
+    @{ Title = 'state close finalizes reachable objects';
+       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("closed") end}); print("done")');
+       Output = "done${newline}closed$newline" },
+    @{ Title = 'failed snippet closes reachable objects';
+       Args = @('-e', 'saved=setmetatable({}, {__gc=function() print("closed") end}); error("expected")');
+       Fail = $true; Error = 'expected'; Output = "closed$newline" },
     # No input is deliberately batch usage, rather than an implicit REPL.
     @{ Title = 'no input displays usage'; Args = @(); Contains = 'Usage:' },
     @{ Title = 'explicit help'; Args = @('--help'); Contains = 'Usage:' },

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "native-branch-counterpart-proposal",
+  "author": "Codex independent review agent /root/review_files",
+  "review_status": "pending-independent-cross-review",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source": "references/lua/testes/files.lua",
+  "source_sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "counterpart": {
+    "path": "tests/conformance/platform/files-native-branches.lua",
+    "sha256": "df5f79a292f8978d5906915c253f69c11fe100041d29ce3ce1d9d51860360a96",
+    "execution": "Shared C and Ada setup; both configurations; all applicable contexts; no source replacement"
+  },
+  "branches": [
+    {
+      "id": "files-native-cint-capacity",
+      "source_spans": [
+        {
+          "first_line": 880,
+          "last_line": 891,
+          "byte_offset": 23566,
+          "byte_length": 459,
+          "sha256": "31e7aec762dceae83c20279afba9079080d63be16a41788ec2e0453c94e380cc"
+        },
+        {
+          "first_line": 908,
+          "last_line": 911,
+          "byte_offset": 24590,
+          "byte_length": 221,
+          "sha256": "24b8c3c3b85b75c65ac7e75dda573cd17081fafe91c9e95f9dabccf0a850a9db"
+        },
+        {
+          "first_line": 931,
+          "last_line": 947,
+          "byte_offset": 25596,
+          "byte_length": 630,
+          "sha256": "a2fb104066f2806cb327f7c46c898f9355c547a67f22b56ec2292527329e8e6b"
+        }
+      ],
+      "guard_facts": [
+        "string.packsize(i)",
+        "string.packsize(j)"
+      ],
+      "inactive_original": "Eight-byte C-int arm is not executed on four-byte-C-int hosts. Width guard alternatives must be recorded, not labelled unchanged passes.",
+      "counterpart_invariant": "Exercise actual native field capacity and range rejection, then prove later ordinary date conversion remains usable; on wide C-int host execute original huge-year distinction. Narrow Lua integer host exercises maximum timestamp roundtrip. Four-byte field failures require the exact year/day/month out-of-bound diagnostic.",
+      "required_marker": "native C-int field boundary counterpart OK",
+      "classification": "native equivalent; inactive original branches remain distinguished"
+    },
+    {
+      "id": "files-native-time-range",
+      "source_spans": [
+        {
+          "first_line": 912,
+          "last_line": 928,
+          "byte_offset": 24811,
+          "byte_length": 728,
+          "sha256": "a1fedab58758222d9446a134edde7dba58d61e68645d6419eb7dbc5dd39c1748"
+        }
+      ],
+      "guard_facts": [
+        "Protected os.date(%Y, 2^40) success or specified bound/representation error"
+      ],
+      "inactive_original": "Actual probe selects available native time range; no claim that four-byte time_t arm ran on eight-byte host.",
+      "counterpart_invariant": "Same original probe value; representable result must roundtrip date table to exact instant; rejected value must produce expected range diagnostic and leave later conversion usable. Existing separately approved Windows last-instant/next-second test is still required, not replaced by this recovery check. The actual source year4000 calendar conversion also runs: supported result roundtrips and has year4000; unsupported result requires representability error and successful later recovery.",
+      "required_marker": "native time range recovery counterpart OK",
+      "classification": "native equivalent plus explicit actual guard fact"
+    },
+    {
+      "id": "files-native-dst-presence",
+      "source_spans": [
+        {
+          "first_line": 952,
+          "last_line": 961,
+          "byte_offset": 26240,
+          "byte_length": 273,
+          "sha256": "403714372db6be2d3b4449008e7e1c4b1aceae8eae5930dfe42ed779eb857553"
+        }
+      ],
+      "guard_facts": [
+        "Native date table isdst absent or boolean"
+      ],
+      "inactive_original": "The nil-output-field arm is not claimed executed when native libc returns boolean.",
+      "counterpart_invariant": "Record native field presence and execute omitted, explicit false and explicit true DST inputs; normalized resulting date must reconstruct the same instant in every case. Clearing isdst in the native date table must reconstruct the identical original instant.",
+      "required_marker": "native DST inference counterpart OK",
+      "classification": "native equivalent for optional-field inference"
+    }
+  ],
+  "local_observation": {
+    "path": "reports/review-files-native-branches/index.json",
+    "sha256": "7f8e1f6bdec7608d2d765d79b377aeb7f665d9adb3d831fea260cf926e352ee3",
+    "scope": "Four existing-executable Windows observations: C/Ada at JST-9 and UTC0. Not Linux/macOS or final-context acceptance."
+  },
+  "pending": [
+    "Independent semantic review",
+    "Shared launcher source/hash bindings and mandatory markers",
+    "Actual C/Ada execution for every applicable final context",
+    "Explicit per-context guard fact records; no not-applicable shortcut"
+  ]
+}

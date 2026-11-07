@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "kind": "independent-transformation-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-pending-runtime-classification-transformation",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "path": "scripts/test-conformance-scope.ps1",
+      "sha256": "e186d7f01eaf61308cc62cb42f606a4a45f6a4ea15131a31fa64830775be725f"
+    },
+    {
+      "path": "tests/conformance/coverage/events.jsonl",
+      "sha256": "e6446283933508b15dc410d825287d8e9156daed2f026c491433df4b3632a27a"
+    },
+    {
+      "path": "tests/conformance/coverage/gc.jsonl",
+      "sha256": "90c868e396f05f1709271ae9238a4ade1f3c109154e0683762cb6b1d5fdb85cb"
+    },
+    {
+      "path": "tests/conformance/coverage/gengc.jsonl",
+      "sha256": "9f1c9fc1182c5d5992eefa026bc0f4627173c6f25752de70ed7074a603334eeb"
+    },
+    {
+      "path": "tests/conformance/coverage/files.jsonl",
+      "sha256": "299d3208628e4a7a465d823119a51c140a6da483da5bb72e2d05f8e0167de1f1"
+    },
+    {
+      "path": "tests/conformance/scopes/gc-io-events.api.jsonl",
+      "sha256": "97e1d2e96dbe0a0d2063ad43c75f7dc1dd5fcc7ac5b50a183b1adcc6c55fbba8"
+    }
+  ],
+  "checks": [
+    "All 762 preexisting source anchors preserve id, kind, byte offset/length, anchor hash, start/end lines exactly against HEAD.",
+    "All 899 resulting source spans independently rehashed against immutable upstream bytes; 137 added reviewed blocks match their cited spans.",
+    "191 lexical entries are reviewed; 708 runtime/audit entries remain pending. All evidence arrays are empty and no source entry is passed.",
+    "77 scoped API entries remain pending with empty evidence; all attached named-case source hashes match actual current files.",
+    "Manual-audit entries remain pending and cannot stand in for runtime body evidence. Source guard/setup review is distinct from runtime execution.",
+    "API missing-invariant negative explicitly nulls the newly populated invariant before setting fixture passed. This restores the intended negative mutation without changing validator or expected rejection."
+  ],
+  "limitations": [
+    "Semantic proposal reviews remain the authority for classifications; this review audits their transformation, not new execution.",
+    "Added block end_line normalization is acceptable because byte spans/hashes are authoritative and originals remain unchanged.",
+    "Actual full-context execution, native equivalence approval and final review still required."
+  ],
+  "execution_evidence": [],
+  "final_scope_metadata_delta": {
+    "decision": "accepted",
+    "reviewer": "Codex /root/review_events_harness",
+    "source_bindings": [
+      {
+        "path": "scripts/test-conformance-scope.ps1",
+        "sha256": "06ae0ffba89a4b78fce088a311085b2b605c53ba95be0aa64a13ab103dd6dc5e"
+      },
+      {
+        "path": "tests/conformance/scopes/gc-io-events.json",
+        "sha256": "79fa732f60f380c93be190f43640acf0b2ac595bdf9196d2fc8fd0a7ee62eae7"
+      }
+    ],
+    "rationale": "Pending-review negative explicitly sets fixture review.status to pending instead of relying on production state. Expected independent-review rejection and validator remain unchanged. Scope metadata now identifies independent semantic approval; every approved identity field matches the approval artifact exactly. Runtime coverage remains pending.",
+    "execution_evidence": []
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "independent-aunit-evidence-implementation-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-named-case-replay-implementation",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "sha256": "a3cec5c70bf1310f7235bfccd8fb68e3eadb7f39694bcf89e83ee498dbb30961",
+      "path": "scripts/AUnitEvidence.psm1"
+    },
+    {
+      "sha256": "b2854afcbe49536dd13d7423d345b0ca1d5e4473d8854b8522725fb190251a7e",
+      "path": "scripts/check-aunit-evidence.ps1"
+    },
+    {
+      "sha256": "2a7fb8af7e502bdb0e3e603722e65e13e76d23ff59044a677a5883cff53877c0",
+      "path": "scripts/check.ps1"
+    },
+    {
+      "sha256": "9255360b864da57d85c0fe0ac84f8c7146865c261ee8b8b009827a13b1d7b622",
+      "path": "scripts/check-instrumented.ps1"
+    },
+    {
+      "sha256": "8c11acceb8a76759ab3c79bfc391413713df8ddcc42ba884c6b5057c475c9aec",
+      "path": "scripts/ConformanceMatrix.psm1"
+    },
+    {
+      "sha256": "453debe2499261f2bebfdc52423bc08a7654cafce2d975fc0898b4d7535fc597",
+      "path": "scripts/test-aunit-evidence.ps1"
+    }
+  ],
+  "resolved_findings": [
+    "Default pipeline saves/sets/restores configuration; runner path must match selected configuration and actual sibling configuration probe is captured, hashed and checked.",
+    "Every mapped source/hash must appear exactly once in mapping bindings, whose actual files are resolved and hashed.",
+    "Blank case identities, duplicate case identities, missing labels and empty mappings reject; explicit blank/empty negatives added.",
+    "Summary is explicitly documented as consistency checking for named-case replay. Retained whole-suite CI remains a separate gate, not inferred from self-reported total alone."
+  ],
+  "accepted_checks": [
+    "Actual stderr must contain exactly the expected finalizer warning; unexpected diagnostic output fails.",
+    "Clean revision and exact platform/configuration/profile/library type, completed process, zero exit, hashed captures and matching runtime library identities required.",
+    "Every required context must supply reviewed named AUnit evidence; missing/duplicate contexts reject."
+  ],
+  "validation_note": "Independent source review only. Parent reports17 synthetic cases and real default/instrumented1306-case runs passed; clean14-label replay remains pending.",
+  "remaining_validation": [
+    "Run clean committed actual14-label replay and retain all26-context artifacts.",
+    "Exercise matrix-level missing/duplicate source binding and review rejection paths in acceptance fixtures.",
+    "Source applicability, approved equivalents and complete whole-suite CI remain separate requirements."
+  ],
+  "execution_evidence": []
+}

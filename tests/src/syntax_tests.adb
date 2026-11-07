@@ -3,6 +3,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Lua.Syntax; use Lua.Syntax;
 with Lua.Sessions;
 with Test_Support;
+with Lua.Test_Configuration;
 
 package body Syntax_Tests is
    procedure Empty;
@@ -113,7 +114,7 @@ package body Syntax_Tests is
    begin
       Require
         ("local global = 1; return global",
-         True);
+         Lua.Test_Configuration.Compatible_Global);
    end Contextual_Global;
 
    procedure Global_Field is
@@ -122,7 +123,7 @@ package body Syntax_Tests is
    begin
       Require
         ("local t = {global=1}; return t.global",
-         True);
+         Lua.Test_Configuration.Compatible_Global);
    end Global_Field;
 
    procedure Global_Function is

@@ -47,6 +47,14 @@ package Lua.Engine.Stacks is
    --  Clear initialized slots above Last, retaining arena capacity/length.
    --  Do not change any semantic/API top; the caller owns those transitions.
 
+   function Try_Shrink
+     (Context : not null Context_Access; Last : Natural) return Boolean;
+   --  Build two exact smaller physical arenas and publish only after both
+   --  succeed. Last includes physical extra rows. The caller checks live
+   --  reserved windows and never calls this during emergency collection.
+   --  Actual provider refusal is optional-shrink failure, preserving original
+   --  arenas/tops and acknowledging its witness. No semantic top is invented.
+
    procedure Trace
      (Context : not null Context_Access;
       Mark_Value : not null access procedure (Item : Value);

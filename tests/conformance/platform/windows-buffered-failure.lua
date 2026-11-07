@@ -1,0 +1,17 @@
+-- First-party counterpart for files.lua's /dev/full block on Windows.
+-- The same native driver and these assertions run against C and Ada.
+assert(type(_test_failing_stream) == 'function')
+local old = io.output()
+local f = assert(io.tmpfile())
+assert(_test_failing_stream(f) == f)
+io.output(f)
+assert(f:write('abcd') == f)
+assert(not f:flush())
+assert(f:write('abcd') == f)
+assert(not io.flush())
+assert(f:close())
+assert(io.type(f) == 'closed file')
+io.output(old)
+assert(not pcall(_test_failing_stream, {}))
+assert(not pcall(_test_failing_stream, f))
+print('native Windows buffered failure counterpart OK')

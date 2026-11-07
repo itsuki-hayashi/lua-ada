@@ -4,7 +4,9 @@
  * C raises it. No reference interpreter object is linked into this library. */
 #include "lua_ada_boundary.h"
 #include "lauxlib.h"
+#include "lualib.h"
 #include <setjmp.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -186,6 +188,25 @@ static int drive_call(lua_State *state, int arguments, int results,
     }
     raise_action(state, action, &output);
     return (int)output.integer_data;
+}
+
+static int close_io_primitive(lua_State *state, int kind) {
+    struct lua_ada_request input = request(ADA_CLOSE_IO_PRIMITIVE);
+    input.count = kind;
+    return (int)dispatch(state, input).integer_data;
+}
+
+/* These addresses are real callable lua_CFunction values stored in the public
+ * luaL_Stream payload. Lua close validation/results stay Ada-owned; direct C
+ * closef invocation deliberately creates no extra interpreter/debug frame. */
+int lua_ada_io_close_regular(lua_State *state) {
+    return close_io_primitive(state, 0);
+}
+int lua_ada_io_close_pipe(lua_State *state) {
+    return close_io_primitive(state, 1);
+}
+int lua_ada_io_close_borrowed(lua_State *state) {
+    return close_io_primitive(state, 2);
 }
 
 void lua_pushcclosure(lua_State *state, lua_CFunction function, int upvalues) {
@@ -499,4 +520,44 @@ lua_Alloc lua_getallocf(lua_State *state, void **userdata) {
 void lua_setallocf(lua_State *state, lua_Alloc allocator, void *userdata) {
     struct lua_ada_request input = request(ADA_SET_ALLOCATOR);
     input.allocator = allocator; input.pointer = userdata; dispatch(state, input);
+}
+
+int luaopen_io(lua_State *state) {
+    return (int)dispatch(state, request(ADA_OPEN_IO_MODULE)).integer_data;
+}
+int luaopen_os(lua_State *state) {
+    return (int)dispatch(state, request(ADA_OPEN_OS_MODULE)).integer_data;
+}
+
+static int drain_collector(lua_State *state) {
+    dispatch(state, request(ADA_PUSH_COLLECTOR_DRAIN));
+    lua_call(state, 0, 0);
+    return 0;
+}
+
+int lua_gc(lua_State *state, int what, ...) {
+    struct lua_ada_request input = request(ADA_COLLECTOR_CONTROL);
+    struct lua_ada_response output;
+    va_list arguments;
+    int status;
+    input.index = what;
+    va_start(arguments, what);
+    if (what == LUA_GCSTEP) input.length = va_arg(arguments, size_t);
+    else if (what == LUA_GCPARAM) {
+        input.count = va_arg(arguments, int);
+        input.error_index = va_arg(arguments, int);
+    }
+    va_end(arguments);
+    output = dispatch(state, input);
+    /* Lua finalizers run only after the Ada control call has returned. The
+     * ordinary protected C pump owns every callback and nonlocal transfer.
+     * Failure to obtain optional frame/stack storage defers the intact queue;
+     * host-abort transfers retain their existing uncatchable boundary. */
+    if (output.length && lua_checkstack(state, 1)) {
+        lua_pushcfunction(state, drain_collector);
+        status = lua_pcall(state, 0, 0, 0);
+        if (status == LUA_ERRMEM) lua_pop(state, 1);
+        else if (status != LUA_OK) lua_error(state);
+    }
+    return (int)output.integer_data;
 }

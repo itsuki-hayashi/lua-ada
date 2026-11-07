@@ -43,7 +43,7 @@ package body Lua.Runtime_Vector_Tests is
    begin
       --  Every constructor must seed future list growth, even when the list
       --  is empty. These objects have no executable code or host callbacks.
-      State.Programs.Append (Program);
+      --  New_Program has already published its stable owned registry slot.
       Closure := New_Closure (State, Program, null);
       State.Current.Stack.Append (Activation);
       Assert (State.Heap.Owner_Of = Memory and
@@ -105,7 +105,7 @@ package body Lua.Runtime_Vector_Tests is
             Set (State, Right, (Integer_Kind, 1), Left);
          end;
       end loop;
-      Before_Count := Natural (State.Heap.Length);
+      Before_Count := State.Live_Objects;
       --  Emergency collection conservatively retains objects born during
       --  the current atomic operation. Begin after constructing the garbage,
       --  so these older cycles are eligible while any new temporaries root.
@@ -117,7 +117,7 @@ package body Lua.Runtime_Vector_Tests is
               "emergency collection attempted managed growth");
       Assert (not Refusal_Pending (State.Memory),
               "allocation-free collection reached allocator refusal");
-      Assert (Natural (State.Heap.Length) <= Before_Count - 256,
+      Assert (State.Live_Objects <= Before_Count - 256,
               "unreachable cycles reclaimed without scratch allocation");
       Assert (Get (Kept, (Integer_Kind, 1)) = Kept,
               "reachable cycle survived allocation-free marking");
@@ -170,12 +170,18 @@ package body Lua.Runtime_Vector_Tests is
       Assert (Failed and not State.Collector_Active,
               "failed marking restored collector lifecycle");
       for Item of State.Heap loop
-         Assert (not Item.Marked and Item.Mark_Next = null,
-                 "failed marking cleared object colors and queue links");
+         if Item /= null then
+            Assert (Item.Color = State.GC.Current_White and
+                    Item.Gray_List = Not_Queued and Item.Mark_Next = null,
+                    "failed marking cleared object colors and queue links");
+         end if;
       end loop;
       for Program of State.Programs loop
-         Assert (not Program.Marked and Program.Mark_Next = null,
-                 "failed marking cleared prototype colors and links");
+         if Program /= null then
+            Assert (Program.Color = State.GC.Current_White and
+                    Program.Mark_Next = null,
+                    "failed marking cleared prototype colors and links");
+         end if;
       end loop;
       Collect (State);
       Assert (State.Heap.Contains (Thread.Reference),

@@ -28,6 +28,9 @@ package body Lua.Finalizer_Queue_Tests is
    procedure Fixture is
       State : World;
    begin
+      --  Queue-component fixtures own only their explicitly enrolled objects;
+      --  standard stream finalizers belong to the integration fixtures.
+      State.Open_Standard_Libraries := False;
       Initialize (State, (others => <>));
       Begin_Operation (State);
       begin

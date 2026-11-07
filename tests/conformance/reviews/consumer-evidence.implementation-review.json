@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "kind": "independent-consumer-evidence-implementation-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-implementation-pending-real-replay",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "sha256": "6ee64043c92ecee646e99df883203d0deb23f6adeac3f2b9fc099b4f4af25ae9",
+      "path": "scripts/ConsumerEvidence.psm1"
+    },
+    {
+      "sha256": "0bbf21ed9af6e52a8c7889949d02db2ddf5b7794ab7226a6ad91c3fae479f9a3",
+      "path": "scripts/ConformanceMatrix.psm1"
+    },
+    {
+      "sha256": "c299fc50efbc1c85652311673c7213db81eaee6921f4599bc9db412381afa9b5",
+      "path": "scripts/check-core-image.ps1"
+    },
+    {
+      "sha256": "f7349e191227387b3f1db955922503a1700bdf6bd8d602bac75efef74329a1ac",
+      "path": "scripts/test-consumer-evidence.ps1"
+    }
+  ],
+  "accepted_checks": [
+    "Exact platform/configuration/profile/library type, clean revision and pinned reference are now checked.",
+    "Mapping requires independent author/reviewer and hash binding; every mapped source must be explicitly present in reviewed source bindings.",
+    "All77 current scoped API IDs and their named case sets are compared; every required case resolves exactly once.",
+    "Actual captured stdout/stderr hashes, unique final markers, unique named witnesses, process status and oracle output equality are replayed.",
+    "Oracle driver and shared allocator source hashes are checked against current files; reference library identities must be present and shaped correctly.",
+    "Ada consumer library names/hashes must appear exactly once in each matching-context file execution report."
+  ],
+  "regression_review": "Source-reviewed23 synthetic cases include dirty/wrong identity, platform/pin/library failures, rehashed nonempty stderr, duplicate named/final witnesses and unequal oracle bytes. Parent execution results remain distinct from this source review.",
+  "remaining_validation": [
+    "Replay all41 actual cases from a clean committed revision before treating implementation as validated on real artifacts.",
+    "Exercise matrix-level review/source/API-set/case-set/library mismatch negatives as acceptance fixtures become available; helper tests alone do not execute these new matrix branches.",
+    "Named C evidence does not replace AUnit internal-equivalent evidence or source obligation applicability review."
+  ],
+  "execution_evidence": [],
+  "oracle_library_delta": {
+    "previous_matrix_sha256": "707967ff346f96f9af2d22aef647ffd1d1639918e797fabe6708686a8ff79630",
+    "decision": "accepted",
+    "rationale": "Both GC and IO consumer oracle library identities must match exactly one basename/hash in each same-context C file execution report. Earlier nonempty/hashshape checks prevent vacuous missing lists. This strengthens observed oracle provenance without claiming runtime acceptance.",
+    "current_matrix_sha256": "0bbf21ed9af6e52a8c7889949d02db2ddf5b7794ab7226a6ad91c3fae479f9a3",
+    "reviewer": "Codex /root/review_events_harness"
+  }
+}

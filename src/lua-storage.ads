@@ -80,6 +80,9 @@ private package Lua.Storage is
    --  Bound total raw live bytes, including alignment/ownership metadata.
    --  Lowering below current use is allowed; releases and shrinking remain
    --  possible. This is an allocator ceiling, not an instruction quota.
+   procedure Set_Test_Ceiling (Self : in out Owner; Bytes : Byte_Count);
+   --  Independent fault-injection ceiling. Raising this cannot bypass the
+   --  host's Set_Ceiling limit. Zero restores the unrestricted test ceiling.
    procedure Set_Failure_Countdown
      (Self : in out Owner; Successful_Growths : Byte_Count);
    --  Permit this many successful growth operations, then refuse subsequent
@@ -87,6 +90,9 @@ private package Lua.Storage is
    --  never consume the countdown. No retry or collection is performed here:
    --  the engine owns emergency collection and its single retry policy.
    procedure Clear_Failures (Self : in out Owner);
+   procedure Fail_Next_Growth (Self : in out Owner);
+   --  Refuse exactly one future growth, independently of persistent limits.
+   --  Shrinking and releasing storage never consume this request.
 
    function Allocate
      (Self : in out Owner; Size : Byte_Count;
@@ -135,6 +141,18 @@ private package Lua.Storage is
    --  A closed owner cannot be reused; construct a fresh owner for reset.
 
 private
+   --  Shared only with test-only child inspection. This is the production
+   --  provider header itself, never a copied test layout or public C ABI.
+   type Header is record
+      Parent : Owner_Access;
+      Before, After : System.Address;
+      Raw : System.Address;
+      Raw_Size : Byte_Count;
+      User : System.Address;
+      Size : Byte_Count;
+      Alignment : Byte_Count;
+   end record;
+
    type Managed_Subpool is new
      System.Storage_Pools.Subpools.Root_Subpool with record
       Parent : Owner_Access;
@@ -147,8 +165,10 @@ private
       Provider_Data : System.Address := System.Null_Address;
       Counts : Allocation_Statistics;
       Ceiling : Byte_Count := Byte_Count'Last;
+      Test_Ceiling : Byte_Count := Byte_Count'Last;
       Countdown : Byte_Count := 0;
       Injecting : Boolean := False;
+      Fail_Next : Boolean := False;
       Closed : Boolean := False;
       Pending_Refusal : Boolean := False;
    end record;

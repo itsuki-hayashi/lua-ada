@@ -98,7 +98,7 @@ package body Runtime_Control_Tests is
    procedure Coroutine_Closure_Graph;
    procedure Surviving_Capture;
    procedure Collection_Control;
-   procedure Collection_Unsupported;
+   procedure Collection_Mode_Transition;
    procedure Hook_Error_Recovery;
    procedure Close_Normal_Yield;
    procedure Close_Explicit_Not_Yieldable;
@@ -663,16 +663,16 @@ package body Runtime_Control_Tests is
          "assert(collectgarbage('isrunning'))");
    end Collection_Control;
 
-   procedure Collection_Unsupported is
-      --  Deferred collector accounting must not return fake numbers.
-      --  Request count and generational modes under pcall.
-      --  Both requests raise explicit unsupported-option errors.
+   procedure Collection_Mode_Transition is
+      --  Actual selected-provider bytes and mode transitions are supported.
+      --  Query count, enter generational mode and return to incremental.
+      --  Results describe real collector state rather than placeholder data.
    begin
       Check
-        ("local ok,e=pcall(collectgarbage,'count');" &
-         "assert(not ok and e:find('unsupported'));" &
-         "assert(not pcall(collectgarbage,'generational'))");
-   end Collection_Unsupported;
+        ("assert(collectgarbage('count')>0);" &
+         "assert(collectgarbage('generational')=='incremental');" &
+         "assert(collectgarbage('incremental')=='generational')");
+   end Collection_Mode_Transition;
 
    procedure Hook_Error_Recovery is
       --  A hook error must unwind its suppression continuation.
@@ -1542,8 +1542,8 @@ package body Runtime_Control_Tests is
         (Suite, "control: Collection_Control",
          Collection_Control'Access);
       Test_Support.Add
-        (Suite, "control: Collection_Unsupported",
-         Collection_Unsupported'Access);
+        (Suite, "control: Collection_Mode_Transition",
+         Collection_Mode_Transition'Access);
       Test_Support.Add
         (Suite, "control: Hook_Error_Recovery",
          Hook_Error_Recovery'Access);

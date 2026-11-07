@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/review_files",
+  "date": "2026-11-07",
+  "coverage_authority": false,
+  "warning_review": {
+    "author": "/root/review_gc",
+    "status": "changes-requested",
+    "reviewed_script_sha256": "e8d0da41055ed2a93ce428e36b638a680c3a3bd1e62ff9807d78cfd171e144a5",
+    "reviewed_hook_sha256": "ebf55f88ee77ef6d22d7db261227569266ae6c52d9f471a904a366248bd383d2",
+    "files": [
+      "scripts/test-scoped-warnings.ps1",
+      "scripts/check-gc-events.ps1"
+    ],
+    "accepted_design": [
+      "Root run-conformance setup enables warn('@on') before native counterparts and selected upstream execution, preventing the initial off state from hiding unexpected warnings.",
+      "The retained global __gc object stays rooted until state closure. Requiring stdout OK in the shutdown negative distinguishes top-level completion from an earlier script error.",
+      "Default warnings preserve normal process success but must be rejected by the scoped empty-stderr criterion. The real T warning handler rejects unexpected warnings as a process failure.",
+      "Explicit @off remains a successful control. Fragmented @store publication, exact _WARN content, explicit consumption and restoration to @normal are checked.",
+      "Timeout, capture overflow, pipe-drain failure and process-tree kill failure are rejected. Diagnostic substring requirements prevent a missing executable/library alone from being mistaken for a successful warning negative."
+    ],
+    "findings": [
+      {
+        "id": "WARN-X1",
+        "priority": 2,
+        "location": "scripts/test-scoped-warnings.ps1:56",
+        "finding": "A matching diagnostic plus any nonzero exit is accepted, including a crash after emitting that diagnostic. Default normal-warning does not require top-level OK either.",
+        "required_resolution": "Require the known normal/default zero exit and OK, C test handler EXIT_FAILURE, and the actual Ada abort status for the platform; reject unrelated termination statuses while retaining the diagnostic and shutdown-order checks."
+      },
+      {
+        "id": "WARN-X2",
+        "priority": 2,
+        "location": "scripts/test-scoped-warnings.ps1:73",
+        "finding": "The index records arguments, executable/capture hashes and results but no repository/source/library identity. The parent GC/events index does not hash-link this warning index; the main runner source list omits both warning/hook scripts.",
+        "required_resolution": "Bind the warning evidence to its source/revision/library identities and retain a hash link from the parent campaign. A passing local output alone must not become final-revision warning evidence."
+      }
+    ],
+    "inspected_evidence": {
+      "default": "reports/review-scoped-warnings-default/index.json",
+      "instrumented": "reports/review-scoped-warnings-upstream/index.json",
+      "capture_hashes_verified": true,
+      "observed_cases": 14,
+      "actual_results": "Six default C/Ada cases exit zero; warning negatives have the expected diagnostics and shutdown OK. Eight instrumented cases show C warning failures exit 1, Ada Windows warning failures exit 3; explicit-off and consumed-store controls exit zero. All retained stdout/stderr hashes match.",
+      "limitation": "These are local Windows observations of the reviewed draft; they do not establish Linux/macOS or complete scoped coverage."
+    }
+  },
+  "warning_revision_review": {
+    "author": "/root/review_gc",
+    "reviewer": "/root/review_files",
+    "decision": "accepted-warning-regression-fixes",
+    "script_sha256": "ec8fcf2245e10b3b44b317d0c59e07a78b6bd5b980006bc09b7a62df943a9038",
+    "hook_sha256": "4a1687956c353ce61a64dbf1a85dbcd787f32a076c4e5be027492cf0b23041f1",
+    "resolved_findings": [
+      "WARN-X1",
+      "WARN-X2"
+    ],
+    "rationale": [
+      "Default negatives now require exit zero and top-level OK, while still requiring the specific warning diagnostic and rejecting empty stderr. A warning followed by an unrelated abnormal exit is no longer accepted.",
+      "The C T failure matches pinned ltests.c badexit EXIT_FAILURE; the Ada handler matches its explicit abort path (Windows 3, supported POSIX Process.ExitCode 134). Unexpected termination codes are rejected in addition to process/capture failures and missing diagnostics.",
+      "The retained-global shutdown case still requires OK before its finalizer diagnostic. Explicit off and fragmented store-consume-normal positive controls remain zero-exit/empty-stderr checks.",
+      "The warning index now binds repository revision/dirty state, six source hashes, actual runtime/reference library hashes, executable hashes, exact command arguments and capture hashes. The GC/events campaign index links it by path and hash. A partial or failed warning run cannot produce successful later file observations because the hook throws before those executions."
+    ],
+    "evidence": [
+      {
+        "path": "reports/review-scoped-warnings-default-v2/index.json",
+        "sha256": "10000d9f87590ac207964aca1a8e85fff47cdb7260561a395b492a147924e819"
+      },
+      {
+        "path": "reports/review-scoped-warnings-upstream-v2/index.json",
+        "sha256": "b1ab5c9b5356fe74c9f2fa1c560e59a6f042b2444e98f3fdb947290a5e923c2c"
+      }
+    ],
+    "verification": "Independently rehashed all 14 cases' stdout/stderr captures and both reviewed script identities in the recorded source lists. Observed default exits are zero, C T negatives one, Ada Windows T negatives three, and positive controls zero. No Alire build or source change by this cross-reviewer was needed.",
+    "limitations": [
+      "Local evidence records a dirty implementation checkout honestly; final clean revision and all platform executions remain required.",
+      "POSIX abort-status handling is a fail-closed expectation derived from abort/SIGABRT and the process runner, not a claim that the newly added tests have already passed POSIX CI.",
+      "This accepts the warning regression changes and provenance design, not complete scoped or full-M3 acceptance."
+    ]
+  },
+  "capability_review": {
+    "author": "/root",
+    "status": "accepted-for-registration-design",
+    "sources": [
+      {
+        "path": "tests/src/lua-conformance_adapter.adb",
+        "sha256": "be303995f084caa3a44a41e088174ae6f09936ea5ae9b04e79872a0f5c71d11d"
+      },
+      {
+        "path": "tests/src/lua-conformance_adapter.ads",
+        "sha256": "4bdd229b2d7392a4cdc2d5cb5d44b5a9a73b850c2255dc9fb97c10973a47f5da"
+      },
+      {
+        "path": "tests/src/lua-conformance_adapter_tests.adb",
+        "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+      }
+    ],
+    "rationale": "Has_Nonblocking_Pair reads callback 16 independently from failing-stream callback 15. The native dispatcher supplies 16 only on Windows, so pair/protocol tests cannot run on macOS merely because a failing-stream fixture exists there. Shared file validation and zero-byte refusal tests remain selected on both supported hosts. Buffered-close expectations are explicitly separated by native capability rather than suppressing a failing test.",
+    "limitation": "This accepts the capability/registration correction, not the inferred Darwin close behavior. The Darwin test and three-span equivalent still need actual native C/Ada execution before semantic acceptance."
+  },
+  "posix_gnat_termination_delta_review": {
+    "reviewer": "Codex independent review agent /root/review_files",
+    "author": "Codex independent review agent /root/review_gc",
+    "status": "accepted-for-implementation",
+    "source": {
+      "path": "scripts/test-scoped-warnings.ps1",
+      "sha256": "296cf3250798a80dd5831200dcd8ec1339c294a98deb39dcaeb09301f3b94d06"
+    },
+    "rationale": [
+      "Observed Linux capture contains both the T warning handler diagnostic and the exact GNAT command-line unhandled-signal diagnostic. Exit one is admitted only for POSIX Ada with both lines, while the outer verifier separately requires the case-specific warning text.",
+      "POSIX exit 134 still requires the T warning prefix. Wrong exit codes, unrelated errors, missing handler prefix and missing signal diagnostic are rejected. C exit one, Windows abort three and default zero remain unchanged.",
+      "Shutdown still requires top-level OK before rejection; explicit-off and fragmented-store positive cases still require zero exit and empty stderr. Timeout, capture overflow, pipe draining and process-tree errors remain failures."
+    ],
+    "verification": "Independently parsed the script and invoked its actual verifier against the captured Linux stderr: accepted observed exit one; rejected three diagnostic mutations and exit codes two, three and139. Rehashed all stdout/stderr captures for the six default and eight instrumented local v3 cases.",
+    "evidence": [
+      {
+        "path": "reports/review-scoped-warnings-default-v3/index.json",
+        "sha256": "0c9be1b45d7c7359fce01bf31716f51d91371b32448a8efab8c79f06e4977149"
+      },
+      {
+        "path": "reports/review-scoped-warnings-upstream-v3/index.json",
+        "sha256": "344751f4e5abeebd16bfbcd03c22b97c740f60a1dca19bf4190e545d07684946"
+      }
+    ],
+    "limitations": [
+      "The Linux observation motivated the correction; it is not a successful rerun of the corrected full Linux campaign.",
+      "Local v3 executions are Windows observations with dirty-source provenance; final-revision Linux/macOS and all26 acceptance contexts remain separate requirements."
+    ]
+  },
+  "posix_shutdown_route_delta_review": {
+    "reviewer": "Codex independent review agent /root/review_files",
+    "status": "accepted-for-implementation",
+    "source": {
+      "path": "scripts/test-scoped-warnings.ps1",
+      "sha256": "3847917c17c1eae6d17d43b537618b3228a57f3ab3c7632ebd0e37f9eab943a5"
+    },
+    "source_analysis": [
+      {
+        "path": "src/lua-engine.adb",
+        "line": 2431,
+        "reason": "Execute converts Program_Error into internal Ada check diagnostic."
+      },
+      {
+        "path": "src/lua-engine-machine.adb",
+        "line": 4308,
+        "reason": "Close_Lua_State re-raises unexpected exceptions after scheduler cleanup."
+      },
+      {
+        "path": "src/lua-sessions.adb",
+        "line": 54,
+        "reason": "Session.Close catches Language_Error and Storage_Error, not Program_Error."
+      },
+      {
+        "path": "cli/shared/lua_cli.adb",
+        "line": 309,
+        "reason": "Close runs outside Execute; outer handler prints lua_ada plus exception message and sets failure status."
+      }
+    ],
+    "verification": "Independently exercised actual verifier: exact shutdown fixture with OK accepted; same warning with command-line diagnostic rejected; absent OK rejected; normal warning with shutdown CLI diagnostic rejected. The actual call supplies case name/stdout. All14 v4 local capture hashes verified.",
+    "evidence": [
+      {
+        "path": "reports/review-scoped-warnings-default-v4/index.json",
+        "sha256": "100ef9ec12a8f1d2c63eb77b2236f6d1397593d30d7b75059a6a2304c4e723c0"
+      },
+      {
+        "path": "reports/review-scoped-warnings-upstream-v4/index.json",
+        "sha256": "d0d1c1110c20a147c17094acaa9af08cfd2c8d3fa880cc4fa96da3776bbf2a1e"
+      }
+    ],
+    "limitations": [
+      "The shutdown POSIX diagnostic route is source-derived, not observed passing POSIX execution. Corrected CI must supply actual shutdown evidence.",
+      "Local v4 observations are Windows C/Ada only; no full scoped acceptance claimed."
+    ]
+  },
+  "darwin_last_chance_delta_review": {
+    "reviewer": "Codex independent review agent /root/review_files",
+    "author": "Codex /root",
+    "decision": "accepted-diagnostic-matcher",
+    "runtime_acceptance": false,
+    "source": {
+      "path": "scripts/test-scoped-warnings.ps1",
+      "sha256": "606779ded513f01d7320b8619707c9dff9b158cf6cf395cf47bf808bc8be2cf3"
+    },
+    "observed_mac_capture": {
+      "path": "reports/ci-artifacts/c247afb-mac-warnings/gc-events/c49036e386bb46ad811e811863aede2b/warnings/Ada-normal-warning.stderr",
+      "sha256": "f78c0139546aa480cd7186ac37dae0078847377d9bcec623048f3c0ebbbf6f9c"
+    },
+    "local_evidence": {
+      "path": "reports/review-scoped-warnings-darwin-verifier/index.json",
+      "sha256": "adc65c20bac74e08eb511239adcf12594a46610f2406c0d6914b19259a77f26f",
+      "case_count": 8,
+      "scope": "Actual Windows instrumented C/Ada cases; Darwin cases are synthetic verifier inputs"
+    },
+    "verification": "Independent invocation of actual parsed Test-WarningTermination accepted the downloaded Darwin normal-warning exit1 diagnostic. Rejected four mutations (exception class, unhandled-signal text, execution header, warning case text) and rejected Darwin diagnostic under non-Mac routing. Rehashed stdout/stderr of all8 local instrumented cases.",
+    "rationale": [
+      "Darwin-only exit1 requires the case-specific T unexpected-warning line plus anchored GNAT execution-terminated header and exact PROGRAM_ERROR/unhandled signal line. Arbitrary exceptions or exit1 are not accepted.",
+      "Shutdown requires its own assertion diagnostic and top-level OK, including in the Darwin branch; code134 remains separately gated by the case-specific T diagnostic.",
+      "Actual caller supplies IsMacOS; Linux command-line/close routes and Windows3/C1/default0 remain unchanged."
+    ],
+    "metadata_note": "At review time verifier_fixture_count excludes seven Darwin fixtures; report their count separately or include them before final evidence regeneration.",
+    "limitations": [
+      "Observed Mac evidence is the prior normal-warning failure, not a corrected full campaign pass.",
+      "Mac shutdown last-chance expectation and positive controls require actual next-CI execution.",
+      "No final-revision or full-context runtime acceptance is granted."
+    ],
+    "final_binding_update": {
+      "decision": "accepted-with-metadata-correction",
+      "source": {
+        "path": "scripts/test-scoped-warnings.ps1",
+        "sha256": "410f4592b1e16e542b60e11ac6e7e9e2f7e1e8f1a79757e5ac881b8508244c9d"
+      },
+      "evidence": {
+        "path": "reports/review-scoped-warnings-darwin-final/index.json",
+        "sha256": "6d68127b87ac303290ad24470d9aeb0f0747f0851ad7c2c7c223264eb4e3784b"
+      },
+      "verifier_fixture_count": 21,
+      "actual_windows_instrumented_case_count": 8,
+      "resolved_metadata_note": "Named macFixtures contributes its seven cases to the verifier count. Earlier count note retained above as review history.",
+      "verification": "Verified final source binding and all16 stdout/stderr hashes for eight actual Windows cases. The21 verifier inputs remain distinct from runtime cases; no synthetic Darwin input is counted as Mac execution.",
+      "runtime_acceptance": false
+    }
+  }
+}

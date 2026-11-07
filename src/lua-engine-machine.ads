@@ -151,6 +151,10 @@ package Lua.Engine.Machine is
    procedure Run (State : in out World; Code : Prototype_Access);
    --  Synchronous Ada convenience wrapper over Start, Step and Finish.
 
+   procedure Close_Lua_State (State : in out World);
+   --  Drive an idle main thread's TBC/finalizer close protocol, leaving
+   --  physical ownership with the caller. Never call from an active drive.
+
    procedure Clear_Frames (State : in out World);
    --  Release all frame-owned packets after success or failed execution.
 

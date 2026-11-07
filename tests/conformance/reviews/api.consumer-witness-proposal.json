@@ -1,0 +1,1583 @@
+{
+  "schema_version": 1,
+  "kind": "api-named-consumer-witness-proposal",
+  "author": "Codex /root/review_events_harness",
+  "review_status": "pending-independent-cross-review",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "mapping_source": {
+    "path": "tests/conformance/reviews/api.mapping-proposal.json",
+    "sha256": "6d90221ce821a169d675d7df5ea03af60e6077a4bdeba10b322446b1aef6de2d"
+  },
+  "cases": [
+    {
+      "case_id": "test_reentrant_warning",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 925,
+      "function_sha256": "9e334ec8952d8ede7240304e01b340591f74517d3620fdcdb704dce9a3f5e7dc",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: warning callback reentry preserves outer message"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_raw_tables_and_pointer_identity",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 239,
+      "function_sha256": "55d9a935472828c5ad2f363fda852ef313779a0ad3cb8ec0c7beb73e650016e4",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: raw tables and pointer identity"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_initial_free_stack_needs_no_growth",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 785,
+      "function_sha256": "794b8bb98087a295fe9ccabaf5ca04b777444fee3b88027ed6491371af0edfdf",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: initial native stack slots need no allocation"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_public_yieldability",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 832,
+      "function_sha256": "06e0ebef1f88f15cbd2fa1a1d054f00d81cb80c946060d3771db13f8f1da0371",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: real main and secondary thread yieldability"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_protected_c_error_identity",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 395,
+      "function_sha256": "685fbb416662bbde03c677d20b6f463ad45d1871a970f160e204639a97cea223",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: protected C error identity and recovery"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_threads_registry_extra_space_and_moves",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 267,
+      "function_sha256": "a31078e62b6a5059a00eb0076da11991772821482b57b00d23e07cb6dbd96ea4",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: threads registry extra space and moves"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_callback_stack_window",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 358,
+      "function_sha256": "5c5deba15105f9df0f2c616a6b77bb590c07087514e34dcb580fdfbfea5983f8",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: callback stack window and results"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_nonyieldable_callk",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 845,
+      "function_sha256": "4360a01b2fa9ff0288c2a872665ce7eb7901958b9055453af1c68be09ba574a6",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: non-yieldable callk ignores continuation"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_stack_rotation_copy_and_bounds",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 124,
+      "function_sha256": "16cf0a972fdc99e31985b7c93bf87a859697ae5adb264f1956557784968c1b14",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: stack rotation copy and bounds"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_warning_uses_no_allocator",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 964,
+      "function_sha256": "ef938adf65b52f0f0fcd4f6bb0bc963f61a3d22ca824a39567844231d3df7954",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: warning delivery allocates no Lua storage"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_protected_callback_memory_failure",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 596,
+      "function_sha256": "b05a21aab97b647fdead3d3317b34d6c59871412625b725b315c220178da8ec7",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: protected callback memory failure and recovery"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_file_payload_closer_callback",
+      "source": "c_api/tests/io_contract.h",
+      "source_sha256": "9553a625db792889399df3aa246594018aed850a90404659fe189c0835c47f86",
+      "function_line": 50,
+      "function_sha256": "bca8fdebdb57a1d586e927e0140069d1f7b8654315c961610704d63fadb6bf86",
+      "consumer": "io-api",
+      "stdout_file": "io-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: public FILE closer callback closes actual native stream"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_warning_error_boundary",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 946,
+      "function_sha256": "226eda49f43ae9c83a8dc000d13c972a256976b5730c92bbe0a068ac0b91378d",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: warning error crosses only C guard and recovers"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_gc_modes_and_stopped_steps",
+      "source": "c_api/tests/gc_contract.h",
+      "source_sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6",
+      "function_line": 36,
+      "function_sha256": "b3c7a38fb86907fbb152d2909d1cd43539407f52e26f9c1ea8e5db228a4826df",
+      "consumer": "gc-api",
+      "stdout_file": "gc-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: GC mode returns and stopped incremental progress"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_state_allocator_lifetime",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 19,
+      "function_sha256": "135d547b2757e2c976722864ae28b8f9bda37f3c0658081caff3938b86d1a271",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: state allocator lifetime"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_userdata_metatable_identity",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 743,
+      "function_sha256": "ac5acac209c12b30bf320c9a5bda037575c7c11679510e536259734683a1f7a6",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: real raw userdata metatables"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_number_macro_without_validity_output",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 171,
+      "function_sha256": "9dae1da81de72ba636e7896b62259621cb392402d79bd4f52cea802a76e043af",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: number macro with null validity output"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_gc_controls_without_allocation",
+      "source": "c_api/tests/gc_contract.h",
+      "source_sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6",
+      "function_line": 5,
+      "function_sha256": "e9bd8c170dfeda5f056fc1dacb41ebe783be7f065a7ba8bbcd3f7584207f7cb8",
+      "consumer": "gc-api",
+      "stdout_file": "gc-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: GC controls and actual byte counts need no allocation"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_os_opener_without_global_publication",
+      "source": "c_api/tests/io_contract.h",
+      "source_sha256": "9553a625db792889399df3aa246594018aed850a90404659fe189c0835c47f86",
+      "function_line": 35,
+      "function_sha256": "1735c336c705305a6716ef9cf851aeeb9d8df12aba5a9a612f69f384832991d8",
+      "consumer": "io-api",
+      "stdout_file": "io-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: os opener returns callable exports without global write"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_userdata_maximum_uservalue_count",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 767,
+      "function_sha256": "7e275ed5f19027d39afa6921e0cf586ba395b93030ed67dd81df220ddb4bf627",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: maximum valid userdata uservalue count"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_c_closure_cells",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 378,
+      "function_sha256": "d321655ef140fbd93b1ccb5e741e6ce292d3d17a46b779a7fd23e02855e2450c",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: C closure mutable cells"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_gc_and_close_warning_callbacks",
+      "source": "c_api/tests/gc_contract.h",
+      "source_sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6",
+      "function_line": 161,
+      "function_sha256": "ba22404a9987cacdba75695e6f5991cade60c631a4d97e0958aac7e5faeba575",
+      "consumer": "gc-api",
+      "stdout_file": "gc-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: GC and state close deliver fragmented warning callbacks"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_canonical_lua_calls_c",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 425,
+      "function_sha256": "dbabeb511e6c406608782dbcf53087624d43ae5046aadcde8b589708686faa1c",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: canonical Lua calls C and load errors"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_reentrant_c_to_c_calls",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 414,
+      "function_sha256": "92abb8ebc1b19c5ca8f0091829db575f48913f588bfe846799a33ec91a6aae41",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: reentrant C calls on one scheduler"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_failed_checkstack_keeps_state_usable",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 805,
+      "function_sha256": "49eb7faf67e0e60a6d9023eedd59ee496a363bbbd109be2aaa3bb6a907dcfdb8",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: failed checkstack preserves caller and recovery"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_userdata_uservalue_results",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 712,
+      "function_sha256": "af2c3c2ec3d322e4d906a8ebb8344f0e3e8f34d82b754a257a1584815a282c91",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: userdata uservalue count and pop rules"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_gc_finalizer_callback_order",
+      "source": "c_api/tests/gc_contract.h",
+      "source_sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6",
+      "function_line": 79,
+      "function_sha256": "d3cff6acd18976e42ce2111e140656456a2ebba89ee35472d0f4269303a3b2cf",
+      "consumer": "gc-api",
+      "stdout_file": "gc-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: GC drains ordered nonyieldable C finalizers once"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_nonyieldable_pcallk",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 858,
+      "function_sha256": "949eb9ed9697a06fc6d65036074a590ee38c30f03b4a70a945daa97135e29eb2",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: non-yieldable pcallk returns result and exact error"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_guarded_allocator_refusal_and_recovery",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 90,
+      "function_sha256": "1c0db968cf89ecfeafe036e04048dc5ad4d3a6c40f58e450cd870f87eae2c02d",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: guarded allocator refusal and recovery"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_global_table_macro",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 204,
+      "function_sha256": "7ec8926b6b3c5894ae096957578ef186d3e112d7c0607bb1df3b0fcbcfd2b65e",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: registry-owned global table macro"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_gc_finalizer_storage_refusal",
+      "source": "c_api/tests/gc_contract.h",
+      "source_sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6",
+      "function_line": 96,
+      "function_sha256": "260bb65dd310f4b6f96cf25d54aa3268af971021c77d75a0677576f52c6b3576",
+      "consumer": "gc-api",
+      "stdout_file": "gc-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: GC defers refused finalizer storage and retries"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_none_or_nil_macro",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 188,
+      "function_sha256": "09436346f2a22b61158852fbd1197aa5f8375e7d6d1cb684e0e8cca72f49ca7a",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: optional argument none or nil macro"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_custom_warning_literals",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 897,
+      "function_sha256": "6615a64dbd7dd137b94f60ac57403272b24fa96545bfcdbe955b8120da571688",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: custom warning data, controls and fragments"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_constructor_refusal",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 33,
+      "function_sha256": "d6d061ccffbede7376e580f351f9614a4fe1017e46504fdfad626ab99592bcec",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: constructor refusal and recovery"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_io_opener_and_stream_layout",
+      "source": "c_api/tests/io_contract.h",
+      "source_sha256": "9553a625db792889399df3aa246594018aed850a90404659fe189c0835c47f86",
+      "function_line": 11,
+      "function_sha256": "02241ad6347d6ce2f11bda2ffef59184f1bad00afe160c9ec8b7ce2066ddc123",
+      "consumer": "io-api",
+      "stdout_file": "io-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: io opener preserves live FILE payload and metatable"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_cold_constructor_failure_sweep",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 48,
+      "function_sha256": "987f37827a1cb842bd70170b0a48f63164a0f1ba65c2f4f81fd7266009022a27",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [],
+      "pattern_witness": "^C API PASS: cold constructor failure sweep \\([1-9][0-9]* growth points\\)\\r?$",
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_userdata_payload_alignment",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 681,
+      "function_sha256": "5e5731ef47dd73a54031f4a88c59f24efd54ec8ae48869b539ea414ec05c995d",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: aligned stable userdata payloads"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_numeric_conversions",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 149,
+      "function_sha256": "aa8d65b5107e7b953430dd03a045342fbafbfdd9c63e7b7c6d0197faa78e0b84",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: numeric conversions"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_close_refusal_releases_storage",
+      "source": "c_api/tests/gc_contract.h",
+      "source_sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6",
+      "function_line": 130,
+      "function_sha256": "2cba80ccce84fea795344050a85768dd5e5f764932bbc4da54ad0b7d626d7ab2",
+      "consumer": "gc-api",
+      "stdout_file": "gc-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: refused close activation still frees all managed storage"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_binary_strings_and_stable_addresses",
+      "source": "c_api/tests/c_api_consumer.c",
+      "source_sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67",
+      "function_line": 219,
+      "function_sha256": "3dec3953ca9d6b67e4b6d6d28956f68348bc5092667464ebba45d29aa80fb8ee",
+      "consumer": "c-api",
+      "stdout_file": "c-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: binary strings and stable addresses"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    },
+    {
+      "case_id": "test_close_drains_c_finalizers",
+      "source": "c_api/tests/gc_contract.h",
+      "source_sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6",
+      "function_line": 116,
+      "function_sha256": "6e9fc8c1a7cd4692be34747ffe29a4c2385e2d64a1c413d3d46a5c57445b6b42",
+      "consumer": "gc-api",
+      "stdout_file": "gc-api.stdout",
+      "exact_witnesses": [
+        "C API PASS: state close drains C finalizers before allocator release"
+      ],
+      "pattern_witness": null,
+      "expected_count": 1,
+      "semantic_basis": "Named case assertions precede its terminal witness. Require zero process exit, no timeout, empty stderr and final consumer marker; witness alone does not establish configuration identity.",
+      "gap": null
+    }
+  ],
+  "entries": [
+    {
+      "invariant": "Indices resolve before mutation, callbacks see their argument window, results are adjusted including multiple results, and failed growth preserves the live prefix and later calls.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_stack_rotation_copy_and_bounds",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_initial_free_stack_needs_no_growth",
+        "c_api/tests/c_api_consumer.c#test_failed_checkstack_keeps_state_usable",
+        "c_api/tests/c_api_consumer.c#test_canonical_lua_calls_c"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_MULTRET-35",
+      "boundaries": "Macros must be checked through the pinned headers and their expanded public calls. Merely compiling the macro name does not establish its observable stack effect."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_REGISTRYINDEX-43",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_UPVALUEINDEX-44",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Success, nil, absent optional arguments and actual full userdata remain distinct through public type queries and callback results.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_OK-48",
+      "boundaries": "The T.newuserdata optional-argument checks in tests/c/conformance_adapter.c also exercise lua_isnoneornil. Review invalid/missing arguments independently of successful allocations."
+    },
+    {
+      "invariant": "Success, nil, absent optional arguments and actual full userdata remain distinct through public type queries and callback results.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_TNIL-64",
+      "boundaries": "The T.newuserdata optional-argument checks in tests/c/conformance_adapter.c also exercise lua_isnoneornil. Review invalid/missing arguments independently of successful allocations."
+    },
+    {
+      "invariant": "Success, nil, absent optional arguments and actual full userdata remain distinct through public type queries and callback results.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_TUSERDATA-71",
+      "boundaries": "The T.newuserdata optional-argument checks in tests/c/conformance_adapter.c also exercise lua_isnoneornil. Review invalid/missing arguments independently of successful allocations."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-TYPE-LUA_CFUNCTION-106",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Actual callback/data identity, seeded construction, refusal at measured growth positions, usable recovery, and physical release of all allocator-owned blocks.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_state_allocator_lifetime",
+        "c_api/tests/c_api_consumer.c#test_constructor_refusal",
+        "c_api/tests/c_api_consumer.c#test_cold_constructor_failure_sweep",
+        "c_api/tests/c_api_consumer.c#test_guarded_allocator_refusal_and_recovery"
+      ],
+      "id": "CAPI-LUA-H-TYPE-LUA_ALLOC-125",
+      "boundaries": "AUnit and the public GC contract additionally exercise state-close finalizers. This group does not establish arbitrary foreign allocator replacement compatibility or unrelated allocator parity."
+    },
+    {
+      "invariant": "Warning callbacks receive the registered data, exact literal fragments and continuation flags; nested delivery and protected callback errors return through guarded C paths without requiring managed allocation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_custom_warning_literals",
+        "c_api/tests/c_api_consumer.c#test_reentrant_warning",
+        "c_api/tests/c_api_consumer.c#test_warning_error_boundary",
+        "c_api/tests/c_api_consumer.c#test_warning_uses_no_allocator"
+      ],
+      "id": "CAPI-LUA-H-TYPE-LUA_WARNFUNCTION-131",
+      "boundaries": "The shared GC contract checks fragmented warnings during collection and state close. Test-only @on/@off/@normal/@allow/@store and _WARN ownership must also be reviewed against the pinned ltests.c semantics."
+    },
+    {
+      "invariant": "Actual callback/data identity, seeded construction, refusal at measured growth positions, usable recovery, and physical release of all allocator-owned blocks.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_state_allocator_lifetime",
+        "c_api/tests/c_api_consumer.c#test_constructor_refusal",
+        "c_api/tests/c_api_consumer.c#test_cold_constructor_failure_sweep",
+        "c_api/tests/c_api_consumer.c#test_guarded_allocator_refusal_and_recovery"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_NEWSTATE-163",
+      "boundaries": "AUnit and the public GC contract additionally exercise state-close finalizers. This group does not establish arbitrary foreign allocator replacement compatibility or unrelated allocator parity."
+    },
+    {
+      "invariant": "Actual callback/data identity, seeded construction, refusal at measured growth positions, usable recovery, and physical release of all allocator-owned blocks.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_state_allocator_lifetime",
+        "c_api/tests/c_api_consumer.c#test_constructor_refusal",
+        "c_api/tests/c_api_consumer.c#test_cold_constructor_failure_sweep",
+        "c_api/tests/c_api_consumer.c#test_guarded_allocator_refusal_and_recovery"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CLOSE-164",
+      "boundaries": "AUnit and the public GC contract additionally exercise state-close finalizers. This group does not establish arbitrary foreign allocator replacement compatibility or unrelated allocator parity."
+    },
+    {
+      "invariant": "Indices resolve before mutation, callbacks see their argument window, results are adjusted including multiple results, and failed growth preserves the live prefix and later calls.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_stack_rotation_copy_and_bounds",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_initial_free_stack_needs_no_growth",
+        "c_api/tests/c_api_consumer.c#test_failed_checkstack_keeps_state_usable"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ABSINDEX-177",
+      "boundaries": "Macros must be checked through the pinned headers and their expanded public calls. Merely compiling the macro name does not establish its observable stack effect."
+    },
+    {
+      "invariant": "Indices resolve before mutation, callbacks see their argument window, results are adjusted including multiple results, and failed growth preserves the live prefix and later calls.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_stack_rotation_copy_and_bounds",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_initial_free_stack_needs_no_growth",
+        "c_api/tests/c_api_consumer.c#test_failed_checkstack_keeps_state_usable"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETTOP-178",
+      "boundaries": "Macros must be checked through the pinned headers and their expanded public calls. Merely compiling the macro name does not establish its observable stack effect."
+    },
+    {
+      "invariant": "Indices resolve before mutation, callbacks see their argument window, results are adjusted including multiple results, and failed growth preserves the live prefix and later calls.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_stack_rotation_copy_and_bounds",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_initial_free_stack_needs_no_growth",
+        "c_api/tests/c_api_consumer.c#test_failed_checkstack_keeps_state_usable"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETTOP-179",
+      "boundaries": "Macros must be checked through the pinned headers and their expanded public calls. Merely compiling the macro name does not establish its observable stack effect."
+    },
+    {
+      "invariant": "Indices resolve before mutation, callbacks see their argument window, results are adjusted including multiple results, and failed growth preserves the live prefix and later calls.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_stack_rotation_copy_and_bounds",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_initial_free_stack_needs_no_growth",
+        "c_api/tests/c_api_consumer.c#test_failed_checkstack_keeps_state_usable"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHVALUE-180",
+      "boundaries": "Macros must be checked through the pinned headers and their expanded public calls. Merely compiling the macro name does not establish its observable stack effect."
+    },
+    {
+      "invariant": "Indices resolve before mutation, callbacks see their argument window, results are adjusted including multiple results, and failed growth preserves the live prefix and later calls.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_stack_rotation_copy_and_bounds",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_initial_free_stack_needs_no_growth",
+        "c_api/tests/c_api_consumer.c#test_failed_checkstack_keeps_state_usable"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CHECKSTACK-183",
+      "boundaries": "Macros must be checked through the pinned headers and their expanded public calls. Merely compiling the macro name does not establish its observable stack effect."
+    },
+    {
+      "invariant": "Success, nil, absent optional arguments and actual full userdata remain distinct through public type queries and callback results.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TYPE-197",
+      "boundaries": "The T.newuserdata optional-argument checks in tests/c/conformance_adapter.c also exercise lua_isnoneornil. Review invalid/missing arguments independently of successful allocations."
+    },
+    {
+      "invariant": "Integer bounds, nonintegral conversion refusal, valid numeric string conversion without changing source type, and Lua truth of integer zero are observable through real API values.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TONUMBERX-200",
+      "boundaries": "Test adapter parameter arguments and inspected results use these paths. This scope is not all numeric conversion/formatting compatibility."
+    },
+    {
+      "invariant": "Integer bounds, nonintegral conversion refusal, valid numeric string conversion without changing source type, and Lua truth of integer zero are observable through real API values.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TOINTEGERX-201",
+      "boundaries": "Test adapter parameter arguments and inspected results use these paths. This scope is not all numeric conversion/formatting compatibility."
+    },
+    {
+      "invariant": "Integer bounds, nonintegral conversion refusal, valid numeric string conversion without changing source type, and Lua truth of integer zero are observable through real API values.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TOBOOLEAN-202",
+      "boundaries": "Test adapter parameter arguments and inspected results use these paths. This scope is not all numeric conversion/formatting compatibility."
+    },
+    {
+      "invariant": "The public pointer addresses stable aligned writable payload storage; zero-size objects retain distinct identities; uservalue reads/writes obey nil, invalid-index, pop and maximum-count rules.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_maximum_uservalue_count"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RAWLEN-204",
+      "boundaries": "The selected T.newuserdata calls must use real C exports. GC/finalizer ownership remains a separate dynamic obligation in events.lua and gc.lua."
+    },
+    {
+      "invariant": "The public pointer addresses stable aligned writable payload storage; zero-size objects retain distinct identities; uservalue reads/writes obey nil, invalid-index, pop and maximum-count rules.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_maximum_uservalue_count"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TOUSERDATA-206",
+      "boundaries": "The selected T.newuserdata calls must use real C exports. GC/finalizer ownership remains a separate dynamic obligation in events.lua and gc.lua."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RAWEQUAL-236",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "Integer bounds, nonintegral conversion refusal, valid numeric string conversion without changing source type, and Lua truth of integer zero are observable through real API values.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHINTEGER-245",
+      "boundaries": "Test adapter parameter arguments and inspected results use these paths. This scope is not all numeric conversion/formatting compatibility."
+    },
+    {
+      "invariant": "Embedded NUL and high bytes retain exact lengths and stable rooted addresses; null string input becomes nil, and real allocation failure stays within the C-owned error boundary.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_binary_strings_and_stable_addresses",
+        "c_api/tests/c_api_consumer.c#test_protected_callback_memory_failure"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHLSTRING-246",
+      "boundaries": "Warning fragments and adapter diagnostics exercise actual retained byte strings. Source citations must not substitute for refusal/recovery execution."
+    },
+    {
+      "invariant": "Embedded NUL and high bytes retain exact lengths and stable rooted addresses; null string input becomes nil, and real allocation failure stays within the C-owned error boundary.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_binary_strings_and_stable_addresses",
+        "c_api/tests/c_api_consumer.c#test_protected_callback_memory_failure"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHSTRING-249",
+      "boundaries": "Warning fragments and adapter diagnostics exercise actual retained byte strings. Source citations must not substitute for refusal/recovery execution."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PUSHCCLOSURE-253",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RAWGET-266",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RAWGETI-267",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CREATETABLE-270",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "The public pointer addresses stable aligned writable payload storage; zero-size objects retain distinct identities; uservalue reads/writes obey nil, invalid-index, pop and maximum-count rules.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_maximum_uservalue_count"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_NEWUSERDATAUV-271",
+      "boundaries": "The selected T.newuserdata calls must use real C exports. GC/finalizer ownership remains a separate dynamic obligation in events.lua and gc.lua."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETMETATABLE-272",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "The public pointer addresses stable aligned writable payload storage; zero-size objects retain distinct identities; uservalue reads/writes obey nil, invalid-index, pop and maximum-count rules.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_maximum_uservalue_count"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETIUSERVALUE-273",
+      "boundaries": "The selected T.newuserdata calls must use real C exports. GC/finalizer ownership remains a separate dynamic obligation in events.lua and gc.lua."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RAWSET-283",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RAWSETP-285",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETMETATABLE-286",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "The public pointer addresses stable aligned writable payload storage; zero-size objects retain distinct identities; uservalue reads/writes obey nil, invalid-index, pop and maximum-count rules.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_maximum_uservalue_count"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETIUSERVALUE-287",
+      "boundaries": "The selected T.newuserdata calls must use real C exports. GC/finalizer ownership remains a separate dynamic obligation in events.lua and gc.lua."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CALLK-293",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_CALL-295",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_PCALLK-297",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_PCALL-299",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ISYIELDABLE-315",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Warning callbacks receive the registered data, exact literal fragments and continuation flags; nested delivery and protected callback errors return through guarded C paths without requiring managed allocation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_custom_warning_literals",
+        "c_api/tests/c_api_consumer.c#test_reentrant_warning",
+        "c_api/tests/c_api_consumer.c#test_warning_error_boundary",
+        "c_api/tests/c_api_consumer.c#test_warning_uses_no_allocator"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETWARNF-323",
+      "boundaries": "The shared GC contract checks fragmented warnings during collection and state close. Test-only @on/@off/@normal/@allow/@store and _WARN ownership must also be reviewed against the pinned ltests.c semantics."
+    },
+    {
+      "invariant": "Warning callbacks receive the registered data, exact literal fragments and continuation flags; nested delivery and protected callback errors return through guarded C paths without requiring managed allocation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_custom_warning_literals",
+        "c_api/tests/c_api_consumer.c#test_reentrant_warning",
+        "c_api/tests/c_api_consumer.c#test_warning_error_boundary",
+        "c_api/tests/c_api_consumer.c#test_warning_uses_no_allocator"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_WARNING-324",
+      "boundaries": "The shared GC contract checks fragmented warnings during collection and state close. Test-only @on/@off/@normal/@allow/@store and _WARN ownership must also be reviewed against the pinned ltests.c semantics."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCSTOP-331",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCRESTART-332",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCCOLLECT-333",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCCOUNT-334",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCCOUNTB-335",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCSTEP-336",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCISRUNNING-337",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCGEN-338",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCINC-339",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCPARAM-340",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations. Named parameter constants identify the numeric production parameter slots; the C test iterates these slots. Roundtrip checks alone do not prove collection scheduling. Parameter consumption and actual collector behavior additionally require gc/gengc semantic obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCPMINORMUL-347",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations. Named parameter constants identify the numeric production parameter slots; the C test iterates these slots. Roundtrip checks alone do not prove collection scheduling. Parameter consumption and actual collector behavior additionally require gc/gengc semantic obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCPMAJORMINOR-348",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations. Named parameter constants identify the numeric production parameter slots; the C test iterates these slots. Roundtrip checks alone do not prove collection scheduling. Parameter consumption and actual collector behavior additionally require gc/gengc semantic obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCPMINORMAJOR-349",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations. Named parameter constants identify the numeric production parameter slots; the C test iterates these slots. Roundtrip checks alone do not prove collection scheduling. Parameter consumption and actual collector behavior additionally require gc/gengc semantic obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCPPAUSE-352",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations. Named parameter constants identify the numeric production parameter slots; the C test iterates these slots. Roundtrip checks alone do not prove collection scheduling. Parameter consumption and actual collector behavior additionally require gc/gengc semantic obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCPSTEPMUL-353",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations. Named parameter constants identify the numeric production parameter slots; the C test iterates these slots. Roundtrip checks alone do not prove collection scheduling. Parameter consumption and actual collector behavior additionally require gc/gengc semantic obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCPSTEPSIZE-354",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations. Named parameter constants identify the numeric production parameter slots; the C test iterates these slots. Roundtrip checks alone do not prove collection scheduling. Parameter consumption and actual collector behavior additionally require gc/gengc semantic obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_GCPN-357",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations. Named parameter constants identify the numeric production parameter slots; the C test iterates these slots. Roundtrip checks alone do not prove collection scheduling. Parameter consumption and actual collector behavior additionally require gc/gengc semantic obligations."
+    },
+    {
+      "invariant": "Controls return previous mode/parameter values, report actual managed bytes, progress while manually stopped, safely handle extreme parameters, defer refused finalizer storage, and drain ordered finalizers or release storage on close.",
+      "cases": [
+        "c_api/tests/gc_contract.h#test_gc_controls_without_allocation",
+        "c_api/tests/gc_contract.h#test_gc_modes_and_stopped_steps",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_callback_order",
+        "c_api/tests/gc_contract.h#test_gc_finalizer_storage_refusal",
+        "c_api/tests/gc_contract.h#test_close_drains_c_finalizers",
+        "c_api/tests/gc_contract.h#test_close_refusal_releases_storage",
+        "c_api/tests/gc_contract.h#test_gc_and_close_warning_callbacks"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GC-360",
+      "boundaries": "The same public contract runs against C and Ada. Named parameter indices still require semantic correspondence review with production parameter application and T codeparam/applyparam; round-trip storage alone is insufficient. Real phases/ages/barriers are separate Ada-internal T obligations."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_ERROR-367",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Actual callback/data identity, seeded construction, refusal at measured growth positions, usable recovery, and physical release of all allocator-owned blocks.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_state_allocator_lifetime",
+        "c_api/tests/c_api_consumer.c#test_constructor_refusal",
+        "c_api/tests/c_api_consumer.c#test_cold_constructor_failure_sweep",
+        "c_api/tests/c_api_consumer.c#test_guarded_allocator_refusal_and_recovery"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETALLOCF-378",
+      "boundaries": "AUnit and the public GC contract additionally exercise state-close finalizers. This group does not establish arbitrary foreign allocator replacement compatibility or unrelated allocator parity."
+    },
+    {
+      "invariant": "Actual callback/data identity, seeded construction, refusal at measured growth positions, usable recovery, and physical release of all allocator-owned blocks.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_state_allocator_lifetime",
+        "c_api/tests/c_api_consumer.c#test_constructor_refusal",
+        "c_api/tests/c_api_consumer.c#test_cold_constructor_failure_sweep",
+        "c_api/tests/c_api_consumer.c#test_guarded_allocator_refusal_and_recovery"
+      ],
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETALLOCF-379",
+      "boundaries": "AUnit and the public GC contract additionally exercise state-close finalizers. This group does not establish arbitrary foreign allocator replacement compatibility or unrelated allocator parity."
+    },
+    {
+      "invariant": "Integer bounds, nonintegral conversion refusal, valid numeric string conversion without changing source type, and Lua truth of integer zero are observable through real API values.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk",
+        "c_api/tests/c_api_consumer.c#test_number_macro_without_validity_output"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_TONUMBER-393",
+      "boundaries": "Test adapter parameter arguments and inspected results use these paths. This scope is not all numeric conversion/formatting compatibility."
+    },
+    {
+      "invariant": "Integer bounds, nonintegral conversion refusal, valid numeric string conversion without changing source type, and Lua truth of integer zero are observable through real API values.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_numeric_conversions",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_TOINTEGER-394",
+      "boundaries": "Test adapter parameter arguments and inspected results use these paths. This scope is not all numeric conversion/formatting compatibility."
+    },
+    {
+      "invariant": "Indices resolve before mutation, callbacks see their argument window, results are adjusted including multiple results, and failed growth preserves the live prefix and later calls.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_stack_rotation_copy_and_bounds",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_initial_free_stack_needs_no_growth",
+        "c_api/tests/c_api_consumer.c#test_failed_checkstack_keeps_state_usable"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_POP-396",
+      "boundaries": "Macros must be checked through the pinned headers and their expanded public calls. Merely compiling the macro name does not establish its observable stack effect."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_NEWTABLE-398",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back."
+    },
+    {
+      "invariant": "Callbacks receive owned argument windows and captured cells, protected errors retain exact values, nested callbacks recover, and non-yieldable calls return synchronously without invoking their supplied continuation.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_c_closure_cells",
+        "c_api/tests/c_api_consumer.c#test_protected_c_error_identity",
+        "c_api/tests/c_api_consumer.c#test_reentrant_c_to_c_calls",
+        "c_api/tests/c_api_consumer.c#test_public_yieldability",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_callk",
+        "c_api/tests/c_api_consumer.c#test_nonyieldable_pcallk"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_PUSHCFUNCTION-402",
+      "boundaries": "Only the synchronous/non-yieldable API paths directly exercised by this batch are candidates. Yieldable C continuations, C coroutine resumption and the remaining full ABI stay pending. Foreign jumps must never cross active Ada frames."
+    },
+    {
+      "invariant": "Success, nil, absent optional arguments and actual full userdata remain distinct through public type queries and callback results.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_userdata_payload_alignment",
+        "c_api/tests/c_api_consumer.c#test_userdata_uservalue_results",
+        "c_api/tests/c_api_consumer.c#test_callback_stack_window",
+        "c_api/tests/c_api_consumer.c#test_none_or_nil_macro"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_ISNONEORNIL-411",
+      "boundaries": "The T.newuserdata optional-argument checks in tests/c/conformance_adapter.c also exercise lua_isnoneornil. Review invalid/missing arguments independently of successful allocations. The production adapter userdata driver uses this macro for optional argument defaults. Explicit-argument AUnit Userdata alone cannot certify absent/nil defaults; upstream userdata calls and their actual configurations must supply that evidence."
+    },
+    {
+      "invariant": "Embedded NUL and high bytes retain exact lengths and stable rooted addresses; null string input becomes nil, and real allocation failure stays within the C-owned error boundary.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_binary_strings_and_stable_addresses",
+        "c_api/tests/c_api_consumer.c#test_protected_callback_memory_failure"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_PUSHLITERAL-413",
+      "boundaries": "Warning fragments and adapter diagnostics exercise actual retained byte strings. Source citations must not substitute for refusal/recovery execution."
+    },
+    {
+      "invariant": "Raw operations preserve actual key/object identity and bypass handlers; registry/global roots remain live, and public metatable access bypasses Lua protection strings.",
+      "cases": [
+        "c_api/tests/c_api_consumer.c#test_raw_tables_and_pointer_identity",
+        "c_api/tests/c_api_consumer.c#test_userdata_metatable_identity",
+        "c_api/tests/c_api_consumer.c#test_threads_registry_extra_space_and_moves",
+        "c_api/tests/c_api_consumer.c#test_global_table_macro"
+      ],
+      "id": "CAPI-LUA-H-MACRO-LUA_PUSHGLOBALTABLE-415",
+      "boundaries": "Warning-state registry ownership and FILE metatable lookup additionally use these operations. Review barrier/root safety through collector regressions, not only a raw read-back. The adapter warning callback test_warning uses this macro to publish _WARN; Stored_Warning exercises fragmented storage. Registry consumer cases support the expanded rawgeti/global registry operation."
+    },
+    {
+      "invariant": "The public payload contains the actual FILE pointer and callable closer; reopening io retains live stream metatable identity; os returns callable exports without implicit global publication; native closer invocation closes the owned stream.",
+      "cases": [
+        "c_api/tests/io_contract.h#test_io_opener_and_stream_layout",
+        "c_api/tests/io_contract.h#test_os_opener_without_global_publication",
+        "c_api/tests/io_contract.h#test_file_payload_closer_callback"
+      ],
+      "id": "CAPI-LAUXLIB-H-MACRO-LUA_FILEHANDLE-236",
+      "boundaries": "The standalone IO contract compares C and Ada with zero outstanding allocator storage after close. Native device/date/shell equivalents and partial-write behavior need their own source-bound review; these layout cases do not establish all IO semantics."
+    },
+    {
+      "invariant": "The public payload contains the actual FILE pointer and callable closer; reopening io retains live stream metatable identity; os returns callable exports without implicit global publication; native closer invocation closes the owned stream.",
+      "cases": [
+        "c_api/tests/io_contract.h#test_io_opener_and_stream_layout",
+        "c_api/tests/io_contract.h#test_os_opener_without_global_publication",
+        "c_api/tests/io_contract.h#test_file_payload_closer_callback"
+      ],
+      "id": "CAPI-LAUXLIB-H-TYPE-LUAL_STREAM-239",
+      "boundaries": "The standalone IO contract compares C and Ada with zero outstanding allocator storage after close. Native device/date/shell equivalents and partial-write behavior need their own source-bound review; these layout cases do not establish all IO semantics."
+    },
+    {
+      "invariant": "The public payload contains the actual FILE pointer and callable closer; reopening io retains live stream metatable identity; os returns callable exports without implicit global publication; native closer invocation closes the owned stream.",
+      "cases": [
+        "c_api/tests/io_contract.h#test_io_opener_and_stream_layout",
+        "c_api/tests/io_contract.h#test_os_opener_without_global_publication",
+        "c_api/tests/io_contract.h#test_file_payload_closer_callback"
+      ],
+      "id": "CAPI-LUALIB-H-FUNCTION-LUAOPEN_IO-35",
+      "boundaries": "The standalone IO contract compares C and Ada with zero outstanding allocator storage after close. Native device/date/shell equivalents and partial-write behavior need their own source-bound review; these layout cases do not establish all IO semantics."
+    },
+    {
+      "invariant": "The public payload contains the actual FILE pointer and callable closer; reopening io retains live stream metatable identity; os returns callable exports without implicit global publication; native closer invocation closes the owned stream.",
+      "cases": [
+        "c_api/tests/io_contract.h#test_io_opener_and_stream_layout",
+        "c_api/tests/io_contract.h#test_os_opener_without_global_publication",
+        "c_api/tests/io_contract.h#test_file_payload_closer_callback"
+      ],
+      "id": "CAPI-LUALIB-H-FUNCTION-LUAOPEN_OS-43",
+      "boundaries": "The standalone IO contract compares C and Ada with zero outstanding allocator storage after close. Native device/date/shell equivalents and partial-write behavior need their own source-bound review; these layout cases do not establish all IO semantics."
+    }
+  ],
+  "requirements": [
+    "Bind result.json and every stdout/stderr capture by SHA256 plus clean revision and exact context/configuration/profile/library type.",
+    "Require mapped terminal witnesses exactly once, final consumer marker and exit0/no timeout/empty stderr.",
+    "Cold constructor sweep prints measured growth count; require positive integer without hardcoded platform count. Loop checks every refusal and zero allocator residue before print.",
+    "GC and IO captures have matching C-oracle counterparts; verify actual captured-byte equality and source identities.",
+    "Supporting cases remain supporting; witness union cannot broaden original mapping boundaries."
+  ],
+  "execution_evidence": []
+}

@@ -147,7 +147,7 @@ package body Lua.Engine.Compiler is
       Site : Source_Location;
       Loop_Stack : Loops.Vector;
       Label_Places : Label_Lists.Vector;
-      Build_Start : constant Positive := State.Programs.Last_Index + 1;
+      Built_Programs : Prototypes.Vector;
 
       function Fetch (Id : Node_Id) return Node is
         (Unit.Tree (Positive (Id)));
@@ -315,7 +315,7 @@ package body Lua.Engine.Compiler is
       begin
          --  Publish partial prototypes immediately: runtime ownership must
          --  reclaim them even when lowering exhausts a register budget.
-         State.Programs.Append (Child);
+         Built_Programs.Append (Child);
          Child.Name := Outer.Name;
          Child.Function_Node := Natural (Id);
          Child.First_Line := Item.Site.Line;
@@ -810,6 +810,7 @@ package body Lua.Engine.Compiler is
          end case;
       end Statement;
    begin
+      Built_Programs.Set_Owner (Lua.Storage.Reference (State.Memory));
       Loop_Stack.Set_Owner (Lua.Storage.Reference (State.Memory));
       Label_Places.Set_Owner (Lua.Storage.Reference (State.Memory));
       State.Compiling := True;
@@ -830,7 +831,7 @@ package body Lua.Engine.Compiler is
       end if;
       State.Next_Symbol := Symbol_Base + Natural (Unit.Names.Length);
       Current := New_Program (State);
-      State.Programs.Append (Current);
+      Built_Programs.Append (Current);
       Current.Name := To_Unbounded_String (Name);
       Current.Vararg := True;
       Current.Is_Main := True;
@@ -840,9 +841,8 @@ package body Lua.Engine.Compiler is
       --  Resolve forward and backward branches only after every function has
       --  been lowered. Node IDs are compilation-local; never rewrite older
       --  prototypes retained by the session from a preceding source chunk.
-      for Index in Build_Start .. State.Programs.Last_Index loop
+      for Program of Built_Programs loop
          declare
-            Program : constant Prototype_Access := State.Programs (Index);
          begin
             --  Preserve source names independently of the temporary AST.
             --  Debug lookup consults only this prototype's local/capture set.

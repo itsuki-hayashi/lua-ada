@@ -9,6 +9,58 @@ permissions:
   contents: read
 
 jobs:
+  instrumented:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        library: [static, relocatable]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Preserve pinned source bytes
+        shell: pwsh
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v5
+        with:
+          # Scoped matrix evidence must name the published implementation head.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          submodules: recursive
+      - uses: alire-project/setup-alire@v6
+      - name: Record tools
+        shell: pwsh
+        run: |
+          alr --version
+          ./scripts/select-stable-toolchain.ps1
+          alr -n toolchain
+          alr exec -- gcc --version
+          alr exec -- gcc -dumpmachine
+          alr exec -- gprbuild --version
+      - name: Instrumented runtime and adapter regressions
+        shell: pwsh
+        run: ./scripts/check-instrumented.ps1 -LibraryType '${{ matrix.library }}'
+      - name: Windows instrumented static-PIC regressions
+        if: matrix.os == 'windows-latest' && matrix.library == 'static'
+        shell: pwsh
+        run: ./scripts/check-instrumented.ps1 -LibraryType static-pic
+      - name: Preserve instrumented observations
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: instrumented-${{ runner.os }}-${{ matrix.library }}
+          path: |
+            reports/instrumented/**
+            reports/windows-buffered-failure/**
+            reports/posix-files/**
+            reports/managed-telemetry/**
+            reports/launcher-selftest/**
+            reports/core-image/**
+            reports/gc-events/**
+            reports/scoped-files/**
+            reports/conformance/**/*.json
+            reports/conformance/**/*.stdout
+            reports/conformance/**/*.stderr
+            reports/conformance/**/equivalent-*.lua
+          if-no-files-found: error
   check:
     strategy:
       fail-fast: false
@@ -23,6 +75,8 @@ jobs:
         run: git config --global core.autocrlf false
       - uses: actions/checkout@v5
         with:
+          # Keep all 26 contexts on the same reviewable source revision.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
       - uses: alire-project/setup-alire@v6
       - name: Record tools
@@ -46,6 +100,11 @@ jobs:
           ./scripts/check-conformance-inventory.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-inventory.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/check-conformance-scope.ps1
+          ./scripts/test-conformance-scope.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/test-conformance-matrix.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-runner.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -90,6 +149,7 @@ jobs:
             reports/conformance/**/report.json
             reports/conformance/**/*.stdout
             reports/conformance/**/*.stderr
+            reports/conformance/**/equivalent-*.lua
           if-no-files-found: error
       - name: Windows static-PIC acceptance
         if: matrix.os == 'windows-latest' && matrix.library == 'static' && matrix.profile == 'validation'
@@ -104,7 +164,17 @@ jobs:
           path: |
             reports/lifecycle/**
             reports/m3-lifecycle-campaign*
+            reports/managed-telemetry/**
+            reports/launcher-selftest/**
+            reports/windows-buffered-failure/**
             LICENSE
+            reports/posix-files/**
+            reports/gc-events/**
+            reports/scoped-files/**
+            reports/conformance/**/*.json
+            reports/conformance/**/*.stdout
+            reports/conformance/**/*.stderr
+            reports/conformance/**/equivalent-*.lua
             docs/licenses/lua.md
           if-no-files-found: warn
       - name: Preserve core-image observations

@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "operation": "file:files.lua",
+  "context": "default/macos/release/static",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_hashes": {
+    "files.lua": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86"
+  },
+  "review": {
+    "author": "/root",
+    "reviewer": "/root/review_files",
+    "artifact": "tests/conformance/reviews/files.execution-contracts.cross-review.json",
+    "rationale": "Scoped protocol and omission mapping; matrix replays separate named cases, native counterparts and physical shutdown.",
+    "original_c_evidence": "lifecycle-macOS-release-static/reports/scoped-files/4ca0dac20a0144fda4b54bf8c203040b/ReferenceC-files.lua.json#sha256=8cf3ec54efa1bf8ecf8963a369c99b13b944b7cc45246283cc7d348088bddb07"
+  },
+  "completion_marker": "Lua 5.5",
+  "stdout_required": [
+    {
+      "pattern": "(?m)^native\\ unbuffered\\ visibility\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^native\\ C-int\\ field\\ boundary\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^native\\ time\\ range\\ recovery\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^native\\ DST\\ inference\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ i/o\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ flush\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ large\\ files\\ \\(>\\ BUFSIZ\\)\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ popen/pclose\\ and\\ execute\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ date/time\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^native\\ macOS\\ buffered\\ failure\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^native\\ macOS\\ nested\\ shell\\ status\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^native\\ macOS\\ calendar\\ boundary\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^test done on \\d{2}/\\d{2}/\\d+, at \\d{2}:\\d{2}:\\d{2}\\r?\\nLua 5\\.5\\r?\\n\\z",
+      "count": 1
+    }
+  ],
+  "stderr_expected": [
+    {
+      "pattern": "^sh:\\ not-to-be-found-command:\\ command\\ not\\ found\\r?$",
+      "count": 4
+    },
+    {
+      "pattern": "^sh: line 1: [1-9][0-9]* Hangup: 1 +sh -c 'kill -s HUP \\$\\$'$",
+      "count": 6
+    }
+  ],
+  "expected_skips": [],
+  "disposition": "native-platform-equivalent",
+  "equivalent_manifest_sha256": "ce950f0bbc4d6608397815e508f9085de4ef49495ac6c23d4290500aae5a36d1",
+  "executed_sha256": "7834b8f4a18cfd151f8ed895b0a36f1fa9805d05e8e682e8cbda472e43e94731"
+}

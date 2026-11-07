@@ -38,6 +38,8 @@ begin
          Positive'Image (Lua.Runtime_Configuration.Maximum_Stack) &
          ",""configured_c_calls"":" &
          Positive'Image (Lua.Runtime_Configuration.Maximum_C_Calls) &
+         ",""configured_aux_buffer_bytes"":" & Positive'Image
+           (Lua.Runtime_Configuration.Auxiliary_Buffer_Bytes) &
          ",""compatible_global"":" & Boolean_Text
            (Lua.Runtime_Configuration.Compatible_Global) &
          ",""world_random32"":" &

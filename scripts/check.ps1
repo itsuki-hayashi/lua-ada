@@ -14,6 +14,7 @@ $savedDyldPath = $env:DYLD_LIBRARY_PATH
 $savedArchive = $env:LUA_ADA_ABI_RUNTIME_ARCHIVE
 $savedTaskingArchive = $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE
 $savedRuntimeDirectory = $env:LUA_ADA_RUNTIME_LIBRARY_DIR
+$savedConfiguration = $env:LUA_ADA_CONFIGURATION
 Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 $scenario = '-XLUA_ADA_LIBRARY_TYPE=' + $LibraryType
 $profileArgument = '--' + $Profile
@@ -29,35 +30,42 @@ function Invoke-Alire {
 
 try {
     Set-Location $projectRoot
+    $env:LUA_ADA_CONFIGURATION = 'default'
     $adaRuntimeDirectory = ''
-    if ($IsMacOS) {
+    if (-not $IsWindows) {
         $runtime = Get-SelectedAdaRuntime
-        $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $runtime.CoreArchive
-        $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $runtime.TaskingArchive
-        $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $runtime.Directory
+        if ($IsMacOS) {
+            $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $runtime.CoreArchive
+            $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $runtime.TaskingArchive
+            $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $runtime.Directory
+        }
         $adaRuntimeDirectory = $runtime.Directory + [IO.Path]::PathSeparator
     }
     & (Join-Path $PSScriptRoot 'check-documentation.ps1')
     & (Join-Path $PSScriptRoot 'test-pe-unwind.ps1')
-    Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario)
+    Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario, '-XLUA_ADA_PREBUILT=false')
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-core-image.ps1'),
-        '-LibraryType', $LibraryType, '-Profile', $Profile)
+        '-LibraryType', $LibraryType, '-Profile', $Profile, '-UseExistingRuntime')
     foreach ($crateName in @('cli', 'tests')) {
         Set-Location (Join-Path $projectRoot $crateName)
         Invoke-Alire -Arguments @('-n', 'build', $profileArgument,
-            "--profiles=lua_ada=$Profile", '--', $scenario)
+            "--profiles=lua_ada=$Profile", '--', $scenario, '-XLUA_ADA_PREBUILT=true')
     }
 
     # Pin runtime lookup to the exact library that this job compiled. Searching
     # other profiles first could accidentally load a stale, incompatible DLL.
     $runtimePath = Join-Path $projectRoot "lib/$Profile/$LibraryType"
     $env:PATH = $runtimePath + [IO.Path]::PathSeparator + $savedPath
-    $env:LD_LIBRARY_PATH = $runtimePath + [IO.Path]::PathSeparator + $savedLdPath
+    # Disposable launchers lose any executable-relative compiler runtime path.
+    # Keep the selected compiler's real adalib directory for their children.
+    $env:LD_LIBRARY_PATH = $runtimePath + [IO.Path]::PathSeparator + $adaRuntimeDirectory + $savedLdPath
     $env:DYLD_LIBRARY_PATH = $runtimePath + [IO.Path]::PathSeparator + $adaRuntimeDirectory + $savedDyldPath
 
     Set-Location (Join-Path $projectRoot 'tests')
-    Invoke-Alire -Arguments @('exec', '--', "bin/$LibraryType/test_runner$suffix")
+    & (Join-Path $PSScriptRoot 'check-aunit-evidence.ps1') `
+        -Executable (Join-Path $projectRoot "tests/bin/$LibraryType/test_runner$suffix") `
+        -Profile $Profile -LibraryType $LibraryType
     Invoke-Alire -Arguments @('exec', '--', "bin/$LibraryType/syntax_consumer$suffix")
     $upstreamRunner = Join-Path (Get-Location).Path "bin/$LibraryType/upstream_runner$suffix"
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
@@ -103,6 +111,43 @@ try {
     Set-Location $projectRoot
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli)
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-conformance-telemetry.ps1'),
+        '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
+        '-Configuration', 'default')
+    if ($IsWindows) {
+        Set-Location $projectRoot
+        & (Join-Path $PSScriptRoot 'check-windows-buffered-failure.ps1') `
+            -Interpreter (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix") `
+            -ReferenceInterpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `
+            -ReferenceLibraryDirectory (Join-Path $projectRoot 'build/conformance/default/lib') `
+            -Profile $Profile -LibraryType $LibraryType
+    } elseif (-not $IsMacOS) {
+        # macOS executes its named native counterpart in the scoped runner;
+        # unchanged files.lua requires Linux's /dev/full device.
+        & (Join-Path $PSScriptRoot 'check-posix-files.ps1') `
+            -Interpreter (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix") `
+            -ReferenceInterpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `
+            -ReferenceLibraryDirectory (Join-Path $projectRoot 'build/conformance/default/lib') `
+            -Profile $Profile -LibraryType $LibraryType
+    }
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'test-conformance-launcher.ps1'),
+        '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
+        '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-ReferenceLibraryDirectory', (Join-Path $projectRoot 'build/conformance/default/lib'))
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-gc-events.ps1'),
+        '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
+        '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-RuntimeDirectory', $runtimePath, '-Configuration', 'default',
+        '-Profile', $Profile, '-LibraryType', $LibraryType)
+    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+        (Join-Path $PSScriptRoot 'check-files-scoped.ps1'),
+        '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
+        '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-RuntimeDirectory', $runtimePath, '-Configuration', 'default',
+        '-Profile', $Profile, '-LibraryType', $LibraryType)
     Write-Output "PASS: $Profile / $LibraryType (AUnit and CLI contracts)"
 }
 finally {
@@ -113,6 +158,7 @@ finally {
     $env:LUA_ADA_ABI_RUNTIME_ARCHIVE = $savedArchive
     $env:LUA_ADA_TASKING_RUNTIME_ARCHIVE = $savedTaskingArchive
     $env:LUA_ADA_RUNTIME_LIBRARY_DIR = $savedRuntimeDirectory
+    $env:LUA_ADA_CONFIGURATION = $savedConfiguration
 }
 
 # The expected negative CLI test leaves the last native exit status nonzero.

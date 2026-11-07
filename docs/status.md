@@ -1,5 +1,39 @@
 # Project Status
 
+## Four-file conformance follow-up (2026-11-07)
+
+[PR #9](https://github.com/itsuki-hayashi/lua-ada/pull/9) covers
+`events.lua`, `gc.lua`, `gengc.lua` and `files.lua` on Windows, Linux and
+macOS. The [session record](sessions/2026-11-07-gc-io-conformance.md)
+retains intermediate failures and fixes. The suite contains 1,306 AUnit cases;
+the scoped replay selects 35 physical/runtime regressions and 41 named C
+consumer cases for the four files and their 77 directly exercised API entries.
+
+At ff93190 the combined pipeline builds one Ada runtime for the CLI, C
+consumers and AUnit. Candidate reports identify the binaries by hash.
+The events wrapper checks the unchanged chunk returns 12; the collector
+observer verifies ten instrumented shutdown warnings after the terminal
+`OK`. The collector equivalents replace reviewed implementation-specific
+assumptions, including a C byte allowance, with measured Ada behavior.
+File equivalents on Windows and macOS and supplemental native checks
+are identified separately from unchanged Linux file executions.
+
+The [candidate workflow](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42327273160)
+supplied raw evidence for all 26 contexts: 60 unchanged Ada executions,
+26 Ada collector equivalents and 18 native file equivalents. The
+[observation index](../tests/conformance/reviews/gc-io-events.observation-index.json)
+identifies the 42 archives and individual reports. Independent reviewers
+resolved 708 runtime/audit entries and 77 scoped API entries; 191 lexical
+entries retain their non-runtime classifications. The
+[contract index](../tests/conformance/scopes/gc-io-events.contracts.json)
+binds each operation to its approved protocol. Final scoped acceptance
+requires a fresh 26-context run against the resolved ledger and approved
+contracts, followed by independent reconciliation of all 208 process reports.
+Full M3, aggregate and heavy execution, and unrelated C ABI obligations remain
+outside this scope.
+
+The paused-checkpoint statements below retain the prior delivery's evidence.
+
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**
 **M3 is paused at a verified checkpoint. The bounded language lifecycle delivery has completed
 runtime acceptance; final publication checks are linked from PR #7.**

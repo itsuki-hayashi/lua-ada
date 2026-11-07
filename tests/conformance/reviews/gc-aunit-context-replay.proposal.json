@@ -1,0 +1,1192 @@
+{
+  "schema_version": 1,
+  "kind": "gc-aunit-context-replay-proposal",
+  "author": "Codex independent review agent /root/review_gc",
+  "review_status": "pending-independent-cross-review",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "bindings": [
+    {
+      "path": "tests/src/lua-conformance_adapter_tests.adb",
+      "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+    },
+    {
+      "path": "tests/src/lua-collector_tests.adb",
+      "sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4"
+    },
+    {
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json",
+      "sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e"
+    },
+    {
+      "path": "tests/conformance/reviews/gc-parameter-api.mapping-proposal.json",
+      "sha256": "af5d3cf818dd164d073cdcf74dd89c03ef1f8390e73be34e1bb0021233fa02c4"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "3b7be34cb68bb3e59db6533e3317274e8013b4b320fca11e704c12dc0258e7f8"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "d4f0208208f1c48a1a8394bb200f365c15f5810236b8f638f53b794e8b67ef1c"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "43c7f58e5435290e7ac071446a195d7208d49864ce2ce73906aaf729a4d85416"
+    },
+    {
+      "path": "scripts/check-aunit-evidence.ps1",
+      "sha256": "b2854afcbe49536dd13d7423d345b0ca1d5e4473d8854b8522725fb190251a7e"
+    },
+    {
+      "path": "tests/src/lua-physical_stack_tests.adb",
+      "sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd"
+    },
+    {
+      "path": "tests/src/lua-gc_control_tests.adb",
+      "sha256": "9e5a1dd3d16abe4e58d5fde4cfcd1f54d8f284458ca14b6d3a68492b63e4e1c8"
+    },
+    {
+      "path": "tests/src/lua-finalizer_runtime_tests.adb",
+      "sha256": "fa5110c03d1fe5d2d6fc21ddc40e08ac654c2c8b75f807c050e91ebff7ae9ff8"
+    }
+  ],
+  "entries": [
+    {
+      "case": "tests/src/lua-collector_tests.adb#Larger_Debt_Payments",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: larger byte payments finish sooner",
+      "required_stdout_line": "OK collector: larger byte payments finish sooner",
+      "registration_procedure": "Larger_Case",
+      "parameter_slots": [
+        3,
+        4
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Minor_Multiplier_Debt",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: minormul changes minor byte debt",
+      "required_stdout_line": "OK collector: minormul changes minor byte debt",
+      "registration_procedure": "Minor_Debt_Case",
+      "parameter_slots": [
+        0
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Parameter_Rounding",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: pinned parameter rounding",
+      "required_stdout_line": "OK collector: pinned parameter rounding",
+      "registration_procedure": "Rounding_Case",
+      "parameter_slots": [
+        4
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Parameter_Saturation",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: saturated parameter arithmetic",
+      "required_stdout_line": "OK collector: saturated parameter arithmetic",
+      "registration_procedure": "Saturation_Case",
+      "parameter_slots": [
+        3
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Positive_Step_Debt",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: positive steps pay byte debt",
+      "required_stdout_line": "OK collector: positive steps pay byte debt",
+      "registration_procedure": "Payment_Case",
+      "parameter_slots": [
+        3
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Promotion_And_Major",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: real promotion and major cycle",
+      "required_stdout_line": "OK collector: real promotion and major cycle",
+      "registration_procedure": "Major_Case",
+      "parameter_slots": [
+        0,
+        1,
+        2
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Remembered_Table",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: remembered old table graph",
+      "required_stdout_line": "OK collector: remembered old table graph",
+      "registration_procedure": "Remember_Case",
+      "parameter_slots": [
+        0
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Zero_Forces_Work",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: zero forces real basic work",
+      "required_stdout_line": "OK collector: zero forces real basic work",
+      "registration_procedure": "Force_Case",
+      "parameter_slots": [
+        4,
+        5
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Zero_Major_Threshold",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: zero disables major threshold",
+      "required_stdout_line": "OK collector: zero disables major threshold",
+      "registration_procedure": "Threshold_Case",
+      "parameter_slots": [
+        2
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Zero_Step_Size",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: zero stepsize completes cycles",
+      "required_stdout_line": "OK collector: zero stepsize completes cycles",
+      "registration_procedure": "Step_Case",
+      "parameter_slots": [
+        5
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Orphan_Cell",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: orphan cell survives atomic sweep",
+      "required_stdout_line": "OK collector: orphan cell survives atomic sweep",
+      "registration_procedure": "Atomic_Orphan_Cell",
+      "parameter_slots": [],
+      "equivalent_replacements": [
+        "stable-cell-color"
+      ],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Measured_Emergency_Headroom",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: measured emergency table headroom",
+      "required_stdout_line": "OK collector: measured emergency table headroom",
+      "registration_procedure": "Measured_Emergency_Headroom",
+      "parameter_slots": [],
+      "equivalent_replacements": [
+        "measured-emergency-headroom"
+      ],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Parameters",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "adapter: production parameter codec",
+      "required_stdout_line": "OK adapter: production parameter codec",
+      "registration_procedure": "Parameters",
+      "parameter_slots": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: weak string payload reclamation",
+      "required_stdout_line": "OK collector: weak string payload reclamation",
+      "registration_procedure": "Weak_String_Payloads",
+      "parameter_slots": [],
+      "equivalent_replacements": [
+        "measure-live-payloads",
+        "reclaim-payloads"
+      ],
+      "historical_label_observations": [
+        {
+          "capture_path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        },
+        {
+          "capture_path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+          "occurrences": 1
+        }
+      ],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Frame_Reset",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "adapter: physical unused frame reset",
+      "required_stdout_line": "OK adapter: physical unused frame reset",
+      "registration_procedure": "Frame_Reset",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Release unused physical CallInfo storage through T.resetCI.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Stack_Resize",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "adapter: physical stack resize preserves cell",
+      "required_stdout_line": "OK adapter: physical stack resize preserves cell",
+      "registration_procedure": "Stack_Resize",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Resize real stack storage while a closure retains its live captured cell.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Finalizer_Frame_Refusal",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "finalizer: Lua frame refusal and later retry",
+      "required_stdout_line": "OK finalizer: Lua frame refusal and later retry",
+      "registration_procedure": "Finalizer_Frame_Refusal",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "After frame-cache reset, persistent refusal defers the callback until allocation resumes.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Finalizer_Stack_Refusal",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "finalizer: Lua stack refusal and later retry",
+      "required_stdout_line": "OK finalizer: Lua stack refusal and later retry",
+      "registration_procedure": "Finalizer_Stack_Refusal",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "After stack shrink, refused growth defers the same pending callback until a later collection.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Refusal_Reset",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "allocator: Lua restores persistent refusal",
+      "required_stdout_line": "OK allocator: Lua restores persistent refusal",
+      "registration_procedure": "Refusal_Reset",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0024",
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Lua clears real persistent refusal through the nonallocating restoration callback.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Actual_Stack_Release",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: actual paired memory release",
+      "required_stdout_line": "OK physical stack: actual paired memory release",
+      "registration_procedure": "Release_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Measure paired stack/cell arena release while retaining live contents.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Alternate_Cache_Release",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: alternate cache release",
+      "required_stdout_line": "OK physical stack: alternate cache release",
+      "registration_procedure": "Cache_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Distinct cached frames with owned builders release actual blocks and bytes.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#First_Copy_Refusal",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: first-copy refusal",
+      "required_stdout_line": "OK physical stack: first-copy refusal",
+      "registration_procedure": "First_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Refusal before the first replacement allocation preserves the original stack arenas.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Second_Copy_Refusal",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: second-copy transaction",
+      "required_stdout_line": "OK physical stack: second-copy transaction",
+      "registration_procedure": "Second_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Refusal during second arena copy preserves both original arrays and contents without leaking the first temporary.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Emergency_Keeps_Storage",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: emergency skips maintenance",
+      "required_stdout_line": "OK physical stack: emergency skips maintenance",
+      "registration_procedure": "Emergency_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0024",
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Emergency GC preserves physical reserve capacity during allocator recovery.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Suspended_Thread_Shrink",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: inactive thread atomic shrink",
+      "required_stdout_line": "OK physical stack: inactive thread atomic shrink",
+      "registration_procedure": "Suspended_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0019",
+        "LUA-GC-REVIEWED-BLOCK-0021"
+      ],
+      "mechanism": "Shrinking an inactive coroutine retains its live stack/cell windows.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Refusing_Full",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: refusing allocator emergency GC",
+      "required_stdout_line": "OK collector: refusing allocator emergency GC",
+      "registration_procedure": "Refusal_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0024"
+      ],
+      "mechanism": "Refusing allocator exercises real emergency reclamation under managed allocation pressure.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Emergency_Queue",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: emergency queues without calls",
+      "required_stdout_line": "OK collector: emergency queues without calls",
+      "registration_procedure": "Emergency_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0024",
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Emergency atomic queues a real unreachable finalizable without invoking its callback.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Pending_Finalizer",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: queued finalizer graph ownership",
+      "required_stdout_line": "OK collector: queued finalizer graph ownership",
+      "registration_procedure": "Finalizer_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0011",
+        "LUA-GC-REVIEWED-BLOCK-0025"
+      ],
+      "mechanism": "A pending finalizable strongly owns its child graph until queue ownership releases.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Weak_Before_Finalizer",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: weak values before finalization",
+      "required_stdout_line": "OK collector: weak values before finalization",
+      "registration_procedure": "Ordering_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0011",
+        "LUA-GC-REVIEWED-BLOCK-0014"
+      ],
+      "mechanism": "Weak edge clears before pending finalizer graph retention.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-gc_control_tests.adb#Finalizer_Resurrection",
+      "source_sha256": "9e5a1dd3d16abe4e58d5fde4cfcd1f54d8f284458ca14b6d3a68492b63e4e1c8",
+      "registered_label": "GC controls: real resurrection lifetime",
+      "required_stdout_line": "OK GC controls: real resurrection lifetime",
+      "registration_procedure": "Resurrection_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0025",
+        "LUA-GENGC-REVIEWED-BLOCK-0004"
+      ],
+      "mechanism": "Real handler publishes the target to a global and verifies one enrollment across subsequent collections.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-finalizer_runtime_tests.adb#Callback_Graph_Roots",
+      "source_sha256": "fa5110c03d1fe5d2d6fc21ddc40e08ac654c2c8b75f807c050e91ebff7ae9ff8",
+      "registered_label": "finalizer execution: callback graph survives collection",
+      "required_stdout_line": "OK finalizer execution: callback graph survives collection",
+      "registration_procedure": "Callback_Graph_Roots",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0011",
+        "LUA-GC-REVIEWED-BLOCK-0025"
+      ],
+      "mechanism": "Actual callback target retains a cycle and child through active collector control.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-finalizer_runtime_tests.adb#Unavailable_C_Stack_Defers",
+      "source_sha256": "fa5110c03d1fe5d2d6fc21ddc40e08ac654c2c8b75f807c050e91ebff7ae9ff8",
+      "registered_label": "finalizer execution: minimum space defers without starvation",
+      "required_stdout_line": "OK finalizer execution: minimum space defers without starvation",
+      "registration_procedure": "Unavailable_C_Stack_Defers",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Scheduler defers with insufficient callback storage and subsequently dispatches pending work.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Transient_Root",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: atomic transient root expires",
+      "required_stdout_line": "OK collector: atomic transient root expires",
+      "registration_procedure": "Atomic_Transient_Root",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0021"
+      ],
+      "mechanism": "A temporary API argument ceases to be a root at the next collector phase.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Retained_Root",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: atomic live register survives",
+      "required_stdout_line": "OK collector: atomic live register survives",
+      "registration_procedure": "Atomic_Retained_Root",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0021"
+      ],
+      "mechanism": "A live activation register retains the referenced value across atomic collection.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Dead_Context_Cells",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: dead context cell sweep order",
+      "required_stdout_line": "OK collector: dead context cell sweep order",
+      "registration_procedure": "Dead_Context_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0019",
+        "LUA-GC-REVIEWED-BLOCK-0021"
+      ],
+      "mechanism": "Repeated suspended coroutine reclamation preserves separately retained closure cells.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false
+    }
+  ],
+  "historical_capture_bindings": [
+    {
+      "path": "reports/ci-artifacts/2e9a145-linux-warning/instrumented/static/aunit.stdout",
+      "sha256": "a65fde0e734e5598787ee3149071b0c31b4ac29e65e8f9237f85d961625557e7"
+    },
+    {
+      "path": "reports/ci-artifacts/37cd287-linux-shared/instrumented/relocatable/aunit.stdout",
+      "sha256": "ed38f760928d5aba223c1665ec1819755aab6d7c9d5b79bf6913d79bb7a5ee6f"
+    },
+    {
+      "path": "reports/ci-artifacts/70a22-linux-shared/instrumented/relocatable/aunit.stdout",
+      "sha256": "ed38f760928d5aba223c1665ec1819755aab6d7c9d5b79bf6913d79bb7a5ee6f"
+    },
+    {
+      "path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout",
+      "sha256": "9c94093ef5747ca615881d3b6cd6f603ba743b3b5fc5c5a5f197846d4d691b4c"
+    },
+    {
+      "path": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static-pic/aunit.stdout",
+      "sha256": "9c94093ef5747ca615881d3b6cd6f603ba743b3b5fc5c5a5f197846d4d691b4c"
+    },
+    {
+      "path": "reports/ci-artifacts/810e254-linux-shared/reports/instrumented/relocatable/aunit.stdout",
+      "sha256": "ed38f760928d5aba223c1665ec1819755aab6d7c9d5b79bf6913d79bb7a5ee6f"
+    },
+    {
+      "path": "reports/ci-artifacts/810e254-linux-static/reports/instrumented/static/aunit.stdout",
+      "sha256": "ed38f760928d5aba223c1665ec1819755aab6d7c9d5b79bf6913d79bb7a5ee6f"
+    },
+    {
+      "path": "reports/ci-artifacts/810e254-windows-shared/reports/instrumented/relocatable/aunit.stdout",
+      "sha256": "9c94093ef5747ca615881d3b6cd6f603ba743b3b5fc5c5a5f197846d4d691b4c"
+    },
+    {
+      "path": "reports/ci-artifacts/c247afb-mac-warnings/instrumented/relocatable/aunit.stdout",
+      "sha256": "8b7054fa39f0574ddb611aba26a11a9eb71916ef1dcdea70c4bbb78451b064fd"
+    }
+  ],
+  "scope_notes": [
+    "GC manifest has four accepted replacement spans backed by three distinct AUnit cases; gengc has no separate source replacement manifest in this mapping. Parameter mapping includes additional production behavior and codec cases.",
+    "Source registration and historical OK-label occurrence are evidence-discovery facts only; they establish no final-context or source-revision acceptance.",
+    "Replay each required case in every applicable configured AUnit job, including default jobs where private test package directly registers adapter tests; production T availability does not determine test-suite registration."
+  ],
+  "capture_gaps": [
+    "Shared capture now retains stdout/stderr hashes, executable and test-source hashes, library hashes, revision/dirty flag, configuration/profile/library/platform metadata, completion and exit status, plus a compiled-configuration sibling probe. This source observation is not an executed final-context pass.",
+    "The capture checks aggregate suite footer and expected stderr; per-case replay must still require each of the required exact registered OK labels once and reject missing/duplicate labels.",
+    "Final-context replay must bind captures to expected immutable revision/source/executable/library identities and compare the compiled configuration probe, rather than trusting command arguments. Root separately reviews configuration and provenance enforcement.",
+    "Historical logs retain historical provenance; they cannot satisfy newly added Minor_Multiplier_Debt or final-revision obligations.",
+    "AUnit cleanup assertions complement but do not replace selected whole-file allocator/shutdown telemetry."
+  ],
+  "recommended_record_fields": [
+    "context_id",
+    "revision",
+    "configuration",
+    "profile",
+    "library_type",
+    "platform",
+    "executable_sha256",
+    "library_sha256",
+    "test_source_sha256",
+    "stdout_sha256",
+    "stderr_sha256",
+    "exit_code",
+    "completed",
+    "required_label_occurrences",
+    "suite_summary",
+    "expected_stderr"
+  ],
+  "execution_evidence": [],
+  "historical_capture_gaps": [
+    "Default check.ps1 invokes test_runner through Alire and only forwards console output; no dedicated AUnit stdout/stderr/process metadata capture is retained by that step. CI logs can be independently downloaded, but current artifacts alone lack this per-case stream.",
+    "Instrumented check-instrumented.ps1 retains aunit.stdout/stderr and aggregate completion/exit status plus a library-artifact hash. Its observation does not bind test_runner executable hash, source/revision hashes, stdout/stderr hashes, unique context/run identity or required individual labels.",
+    "Aggregate zero-failure counts are insufficient if required cases are unregistered or replaced. Match exact full OK lines once each, check complete footer/exit/expected stderr and all required labels.",
+    "Minor_Multiplier_Debt is newly added; historical CI captures predating it cannot satisfy its replay obligation.",
+    "Per-case replay must be bound to final revision, test source hashes, executable/library hashes, profile/library/configuration/platform context and retained process captures.",
+    "AUnit physical cleanup assertions complement but do not replace selected whole-file allocator/shutdown telemetry."
+  ],
+  "historical_harness_bindings": [
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "2a7fb8af7e502bdb0e3e603722e65e13e76d23ff59044a677a5883cff53877c0"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "9255360b864da57d85c0fe0ac84f8c7146865c261ee8b8b009827a13b1d7b622"
+    }
+  ],
+  "current_capture_delta": {
+    "kind": "source-observed-capture-improvement",
+    "paths": [
+      "scripts/check-aunit-evidence.ps1",
+      "scripts/check.ps1",
+      "scripts/check-instrumented.ps1"
+    ],
+    "observations": [
+      "Default and instrumented entrypoints now invoke the shared evidence capture.",
+      "Unique retained result directory and hashed AUnit streams provide named-case replay inputs for both configurations.",
+      "Actual executable path and sibling compiled-configuration probe are checked; probe bytes and executable hash are retained.",
+      "Test source and library artifact hashes, process status and expected diagnostic checks improve provenance; root owns remaining enforcement review."
+    ],
+    "runtime_acceptance": false,
+    "execution_evidence": []
+  },
+  "immutable_library_delta": {
+    "previous_bindings": [
+      {
+        "path": "scripts/check.ps1",
+        "sha256": "2a7fb8af7e502bdb0e3e603722e65e13e76d23ff59044a677a5883cff53877c0"
+      },
+      {
+        "path": "scripts/check-instrumented.ps1",
+        "sha256": "9255360b864da57d85c0fe0ac84f8c7146865c261ee8b8b009827a13b1d7b622"
+      }
+    ],
+    "observation": "Runtime-producing builds explicitly select PREBUILT=false. Default CLI and AUnit consumers select PREBUILT=true after the owning build. Both core-image consumer runs select UseExistingRuntime to preserve the measured runtime artifact.",
+    "execution_evidence": [],
+    "runtime_acceptance": false
+  },
+  "physical_replay_delta": {
+    "required_cases": 35,
+    "runtime_acceptance": false,
+    "scope": "Physical mechanisms supplement source-specific assertions and timed process closure. All labels must occur once in actual complete AUnit output.",
+    "execution_evidence": [],
+    "additional_cases": 21
+  }
+}

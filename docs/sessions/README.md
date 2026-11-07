@@ -1,6 +1,8 @@
 # Session Records
 
-Current: [complete M3 upstream conformance](2026-11-06-m3-upstream-conformance.md).
+Current: [four-file GC/IO conformance](2026-11-07-gc-io-conformance.md).
+
+Previous checkpoint: [complete M3 upstream conformance](2026-11-06-m3-upstream-conformance.md).
 
 Previous: [major M3 language lifecycle](2026-11-06-m3-language-lifecycle.md).
 The current delivery follows merged PR #7 and combines all remaining M3 work

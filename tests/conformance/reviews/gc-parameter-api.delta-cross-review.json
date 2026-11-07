@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "kind": "independent-semantic-review-delta",
+  "author": "Codex independent review agent /root/review_gc",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-parameter-mapping-and-minor-sensitivity-source",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "reviewed_artifact": {
+    "path": "tests/conformance/reviews/gc-parameter-api.mapping-proposal.json",
+    "sha256": "af5d3cf818dd164d073cdcf74dd89c03ef1f8390e73be34e1bb0021233fa02c4"
+  },
+  "source_bindings": [
+    {
+      "path": "tests/src/lua-collector_tests.adb",
+      "sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4"
+    }
+  ],
+  "findings": [
+    "Updated proposal bindings all match. New Minor_Multiplier_Debt sets100 before actual mode entry, observes nonzero baseline/debt, changes only multiplier to200, executes actual Minor and requires one completed cycle, unchanged minor mode/baseline, doubled debt.",
+    "The new regression closes the previous missing source-level minormul sensitivity witness. Registration/fixture instantiation are unconditional; fixture cleanup remains shared.",
+    "Prior review distinctions remain: numeric codec and explicit step-payment sensitivity do not independently establish comparative pause/stepmul parameter sensitivity."
+  ],
+  "execution_evidence": [],
+  "runtime_note": "Parent reports instrumented1306 AUnit cases passed; this artifact is independent source review, not a re-execution or final26-context certificate."
+}

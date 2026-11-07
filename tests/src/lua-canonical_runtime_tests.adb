@@ -475,7 +475,7 @@ package body Lua.Canonical_Runtime_Tests is
       Callee : Value;
       Driver : VM.Driver;
       Packet : Values.Vector;
-      Before : constant Natural := Natural (State.Programs.Length);
+      Before : constant Natural := State.Live_Programs;
    begin
       --  Only the returned closure roots this canonical bundle after its
       --  creator dies. Its captured table has no live frame/register owner;
@@ -494,7 +494,7 @@ package body Lua.Canonical_Runtime_Tests is
       Lua.Engine.Stacks.Trim (State.Current, 0);
       Packet.Clear;
       Collect (State.all);
-      Assert (Natural (State.Programs.Length) = Before,
+      Assert (State.Live_Programs = Before,
               "unreachable canonical bundle remained registered");
    end Returned_Closure_Collection;
 

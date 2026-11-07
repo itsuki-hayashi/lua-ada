@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "file": "files.lua",
+  "reviewer": "/root/review_files",
+  "date": "2026-11-07",
+  "reviewed_revision": "810e25466e3ccec973b4085b9f7298d5592fa3f1",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86",
+  "status": "changes-requested",
+  "coverage_authority": false,
+  "review_scope": [
+    "All 1005 pinned source lines and all 25 author semantic sections, including embedded chunks, date-generated assertions, native guards and child commands",
+    "Windows ten-span and original macOS one-span native mappings; actual public FILE/closer driver ownership and POSIX nonblock behavior",
+    "Ada IO read/write/iterator implementation, native stream and OS glue, file resource publication/disposal and public C IO contract",
+    "Actual files.lua reports from 18 Windows/Linux contexts and their unchanged-versus-equivalent dispositions; macOS failures remain unresolved",
+    "Completion witnesses require the final date/version suffix AND IO branch markers/no omissions AND physical process shutdown"
+  ],
+  "semantic_inventory": {
+    "section_count": 25,
+    "byte_ranges_and_hashes_verified": true,
+    "result": "The section partition covers the complete pinned file. Its semantic descriptions are suitable author inventory except for the child-count note and the insufficient cited unbuffered visibility evidence described below. Inventory review does not establish executed coverage or resolve the ledger.",
+    "dynamic_obligations": [
+      "The temporary-name open guard encloses lines 57-831; a final date/version suffix alone cannot certify it.",
+      "The loaded chunk at lines 199-202 yields through dofile twice and must execute with resumed arguments.",
+      "io.lines readers feed load at lines 425, 520-527; binary/text/BOM/environment cases execute loaded code rather than merely compare source strings.",
+      "gettoclose discovers the third generic-for state debug local and proves closure after break and error, including a file-valued error object.",
+      "T.nonblock at lines 718-747 is required in instrumented POSIX executions; Windows explicitly substitutes a native multiargument partial-write counterpart. Default T absence needs a link to instrumented evidence.",
+      "The nonblocking receiver is a same-implementation child. Shell matrix commands execute through BOTH popen-close and os.execute; typed exit children and their configuration/cleanup are distinct obligations.",
+      "checkDateTable generates and executes assertions from os.date output. Actual C-int/time-width guards select range branches; unexecuted alternative platform branches require documented disposition.",
+      "_soft and _port must remain unset; large-file, shell and date branches cannot be closed by portability omissions."
+    ]
+  },
+  "findings": [
+    {
+      "id": "FILES-R1",
+      "priority": 1,
+      "location": "tests/conformance/equivalents/files-macos-platform.json:11",
+      "source_location": "references/lua/testes/files.lua:722",
+      "finding": "The one-span macOS mapping replaces only the buffered /dev/full open at line 474. The T.nonblock branch also opens /dev/full at line 722, then dereferences f. The Mac driver provides T.nonblock, so instrumented execution still fails on the unavailable device.",
+      "required_resolution": "Replace the second exact source span with a real failing FILE fixture; preserve unbuffered positive errno/zero-byte assertions and the original native nonblocking pipe/receiver sequence. Execute matching C/Ada macOS evidence.",
+      "status": "root-authored fix under review; native execution pending"
+    },
+    {
+      "id": "FILES-R2",
+      "priority": 1,
+      "location": "tests/conformance/platform/macos-buffered-failure.lua:15",
+      "finding": "The Mac read-only-descriptor fixture assumes fclose succeeds after failed buffered flushes. Actual macOS AUnit evidence reports Bad file descriptor. Native stdio may retain failed buffered bytes and retry them during fclose. The Windows-only nonblocking-pair tests were also selected by the newly shared failing-stream capability.",
+      "evidence": "reports/ci-810e254/128116795520.log:3399-3409",
+      "required_resolution": "Separate driver capabilities. Preserve actual Darwin fclose error plus physical closure with an explicit native equivalent, or supply a separately justified fixture whose native sequence truly matches the intended behavior. Do not fabricate close success or silently discard bytes to satisfy the assertion. Obtain C and Ada evidence for both buffered and unbuffered cases.",
+      "status": "root-authored fix under review; native execution pending"
+    },
+    {
+      "id": "FILES-R3",
+      "priority": 2,
+      "location": "tests/conformance/equivalents/files-windows-platform.json:windows-span-10",
+      "source_location": "references/lua/testes/files.lua:922-927",
+      "finding": "Year 3000 at noon succeeds and an enormous year fails, but neither proves the original adjacent last-instant/next-normalized-second boundary invariant. The following sec=60 test still rejects the enormous year for an unrelated reason.",
+      "required_resolution": "Add a Windows-native adjacent time boundary measured from the pinned C oracle, using local calendar fields for timezone-independent mktime behavior.",
+      "status": "fix authored by this reviewer; requires separate cross-review and final-revision execution"
+    },
+    {
+      "id": "FILES-R4",
+      "priority": 2,
+      "location": "tests/src/io_runtime_tests.adb:257",
+      "finding": "Buffering_Modes flushes before observing data. It does not provide the stronger unbuffered visibility regression cited by the author inventory; the upstream no-buffer example writes to a read-only file and ignores the result.",
+      "required_resolution": "A separately named two-handle regression must observe the successful binary write before any writer flush, seek or close, with matching C/Ada evidence.",
+      "status": "fix authored by this reviewer; requires separate cross-review and final-revision execution"
+    },
+    {
+      "id": "FILES-R5",
+      "priority": 3,
+      "location": "tests/conformance/reviews/files.candidate.json:notes",
+      "finding": "The child telemetry note describes legacy probe-inclusive totals. The shared scoped runner separates configuration-probe lifetimes: actual main-operation child totals are Ada six/seven on POSIX default/instrumented, eight on Windows, and C two/three on POSIX, four on Windows.",
+      "required_resolution": "Correct the note or explicitly label its legacy runner scope; preserve separate launcher-probe evidence.",
+      "status": "correction requested"
+    }
+  ],
+  "mapping_assessment": {
+    "windows_spans_01_02": "Semantically acceptable native path counterparts: stripping the Windows-root separator allows the generated basename lifecycle in the disposable directory; real create/read/rename/remove assertions remain. This does not claim a reserved temporary filename API.",
+    "windows_span_03": "Acceptable for the measured harness stdin contract: verify its native successful seek separately, and exercise an actual negative regular-file seek failure tuple. It is not an unchanged stdin failure assertion.",
+    "windows_spans_04_05": "NUL and a real broken pipe preserve sink success and buffered native refusal. Driver retains FILE pointer, C closer and Ada ownership metadata; native descriptors are adopted/closed before a potentially transferring Lua API call.",
+    "windows_span_06": "Acceptable platform counterpart for CRT atomic oversized-write refusal: actual earlier arguments produce partial progress; reader bytes, EOF and both endpoint closes are checked. It does not claim a POSIX single-fwrite partial count. Separate unchanged pipe/system matrix covers process wait/status behavior.",
+    "windows_spans_07_08": "Acceptable native shell counterparts: same-implementation Lua performs both copy directions; TerminateProcess is a genuine forced termination and both system/popen observe its native exit status. Windows exit statuses are explicitly equivalents, not POSIX signal results.",
+    "windows_span_09": "Acceptable native modifier/range counterpart: unsupported E/O modifiers must raise C-matching errors; the shifted year retains exact signed 31-bit second normalization differences in the native supported range.",
+    "windows_span_10": "Cannot accept original 810e254 mapping until FILES-R3 is resolved and cross-reviewed.",
+    "macos": "Cannot accept original 810e254 mapping due to FILES-R1/R2. The narrow native descriptor approach is appropriate in principle; actual native flush/close behavior and all T guards must be executed."
+  },
+  "completion_witness_assessment": "The exact terminal date/time and Lua 5.5 suffix matches upstream lines 990-1003 and is acceptable together with successful process status, required IO/flush/large-file/popen/date markers, instrumented failed-write marker, omission rejection, expected stderr, child configuration and balanced shutdown. This review does not accept the suffix in isolation.",
+  "evidence_assessment": {
+    "revision": "810e25466e3ccec973b4085b9f7298d5592fa3f1",
+    "paired_files_contexts": 18,
+    "linux": "Eight contexts: six default and two instrumented, all files.lua observations unchanged and passed.",
+    "windows": "Ten contexts including both static-PIC configurations: files.lua observations are native-platform equivalents and passed; this does not resolve the boundary coverage gap by itself.",
+    "macos": "No accepted files.lua execution. Actual default release/shared job fails the adapter AUnit cases before the file campaign.",
+    "matrix_index": "reports/ci-artifacts/810e254-matrix-pending.json",
+    "full_scoped_acceptance": false,
+    "full_m3_acceptance": false
+  },
+  "reviewer_authored_fixes": {
+    "independent_acceptance": false,
+    "files": [
+      "tests/src/io_runtime_tests.adb:Unbuffered_Visibility",
+      "tests/conformance/platform/unbuffered-visibility.lua",
+      "tests/conformance/platform/windows-files-contract.lua:native final instant and next-second overflow",
+      "tests/conformance/equivalents/files-windows-platform.json:windows-span-10"
+    ],
+    "measurement": "Actual pinned C Lua 5.5.1 and Ada default launcher both accept timestamp 32535244799 (UTC 3001-01-01 07:59:59), round-trip its local calendar, and reject its next normalized second. Both also pass the two-handle unbuffered visibility fixture. Tested in TZ=JST-9 and TZ=UTC0; eight executions captured with executable/script hashes.",
+    "evidence": "reports/review-files-native-probes.json",
+    "limitation": "These fixes were authored after independent findings, so this reviewer cannot independently approve them. Another reviewer must assess them and the final implementation revision must be rerun."
+  }
+}

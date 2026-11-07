@@ -154,3 +154,12 @@ validation/static consumer (reports/m3-k-nonyieldable-consumer1.log), including
 three separately oracle-checked cases for thread yieldability and the
 non-yieldable callk/pcallk branch. Yieldable continuations and public C coroutine
 resumption remain pending; these synchronous cases do not establish them.
+
+The four-file follow-up shares three public IO/OS cases in `io_contract.h`
+between the ordinary C consumer and `io_api_contract.c`. The latter is built
+independently against Ada and the pinned C oracle by `check-core-image.ps1`.
+It compares FILE pointer/closer layout, metatable identity after reopening io,
+the os opener without global publication, and real native closure through the
+public callback. Both runtimes must free all counted allocator storage at close
+and produce identical output. This comparison does not expand the public API
+boundary or establish complete C ABI coverage.

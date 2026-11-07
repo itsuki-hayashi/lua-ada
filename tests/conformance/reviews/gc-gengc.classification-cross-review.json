@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "independent-classification-cross-review",
+  "author": "/root/review_gc",
+  "reviewer": "Codex primary agent /root",
+  "decision": "accepted-semantic-classification",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "proposal": {
+    "path": "tests/conformance/reviews/gc-gengc.anchor-classification-proposal.json",
+    "sha256": "8165f338c8a64c2ac154673c0e26477f4dfabee7e0153b35c7eb1b9c87dfe963"
+  },
+  "verification": [
+    "Read complete pinned gc.lua and gengc.lua, including deferred and dynamically invoked bodies; verified 219 original anchor spans and 46 added block spans against source bytes and resolved every linked ID.",
+    "GC1/GC2 bodies execute through four GC() invocations in the ephemeron sections. Dynamic 5000 definitions and exhaustive substring load/pcall loops are explicit obligations with _soft unset.",
+    "T guards and default omissions link their controlled instrumented bodies, not fabricated default execution. Gengc short-circuit age/color operands have separate T-only runtime identities; ordinary reachability effects remain both-configuration blocks.",
+    "Reviewed weak value clearing before callbacks, weak keys retained during callbacks, ephemeron convergence, invocation-time handler replacement, resurrection and deferred frame/stack refusal retry against source.",
+    "Reviewed gc state-close registration and ten expected-warning finalizers separately from top-level OK; warning storage mode checks prior _WARN before storing another message, so assertion failures cannot be silently replaced by later warnings.",
+    "Reviewed C-layout-sensitive GC mappings as equivalents, preserving the original source assertions and distinct measured Ada invariants rather than stamping unchanged execution.",
+    "Ledger insertion preserves reviewed bytes/hashes and converts proposal inclusive end lines to the inventory's exclusive byte-end line convention (a terminating newline advances end_line by one). Runtime blocks remain pending with empty evidence."
+  ],
+  "limits": [
+    "This approves classifications and invariant descriptions only; no runtime record is passed.",
+    "All 26 required contexts, actual warning verification including post-OK finalizers, allocator balance and independent final evidence review remain mandatory.",
+    "Runtime ledger promotion must bind the corresponding accepted GC equivalent mapping for memory allowances, cell color and emergency recovery.",
+    "Whole-file inventory audit is not runtime evidence. The commented ephemeron assertion is a source reference, not an executed assertion."
+  ]
+}
