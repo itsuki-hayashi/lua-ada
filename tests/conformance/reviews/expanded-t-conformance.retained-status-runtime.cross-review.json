@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "kind": "independent-retained-coroutine-error-status-runtime-delta-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "base_revision": "c209b8a918dc114d6fb2b6f3f8c887634a2dde8c",
+  "author": "Codex /root/conformance_scope",
+  "reviewer": "Codex /root/draft_assessment",
+  "decision": "accepted-retained-coroutine-error-status-fix",
+  "repository_path": "tests/conformance/reviews/expanded-t-conformance.retained-status-runtime.cross-review.json",
+  "source_bindings": [
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "sha256": "8274675cd1668f041e32100a7e9106ba6ecc65871da8ba0f0660df27878b4313"
+    },
+    {
+      "path": "tests/c/foreign_hook_contract.c",
+      "sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929"
+    },
+    {
+      "path": "tests/src/lua-foreign_hook_tests.adb",
+      "sha256": "c698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6"
+    }
+  ],
+  "source_preimages": [
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "sha256": "31590d9a9a56aaa6e50e1dbbcd4834c722af8433bc8f8d1e3ceba86415f3f829"
+    },
+    {
+      "path": "tests/c/foreign_hook_contract.c",
+      "sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b"
+    },
+    {
+      "path": "tests/src/lua-foreign_hook_tests.adb",
+      "sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce"
+    }
+  ],
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "reference_bindings": [
+    {
+      "path": "references/lua/lapi.c",
+      "sha256": "d744084bfec5049f6eaa509f4f353886a8c4fa8c8ef875d9f5bd3783caa46e09"
+    },
+    {
+      "path": "references/lua/ldo.c",
+      "sha256": "6dd1265ccbc686073580a49de19e7fb5af80133d5decee104fc012dbfaaab3b8"
+    },
+    {
+      "path": "references/lua/lua.h",
+      "sha256": "5e00319e803893f4310b1206394c80b82f03f42609b40ceb306d92a6740d828e"
+    },
+    {
+      "path": "lua_ada.gpr",
+      "sha256": "7598e19305599e2099c08b47557c065735ed96e6934ae182210ed8f3a5953ec1"
+    }
+  ],
+  "reviewed_behavior": [
+    "The only production delta is Get_Status. Suspended execution retains precedence and returns1; a retained Memory_Failure returns4, Handling_Failure5, other retained failures2, and no failure0. No activation, failure, stack or driver metadata is mutated.",
+    "Pinned lapi.c1163 returns APIstatus(L->status); ldo.c990-995 preserves the exact unrecoverable resume category. Existing Foreign.Pump memory4/handling5 mappings agree.",
+    "Actual counted-allocation refusals within existing foreign-hook-13 now query ERRMEM before allocator recovery, and after a healthy parent protected call plus scalar trimming/reuse of the failed child. Failed children are not illegally executed. All64 offsets remain checked and at least one actual refusal plus balanced physical cleanup is required.",
+    "Existing continuation3 and9 remain separate normal YIELD/OK and ERRRUN controls. The strengthened case13 status observation belongs to its existing refused-thread state/lifetime scenario; no catalog ID or registered label changes. The broader internal Handling_Failure branch is source-reviewed; no new public handler-error runtime witness is claimed."
+  ],
+  "independently_executed_probes": [
+    {
+      "target": "preserved pre-fix Ada executable",
+      "exit_code": 1,
+      "stdout": "C resume refusal/status case 13: 58",
+      "meaning": "The first retained-memory-status assertion exposes the original defect."
+    },
+    {
+      "target": "fixed Ada executable",
+      "exit_code": 0,
+      "stdout": "C resume refusal/status case 13: 0"
+    },
+    {
+      "target": "pinned native C default",
+      "exit_code": 0,
+      "stdout": "C resume refusal/status case 13: 0"
+    },
+    {
+      "target": "pinned native C upstream-test",
+      "exit_code": 0,
+      "stdout": "C resume refusal/status case 13: 0"
+    }
+  ],
+  "native_loader": "Native library build/conformance/<configuration>/lib plus the selected GNAT16.1.0 bin directory were prepended to the independent subprocess PATH. Bare-shell native launches lacked required DLL search paths and produced no test observations; they are not counted as test failures or passes.",
+  "inspected_aunit": {
+    "configuration": "default",
+    "profile": "validation",
+    "library_type": "static",
+    "total": 1390,
+    "successful": 1390,
+    "failed_assertions": 0,
+    "unexpected_errors": 0,
+    "expected_stderr": "Lua warning: error in __gc ([string \"file-abort-test\"]:1: ordinary failure)\n",
+    "source": "Actual author-produced full stdout/stderr and strict test-build log inspected by the reviewer; not an independently rerun full suite."
+  },
+  "build_provenance": "The implementation author executed the strict default validation/static production build successfully, then preserved the strict prebuilt AUnit build log. No standalone production stdout log was captured for the first command; this review does not invent one. Fresh complete clean-head production pipelines and26-context evidence remain required.",
+  "evidence_bindings": [
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/old-ada.exe",
+      "sha256": "7f116182ef5a756aa09d77eb027126d8f239374d7bcf4f206c566e5039eb4700"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/old-default-runtime.a",
+      "sha256": "dd55c3f5f2a5bcb51c81960021db9b9586732d687cf3a70596c5bc6c6f5bd39f"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/fixed-ada.exe",
+      "sha256": "36ac21c97e7b536f7cddb962ce2dcd40e2b400508ffe81a5043b35c170a8a0db"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/native-default.exe",
+      "sha256": "5d0654f01865a50b1438e2d37cdc7566da5f1cbeba330e03a53c40cb52583376"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/native-upstream-test.exe",
+      "sha256": "e9cc43e6c3a184ad8e29745464c467e4eb031ffe60eed49cfc23e44adc70e510"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/status-refusal-main.c",
+      "sha256": "fade8ddc909a377a546f38e620388762a7d8183af0ee16b98a47f410e7ba3158"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/status_refusal_probe.gpr",
+      "sha256": "375114c07908cf39e5417a8ae1d832c7b6d46c89a917c67ee138cdc08e9cb167"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/old-ada.stdout",
+      "sha256": "93f6febcdbe5ff26c9f2a4637fa2a82bd903b1e75f1c9f01f0d0af390cb7c53e"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/old-ada.stderr",
+      "sha256": "ea118dac9d7d67c1277221305f95e3d90a1198856e1834b3d62a1ddcb30a8922"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/fixed-ada.stdout",
+      "sha256": "589a7f6befec41ad4dd3e8aed3e815eaee6a1a344e3d838acc65085e4316459f"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/fixed-ada.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/native-default.stdout",
+      "sha256": "589a7f6befec41ad4dd3e8aed3e815eaee6a1a344e3d838acc65085e4316459f"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/native-default.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/native-upstream-test.stdout",
+      "sha256": "589a7f6befec41ad4dd3e8aed3e815eaee6a1a344e3d838acc65085e4316459f"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/native-upstream-test.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/fixed-aunit-build.log",
+      "sha256": "c6e29a15b0f52aeaebfeb8fd86437d0700009d9a8e213b7af924282820284b1e"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/fixed-aunit.stdout",
+      "sha256": "4439276b86597f4a19792efca2a78a178441f95d2667060a43900ecbbd0824ac"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-refusal-probe/fixed-aunit.stderr",
+      "sha256": "3e625e3a8b5a26e964bab98c6469115fe5bb3fdf67e0d9bf0d7c7753f02e8358"
+    }
+  ],
+  "findings": [],
+  "current_head_execution_acceptance": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "future_acceptance_requirement": "Preserved historical pass/evidence/review fields do not certify the new memory-status assertions. Final reconciliation must require fresh strengthened case13 C and AUnit observations in all26 applicable contexts at the corrected clean head, bound to C source01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929 and wrapperc698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6, or separately reviewed exact derivatives. Existing850 source obligations are not reclassified."
+}

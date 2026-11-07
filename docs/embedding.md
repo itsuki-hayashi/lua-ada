@@ -124,7 +124,19 @@ when reopened, so earlier live file objects remain valid. The public userdata
 payload is the actual luaL_Stream (FILE pointer and callable C closer); private
 ownership metadata lives outside that payload. These exports use the same Ada
 library continuations as owned sessions. They do not establish completion of
-the remaining library openers, auxiliary API or complete C ABI.
+the full auxiliary API or complete C ABI.
+
+The expanded implementation also supplies the base, package, coroutine, debug,
+math, string, table and UTF-8 constructors through the real Ada library drivers.
+Ordinary module constructors push their value without publishing a global or
+a loaded-module entry; requiref and selected-library initialization own that
+publication. The base opener instead initializes the existing global table.
+Reopened math modules retain independent RNG captures. Public
+callk/pcallk, yieldk/resume and C hooks use explicit callback phases and separate
+rooted public resume windows, as specified in
+[ADR 0017](decisions/0017-c-continuations-and-resume.md). Source-hashed native
+and Ada contract cases cover these paths. Independent scope review and the
+separate final-head certificate own runtime acceptance; see [status](status.md).
 
 lua_gc operates on the actual collector and managed byte statistics. Its
 stop/restart, count, running and parameter controls do not allocate Lua storage.

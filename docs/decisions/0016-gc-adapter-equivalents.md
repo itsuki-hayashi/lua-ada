@@ -1,7 +1,7 @@
 # ADR 0016: Real Collector Inspection and Storage Equivalents
 
 - Date: 2026-11-07
-- State: implemented candidate; independent conformance review pending
+- State: equivalents accepted for gc-io-events in PR #9; changed-runtime acceptance separately certified
 - Owners: `Lua.Engine.Collector`, test adapter, conformance runner
 
 ## Context
@@ -22,12 +22,18 @@ heap/code edges, active stack windows and finalizer queues. The allocator header
 type is shared through the private storage specification; the inspector exists
 only in the test crate. No copied private C layout is interpreted as Ada data.
 
-Running-thread roots are rescanned at atomic. Temporary native argument packets
-published at the enter-atomic boundary therefore do not eagerly mark values
-that disappear before that rescan. Live registers still retain their objects;
-heap writes retain their forward/backward barriers. Backward barriers during
+Running-thread roots are rescanned at atomic, and already traversed reachable
+suspended threads remain revisitable through gray-again. Uncaptured scalar
+writes defer marking to that snapshot; callers publish the live interval before
+the next allocating or collection safe point. Consumed condition temporaries
+are retired before allocating bodies. Temporary native packets published at
+enter-atomic likewise do not eagerly mark values that disappear before the
+rescan. Retained registers and authoritative captured cells remain roots;
+captured-cell and heap writes keep their barriers. Backward barriers during
 incremental sweep mark their already-live owner gray; completion removes the
-revisit links after sweeping, before a later cycle can reclaim those owners.
+revisit links before a later cycle can reclaim those owners. Independent repair
+reviews and focused main/suspended weak-value cases support this implementation;
+final-head acceptance is separately certified in the tested head's conformance note.
 
 Plain table reads bypass allocation when no delegation is needed. GC control
 results move into caller-owned actions, and unprotected result delivery may
@@ -35,15 +41,16 @@ borrow an independent action packet across frame retirement. This preserves
 normal returns under actual allocator refusal without turning off fault
 injection. Packets owned by a retiring frame still receive an independent copy.
 
-The `gc-ada-instrumented` equivalent candidate replaces only source-hashed spans:
+The `gc-ada-instrumented` equivalent replaces only source-hashed spans:
 
 Its applicability now includes default and upstream-test configurations: the
 weak-string residual-storage assertion is unconditional in the original file.
 The capture-color and fault-injection replacements remain inside their original
 T guards. Default execution records the exact T-absent omission and cannot
 certify those guarded obligations. The candidate name is retained for continuity;
-the manifest configuration field owns applicability. Independent review remains
-pending for both configurations.
+the manifest configuration field owns applicability. Independent review and
+execution for both configurations completed in the four-file PR #9 scope. A
+changed runtime still requires fresh observations and applicability review.
 
 - Measure live storage before collecting the weak long-string graph and require
   both original 4 MiB payloads to be reclaimed. Empty Ada table capacity is not
@@ -58,7 +65,8 @@ The equivalent generator preserves upstream source bytes and rejects drift,
 overlap, missing counterparts and unreviewed acceptance. An explicit diagnostic
 mode emits `diagnostic_only: true`; successful execution cannot itself approve
 the mapping. Scope acceptance must separately validate review and original-C
-evidence. These candidates do not close full M3 or the four-file batch.
+evidence. PR #9 completed the four-file batch; the same mappings alone do not
+accept a changed runtime or close full M3.
 
 ## Alternatives and consequences
 

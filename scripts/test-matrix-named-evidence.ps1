@@ -10,7 +10,7 @@ $unitPath='tests/conformance/reviews/gc-aunit-context-replay.proposal.json'
 $unitReview='tests/conformance/reviews/gc-aunit-context-replay.cross-review.json'
 function Read-Json($path){Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 64}
 function Hash($path){(Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()}
-function Save-Json($path,$value){[IO.File]::WriteAllText($path,($value | ConvertTo-Json -Depth 64),[Text.UTF8Encoding]::new($false))}
+function Save-Json($path,$value){[IO.File]::WriteAllText($path,($value | ConvertTo-Json -Depth 64).Replace("`r`n","`n"),[Text.UTF8Encoding]::new($false))}
 $cm=Read-Json (Join-Path $root $consumerPath)
 $cr=Read-Json (Join-Path $root $consumerReview)
 $am=Read-Json (Join-Path $root $unitPath)
@@ -23,6 +23,13 @@ foreach($file in @($files | Sort-Object -Unique)){
     [void][IO.Directory]::CreateDirectory((Split-Path -Parent $destination))
     Copy-Item -LiteralPath (Join-Path $root $file) -Destination $destination
 }
+# Synthetic fixtures use the current copied source bytes. Historical review
+# artifacts remain unchanged in the repository; their old revision hashes do
+# not make a self-test's fabricated review describe this new implementation.
+foreach($binding in $cr.source_bindings){$binding.sha256=Hash (Join-Path $fixture $binding.path)}
+foreach($case in $cm.cases){$case.source_sha256=Hash (Join-Path $fixture $case.source)}
+foreach($binding in $am.bindings){$binding.sha256=Hash (Join-Path $fixture $binding.path)}
+foreach($entry in $am.entries){$entry.source_sha256=Hash (Join-Path $fixture $entry.case.Split('#')[0])}
 $captureDirectory=Join-Path $fixture 'reports/captures'
 [void][IO.Directory]::CreateDirectory($captureDirectory)
 function Capture($name,$text){
@@ -81,7 +88,7 @@ function Run-Case($Name,$Mutation,$Expected){
     Save-Json (Join-Path $fixture $unitReview) $v.ar
     Save-Json (Join-Path $fixture 'consumer.json') $v.c
     Save-Json (Join-Path $fixture 'aunit.json') $v.a
-    $manifest=@{revision=$revision;consumer_mapping=@{path=$consumerPath;sha256=(Hash (Join-Path $fixture $consumerPath));
+    $manifest=@{scope='gc-io-events';revision=$revision;consumer_mapping=@{path=$consumerPath;sha256=(Hash (Join-Path $fixture $consumerPath));
         review=$consumerReview;review_sha256=(Hash (Join-Path $fixture $consumerReview))};
         aunit_mapping=@{path=$unitPath;sha256=(Hash (Join-Path $fixture $unitPath));review=$unitReview;review_sha256=(Hash (Join-Path $fixture $unitReview))};
         named_consumers=@(@{context=$context;report='consumer.json';sha256=(Hash (Join-Path $fixture 'consumer.json'));artifact_root='.'});

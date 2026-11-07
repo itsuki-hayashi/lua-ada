@@ -24,7 +24,11 @@ enum lua_ada_operation {
     ADA_GET_YIELDABILITY = 50, ADA_SET_WARNING_FUNCTION,
     ADA_ISSUE_WARNING, ADA_COMPLETE_WARNING,
     ADA_OPEN_IO_MODULE, ADA_OPEN_OS_MODULE,
-    ADA_COLLECTOR_CONTROL, ADA_PUSH_COLLECTOR_DRAIN
+    ADA_COLLECTOR_CONTROL, ADA_PUSH_COLLECTOR_DRAIN,
+    ADA_YIELD_CALL = 58, ADA_GET_STATUS, ADA_BEGIN_RESUME,
+    ADA_OPEN_STANDARD_MODULE, ADA_PREPARE_INDEX, ADA_MARK_CLOSE, ADA_CLOSE_SLOT,
+    ADA_SET_HOOK = 80, ADA_GET_HOOK, ADA_GET_HOOK_MASK, ADA_GET_HOOK_COUNT,
+    ADA_GET_DEBUG_FRAME, ADA_GET_DEBUG_LINE
 };
 
 /* Identity is opaque C-owned transport, not a C Lua frame layout. Guard
@@ -54,6 +58,8 @@ struct lua_ada_request {
     void *warning_data;
     const char *warning_message;
     int warning_continuation;
+    lua_KFunction continuation;
+    lua_KContext kcontext;
 };
 
 struct lua_ada_response {
@@ -69,6 +75,9 @@ struct lua_ada_response {
     void *warning_data;
     const char *warning_message;
     int warning_continuation;
+    lua_KFunction continuation;
+    lua_KContext kcontext;
+    int kstatus;
 };
 
 enum lua_ada_action {
@@ -78,7 +87,8 @@ enum lua_ada_action {
     ADA_ACTION_MEMORY = LUA_ERRMEM,
     ADA_ACTION_HANDLING = LUA_ERRERR,
     ADA_ACTION_ABORT = 6,
-    ADA_ACTION_WARNING = 7
+    ADA_ACTION_WARNING = 7,
+    ADA_ACTION_SUSPEND = 8
 };
 
 /* This is an opaque state surface, not C Lua's private lua_State layout.
@@ -96,6 +106,9 @@ enum lua_ada_action ada_lua_dispatch(lua_State *state,
                                     const struct lua_ada_request *input,
                                     struct lua_ada_response *output);
 size_t ada_lua_contract(int part);
+int lua_ada_debug_dispatch(lua_State *state,
+                           const struct lua_ada_request *input,
+                           struct lua_ada_response *output);
 size_t lua_ada_surface_size(void);
 size_t lua_ada_request_size(void);
 size_t lua_ada_response_size(void);

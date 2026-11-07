@@ -1,5 +1,51 @@
 # Project Status
 
+## Expanded T conformance (2026-11-07)
+
+The delivery on codex/m3-expanded-t-conformance retains the nine previously
+exercised primary files and adds constructs.lua, closure.lua, pm.lua and
+math.lua, including selected T paths and the bwcoercion.lua helper. The
+installed scope resolves 850 runtime/audit obligations and 159 selected API
+entries. Its 1,643 non-runtime classifications remain separately reviewed
+source inventory, not executed test cases. The historical gc-io-events scope
+and unrelated global obligations remain distinct.
+
+Clean candidate 3107dd6e43e028ae7cd107222802fcf852ded62a passed all 24 jobs
+and 26 contexts in [workflow 42348074001](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42348074001).
+The single checkout-only failure passed when retried on the same revision.
+The verified bundle contains 338 primary C/Ada pairs and 26 additional
+constructs pairs: 676 primary reports and 52 supplemental reports. It also
+contains all 26 warning indices and 170 warning processes. All seven
+upstream-test contexts reach their applicable guarded tests without omissions;
+default T-absence messages retain explicit instrumented coverage links.
+
+The complete pipelines pass 1,390 applicable AUnit cases on Windows, 1,385 on
+Linux and 1,388 on macOS, with zero assertion failures or unexpected errors.
+The scoped named catalog selects 100 C cases and 94 AUnit cases with explicit
+semantic and platform bounds. The retained ABI, frontend/opcode, native layout,
+CLI, binary, consumer and seeded differential campaigns also pass. All hosts
+select Alire 2.1.1, stable native GNAT 16.1.0 and GPRbuild package 26.0.1;
+the GPRBUILD executable banner is 26.0.0. Required flags and checks stay enabled.
+
+The automatic review of [PR #10](https://github.com/itsuki-hayashi/lua-ada/pull/10)
+identified a retained coroutine-status mismatch after allocation refusal.
+The correction preserves the memory/error-handler classes already transported
+by resume when lua_status queries a failed coroutine. The existing separately
+named refusal witness now checks that status both immediately and after scalar
+stack access. Its catalog counts stay unchanged. The corrected implementation
+requires fresh 26-context execution and independent acceptance on its own head;
+the earlier accepted certificate remains dated evidence for its original tree.
+
+Independent decisions bind all 1,009 exact source/API projections, fresh
+collector/platform applicability and the final bytes of all 338 execution
+contracts. Candidate adjudication and installation do not establish final-head
+acceptance. The fresh matrix, independent reconciliation and immutable
+certificate in refs/notes/expanded-t-conformance on the tested PR head own
+that exact revision's acceptance. The [conformance catalog](../tests/conformance/README.md)
+documents retrieval; the [session](sessions/2026-11-07-expanded-t-conformance.md)
+preserves failed candidates, repairs and review evidence. Other files, all.lua,
+heavy.lua, full M3 and complete public ABI acceptance remain outside this scope.
+
 ## Four-file conformance follow-up (2026-11-07)
 
 [PR #9](https://github.com/itsuki-hayashi/lua-ada/pull/9) covers
@@ -27,8 +73,12 @@ resolved 708 runtime/audit entries and 77 scoped API entries; 191 lexical
 entries retain their non-runtime classifications. The
 [contract index](../tests/conformance/scopes/gc-io-events.contracts.json)
 binds each operation to its approved protocol. Final scoped acceptance
-requires a fresh 26-context run against the resolved ledger and approved
-contracts, followed by independent reconciliation of all 208 process reports.
+passed at 6b263193e8c165df75158f144cf4738dbb040def in workflows
+[42330407879](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42330407879)
+and [42330402884](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42330402884).
+Both passed all 24 jobs/26 contexts; independent reconciliation accepted all
+104 operations and 208 process reports. PR #9 is merged. Final certificates
+are published in its tested head's gc-io-events-conformance Git note.
 Full M3, aggregate and heavy execution, and unrelated C ABI obligations remain
 outside this scope.
 

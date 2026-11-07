@@ -513,6 +513,14 @@ package body Lua.Conformance_Adapter is
       Add ("checkmemory", 12);
       Add ("ada_emergency_tables", 13);
       if Callback (14) /= null then Add ("nonblock", 14); end if;
+      Add ("testC", 17);
+      Add ("makeCfunc", 18);
+      Add ("sethook", 19);
+      Add ("resume", 20);
+      Add ("newstate", 21);
+      Add ("loadlib", 22);
+      Add ("doremote", 23);
+      Add ("closestate", 24);
       End_Operation (State);
    exception
       when others => End_Operation (State); raise;

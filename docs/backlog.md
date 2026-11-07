@@ -3,7 +3,26 @@
 IDs are stable. Completion requires evidence, including relevant platform gates.
 M1 is complete; [all five gates passed](validation.md).
 
-The active 2026-11-07 bounded follow-up is `gc-io-events` on
+The 2026-11-07 delivery is `expanded-t-conformance` on
+`codex/m3-expanded-t-conformance`, based on merged PR #9. It retains all nine
+previously exercised primary files, adds constructs.lua, closure.lua, pm.lua
+and math.lua, and resolves their T/helper obligations in all 26 contexts.
+See the [current session](sessions/2026-11-07-expanded-t-conformance.md).
+Implementation and independent per-obligation adjudication are complete for
+this bounded scope. Its 850 runtime/audit obligations, 159 selected API entries
+and 338 execution contracts have exact independent approvals. The immutable
+certificate in refs/notes/expanded-t-conformance on the tested PR head owns
+final scoped completion evidence; candidate success alone does not establish
+it. Merge is authorized after current-head CI, independent final reconciliation
+and review fixes pass. All broader M3 obligations retain their separate gates.
+
+PR #10's automatic review adds an explicit retained-memory-status assertion to
+the existing allocation-refusal C/AUnit witness. Its lua_status/LUA_ERRMEM links
+and producer hashes are independently reviewed with the correction. The final
+certificate must follow fresh 26-context execution of the corrected head;
+neither the preceding head's acceptance nor its partial PR workflow closes it.
+
+The preceding 2026-11-07 bounded follow-up was `gc-io-events` on
 `codex/m3-gc-io-conformance`, based on merged PR #8. It covers events.lua,
 gc.lua, gengc.lua and files.lua, including T and all 26 applicable contexts.
 This supersedes earlier branch instructions for this batch only. Existing M3

@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "kind": "independent-prebuilt-profile-harness-review",
+  "author": "Codex /root/expanded_source_audit",
+  "reviewer": "Codex /root/draft_assessment",
+  "decision": "accepted-narrow-profile-selection-fix",
+  "date": "2026-11-07",
+  "base_revision": "13df577db1014a83a235a3f21b6031ba77763b96",
+  "scope": "expanded-t-conformance",
+  "source_bindings": [
+    {
+      "path": "scripts/check-core-image.ps1",
+      "sha256": "401684a1b7d3f5561b40ccf2d6ec72db1b9d40c17282b6a52ec0a6fbe1ce0759"
+    },
+    {
+      "path": "scripts/test-prebuilt-runtime-profile.ps1",
+      "sha256": "2dc07e876ce062c213d100bf9ea228af946e49bb78459b71e20cbdda0b2518c6"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "87e9a5b46ae8028f9ba8fe41e7502c12af622382bf0e91a36e78ae06944d2258"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "reports/expanded-t-conformance/prebuilt-profile-before-fix.log",
+      "sha256": "b2cf93fd03e2274f0533b1aa3d8f9e53139d9c2952017063f02f18069c492e8a",
+      "meaning": "Actual old-core failure attempts missing upstream-test/development/static archive after wrong remembered profile."
+    },
+    {
+      "path": "reports/expanded-t-conformance/prebuilt-profile-after-fix-static-final.log",
+      "sha256": "c456944f6fbbc4f8b68dff5a7c5f50315f05f77174228b03c0fd8112b1c6ac50",
+      "meaning": "Author actual fixed regression and nine real consumers."
+    },
+    {
+      "path": "reports/expanded-t-conformance/independent-prebuilt-profile-regression.log",
+      "sha256": "3e5eb9727cf68b28ab27b7088a6c37141d3bd4699f01abc27ca9547b5c1d4ca1",
+      "meaning": "Reviewer independently executed the regression at a dirty diagnostic tree; all nine consumers and matching native contracts passed."
+    },
+    {
+      "path": "reports/instrumented/prebuilt-profile/58171f56157c49d791703cd202cea50f/result.json",
+      "sha256": "38673b01c2a566dac8b5becee1ee760904fae212180c6ac256a1a0703cf66a65",
+      "meaning": "Independent actual generated+remembered development->validation transition; requested runtime image unchanged, no runtime build requested."
+    },
+    {
+      "path": "reports/core-image/13f5cf2455774a6eb1d092084a3d060c/result.json",
+      "sha256": "92eddc120ed5d56f035c0d5aaccc5cf43ec7968f78dfe352cd6dfadfc886a5df",
+      "meaning": "Independent actual nine-process public C/native/mixed/startup campaign, zero exits/errors and matching GC/IO/foreign contracts."
+    }
+  ],
+  "reviewed_invariants": [
+    "Alire generation-only selection explicitly sets the root crate's requested profile before GPR prebuilt consumer imports. No generated file is edited by the scripts, and generation stops before compilation/linking/binding.",
+    "The selected existing image must exist before generation, and its hash must remain identical immediately afterward, after consumer builds and after actual consumer execution. Consumer GPR invocations retain LUA_ADA_PREBUILT=true and explicit configuration/library scenarios.",
+    "The regression deliberately establishes both generated and remembered root profile as development for requested validation, verifies the wrong-profile precondition, runs the real existing consumer campaign once, verifies validation restoration and rechecks the same image hash.",
+    "check-instrumented substitutes this regression for its former single consumer campaign; it does not add a second C campaign or request another runtime build. The regression receipt stays outside reports/core-image, preserving one real named consumer report per context.",
+    "The non-prebuilt driver branch still explicitly builds the requested root profile with the existing strict project inputs; runtime, Ada/C tests, headers, GPR inputs and C/AUnit case semantics are unchanged.",
+    "The independently exercised validation/upstream-test/static runtime archive SHA256 remains9fbdeed7b0c07d14a59c4f7ba240ae5a07ef02aa90d0a78ac5dee27d951a818f before/after. Nine actual consumers pass with physical one-image and native GC/IO/foreign equality checks."
+  ],
+  "findings": [],
+  "limitations": [
+    "This review covers the exact three-script harness delta and actual local Windows validation/upstream-test/static evidence. Other OS/library/profile combinations require the fresh replacement CI campaign; no cross-platform pass is inferred.",
+    "The earlier13df local full T pipeline remains incomplete because of its late prebuilt consumer failure. Fourteen accepted Lua operations and independently successful predecessor CI contexts remain separate evidence.",
+    "This is not source/API runtime status promotion, final scope acceptance or permission to rebind3107 historical execution projections. Versioned producer bindings and an updated exact final source-delta allowlist require their separate decisions.",
+    "Fresh24-job/26-context execution and final independent reconciliation are still required on the corrected clean publication revision."
+  ],
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "full_m3_acceptance": false
+}

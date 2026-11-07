@@ -35,11 +35,11 @@ $resolve = {param($path,$expected)
     return $path
 }
 $count = 0
-function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected) {
+function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected,[switch]$Foreign) {
     $report = $baseline | ConvertTo-Json -Depth 16 | ConvertFrom-Json -AsHashtable
     & $Mutation $report
     $failure = $null
-    try { $null = Test-NamedConsumerEvidence $report $mapping $revision $context $resolve }
+    try { $null = Test-NamedConsumerEvidence $report $mapping $revision $context $resolve -RequireForeignContract:$Foreign }
     catch { $failure = $_.Exception.Message }
     if (($Expected -eq '' -and $null -ne $failure) -or
         ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))) {
@@ -94,4 +94,32 @@ Run-Case 'missing named case' {} 'witness missing'
 $mapping.cases[0].exact_witnesses=@('case passed')
 $mapping.cases+=@($mapping.cases[0])
 Run-Case 'duplicate mapped case' {} 'duplicate named'
+$mapping.cases=@($mapping.cases[0])
+$mapping.cases+=@{source='foreign.c'; case_id='foreign-case'; source_sha256=$hash;
+    consumer='foreign-api'; expected_count=1; exact_witnesses=@('foreign case passed'); pattern_witness=$null}
+$baseline.consumer_sources+=@{file='foreign.c';sha256=$hash}
+$baseline.foreign_contract=@{matching_output=$true; reference_library_files=@(@{sha256=$hash})}
+foreach($name in @('foreign-api','foreign-oracle')) {
+    $record=$records[0].Clone()
+    $record.name=$name
+    $out=Join-Path $directory "$name.stdout"
+    [IO.File]::WriteAllText($out,"foreign case passed`nPASS: public foreign contract`n")
+    $record.stdout=$out
+    $record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant()
+    $baseline.consumers+=$record
+}
+Run-Case 'expanded foreign case and matching native process required' {} '' -Foreign
+Run-Case 'expanded foreign oracle cannot be absent' {param($r)
+    $r.consumers=@($r.consumers | Where-Object name -CNE 'foreign-oracle')
+} 'missing/duplicate' -Foreign
+Run-Case 'expanded foreign metadata must identify original C runtime' {param($r)
+    $r.foreign_contract.reference_library_files=@()
+} 'oracle provenance' -Foreign
+Run-Case 'expanded foreign captures must actually agree' {param($r)
+    Replace-Capture $r 'foreign-oracle' stdout "different case result`nPASS: public foreign contract`n"
+} 'oracle bytes differ' -Foreign
+Run-Case 'expanded foreign named case cannot disappear behind completion' {param($r)
+    Replace-Capture $r 'foreign-api' stdout "PASS: public foreign contract`n"
+    Replace-Capture $r 'foreign-oracle' stdout "PASS: public foreign contract`n"
+} 'witness missing' -Foreign
 Write-Output "PASS: $count named consumer evidence regressions; synthetic observations only"

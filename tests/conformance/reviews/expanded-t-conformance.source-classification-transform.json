@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "kind": "approved-source-classification-transformation",
+  "scope": "expanded-t-conformance",
+  "author": "Codex /root/expanded_source_audit",
+  "independent_reviewer": "Codex /root/conformance_scope",
+  "source_review": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.source-cross-review.json",
+    "sha256": "0a50a7963747d8f3c8622f9d2f8db7f92ae09375f3441ee6ca2c63b06b328888"
+  },
+  "reviewed_author_packet_snapshot": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.source-author-packet.json",
+    "sha256": "14dab2ad7f2c623c90aae9eed861e74f5cd0b3b92f95d773e23e93551845ce35"
+  },
+  "files": [
+    {
+      "file": "tpack.lua",
+      "path": "tests/conformance/coverage/tpack.jsonl",
+      "previous_pending_snapshot_sha256": "8edf4c5f58780945849e5dd2f4709c13cb63bcac14ab99bedc4382f406ac6bf3",
+      "current_classified_sha256": "9845b0afea731d6c9f5945401ddaed4233e7fcc00387c46938b34295dc665cbe",
+      "reviewed_lexical_records": 95,
+      "pending_runtime_and_audit_records": 12,
+      "runtime_evidence_added": 0
+    },
+    {
+      "file": "utf8.lua",
+      "path": "tests/conformance/coverage/utf8.jsonl",
+      "previous_pending_snapshot_sha256": "e379874b50880aa2c6356fc4ac8a97c0ee9df65fc0dd7019ef6fbd555ffe6698",
+      "current_classified_sha256": "032b00b176ea84aeee88aec3171672b4b86e242727ba10a2744e15542bea1f49",
+      "reviewed_lexical_records": 58,
+      "pending_runtime_and_audit_records": 10,
+      "runtime_evidence_added": 0
+    },
+    {
+      "file": "bitwise.lua",
+      "path": "tests/conformance/coverage/bitwise.jsonl",
+      "previous_pending_snapshot_sha256": "e668830d947778cdcf97ee7a97905bf3dffe0c718ca59aa0b093fc980dc10132",
+      "current_classified_sha256": "fdd83e353f54761db324f42ebce3adf3e4f7f059166dd18474a4bcef18fe3922",
+      "reviewed_lexical_records": 154,
+      "pending_runtime_and_audit_records": 11,
+      "runtime_evidence_added": 0
+    },
+    {
+      "file": "bwcoercion.lua",
+      "path": "tests/conformance/coverage/bwcoercion.jsonl",
+      "previous_pending_snapshot_sha256": "4d80d54c1763677d2e5293c4e7bdce811e304ccf79af694f27db132edd8fddd6",
+      "current_classified_sha256": "8d2b2b4e1897cadfd1478881110192e9ee257549ed591f309dae32bffd5b2660",
+      "reviewed_lexical_records": 4,
+      "pending_runtime_and_audit_records": 4,
+      "runtime_evidence_added": 0
+    },
+    {
+      "file": "goto.lua",
+      "path": "tests/conformance/coverage/goto.jsonl",
+      "previous_pending_snapshot_sha256": "0d9344de782a450311faa99408e5a9c15d2d62fa10350adaf916ca07bd3e2914",
+      "current_classified_sha256": "95bd919eaa6ff8727422678d48397e82d8911359a18422252a98d95feddb39a7",
+      "reviewed_lexical_records": 61,
+      "pending_runtime_and_audit_records": 13,
+      "runtime_evidence_added": 0
+    },
+    {
+      "file": "constructs.lua",
+      "path": "tests/conformance/coverage/constructs.jsonl",
+      "previous_pending_snapshot_sha256": "bbc8a596fa96583d666617d386c25e681b79ada349d5685301b6b2ba4834ee54",
+      "current_classified_sha256": "8399b769d811cc3346f0f0c009e2c57181efecea9545e33827dd9f49e7e535d9",
+      "reviewed_lexical_records": 82,
+      "pending_runtime_and_audit_records": 13,
+      "runtime_evidence_added": 0
+    },
+    {
+      "file": "closure.lua",
+      "path": "tests/conformance/coverage/closure.jsonl",
+      "previous_pending_snapshot_sha256": "378314fc66c2e6af9df740a030a1aea975bf582e7ffc345e022fe18fe8e86874",
+      "current_classified_sha256": "fedfbbaa0d286467c5a41d9f0e040c7d7a4c899f20164495d3ebc47458cf34cd",
+      "reviewed_lexical_records": 62,
+      "pending_runtime_and_audit_records": 9,
+      "runtime_evidence_added": 0
+    },
+    {
+      "file": "pm.lua",
+      "path": "tests/conformance/coverage/pm.jsonl",
+      "previous_pending_snapshot_sha256": "64e20bca81f2dd886661421295be3e8d45d4a83de647adacb7ab68385be658fc",
+      "current_classified_sha256": "8ef9d262946e482aaa0d0cad9e4634f22c0b3430a28c1222092e4361f95ec717",
+      "reviewed_lexical_records": 183,
+      "pending_runtime_and_audit_records": 14,
+      "runtime_evidence_added": 0
+    },
+    {
+      "file": "math.lua",
+      "path": "tests/conformance/coverage/math.jsonl",
+      "previous_pending_snapshot_sha256": "bc38010be4fe9eec429801fcfb17047c11ead884e72b521a952d7334da5416b0",
+      "current_classified_sha256": "b3ad3d771c52345349374063fccb65ae2004a9fb698191b7021913eff3b808d6",
+      "reviewed_lexical_records": 467,
+      "pending_runtime_and_audit_records": 27,
+      "runtime_evidence_added": 0
+    },
+    {
+      "file": "coroutine.lua",
+      "path": "tests/conformance/coverage/coroutine.jsonl",
+      "previous_pending_snapshot_sha256": "34219d9e1184bf1f0d5f837b1f63be20cb36c332cb8413e95c502949447e41d9",
+      "current_classified_sha256": "8c6ec7f05bed9c2a80d8bb43d53b8d280d7e9096f34e6b09059dfc753f4aa5be",
+      "reviewed_lexical_records": 286,
+      "pending_runtime_and_audit_records": 29,
+      "runtime_evidence_added": 0
+    }
+  ],
+  "runtime_acceptance": false,
+  "execution_evidence": [],
+  "notes": [
+    "Author/cross-review coverage hashes identify the original all-pending input snapshot. This artifact records the approved classification-only transformation to current ledgers without rewriting that historical review snapshot.",
+    "Original source IDs/kinds/offsets/lengths/line/hash fields are preserved. Manual audits and all actual runtime blocks stay pending with no execution evidence."
+  ]
+}

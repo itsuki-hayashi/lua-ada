@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "kind": "independent-condition-root-fix-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "authors": [
+    "Codex /root/draft_assessment",
+    "Codex /root"
+  ],
+  "reviewer": "Codex /root/conformance_scope",
+  "decision": "accepted-minimal-fix-with-platform-revalidation-pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "path": "src/lua-canonical_compiler.adb",
+      "sha256": "41f97f79a0f56c532fed38f933ff0825f75772cf2b1d271ce11d51dc17231269"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.adb",
+      "sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.ads",
+      "sha256": "e6fded8c7879538fd53fb4a92896d32158c85d2f783fb35a6e1a0466ffbb1c62"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "93a2d0d3f9ab57df8bc30419303ec38e7521c986941e23ddc3d6e0c8d65976e3"
+    },
+    {
+      "path": "tests/lua/condition_if_root.lua",
+      "sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476"
+    },
+    {
+      "path": "tests/lua/condition_repeat_root.lua",
+      "sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c"
+    },
+    {
+      "path": "tests/lua/condition_repeat_value_root.lua",
+      "sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228"
+    },
+    {
+      "path": "tests/lua/condition_short_circuit_root.lua",
+      "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
+    },
+    {
+      "path": "tests/lua/condition_while_root.lua",
+      "sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9"
+    }
+  ],
+  "trigger": {
+    "workflow_run": 42342542403,
+    "revision": "a1ffa07ed3495541ffee431f3260bb114524cd42",
+    "context": "default/macos/release/static",
+    "report": {
+      "path": "reports/ci-artifacts/a1ffa07-42342542403/lifecycle-macOS-release-static/reports/expanded-conformance/2d25a95df9604e608090c9b8d18450d1/Ada-closure.lua.json",
+      "sha256": "e101646fb91b60dff2d801000a2ae709233a18e1579b32b2c3d0da929d9ffe54"
+    },
+    "observed": "Original unchanged closure.lua stalled for 900 seconds before its first plus marker, with empty stderr and external timeout termination."
+  },
+  "evidence": [
+    {
+      "path": "reports/expanded-t-conformance/weak-while-guard.lua",
+      "sha256": "c80a6f3d211965c29a854e3e81dd373cf44363baa20426954c1013274d20ae5c"
+    },
+    {
+      "path": "reports/expanded-t-conformance/weak-while-ada.log",
+      "sha256": "ec79dccfdb80ac8fc3e57498bbb032eb5e072622b1491780027b29b45b854d8e"
+    },
+    {
+      "path": "reports/expanded-t-conformance/weak-while-native.log",
+      "sha256": "757ad1e6b98348fbf3b0252d5a2743b5667ad7cd5082de35f55704228ea61293"
+    },
+    {
+      "path": "reports/expanded-t-conformance/condition-roots-build-1.log",
+      "sha256": "ebeb63f1f632a7df9c759c272dabdb1c4c7c7dce53f91fa5f6a26c9df722a008"
+    },
+    {
+      "path": "reports/expanded-t-conformance/condition-roots-build-2.log",
+      "sha256": "aa76d4a666b30688e5efbfd31db9116ed219a9ac6e467321f2248253a808dd98"
+    },
+    {
+      "path": "reports/expanded-t-conformance/condition-roots-tests-1.log",
+      "sha256": "984b5f648eb87014f9f3b16956e56dd43e9ac63558b5f5322e6c8a9408c8c136"
+    },
+    {
+      "path": "reports/expanded-t-conformance/condition-root-independent/index.json",
+      "sha256": "c6e322467eec171bd0bbf585457c5048603c5026a52fcc448c94b8bc8079760e"
+    },
+    {
+      "sha256": "390eccb5e25c581a0b897697363f20d42082371ff4cb7d91b4d8d2fbce9a91d9",
+      "path": "reports/expanded-t-conformance/closure-fixed-default.log"
+    }
+  ],
+  "reviewed_invariants": [
+    "TEST defaultK=false skips the following exit jump only for truthy operands. LOADNIL therefore runs on the consumed true edge, before if/while bodies or repeat scope closing.",
+    "Temporary allocators place each condition result at or above Fn.Base. Retire_Condition checks that bound; lexical locals, captured cells and repeat closing variables remain below it.",
+    "The added opcode clears exactly one consumed result slot with B=0. Expression and/or TEST lowering and runtime TEST semantics are unchanged.",
+    "False condition results are nil/false and have no collectible value to retain. The false edges retain their existing jump targets.",
+    "Raw-byte allocation debt and actual Ada header size schedule automatic collection; no clock dependency exists. A stale condition register can be marked while a higher concat RHS allocates, creating timing-sensitive weak reachability.",
+    "Separately named while/if/repeat-value tests force collection before a nested RHS overwrites the consumed register. Repeat-close and short-circuit tests protect required live values and closing behavior."
+  ],
+  "verification": {
+    "independently_executed_lua_cases": 15,
+    "native_default_cases": 5,
+    "native_upstream_test_cases": 5,
+    "patched_ada_default_cases": 5,
+    "all_cases_exit_zero": true,
+    "all_cases_stderr_empty": true,
+    "prepatch_ada_reproduction": "while guard fails exact consumed-guard assertion; same source passes native oracle",
+    "fresh_default_strict_builds": "Both recorded builds succeeded with the retained GPR warning and runtime-check switches; the second build compiles and registers the fifth case.",
+    "fresh_default_aunit": {
+      "total": 1385,
+      "successful": 1385,
+      "failed_assertions": 0,
+      "unexpected_errors": 0,
+      "labels": [
+        "condition roots: consumed while guard",
+        "condition roots: consumed if guard",
+        "condition roots: consumed repeat guard",
+        "condition roots: repeat closing local",
+        "condition roots: short circuit result"
+      ]
+    },
+    "unchanged_closure_default": "Unchanged closure.lua completed in 0.49 seconds with testing closures, plus, and terminal OK on the fixed default Ada runner; source and 900-second budget are unchanged."
+  },
+  "findings": [],
+  "limits": [
+    "Local validation is Windows validation/static and includes dirty-worktree focused observations. It does not establish a corrected macOS or Linux pass.",
+    "Fresh unchanged execution in all 26 contexts, source/API adjudication and final independent matrix reconciliation remain required.",
+    "The fix resolves consumed statement result slots. It makes no general claim that every unused canonical temporary has a complete liveness analysis."
+  ]
+}

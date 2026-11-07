@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "kind": "independent-expanded-harness-semantic-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "author": "Codex /root/conformance_scope",
+  "reviewer": "Codex /root/draft_assessment",
+  "decision": "accepted-harness-mechanisms-with-runtime-obligations-pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review_scope": "Independent source review of the expanded 13-file selection, process protocol, source/API immutable semantic projections, named consumer/AUnit replay, candidate bundle collector and final matrix gates. This excludes production runtime implementation and grants no source/API runtime pass, context acceptance or final matrix approval.",
+  "source_bindings": [
+    {
+      "path": "scripts/ConformanceScope.psm1",
+      "sha256": "05c8dcfd73d1b2239af8ff1f4ee9f47e6838712e7bdf9eca79262e7c00631300"
+    },
+    {
+      "path": "scripts/ConformanceMatrix.psm1",
+      "sha256": "336005ea70cf3c46b315e3682e1a10d25c7d4a295ab27d46ead94c198fedd9a7"
+    },
+    {
+      "path": "scripts/ConformanceReview.psm1",
+      "sha256": "c2aa53e9d8eaa825f34ac0ee45bfbebdf4755c6afa60d7c2709d9218f6e29e9c"
+    },
+    {
+      "path": "scripts/ScopedAcceptancePolicy.psm1",
+      "sha256": "52ad841444f3ee7498f4c51d61d6c96891ca8dbb6a782b06186f9c99841fd653"
+    },
+    {
+      "path": "scripts/ConformanceRunner.psm1",
+      "sha256": "14c5528004b9b574954b653ccb9492e8bd6292e88ebe97d22113562829febf2f"
+    },
+    {
+      "path": "scripts/ConsumerEvidence.psm1",
+      "sha256": "c8bcc969814278889cf1cd0ca5649d39be11a7bd40bcf934eeb0fefcd2d584f2"
+    },
+    {
+      "path": "scripts/AUnitEvidence.psm1",
+      "sha256": "88b6e2497952cffa0072ce5345616d8f97d1a674b9f1cdce10ca6d540fac658c"
+    },
+    {
+      "path": "scripts/run-conformance.ps1",
+      "sha256": "c9db96176c66216fd2874fcb955e8f1549db16dfdea10652f95de11e4f80af4d"
+    },
+    {
+      "path": "scripts/check-conformance-scope.ps1",
+      "sha256": "ae1fd426e2fce0ab542323864b12529ace26280f2072a95cb14f3cb625828bfc"
+    },
+    {
+      "path": "scripts/check-expanded-conformance.ps1",
+      "sha256": "beec8192f1185b30ad0e02fb940ef7baa776be2c65b29c418211c9b12d1cb164"
+    },
+    {
+      "path": "scripts/check-gc-events.ps1",
+      "sha256": "720c91882360a1a81b1b1e022df5ce5c288c09474396afa567ac9b5def8afaad"
+    },
+    {
+      "path": "scripts/check-files-scoped.ps1",
+      "sha256": "100e3f6a6cdd4b5ecdfa821963a4c33997690956f4af20c84564d003f9573934"
+    },
+    {
+      "path": "scripts/check-aunit-evidence.ps1",
+      "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "ae2e8b732e37f09edd0477c862d99950f3c00293aeff39405958dea804fb0ec2"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "8071c9872cc2244d59cc8de256b530262820e453cd802c5edbf6cee7db16c9e5"
+    },
+    {
+      "path": "scripts/test-expanded-conformance.ps1",
+      "sha256": "57aec3613fb1bbeba2d80381882611c2a422a0f49e363102ef39385b7c9ba1f5"
+    },
+    {
+      "path": "scripts/test-consumer-evidence.ps1",
+      "sha256": "3e72e5869f2f4c05a84c02118bcbfa50f8d5aa60d8ca942e9d6f85b5182be54f"
+    },
+    {
+      "path": "scripts/test-aunit-evidence.ps1",
+      "sha256": "871743e8fdfb4be11799cff06ac70562986093146ccf186114dc742fe429ff06"
+    },
+    {
+      "path": "scripts/test-conformance-review.ps1",
+      "sha256": "cf691875c831864fd8ee91ae38e9d75ae192d5bb7d70a9bb24caf0980537c6a9"
+    },
+    {
+      "path": "scripts/test-matrix-named-evidence.ps1",
+      "sha256": "96ecf80a3ad2fdcf2671763e37a97695952667dfcf24bd06d1a005d3e21b0670"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "sha256": "3d872c6a3005d0a4eea70e8d52b61ad7f4d484a36c1c46f0f0d13efc636dec2b"
+    },
+    {
+      "path": "tests/conformance/constructs-seeded.lua",
+      "sha256": "55f6e2cb2c542dfcd2267dff56a0fae28027cd1730839e79c88e89c8f0ebd7c7"
+    },
+    {
+      "path": "tests/conformance/source-profile-witness.lua",
+      "sha256": "e9170727df20072001968fccdc551ef827d3b2937eee997921c224b5ef2ba752"
+    },
+    {
+      "path": "tests/conformance/bitwise-helper-witness.lua",
+      "sha256": "1a858b2c5592f2945bbe7b17d7cfa4269774908069c125de1d1f1a87ea086f55"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "sha256": "c9d4b05b943d6864b8bee90e51c6536313f91ec9a434b368c5c7d9d4309c1210"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
+      "sha256": "5c3b40faa112c9926c32fd628f430026acd076ec0b96f0236548fa59c2eb86cf"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.contracts.json",
+      "sha256": "033ba398d337e0a57eab8b77032431297268b6482850256377e9177cd3439ea8"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-author-proposal.json",
+      "sha256": "8c7b762d69202c581f297c978ddacafe5a6e72382eef474657f78d33faa9d7a9"
+    },
+    {
+      "path": "scripts/ExpandedMatrixBundle.psm1",
+      "sha256": "561e70aca784288166bbd4c8fd058485bf7618720404141325c5f504a4eaa069"
+    },
+    {
+      "path": "scripts/new-expanded-matrix.ps1",
+      "sha256": "35e2f43e2cc60831f6c070c2ce4f7bda25d5d0c385cd60ff454949419ab99ac3"
+    },
+    {
+      "path": "scripts/test-expanded-matrix-bundle.ps1",
+      "sha256": "7dbd7f896f55bf5f6fe203306564e053df80739e37683796ba76ec452ba5fc38"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-author-proposal.json",
+      "sha256": "730a2a50224ff898350eaf1172f36968d2e81cfdf50b1bf78ab509413a1688f3"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
+      "sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json",
+      "sha256": "7282928161c9aff1a5fcec553e4a26022a5c3714f365d574b8c74ceef1da60bc"
+    },
+    {
+      "path": "scripts/ScopedWarnings.psm1",
+      "sha256": "78b40d69355d1dab854415a30a869f8baa8411b6171161da89ed8cc83a5d5fc4"
+    },
+    {
+      "path": "scripts/test-scoped-warnings.ps1",
+      "sha256": "6ab13300d4535979deef1292bdbeecfa3c462cb0b6788dd8fe3d142d13dd3aa4"
+    },
+    {
+      "path": "scripts/test-scoped-warning-evidence.ps1",
+      "sha256": "52dd4fb651e09a80764c88e54dd8e7982a47769d679a1d39682bcb521005d400"
+    },
+    {
+      "path": "scripts/test-conformance-matrix.ps1",
+      "sha256": "1761ffc84ed45bb2bff8687a652e5fec100cf85b06fe464921a6ea4db3eb3021"
+    },
+    {
+      "path": "scripts/test-scoped-acceptance-policy.ps1",
+      "sha256": "64d9c8bde20892fa8715471ac097f3035c21e7c31ab055c17a17bb98f090ade0"
+    },
+    {
+      "path": "scripts/test-native-branch-review.ps1",
+      "sha256": "4243eb9989260d76e9eff398110fd1a72934a8aafb8759ffe62dde590785b330"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-mapping-installation.json",
+      "sha256": "2a48276be643b773b99aa2c8376a51077583cc22fc0b59fa96b9c3994e096874"
+    },
+    {
+      "path": "src/lua-canonical_compiler.adb",
+      "sha256": "41f97f79a0f56c532fed38f933ff0825f75772cf2b1d271ce11d51dc17231269"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.adb",
+      "sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.ads",
+      "sha256": "e6fded8c7879538fd53fb4a92896d32158c85d2f783fb35a6e1a0466ffbb1c62"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-condition-roots.cross-review.json",
+      "sha256": "fcc8833405756300096a0f6d450dd6215770776d529e051cff506db212059508"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-author-proposal.json",
+      "sha256": "f89fd3127e44266863dbf44e6e01863c2f590536a906325936a6f0bc1435813e"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness.cross-review.json",
+      "sha256": "6224fa2d19c8f957be9c960093a8b584d997dab69bf7179659f560b044f30f7d"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-author-proposal.json",
+      "sha256": "21005e003734cd3419a84b8e61f87ff8458b22eab85f439744181e8c6f159de6"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness.cross-review.json",
+      "sha256": "611de9ec3cfd798f10b650a2372ab0a279649de3a04383a1e69066ddbd9a8d9b"
+    },
+    {
+      "path": "tests/lua/condition_if_root.lua",
+      "sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476"
+    },
+    {
+      "path": "tests/lua/condition_repeat_root.lua",
+      "sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c"
+    },
+    {
+      "path": "tests/lua/condition_repeat_value_root.lua",
+      "sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228"
+    },
+    {
+      "path": "tests/lua/condition_short_circuit_root.lua",
+      "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
+    },
+    {
+      "path": "tests/lua/condition_while_root.lua",
+      "sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9"
+    },
+    {
+      "path": "src/lua-engine-stacks.adb",
+      "sha256": "5756806521ec2fc798d126e728fc44829b2ce9e51ebf634492d61a91b8ec5dd8"
+    },
+    {
+      "path": "src/lua-engine-stacks.ads",
+      "sha256": "939309a0ebddfc02228787fb432049ce23ee15eee53d4feefaa11a620b8a44a3"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.adb",
+      "sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.ads",
+      "sha256": "49449173d1f133c1cdd3b86220afa307663d16cfb54766b36b7ab75e8e3b767d"
+    },
+    {
+      "path": "tests/lua/collector_scalar_weak_progress.lua",
+      "sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-scalar-stack-roots.cross-review.json",
+      "sha256": "89b58933919c783541ae193df18953e58d7c789cf6350bd87c22af60b4a0e0fe"
+    }
+  ],
+  "input_manifest": {
+    "sha256": "dfbeb1a47d4643d35d0373207da98f01c49e0b520a7dfdbd9b5422811b3aac8e",
+    "path": "reports/expanded-harness-review-inputs.json"
+  },
+  "scope_selection": {
+    "result": "Installed selection metadata validates 13 actual primary files, 2493 source anchors, one helper and 159 APIs; 142 source and 159 API obligations remain pending.",
+    "sha256": "7282928161c9aff1a5fcec553e4a26022a5c3714f365d574b8c74ceef1da60bc",
+    "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json"
+  },
+  "resolved_findings": [
+    {
+      "regression": "Editing both the guard threshold and lexical condition is rejected by the source applicability binding.",
+      "problem": "A coordinated edit to both a measured guard and its linked lexical applicability descriptor could otherwise retain earlier source review.",
+      "id": "H1",
+      "resolution": "The definition now binds immutable source cross-review/proposal bytes. Current anchor,classifications,obligation links,invariants,configuration and measured descriptors must match the approved source projection."
+    },
+    {
+      "regression": "Corrupted approval hash and five independent semantic descriptor drift mutations are rejected.",
+      "problem": "API invariant/scoped boundary text could otherwise broaden while approved named-case IDs remained unchanged.",
+      "id": "H2",
+      "resolution": "The scope and its selection approval now bind the independently reviewed API proposal. All159 current invariant,boundary,C/AUnit references and selected Lua obligation projections must match immutable approved bytes; status/evidence remain independently adjudicated."
+    },
+    {
+      "problem": "Windows pretty JSON CRLF bytes could be reviewed locally but normalized to LF during Git staging, invalidating every dependent review hash on clean CI.",
+      "id": "H3",
+      "resolution": "The five owned reviews and math review were normalized to exact LF bytes, all dependent API and selection identities cascaded, and first-party reviewed inputs now reject CRLF, BOM and invalid UTF-8. Synthetic metadata writers emit LF; native process captures are preserved unchanged.",
+      "regression": "Actual Git staging/checkout reproduces changed CRLF review bytes, and three raw-byte invalid forms are rejected even when the supplied worktree hash matches."
+    },
+    {
+      "problem": "Expanded final matrix replay could otherwise omit separate warning-regression indices retained by the GC/events child campaign.",
+      "id": "H4",
+      "resolution": "Collection and matrix shape now require exactly one warning index per each of 26 contexts. Independent matrix approval binds their hashes; replay derives six default or eight instrumented target/case pairs, checks actual scripts, payloads, phase, abort/control transport, source and executable/library identities, and rebases hashed captures.",
+      "regression": "Missing child/context warning evidence, changed reviewed hashes and rejected process/source/payload/noise/phase/runtime mutations fail. The shared active verifier has 21 focused regressions, including Linux converted normal and shutdown signals."
+    }
+  ],
+  "reviewed_guarantees": [
+    "The required scope cannot shrink its own 13 original-source identities or bwcoercion helper; exact 159 selected public header IDs and both semantic review identities are immutable selection inputs.",
+    "Per-process source-profile witness measures integer/mantissa/exponent/endian/precision facts without consuming the RNG. Declarative typed guard evaluation records false native alternatives as reviewed references without passing inactive assertion bodies.",
+    "Instrumented coroutine execution requires hook tail and both actual public C API sections. Default omission reports require genuine linked instrumented runtime obligations. Unexpected omissions or diagnostics fail.",
+    "Both separately seeded unchanged constructs templates are mandatory in every context,  with actual branch output and source/copy hashes. No RNG replacement or fabricated branch coverage is accepted.",
+    "Expanded public foreign consumers execute the identical 48 public-header contracts against Ada and separately built pinned C. Named source hashes,  unique completion/case witnesses, empty stderr and exact C/Ada captured bytes are replayed.",
+    "AUnit replay binds exact registered names/current sources, complete actual suite count, zero failures/errors and exact expected warning bytes. Generic source text, wrong chunk names and appended stderr are rejected.",
+    "Final matrix acceptance requires 26 distinct contexts, clean final checkout revision, reviewed source/contract/equivalent identities, actual measured launcher configurations, 900 second / 2 GiB policy, balanced allocator shutdown and matching runtime/oracle libraries across files, C consumers and AUnit.",
+    "Independent reconciliation binds all primary/supplemental process reports, contracts and named consumer/AUnit identities. A successful observation or pending author mapping alone carries no acceptance authority.",
+    "The artifact collector requires every context and named report, verifies original reports paths/hashes/revisions, refuses duplicates/partial indices and cannot overwrite a matrix with review metadata. Its output remains diagnostic until separately reviewed.",
+    "CI jobs select one PR head revision and preserve raw reports, captures, equivalents and process evidence for later independent replay.",
+    "Mandatory warning replay covers 26 unique context indices and 170 actual process cases across the supported context matrix: six cases in each default context and eight in each instrumented context. A record cannot waive rejection by changing its expected flag.",
+    "One shared case generator and active verifier govern warning capture and replay. Exact normal/shutdown payloads distinguish Ada and native chunk names; controls require empty stderr, shutdown requires prior OK, and platform abort transports cannot hide unrelated diagnostics.",
+    "Reviewed first-party text must be UTF-8 without BOM and LF, matching immutable repository bytes; source hashes are never silently normalized. Native captured output remains untouched."
+  ],
+  "independent_checks": {
+    "final_scope_selection_check": "passed after installed reviewed metadata",
+    "aunit_evidence_regressions": 24,
+    "consumer_evidence_regressions": 29,
+    "contract_policy_regressions": 11,
+    "legacy_matrix_regressions": 35,
+    "expanded_harness_regressions": 58,
+    "native_mapping_regressions": 18,
+    "notes": "Synthetic protocol regressions plus current source/hash checks. Fourteen existing final-runtime Windows captures independently pass the new shared verifier as diagnostic corroboration. No foreign-platform or final runtime/context acceptance is inferred.",
+    "source_input_hashes": 61,
+    "review_binding_regressions": 46,
+    "git_diff_check": "passed",
+    "bundle_collector_regressions": 10,
+    "macos_output_regressions": 10,
+    "named_matrix_regressions": 12,
+    "warning_evidence_regressions": 21,
+    "actual_windows_warning_captures_replayed": 14
+  },
+  "independent_check_logs": [
+    "reports/expanded-t-conformance/independent-expanded-harness-review-2.log",
+    "reports/expanded-t-conformance/independent-consumer-harness-review.log",
+    "reports/expanded-t-conformance/independent-aunit-harness-review-2.log",
+    "reports/expanded-t-conformance/independent-full-matrix-harness.log",
+    "reports/expanded-t-conformance/independent-bundle-collector.log",
+    "reports/expanded-t-conformance/independent-final-scope-selection.log",
+    "reports/expanded-t-conformance/independent-expanded-harness-review-3.log",
+    "reports/expanded-t-conformance/independent-bundle-collector-2.log",
+    "reports/expanded-t-conformance/independent-warning-evidence-review-2.log",
+    "reports/expanded-t-conformance/independent-review-bindings-3.log",
+    "reports/expanded-t-conformance/independent-condition-witness-mapping-verification.log",
+    "reports/expanded-t-conformance/independent-scalar-witness-mapping-verification.log"
+  ],
+  "findings": [],
+  "remaining_gates": [
+    "All 142 source obligations and 159 selected API obligations still need actual clean-revision evidence in their required contexts.",
+    "Execution-contract review, source/API runtime adjudication, all 26 contexts and final independent matrix acceptance remain separate obligations.",
+    "Full M3, unselected primary files, aggregate/heavy and unrelated global ABI/ecosystem claims remain outside this bounded decision."
+  ],
+  "newline_identity": "Reviewed as exact UTF-8 without BOM and LF repository bytes. Captured stdout/stderr retain original native bytes and hashes.",
+  "supersedes_sha256": "c53509c090c71cfd42b80a0880d137d6c243837cbfa00db78a00f2f3b0a838ba",
+  "condition_root_delta": {
+    "scoped_api_entries": 159,
+    "independent_production_review": {
+      "reviewer": "Codex /root/conformance_scope",
+      "sha256": "fcc8833405756300096a0f6d450dd6215770776d529e051cff506db212059508",
+      "path": "tests/conformance/reviews/expanded-condition-roots.cross-review.json"
+    },
+    "runtime_acceptance": false,
+    "source_identity_verification": "All55 current file hashes, installed13-file/2493-anchor/159-API scope selection and exactLF metadata validated.142source and159API runtime obligations remain pending.",
+    "named_aunit_cases": 94,
+    "decision": "accepted-harness-and-witness-identity-refresh-only",
+    "rationale": "The actual Mac closure timeout exposed a consumed statement-condition root. The condition compiler and five focused cases are bound for identity only and approved by their separate independent production reviewer. This harness/mapping certificate does not self-review that production implementation. The five new Ada Session lifetime supports remain distinct from real public C export witnesses; all prior API claims and scope identities are retained.",
+    "api_mapping_approval": {
+      "sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234",
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json"
+    },
+    "harness_implementation_unchanged": true,
+    "named_c_cases": 100
+  },
+  "scalar_stack_delta": {
+    "source_identity_verification": "All61 current source hashes,installed13-file/2493-anchor/159-API scope and exactLF metadata validate.142source/159API runtime obligations and fresh complete platform correction remain pending.",
+    "rationale": "Five additional separately registered Ada-only supports exercise actual incremental main/suspended root publication and weak progress. They supplement mandatory public C evidence; all existing API invariants,boundaries,C cases and original-source obligations are unchanged. Stack production sources are identity-bound only and independently reviewed by Codex /root/conformance_scope. This mechanism/mapping certificate does not self-review their implementation or promote runtime obligations.",
+    "named_c_cases": 100,
+    "independent_production_review": {
+      "reviewer": "Codex /root/conformance_scope",
+      "path": "tests/conformance/reviews/expanded-scalar-stack-roots.cross-review.json",
+      "sha256": "89b58933919c783541ae193df18953e58d7c789cf6350bd87c22af60b4a0e0fe"
+    },
+    "harness_implementation_unchanged": true,
+    "decision": "accepted-harness-and-witness-identity-refresh-only",
+    "named_aunit_cases": 94,
+    "runtime_acceptance": false,
+    "scoped_api_entries": 159,
+    "api_mapping_approval": {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
+      "sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234"
+    }
+  }
+}

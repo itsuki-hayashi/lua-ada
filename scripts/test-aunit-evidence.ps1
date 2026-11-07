@@ -65,4 +65,23 @@ $mapping.entries[0].case=''
 Run-Case 'blank named case' {} 'mapping duplicate/empty'
 $mapping.entries=@()
 Run-Case 'empty mapping' {} 'mapping empty'
+$mapping.entries=@(@{case='case.adb#Case';source_sha256=$hash;required_stdout_line='OK sample case'})
+$currentWarning="Lua warning: error in __gc ([string `"file-abort-test`"]:1: ordinary failure)`n"
+$mapping.expected_stderr=$currentWarning
+Run-Case 'current mapping requires actual Lua source warning' {param($r)
+    $c=Capture $currentWarning; $r.stderr=$c.path; $r.stderr_sha256=$c.hash
+} ''
+Run-Case 'current mapping rejects historical generic source warning' {} 'warning differs'
+Run-Case 'current mapping rejects unformatted Lua chunk identifier' {param($r)
+    $c=Capture "Lua warning: error in __gc (file-abort-test:1: ordinary failure)`n"
+    $r.stderr=$c.path;$r.stderr_sha256=$c.hash
+} 'warning differs'
+Run-Case 'current source warning rejects an appended diagnostic' {param($r)
+    $c=Capture ($currentWarning+"unexpected diagnostic`n"); $r.stderr=$c.path; $r.stderr_sha256=$c.hash
+} 'warning differs'
+Run-Case 'current source warning rejects a different source name' {param($r)
+    $c=Capture $currentWarning.Replace('file-abort-test','another-source'); $r.stderr=$c.path; $r.stderr_sha256=$c.hash
+} 'warning differs'
+$mapping.expected_stderr=''
+Run-Case 'empty expected warning cannot suppress stderr verification' {} 'empty or invalid'
 Write-Output "PASS: $count AUnit evidence regressions; synthetic observations only"

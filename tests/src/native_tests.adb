@@ -28,6 +28,32 @@ package body Native_Tests is
    procedure Xpcall_Handler_Validation;
    procedure Xpcall_Empty_Handler_Result;
    procedure Protected_Tail_Unwind;
+   procedure Replacement_Type_Diagnostic;
+   procedure Integer_Divide_Zero_Diagnostic;
+   procedure Integer_Modulo_Zero_Diagnostic;
+   procedure Integer_Field_Diagnostic;
+   procedure Integer_Right_Field_Diagnostic;
+   procedure Integer_Local_Diagnostic;
+   procedure Integer_Metamethod_Precedence;
+   procedure Gsub_Unmatched_Identity;
+   procedure Gsub_Callback_Unchanged_Identity;
+   procedure Gsub_Table_Unchanged_Identity;
+   procedure Gsub_Later_Replacement;
+   procedure Integer_Register_Diagnostic;
+   procedure Integer_First_Invalid_Diagnostic;
+   procedure Integer_Unary_Diagnostic;
+   procedure Integer_Global_Diagnostic;
+   procedure Integer_Upvalue_Diagnostic;
+   procedure Integer_Unnamed_Diagnostic;
+   procedure Integer_Indexed_Environment_Diagnostic;
+   procedure Integer_Stripped_Upvalue_Diagnostic;
+   procedure Integer_Unary_Metamethod;
+   procedure Integer_Right_Metamethod;
+   procedure Gsub_Callback_Substitution_Identity;
+   procedure Gsub_String_Substitution_Identity;
+   procedure Gsub_Negative_Limit_Identity;
+   procedure Gsub_Capture_Index_Diagnostic;
+   procedure Integer_Error (Source, Expected : String);
    procedure Succeeds (Source : String);
 
    procedure Succeeds (Source : String) is
@@ -331,6 +357,246 @@ package body Native_Tests is
          "function() error('x',0) end)");
    end Protected_Tail_Unwind;
 
+   procedure Replacement_Type_Diagnostic is
+   begin
+      --  Returning a table from the replacement callback is invalid. The
+      --  protected call must retain its type in the returned language error,
+      --  rather than converting it or reporting the replacement argument.
+      Succeeds
+        ("local ok,e=pcall(string.gsub,'a','.',function() return {} end); " &
+         "assert(not ok and e:find('invalid replacement value %(a table%)'))");
+   end Replacement_Type_Diagnostic;
+
+   procedure Integer_Divide_Zero_Diagnostic is
+   begin
+      --  Evaluate at runtime so the diagnostic belongs to the integer VM
+      --  operation and stays catchable through the native protection frame.
+      Succeeds
+        ("local function f(x) return 2//x end; local ok,e=pcall(f,0); " &
+         "assert(not ok and e:find('attempt to divide by zero',1,true))");
+   end Integer_Divide_Zero_Diagnostic;
+
+   procedure Integer_Modulo_Zero_Diagnostic is
+   begin
+      --  Modulo has its own pinned diagnostic; sharing the division helper
+      --  must not collapse the two distinct Lua errors into one message.
+      Succeeds
+        ("local function f(x) return 2%x end; local ok,e=pcall(f,0); " &
+         "assert(not ok and e:find(""attempt to perform 'n%0'"",1,true))");
+   end Integer_Modulo_Zero_Diagnostic;
+
+   procedure Integer_Field_Diagnostic is
+   begin
+      --  A failed left conversion must explain the actual table lookup at
+      --  the saved fallback PC, including an immediate right shift operand.
+      Succeeds
+        ("local f=assert(load('return math.huge << 1')); " &
+         "local ok,e=pcall(f); " &
+         "assert(not ok and e:find(""field 'huge'"",1,true))");
+   end Integer_Field_Diagnostic;
+
+   procedure Integer_Right_Field_Diagnostic is
+   begin
+      --  Reversing the operands must retain the right field's provenance,
+      --  rather than attaching the first operand's constant or local name.
+      Succeeds
+        ("local f=assert(load('return 1 << math.huge')); " &
+         "local ok,e=pcall(f); " &
+         "assert(not ok and e:find(""field 'huge'"",1,true))");
+   end Integer_Right_Field_Diagnostic;
+
+   procedure Integer_Local_Diagnostic is
+   begin
+      --  Equal numeric values do not identify a source binding. The right
+      --  operand is the invalid local while the first operand is integral.
+      Succeeds
+        ("local function f(bad) return 1 & bad end; " &
+         "local ok,e=pcall(f,math.huge); " &
+         "assert(not ok and e:find(""local 'bad'"",1,true))");
+   end Integer_Local_Diagnostic;
+
+   procedure Integer_Metamethod_Precedence is
+   begin
+      --  A numeric type's explicit bitwise handler can accept a value which
+      --  has no integer representation. Diagnostics run after that lookup.
+      Succeeds
+        ("debug.setmetatable(0,{__shl=function(a,b) return 17 end}); " &
+         "local result=math.huge << 1; debug.setmetatable(0,nil); " &
+         "assert(result==17)");
+   end Integer_Metamethod_Precedence;
+
+   procedure Gsub_Unmatched_Identity is
+   begin
+      --  A large noninterned string with no matches must retain its actual
+      --  identity; allocating equal bytes would fail the observable %p test.
+      Succeeds
+        ("local s=string.rep('a',1000); local r,n=s:gsub('z','x'); " &
+         "assert(n==0 and string.format('%p',s)==string.format('%p',r))");
+   end Gsub_Unmatched_Identity;
+
+   procedure Gsub_Callback_Unchanged_Identity is
+   begin
+      --  Matches whose callbacks return nil or false count as matches while
+      --  preserving the original object even across explicit collection.
+      Succeeds
+        ("local s=string.rep('a',100); local calls=0; " &
+         "local r,n=s:gsub('.',function() calls=calls+1; " &
+         "if calls==1 then collectgarbage(); return nil end; " &
+         "return false end); assert(n==100 and calls==n); " &
+         "assert(string.format('%p',s)==string.format('%p',r))");
+   end Gsub_Callback_Unchanged_Identity;
+
+   procedure Gsub_Table_Unchanged_Identity is
+   begin
+      --  Table lookup uses the same unchanged-result rule as callbacks;
+      --  absent and false replacement entries must both preserve identity.
+      Succeeds
+        ("local s=string.rep('ab',50); local r,n=s:gsub('.',{a=false}); " &
+         "assert(n==100 and string.format('%p',s)==string.format('%p',r))");
+   end Gsub_Table_Unchanged_Identity;
+
+   procedure Gsub_Later_Replacement is
+   begin
+      --  An early unchanged result must not hide a later real substitution,
+      --  and subsequent false results must not clear the changed flag.
+      Succeeds
+        ("local r,n=('abc'):gsub('.',function(c) " &
+         "if c=='b' then return 'X' else return false end end); " &
+         "assert(r=='aXc' and n==3)");
+   end Gsub_Later_Replacement;
+
+   procedure Integer_Error (Source, Expected : String) is
+   begin
+      Succeeds
+        ("local f=assert(load([==[" & Source & "]==])); " &
+         "local ok,e=pcall(f); assert(not ok and " &
+         "e:find([==[" & Expected & "]==],1,true))");
+   end Integer_Error;
+
+   procedure Integer_Register_Diagnostic is
+   begin
+      --  Register-register MMBIN must attribute the second failing argument,
+      --  independently of the immediate/constant forms used by math.lua.
+      Integer_Error
+        ("local function f(a,b) return a|b end; return f(1,2.5)",
+         "local 'b'");
+   end Integer_Register_Diagnostic;
+
+   procedure Integer_First_Invalid_Diagnostic is
+   begin
+      --  Both parameters fail conversion; Lua explains the first operand.
+      Integer_Error
+        ("local function f(a,b) return a|b end; return f(2.5,3.5)",
+         "local 'a'");
+   end Integer_First_Invalid_Diagnostic;
+
+   procedure Integer_Unary_Diagnostic is
+   begin
+      --  BNOT names its source register rather than its destination slot.
+      Integer_Error
+        ("local function f(x) return ~x end; return f(2.5)", "local 'x'");
+   end Integer_Unary_Diagnostic;
+
+   procedure Integer_Global_Diagnostic is
+   begin
+      --  An _ENV lookup describes a global even with explicit table syntax.
+      Integer_Error
+        ("_ENV.BAD_INTEGER=2.5; return _ENV.BAD_INTEGER|1",
+         "global 'BAD_INTEGER'");
+   end Integer_Global_Diagnostic;
+
+   procedure Integer_Upvalue_Diagnostic is
+   begin
+      --  A captured binding is not a local in its nested function's frame.
+      Integer_Error
+        ("local u=2.5; local function f() return u|1 end; return f()",
+         "upvalue 'u'");
+   end Integer_Upvalue_Diagnostic;
+
+   procedure Integer_Unnamed_Diagnostic is
+   begin
+      --  A numeric constant has no variable name; the generic diagnostic
+      --  must end without inventing a parenthesized constant attribution.
+      Succeeds
+        ("local f=assert(load('return 2.3 >> 0')); local ok,e=pcall(f); " &
+         "assert(not ok and e:match(" &
+         "'number has no integer representation$'))");
+   end Integer_Unnamed_Diagnostic;
+
+   procedure Integer_Indexed_Environment_Diagnostic is
+   begin
+      --  Integer indexing has field provenance even when its table is _ENV.
+      Integer_Error
+        ("local _ENV={[1]=2.5}; return _ENV[1]|0",
+         "field 'integer index'");
+   end Integer_Indexed_Environment_Diagnostic;
+
+   procedure Integer_Stripped_Upvalue_Diagnostic is
+   begin
+      --  Stripping removes the upvalue's name, not its identity or value.
+      --  The diagnostic uses the pinned unknown-name marker for that slot.
+      Integer_Error
+        ("local u=2.5; local f=function() return u|1 end; " &
+         "f=assert(load(string.dump(f,true))); debug.setupvalue(f,1,2.5); " &
+         "return f()", "upvalue '?'");
+   end Integer_Stripped_Upvalue_Diagnostic;
+
+   procedure Integer_Unary_Metamethod is
+   begin
+      --  Nonintegral BNOT tries the numeric handler before conversion fails.
+      Succeeds
+        ("debug.setmetatable(0,{__bnot=function(x) assert(x==2.5); " &
+         "return 5 end}); local r=~2.5; debug.setmetatable(0,nil); " &
+         "assert(r==5)");
+   end Integer_Unary_Metamethod;
+
+   procedure Integer_Right_Metamethod is
+   begin
+      --  An integral left operand cannot make a nonintegral right primitive.
+      Succeeds
+        ("debug.setmetatable(0,{__shl=function(a,b) " &
+         "assert(a==1 and b==math.huge); return 9 end}); " &
+         "local r=1 << math.huge; debug.setmetatable(0,nil); assert(r==9)");
+   end Integer_Right_Metamethod;
+
+   procedure Gsub_Callback_Substitution_Identity is
+   begin
+      --  Returning identical bytes still performs a substitution. A long
+      --  string must therefore get a distinct object despite byte equality.
+      Succeeds
+        ("local s=string.rep('a',100); local r,n=s:gsub('.'," &
+         "function(c) return c end); assert(r==s and n==100); " &
+         "assert(string.format('%p',s)~=string.format('%p',r))");
+   end Gsub_Callback_Substitution_Identity;
+
+   procedure Gsub_String_Substitution_Identity is
+   begin
+      --  The explicit replacement path follows the same identity rule.
+      Succeeds
+        ("local s=string.rep('a',100); local r,n=s:gsub('a','%0'); " &
+         "assert(r==s and n==100); " &
+         "assert(string.format('%p',s)~=string.format('%p',r))");
+   end Gsub_String_Substitution_Identity;
+
+   procedure Gsub_Negative_Limit_Identity is
+   begin
+      --  A nonpositive match limit never calls the replacement and must
+      --  return the original object even though the pattern could match.
+      Succeeds
+        ("local s=string.rep('a',100); local r,n=s:gsub('.'," &
+         "function() error('must not run') end,-1); assert(n==0); " &
+         "assert(string.format('%p',s)==string.format('%p',r))");
+   end Gsub_Negative_Limit_Identity;
+
+   procedure Gsub_Capture_Index_Diagnostic is
+   begin
+      --  Preserve the actual requested index so callers can identify the
+      --  bad replacement capture rather than an unrelated pattern failure.
+      Succeeds
+        ("local ok,e=pcall(string.gsub,'ab','(a)','%2'); " &
+         "assert(not ok and e:find('invalid capture index %2',1,true))");
+   end Gsub_Capture_Index_Diagnostic;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -395,5 +661,80 @@ package body Native_Tests is
          Xpcall_Empty_Handler_Result'Access);
       Test_Support.Add
         (Suite, "native: protected tail unwind", Protected_Tail_Unwind'Access);
+      Test_Support.Add
+        (Suite, "native: replacement type diagnostic",
+         Replacement_Type_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer divide zero diagnostic",
+         Integer_Divide_Zero_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer modulo zero diagnostic",
+         Integer_Modulo_Zero_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer field diagnostic",
+         Integer_Field_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer right field diagnostic",
+         Integer_Right_Field_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer local diagnostic",
+         Integer_Local_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer metamethod before conversion error",
+         Integer_Metamethod_Precedence'Access);
+      Test_Support.Add
+        (Suite, "native: gsub unmatched string identity",
+         Gsub_Unmatched_Identity'Access);
+      Test_Support.Add
+        (Suite, "native: gsub unchanged callback identity",
+         Gsub_Callback_Unchanged_Identity'Access);
+      Test_Support.Add
+        (Suite, "native: gsub unchanged table identity",
+         Gsub_Table_Unchanged_Identity'Access);
+      Test_Support.Add
+        (Suite, "native: gsub later replacement retained",
+         Gsub_Later_Replacement'Access);
+      Test_Support.Add
+        (Suite, "native: integer register diagnostic",
+         Integer_Register_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer first invalid operand diagnostic",
+         Integer_First_Invalid_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer unary diagnostic",
+         Integer_Unary_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer global diagnostic",
+         Integer_Global_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer upvalue diagnostic",
+         Integer_Upvalue_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer unnamed diagnostic",
+         Integer_Unnamed_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer indexed environment diagnostic",
+         Integer_Indexed_Environment_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer stripped upvalue diagnostic",
+         Integer_Stripped_Upvalue_Diagnostic'Access);
+      Test_Support.Add
+        (Suite, "native: integer unary metamethod before conversion error",
+         Integer_Unary_Metamethod'Access);
+      Test_Support.Add
+        (Suite, "native: integer right metamethod before conversion error",
+         Integer_Right_Metamethod'Access);
+      Test_Support.Add
+        (Suite, "native: gsub callback substitution identity",
+         Gsub_Callback_Substitution_Identity'Access);
+      Test_Support.Add
+        (Suite, "native: gsub string substitution identity",
+         Gsub_String_Substitution_Identity'Access);
+      Test_Support.Add
+        (Suite, "native: gsub negative limit identity",
+         Gsub_Negative_Limit_Identity'Access);
+      Test_Support.Add
+        (Suite, "native: gsub capture index diagnostic",
+         Gsub_Capture_Index_Diagnostic'Access);
    end Register;
 end Native_Tests;

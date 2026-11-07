@@ -1,0 +1,1360 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "constructs.lua",
+  "role": "primary",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/constructs.lua",
+    "sha256": "fd4eeece596bf53ee3a8ed015960dd34f34abcc9991a332e3c4b83a374cb5514",
+    "byte_length": 9946,
+    "line_count": 406
+  },
+  "original_anchor_count": 83,
+  "original_pending_ledger_sha256": "d463d214006e3ba4baa417f6a407517d4c823f514f5e8056785ee89290eaad86",
+  "appended_runtime_blocks": 12,
+  "proposal": {
+    "path": "tests/conformance/reviews/constructs.expanded-classification-proposal.jsonl",
+    "sha256": "c1a6e5de25531075de78dddbb7e14a4860505d4f85ce92da23e5b7e06fd39702"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/constructs.jsonl",
+    "sha256": "bbc8a596fa96583d666617d386c25e681b79ada349d5685301b6b2ba4834ee54"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "load-error-helper-and-precedence",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 62,
+      "span_end_line": 63,
+      "byte_offset": 0,
+      "byte_length": 1548,
+      "span_sha256": "37dcee1e92eb92ecd3e59293d76795eee8063f437e1476238da4906542febacb",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Semicolons, deliberate inactive invalid arithmetic, power/unary/arithmetic/concat/bitwise/boolean precedence and short-circuit truthiness retain their Lua meanings. The invoked checkload helper verifies diagnostic patterns from actual load failures.",
+      "dynamic_invocation": "Execute the actual source calls print@4, require@6, string.find@10, select@10, load@10, tonumber@61 in section load-error-helper-and-precedence. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected constructs.lua section load-error-helper-and-precedence; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 4,
+          "source_statement": ";;print \"testing syntax\";;"
+        },
+        {
+          "name": "require",
+          "line": 6,
+          "source_statement": "local debug = require \"debug\""
+        },
+        {
+          "name": "string.find",
+          "line": 10,
+          "source_statement": "  assert(string.find(select(2, load(s)), msg))"
+        },
+        {
+          "name": "select",
+          "line": 10,
+          "source_statement": "  assert(string.find(select(2, load(s)), msg))"
+        },
+        {
+          "name": "load",
+          "line": 10,
+          "source_statement": "  assert(string.find(select(2, load(s)), msg))"
+        },
+        {
+          "name": "tonumber",
+          "line": 61,
+          "source_statement": "assert(1234567890 == tonumber('1234567890') and 1234567890+1 == 1234567891)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 21,
+          "source_statement": "if false then a = 3 // 0; a = 0 % 0 end"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 4,
+          "kind": "source-phase-output",
+          "source_statement": ";;print \"testing syntax\";;"
+        }
+      ]
+    },
+    {
+      "id": "generated-operator-operand-matrix",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0002",
+      "first_line": 63,
+      "last_line": 98,
+      "span_end_line": 99,
+      "byte_offset": 1548,
+      "byte_length": 1131,
+      "span_sha256": "076d3085e14ddc26037cabb26afbc81b6470b056e312f17c9f1d5d09c2d69c03",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "For every supplied operator and pair of seven integer/float/immediate/large constants, dynamically compiled variable-variable, variable-constant, constant-variable and constant-constant forms return the same result.",
+      "dynamic_invocation": "Execute the actual source calls ipairs@72, load@73, string.format@73, ipairs@76, ipairs@77, f@78, string.format@81, load@82, string.format@86, load@87, string.format@90, load@91 in section generated-operator-operand-matrix. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected constructs.lua section generated-operator-operand-matrix; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "ipairs",
+          "line": 72,
+          "source_statement": "  for _, op in ipairs(operator) do"
+        },
+        {
+          "name": "load",
+          "line": 73,
+          "source_statement": "    local f = assert(load(string.format([[return function (x,y)"
+        },
+        {
+          "name": "string.format",
+          "line": 73,
+          "source_statement": "    local f = assert(load(string.format([[return function (x,y)"
+        },
+        {
+          "name": "ipairs",
+          "line": 76,
+          "source_statement": "    for _, o1 in ipairs(operand) do"
+        },
+        {
+          "name": "ipairs",
+          "line": 77,
+          "source_statement": "      for _, o2 in ipairs(operand) do"
+        },
+        {
+          "name": "f",
+          "line": 78,
+          "source_statement": "        local gab = f(o1, o2)"
+        },
+        {
+          "name": "string.format",
+          "line": 81,
+          "source_statement": "        local code = string.format(\"return XX %s %s\", op, o2)"
+        },
+        {
+          "name": "load",
+          "line": 82,
+          "source_statement": "        local res = assert(load(code))()"
+        },
+        {
+          "name": "string.format",
+          "line": 86,
+          "source_statement": "        code = string.format(\"return (%s) %s XX\", o1, op)"
+        },
+        {
+          "name": "load",
+          "line": 87,
+          "source_statement": "        res = assert(load(code))()"
+        },
+        {
+          "name": "string.format",
+          "line": 90,
+          "source_statement": "        code = string.format(\"return (%s) %s %s\", o1, op, o2)"
+        },
+        {
+          "name": "load",
+          "line": 91,
+          "source_statement": "        res = assert(load(code))()"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 72,
+          "source_statement": "  for _, op in ipairs(operator) do"
+        },
+        {
+          "line": 76,
+          "source_statement": "    for _, o1 in ipairs(operand) do"
+        },
+        {
+          "line": 77,
+          "source_statement": "      for _, o2 in ipairs(operand) do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "empty-loops-and-large-constant-expression-regression",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0003",
+      "first_line": 99,
+      "last_line": 131,
+      "span_end_line": 132,
+      "byte_offset": 2679,
+      "byte_length": 825,
+      "span_sha256": "fc2bd62b6fb4155eae043c48e31f8be3f2ce022def0f22e6db500648da269afd",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Empty loops and upvalue/table field syntax compile correctly; generated constructors with257 constants still evaluate each appended bitwise/arithmetic/shift expression correctly.",
+      "dynamic_invocation": "Execute the actual source calls table.concat@116, load@122, code@123, check@126, check@127, check@128, check@129 in section empty-loops-and-large-constant-expression-regression. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected constructs.lua section empty-loops-and-large-constant-expression-regression; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "table.concat",
+          "line": 116,
+          "source_statement": "  code = table.concat(code)"
+        },
+        {
+          "name": "load",
+          "line": 122,
+          "source_statement": "    code = load(code)"
+        },
+        {
+          "name": "code",
+          "line": 123,
+          "source_statement": "    assert(code() == val)"
+        },
+        {
+          "name": "check",
+          "line": 126,
+          "source_statement": "  check(\"return (1 ~ (2 or 3))\", 1 ~ 2)"
+        },
+        {
+          "name": "check",
+          "line": 127,
+          "source_statement": "  check(\"return (1 | (2 or 3))\", 1 | 2)"
+        },
+        {
+          "name": "check",
+          "line": 128,
+          "source_statement": "  check(\"return (1 + (2 or 3))\", 1 + 2)"
+        },
+        {
+          "name": "check",
+          "line": 129,
+          "source_statement": "  check(\"return (1 << (2 or 3))\", 1 << 2)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 101,
+          "source_statement": "repeat until 1; repeat until true;"
+        },
+        {
+          "line": 101,
+          "source_statement": "repeat until 1; repeat until true;"
+        },
+        {
+          "line": 102,
+          "source_statement": "while false do end; while nil do end;"
+        },
+        {
+          "line": 102,
+          "source_statement": "while false do end; while nil do end;"
+        },
+        {
+          "line": 112,
+          "source_statement": "  for i = 1, 257 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "constructor-result-adjustment-and-loop-control",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0004",
+      "first_line": 132,
+      "last_line": 204,
+      "span_end_line": 205,
+      "byte_offset": 3504,
+      "byte_length": 1578,
+      "span_sha256": "4f3dc2120b2d27745072df667ea4d286a627cf5e8d18c5110690b6f5791e8a90",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Recursive multires results adjust according to constructor position; conditional branches, nested loops, break and repeat-until retain local scope and expected counters/table extents.",
+      "dynamic_invocation": "Execute the actual source calls type@134, f@135, f@138, f@141, f@143, type@146, f@156, math.sin@176, f@182, f@193, f@196 in section constructor-result-adjustment-and-loop-control. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected constructs.lua section constructor-result-adjustment-and-loop-control; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "type",
+          "line": 134,
+          "source_statement": "  if type(i) ~= 'number' then return i,'jojo'; end;"
+        },
+        {
+          "name": "f",
+          "line": 135,
+          "source_statement": "  if i > 0 then return i, f(i-1); end;"
+        },
+        {
+          "name": "f",
+          "line": 138,
+          "source_statement": "x = {f(3), f(5), f(10);};"
+        },
+        {
+          "name": "f",
+          "line": 138,
+          "source_statement": "x = {f(3), f(5), f(10);};"
+        },
+        {
+          "name": "f",
+          "line": 138,
+          "source_statement": "x = {f(3), f(5), f(10);};"
+        },
+        {
+          "name": "f",
+          "line": 141,
+          "source_statement": "x = {f'alo', f'xixi', nil};"
+        },
+        {
+          "name": "f",
+          "line": 141,
+          "source_statement": "x = {f'alo', f'xixi', nil};"
+        },
+        {
+          "name": "f",
+          "line": 143,
+          "source_statement": "x = {f'alo'..'xixi'};"
+        },
+        {
+          "name": "type",
+          "line": 146,
+          "source_statement": "assert(x[2] == 'jojo' and type(x[1]) == 'table')"
+        },
+        {
+          "name": "f",
+          "line": 156,
+          "source_statement": "assert(f(3) == 'a' and f(12) == 'b' and f(26) == 'c' and f(100) == nil)"
+        },
+        {
+          "name": "f",
+          "line": 156,
+          "source_statement": "assert(f(3) == 'a' and f(12) == 'b' and f(26) == 'c' and f(100) == nil)"
+        },
+        {
+          "name": "f",
+          "line": 156,
+          "source_statement": "assert(f(3) == 'a' and f(12) == 'b' and f(26) == 'c' and f(100) == nil)"
+        },
+        {
+          "name": "f",
+          "line": 156,
+          "source_statement": "assert(f(3) == 'a' and f(12) == 'b' and f(26) == 'c' and f(100) == nil)"
+        },
+        {
+          "name": "math.sin",
+          "line": 176,
+          "source_statement": "    else local a,b,c,d=math.sin(1); x=x+1;"
+        },
+        {
+          "name": "f",
+          "line": 182,
+          "source_statement": "assert(f(1) == 10 and f(2) == 20 and f(3) == 30 and f(4)==12)"
+        },
+        {
+          "name": "f",
+          "line": 182,
+          "source_statement": "assert(f(1) == 10 and f(2) == 20 and f(3) == 30 and f(4)==12)"
+        },
+        {
+          "name": "f",
+          "line": 182,
+          "source_statement": "assert(f(1) == 10 and f(2) == 20 and f(3) == 30 and f(4)==12)"
+        },
+        {
+          "name": "f",
+          "line": 182,
+          "source_statement": "assert(f(1) == 10 and f(2) == 20 and f(3) == 30 and f(4)==12)"
+        },
+        {
+          "name": "f",
+          "line": 193,
+          "source_statement": "assert(f(3) == 'a' and f(12) == 'b' and f(26) == 'c' and f(100) == 8)"
+        },
+        {
+          "name": "f",
+          "line": 193,
+          "source_statement": "assert(f(3) == 'a' and f(12) == 'b' and f(26) == 'c' and f(100) == 8)"
+        },
+        {
+          "name": "f",
+          "line": 193,
+          "source_statement": "assert(f(3) == 'a' and f(12) == 'b' and f(26) == 'c' and f(100) == 8)"
+        },
+        {
+          "name": "f",
+          "line": 193,
+          "source_statement": "assert(f(3) == 'a' and f(12) == 'b' and f(26) == 'c' and f(100) == 8)"
+        },
+        {
+          "name": "f",
+          "line": 196,
+          "source_statement": "x = {f(100)*2+3 or a, a or b+2}"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 134,
+          "source_statement": "  if type(i) ~= 'number' then return i,'jojo'; end;"
+        },
+        {
+          "line": 135,
+          "source_statement": "  if i > 0 then return i, f(i-1); end;"
+        },
+        {
+          "line": 150,
+          "source_statement": "  if i < 10 then return 'a';"
+        },
+        {
+          "line": 173,
+          "source_statement": "    if b==1 then local b=1; x=10; break"
+        },
+        {
+          "line": 186,
+          "source_statement": "  if i < 10 then return 'a'"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 158,
+          "source_statement": "for i=1,1000 do break; end;"
+        },
+        {
+          "line": 163,
+          "source_statement": "while not a do"
+        },
+        {
+          "line": 164,
+          "source_statement": "  a=0; for i=1,n do for i=i,1,-1 do a=a+1; t[i]=1; end; end;"
+        },
+        {
+          "line": 164,
+          "source_statement": "  a=0; for i=1,n do for i=i,1,-1 do a=a+1; t[i]=1; end; end;"
+        },
+        {
+          "line": 171,
+          "source_statement": "  repeat"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "return-and-parenthesized-adjustment",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0005",
+      "first_line": 205,
+      "last_line": 239,
+      "span_end_line": 240,
+      "byte_offset": 5082,
+      "byte_length": 526,
+      "span_sha256": "32bc886d1a1bc85b939354eb0b197032a8817c72c4ba250fe8c2932e2bb9cb22",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "While returns, explicit no-result return, parenthesized calls and logical expressions apply single/multiple result adjustment at each tested assignment/call position.",
+      "dynamic_invocation": "Execute the actual source calls f@219, g@219, f@223, f@225, f@229, f@232, g@233, f@234, g@235, print@238 in section return-and-parenthesized-adjustment. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected constructs.lua section return-and-parenthesized-adjustment; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "f",
+          "line": 219,
+          "source_statement": "f(10); g(10);"
+        },
+        {
+          "name": "g",
+          "line": 219,
+          "source_statement": "f(10); g(10);"
+        },
+        {
+          "name": "f",
+          "line": 223,
+          "source_statement": "  local a, b, c = f();"
+        },
+        {
+          "name": "f",
+          "line": 225,
+          "source_statement": "  a, b, c = (f());"
+        },
+        {
+          "name": "f",
+          "line": 229,
+          "source_statement": "local a,b = 3 and f();"
+        },
+        {
+          "name": "f",
+          "line": 232,
+          "source_statement": "function g() f(); return; end;"
+        },
+        {
+          "name": "g",
+          "line": 233,
+          "source_statement": "assert(g() == nil)"
+        },
+        {
+          "name": "f",
+          "line": 234,
+          "source_statement": "function g() return nil or f() end"
+        },
+        {
+          "name": "g",
+          "line": 235,
+          "source_statement": "a,b = g()"
+        },
+        {
+          "name": "print",
+          "line": 238,
+          "source_statement": "print'+';"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 207,
+          "source_statement": "    if i>0 then i=i-1;"
+        },
+        {
+          "line": 214,
+          "source_statement": "    if i>0 then i=i-1"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 206,
+          "source_statement": "  while 1 do"
+        },
+        {
+          "line": 213,
+          "source_statement": "  while 1 do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 238,
+          "kind": "source-phase-output",
+          "source_statement": "print'+';"
+        }
+      ]
+    },
+    {
+      "id": "constant-close-attribute-errors",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0006",
+      "first_line": 240,
+      "last_line": 262,
+      "span_end_line": 263,
+      "byte_offset": 5608,
+      "byte_length": 606,
+      "span_sha256": "8bf785b4546f9437519614862d8356b455e464f4600757006a6f08ae1c8c2c6f",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Unknown attribute spelling and assigning to const/captured-const/close locals fail compilation with the exact source name and line patterns; every supplied invalid source is passed to the helper.",
+      "dynamic_invocation": "Execute the actual source calls checkload@242, checkload@244, checkload@247, checkload@257 in section constant-close-attribute-errors. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected constructs.lua section constant-close-attribute-errors; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "checkload",
+          "line": 242,
+          "source_statement": "  checkload(prog, \"unknown attribute 'XXX'\")"
+        },
+        {
+          "name": "checkload",
+          "line": 244,
+          "source_statement": "  checkload([[local xxx <const> = 20; xxx = 10]],"
+        },
+        {
+          "name": "checkload",
+          "line": 247,
+          "source_statement": "  checkload([["
+        },
+        {
+          "name": "checkload",
+          "line": 257,
+          "source_statement": "  checkload([["
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "line-split-short-circuit-and-debug-name",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0007",
+      "first_line": 263,
+      "last_line": 313,
+      "span_end_line": 314,
+      "byte_offset": 6214,
+      "byte_length": 1569,
+      "span_sha256": "153858c13ac83a2dfb71e2a326c0040fd6990c16d92264973428fa2e99fe3d1b",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "A generated newline-split function preserves boolean values and table constructors; corresponding if/while paths agree for all truthy/falsy operand combinations. debug.getinfo infers the actual F call name.",
+      "dynamic_invocation": "Execute the actual source calls string.gsub@269, load@270, f@282, g@282, h@282, f@283, g@283, h@283, f@284, f@287, g@287, h@287, f@288, g@288, h@289, f@290, g@290, h@291, f@292, g@292, h@293, debug.getinfo@306, F@310, F@311 in section line-split-short-circuit-and-debug-name. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected constructs.lua section line-split-short-circuit-and-debug-name; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gsub",
+          "line": 269,
+          "source_statement": "f = string.gsub(f, \"%s+\", \"\\n\");   -- force a SETLINE between opcodes"
+        },
+        {
+          "name": "load",
+          "line": 270,
+          "source_statement": "f,a = load(f)();"
+        },
+        {
+          "name": "f",
+          "line": 282,
+          "source_statement": "assert(f(2,1) == true and g(2,1) == 1 and h(2,1) == 1)"
+        },
+        {
+          "name": "g",
+          "line": 282,
+          "source_statement": "assert(f(2,1) == true and g(2,1) == 1 and h(2,1) == 1)"
+        },
+        {
+          "name": "h",
+          "line": 282,
+          "source_statement": "assert(f(2,1) == true and g(2,1) == 1 and h(2,1) == 1)"
+        },
+        {
+          "name": "f",
+          "line": 283,
+          "source_statement": "assert(f(1,2,'a') == 'a' and g(1,2,'a') == 1 and h(1,2,'a') == 1)"
+        },
+        {
+          "name": "g",
+          "line": 283,
+          "source_statement": "assert(f(1,2,'a') == 'a' and g(1,2,'a') == 1 and h(1,2,'a') == 1)"
+        },
+        {
+          "name": "h",
+          "line": 283,
+          "source_statement": "assert(f(1,2,'a') == 'a' and g(1,2,'a') == 1 and h(1,2,'a') == 1)"
+        },
+        {
+          "name": "f",
+          "line": 284,
+          "source_statement": "assert(f(1,2,'a')"
+        },
+        {
+          "name": "f",
+          "line": 287,
+          "source_statement": "assert(f(1,2,'a') == 'a' and g(1,2,'a') == 1 and h(1,2,'a') == 1)"
+        },
+        {
+          "name": "g",
+          "line": 287,
+          "source_statement": "assert(f(1,2,'a') == 'a' and g(1,2,'a') == 1 and h(1,2,'a') == 1)"
+        },
+        {
+          "name": "h",
+          "line": 287,
+          "source_statement": "assert(f(1,2,'a') == 'a' and g(1,2,'a') == 1 and h(1,2,'a') == 1)"
+        },
+        {
+          "name": "f",
+          "line": 288,
+          "source_statement": "assert(f(1,2,nil,1,'x') == 'x' and g(1,2,nil,1,'x') == 1 and"
+        },
+        {
+          "name": "g",
+          "line": 288,
+          "source_statement": "assert(f(1,2,nil,1,'x') == 'x' and g(1,2,nil,1,'x') == 1 and"
+        },
+        {
+          "name": "h",
+          "line": 289,
+          "source_statement": "                                   h(1,2,nil,1,'x') == 1)"
+        },
+        {
+          "name": "f",
+          "line": 290,
+          "source_statement": "assert(f(1,2,nil,nil,'x') == nil and g(1,2,nil,nil,'x') == 0 and"
+        },
+        {
+          "name": "g",
+          "line": 290,
+          "source_statement": "assert(f(1,2,nil,nil,'x') == nil and g(1,2,nil,nil,'x') == 0 and"
+        },
+        {
+          "name": "h",
+          "line": 291,
+          "source_statement": "                                     h(1,2,nil,nil,'x') == 0)"
+        },
+        {
+          "name": "f",
+          "line": 292,
+          "source_statement": "assert(f(1,2,nil,1,nil) == nil and g(1,2,nil,1,nil) == 0 and"
+        },
+        {
+          "name": "g",
+          "line": 292,
+          "source_statement": "assert(f(1,2,nil,1,nil) == nil and g(1,2,nil,1,nil) == 0 and"
+        },
+        {
+          "name": "h",
+          "line": 293,
+          "source_statement": "                                   h(1,2,nil,1,nil) == 0)"
+        },
+        {
+          "name": "debug.getinfo",
+          "line": 306,
+          "source_statement": "  assert(debug.getinfo(1, \"n\").name == 'F')"
+        },
+        {
+          "name": "F",
+          "line": 310,
+          "source_statement": "a,b = F(1)~=nil; assert(a == true and b == nil);"
+        },
+        {
+          "name": "F",
+          "line": 311,
+          "source_statement": "a,b = F(nil)==nil; assert(a == true and b == nil)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 274,
+          "source_statement": "  if not (a>=b or c or d and e or nil) then return 0; else return 1; end;"
+        },
+        {
+          "line": 301,
+          "source_statement": "  local a; if nil then a=1; else a=2; end;    -- this nil comes as PUSHNIL 2"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 278,
+          "source_statement": "  while (a>=b or c or (d and e) or nil) do return 1; end;"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "constant-false-template-selection",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0008",
+      "first_line": 314,
+      "last_line": 330,
+      "span_end_line": 331,
+      "byte_offset": 7783,
+      "byte_length": 364,
+      "span_sha256": "cd08a67b1e37f992eb8b6b7e8cac093cea26047c129b2512b5d667fe0f2a325f",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The random control bit is measured and selects the generated constant-false or constant-integer template. Both control values must have source-preserving seeded execution evidence in every context.",
+      "dynamic_invocation": "Run unchanged constructs.lua through math.randomseed(4,0) and math.randomseed(0,0) wrappers to reach GLOB1=0 and GLOB1=1 respectively.",
+      "execution_condition": "Selected constructs.lua section constant-false-template-selection; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "math.random",
+          "line": 317,
+          "source_statement": "_ENV.GLOB1 = math.random(0, 1)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 330,
+          "source_statement": "if _ENV.GLOB1 == 0 then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "constant-false-generated-template",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0009",
+      "first_line": 331,
+      "last_line": 338,
+      "span_end_line": 339,
+      "byte_offset": 8147,
+      "byte_length": 137,
+      "span_sha256": "f04cea60aeeb5454ffc8edece6f22e1d5b67288911f5739524415decc098efbf",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "For GLOB1=0, generated source declares F<const>=false and uses it in both an if condition and returned expression; both effects must agree with the model.",
+      "dynamic_invocation": "Section constant-false-generated-template defines/executes the source-local control and capture operations listed in its invariant; its invoked callback/closure bodies are checked by the unchanged callers in the same whole-file run, not by a declaration-only pass.",
+      "execution_condition": "GLOB1=0; seed(4,0)",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "constant-integer-generated-template",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0010",
+      "first_line": 339,
+      "last_line": 347,
+      "span_end_line": 348,
+      "byte_offset": 8284,
+      "byte_length": 137,
+      "span_sha256": "d805665d9a09714d93604a6dc8d36c353d0be34520d5e17003d62ce23049dc70",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "For GLOB1=1, generated source declares k10<const>=10 and uses it in both an if condition and returned expression; both effects must agree with the model.",
+      "dynamic_invocation": "Section constant-integer-generated-template defines/executes the source-local control and capture operations listed in its invariant; its invoked callback/closure bodies are checked by the unchanged callers in the same whole-file run, not by a declaration-only pass.",
+      "execution_condition": "GLOB1=1; seed(0,0)",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "full-generated-short-circuit-campaign",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0011",
+      "first_line": 348,
+      "last_line": 400,
+      "span_end_line": 401,
+      "byte_offset": 8421,
+      "byte_length": 1393,
+      "span_sha256": "0350ae9fcb5cef319c09c9a7cb045efdf696a53877993c755a8f3a8105b4e730",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The full non-soft level4 combinatorial generator creates all parenthesized and/or/not expressions, compiles each selected constant template, and checks returned value plus IX side effect against the Lua model. The random branch does not waive the other template.",
+      "dynamic_invocation": "Both seed(4,0) andseed(0,0) runs execute createcases for levels2..4, then every generated case at388-397. Source391 compiles its chosen F/k10 source;393 checks returned model value and actualIX side effect;395 prints actual progress each60000 cases.",
+      "execution_condition": "Selected constructs.lua section full-generated-short-circuit-campaign; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 348,
+          "source_statement": "print('testing short-circuit optimizations (' .. _ENV.GLOB1 .. ')')"
+        },
+        {
+          "name": "ipairs",
+          "line": 364,
+          "source_statement": "    for _, v1 in ipairs(cases[i]) do"
+        },
+        {
+          "name": "ipairs",
+          "line": 365,
+          "source_statement": "      for _, v2 in ipairs(cases[n - i]) do"
+        },
+        {
+          "name": "ipairs",
+          "line": 366,
+          "source_statement": "        for _, op in ipairs(binops) do"
+        },
+        {
+          "name": "createcases",
+          "line": 384,
+          "source_statement": "for i = 2, level do cases[i] = createcases(i) end"
+        },
+        {
+          "name": "print",
+          "line": 385,
+          "source_statement": "print(\"+\")"
+        },
+        {
+          "name": "pairs",
+          "line": 389,
+          "source_statement": "  for _, v in pairs(cases[n]) do"
+        },
+        {
+          "name": "load",
+          "line": 391,
+          "source_statement": "    local p = load(string.format(prog, s, s), \"\")"
+        },
+        {
+          "name": "string.format",
+          "line": 391,
+          "source_statement": "    local p = load(string.format(prog, s, s), \"\")"
+        },
+        {
+          "name": "p",
+          "line": 393,
+          "source_statement": "    assert(p() == v[2] and IX == not not v[2])"
+        },
+        {
+          "name": "print",
+          "line": 395,
+          "source_statement": "    if i % 60000 == 0 then print('+') end"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 353,
+          "source_statement": "  {\" and \", function (a,b) if not a then return a else return b end end},"
+        },
+        {
+          "line": 354,
+          "source_statement": "  {\" or \", function (a,b) if a then return a else return b end end},"
+        },
+        {
+          "line": 395,
+          "source_statement": "    if i % 60000 == 0 then print('+') end"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 363,
+          "source_statement": "  for i = 1, n - 1 do"
+        },
+        {
+          "line": 364,
+          "source_statement": "    for _, v1 in ipairs(cases[i]) do"
+        },
+        {
+          "line": 365,
+          "source_statement": "      for _, v2 in ipairs(cases[n - i]) do"
+        },
+        {
+          "line": 366,
+          "source_statement": "        for _, op in ipairs(binops) do"
+        },
+        {
+          "line": 384,
+          "source_statement": "for i = 2, level do cases[i] = createcases(i) end"
+        },
+        {
+          "line": 388,
+          "source_statement": "for n = 1, level do"
+        },
+        {
+          "line": 389,
+          "source_statement": "  for _, v in pairs(cases[n]) do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 348,
+          "kind": "selected-template",
+          "pattern": "^testing short-circuit optimizations \\([01]\\)$",
+          "require_both_seed_runs": [
+            [
+              4,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ],
+          "require_flags_unset": [
+            "_soft"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "syntax-error-tail-and-completion",
+      "runtime_id": "LUA-CONSTRUCTS-REVIEWED-BLOCK-0012",
+      "first_line": 401,
+      "last_line": 406,
+      "span_end_line": 407,
+      "byte_offset": 9814,
+      "byte_length": 132,
+      "span_sha256": "3937f2d307fbc76c6a6a94521b560396e1a8df58008d860ba9b5cb6a96c59e21",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The final malformed for and method-call fragments both fail load with expected syntax text, then terminal OK follows the full generated campaign.",
+      "dynamic_invocation": "Execute the actual source calls checkload@403, checkload@404, print@406 in section syntax-error-tail-and-completion. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected constructs.lua section syntax-error-tail-and-completion; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "checkload",
+          "line": 403,
+          "source_statement": "checkload(\"for x do\", \"expected\")"
+        },
+        {
+          "name": "checkload",
+          "line": 404,
+          "source_statement": "checkload(\"x:call\", \"expected\")"
+        },
+        {
+          "name": "print",
+          "line": 406,
+          "source_statement": "print'OK'"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 406,
+          "kind": "source-phase-output",
+          "source_statement": "print'OK'"
+        }
+      ]
+    }
+  ],
+  "supplemental_obligations": [],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": [],
+  "required_supplemental_scenarios": [
+    {
+      "id": "constant-false-template",
+      "initial_seed": [
+        4,
+        0
+      ],
+      "expected_GLOB1": 0,
+      "original_source_unchanged": true
+    },
+    {
+      "id": "constant-integer-template",
+      "initial_seed": [
+        0,
+        0
+      ],
+      "expected_GLOB1": 1,
+      "original_source_unchanged": true
+    }
+  ]
+}

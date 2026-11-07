@@ -80,6 +80,14 @@ static struct lua_ada_response dispatch(lua_State *state,
     return output;
 }
 
+int lua_ada_debug_dispatch(lua_State *state,
+                           const struct lua_ada_request *input,
+                           struct lua_ada_response *output) {
+    int status = ada_lua_dispatch(state, input, output);
+    raise_action(state, status, output);
+    return status;
+}
+
 int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
     struct lua_ada_guard guard;
     int status;
@@ -116,6 +124,9 @@ int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
         if (action == ADA_ACTION_WARNING)
             pending->warning_function(pending->warning_data,
                 pending->warning_message, pending->warning_continuation);
+        else if (pending->continuation != NULL)
+            count = pending->continuation(state, pending->kstatus,
+                                           pending->kcontext);
         else count = pending->function_data(state);
     }
     state->guard = guard.previous;
@@ -125,20 +136,15 @@ int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
     return status;
 }
 
-static int drive_call(lua_State *state, int arguments, int results,
-                      int protected_call, int error_function) {
-    struct lua_ada_request input = request(ADA_BEGIN_CALL);
-    struct lua_ada_response output;
-    int action;
-    int function_slot = lua_gettop(state) - arguments;
-    input.index = arguments;
-    input.count = results;
-    input.integer_data = protected_call;
-    input.error_index = error_function;
-    action = ada_lua_dispatch(state, &input, &output);
+static int pump_callbacks(int action, struct lua_ada_response *pending) {
+    struct lua_ada_request input;
+    struct lua_ada_response output = *pending;
     while (action == ADA_ACTION_CALL || action == ADA_ACTION_WARNING) {
         lua_State *callback_state = (lua_State *)output.pointer;
         lua_CFunction callback = output.function_data;
+        lua_KFunction pending_k = output.continuation;
+        lua_KContext pending_context = output.kcontext;
+        int pending_status = output.kstatus;
         lua_WarnFunction warning = output.warning_function;
         int is_warning = action == ADA_ACTION_WARNING;
         void *warning_data = output.warning_data;
@@ -159,6 +165,9 @@ static int drive_call(lua_State *state, int arguments, int results,
         if (status == 0) {
             if (is_warning)
                 warning(warning_data, warning_message, warning_continuation);
+            else if (pending_k != NULL)
+                count = pending_k(callback_state, pending_status,
+                                  pending_context);
             else count = callback(callback_state);
         }
         callback_state->guard = guard.previous;
@@ -176,6 +185,25 @@ static int drive_call(lua_State *state, int arguments, int results,
         input.callback_token = guard.callback_token;
         action = ada_lua_dispatch(callback_state, &input, &output);
     }
+    *pending = output;
+    return action;
+}
+
+static int drive_call(lua_State *state, int arguments, int results,
+                      int protected_call, int error_function,
+                      lua_KContext context, lua_KFunction continuation) {
+    struct lua_ada_request input = request(ADA_BEGIN_CALL);
+    struct lua_ada_response output;
+    int action;
+    int function_slot = lua_gettop(state) - arguments;
+    input.index = arguments;
+    input.count = results;
+    input.integer_data = protected_call;
+    input.error_index = error_function;
+    input.continuation = continuation;
+    input.kcontext = context;
+    action = ada_lua_dispatch(state, &input, &output);
+    action = pump_callbacks(action, &output);
     if (protected_call &&
         (action == ADA_ACTION_RAISE || action == ADA_ACTION_MEMORY ||
          action == ADA_ACTION_HANDLING)) {
@@ -228,29 +256,51 @@ int lua_iscfunction(lua_State *state, int index) {
 
 void lua_callk(lua_State *state, int arguments, int results,
                lua_KContext context, lua_KFunction continuation) {
-    (void)context;
-    if (continuation != NULL && lua_isyieldable(state)) {
-        lua_pushliteral(state, "continuation-aware C calls are not implemented");
-        lua_error(state);
-    }
-    (void)drive_call(state, arguments, results, 0, 0);
+    (void)drive_call(state, arguments, results, 0, 0, context,
+                     lua_isyieldable(state) ? continuation : NULL);
 }
 
 int lua_pcallk(lua_State *state, int arguments, int results, int error_function,
                lua_KContext context, lua_KFunction continuation) {
-    (void)context;
-    if (continuation != NULL && lua_isyieldable(state)) {
-        /* Yieldable K still requires its explicit scheduler phase. A real
-         * non-yieldable boundary instead ignores K, exactly as C Lua does;
-         * it executes the ordinary protected call and returns to this body. */
-        lua_settop(state, -(arguments + 2));
-        lua_pushliteral(state,
-            "C continuations are not implemented");
-        return LUA_ERRRUN;
-    }
     return drive_call(state, arguments, results, 1,
                       error_function == 0 ? 0 :
-                      lua_absindex(state, error_function));
+                      lua_absindex(state, error_function), context,
+                      lua_isyieldable(state) ? continuation : NULL);
+}
+
+int lua_yieldk(lua_State *state, int results, lua_KContext context,
+                lua_KFunction continuation) {
+    struct lua_ada_request input = request(ADA_YIELD_CALL);
+    input.count = results;
+    input.continuation = continuation;
+    input.kcontext = context;
+    dispatch(state, input);
+    return 0;
+}
+
+int lua_status(lua_State *state) {
+    return (int)dispatch(state, request(ADA_GET_STATUS)).integer_data;
+}
+
+int lua_resume(lua_State *state, lua_State *from, int arguments, int *results) {
+    struct lua_ada_request input = request(ADA_BEGIN_RESUME);
+    struct lua_ada_response output;
+    int action;
+    input.index = arguments;
+    input.pointer = from;
+    action = ada_lua_dispatch(state, &input, &output);
+    action = pump_callbacks(action, &output);
+    if (action == ADA_ACTION_RAISE || action == ADA_ACTION_MEMORY ||
+        action == ADA_ACTION_HANDLING) {
+        /* lua_resume is itself a protected C boundary. Setup refusal and
+         * language errors return their real status/object to its caller;
+         * host abort remains an uncatchable transfer through the C guard. */
+        if (results != NULL) *results = 1;
+        return action;
+    }
+    raise_action(state, action, &output);
+    if (results != NULL) *results = (int)output.length;
+    return (int)output.integer_data;
 }
 
 int lua_error(lua_State *state) {
@@ -317,7 +367,11 @@ int lua_gettop(lua_State *state) {
     return (int)dispatch(state, request(ADA_GET_TOP)).integer_data;
 }
 void lua_settop(lua_State *state, int index) {
-    indexed(state, ADA_SET_TOP, index);
+    struct lua_ada_response output = indexed(state, ADA_SET_TOP, index);
+    if (output.length != 0) {
+        lua_call(state, 0, 0);
+        indexed(state, ADA_SET_TOP, index);
+    }
 }
 int lua_absindex(lua_State *state, int index) {
     return (int)indexed(state, ADA_ABSOLUTE_INDEX, index).integer_data;
@@ -511,6 +565,81 @@ int lua_rawequal(lua_State *state, int first, int second) {
 }
 int lua_next(lua_State *state, int index) {
     return (int)indexed(state, ADA_NEXT_ITEM, index).integer_data;
+}
+
+int lua_gettable(lua_State *state, int index) {
+    struct lua_ada_request input = request(ADA_PREPARE_INDEX);
+    struct lua_ada_response output;
+    input.index = index;
+    output = dispatch(state, input);
+    if (output.length != 0) lua_call(state, 2, 1);
+    return lua_type(state, -1);
+}
+
+void lua_settable(lua_State *state, int index) {
+    struct lua_ada_request input = request(ADA_PREPARE_INDEX);
+    struct lua_ada_response output;
+    input.index = index;
+    input.count = 1;
+    output = dispatch(state, input);
+    if (output.length != 0) lua_call(state, 3, 0);
+}
+
+int lua_getfield(lua_State *state, int index, const char *key) {
+    index = lua_absindex(state, index);
+    lua_pushstring(state, key);
+    return lua_gettable(state, index);
+}
+
+void lua_setfield(lua_State *state, int index, const char *key) {
+    index = lua_absindex(state, index);
+    lua_pushstring(state, key);
+    lua_insert(state, -2);
+    lua_settable(state, index);
+}
+
+int lua_geti(lua_State *state, int index, lua_Integer key) {
+    index = lua_absindex(state, index);
+    lua_pushinteger(state, key);
+    return lua_gettable(state, index);
+}
+
+void lua_seti(lua_State *state, int index, lua_Integer key) {
+    index = lua_absindex(state, index);
+    lua_pushinteger(state, key);
+    lua_insert(state, -2);
+    lua_settable(state, index);
+}
+
+int lua_getglobal(lua_State *state, const char *name) {
+    int type;
+    lua_pushglobaltable(state);
+    type = lua_getfield(state, -1, name);
+    lua_remove(state, -2);
+    return type;
+}
+
+void lua_setglobal(lua_State *state, const char *name) {
+    lua_pushglobaltable(state);
+    lua_insert(state, -2);
+    lua_setfield(state, -2, name);
+    lua_pop(state, 1);
+}
+
+void lua_toclose(lua_State *state, int index) {
+    indexed(state, ADA_MARK_CLOSE, index);
+}
+
+void lua_closeslot(lua_State *state, int index) {
+    struct lua_ada_request input = request(ADA_CLOSE_SLOT);
+    struct lua_ada_response output;
+    input.index = lua_absindex(state, index);
+    output = dispatch(state, input);
+    if (output.length != 0) {
+        lua_call(state, 0, 0);
+        input.count = 1;
+        dispatch(state, input);
+    }
 }
 lua_Alloc lua_getallocf(lua_State *state, void **userdata) {
     struct lua_ada_response output = dispatch(state, request(ADA_GET_ALLOCATOR));

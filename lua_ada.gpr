@@ -75,6 +75,8 @@ library project Lua_Ada is
    for Interfaces use
      (
       "lua_ada_boundary.c",
+      "lua_ada_libraries.c",
+      "lua_ada_debug.c",
       "lua_ada_host_numerics.c",
       "lua_ada_streams.c",
       "lua_ada_os.c",
@@ -90,6 +92,7 @@ library project Lua_Ada is
       "lua-engine-compiler.ads",
       "lua-engine-core_libraries.ads",
       "lua-engine-foreign.ads",
+      "lua-engine-foreign_hooks.ads",
       "lua-engine-finalizers.ads",
       "lua-engine-garbage_collection.ads",
       "lua-engine-format_drivers.ads",
@@ -97,6 +100,7 @@ library project Lua_Ada is
       "lua-engine-formats.ads",
       "lua-engine-inspection.ads",
       "lua-engine-io_libraries.ads",
+      "lua-engine-library_openers.ads",
       "lua-engine-loaders.ads",
       "lua-engine-machine.ads",
       "lua-engine-mathematics.ads",

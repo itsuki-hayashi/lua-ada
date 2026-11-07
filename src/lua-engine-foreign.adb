@@ -9,6 +9,8 @@ with Lua.Engine.Canonical;
 with Lua.Engine.Stacks;
 with Lua.Engine.IO_Libraries;
 with Lua.Engine.Garbage_Collection;
+with Lua.Engine.Foreign_Hooks;
+with Lua.Engine.Library_Openers;
 with Lua.Engine.Operating_System;
 with Lua.Engine.Warnings;
 with Lua.Runtime_Configuration;
@@ -82,12 +84,28 @@ package body Lua.Engine.Foreign is
       Protected_Call : Boolean := False;
       Is_Root : Boolean := False;
       Context : Context_Id := 1;
+      Activation : Frame_Access;
+      Is_Resume : Boolean := False;
+      Saved_Driver : Driver_View;
+      Saved_Owned_Driver : VM.Driver_Access;
+      Saved_Calls : System.Address := System.Null_Address;
+      Saved_Borrowed : Boolean := False;
+      Saved_Context : Context_Access;
+      Saved_Native_Depth : Natural := 0;
+      Saved_Status : Context_Status := New_Context;
+      Entry_Depth : Natural := 0;
+      Original_Top : Natural := 0;
+      Original_Base : Natural := 0;
    end record;
    package Calls is new System.Address_To_Access_Conversions (Call_Record);
    function Function_Address is new Ada.Unchecked_Conversion
      (C_Function, System.Address);
    function Address_Function is new Ada.Unchecked_Conversion
      (System.Address, C_Function);
+   function Continuation_Address is new Ada.Unchecked_Conversion
+     (C_Continuation, System.Address);
+   function Address_Continuation is new Ada.Unchecked_Conversion
+     (System.Address, C_Continuation);
    function Warning_Address is new Ada.Unchecked_Conversion
      (C_Warning_Function, System.Address);
    function Address_Warning is new Ada.Unchecked_Conversion
@@ -142,6 +160,48 @@ package body Lua.Engine.Foreign is
      (Pointer : System.Address; Length : C.size_t) return String;
    function Read_Name (Pointer : System.Address; Default : String)
                        return String;
+   procedure Discard_Pending
+     (State : in out World; Owner : Controls.Object_Pointer);
+
+   procedure Discard_Pending
+     (State : in out World; Owner : Controls.Object_Pointer)
+   is
+      Address : System.Address := Owner.Calls;
+      Pending : constant Calls.Object_Pointer := Calls.To_Pointer (Address);
+      Target : constant Context_Access :=
+        State.Contexts (Positive (Pending.Context));
+   begin
+      --  Raw pending metadata owns a driver switch, not just an allocation.
+      --  Restore those fields before freeing the record on every exceptional
+      --  exit, including a host abort caught by an Ada borrowed callback.
+      if Pending.Is_Resume then
+         VM.Cancel (Owner.Driver.all);
+         VM.Free_Driver (Owner.Owned_Driver);
+         Owner.Driver := Pending.Saved_Driver;
+         Owner.Owned_Driver := Pending.Saved_Owned_Driver;
+         Owner.Driver_Borrowed := Pending.Saved_Borrowed;
+         Owner.Calls := Pending.Saved_Calls;
+         State.Current := Pending.Saved_Context;
+         State.Native_Depth := Pending.Saved_Native_Depth;
+         Target.C_Resuming := False;
+         Target.Status := Dead_Context;
+      else
+         Owner.Calls := Pending.Previous;
+         if Pending.Is_Root then
+            VM.Cancel (Owner.Driver.all);
+            State.Current := Target;
+            VM.Clear_Frames (State, Pending.Entry_Depth);
+            if Target.Non_Yieldable > 0 then
+               Target.Non_Yieldable := Target.Non_Yieldable - 1;
+            end if;
+            Target.Status := Pending.Saved_Status;
+            Target.Foreign_Base := Pending.Original_Base;
+            Target.Foreign_Top := Pending.Original_Top;
+            Target.Host_Stack_Top := Pending.Original_Top;
+         end if;
+      end if;
+      Memory.Release (State.Memory, Address);
+   end Discard_Pending;
 
    function Read_Name (Pointer : System.Address; Default : String)
                        return String is
@@ -326,12 +386,7 @@ package body Lua.Engine.Foreign is
          --  its C activations have already unwound; release scalar ownership
          --  metadata without running a Lua callback or restarting a budget.
          while Owner.Calls /= System.Null_Address loop
-            declare
-               Address : System.Address := Owner.Calls;
-            begin
-               Owner.Calls := Calls.To_Pointer (Address).Previous;
-               Memory.Release (State.Memory, Address);
-            end;
+            Discard_Pending (State, Owner);
          end loop;
          Owner.Driver := Saved_Driver;
          Owner.Driver_Borrowed := Saved_Borrowed;
@@ -392,6 +447,10 @@ package body Lua.Engine.Foreign is
       else
          Target := VM.Foreign_Context (Driver);
          Input.Function_Data := Address_Function (VM.Foreign_Handler (Driver));
+         Input.Continuation :=
+           Address_Continuation (VM.Foreign_Continuation (Driver));
+         Input.KContext := VM.Foreign_KContext (Driver);
+         Input.KStatus := VM.Foreign_KStatus (Driver);
          Token := VM.Foreign_Token (Driver);
          Action := Action_Call;
       end if;
@@ -407,6 +466,7 @@ package body Lua.Engine.Foreign is
          when 4 => Status := Action_Memory;
          when 5 => Status := Action_Handling;
          when 6 => Status := Action_Abort;
+         when 8 => Status := Action_Suspend;
          when others =>
             raise Program_Error with "invalid borrowed C callback transfer";
       end case;
@@ -435,7 +495,7 @@ package body Lua.Engine.Foreign is
             State.Warning_Head.Warning_Failed := True;
          end if;
          Warnings.Acknowledge (State, Token);
-      else
+      elsif Status /= Action_Suspend then
          VM.Complete_Foreign_Call
            (Driver, Natural (Output.Integer_Data),
             Action_Status'Enum_Rep (Status), Output.Error_Handled /= 0, Token);
@@ -659,7 +719,23 @@ package body Lua.Engine.Foreign is
       procedure Memory_Result;
       function Require_Table return Value;
       procedure Get_Raw (Key : Value);
+      procedure Prepare_C_Slots
+        (Frame : not null Frame_Access; Depth : Natural);
       function Pump (Start_Error : Boolean := False) return Action_Status;
+
+      procedure Prepare_C_Slots
+        (Frame : not null Frame_Access; Depth : Natural)
+      is
+         Captures : Values.Vector := Owned_Values (Owner.Universe.all);
+      begin
+         Append_Root (Owner.Universe.all, Captures,
+                      (Light_Identity_Kind, Frame.all'Address));
+         Append_Root (Owner.Universe.all, Captures,
+                      (Integer_Kind, Integer_Value (Depth)));
+         Push (Owner.Universe.all, Context,
+               New_Native (Owner.Universe.all, "@foreign.close", Captures));
+         Output.Length := 1;
+      end Prepare_C_Slots;
 
       procedure Leave_Context is
       begin
@@ -690,11 +766,26 @@ package body Lua.Engine.Foreign is
       end Error_Result;
 
       procedure Memory_Result is
+         Saved : Context_Access;
       begin
          if Context /= null then
             --  The actual immutable error string was allocated during state
             --  initialization. Its reserved stack slot needs no provider call.
+            Saved := Owner.Universe.Current;
+            Owner.Universe.Current := Context;
             Record_Memory_Error (Owner.Universe.all);
+            Owner.Universe.Current := Saved;
+            if Input.Operation = Begin_Resume then
+               --  All setup refusal points leave one error-dead thread;
+               --  no unstarted argument packet remains resumable by accident.
+               Context.C_Resuming := False;
+               Context.Status := Dead_Context;
+               if Input.Index >= 0 then
+                  Pop (Context, Natural'Min
+                    (Natural (Input.Index),
+                     Context.Foreign_Top - Context.Foreign_Base));
+               end if;
+            end if;
             Push (Owner.Universe.all, Context, Context.Failure);
             Output.Pointer := Context.Failure.Reference.C_Bytes;
          end if;
@@ -726,8 +817,10 @@ package body Lua.Engine.Foreign is
 
       function Pump (Start_Error : Boolean := False) return Action_Status is
          Driver : VM.Driver renames Main_Owner.Driver.all;
+         Record_Address : constant System.Address := Main_Owner.Calls;
          Pending : constant Calls.Object_Pointer :=
            Calls.To_Pointer (Main_Owner.Calls);
+         Is_Resume_Entry : constant Boolean := Pending.Is_Resume;
          Caller : constant Context_Access := Owner.Universe.Contexts
            (Positive (Pending.Context));
          Packet : Values.Vector renames Caller.Boundary_Results;
@@ -763,37 +856,105 @@ package body Lua.Engine.Foreign is
                declare
                   Event : constant Frame_Access :=
                     Owner.Universe.Warning_Head;
+                  Ready : Boolean := False;
                begin
-                  Output.Pointer := Create_Surface
-                    (Owner.Universe, Context_Id
-                       (Event.Context.Thread.Context_Index),
-                     Main_Owner.Extra, Main_Owner.Seed,
-                     Surfaces.To_Pointer (State).Main);
-                  Output.Warning_Function :=
-                    Address_Warning (Event.Warning_Handler);
-                  Output.Warning_Data := Event.Warning_Data;
-                  Output.Warning_Message := Event.Warning_Message.Address;
-                  Output.Warning_Continuation :=
-                    Boolean'Pos (Event.Warning_To_Continue);
-                  Output.Callback_Token :=
-                    Warnings.Identity (Owner.Universe.all);
-                  Warnings.Begin_Callback (Owner.Universe.all);
-                  return Action_Warning;
+                  begin
+                     Output.Pointer := Create_Surface
+                       (Owner.Universe, Context_Id
+                          (Event.Context.Thread.Context_Index),
+                        Main_Owner.Extra, Main_Owner.Seed,
+                        Surfaces.To_Pointer (State).Main);
+                     Ready := True;
+                  exception
+                     when Memory.Allocation_Error => null;
+                     when Program_Error =>
+                        if not Memory.Refusal_Pending
+                          (Owner.Universe.Memory)
+                        then
+                           raise;
+                        end if;
+                  end;
+                  if not Ready then
+                     Record_Memory_Error (Owner.Universe.all);
+                     Event.Warning_Failed := True;
+                     Warnings.Discard (Owner.Universe.all, Event);
+                  else
+                     Output.Warning_Function :=
+                       Address_Warning (Event.Warning_Handler);
+                     Output.Warning_Data := Event.Warning_Data;
+                     Output.Warning_Message := Event.Warning_Message.Address;
+                     Output.Warning_Continuation :=
+                       Boolean'Pos (Event.Warning_To_Continue);
+                     Output.Callback_Token :=
+                       Warnings.Identity (Owner.Universe.all);
+                     Warnings.Begin_Callback (Owner.Universe.all);
+                     return Action_Warning;
+                  end if;
                end;
             elsif VM.Needs_Foreign_Call (Driver) then
                declare
                   Target : constant Context_Access :=
                     VM.Foreign_Context (Driver);
+                  Ready : Boolean := False;
                begin
-                  Output.Pointer := Create_Surface
-                    (Owner.Universe, Context_Id (Target.Thread.Context_Index),
-                     Main_Owner.Extra, Main_Owner.Seed,
-                     Surfaces.To_Pointer (State).Main);
-                  Output.Function_Data :=
-                    Address_Function (VM.Foreign_Handler (Driver));
-                  Output.Callback_Token := VM.Foreign_Token (Driver);
-                  return Action_Call;
+                  begin
+                     Output.Pointer := Create_Surface
+                       (Owner.Universe,
+                        Context_Id (Target.Thread.Context_Index),
+                        Main_Owner.Extra, Main_Owner.Seed,
+                        Surfaces.To_Pointer (State).Main);
+                     Ready := True;
+                  exception
+                     when Memory.Allocation_Error => null;
+                     when Program_Error =>
+                        if not Memory.Refusal_Pending
+                          (Owner.Universe.Memory)
+                        then
+                           raise;
+                        end if;
+                  end;
+                  if not Ready then
+                     --  Refusing a C surface is failure of this requested
+                     --  callback. Feed the preallocated error through its
+                     --  exact VM token, so its ordinary protected boundary
+                     --  unwinds before any original caller C guard resumes.
+                     Record_Memory_Error (Owner.Universe.all);
+                     Push (Owner.Universe.all, Target, Target.Failure);
+                     VM.Complete_Foreign_Call
+                       (Driver, 0, 4, Token => VM.Foreign_Token (Driver));
+                  else
+                     Output.Function_Data :=
+                       Address_Function (VM.Foreign_Handler (Driver));
+                     Output.Continuation := Address_Continuation
+                       (VM.Foreign_Continuation (Driver));
+                     Output.KContext := VM.Foreign_KContext (Driver);
+                     Output.KStatus := VM.Foreign_KStatus (Driver);
+                     Output.Callback_Token := VM.Foreign_Token (Driver);
+                     return Action_Call;
+                  end if;
                end;
+            end if;
+            if not Pending.Is_Root and then
+              Caller.Transfer.Kind = Yielded and then
+              Pending.Activation /= null and then
+              Pending.Activation.Foreign_Continuation /=
+                System.Null_Address
+            then
+               --  The child suspended below a K-aware C call. Its boundary
+               --  and original C activation now own the continuation; retire
+               --  only this live pump's scalar call record before C unwinds.
+               for Frame of reverse Caller.Stack loop
+                  if Frame.Native_Name = "@foreign.boundary" and then
+                    Frame.Foreign_Previous_Frame = Pending.Activation
+                  then
+                     Frame.Foreign_Suspended := True;
+                     exit;
+                  end if;
+               end loop;
+               Address := Main_Owner.Calls;
+               Main_Owner.Calls := Pending.Previous;
+               Memory.Release (Owner.Universe.Memory, Address);
+               return Action_Suspend;
             end if;
             begin
                VM.Step (Driver);
@@ -818,23 +979,32 @@ package body Lua.Engine.Foreign is
          end loop;
          if Error_Status = 0 then
             if Pending.Is_Root then
-               if VM.Outcome (Driver) /= Completed then
-                  raise Foreign_Error with "unexpected C-call suspension";
-               end if;
-               VM.Take_Results (Driver, Packet);
-               if Packet.Is_Empty or else
-                 Packet.First_Element.Kind /= Boolean_Kind
-               then
-                  raise Program_Error with "C entry lost protection packet";
-               end if;
-               if not Packet.First_Element.Boolean_Data then
+               if Pending.Is_Resume then
                   Error_Status :=
-                    (if Caller.Protected_Failure_Class = Memory_Failure then 4
-                     elsif Caller.Protected_Failure_Class = Handling_Failure
-                     then 5 else 2);
-                  Handler_Called := Caller.Protected_Handler_Called;
+                    (if VM.Outcome (Driver) = Yielded then 1
+                     elsif VM.Outcome (Driver) = Lua_Raised then 2 else 0);
+                  VM.Take_Results (Driver, Packet);
+               elsif VM.Outcome (Driver) /= Completed then
+                  raise Foreign_Error with "unexpected C-call suspension";
+               else
+                  VM.Take_Results (Driver, Packet);
                end if;
-               Packet.Delete_First;
+               if not Pending.Is_Resume then
+                  if Packet.Is_Empty or else
+                    Packet.First_Element.Kind /= Boolean_Kind
+                  then
+                     raise Program_Error with "C entry lost protection packet";
+                  end if;
+                  if not Packet.First_Element.Boolean_Data then
+                     Error_Status :=
+                       (if Caller.Protected_Failure_Class = Memory_Failure
+                        then 4
+                        elsif Caller.Protected_Failure_Class = Handling_Failure
+                        then 5 else 2);
+                     Handler_Called := Caller.Protected_Handler_Called;
+                  end if;
+                  Packet.Delete_First;
+               end if;
             else
                VM.Take_Foreign_Result
                  (Driver, Packet, Error_Status, Handler_Called);
@@ -842,11 +1012,47 @@ package body Lua.Engine.Foreign is
          end if;
          if Pending.Is_Root then
             VM.Finish (Driver);
-            VM.Clear_Frames (Owner.Universe.all);
-            Caller.Non_Yieldable := Caller.Non_Yieldable - 1;
+            if Pending.Is_Resume then
+               Caller.C_Resuming := False;
+               if Error_Status not in 0 | 1 then
+                  Caller.Status := Dead_Context;
+               end if;
+            else
+               VM.Clear_Frames (Owner.Universe.all, Pending.Entry_Depth);
+               Caller.Non_Yieldable := Caller.Non_Yieldable - 1;
+               --  An ordinary protected C call does not consume a thread's
+               --  coroutine lifecycle. In particular an independent main
+               --  state may subsequently be used by lua_resume.
+               Caller.Status := Pending.Saved_Status;
+               Caller.Foreign_Base := Pending.Original_Base;
+               Caller.Foreign_Top := Pending.Original_Top;
+               Caller.Host_Stack_Top := Pending.Original_Top;
+            end if;
          end if;
-         Set_C_Top (Owner.Universe.all, Caller, Pending.Base);
-         Count := (if Error_Status /= 0 then 1
+         if Pending.Is_Resume then
+            --  Results cannot replace the bottom of a suspended Lua/C
+            --  activation: those registers and C-prefix arguments are still
+            --  live. Detach the host-facing stack above every retained real
+            --  window. The next resume restores this exact execution view
+            --  only after copying its newly supplied arguments into roots.
+            Caller.Resume_Foreign_Activation := Caller.Foreign_Activation;
+            Caller.Resume_Foreign_Base := Caller.Foreign_Base;
+            Caller.Resume_Foreign_Top := Caller.Foreign_Top;
+            Caller.Resume_Stack_Used := Caller.Stack_Used;
+            Caller.Resume_Host_Stack_Top := Caller.Host_Stack_Top;
+            Caller.Detached_Resume_Window := Error_Status = 1;
+            Caller.Foreign_Activation := null;
+            Caller.Foreign_Base :=
+              (if Error_Status = 1 then Caller.Stack_Used
+               else Caller.Resume_Return_Base);
+            Caller.Foreign_Top :=
+              (if Error_Status = 1 then Caller.Foreign_Base
+               else Caller.Resume_Return_Top);
+            Caller.Host_Stack_Top := Caller.Foreign_Top;
+         else
+            Set_C_Top (Owner.Universe.all, Caller, Pending.Base);
+         end if;
+         Count := (if Error_Status not in 0 | 1 then 1
                    elsif Pending.Wanted = -1 then Natural (Packet.Length)
                    else Natural (Pending.Wanted));
          --  The Call_Record contains only scalar ownership metadata; pop it
@@ -856,8 +1062,29 @@ package body Lua.Engine.Foreign is
          Main_Owner.Calls := Pending.Previous;
          declare
             Protected_Call : constant Boolean := Pending.Protected_Call;
+            Is_Resume : constant Boolean := Pending.Is_Resume;
+            Saved_Driver : constant Driver_View := Pending.Saved_Driver;
+            Saved_Owned : constant VM.Driver_Access :=
+              Pending.Saved_Owned_Driver;
+            Saved_Calls : constant System.Address := Pending.Saved_Calls;
+            Saved_Borrowed : constant Boolean := Pending.Saved_Borrowed;
+            Saved_Context : constant Context_Access := Pending.Saved_Context;
+            Saved_Depth : constant Natural := Pending.Saved_Native_Depth;
          begin
             Memory.Release (Owner.Universe.Memory, Address);
+            if Is_Resume then
+               --  Release/restore scalar driver ownership before result
+               --  publication can allocate. A refused host-window growth
+               --  must not strand the caller under a completed child drive.
+               VM.Free_Driver (Main_Owner.Owned_Driver);
+               Main_Owner.Driver := Saved_Driver;
+               Main_Owner.Owned_Driver := Saved_Owned;
+               Main_Owner.Calls := Saved_Calls;
+               Main_Owner.Driver_Borrowed := Saved_Borrowed;
+               Owner.Universe.Current := Saved_Context;
+               Owner.Universe.Native_Depth := Saved_Depth;
+               Output.Length := C.size_t (Count);
+            end if;
             for Index in 1 .. Count loop
                Push (Owner.Universe.all, Caller,
                  (if Index <= Natural (Packet.Length) then Packet (Index)
@@ -866,7 +1093,24 @@ package body Lua.Engine.Foreign is
             Packet.Clear;
             Output.Integer_Data := C.long_long (Error_Status);
             Output.Error_Handled := Boolean'Pos (Handler_Called);
-            if Error_Status /= 0 and then not Protected_Call then
+            if Error_Status /= 0 and then Protected_Call and then
+              not Is_Resume and then Caller.Foreign_Activation /= null and then
+              Caller.Foreign_Activation.Foreign_Continuation /=
+                System.Null_Address
+            then
+               --  Yieldable pcallk recovers errors through K even when the
+               --  protected child failed before its first yield. Abandon the
+               --  original C body through its live guard, then request K as
+               --  the next explicit callback; the coroutine itself has not
+               --  yielded a result to its external resumer.
+               Caller.Foreign_Activation.Foreign_KStatus :=
+                 C.int (Error_Status);
+               Caller.Foreign_Activation.Native_Stage := 1;
+               return Action_Suspend;
+            end if;
+            if Error_Status /= 0 and then not Protected_Call and then
+              not Is_Resume
+            then
                if Stacks.Read (Caller, Caller.Foreign_Top).Kind = String_Kind
                then
                   Output.Pointer :=
@@ -881,6 +1125,18 @@ package body Lua.Engine.Foreign is
       exception
          when others =>
             Packet.Clear;
+            if Main_Owner.Calls = Record_Address then
+               Discard_Pending (Owner.Universe.all, Main_Owner);
+            end if;
+            if Is_Resume_Entry then
+               --  Publication may fail after the record was already popped.
+               --  Its ownership is restored, but the API error still belongs
+               --  to the resumed root, not whichever nested C callback most
+               --  recently returned control to this pump.
+               Caller.C_Resuming := False;
+               Caller.Status := Dead_Context;
+               Context := Caller;
+            end if;
             raise;
       end Pump;
 
@@ -906,6 +1162,324 @@ package body Lua.Engine.Foreign is
       --  when it is an inactive coroutine. Borrowing it never resets budgets
       --  or resumes Lua execution, and the caller's context is restored below.
       case Input.Operation is
+         when Set_Hook | Get_Hook | Get_Hook_Mask | Get_Hook_Count |
+           Get_Debug_Frame | Get_Debug_Line =>
+            Foreign_Hooks.Handle
+              (Owner.Universe.all, Context, Input.all, Output.all);
+         when Get_Status =>
+            --  Resume retains the failure category after its public result
+            --  window is inspected or cleared. Report the same public status
+            --  as the driver, rather than treating every retained error as a
+            --  language failure. Suspended execution still takes precedence.
+            Output.Integer_Data :=
+              (if Context.Status = Suspended_Context then 1
+               elsif Context.Has_Failure_Value then
+                 (if Context.Failure_Class = Memory_Failure then 4
+                  elsif Context.Failure_Class = Handling_Failure then 5
+                  else 2)
+               else 0);
+         when Prepare_Index =>
+            declare
+               Target : constant Value := Get_Value (Input.Index);
+               Is_Set : constant Boolean := Input.Count /= 0;
+               Needed : constant Positive := (if Is_Set then 2 else 1);
+               Key, Item : Value;
+            begin
+               if Context.Foreign_Top - Context.Foreign_Base < Needed then
+                  raise Foreign_Error with "missing table operation operands";
+               end if;
+               Key := Get_Value (-C.int (Needed));
+               if Is_Set then Item := Get_Value (-1); end if;
+               Pin (Owner.Universe.all, Target);
+               Pin (Owner.Universe.all, Key);
+               Pin (Owner.Universe.all, Item);
+               if Target.Kind = Table_Kind and then
+                 (Get (Target, Key).Kind /= Nil_Kind or else
+                  Metafield (Owner.Universe.all, Target,
+                    (if Is_Set then "__newindex" else "__index")).Kind =
+                      Nil_Kind)
+               then
+                  --  A public API lookup on a suspended thread commonly
+                  --  needs no callback. Preserve that thread's execution
+                  --  stack and avoid inventing an allocating call frame for
+                  --  a raw fast path whose handlers are absent.
+                  if Is_Set then
+                     Set (Owner.Universe.all, Target, Key, Item);
+                  else
+                     Item := Get (Target, Key);
+                     Pin (Owner.Universe.all, Item);
+                  end if;
+                  Pop (Context, Needed);
+                  if not Is_Set then
+                     Push (Owner.Universe.all, Context, Item);
+                  end if;
+                  Leave_Context;
+                  return Action_Done;
+               end if;
+               Pop (Context, Needed);
+               --  Public C operations may call handlers, but cannot yield.
+               --  Publish a real Ada continuation and its rooted operands;
+               --  the ordinary C-owned lua_call pump drives @get/@set after
+               --  this dispatcher has returned. Raw APIs use other cases.
+               Push (Owner.Universe.all, Context,
+                     New_Native (Owner.Universe.all,
+                       (if Is_Set then "@set" else "@get")));
+               Push (Owner.Universe.all, Context, Target);
+               Push (Owner.Universe.all, Context, Key);
+               if Is_Set then Push (Owner.Universe.all, Context, Item); end if;
+               Output.Length := 1;
+            end;
+         when Mark_Close =>
+            declare
+               Frame : constant Frame_Access := Context.Foreign_Activation;
+               Slot : constant Natural := Position (Context, Input.Index);
+               Item : constant Value := Get_Value (Input.Index);
+            begin
+               if Frame = null or else not Valid_Index
+                 (Context, Input.Index) or else Slot <= Context.Foreign_Base
+               then
+                  raise Foreign_Error with "invalid to-be-closed C slot";
+               elsif not Frame.Closers.Is_Empty and then
+                 Slot <= Frame.Closers.Last_Element.Depth
+               then
+                  raise Foreign_Error with "C close slots are out of order";
+               end if;
+               if Truth (Item) then
+                  if Metafield
+                    (Owner.Universe.all, Item, "__close").Kind = Nil_Kind
+                  then
+                     raise Foreign_Error with
+                       "variable '(C temporary)' got a non-closable value";
+                  end if;
+                  Frame.Closers.Append
+                    (Close_Entry'
+                       (Cell => Stacks.Capture
+                          (Owner.Universe.all, Context, Slot),
+                        Depth => Slot, others => <>));
+               end if;
+            end;
+         when Close_Slot =>
+            declare
+               Frame : constant Frame_Access := Context.Foreign_Activation;
+               Slot : constant Natural := Position (Context, Input.Index);
+            begin
+               if Frame = null or else not Valid_Index
+                 (Context, Input.Index) or else Slot <= Context.Foreign_Base
+               then
+                  raise Foreign_Error with "invalid C close slot";
+               elsif Input.Count = 0 then
+                  if Frame.Closers.Is_Empty or else
+                    Frame.Closers.Last_Element.Depth /= Slot
+                  then
+                     raise Foreign_Error with "C slot is not marked to close";
+                  end if;
+                  Prepare_C_Slots (Frame, Slot - 1);
+               else
+                  --  The handler has returned through its C-owned pump.
+                  --  Detach the stable closing cell before reusing the slot,
+                  --  preserving any independently retained closed capture.
+                  Stacks.Detach (Context, Slot, Slot);
+                  Stacks.Write (Owner.Universe.all, Context, Slot, Nil_Value);
+               end if;
+            end;
+         when Begin_Resume =>
+            declare
+               Fresh : constant Boolean := Context.Status = New_Context or
+                 (Context.Status = Dead_Context and then
+                  not Context.Has_Failure_Value and then
+                  Context.Stack.Is_Empty);
+               Arguments : Values.Vector :=
+                 Owned_Values (Owner.Universe.all);
+               Callee : Value;
+               Slot : Natural := 0;
+               Address : System.Address := System.Null_Address;
+               New_Driver : VM.Driver_Access;
+               Next : Calls.Object_Pointer;
+               Result : Action_Status;
+               Start_Error : Boolean := False;
+               From_Depth : Natural := 0;
+            begin
+               --  Resume failures are results of lua_resume, not errors in
+               --  the C caller. Keep the original suspended/dead state and
+               --  publish one genuine error object on its public stack.
+               if Input.Index < 0 or else Natural (Input.Index) >
+                 Context.Foreign_Top - Context.Foreign_Base
+               then
+                  Error_Result ("not enough elements in the stack");
+                  Output.Integer_Data := 2;
+                  Output.Length := 1;
+                  Leave_Context;
+                  return Action_Done;
+               elsif (not Fresh and then
+                      Context.Status /= Suspended_Context) or else
+                 (Fresh and then not Context.Stack.Is_Empty)
+               then
+                  Pop (Context, Natural (Input.Index));
+                  Error_Result
+                    ((if Context.Status = Dead_Context then
+                        "cannot resume dead coroutine" else
+                        "cannot resume non-suspended coroutine"));
+                  Output.Integer_Data := 2;
+                  Output.Length := 1;
+                  Leave_Context;
+                  return Action_Done;
+               end if;
+               if Input.Pointer /= System.Null_Address then
+                  --  'from' supplies the actual C-call depth only. Native
+                  --  Lua also accepts an independently owned source state;
+                  --  no value, registry or resumer relationship is shared.
+                  From_Depth := Controls.To_Pointer
+                    (Surfaces.To_Pointer (Input.Pointer).Owner).
+                      Universe.Native_Depth;
+               end if;
+               if Context.Native_Depth >=
+                 Lua.Runtime_Configuration.Maximum_C_Calls or else
+                 From_Depth >=
+                   Lua.Runtime_Configuration.Maximum_C_Calls -
+                     Context.Native_Depth
+               then
+                  Pop (Context, Natural (Input.Index));
+                  Error_Result ("C stack overflow");
+                  Output.Integer_Data := 2;
+                  Output.Length := 1;
+                  Leave_Context;
+                  return Action_Done;
+               end if;
+               for Index in Context.Foreign_Top - Natural (Input.Index) + 1
+                 .. Context.Foreign_Top
+               loop
+                  Append_Root (Owner.Universe.all, Arguments,
+                               Stacks.Read (Context, Index));
+               end loop;
+               if Fresh then
+                  if Context.Entry_Function.Kind /= Nil_Kind then
+                     Callee := Context.Entry_Function;
+                     Slot := 1;
+                  elsif Natural (Input.Index) <
+                    Context.Foreign_Top - Context.Foreign_Base
+                  then
+                     Slot := Context.Foreign_Top - Natural (Input.Index);
+                     Callee := Stacks.Read (Context, Slot);
+                  else
+                     Pop (Context, Natural (Input.Index));
+                     Error_Result ("cannot resume dead coroutine");
+                     Output.Integer_Data := 2;
+                     Output.Length := 1;
+                     Leave_Context;
+                     return Action_Done;
+                  end if;
+                  Pin (Owner.Universe.all, Callee);
+                  Context.Resume_Return_Base := Context.Foreign_Base;
+                  Context.Resume_Return_Top := Slot - 1;
+               end if;
+               Pin (Owner.Universe.all, Arguments);
+               --  Allocate both scalar owners before changing the active
+               --  driver. Refusal leaves the caller's real execution intact.
+               Context.Boundary_Results.Reserve_Capacity (2);
+               New_Driver := VM.New_Driver (Owner.Universe.all);
+               begin
+                  Address := Memory.Allocate
+                    (Owner.Universe.Memory,
+                     Call_Record'Object_Size / System.Storage_Unit,
+                     Call_Record'Alignment);
+               exception
+                  when others =>
+                     VM.Free_Driver (New_Driver);
+                     raise;
+               end;
+               Next := Calls.To_Pointer (Address);
+               Next.all :=
+                 (Is_Root => True, Is_Resume => True, Wanted => -1,
+                  Context => Owner.Context,
+                  Saved_Driver => Main_Owner.Driver,
+                  Saved_Owned_Driver => Main_Owner.Owned_Driver,
+                  Saved_Calls => Main_Owner.Calls,
+                  Saved_Borrowed => Main_Owner.Driver_Borrowed,
+                  Saved_Context => Previous,
+                  Saved_Native_Depth => Owner.Universe.Native_Depth,
+                  others => <>);
+               Main_Owner.Driver := Driver_View (New_Driver);
+               Main_Owner.Owned_Driver := New_Driver;
+               Main_Owner.Driver_Borrowed := False;
+               Main_Owner.Calls := Address;
+               if not Fresh and then Context.Detached_Resume_Window then
+                  Context.Foreign_Activation :=
+                    Context.Resume_Foreign_Activation;
+                  Context.Foreign_Base := Context.Resume_Foreign_Base;
+                  Context.Foreign_Top := Context.Resume_Foreign_Top;
+                  Context.Stack_Used := Context.Resume_Stack_Used;
+                  Context.Host_Stack_Top := Context.Resume_Host_Stack_Top;
+                  Context.Resume_Foreign_Activation := null;
+                  Context.Detached_Resume_Window := False;
+               else
+                  Context.Host_Stack_Top := Context.Resume_Return_Top;
+               end if;
+               Owner.Universe.Native_Depth :=
+                 From_Depth + Context.Native_Depth;
+               begin
+                  VM.Start_Resume
+                    (Main_Owner.Driver.all, Owner.Universe.all,
+                     Callee, Arguments, Fresh, Slot);
+               exception
+                  when Language_Error => Start_Error := True;
+                  when Memory.Allocation_Error =>
+                     Record_Memory_Error (Owner.Universe.all);
+                     Start_Error := True;
+                  when Program_Error =>
+                     if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                        Record_Memory_Error (Owner.Universe.all);
+                        Start_Error := True;
+                     else
+                        raise;
+                     end if;
+               end;
+               Result := Pump (Start_Error);
+               Leave_Context;
+               return Result;
+            end;
+         when Yield_Call =>
+            declare
+               Frame : constant Frame_Access := Context.Foreign_Activation;
+            begin
+               if Frame = null or else Input.Count < 0 or else
+                 Natural (Input.Count) >
+                   Context.Foreign_Top - Context.Foreign_Base or else
+                 Context.Non_Yieldable /= 0 or else
+                 (Context.Resumer = null and then not Context.C_Resuming)
+               then
+                  raise Foreign_Error with
+                    (if Context = Owner.Universe.Main_Context and then
+                        not Context.C_Resuming then
+                       "attempt to yield from outside a coroutine" else
+                       "attempt to yield across a C-call boundary");
+               end if;
+               if Context.Hook_Active and then
+                 (Context.Hook_Transfer or else Input.Count /= 0 or else
+                  Input.Continuation /= null)
+               then
+                  raise Foreign_Error with "invalid yield from a hook";
+               end if;
+               Frame.Foreign_Continuation :=
+                 Continuation_Address (Input.Continuation);
+               Frame.Foreign_KContext := Input.KContext;
+               Frame.Foreign_Yield_Count := Natural (Input.Count);
+               Context.Transfer.Kind := Yielded;
+               Context.Transfer.Results.Clear;
+               for Index in Context.Foreign_Top - Natural (Input.Count) + 1
+                 .. Context.Foreign_Top
+               loop
+                  Append_Root
+                    (Owner.Universe.all, Context.Transfer.Results,
+                     Stacks.Read (Context, Index));
+               end loop;
+               if Context.Hook_Active then
+                  Frame.Foreign_Suspended := True;
+               else
+                  Frame.Native_Stage := 5;
+                  Leave_Context;
+                  return Action_Suspend;
+               end if;
+            end;
          when Create_State | Create_Default_State => null;
          when Close_State =>
             declare
@@ -1040,12 +1614,25 @@ package body Lua.Engine.Foreign is
             Push (Owner.Universe.all, Context,
                   Operating_System.Open_Module (Owner.Universe.all));
             Output.Integer_Data := 1;
+         when Open_Standard_Module =>
+            if Input.Index not in 0 ..
+              Library_Openers.Module_Kind'Pos
+                (Library_Openers.Module_Kind'Last)
+            then
+               raise Foreign_Error with "invalid standard library selector";
+            end if;
+            Push (Owner.Universe.all, Context,
+                  Library_Openers.Open_Module
+                    (Owner.Universe.all,
+                     Library_Openers.Module_Kind'Val (Input.Index)));
+            Output.Integer_Data := 1;
          when Get_Yieldability =>
             --  A new secondary thread is yieldable even outside execution.
             --  Abandoned barriers on a dead thread cannot describe a current
             --  C call; main-thread/closing restrictions remain explicit.
             Output.Integer_Data := Boolean'Pos
-              (Context /= Owner.Universe.Main_Context and then
+              ((Context /= Owner.Universe.Main_Context or else
+                Context.C_Resuming) and then
                Context.Phase /= Closing and then
                (Context.Status = Dead_Context or else
                 Context.Non_Yieldable = 0));
@@ -1073,7 +1660,16 @@ package body Lua.Engine.Foreign is
                then
                   raise Foreign_Error with "invalid stack top";
                end if;
-               Set_C_Top (Owner.Universe.all, Context, Natural (Count));
+               if Context.Foreign_Activation /= null and then
+                 not Context.Foreign_Activation.Closers.Is_Empty and then
+                 Context.Foreign_Activation.Closers.Last_Element.Depth >
+                   Natural (Count)
+               then
+                  Prepare_C_Slots
+                    (Context.Foreign_Activation, Natural (Count));
+               else
+                  Set_C_Top (Owner.Universe.all, Context, Natural (Count));
+               end if;
             end;
          when Check_Stack =>
             if Input.Count >= 0 then
@@ -1575,7 +2171,8 @@ package body Lua.Engine.Foreign is
             end;
          when Begin_Call =>
             if not Main_Owner.Owns_Universe and then
-              not Main_Owner.Driver_Borrowed
+              not Main_Owner.Driver_Borrowed and then
+              Main_Owner.Calls = System.Null_Address
             then
                raise Foreign_Error with
                  "host-owned state requires its active Ada execution";
@@ -1628,6 +2225,7 @@ package body Lua.Engine.Foreign is
                Pin (Owner.Universe.all, Callee);
                Pin (Owner.Universe.all, Arguments);
                Pin (Owner.Universe.all, Message_Handler);
+               Context.Boundary_Results.Reserve_Capacity (2);
                if Main_Owner.Driver = null then
                   Main_Owner.Owned_Driver :=
                     VM.New_Driver (Owner.Universe.all);
@@ -1641,7 +2239,12 @@ package body Lua.Engine.Foreign is
                Next.all := (Previous => Main_Owner.Calls, Base => Slot - 1,
                  Wanted => Input.Count,
                  Protected_Call => Input.Integer_Data /= 0,
-                 Is_Root => Root_Call, Context => Owner.Context);
+                 Is_Root => Root_Call, Context => Owner.Context,
+                 Activation => Context.Foreign_Activation,
+                 Entry_Depth => Natural (Context.Stack.Length),
+                 Original_Top => Context.Foreign_Top,
+                 Original_Base => Context.Foreign_Base,
+                 Saved_Status => Context.Status, others => <>);
                Main_Owner.Calls := Address;
                begin
                   if Root_Call then
@@ -1655,12 +2258,22 @@ package body Lua.Engine.Foreign is
                      VM.Start_Foreign
                        (Main_Owner.Driver.all, Main_Owner.Owned_Universe,
                         Callee, Arguments, Message_Handler,
-                        Call_Base => Slot, Has_Call_Window => True);
+                        Call_Base => Slot, Has_Call_Window => True,
+                        Retained_Depth => Next.Entry_Depth);
                   else
+                     if Context.Foreign_Activation /= null then
+                        Context.Foreign_Activation.Foreign_Continuation :=
+                          Continuation_Address (Input.Continuation);
+                        Context.Foreign_Activation.Foreign_KContext :=
+                          Input.KContext;
+                     end if;
                      VM.Start_Foreign_Boundary
                        (Main_Owner.Driver.all, Callee, Arguments,
                         Message_Handler,
-                        Call_Base => Slot, Has_Call_Window => True);
+                        Call_Base => Slot, Has_Call_Window => True,
+                        Yieldable => Input.Continuation /= null,
+                        Wanted => Integer (Input.Count),
+                        Protected_Call => Input.Integer_Data /= 0);
                   end if;
                exception
                   when Language_Error => Start_Error := True;
@@ -1685,31 +2298,33 @@ package body Lua.Engine.Foreign is
             end;
          when Complete_Callback =>
             if Main_Owner.Driver = null or else Input.Count < 0 or else
-              Input.Index not in 0 | 2 | 4 | 5
+              Input.Index not in 0 | 2 | 4 | 5 | 8
             then
                raise Foreign_Error with "invalid callback completion";
             end if;
-            begin
-               VM.Complete_Foreign_Call
-                 (Main_Owner.Driver.all, Natural (Input.Count),
-                  Natural (Input.Index), Input.Error_Handled /= 0,
-                  Input.Callback_Token);
-            exception
-               when Memory.Allocation_Error =>
-                  Memory_Result;
+            if Input.Index /= 8 then
+               begin
                   VM.Complete_Foreign_Call
-                    (Main_Owner.Driver.all, 0, 4,
-                     Token => Input.Callback_Token);
-               when Program_Error =>
-                  if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                    (Main_Owner.Driver.all, Natural (Input.Count),
+                     Natural (Input.Index), Input.Error_Handled /= 0,
+                     Input.Callback_Token);
+               exception
+                  when Memory.Allocation_Error =>
                      Memory_Result;
                      VM.Complete_Foreign_Call
                        (Main_Owner.Driver.all, 0, 4,
                         Token => Input.Callback_Token);
-                  else
-                     raise;
-                  end if;
-            end;
+                  when Program_Error =>
+                     if Memory.Refusal_Pending (Owner.Universe.Memory) then
+                        Memory_Result;
+                        VM.Complete_Foreign_Call
+                          (Main_Owner.Driver.all, 0, 4,
+                           Token => Input.Callback_Token);
+                     else
+                        raise;
+                     end if;
+               end;
+            end if;
             declare
                Result : constant Action_Status := Pump;
             begin

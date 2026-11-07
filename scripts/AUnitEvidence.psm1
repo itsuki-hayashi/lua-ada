@@ -29,7 +29,13 @@ function Test-NamedAUnitEvidence {
     $errPath = & $ResolveCapture $Report.stderr $Report.stderr_sha256
     $stdout = [IO.File]::ReadAllText($outPath)
     $stderr = [IO.File]::ReadAllText($errPath).Replace("`r`n","`n")
-    if ($stderr -cne "Lua warning: error in __gc ((native):1: ordinary failure)`n") {
+    $expectedStderr = if ($Mapping.Contains('expected_stderr')) {
+        if ($Mapping.expected_stderr -isnot [string] -or [string]::IsNullOrEmpty($Mapping.expected_stderr)) {
+            throw 'AUnit expected stderr mapping is empty or invalid'
+        }
+        $Mapping.expected_stderr
+    } else { "Lua warning: error in __gc ((native):1: ordinary failure)`n" }
+    if ($stderr -cne $expectedStderr) {
         throw 'AUnit expected finalizer warning differs'
     }
     # A positive summary is necessary but insufficient. Check the full case

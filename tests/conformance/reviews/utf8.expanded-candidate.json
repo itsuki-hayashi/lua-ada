@@ -1,0 +1,1204 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "utf8.lua",
+  "role": "primary",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/utf8.lua",
+    "sha256": "ba41997fb956fcd4a48d07c31c0b9e404cb88f0e2ea99ddf4a5cdcf48eb09696",
+    "byte_length": 8273,
+    "line_count": 292
+  },
+  "original_anchor_count": 59,
+  "original_pending_ledger_sha256": "6e2e52ccd816a29c61b0db903fb37b1f2e267d8b61938cbe5d774a618bf42cc9",
+  "appended_runtime_blocks": 9,
+  "proposal": {
+    "path": "tests/conformance/reviews/utf8.expanded-classification-proposal.jsonl",
+    "sha256": "1da9cf40599df03ffb9a3ee8a159521edd45574eb323513e2dd7f03f57c12a4b"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/utf8.jsonl",
+    "sha256": "e379874b50880aa2c6356fc4ac8a97c0ee9df65fc0dd7019ef6fbd555ffe6698"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "unicode-escape-and-error-helpers",
+      "runtime_id": "LUA-UTF8-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 38,
+      "span_end_line": 39,
+      "byte_offset": 0,
+      "byte_length": 808,
+      "span_sha256": "833e0e5bb55c989532c62ef237519ca260324a8d0c1fa05e4bd6bc77b15439f0",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The error helper validates protected failures; checksyntax constructs Unicode escape source, compiles it and requires the actual result to equal the original byte string. Empty/outside offset requests return nil as specified.",
+      "dynamic_invocation": "checksyntax is invoked by every later check call, including strict and lax data vectors.",
+      "execution_condition": "Selected utf8.lua section unicode-escape-and-error-helpers; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 8,
+          "source_statement": "print \"testing UTF-8 library\""
+        },
+        {
+          "name": "require",
+          "line": 10,
+          "source_statement": "local utf8 = require'utf8'"
+        },
+        {
+          "name": "pcall",
+          "line": 14,
+          "source_statement": "  local s, err = pcall(f, ...)"
+        },
+        {
+          "name": "string.find",
+          "line": 15,
+          "source_statement": "  assert(not s and string.find(err, msg))"
+        },
+        {
+          "name": "string.gsub",
+          "line": 20,
+          "source_statement": "  return #string.gsub(s, \"[\\x80-\\xBF]\", \"\")"
+        },
+        {
+          "name": "string.format",
+          "line": 30,
+          "source_statement": "  for i = 1, #t do ts[i + 1] = string.format(\"\\\\u{%x}\", t[i]) end"
+        },
+        {
+          "name": "table.concat",
+          "line": 32,
+          "source_statement": "  ts = table.concat(ts)"
+        },
+        {
+          "name": "load",
+          "line": 34,
+          "source_statement": "  assert(assert(load(ts))() == s)"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 37,
+          "source_statement": "assert(not utf8.offset(\"alo\", 5))"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 38,
+          "source_statement": "assert(not utf8.offset(\"alo\", -4))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 30,
+          "source_statement": "  for i = 1, #t do ts[i + 1] = string.format(\"\\\\u{%x}\", t[i]) end"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 8,
+          "kind": "source-phase-output",
+          "source_statement": "print \"testing UTF-8 library\""
+        }
+      ]
+    },
+    {
+      "id": "cross-api-sequence-checker",
+      "runtime_id": "LUA-UTF8-REVIEWED-BLOCK-0002",
+      "first_line": 39,
+      "last_line": 105,
+      "span_end_line": 106,
+      "byte_offset": 808,
+      "byte_length": 2063,
+      "span_sha256": "a93393fe18fc0e606d59705663be70f5fa3de7f0e8f306c828556f323951be06",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "For each invoked sequence, len, char, codepoint, offset start/end positions, forward/backward iteration, charpattern and generated Unicode escape source agree. Every continuation byte and all substring boundaries are exercised.",
+      "dynamic_invocation": "The check helper runs for ASCII, empty, multilingual, supplementary, strict-boundary and lax extended sequences below.",
+      "execution_condition": "Selected utf8.lua section cross-api-sequence-checker; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "utf8.len",
+          "line": 43,
+          "source_statement": "  local l = utf8.len(s, 1, -1, nonstrict)"
+        },
+        {
+          "name": "len",
+          "line": 44,
+          "source_statement": "  assert(#t == l and len(s) == l)"
+        },
+        {
+          "name": "utf8.char",
+          "line": 45,
+          "source_statement": "  assert(utf8.char(table.unpack(t)) == s)   -- 't' and 's' are equivalent"
+        },
+        {
+          "name": "table.unpack",
+          "line": 45,
+          "source_statement": "  assert(utf8.char(table.unpack(t)) == s)   -- 't' and 's' are equivalent"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 47,
+          "source_statement": "  assert(utf8.offset(s, 0) == 1)"
+        },
+        {
+          "name": "checksyntax",
+          "line": 49,
+          "source_statement": "  checksyntax(s, t)"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 52,
+          "source_statement": "  local t1 = {utf8.codepoint(s, 1, -1, nonstrict)}"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 57,
+          "source_statement": "    local pi, pie = utf8.offset(s, i)        -- position of i-th char"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 58,
+          "source_statement": "    local pi1 = utf8.offset(s, 2, pi)   -- position of next char"
+        },
+        {
+          "name": "string.find",
+          "line": 60,
+          "source_statement": "    assert(string.find(string.sub(s, pi, pi1 - 1), justone))"
+        },
+        {
+          "name": "string.sub",
+          "line": 60,
+          "source_statement": "    assert(string.find(string.sub(s, pi, pi1 - 1), justone))"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 61,
+          "source_statement": "    assert(utf8.offset(s, -1, pi1) == pi)"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 62,
+          "source_statement": "    assert(utf8.offset(s, i - l - 1) == pi)"
+        },
+        {
+          "name": "utf8.char",
+          "line": 63,
+          "source_statement": "    assert(pi1 - pi == #utf8.char(utf8.codepoint(s, pi, pi, nonstrict)))"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 63,
+          "source_statement": "    assert(pi1 - pi == #utf8.char(utf8.codepoint(s, pi, pi, nonstrict)))"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 65,
+          "source_statement": "      local off1, off2 = utf8.offset(s, 0, j)"
+        },
+        {
+          "name": "utf8.len",
+          "line": 69,
+          "source_statement": "      assert(not utf8.len(s, j))"
+        },
+        {
+          "name": "utf8.len",
+          "line": 71,
+          "source_statement": "    assert(utf8.len(s, pi, pi, nonstrict) == 1)"
+        },
+        {
+          "name": "utf8.len",
+          "line": 72,
+          "source_statement": "    assert(utf8.len(s, pi, pi1 - 1, nonstrict) == 1)"
+        },
+        {
+          "name": "utf8.len",
+          "line": 73,
+          "source_statement": "    assert(utf8.len(s, pi, -1, nonstrict) == l - i + 1)"
+        },
+        {
+          "name": "utf8.len",
+          "line": 74,
+          "source_statement": "    assert(utf8.len(s, pi1, -1, nonstrict) == l - i)"
+        },
+        {
+          "name": "utf8.len",
+          "line": 75,
+          "source_statement": "    assert(utf8.len(s, 1, pi, nonstrict) == i)"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 80,
+          "source_statement": "    local p, e = utf8.offset(s, i)"
+        },
+        {
+          "name": "utf8.codes",
+          "line": 87,
+          "source_statement": "  for p, c in utf8.codes(s, nonstrict) do"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 89,
+          "source_statement": "    assert(c == t[i] and p == utf8.offset(s, i))"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 90,
+          "source_statement": "    assert(utf8.codepoint(s, p, p, nonstrict) == c)"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 95,
+          "source_statement": "  for c in string.gmatch(s, utf8.charpattern) do"
+        },
+        {
+          "name": "utf8.char",
+          "line": 97,
+          "source_statement": "    assert(c == utf8.char(t[i]))"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 102,
+          "source_statement": "    assert(utf8.offset(s, i) == utf8.offset(s, i - l - 1, #s + 1))"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 102,
+          "source_statement": "    assert(utf8.offset(s, i) == utf8.offset(s, i - l - 1, #s + 1))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 54,
+          "source_statement": "  for i = 1, #t do assert(t[i] == t1[i]) end   -- 't' is equal to 't1'"
+        },
+        {
+          "line": 56,
+          "source_statement": "  for i = 1, l do   -- for all codepoints"
+        },
+        {
+          "line": 64,
+          "source_statement": "    for j = pi, pi1 - 1 do"
+        },
+        {
+          "line": 68,
+          "source_statement": "    for j = pi + 1, pi1 - 1 do"
+        },
+        {
+          "line": 79,
+          "source_statement": "  for i = 1, l + 1 do"
+        },
+        {
+          "line": 87,
+          "source_statement": "  for p, c in utf8.codes(s, nonstrict) do"
+        },
+        {
+          "line": 95,
+          "source_statement": "  for c in string.gmatch(s, utf8.charpattern) do"
+        },
+        {
+          "line": 101,
+          "source_statement": "  for i = 1, l do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "invalid-length-positions",
+      "runtime_id": "LUA-UTF8-REVIEWED-BLOCK-0003",
+      "first_line": 106,
+      "last_line": 123,
+      "span_end_line": 124,
+      "byte_offset": 2871,
+      "byte_length": 458,
+      "span_sha256": "cb36fcd82f8879ed5a772423ff32bd92bdc51cd715af240b21c3d18c2b39786e",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "utf8.len returns nil and the exact first invalid byte for truncated, oversized and spurious continuation sequences.",
+      "dynamic_invocation": "Execute the actual source calls utf8.len@110, checklen@113, checklen@114, checklen@115, checklen@117, checklen@118, checklen@119, checklen@120, checklen@121, checklen@122 in section invalid-length-positions. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected utf8.lua section invalid-length-positions; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "utf8.len",
+          "line": 110,
+          "source_statement": "    local a, b = utf8.len(s)"
+        },
+        {
+          "name": "checklen",
+          "line": 113,
+          "source_statement": "  checklen(\"abc\\xE3def\", 4)"
+        },
+        {
+          "name": "checklen",
+          "line": 114,
+          "source_statement": "  checklen(\"\\xF4\\x9F\\xBF\", 1)"
+        },
+        {
+          "name": "checklen",
+          "line": 115,
+          "source_statement": "  checklen(\"\\xF4\\x9F\\xBF\\xBF\", 1)"
+        },
+        {
+          "name": "checklen",
+          "line": 117,
+          "source_statement": "  checklen(\"汉字\\x80\", #(\"汉字\") + 1)"
+        },
+        {
+          "name": "checklen",
+          "line": 118,
+          "source_statement": "  checklen(\"\\x80hello\", 1)"
+        },
+        {
+          "name": "checklen",
+          "line": 119,
+          "source_statement": "  checklen(\"hel\\x80lo\", 4)"
+        },
+        {
+          "name": "checklen",
+          "line": 120,
+          "source_statement": "  checklen(\"汉字\\xBF\", #(\"汉字\") + 1)"
+        },
+        {
+          "name": "checklen",
+          "line": 121,
+          "source_statement": "  checklen(\"\\xBFhello\", 1)"
+        },
+        {
+          "name": "checklen",
+          "line": 122,
+          "source_statement": "  checklen(\"hel\\xBFlo\", 4)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "codes-failures-and-iterator-state",
+      "runtime_id": "LUA-UTF8-REVIEWED-BLOCK-0004",
+      "first_line": 124,
+      "last_line": 144,
+      "span_end_line": 145,
+      "byte_offset": 3329,
+      "byte_length": 493,
+      "span_sha256": "cd30ff4376f8affc02fd37bf931f1d5342b71b7056935617396e4f7e4072ab4e",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "utf8.codes reports malformed/out-of-range strings, and its exposed iterator handles empty strings and invalid starting positions without a fabricated element.",
+      "dynamic_invocation": "Execute the actual source calls checkerror@128, utf8.codes@130, errorcodes@133, errorcodes@134, errorcodes@135, errorcodes@136, errorcodes@137, utf8.codes@140, f@141, f@142, f@143 in section codes-failures-and-iterator-state. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected utf8.lua section codes-failures-and-iterator-state; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "checkerror",
+          "line": 128,
+          "source_statement": "    checkerror(\"invalid UTF%-8 code\","
+        },
+        {
+          "name": "utf8.codes",
+          "line": 130,
+          "source_statement": "        for c in utf8.codes(s) do assert(c) end"
+        },
+        {
+          "name": "errorcodes",
+          "line": 133,
+          "source_statement": "  errorcodes(\"ab\\xff\")"
+        },
+        {
+          "name": "errorcodes",
+          "line": 134,
+          "source_statement": "  errorcodes(\"\\u{110000}\")"
+        },
+        {
+          "name": "errorcodes",
+          "line": 135,
+          "source_statement": "  errorcodes(\"in\\x80valid\")"
+        },
+        {
+          "name": "errorcodes",
+          "line": 136,
+          "source_statement": "  errorcodes(\"\\xbfinvalid\")"
+        },
+        {
+          "name": "errorcodes",
+          "line": 137,
+          "source_statement": "  errorcodes(\"αλφ\\xBFα\")"
+        },
+        {
+          "name": "utf8.codes",
+          "line": 140,
+          "source_statement": "  local f = utf8.codes(\"\")"
+        },
+        {
+          "name": "f",
+          "line": 141,
+          "source_statement": "  assert(f(\"\", 2) == nil)"
+        },
+        {
+          "name": "f",
+          "line": 142,
+          "source_statement": "  assert(f(\"\", -1) == nil)"
+        },
+        {
+          "name": "f",
+          "line": 143,
+          "source_statement": "  assert(f(\"\", math.mininteger) == nil)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 130,
+          "source_statement": "        for c in utf8.codes(s) do assert(c) end"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "offset-and-length-error-boundaries",
+      "runtime_id": "LUA-UTF8-REVIEWED-BLOCK-0005",
+      "first_line": 145,
+      "last_line": 167,
+      "span_end_line": 168,
+      "byte_offset": 3822,
+      "byte_length": 858,
+      "span_sha256": "e42e64b9e26e74a118463e6e8496fbd788a80159448376db2f93b6c04d56d762",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Offset bounds and continuation-byte starting positions raise the expected errors; len rejects invalid bounds, while incomplete codepoint offset queries report available byte endpoints.",
+      "dynamic_invocation": "Execute the actual source calls checkerror@148, checkerror@149, checkerror@150, checkerror@151, checkerror@152, checkerror@153, checkerror@154, checkerror@155, checkerror@158, checkerror@159, utf8.offset@163, utf8.offset@165 in section offset-and-length-error-boundaries. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected utf8.lua section offset-and-length-error-boundaries; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "checkerror",
+          "line": 148,
+          "source_statement": "checkerror(\"position out of bounds\", utf8.offset, \"abc\", 1, 5)"
+        },
+        {
+          "name": "checkerror",
+          "line": 149,
+          "source_statement": "checkerror(\"position out of bounds\", utf8.offset, \"abc\", 1, -4)"
+        },
+        {
+          "name": "checkerror",
+          "line": 150,
+          "source_statement": "checkerror(\"position out of bounds\", utf8.offset, \"\", 1, 2)"
+        },
+        {
+          "name": "checkerror",
+          "line": 151,
+          "source_statement": "checkerror(\"position out of bounds\", utf8.offset, \"\", 1, -1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 152,
+          "source_statement": "checkerror(\"continuation byte\", utf8.offset, \"𦧺\", 1, 2)"
+        },
+        {
+          "name": "checkerror",
+          "line": 153,
+          "source_statement": "checkerror(\"continuation byte\", utf8.offset, \"𦧺\", 1, 2)"
+        },
+        {
+          "name": "checkerror",
+          "line": 154,
+          "source_statement": "checkerror(\"continuation byte\", utf8.offset, \"\\x80\", 1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 155,
+          "source_statement": "checkerror(\"continuation byte\", utf8.offset, \"\\x9c\", -1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 158,
+          "source_statement": "checkerror(\"out of bounds\", utf8.len, \"abc\", 0, 2)"
+        },
+        {
+          "name": "checkerror",
+          "line": 159,
+          "source_statement": "checkerror(\"out of bounds\", utf8.len, \"abc\", 1, 4)"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 163,
+          "source_statement": "  local p, e = utf8.offset(\"\\xE0\", 1)"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 165,
+          "source_statement": "  local p, e = utf8.offset(\"\\xE0\\x9e\", -1)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "ascii-and-multilingual-vectors",
+      "runtime_id": "LUA-UTF8-REVIEWED-BLOCK-0006",
+      "first_line": 168,
+      "last_line": 192,
+      "span_end_line": 193,
+      "byte_offset": 4680,
+      "byte_length": 926,
+      "span_sha256": "eb3618b42818743bb911e92f3d14d69cc3f5c21a029f52733572668920506e7e",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "ASCII and Chinese strings pass the full checker. codepoint ranges reject malformed tails/outside bounds and handle empty ranges; lax surrogate and largest supported codepoints remain explicit.",
+      "dynamic_invocation": "Execute the actual source calls string.byte@171, utf8.len@172, string.byte@172, check@173, check@175, utf8.codepoint@179, checkerror@181, checkerror@182, utf8.codepoint@183, checkerror@185, checkerror@186, utf8.codepoint@188, utf8.codepoint@189, utf8.codepoint@190, utf8.codepoint@191, utf8.codepoint@192 in section ascii-and-multilingual-vectors. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected utf8.lua section ascii-and-multilingual-vectors; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.byte",
+          "line": 171,
+          "source_statement": "local t = {string.byte(s, 1, -1)}"
+        },
+        {
+          "name": "utf8.len",
+          "line": 172,
+          "source_statement": "for i = 1, utf8.len(s) do assert(t[i] == string.byte(s, i)) end"
+        },
+        {
+          "name": "string.byte",
+          "line": 172,
+          "source_statement": "for i = 1, utf8.len(s) do assert(t[i] == string.byte(s, i)) end"
+        },
+        {
+          "name": "check",
+          "line": 173,
+          "source_statement": "check(s, t)"
+        },
+        {
+          "name": "check",
+          "line": 175,
+          "source_statement": "check(\"汉字/漢字\", {27721, 23383, 47, 28450, 23383,})"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 179,
+          "source_statement": "  local t = {utf8.codepoint(s,1,#s - 1)}"
+        },
+        {
+          "name": "checkerror",
+          "line": 181,
+          "source_statement": "  checkerror(\"invalid UTF%-8 code\", utf8.codepoint, s, 1, #s)"
+        },
+        {
+          "name": "checkerror",
+          "line": 182,
+          "source_statement": "  checkerror(\"out of bounds\", utf8.codepoint, s, #s + 1)"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 183,
+          "source_statement": "  t = {utf8.codepoint(s, 4, 3)}"
+        },
+        {
+          "name": "checkerror",
+          "line": 185,
+          "source_statement": "  checkerror(\"out of bounds\", utf8.codepoint, s, -(#s + 1), 1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 186,
+          "source_statement": "  checkerror(\"out of bounds\", utf8.codepoint, s, 1, #s + 1)"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 188,
+          "source_statement": "  assert(utf8.codepoint(\"\\u{D7FF}\") == 0xD800 - 1)"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 189,
+          "source_statement": "  assert(utf8.codepoint(\"\\u{E000}\") == 0xDFFF + 1)"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 190,
+          "source_statement": "  assert(utf8.codepoint(\"\\u{D800}\", 1, 1, true) == 0xD800)"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 191,
+          "source_statement": "  assert(utf8.codepoint(\"\\u{DFFF}\", 1, 1, true) == 0xDFFF)"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 192,
+          "source_statement": "  assert(utf8.codepoint(\"\\u{7FFFFFFF}\", 1, 1, true) == 0x7FFFFFFF)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 172,
+          "source_statement": "for i = 1, utf8.len(s) do assert(t[i] == string.byte(s, i)) end"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "character-limits-and-malformed-encodings",
+      "runtime_id": "LUA-UTF8-REVIEWED-BLOCK-0007",
+      "first_line": 193,
+      "last_line": 232,
+      "span_end_line": 233,
+      "byte_offset": 5606,
+      "byte_length": 1034,
+      "span_sha256": "794cade49cacc78d43750a95dd14224af8ea80a222f8541951582f55de48761c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "char supports no arguments, embedded zeros and the largest lax codepoint, rejects negative/oversized values, and strict codepoint/len reject surrogates, overlong sequences and invalid bytes.",
+      "dynamic_invocation": "Execute the actual source calls utf8.char@195, utf8.char@196, utf8.codepoint@198, utf8.char@198, utf8.codepoint@199, utf8.char@199, checkerror@201, checkerror@202, checkerror@205, utf8.len@206, invalid@210, invalid@213, invalid@214, invalid@217, invalid@218, invalid@219, invalid@220, invalid@224, invalid@225, invalid@226, invalid@227, check@231 in section character-limits-and-malformed-encodings. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected utf8.lua section character-limits-and-malformed-encodings; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "utf8.char",
+          "line": 195,
+          "source_statement": "assert(utf8.char() == \"\")"
+        },
+        {
+          "name": "utf8.char",
+          "line": 196,
+          "source_statement": "assert(utf8.char(0, 97, 98, 99, 1) == \"\\0abc\\1\")"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 198,
+          "source_statement": "assert(utf8.codepoint(utf8.char(0x10FFFF)) == 0x10FFFF)"
+        },
+        {
+          "name": "utf8.char",
+          "line": 198,
+          "source_statement": "assert(utf8.codepoint(utf8.char(0x10FFFF)) == 0x10FFFF)"
+        },
+        {
+          "name": "utf8.codepoint",
+          "line": 199,
+          "source_statement": "assert(utf8.codepoint(utf8.char(0x7FFFFFFF), 1, 1, true) == (1<<31) - 1)"
+        },
+        {
+          "name": "utf8.char",
+          "line": 199,
+          "source_statement": "assert(utf8.codepoint(utf8.char(0x7FFFFFFF), 1, 1, true) == (1<<31) - 1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 201,
+          "source_statement": "checkerror(\"value out of range\", utf8.char, 0x7FFFFFFF + 1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 202,
+          "source_statement": "checkerror(\"value out of range\", utf8.char, -1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 205,
+          "source_statement": "  checkerror(\"invalid UTF%-8 code\", utf8.codepoint, s)"
+        },
+        {
+          "name": "utf8.len",
+          "line": 206,
+          "source_statement": "  assert(not utf8.len(s))"
+        },
+        {
+          "name": "invalid",
+          "line": 210,
+          "source_statement": "invalid(\"\\xF4\\x9F\\xBF\\xBF\")"
+        },
+        {
+          "name": "invalid",
+          "line": 213,
+          "source_statement": "invalid(\"\\u{D800}\")"
+        },
+        {
+          "name": "invalid",
+          "line": 214,
+          "source_statement": "invalid(\"\\u{DFFF}\")"
+        },
+        {
+          "name": "invalid",
+          "line": 217,
+          "source_statement": "invalid(\"\\xC0\\x80\")          -- zero"
+        },
+        {
+          "name": "invalid",
+          "line": 218,
+          "source_statement": "invalid(\"\\xC1\\xBF\")          -- 0x7F (should be coded in 1 byte)"
+        },
+        {
+          "name": "invalid",
+          "line": 219,
+          "source_statement": "invalid(\"\\xE0\\x9F\\xBF\")      -- 0x7FF (should be coded in 2 bytes)"
+        },
+        {
+          "name": "invalid",
+          "line": 220,
+          "source_statement": "invalid(\"\\xF0\\x8F\\xBF\\xBF\")  -- 0xFFFF (should be coded in 3 bytes)"
+        },
+        {
+          "name": "invalid",
+          "line": 224,
+          "source_statement": "invalid(\"\\x80\")  -- continuation byte"
+        },
+        {
+          "name": "invalid",
+          "line": 225,
+          "source_statement": "invalid(\"\\xBF\")  -- continuation byte"
+        },
+        {
+          "name": "invalid",
+          "line": 226,
+          "source_statement": "invalid(\"\\xFE\")  -- invalid byte"
+        },
+        {
+          "name": "invalid",
+          "line": 227,
+          "source_statement": "invalid(\"\\xFF\")  -- invalid byte"
+        },
+        {
+          "name": "check",
+          "line": 231,
+          "source_statement": "check(\"\", {})"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "strict-and-lax-size-boundaries",
+      "runtime_id": "LUA-UTF8-REVIEWED-BLOCK-0008",
+      "first_line": 233,
+      "last_line": 268,
+      "span_end_line": 269,
+      "byte_offset": 6640,
+      "byte_length": 1021,
+      "span_sha256": "89ceb173bec328661038106834a08b5d13679a8aa8e38828f2c43e82d8d0102a",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Empty input and every minimum/maximum sequence size pass all checker APIs. Lax five/six-byte encodings produce their actual extended codepoints and source escape byte lengths.",
+      "dynamic_invocation": "Execute the actual source calls string.gsub@238, check@239, string.gsub@246, check@247, check@253, check@257, check@261, check@265 in section strict-and-lax-size-boundaries. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected utf8.lua section strict-and-lax-size-boundaries; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gsub",
+          "line": 238,
+          "source_statement": "s = string.gsub(s, \" \", \"\")"
+        },
+        {
+          "name": "check",
+          "line": 239,
+          "source_statement": "check(s, {0,0x7F, 0x80,0x7FF, 0x800,0xFFFF, 0x10000,0x10FFFF})"
+        },
+        {
+          "name": "string.gsub",
+          "line": 246,
+          "source_statement": "s = string.gsub(s, \" \", \"\")"
+        },
+        {
+          "name": "check",
+          "line": 247,
+          "source_statement": "check(s, {0x10000,0x1FFFFF, 0x200000,0x3FFFFFF, 0x4000000,0x7FFFFFFF}, true)"
+        },
+        {
+          "name": "check",
+          "line": 253,
+          "source_statement": "  check(s, {0x4000000, 0x7FFFFFFF}, true)"
+        },
+        {
+          "name": "check",
+          "line": 257,
+          "source_statement": "  check(s, {0x200000, 0x3FFFFFF}, true)"
+        },
+        {
+          "name": "check",
+          "line": 261,
+          "source_statement": "  check(s, {0x10000, 0x1FFFFF}, true)"
+        },
+        {
+          "name": "check",
+          "line": 265,
+          "source_statement": "check(x, {26085, 26412, 35486, 97, 45, 52, 0, 233, 243})"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "supplementary-vectors-and-pattern-positions",
+      "runtime_id": "LUA-UTF8-REVIEWED-BLOCK-0009",
+      "first_line": 269,
+      "last_line": 292,
+      "span_end_line": 293,
+      "byte_offset": 7661,
+      "byte_length": 612,
+      "span_sha256": "43ffe10591c4d5495814fdacbf28f628dd6803028861d878040abe2c88fff473",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Japanese, embedded-zero and supplementary vectors pass the full checker. A pattern iterator returns matching positions and one-character byte strings with consistent offset/length endpoints; lowercase terminal ok follows all checks.",
+      "dynamic_invocation": "Execute the actual source calls utf8.len@269, check@273, check@276, string.gmatch@281, utf8.offset@283, utf8.len@284, utf8.len@285, utf8.offset@287, print@291 in section supplementary-vectors-and-pattern-positions. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected utf8.lua section supplementary-vectors-and-pattern-positions; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "utf8.len",
+          "line": 269,
+          "source_statement": "assert(not utf8.len(\"\\xff\\x8f\\x8f\\x8f\\x8f\\x8f\\x8f\\x8f\"))"
+        },
+        {
+          "name": "check",
+          "line": 273,
+          "source_statement": "check(\"𣲷𠜎𠱓𡁻𠵼ab𠺢\","
+        },
+        {
+          "name": "check",
+          "line": 276,
+          "source_statement": "check(\"𨳊𩶘𦧺𨳒𥄫𤓓\\xF4\\x8F\\xBF\\xBF\","
+        },
+        {
+          "name": "string.gmatch",
+          "line": 281,
+          "source_statement": "for p, c in string.gmatch(x, \"()(\" .. utf8.charpattern .. \")\") do"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 283,
+          "source_statement": "  assert(utf8.offset(x, i) == p)"
+        },
+        {
+          "name": "utf8.len",
+          "line": 284,
+          "source_statement": "  assert(utf8.len(x, p) == utf8.len(x) - i + 1)"
+        },
+        {
+          "name": "utf8.len",
+          "line": 284,
+          "source_statement": "  assert(utf8.len(x, p) == utf8.len(x) - i + 1)"
+        },
+        {
+          "name": "utf8.len",
+          "line": 285,
+          "source_statement": "  assert(utf8.len(c) == 1)"
+        },
+        {
+          "name": "utf8.offset",
+          "line": 287,
+          "source_statement": "    assert(utf8.offset(x, 0, p + j - 1) == p)"
+        },
+        {
+          "name": "print",
+          "line": 291,
+          "source_statement": "print'ok'"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 281,
+          "source_statement": "for p, c in string.gmatch(x, \"()(\" .. utf8.charpattern .. \")\") do"
+        },
+        {
+          "line": 286,
+          "source_statement": "  for j = 1, #c - 1 do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 291,
+          "kind": "source-phase-output",
+          "source_statement": "print'ok'"
+        }
+      ]
+    }
+  ],
+  "supplemental_obligations": [],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": []
+}

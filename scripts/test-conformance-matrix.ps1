@@ -27,7 +27,7 @@ $nativeReview = @{mapping=$nativeMappingPath; review=$nativeReviewPath;
     mapping_sha256=(Get-FileHash (Join-Path $root $nativeMappingPath)).Hash.ToLowerInvariant();
     review_sha256=(Get-FileHash (Join-Path $root $nativeReviewPath)).Hash.ToLowerInvariant()}
 function Write-Json([string] $Path, $Value) {
-    [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 32) + "`n")
+    [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 32).Replace("`r`n","`n") + "`n")
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 function New-Process([string] $Text, [int] $PidValue, [int] $Timeout = 30) {

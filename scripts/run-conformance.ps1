@@ -12,8 +12,9 @@ param(
     [switch] $BuildReference,
     [switch] $ReportOnly,
     [switch] $RequireAcceptance,
-    [ValidateSet('', 'gc-io-events')][string] $Scope = '',
+    [ValidateSet('', 'gc-io-events','expanded-t-conformance')][string] $Scope = '',
     [switch] $RequireScopedAcceptance,
+    [ValidateSet(0,1)][int] $ConstructsBranch = 0,
     [string] $EquivalentManifest = '',
     [switch] $AllowUnreviewedEquivalent
 )
@@ -37,8 +38,11 @@ if ($RequireAcceptance -and ($Scope -ne '' -or $RequireScopedAcceptance)) {
 if ($RequireScopedAcceptance -and ($Scope -eq '' -or $Target -ne 'Ada')) {
     throw 'Scoped acceptance requires the named scope and actual Ada target'
 }
-if ($Scope -ne '' -and ($Mode -ne 'File' -or $File -notin @('events.lua','files.lua','gc.lua','gengc.lua'))) {
-    throw 'gc-io-events requires File mode and one of its four selected files'
+if ($Scope -ne '') {
+    $scopePolicy = Get-ConformanceScopePolicy -Scope $Scope
+    if ($Mode -ne 'File' -or $File -cnotin $scopePolicy.Files) {
+        throw 'Named scope requires File mode and one of its selected primary files'
+    }
 }
 $acceptanceRequested = $RequireAcceptance -or $RequireScopedAcceptance
 if (($EquivalentManifest -ne '' -and $Scope -eq '') -or
@@ -93,6 +97,7 @@ $evidence = [ordered]@{
     launcher_identity = $null
     launcher_probe_run_id = $null
     launcher_probe_telemetry = @()
+    constructs_branch = $(if ($File -ceq 'constructs.lua' -and $Scope -ceq 'expanded-t-conformance') { $ConstructsBranch } else { $null })
     execution_disposition = 'unchanged'
     equivalent = $null
     repl_preflight_process = $null
@@ -103,6 +108,8 @@ $evidence = [ordered]@{
     build_processes = @()
     native_fixture_records = @()
     native_branch_facts = $null
+    source_profile_facts = $null
+    source_condition_results = $null
     native_branch_review = $null
     allocator_limit_bytes = if ($Mode -eq 'Heavy') { 67108864L } else { 2147483648L }
     timeout_seconds = if ($Mode -eq 'Aggregate') { 3600 } elseif ($Mode -eq 'Heavy') { 600 } else { 900 }
@@ -612,12 +619,45 @@ try {
         # Enable normal warnings before upstream execution, including close-time
         # finalizers. Otherwise the test handler's initial off state can hide
         # early assertions before a source explicitly enables its warnings.
-        $setup = "assert(_soft==nil and _port==nil); warn('@on'); "
+        $setup = "assert(_soft==nil and _port==nil and _U==nil and _nomsg==nil); warn('@on'); "
         $setup += if ($Configuration -eq 'upstream-test') {
             "assert(type(T)=='table' and type(T.checkmemory)=='function'); T.checkmemory()"
         } else { 'assert(T==nil)' }
         if ($File -eq 'files.lua' -and $Configuration -eq 'upstream-test' -and -not $IsWindows) {
             $setup += "; assert(type(T.nonblock)=='function')"
+        }
+        if ($Scope -ceq 'expanded-t-conformance') {
+            $profileWitness = Join-Path $root 'tests/conformance/source-profile-witness.lua'
+            $profileCopy = Join-Path $fixtureDirectory 'equivalent-source-profile-witness.lua'
+            Copy-Item -LiteralPath $profileWitness -Destination $profileCopy
+            $sourceHash = (Get-FileHash $profileWitness).Hash.ToLowerInvariant()
+            $copyHash = (Get-FileHash $profileCopy).Hash.ToLowerInvariant()
+            if ($sourceHash -cne $copyHash) { throw 'Source profile witness copy changed bytes' }
+            $evidence.native_fixture_records += [ordered]@{source='tests/conformance/source-profile-witness.lua';
+                source_sha256=$sourceHash; artifact=$profileCopy; artifact_sha256=$copyHash}
+            $setup += "; dofile('equivalent-source-profile-witness.lua')"
+        }
+        if ($File -eq 'bitwise.lua' -and $Scope -ceq 'expanded-t-conformance') {
+            $wrapper = Join-Path $root 'tests/conformance/bitwise-helper-witness.lua'
+            $wrapperCopy = Join-Path $runRoot 'equivalent-bitwise-helper-witness.lua'
+            Copy-Item -LiteralPath $wrapper -Destination $wrapperCopy
+            $sourceHash = (Get-FileHash $wrapper).Hash.ToLowerInvariant()
+            $copyHash = (Get-FileHash $wrapperCopy).Hash.ToLowerInvariant()
+            if ($sourceHash -cne $copyHash) { throw 'Bitwise helper wrapper copy changed bytes' }
+            $evidence.native_fixture_records += [ordered]@{source='tests/conformance/bitwise-helper-witness.lua';
+                source_sha256=$sourceHash; artifact=$wrapperCopy; artifact_sha256=$copyHash}
+            $arguments = @($wrapperCopy)
+        }
+        if ($File -eq 'constructs.lua' -and $Scope -ceq 'expanded-t-conformance') {
+            $wrapper = Join-Path $root 'tests/conformance/constructs-seeded.lua'
+            $wrapperCopy = Join-Path $runRoot 'equivalent-constructs-seeded.lua'
+            Copy-Item -LiteralPath $wrapper -Destination $wrapperCopy
+            $sourceHash = (Get-FileHash $wrapper).Hash.ToLowerInvariant()
+            $copyHash = (Get-FileHash $wrapperCopy).Hash.ToLowerInvariant()
+            if ($sourceHash -cne $copyHash) { throw 'Constructs seeded wrapper copy changed bytes' }
+            $evidence.native_fixture_records += [ordered]@{source='tests/conformance/constructs-seeded.lua';
+                source_sha256=$sourceHash; artifact=$wrapperCopy; artifact_sha256=$copyHash}
+            $arguments = @($wrapperCopy, [string]$ConstructsBranch)
         }
         if ($File -eq 'events.lua') {
             $wrapper = Join-Path $root 'tests/conformance/events-return-witness.lua'
@@ -631,7 +671,7 @@ try {
             $arguments = @($wrapperCopy)
         }
         $arguments = @('-e', ($setup + $nativeSetup)) + $arguments
-        if ($File -ne 'files.lua') { $marker = 'OK' }
+        if ($File -ne 'files.lua') { $marker = if ($File -ceq 'utf8.lua') { 'ok' } else { 'OK' } }
     }
     if ($acceptanceRequested -or $Scope -ne '') {
         $environment.LUA_ADA_CONFORMANCE_RUN_ID = $runId
@@ -641,6 +681,22 @@ try {
         -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'execution') `
         -TimeoutSeconds $evidence.timeout_seconds -Environment $environment
     $evidence.outcome = Get-ConformanceOutcome -Process $evidence.process -Marker $marker
+    if ($Scope -ceq 'expanded-t-conformance') {
+        $evidence.source_profile_facts = Get-ScopedSourceProfileFacts `
+            -Output ([IO.File]::ReadAllText($evidence.process.stdout_path)) -Observed $observed
+        $selectedSource = @($suite.files | Where-Object path -CEQ $File)[0]
+        $sourceConditions = @(Read-ConformanceJsonLines `
+            -Path (Join-Path $root ('tests/conformance/' + $selectedSource.coverage_file)))
+        $evidence.source_condition_results = Get-ScopedMeasuredConditionResults `
+            -Records $sourceConditions -Facts $evidence.source_profile_facts
+    }
+    if ($File -ceq 'constructs.lua' -and $Scope -ceq 'expanded-t-conformance') {
+        $branchOutput = [IO.File]::ReadAllText($evidence.process.stdout_path)
+        $pattern = '(?m)^testing short-circuit optimizations \(' + $ConstructsBranch + '\)\r?$'
+        if ([regex]::Matches($branchOutput, $pattern).Count -ne 1) {
+            throw 'Constructs seeded template branch witness missing or duplicated'
+        }
+    }
     $evidence.fixture_changes = Test-ConformanceFixtureHashes -Directory $fixtureDirectory -Records $evidence.fixture_records
     $evidence.status = if ($evidence.fixture_changes.Count -gt 0) { 'fixture-source-changed' } else { $evidence.outcome.status }
     if ($Scope -ne '') {
@@ -719,7 +775,7 @@ try {
             }
             $coverageRecords = @{}
             foreach ($source in $suite.files) {
-                if ($RequireScopedAcceptance -and $source.path -notin @('events.lua','files.lua','gc.lua','gengc.lua')) { continue }
+                if ($RequireScopedAcceptance -and $source.path -cnotin (@($evidence.coverage_validation.Definition.files.path) + @($scopePolicy.Helpers))) { continue }
                 $coveragePath = Join-Path $root ('tests/conformance/' + $source.coverage_file)
                 foreach ($record in (Read-ConformanceJsonLines -Path $coveragePath)) {
                     $coverageRecords[$record.id] = $record

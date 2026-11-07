@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "kind": "independent-current-status-witness-source-routing-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "base_revision": "c209b8a918dc114d6fb2b6f3f8c887634a2dde8c",
+  "author": "Codex /root/expanded_source_audit",
+  "reviewer": "Codex /root/draft_assessment",
+  "decision": "accepted-current-status-witness-source-routing",
+  "author_packet": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.status-binding-delta-author-proposal.json",
+    "sha256": "669762db2bb6e48e0a0202b8c25e9c10d8a098fe2ba4c4a695f77ce48f187b06"
+  },
+  "source_bindings": [
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "sha256": "8274675cd1668f041e32100a7e9106ba6ecc65871da8ba0f0660df27878b4313"
+    },
+    {
+      "path": "tests/c/foreign_hook_contract.c",
+      "sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929"
+    },
+    {
+      "path": "tests/src/lua-foreign_hook_tests.adb",
+      "sha256": "c698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6"
+    }
+  ],
+  "runtime_source_review": {
+    "path": "reports/expanded-t-conformance/status-source-refresh/reviews/expanded-t-conformance.retained-status-runtime.cross-review.json",
+    "sha256": "9fc2c3527d0a481512c0d4a48cc65449ea1e8429d3403e43d1046fda540125c1"
+  },
+  "semantic_reviews": [
+    {
+      "path": "reports/expanded-t-conformance/status-source-refresh/reviews/expanded-t-conformance.api-witness-status.cross-review.json",
+      "sha256": "8a4047db129df08a3f444b0a26c1d0da69b15572c7d04babbd9b0ad7c1ffd979"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-source-refresh/reviews/expanded-t-conformance.consumer-witness-status.cross-review.json",
+      "sha256": "e0136b2fe84832748a057a7fe4894101940dd32ec30e7b6560afa504e9ad409e"
+    },
+    {
+      "path": "reports/expanded-t-conformance/status-source-refresh/reviews/expanded-t-conformance.aunit-witness-status.cross-review.json",
+      "sha256": "3e35977ba812a0e239e9fb45c914150470e4308a15d722a54502eed82562bf87"
+    }
+  ],
+  "approved_api_projections": [
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_ERRMEM-52",
+      "projection_sha256": "f6cc954b10abb48a1892555a44b61089aba15c49fd0f9026de5fae98ca8180ec"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_TNUMBER-67",
+      "projection_sha256": "6df54803d2e1bfb49de0bc4f1f811156e1fc95d5f6db2cba07a0ce87d184641b"
+    },
+    {
+      "id": "CAPI-LUA-H-TYPE-LUA_DEBUG-137",
+      "projection_sha256": "2dc06e4c22e5c06d00e8cc002f669563335094149052e4d0559914f390536f75"
+    },
+    {
+      "id": "CAPI-LUA-H-TYPE-LUA_HOOK-143",
+      "projection_sha256": "64e4d261af59376375882e39b0fb57c3f99223484a8adf26460baba8983f3aa9"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CLOSE-164",
+      "projection_sha256": "66a61d12b677996b512b7a7060076fb3dfbee49bafe937dfa419d99ba8f9990f"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETTOP-179",
+      "projection_sha256": "bf5aaf39ea36c2ed871909c1e6d734f4c2cad1af9ca2a1abaa71e8f0601e28c4"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETTABLE-263",
+      "projection_sha256": "1182787430b9b27a8f95550d9d91b000f96e14100e12852501eb4efaf96ea357"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETFIELD-264",
+      "projection_sha256": "f7d58b9157469848476d6c5db0f951a6bf4f739c59864ea4433d4bef4bda023e"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETTABLE-280",
+      "projection_sha256": "6892d86227a598da4991a8299f84b96ce5ddc7a8bc9321823afa2c1172a422b9"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETFIELD-281",
+      "projection_sha256": "81f14ebb2c80545d96e0ce1129c83d21fc219fa346f955f1101972461b6f6ae0"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_RESUME-312",
+      "projection_sha256": "50373c54fe3a0e5825a265e159f84505bcd8c38f61faa5cb176211258e68c137"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_STATUS-314",
+      "projection_sha256": "4cd46f50dc266fc9f879da4f30de285fc8163f347513910fe290e5407ee79a3a"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_TOCLOSE-381",
+      "projection_sha256": "dbfcc987acd67d122d70f80b5c4650e29aec5a753734d7368bec10568df01201"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_CLOSESLOT-382",
+      "projection_sha256": "559ed7a2bbfd123179b02649b93ffe45f4e5ad3ad0499ec2c7b45a3beaec1142"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_POP-396",
+      "projection_sha256": "de30bee1b96f0bf5dcdaab5e1d8e715a11200d6ad7f693c2083ae4c392fc4489"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKCALL-454",
+      "projection_sha256": "6cc251b36175090aff6ac3d67524af594e5088ccbc0187c2a1f690731055f481"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKRET-455",
+      "projection_sha256": "07d506e6786cb09cea6c3579e4202762b548c6901d748d2f691a04d9424802d5"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKLINE-456",
+      "projection_sha256": "a2d26ae50deb67831dd10c28c8b66319d70fa26aab1250c04598bd546fb14497"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKCOUNT-457",
+      "projection_sha256": "55fb04bb88a912d26df963d612e41652ebb2a0538d9361392a9149ab01d75c7b"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_HOOKTAILCALL-458",
+      "projection_sha256": "9c8434777d1221885569e6405b5b99cf97380c56dfb102f18547ee328074e257"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_MASKCALL-464",
+      "projection_sha256": "89db33fc1fd798633b8b1e523596fb24cf95985860816975a0c983e97d48252d"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_MASKRET-465",
+      "projection_sha256": "493de79ea0bd68041fc22b29cb37f812ff2bd47ff1b1269487ba75a1b63c4022"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_MASKLINE-466",
+      "projection_sha256": "5f78d30af753d36a017da73630700beb3175eda02153200c9e47bf1589e5ffda"
+    },
+    {
+      "id": "CAPI-LUA-H-MACRO-LUA_MASKCOUNT-467",
+      "projection_sha256": "56dc5f3184e61649c4fdfcfab0d051c9579430a78395f0295d6982269e3080a4"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETSTACK-470",
+      "projection_sha256": "d3a1ac5eb4e4c37b8a9e7a18945b4f89fcdfd6bf637e266a87684c9149c5fa80"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETINFO-471",
+      "projection_sha256": "345ca0a273823f0ccae78da4b3dee168d1aeb8ccc05bc9bb2c18081965d7d0c3"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_SETHOOK-481",
+      "projection_sha256": "aa0ddce2d259470148983ef46cb32d99272b2a83534743b51a6847ad9c468dd7"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETHOOK-482",
+      "projection_sha256": "bfea6e163d6be1ed7849cb545794e550a04c248324f72498b21f728dc2c39785"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETHOOKMASK-483",
+      "projection_sha256": "7c4accb4fcb3939f08ce6259398f1173b976a1b043df2156ccae71169b674bc2"
+    },
+    {
+      "id": "CAPI-LUA-H-FUNCTION-LUA_GETHOOKCOUNT-484",
+      "projection_sha256": "10642e92c94ed5f4d56beabea2490c2975444b436cef8518a65f563740d7c17c"
+    },
+    {
+      "id": "CAPI-LUA-H-TYPE-LUA_DEBUG-487",
+      "projection_sha256": "9422d53e48e99ee75a2c36d4efefb9926816086687a2e7d3c8423d4fa74a87e4"
+    }
+  ],
+  "verified_counts": {
+    "api_entries": 159,
+    "c_cases": 100,
+    "aunit_cases": 94,
+    "approved_api_projections": 31,
+    "unrelated_api_rows_unchanged": 128,
+    "verified_source_bindings_across_proposals": 126
+  },
+  "reviewed_projection": "Each exact proposed full record excluding only the future semantic_mapping_review was independently reconstructed from its hashed current-ledger preimage and the approved descriptor fields. All31 projection digests match; changes are only named_cases/named_aunit_cases. Historical status/evidence/review/applicability_review fields are preserved.",
+  "findings": [],
+  "installation_boundary": "This approves the exact source/semantic projection inputs only. Mutation ownership, rollback and post-write verification must be independently validated before installing them.",
+  "fresh_status_execution_requirement": {
+    "contexts": 26,
+    "c_case": "tests/c/foreign_hook_contract.c#foreign-hook-13",
+    "aunit_case": "tests/src/lua-foreign_hook_tests.adb#C_Refusal_Reuse",
+    "source_bindings": [
+      {
+        "path": "tests/c/foreign_hook_contract.c",
+        "sha256": "01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929"
+      },
+      {
+        "path": "tests/src/lua-foreign_hook_tests.adb",
+        "sha256": "c698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6"
+      }
+    ],
+    "historical_evidence_sufficient": false
+  },
+  "limitations": [
+    "Preserved historical pass/evidence/review fields do not certify the new memory-status assertions. Final reconciliation must require fresh strengthened case13 C and AUnit observations in all26 applicable contexts at the corrected clean head, bound to C source01ec9c40c61b333c2995b669ba63f1f9d2c42474e6ccd36511bff8d2ce9e4929 and wrapperc698a15c02b037937b9529880b5e2ca1df8267974eb1df06e687dab1f96ce4f6, or separately reviewed exact derivatives. Existing850 source obligations are not reclassified."
+  ],
+  "current_head_execution_acceptance": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false
+}

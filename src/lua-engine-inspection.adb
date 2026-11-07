@@ -4,13 +4,16 @@ with Lua.Engine.Stacks;
 with Lua.Prototypes;
 with Lua.Engine.Strings;
 with Ada.Strings.Fixed;
+with Interfaces.C;
+with System;
 
 package body Lua.Engine.Inspection is
    use type Integer_Value;
    use type Ada.Containers.Count_Type;
    use type Lua.Prototypes.Prototype_Access;
+   use type Interfaces.C.int;
+   use type System.Address;
 
-   function Short_Source (Source : String) return String;
    function Short_Source (Source : String) return String is
       Newline : constant Natural :=
         Ada.Strings.Fixed.Index (Source, "" & Character'Val (10));
@@ -66,7 +69,8 @@ package body Lua.Engine.Inspection is
       function Current_PC (Item : Frame_Access) return Natural;
 
       function Current_PC (Item : Frame_Access) return Natural is
-        (if Context.Hook_Active and then Item = Context.Hook_Frame then
+        (if (Context.Hook_Active or else Context.Hook_Suspended) and then
+            Item = Context.Hook_Frame then
             Item.PC - 1 else Natural'Max (1, Item.PC - 1) - 1);
       --  A hook observes the instruction about to run; a suspended caller
       --  observes its saved call PC. Both are zero-based canonical offsets.
@@ -114,7 +118,10 @@ package body Lua.Engine.Inspection is
          --  stack frames. Public native closures retain their logical frame.
          for Item of reverse Context.Stack loop
             Work;
-            if not Failed_Owner (Item) and then
+            if not Failed_Owner (Item) and then not
+              (Context.Hook_Active and then
+               Context.Foreign_Hook /= System.Null_Address and then
+               Item.Is_Native and then Item.Callee = Context.Hook) and then
               (not Item.Is_Native or else
                (Length (Item.Native_Name) > 0 and then
                 Element (Item.Native_Name, 1) /= '@'))
@@ -178,6 +185,11 @@ package body Lua.Engine.Inspection is
          Base := 2;
       end if;
       if Name = "debug.sethook" then
+         --  A Lua hook replaces the actual C hook installed on this same
+         --  coroutine. Keep the public callback identity/mask from surviving
+         --  a replacement or an explicit removal through the debug library.
+         Context.Foreign_Hook := System.Null_Address;
+         Context.Foreign_Hook_Mask := 0;
          if Arg (Base).Kind = Nil_Kind then
             Context.Hook := Nil_Value;
             Context.Hook_Mask := Null_Unbounded_String;
@@ -225,13 +237,33 @@ package body Lua.Engine.Inspection is
             end if;
          end if;
       elsif Name = "debug.gethook" then
-         Append (Context.Hook);
+         --  Pinned debug.gethook reports an externally installed C callback
+         --  with this string, rather than exposing an uncallable proxy or
+         --  treating the C callback pointer as a Lua hook function.
+         Append
+           ((if Context.Foreign_Hook /= System.Null_Address then
+                 New_String (State, "external hook") else Context.Hook));
          --  With no hook, C Lua returns one nil, not a padded triple. Result
          --  counts remain observable through select, varargs and table.pack.
          if Context.Hook.Kind = Nil_Kind then
             return Result;
          end if;
-         Append (New_String (State, To_String (Context.Hook_Mask)));
+         if Context.Foreign_Hook /= System.Null_Address then
+            declare
+               Mask : Unbounded_String;
+               Characters : constant String := "crl";
+            begin
+               for Bit in 0 .. 2 loop
+                  if (Context.Foreign_Hook_Mask / 2 ** Bit) mod 2 /= 0
+                  then
+                     Append (Mask, Characters (Bit + 1));
+                  end if;
+               end loop;
+               Append (New_String (State, To_String (Mask)));
+            end;
+         else
+            Append (New_String (State, To_String (Context.Hook_Mask)));
+         end if;
          Append ((Integer_Kind, Context.Hook_Reported_Count));
       elsif Name in "debug.getuservalue" | "debug.setuservalue" then
          declare

@@ -398,7 +398,10 @@ package body Lua.String_Helper_Tests is
       Assert (Result.Kind = Invoke, "replacement requests callback");
       Activation.Native_Results.Append (New_String (State, "X"));
       Collect (State);
-      Assert (Activation.Native_Captures (2).Reference.Bytes = "a",
+      Assert (Activation.Native_Captures (2).Kind = Boolean_Kind and then
+              not Activation.Native_Captures (2).Boolean_Data,
+              "pending callback has not performed a replacement");
+      Assert (Activation.Native_Captures (3).Reference.Bytes = "a",
               "whole match survives collection");
       loop
          Result := Pattern_Drivers.Advance (State, Activation);

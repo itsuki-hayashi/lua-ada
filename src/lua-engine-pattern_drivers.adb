@@ -64,8 +64,13 @@ package body Lua.Engine.Pattern_Drivers is
       procedure Finish (Subject : String) is
       begin
          Append_Output (Subject (Activation.Native_Index + 1 .. Subject'Last));
+         --  A match count does not establish a substitution: nil/false
+         --  callback or table results keep the original bytes. Lua retains
+         --  the original string identity when every match is unchanged.
          Action.Results.Append
-           (New_String (State, Activation.Native_Buffer));
+           ((if not Activation.Native_Captures (2).Boolean_Data and then
+                  Arg (1).Kind = String_Kind then Arg (1) else
+                New_String (State, Activation.Native_Buffer)));
          Action.Results.Append
            (Value'(Integer_Kind, Integer_Value (Activation.Native_Aux)));
       end Finish;
@@ -138,6 +143,7 @@ package body Lua.Engine.Pattern_Drivers is
          Whole : Managed.Buffer;
          Last : Integer_Value;
          Changed : Value;
+         Earlier_Change : Boolean;
       begin
          Whole.Set_Owner (Lua.Storage.Reference (State.Memory));
          if Arg (4).Kind /= Nil_Kind then
@@ -155,6 +161,9 @@ package body Lua.Engine.Pattern_Drivers is
             Append_Root
               (State, Activation.Native_Captures,
                Value'(Integer_Kind, -1));
+            Append_Root
+              (State, Activation.Native_Captures,
+               Value'(Boolean_Kind, False));
             Activation.Native_Stage := 1;
          elsif Activation.Native_Stage = 2 then
             --  A callback may have run arbitrary Lua and forced collection.
@@ -163,13 +172,19 @@ package body Lua.Engine.Pattern_Drivers is
             Changed := (if Activation.Native_Results.Is_Empty then Nil_Value
                         else Activation.Native_Results.First_Element);
             Whole.Set_Value
-              (To_String (Activation.Native_Captures (2).Reference.Bytes));
+              (To_String (Activation.Native_Captures (3).Reference.Bytes));
             if not Truth (Changed) then
                Whole.Query (Append_Output'Access);
             elsif Changed.Kind in String_Kind | Integer_Kind | Real_Kind then
+               Activation.Native_Captures.Replace_Element
+                 (2, (Boolean_Kind, True));
                Append_Output (Strings.String_Argument (State, Changed));
             else
-               Fail (State, "invalid replacement value");
+               --  A replacement callback can return any Lua value. Report
+               --  its actual type, as the public gsub contract distinguishes
+               --  a bad returned value from a bad replacement argument.
+               Fail (State, "invalid replacement value (a " &
+                     Type_Name (Changed) & ")");
             end if;
             Activation.Native_Results.Clear;
             Activation.Native_Stage := 1;
@@ -206,10 +221,14 @@ package body Lua.Engine.Pattern_Drivers is
          Captures := Patterns.Capture_Values (State, Subject, Found);
          Activation.Native_Index := Found.After;
          Activation.Native_Aux := Activation.Native_Aux + 1;
+         Earlier_Change := Activation.Native_Captures (2).Boolean_Data;
          Activation.Native_Captures.Clear;
          Append_Root
            (State, Activation.Native_Captures,
             Value'(Integer_Kind, Integer_Value (Found.After)));
+         Append_Root
+           (State, Activation.Native_Captures,
+            Value'(Boolean_Kind, Earlier_Change));
          Append_Root
            (State, Activation.Native_Captures,
             New_String (State, Whole));
@@ -219,6 +238,10 @@ package body Lua.Engine.Pattern_Drivers is
                Item);
          end loop;
          if Replacement.Kind in String_Kind | Integer_Kind | Real_Kind then
+            --  An explicit string/number substitution counts as changed
+            --  even when its bytes happen to equal the matched bytes.
+            Activation.Native_Captures.Replace_Element
+              (2, (Boolean_Kind, True));
             declare
                Text : constant String := Strings.String_Argument
                  (State, Replacement);
@@ -240,7 +263,8 @@ package body Lua.Engine.Pattern_Drivers is
                         if Capture_Index = 0 then
                            Whole.Query (Append_Output'Access);
                         elsif Capture_Index > Natural (Captures.Length) then
-                           Fail (State, "invalid capture index");
+                           Fail (State, "invalid capture index %" &
+                                 Text (Cursor));
                         else
                            Append_Output (Strings.String_Argument
                              (State, Captures (Capture_Index)));

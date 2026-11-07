@@ -9,6 +9,12 @@ compile-only evidence; M2b passed the first three unchanged execution files.
 These distinct evidence levels must not be conflated. Complete upstream
 coverage is now the [M3 target](milestones/m3.md), in progress.
 
+The current [expanded T delivery](sessions/2026-11-07-expanded-t-conformance.md)
+targets 13 primary files and bwcoercion.lua helper coverage. The existing nine
+combine five earlier default/T-absent process passes with the four-file scope
+accepted by merged PR #9. Additional file and T acceptance remains pending.
+The paused status below retains its earlier revision's historical evidence.
+
 ## M3 inventory and coverage ownership
 
 The 34-file inventory consists of all.lua, 30 scheduled primary files,

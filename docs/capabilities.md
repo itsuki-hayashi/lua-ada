@@ -23,9 +23,12 @@ does not establish platform acceptance or full conformance.
 
 ## M2b export inventory
 
-The [four-file follow-up](status.md) tracks the new collector and IO/OS
-coverage separately from the earlier library inventory below. Its public
-C cases cover only the entries exercised by those files.
+The accepted [four-file follow-up](status.md) owns GC/IO coverage and its
+77 selected public API entries. The [expanded T delivery](sessions/2026-11-07-expanded-t-conformance.md)
+adds four files and targets all selected T paths across 13 primary files and
+the bwcoercion.lua helper. Its exact candidate and final-head evidence is owned
+by [status](status.md) and the conformance certificates.
+Neither scope establishes full public C API or whole-suite compatibility.
 
 Fresh sessions register the following library surface. This is the declared
 M2b implementation scope, verified in its acceptance matrix.
@@ -84,24 +87,24 @@ current [status](status.md) owns verified test counts.
 
 The default table excludes the compatibility-only names. Seeded RNG output
 uses xoshiro256** with native-64 or actual split-32 arithmetic, exact two-word
-seeding and unbiased interval rejection. Both paths retain per-universe state;
-reopening math through the future public C API still needs independently
-captured RNG instances. Host mathematical primitives preserve native IEEE
+seeding and unbiased interval rejection. The real C math opener captures
+independent RNG instances on reopening; native-matched contract cases verify
+isolation and refusal cleanup. Host mathematical primitives preserve native IEEE
 domains, signed zero and rounding rather than raising Ada domain exceptions.
 
 There are 38 new focused mathematical cases and a first-party byte-encoded
 differential campaign. Oracle fixture validation is recorded; it does not by
 itself establish Ada parity, unchanged math.lua or complete M3 acceptance.
 
-## Deliberately deferred
+## Implementation boundaries and remaining gates
 
-M2a adds shared syntax checking and a private canonical opcode definition layer.
-Goto/labels/close now execute through the private lifecycle backend.
+M2a established shared syntax checking and canonical opcode definitions.
+Normal execution, including goto/labels/close, now uses the canonical backend.
 See the [frontend inventory](frontend.md) for scope and current evidence.
 
 - Syntax accepted: full pinned default grammar/static-semantic target.
-- Runtime behavior: M1/M2b plus the implemented lifecycle delivery below;
-  verified runtime matrix and final publication checks are recorded separately.
+- Runtime behavior: M1/M2b, lifecycle, collector and IO/OS implementation;
+  selected source/API scopes and final publication checks are recorded separately.
 - Opcode format: all 85 canonical definitions and six encodings.
 - Canonical code generation: normal text compilation emits real pinned words.
 - Canonical code execution: normal sessions/CLI use scalar canonical registers;
@@ -109,18 +112,18 @@ See the [frontend inventory](frontend.md) for scope and current evidence.
 - Native binary chunks: checked load/dump and selected-function string.dump
   have focused execution/interoperability evidence in [binary chunks](binary-chunks.md).
 
-| Facility                          | Later gate / current response                            |
-| --------------------------------- | -------------------------------------------------------- |
-| Finalization                      | Deferred; no finalizer execution                         |
-| Userdata                          | Stable payload/uservalue APIs; finalization pending      |
-| io/os                             | Deferred; unavailable facilities                         |
-| table.sort/create                 | Implemented; focused local acceptance, platforms pending |
-| Reopened C-created math libraries | C-facade integration; distinct RNG captures required     |
-| Binary chunks                     | Implemented; expanded platform acceptance pending        |
-| C exports and allocator parity    | Partial real C surface; remaining API/allocator work     |
-| Dynamic native modules / LuaRocks | M4; no compatibility claim                               |
-| Whole upstream suite              | M3; full coverage ledger remains incomplete              |
-| Interactive REPL                  | Future CLI work; no-input usage is intentional           |
+| Facility                          | Later gate / current response                             |
+| --------------------------------- | --------------------------------------------------------- |
+| Finalization                      | Implemented; queue, resurrection, refusal and close tests |
+| Userdata                          | Stable payload/uservalues and real finalizer integration  |
+| io/os                             | Implemented; accepted four-file scope and native mappings |
+| table.sort/create                 | Implemented; full sort.lua acceptance remains pending     |
+| Reopened C-created math libraries | Implemented; distinct RNG state and native contract tests |
+| Binary chunks                     | Implemented; expanded platform acceptance pending         |
+| C exports and allocator parity    | Partial real C surface; remaining API/allocator work      |
+| Dynamic native modules / LuaRocks | M4; no compatibility claim                                |
+| Whole upstream suite              | M3; full coverage ledger remains incomplete               |
+| Interactive REPL                  | Future CLI work; no-input usage is intentional            |
 
 The runtime does not specify hash iteration order, ambiguous table borders,
 pointer text, or byte-identical diagnostic wording. Differential fixtures avoid
@@ -138,11 +141,12 @@ or math conformance, or complete callback-allocator coverage of the runtime.
 
 Goto/labels, <close>, the fourth generic-for closing value and weak-key/value
 tables execute on the canonical backend. Threads have real identity and
-reachability-based ownership. Ephemerons use fixed-point stop-the-world tracing.
-Lua-facing coroutine exports are create, resume, yield, wrap, status, running,
-isyieldable and close. Base collectgarbage supports no argument, collect, stop,
-restart and isrunning. Other options explicitly fail; no byte counts or collector
-modes are fabricated.
+reachability-based ownership. Ephemerons converge during indivisible atomic
+tracing within the incremental/generational collector. Lua-facing coroutine
+exports are create, resume, yield, wrap, status, running, isyieldable and close.
+Base collectgarbage implements collect, stop, restart, count, step, isrunning,
+incremental, generational and param, using actual managed byte counts, work,
+ages and the named collector parameters. Unsupported options remain errors.
 
 The debug subset is getinfo, getlocal, setlocal, getupvalue, setupvalue, upvalueid,
 sethook, gethook and traceback. The full-M3 implementation additionally provides
@@ -153,12 +157,14 @@ cell identities, mutation and collection. It inspects actual cells and logical L
 activations, including explicit-thread forms, source ranges, call-site names,
 tail calls and per-thread call/return/line/count hooks. Native continuation phases
 are hidden. Count cadence now follows executed canonical words and explicit native work;
-full hook-cadence parity remains an expanded acceptance obligation.
+the expanded delivery exercises real C hooks and instrumented coroutine tests.
+Its exact final-head evidence is recorded separately in [status](status.md).
 Userdata storage and debug access to its actual traced uservalue slots are
 implemented. Existing nil slots return a second true result; absent slots
-return one nil. Finalizers remain pending. Canonical source,
-local/upvalue inspection, native binary load/dump and the added debug operations are M3
-implementation checkpoints with their own evidence and pending platform gates.
+return one nil. Userdata and table finalizers use the actual collector and
+shared close driver. Canonical source/local/upvalue inspection, native binary
+load/dump and the added debug operations retain their separate scope and
+platform evidence; full M3 acceptance remains incomplete.
 
 [Lifecycle acceptance](milestones/m3-language-lifecycle.md) owns unchanged
 goto.lua/coroutine.lua execution, precise T-absent omissions and platform evidence.

@@ -1,0 +1,1757 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "tpack.lua",
+  "role": "primary",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/tpack.lua",
+    "sha256": "43984831af8269b9f9c1be90d39880863b395e835bf094e5dc5be2025674a246",
+    "byte_length": 10641,
+    "line_count": 323
+  },
+  "original_anchor_count": 96,
+  "original_pending_ledger_sha256": "447471dee11b97b2cc2e0763b1722605cee0a41453ae339e5f730913ac0fe860",
+  "appended_runtime_blocks": 11,
+  "proposal": {
+    "path": "tests/conformance/reviews/tpack.expanded-classification-proposal.jsonl",
+    "sha256": "680972d8cbc1eef6b5e6a1c0539f508a4f579528a6d16f45e77beb40efbe5a1c"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/tpack.jsonl",
+    "sha256": "8edf4c5f58780945849e5dd2f4709c13cb63bcac14ab99bedc4382f406ac6bf3"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "native-layout-and-error-helper",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 43,
+      "span_end_line": 44,
+      "byte_offset": 0,
+      "byte_length": 1179,
+      "span_sha256": "49fbedd88ec8c8912d93e233b57a8575985cb3624a1643c22fd266f8f5c9348f",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Native short/int/long/size_t/integer/float/number sizes, byte order and alignment are measured. The invoked checkerror helper requires a failed protected call and the expected error pattern.",
+      "dynamic_invocation": "The helper is exercised by invalid-format, overflow, string and initial-position calls below; printed layout identifies the selected host ABI.",
+      "execution_condition": "Selected tpack.lua section native-layout-and-error-helper; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 8,
+          "source_statement": "print \"testing pack/unpack\""
+        },
+        {
+          "name": "packsize",
+          "line": 13,
+          "source_statement": "local sizeshort = packsize(\"h\")"
+        },
+        {
+          "name": "packsize",
+          "line": 14,
+          "source_statement": "local sizeint = packsize(\"i\")"
+        },
+        {
+          "name": "packsize",
+          "line": 15,
+          "source_statement": "local sizelong = packsize(\"l\")"
+        },
+        {
+          "name": "packsize",
+          "line": 16,
+          "source_statement": "local sizesize_t = packsize(\"T\")"
+        },
+        {
+          "name": "packsize",
+          "line": 17,
+          "source_statement": "local sizeLI = packsize(\"j\")"
+        },
+        {
+          "name": "packsize",
+          "line": 18,
+          "source_statement": "local sizefloat = packsize(\"f\")"
+        },
+        {
+          "name": "packsize",
+          "line": 19,
+          "source_statement": "local sizedouble = packsize(\"d\")"
+        },
+        {
+          "name": "packsize",
+          "line": 20,
+          "source_statement": "local sizenumber = packsize(\"n\")"
+        },
+        {
+          "name": "pack",
+          "line": 21,
+          "source_statement": "local little = (pack(\"i2\", 1) == \"\\1\\0\")"
+        },
+        {
+          "name": "packsize",
+          "line": 22,
+          "source_statement": "local align = packsize(\"!xXi16\")"
+        },
+        {
+          "name": "print",
+          "line": 27,
+          "source_statement": "print(\"platform:\")"
+        },
+        {
+          "name": "print",
+          "line": 28,
+          "source_statement": "print(string.format("
+        },
+        {
+          "name": "string.format",
+          "line": 28,
+          "source_statement": "print(string.format("
+        },
+        {
+          "name": "print",
+          "line": 33,
+          "source_statement": "print(\"\\t\" .. (little and \"little\" or \"big\") .. \" endian\")"
+        },
+        {
+          "name": "print",
+          "line": 34,
+          "source_statement": "print(\"\\talignment: \" .. align)"
+        },
+        {
+          "name": "pcall",
+          "line": 39,
+          "source_statement": "  local status, err = pcall(f, ...)"
+        },
+        {
+          "name": "string.find",
+          "line": 41,
+          "source_statement": "  assert(not status and string.find(err, msg))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 8,
+          "kind": "source-phase-output",
+          "source_statement": "print \"testing pack/unpack\""
+        },
+        {
+          "line": 27,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"platform:\")"
+        },
+        {
+          "line": 28,
+          "kind": "source-phase-output",
+          "source_statement": "print(string.format("
+        },
+        {
+          "line": 33,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"\\t\" .. (little and \"little\" or \"big\") .. \" endian\")"
+        },
+        {
+          "line": 34,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"\\talignment: \" .. align)"
+        }
+      ]
+    },
+    {
+      "id": "integer-formats-and-extended-widths",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0002",
+      "first_line": 44,
+      "last_line": 120,
+      "span_end_line": 121,
+      "byte_offset": 1179,
+      "byte_length": 2480,
+      "span_sha256": "f185f80a1be39edac0a41be6eae5b9fb67b8d222853610063e75d4500e1bb6e5",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Signed and unsigned integer formats from one through sixteen bytes preserve exact endian order, sign extension and low integer bits. Extended representations reject nonzero overflow bytes; native-width limits and mixed-endian formats round-trip.",
+      "dynamic_invocation": "All width loops and checkerror calls execute at their source bounds.",
+      "execution_condition": "Selected tpack.lua section integer-formats-and-extended-widths; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "unpack",
+          "line": 45,
+          "source_statement": "assert(unpack(\"B\", pack(\"B\", 0xff)) == 0xff)"
+        },
+        {
+          "name": "pack",
+          "line": 45,
+          "source_statement": "assert(unpack(\"B\", pack(\"B\", 0xff)) == 0xff)"
+        },
+        {
+          "name": "unpack",
+          "line": 46,
+          "source_statement": "assert(unpack(\"b\", pack(\"b\", 0x7f)) == 0x7f)"
+        },
+        {
+          "name": "pack",
+          "line": 46,
+          "source_statement": "assert(unpack(\"b\", pack(\"b\", 0x7f)) == 0x7f)"
+        },
+        {
+          "name": "unpack",
+          "line": 47,
+          "source_statement": "assert(unpack(\"b\", pack(\"b\", -0x80)) == -0x80)"
+        },
+        {
+          "name": "pack",
+          "line": 47,
+          "source_statement": "assert(unpack(\"b\", pack(\"b\", -0x80)) == -0x80)"
+        },
+        {
+          "name": "unpack",
+          "line": 49,
+          "source_statement": "assert(unpack(\"H\", pack(\"H\", 0xffff)) == 0xffff)"
+        },
+        {
+          "name": "pack",
+          "line": 49,
+          "source_statement": "assert(unpack(\"H\", pack(\"H\", 0xffff)) == 0xffff)"
+        },
+        {
+          "name": "unpack",
+          "line": 50,
+          "source_statement": "assert(unpack(\"h\", pack(\"h\", 0x7fff)) == 0x7fff)"
+        },
+        {
+          "name": "pack",
+          "line": 50,
+          "source_statement": "assert(unpack(\"h\", pack(\"h\", 0x7fff)) == 0x7fff)"
+        },
+        {
+          "name": "unpack",
+          "line": 51,
+          "source_statement": "assert(unpack(\"h\", pack(\"h\", -0x8000)) == -0x8000)"
+        },
+        {
+          "name": "pack",
+          "line": 51,
+          "source_statement": "assert(unpack(\"h\", pack(\"h\", -0x8000)) == -0x8000)"
+        },
+        {
+          "name": "unpack",
+          "line": 53,
+          "source_statement": "assert(unpack(\"L\", pack(\"L\", 0xffffffff)) == 0xffffffff)"
+        },
+        {
+          "name": "pack",
+          "line": 53,
+          "source_statement": "assert(unpack(\"L\", pack(\"L\", 0xffffffff)) == 0xffffffff)"
+        },
+        {
+          "name": "unpack",
+          "line": 54,
+          "source_statement": "assert(unpack(\"l\", pack(\"l\", 0x7fffffff)) == 0x7fffffff)"
+        },
+        {
+          "name": "pack",
+          "line": 54,
+          "source_statement": "assert(unpack(\"l\", pack(\"l\", 0x7fffffff)) == 0x7fffffff)"
+        },
+        {
+          "name": "unpack",
+          "line": 55,
+          "source_statement": "assert(unpack(\"l\", pack(\"l\", -0x80000000)) == -0x80000000)"
+        },
+        {
+          "name": "pack",
+          "line": 55,
+          "source_statement": "assert(unpack(\"l\", pack(\"l\", -0x80000000)) == -0x80000000)"
+        },
+        {
+          "name": "string.rep",
+          "line": 60,
+          "source_statement": "  local s = string.rep(\"\\xff\", i)"
+        },
+        {
+          "name": "pack",
+          "line": 61,
+          "source_statement": "  assert(pack(\"i\" .. i, -1) == s)"
+        },
+        {
+          "name": "packsize",
+          "line": 62,
+          "source_statement": "  assert(packsize(\"i\" .. i) == #s)"
+        },
+        {
+          "name": "unpack",
+          "line": 63,
+          "source_statement": "  assert(unpack(\"i\" .. i, s) == -1)"
+        },
+        {
+          "name": "string.rep",
+          "line": 66,
+          "source_statement": "  s = \"\\xAA\" .. string.rep(\"\\0\", i - 1)"
+        },
+        {
+          "name": "pack",
+          "line": 67,
+          "source_statement": "  assert(pack(\"<I\" .. i, 0xAA) == s)"
+        },
+        {
+          "name": "unpack",
+          "line": 68,
+          "source_statement": "  assert(unpack(\"<I\" .. i, s) == 0xAA)"
+        },
+        {
+          "name": "pack",
+          "line": 69,
+          "source_statement": "  assert(pack(\">I\" .. i, 0xAA) == s:reverse())"
+        },
+        {
+          "name": "s:reverse",
+          "line": 69,
+          "source_statement": "  assert(pack(\">I\" .. i, 0xAA) == s:reverse())"
+        },
+        {
+          "name": "unpack",
+          "line": 70,
+          "source_statement": "  assert(unpack(\">I\" .. i, s:reverse()) == 0xAA)"
+        },
+        {
+          "name": "s:reverse",
+          "line": 70,
+          "source_statement": "  assert(unpack(\">I\" .. i, s:reverse()) == 0xAA)"
+        },
+        {
+          "name": "pack",
+          "line": 75,
+          "source_statement": "  local s = pack(\"<j\", lnum)"
+        },
+        {
+          "name": "unpack",
+          "line": 76,
+          "source_statement": "  assert(unpack(\"<j\", s) == lnum)"
+        },
+        {
+          "name": "unpack",
+          "line": 77,
+          "source_statement": "  assert(unpack(\"<i\" .. sizeLI + 1, s .. \"\\0\") == lnum)"
+        },
+        {
+          "name": "unpack",
+          "line": 78,
+          "source_statement": "  assert(unpack(\"<i\" .. sizeLI + 1, s .. \"\\0\") == lnum)"
+        },
+        {
+          "name": "pack",
+          "line": 81,
+          "source_statement": "    local s = pack(\"<j\", -lnum)"
+        },
+        {
+          "name": "unpack",
+          "line": 82,
+          "source_statement": "    assert(unpack(\"<j\", s) == -lnum)"
+        },
+        {
+          "name": "unpack",
+          "line": 84,
+          "source_statement": "    assert(unpack(\"<i\" .. i, s .. (\"\\xFF\"):rep(i - sizeLI)) == -lnum)"
+        },
+        {
+          "name": "):rep",
+          "line": 84,
+          "source_statement": "    assert(unpack(\"<i\" .. i, s .. (\"\\xFF\"):rep(i - sizeLI)) == -lnum)"
+        },
+        {
+          "name": "unpack",
+          "line": 85,
+          "source_statement": "    assert(unpack(\">i\" .. i, (\"\\xFF\"):rep(i - sizeLI) .. s:reverse()) == -lnum)"
+        },
+        {
+          "name": "):rep",
+          "line": 85,
+          "source_statement": "    assert(unpack(\">i\" .. i, (\"\\xFF\"):rep(i - sizeLI) .. s:reverse()) == -lnum)"
+        },
+        {
+          "name": "s:reverse",
+          "line": 85,
+          "source_statement": "    assert(unpack(\">i\" .. i, (\"\\xFF\"):rep(i - sizeLI) .. s:reverse()) == -lnum)"
+        },
+        {
+          "name": "unpack",
+          "line": 86,
+          "source_statement": "    assert(unpack(\"<I\" .. i, s .. (\"\\0\"):rep(i - sizeLI)) == -lnum)"
+        },
+        {
+          "name": "):rep",
+          "line": 86,
+          "source_statement": "    assert(unpack(\"<I\" .. i, s .. (\"\\0\"):rep(i - sizeLI)) == -lnum)"
+        },
+        {
+          "name": "checkerror",
+          "line": 89,
+          "source_statement": "    checkerror(\"does not fit\", unpack, \"<I\" .. i, (\"\\x00\"):rep(i - 1) .. \"\\1\")"
+        },
+        {
+          "name": "):rep",
+          "line": 89,
+          "source_statement": "    checkerror(\"does not fit\", unpack, \"<I\" .. i, (\"\\x00\"):rep(i - 1) .. \"\\1\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 90,
+          "source_statement": "    checkerror(\"does not fit\", unpack, \">i\" .. i, \"\\1\" .. (\"\\x00\"):rep(i - 1))"
+        },
+        {
+          "name": "):rep",
+          "line": 90,
+          "source_statement": "    checkerror(\"does not fit\", unpack, \">i\" .. i, \"\\1\" .. (\"\\x00\"):rep(i - 1))"
+        },
+        {
+          "name": "string.sub",
+          "line": 98,
+          "source_statement": "  local s = string.sub(lstr, 1, i)"
+        },
+        {
+          "name": "pack",
+          "line": 99,
+          "source_statement": "  assert(pack(\"<i\" .. i, n) == s)"
+        },
+        {
+          "name": "pack",
+          "line": 100,
+          "source_statement": "  assert(pack(\">i\" .. i, n) == s:reverse())"
+        },
+        {
+          "name": "s:reverse",
+          "line": 100,
+          "source_statement": "  assert(pack(\">i\" .. i, n) == s:reverse())"
+        },
+        {
+          "name": "unpack",
+          "line": 101,
+          "source_statement": "  assert(unpack(\">i\" .. i, s:reverse()) == n)"
+        },
+        {
+          "name": "s:reverse",
+          "line": 101,
+          "source_statement": "  assert(unpack(\">i\" .. i, s:reverse()) == n)"
+        },
+        {
+          "name": "unpack",
+          "line": 108,
+          "source_statement": "    assert(unpack(\"<i\"..i, \"\\xf0\"..(\"\\xff\"):rep(i - 1)) == -16)"
+        },
+        {
+          "name": "):rep",
+          "line": 108,
+          "source_statement": "    assert(unpack(\"<i\"..i, \"\\xf0\"..(\"\\xff\"):rep(i - 1)) == -16)"
+        },
+        {
+          "name": "unpack",
+          "line": 109,
+          "source_statement": "    assert(unpack(\">I\"..i, \"\\xf0\"..(\"\\xff\"):rep(i - 1)) == u)"
+        },
+        {
+          "name": "):rep",
+          "line": 109,
+          "source_statement": "    assert(unpack(\">I\"..i, \"\\xf0\"..(\"\\xff\"):rep(i - 1)) == u)"
+        },
+        {
+          "name": "pack",
+          "line": 116,
+          "source_statement": "  assert(pack(\">i2 <i2\", 10, 20) == \"\\0\\10\\20\\0\")"
+        },
+        {
+          "name": "unpack",
+          "line": 117,
+          "source_statement": "  local a, b = unpack(\"<i2 >i2\", \"\\10\\0\\0\\20\")"
+        },
+        {
+          "name": "pack",
+          "line": 119,
+          "source_statement": "  assert(pack(\"=i4\", 2001) == pack(\"i4\", 2001))"
+        },
+        {
+          "name": "pack",
+          "line": 119,
+          "source_statement": "  assert(pack(\"=i4\", 2001) == pack(\"i4\", 2001))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 58,
+          "source_statement": "for i = 1, NB do"
+        },
+        {
+          "line": 80,
+          "source_statement": "  for i = sizeLI + 1, NB do"
+        },
+        {
+          "line": 94,
+          "source_statement": "for i = 1, sizeLI do"
+        },
+        {
+          "line": 107,
+          "source_statement": "  for i = 1, sizeLI - 1 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "format-and-virtual-size-errors",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0003",
+      "first_line": 121,
+      "last_line": 145,
+      "span_end_line": 146,
+      "byte_offset": 3659,
+      "byte_length": 1054,
+      "span_sha256": "6f4434ca54d71addbc9b5b35a488e0b166963dfcd6448355ada5bb33eab8d2e6",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Invalid widths/options/alignment and variable-length packsize formats fail with the specified patterns. Virtual sizes near maxinteger do not allocate and overflow/too-long requests fail semantically.",
+      "dynamic_invocation": "Every checkerror invocation and the maxsize branch determined by measured native widths must be adjudicated.",
+      "execution_condition": "Selected tpack.lua section format-and-virtual-size-errors; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 122,
+          "source_statement": "print(\"testing invalid formats\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 124,
+          "source_statement": "checkerror(\"out of limits\", pack, \"i0\", 0)"
+        },
+        {
+          "name": "checkerror",
+          "line": 125,
+          "source_statement": "checkerror(\"out of limits\", pack, \"i\" .. NB + 1, 0)"
+        },
+        {
+          "name": "checkerror",
+          "line": 126,
+          "source_statement": "checkerror(\"out of limits\", pack, \"!\" .. NB + 1, 0)"
+        },
+        {
+          "name": "checkerror",
+          "line": 127,
+          "source_statement": "checkerror(\"%(17%) out of limits %[1,16%]\", pack, \"Xi\" .. NB + 1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 128,
+          "source_statement": "checkerror(\"invalid format option 'r'\", pack, \"i3r\", 0)"
+        },
+        {
+          "name": "checkerror",
+          "line": 129,
+          "source_statement": "checkerror(\"16%-byte integer\", unpack, \"i16\", string.rep('\\3', 16))"
+        },
+        {
+          "name": "string.rep",
+          "line": 129,
+          "source_statement": "checkerror(\"16%-byte integer\", unpack, \"i16\", string.rep('\\3', 16))"
+        },
+        {
+          "name": "checkerror",
+          "line": 130,
+          "source_statement": "checkerror(\"not power of 2\", pack, \"!4i3\", 0);"
+        },
+        {
+          "name": "checkerror",
+          "line": 131,
+          "source_statement": "checkerror(\"missing size\", pack, \"c\", \"\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 132,
+          "source_statement": "checkerror(\"variable%-length format\", packsize, \"s\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 133,
+          "source_statement": "checkerror(\"variable%-length format\", packsize, \"z\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 136,
+          "source_statement": "checkerror(\"invalid format\", packsize, \"c1\" .. string.rep(\"0\", 40))"
+        },
+        {
+          "name": "string.rep",
+          "line": 136,
+          "source_statement": "checkerror(\"invalid format\", packsize, \"c1\" .. string.rep(\"0\", 40))"
+        },
+        {
+          "name": "packsize",
+          "line": 139,
+          "source_statement": "  local maxsize = (packsize(\"j\") <= packsize(\"T\")) and"
+        },
+        {
+          "name": "packsize",
+          "line": 139,
+          "source_statement": "  local maxsize = (packsize(\"j\") <= packsize(\"T\")) and"
+        },
+        {
+          "name": "packsize",
+          "line": 140,
+          "source_statement": "                      math.maxinteger or (1 << (packsize(\"T\") * 8))"
+        },
+        {
+          "name": "packsize",
+          "line": 141,
+          "source_statement": "  assert (packsize(string.format(\"c%d\", maxsize - 9)) == maxsize - 9)"
+        },
+        {
+          "name": "string.format",
+          "line": 141,
+          "source_statement": "  assert (packsize(string.format(\"c%d\", maxsize - 9)) == maxsize - 9)"
+        },
+        {
+          "name": "checkerror",
+          "line": 142,
+          "source_statement": "  checkerror(\"too large\", packsize, string.format(\"c%dc10\", maxsize - 9))"
+        },
+        {
+          "name": "string.format",
+          "line": 142,
+          "source_statement": "  checkerror(\"too large\", packsize, string.format(\"c%dc10\", maxsize - 9))"
+        },
+        {
+          "name": "checkerror",
+          "line": 143,
+          "source_statement": "  checkerror(\"too long\", pack, string.format(\"xxxxxxxxxx c%d\", maxsize - 9))"
+        },
+        {
+          "name": "string.format",
+          "line": 143,
+          "source_statement": "  checkerror(\"too long\", pack, string.format(\"xxxxxxxxxx c%d\", maxsize - 9))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 122,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"testing invalid formats\")"
+        }
+      ]
+    },
+    {
+      "id": "packing-range-and-integer-limits",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0004",
+      "first_line": 146,
+      "last_line": 174,
+      "span_end_line": 175,
+      "byte_offset": 4713,
+      "byte_length": 941,
+      "span_sha256": "054b31e59bce2328df8a0a4ac4332b8c62942bd4aae425f0ee4eaa9c11f5c64d",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Every sub-native signed and unsigned width rejects out-of-range inputs and round-trips its extrema. Native Lua min/max integers and all-one unsigned bits survive packing; native float byte order follows the measured endian branch.",
+      "dynamic_invocation": "Execute the actual source calls checkerror@152, checkerror@153, checkerror@154, checkerror@156, checkerror@157, checkerror@158, unpack@160, pack@160, unpack@161, pack@161, unpack@162, pack@162, unpack@166, pack@166, unpack@167, pack@167, unpack@168, pack@168, pack@171, pack@173 in section packing-range-and-integer-limits. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected tpack.lua section packing-range-and-integer-limits; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "checkerror",
+          "line": 152,
+          "source_statement": "  checkerror(\"overflow\", pack, \"<I\" .. i, -1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 153,
+          "source_statement": "  checkerror(\"overflow\", pack, \"<I\" .. i, min)"
+        },
+        {
+          "name": "checkerror",
+          "line": 154,
+          "source_statement": "  checkerror(\"overflow\", pack, \">I\" .. i, umax + 1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 156,
+          "source_statement": "  checkerror(\"overflow\", pack, \">i\" .. i, umax)"
+        },
+        {
+          "name": "checkerror",
+          "line": 157,
+          "source_statement": "  checkerror(\"overflow\", pack, \">i\" .. i, max + 1)"
+        },
+        {
+          "name": "checkerror",
+          "line": 158,
+          "source_statement": "  checkerror(\"overflow\", pack, \"<i\" .. i, min - 1)"
+        },
+        {
+          "name": "unpack",
+          "line": 160,
+          "source_statement": "  assert(unpack(\">i\" .. i, pack(\">i\" .. i, max)) == max)"
+        },
+        {
+          "name": "pack",
+          "line": 160,
+          "source_statement": "  assert(unpack(\">i\" .. i, pack(\">i\" .. i, max)) == max)"
+        },
+        {
+          "name": "unpack",
+          "line": 161,
+          "source_statement": "  assert(unpack(\"<i\" .. i, pack(\"<i\" .. i, min)) == min)"
+        },
+        {
+          "name": "pack",
+          "line": 161,
+          "source_statement": "  assert(unpack(\"<i\" .. i, pack(\"<i\" .. i, min)) == min)"
+        },
+        {
+          "name": "unpack",
+          "line": 162,
+          "source_statement": "  assert(unpack(\">I\" .. i, pack(\">I\" .. i, umax)) == umax)"
+        },
+        {
+          "name": "pack",
+          "line": 162,
+          "source_statement": "  assert(unpack(\">I\" .. i, pack(\">I\" .. i, umax)) == umax)"
+        },
+        {
+          "name": "unpack",
+          "line": 166,
+          "source_statement": "assert(unpack(\">j\", pack(\">j\", math.maxinteger)) == math.maxinteger)"
+        },
+        {
+          "name": "pack",
+          "line": 166,
+          "source_statement": "assert(unpack(\">j\", pack(\">j\", math.maxinteger)) == math.maxinteger)"
+        },
+        {
+          "name": "unpack",
+          "line": 167,
+          "source_statement": "assert(unpack(\"<j\", pack(\"<j\", math.mininteger)) == math.mininteger)"
+        },
+        {
+          "name": "pack",
+          "line": 167,
+          "source_statement": "assert(unpack(\"<j\", pack(\"<j\", math.mininteger)) == math.mininteger)"
+        },
+        {
+          "name": "unpack",
+          "line": 168,
+          "source_statement": "assert(unpack(\"<J\", pack(\"<j\", -1)) == -1)   -- maximum unsigned integer"
+        },
+        {
+          "name": "pack",
+          "line": 168,
+          "source_statement": "assert(unpack(\"<J\", pack(\"<j\", -1)) == -1)   -- maximum unsigned integer"
+        },
+        {
+          "name": "pack",
+          "line": 171,
+          "source_statement": "  assert(pack(\"f\", 24) == pack(\"<f\", 24))"
+        },
+        {
+          "name": "pack",
+          "line": 171,
+          "source_statement": "  assert(pack(\"f\", 24) == pack(\"<f\", 24))"
+        },
+        {
+          "name": "pack",
+          "line": 173,
+          "source_statement": "  assert(pack(\"f\", 24) == pack(\">f\", 24))"
+        },
+        {
+          "name": "pack",
+          "line": 173,
+          "source_statement": "  assert(pack(\"f\", 24) == pack(\">f\", 24))"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 170,
+          "source_statement": "if little then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 148,
+          "source_statement": "for i = 1, sizeLI - 1 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "floating-point-endian-roundtrips",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0005",
+      "first_line": 175,
+      "last_line": 193,
+      "span_end_line": 194,
+      "byte_offset": 5654,
+      "byte_length": 680,
+      "span_sha256": "fef95352bd75dd62bef486520fb233d6e621c2c1bb300f04e3421ec30ee0dcbd",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Native numbers, round representable non-native float/double values and infinities survive both endian encodings; opposite-endian byte sequences reverse exactly.",
+      "dynamic_invocation": "Execute the actual source calls print@176, unpack@179, pack@179, unpack@180, pack@180, unpack@181, pack@181, pack@182, ):reverse@182, pack@183, ):reverse@183, unpack@188, pack@188, unpack@189, pack@189, unpack@190, pack@190, unpack@191, pack@191 in section floating-point-endian-roundtrips. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected tpack.lua section floating-point-endian-roundtrips; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 176,
+          "source_statement": "print \"testing pack/unpack of floating-point numbers\" "
+        },
+        {
+          "name": "unpack",
+          "line": 179,
+          "source_statement": "    assert(unpack(\"n\", pack(\"n\", n)) == n)"
+        },
+        {
+          "name": "pack",
+          "line": 179,
+          "source_statement": "    assert(unpack(\"n\", pack(\"n\", n)) == n)"
+        },
+        {
+          "name": "unpack",
+          "line": 180,
+          "source_statement": "    assert(unpack(\"<n\", pack(\"<n\", n)) == n)"
+        },
+        {
+          "name": "pack",
+          "line": 180,
+          "source_statement": "    assert(unpack(\"<n\", pack(\"<n\", n)) == n)"
+        },
+        {
+          "name": "unpack",
+          "line": 181,
+          "source_statement": "    assert(unpack(\">n\", pack(\">n\", n)) == n)"
+        },
+        {
+          "name": "pack",
+          "line": 181,
+          "source_statement": "    assert(unpack(\">n\", pack(\">n\", n)) == n)"
+        },
+        {
+          "name": "pack",
+          "line": 182,
+          "source_statement": "    assert(pack(\"<f\", n) == pack(\">f\", n):reverse())"
+        },
+        {
+          "name": "pack",
+          "line": 182,
+          "source_statement": "    assert(pack(\"<f\", n) == pack(\">f\", n):reverse())"
+        },
+        {
+          "name": "):reverse",
+          "line": 182,
+          "source_statement": "    assert(pack(\"<f\", n) == pack(\">f\", n):reverse())"
+        },
+        {
+          "name": "pack",
+          "line": 183,
+          "source_statement": "    assert(pack(\">d\", n) == pack(\"<d\", n):reverse())"
+        },
+        {
+          "name": "pack",
+          "line": 183,
+          "source_statement": "    assert(pack(\">d\", n) == pack(\"<d\", n):reverse())"
+        },
+        {
+          "name": "):reverse",
+          "line": 183,
+          "source_statement": "    assert(pack(\">d\", n) == pack(\"<d\", n):reverse())"
+        },
+        {
+          "name": "unpack",
+          "line": 188,
+          "source_statement": "  assert(unpack(\"<f\", pack(\"<f\", n)) == n)"
+        },
+        {
+          "name": "pack",
+          "line": 188,
+          "source_statement": "  assert(unpack(\"<f\", pack(\"<f\", n)) == n)"
+        },
+        {
+          "name": "unpack",
+          "line": 189,
+          "source_statement": "  assert(unpack(\">f\", pack(\">f\", n)) == n)"
+        },
+        {
+          "name": "pack",
+          "line": 189,
+          "source_statement": "  assert(unpack(\">f\", pack(\">f\", n)) == n)"
+        },
+        {
+          "name": "unpack",
+          "line": 190,
+          "source_statement": "  assert(unpack(\"<d\", pack(\"<d\", n)) == n)"
+        },
+        {
+          "name": "pack",
+          "line": 190,
+          "source_statement": "  assert(unpack(\"<d\", pack(\"<d\", n)) == n)"
+        },
+        {
+          "name": "unpack",
+          "line": 191,
+          "source_statement": "  assert(unpack(\">d\", pack(\">d\", n)) == n)"
+        },
+        {
+          "name": "pack",
+          "line": 191,
+          "source_statement": "  assert(unpack(\">d\", pack(\">d\", n)) == n)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 178,
+          "source_statement": "for _, n in ipairs{0, -1.1, 1.9, 1/0, -1/0, 1e20, -1e20, 0.1, 2000.7} do"
+        },
+        {
+          "line": 187,
+          "source_statement": "for _, n in ipairs{0, -1.5, 1/0, -1/0, 1e10, -1e9, 0.5, 2000.25} do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 176,
+          "kind": "source-phase-output",
+          "source_statement": "print \"testing pack/unpack of floating-point numbers\" "
+        }
+      ]
+    },
+    {
+      "id": "terminated-and-sized-strings",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0006",
+      "first_line": 194,
+      "last_line": 225,
+      "span_end_line": 226,
+      "byte_offset": 6334,
+      "byte_length": 818,
+      "span_sha256": "e78e440ca36c78a5279aba191a86b6b203d5bfc22a3c5c333c713e4191195a36",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Zero-terminated and counted byte strings preserve content, lengths, following fields and byte positions. Embedded zeros, too-small length fields, unfinished strings and short input raise the expected errors.",
+      "dynamic_invocation": "Execute the actual source calls print@194, string.rep@196, pack@197, unpack@198, pack@200, unpack@201, checkerror@203, checkerror@205, checkerror@207, pack@210, unpack@211, pack@216, checkerror@217, x:sub@217, checkerror@218, checkerror@219, pack@223, packsize@224, unpack@225 in section terminated-and-sized-strings. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected tpack.lua section terminated-and-sized-strings; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 194,
+          "source_statement": "print \"testing pack/unpack of strings\""
+        },
+        {
+          "name": "string.rep",
+          "line": 196,
+          "source_statement": "  local s = string.rep(\"abc\", 1000)"
+        },
+        {
+          "name": "pack",
+          "line": 197,
+          "source_statement": "  assert(pack(\"zB\", s, 247) == s .. \"\\0\\xF7\")"
+        },
+        {
+          "name": "unpack",
+          "line": 198,
+          "source_statement": "  local s1, b = unpack(\"zB\", s .. \"\\0\\xF9\")"
+        },
+        {
+          "name": "pack",
+          "line": 200,
+          "source_statement": "  s1 = pack(\"s\", s)"
+        },
+        {
+          "name": "unpack",
+          "line": 201,
+          "source_statement": "  assert(unpack(\"s\", s1) == s)"
+        },
+        {
+          "name": "checkerror",
+          "line": 203,
+          "source_statement": "  checkerror(\"does not fit\", pack, \"s1\", s)"
+        },
+        {
+          "name": "checkerror",
+          "line": 205,
+          "source_statement": "  checkerror(\"contains zeros\", pack, \"z\", \"alo\\0\");"
+        },
+        {
+          "name": "checkerror",
+          "line": 207,
+          "source_statement": "  checkerror(\"unfinished string\", unpack, \"zc10000000\", \"alo\")"
+        },
+        {
+          "name": "pack",
+          "line": 210,
+          "source_statement": "    local s1 = pack(\"s\" .. i, s)"
+        },
+        {
+          "name": "unpack",
+          "line": 211,
+          "source_statement": "    assert(unpack(\"s\" .. i, s1) == s and #s1 == #s + i)"
+        },
+        {
+          "name": "pack",
+          "line": 216,
+          "source_statement": "  local x = pack(\"s\", \"alo\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 217,
+          "source_statement": "  checkerror(\"too short\", unpack, \"s\", x:sub(1, -2))"
+        },
+        {
+          "name": "x:sub",
+          "line": 217,
+          "source_statement": "  checkerror(\"too short\", unpack, \"s\", x:sub(1, -2))"
+        },
+        {
+          "name": "checkerror",
+          "line": 218,
+          "source_statement": "  checkerror(\"too short\", unpack, \"c5\", \"abcd\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 219,
+          "source_statement": "  checkerror(\"out of limits\", pack, \"s100\", \"alo\")"
+        },
+        {
+          "name": "pack",
+          "line": 223,
+          "source_statement": "  assert(pack(\"c0\", \"\") == \"\")"
+        },
+        {
+          "name": "packsize",
+          "line": 224,
+          "source_statement": "  assert(packsize(\"c0\") == 0)"
+        },
+        {
+          "name": "unpack",
+          "line": 225,
+          "source_statement": "  assert(unpack(\"c0\", \"\") == \"\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 209,
+          "source_statement": "  for i = 2, NB do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 194,
+          "kind": "source-phase-output",
+          "source_statement": "print \"testing pack/unpack of strings\""
+        }
+      ]
+    },
+    {
+      "id": "fixed-strings-and-padding",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0007",
+      "first_line": 226,
+      "last_line": 238,
+      "span_end_line": 239,
+      "byte_offset": 7152,
+      "byte_length": 554,
+      "span_sha256": "3f07f6f9746a1b8bfd00e62bdc6062fadd30794000f11442af814d21174601bc",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Fixed strings include zero-length fields, exact-fit copies and zero padding; oversized inputs fail. Unpack returns the correct next index after zero-terminated and fixed fields.",
+      "dynamic_invocation": "Execute the actual source calls pack@226, packsize@227, pack@228, pack@229, pack@230, pack@231, pack@232, string.rep@232, pack@233, string.rep@234, unpack@235, checkerror@237 in section fixed-strings-and-padding. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected tpack.lua section fixed-strings-and-padding; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "pack",
+          "line": 226,
+          "source_statement": "  assert(pack(\"<! c3\", \"abc\") == \"abc\")"
+        },
+        {
+          "name": "packsize",
+          "line": 227,
+          "source_statement": "  assert(packsize(\"<! c3\") == 3)"
+        },
+        {
+          "name": "pack",
+          "line": 228,
+          "source_statement": "  assert(pack(\">!4 c6\", \"abcdef\") == \"abcdef\")"
+        },
+        {
+          "name": "pack",
+          "line": 229,
+          "source_statement": "  assert(pack(\"c3\", \"123\") == \"123\")"
+        },
+        {
+          "name": "pack",
+          "line": 230,
+          "source_statement": "  assert(pack(\"c0\", \"\") == \"\")"
+        },
+        {
+          "name": "pack",
+          "line": 231,
+          "source_statement": "  assert(pack(\"c8\", \"123456\") == \"123456\\0\\0\")"
+        },
+        {
+          "name": "pack",
+          "line": 232,
+          "source_statement": "  assert(pack(\"c88 c1\", \"\", \"X\") == string.rep(\"\\0\", 88) .. \"X\")"
+        },
+        {
+          "name": "string.rep",
+          "line": 232,
+          "source_statement": "  assert(pack(\"c88 c1\", \"\", \"X\") == string.rep(\"\\0\", 88) .. \"X\")"
+        },
+        {
+          "name": "pack",
+          "line": 233,
+          "source_statement": "  assert(pack(\"c188 c2\", \"ab\", \"X\\1\") =="
+        },
+        {
+          "name": "string.rep",
+          "line": 234,
+          "source_statement": "         \"ab\" .. string.rep(\"\\0\", 188 - 2) .. \"X\\1\")"
+        },
+        {
+          "name": "unpack",
+          "line": 235,
+          "source_statement": "  local a, b, c = unpack(\"!4 z c3\", \"abcdefghi\\0xyz\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 237,
+          "source_statement": "  checkerror(\"longer than\", pack, \"c3\", \"1234\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "mixed-scalar-sequence",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0008",
+      "first_line": 239,
+      "last_line": 248,
+      "span_end_line": 249,
+      "byte_offset": 7706,
+      "byte_length": 321,
+      "span_sha256": "e097517564b3f0547931ba33954ce745970cac23ce0e8bbdc97e003dd60781b7",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "One mixed integer/float/number record has the size computed by packsize and unpacks the original eight values in order.",
+      "dynamic_invocation": "Execute the actual source calls pack@243, packsize@244, unpack@245 in section mixed-scalar-sequence. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected tpack.lua section mixed-scalar-sequence; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "pack",
+          "line": 243,
+          "source_statement": "  local x = pack(\"<b h b f d f n i\", 1, 2, 3, 4, 5, 6, 7, 8)"
+        },
+        {
+          "name": "packsize",
+          "line": 244,
+          "source_statement": "  assert(#x == packsize(\"<b h b f d f n i\"))"
+        },
+        {
+          "name": "unpack",
+          "line": 245,
+          "source_statement": "  local a, b, c, d, e, f, g, h = unpack(\"<b h b f d f n i\", x)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "alignment-and-X-validation",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0009",
+      "first_line": 249,
+      "last_line": 298,
+      "span_end_line": 299,
+      "byte_offset": 8027,
+      "byte_length": 2046,
+      "span_sha256": "94f46821912a72c2cf2d1200e6ea025f80d23e5dc04d416e6ef44c4f8c9f6afd",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Explicit maximum alignment pads only the requested fields, including X lookahead and alignment-only records; actual bytes, sizes and unpack positions agree. Missing or invalid X followers raise expected errors.",
+      "dynamic_invocation": "Execute the actual source calls print@250, pack@252, pack@253, packsize@254, unpack@259, pack@262, unpack@265, pack@269, packsize@270, unpack@272, packsize@276, unpack@277, packsize@278, unpack@279, packsize@280, unpack@281, packsize@282, unpack@283, packsize@284, unpack@285, checkerror@287, checkerror@288, checkerror@289, checkerror@290, pack@294, unpack@296 in section alignment-and-X-validation. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected tpack.lua section alignment-and-X-validation; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 250,
+          "source_statement": "print \"testing alignment\""
+        },
+        {
+          "name": "pack",
+          "line": 252,
+          "source_statement": "  assert(pack(\" < i1 i2 \", 2, 3) == \"\\2\\3\\0\")   -- no alignment by default"
+        },
+        {
+          "name": "pack",
+          "line": 253,
+          "source_statement": "  local x = pack(\">!8 b Xh i4 i8 c1 Xi8\", -12, 100, 200, \"\\xEC\")"
+        },
+        {
+          "name": "packsize",
+          "line": 254,
+          "source_statement": "  assert(#x == packsize(\">!8 b Xh i4 i8 c1 Xi8\"))"
+        },
+        {
+          "name": "unpack",
+          "line": 259,
+          "source_statement": "  local a, b, c, d, pos = unpack(\">!8 c1 Xh i4 i8 b Xi8 XI XH\", x)"
+        },
+        {
+          "name": "pack",
+          "line": 262,
+          "source_statement": "  x = pack(\">!4 c3 c4 c2 z i4 c5 c2 Xi4\","
+        },
+        {
+          "name": "unpack",
+          "line": 265,
+          "source_statement": "  local a, b, c, d, e, f, g, pos = unpack(\">!4 c3 c4 c2 z i4 c5 c2 Xh Xi4\", x)"
+        },
+        {
+          "name": "pack",
+          "line": 269,
+          "source_statement": "  x = pack(\" b b Xd b Xb x\", 1, 2, 3)"
+        },
+        {
+          "name": "packsize",
+          "line": 270,
+          "source_statement": "  assert(packsize(\" b b Xd b Xb x\") == 4)"
+        },
+        {
+          "name": "unpack",
+          "line": 272,
+          "source_statement": "  a, b, c, pos = unpack(\"bbXdb\", x)"
+        },
+        {
+          "name": "packsize",
+          "line": 276,
+          "source_statement": "  assert(packsize(\"!8 xXi8\") == 8)"
+        },
+        {
+          "name": "unpack",
+          "line": 277,
+          "source_statement": "  local pos = unpack(\"!8 xXi8\", \"0123456701234567\"); assert(pos == 9)"
+        },
+        {
+          "name": "packsize",
+          "line": 278,
+          "source_statement": "  assert(packsize(\"!8 xXi2\") == 2)"
+        },
+        {
+          "name": "unpack",
+          "line": 279,
+          "source_statement": "  local pos = unpack(\"!8 xXi2\", \"0123456701234567\"); assert(pos == 3)"
+        },
+        {
+          "name": "packsize",
+          "line": 280,
+          "source_statement": "  assert(packsize(\"!2 xXi2\") == 2)"
+        },
+        {
+          "name": "unpack",
+          "line": 281,
+          "source_statement": "  local pos = unpack(\"!2 xXi2\", \"0123456701234567\"); assert(pos == 3)"
+        },
+        {
+          "name": "packsize",
+          "line": 282,
+          "source_statement": "  assert(packsize(\"!2 xXi8\") == 2)"
+        },
+        {
+          "name": "unpack",
+          "line": 283,
+          "source_statement": "  local pos = unpack(\"!2 xXi8\", \"0123456701234567\"); assert(pos == 3)"
+        },
+        {
+          "name": "packsize",
+          "line": 284,
+          "source_statement": "  assert(packsize(\"!16 xXi16\") == 16)"
+        },
+        {
+          "name": "unpack",
+          "line": 285,
+          "source_statement": "  local pos = unpack(\"!16 xXi16\", \"0123456701234567\"); assert(pos == 17)"
+        },
+        {
+          "name": "checkerror",
+          "line": 287,
+          "source_statement": "  checkerror(\"invalid next option\", pack, \"X\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 288,
+          "source_statement": "  checkerror(\"invalid next option\", unpack, \"XXi\", \"\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 289,
+          "source_statement": "  checkerror(\"invalid next option\", unpack, \"X i\", \"\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 290,
+          "source_statement": "  checkerror(\"invalid next option\", pack, \"Xc1\")"
+        },
+        {
+          "name": "pack",
+          "line": 294,
+          "source_statement": "  local x = pack(\"i4i4i4i4\", 1, 2, 3, 4)"
+        },
+        {
+          "name": "unpack",
+          "line": 296,
+          "source_statement": "    local i, p = unpack(\"i4\", x, pos)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 295,
+          "source_statement": "  for pos = 1, 16, 4 do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 250,
+          "kind": "source-phase-output",
+          "source_statement": "print \"testing alignment\""
+        }
+      ]
+    },
+    {
+      "id": "initial-position-and-completion",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0010",
+      "first_line": 299,
+      "last_line": 323,
+      "span_end_line": 324,
+      "byte_offset": 10073,
+      "byte_length": 568,
+      "span_sha256": "251b93bfebf6e11d6a52e85bdf364953d705bd94794e9bc3ca240aee14eddc47",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Positive, aligned, negative and terminal empty-field positions unpack correctly; positions beyond the string fail. Terminal OK occurs after all width/alignment/position loops.",
+      "dynamic_invocation": "Execute the actual source calls unpack@302, unpack@307, unpack@309, unpack@311, unpack@316, checkerror@318, print@322 in section initial-position-and-completion. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected tpack.lua section initial-position-and-completion; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "unpack",
+          "line": 302,
+          "source_statement": "    local i, p = unpack(\"!4 i4\", x, pos + 1)"
+        },
+        {
+          "name": "unpack",
+          "line": 307,
+          "source_statement": "  local i, p = unpack(\"!4 i4\", x, -4)"
+        },
+        {
+          "name": "unpack",
+          "line": 309,
+          "source_statement": "  local i, p = unpack(\"!4 i4\", x, -7)"
+        },
+        {
+          "name": "unpack",
+          "line": 311,
+          "source_statement": "  local i, p = unpack(\"!4 i4\", x, -#x)"
+        },
+        {
+          "name": "unpack",
+          "line": 316,
+          "source_statement": "    assert(unpack(\"c0\", x, i) == \"\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 318,
+          "source_statement": "  checkerror(\"out of string\", unpack, \"c0\", x, #x + 2)"
+        },
+        {
+          "name": "print",
+          "line": 322,
+          "source_statement": "print \"OK\""
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 301,
+          "source_statement": "  for pos = 0, 12 do    -- will always round position to power of 2"
+        },
+        {
+          "line": 315,
+          "source_statement": "  for i = 1, #x + 1 do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 322,
+          "kind": "source-phase-output",
+          "source_statement": "print \"OK\""
+        }
+      ]
+    }
+  ],
+  "supplemental_obligations": [
+    {
+      "id": "measured-native-endian-guard",
+      "runtime_id": "LUA-TPACK-REVIEWED-BLOCK-0011",
+      "first_line": 170,
+      "last_line": 174,
+      "span_end_line": 175,
+      "byte_offset": 5546,
+      "byte_length": 108,
+      "span_sha256": "34907e3ee5bf95eddfacb8bb01ae5d6cdc2a56befd068ce88b4e165bb001663c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Actual pack byte order selects the native-float little/big-endian comparison. Source171 executes only on little-endian,173 only on big-endian; the other assertion is an explicit measured-inactive lexical reference.",
+      "measured_condition": {
+        "fact": "byte_order",
+        "operator": "eq",
+        "value": "little"
+      },
+      "dynamic_invocation": "Run the unchanged source with a hash-bound source-profile-witness.lua measurement in this same C/Ada process. Compare actual facts with this condition and independently adjudicate which original body is active; do not record the inactive body as executed.",
+      "execution_condition": "The guard measurement applies in every selected configuration; its body applicability is determined by actual per-context facts.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ]
+    }
+  ],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": []
+}

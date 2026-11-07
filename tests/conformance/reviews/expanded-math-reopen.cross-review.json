@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "kind": "independent-module-rng-source-review",
+  "date": "2026-11-07",
+  "author": "Codex /root/expanded_source_audit",
+  "reviewer": "Codex /root",
+  "decision": "accepted-source-and-local-focused-regressions",
+  "bindings": [
+    {
+      "path": "src/lua-engine-mathematics.ads",
+      "sha256": "0248a1f36ba55dc16b3ec08f9ec312d5f047861d036e4d1d385ac56c1703a564"
+    },
+    {
+      "path": "src/lua-engine-mathematics.adb",
+      "sha256": "154b3adc79213eae636a15c2400d1372fba38f7ef3aa40df4ac6ce0116c76a39"
+    },
+    {
+      "path": "src/lua-engine-library_openers.adb",
+      "sha256": "d2b906f55ffad70f897eeb55fc2246d02970f6cb46177863438b7049fdaddcf7"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "sha256": "886dc5d4d96f875d9931c443b3a239ccd0ac85fa0a922e53c2151c96c88c82a8"
+    },
+    {
+      "path": "tests/c/math_reopen_contract.c",
+      "sha256": "a2f702157d5a5b755f93bd594f929602ea8d3cc9a0612bddd11ee740c5085119"
+    },
+    {
+      "path": "tests/src/lua-math_reopen_tests.adb",
+      "sha256": "d268c079f5c31d9d093e5447a2bb77cd0c25208bca14f124cbeaf985faf59d7d"
+    },
+    {
+      "path": "tests/src/lua-math_reopen_tests.ads",
+      "sha256": "139702d308924fa7fa854edd507afcc25efd311c2537975607e73f0ec68930fe"
+    }
+  ],
+  "reviewed_invariants": [
+    "One real allocator-owned userdata stores four modular RNG words; its alignment and byte extent are checked before payload views. There is no separately allocated hidden RNG owner.",
+    "The module random and randomseed closures share the same actual userdata capture. A later opener creates another payload and cannot reseed the old closure pair.",
+    "New_Generator pins its payload before capture/closure allocations. The activation retains its closure and generator during RNG operations; ordinary tracing releases the userdata.",
+    "Both 32-bit arithmetic and native word paths read and write the selected captured state while retaining the existing transitions, warmup, range rejection and budget charging.",
+    "The nil-generator fallback serves existing private component tests; production module exports receive their owned captured generator.",
+    "Five separate C/AUnit cases cover old-stream preservation, independent advancement, retained capture roots, real userdata identity and sustained allocator refusal followed by recovery and balanced release."
+  ],
+  "observations": [
+    {
+      "artifact": "reports/expanded-t-conformance/runtime-instrumented-tests-6.log",
+      "result": "all-1366-passed-including-five-math-reopen-cases"
+    },
+    {
+      "artifact": "reports/expanded-t-conformance/native-foreign-default.log",
+      "result": "all-34-public-cases-passed-including-five-math-reopen-cases"
+    },
+    {
+      "artifact": "reports/expanded-t-conformance/native-foreign-upstream-test.log",
+      "result": "all-34-public-cases-passed-including-five-math-reopen-cases"
+    }
+  ],
+  "limitations": [
+    "Review covers the module RNG changes authored by the named author, not other changes sharing Machine or Library_Openers.",
+    "Local dirty Windows observations are not final clean-revision or cross-platform acceptance."
+  ],
+  "runtime_acceptance": false,
+  "full_m3_acceptance": false
+}

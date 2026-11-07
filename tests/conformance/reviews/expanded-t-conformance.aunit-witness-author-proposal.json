@@ -1,0 +1,1979 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-aunit-context-replay-author-proposal",
+  "scope": "expanded-t-conformance",
+  "author": "Codex /root/expanded_source_audit",
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "expected_stderr": "Lua warning: error in __gc ([string \"file-abort-test\"]:1: ordinary failure)\n",
+  "bindings": [
+    {
+      "path": "tests/src/lua-foreign_continuation_tests.adb",
+      "sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d"
+    },
+    {
+      "path": "tests/c/foreign_continuation_contract.c",
+      "sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c"
+    },
+    {
+      "path": "tests/src/lua-foreign_hook_tests.adb",
+      "sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce"
+    },
+    {
+      "path": "tests/c/foreign_hook_contract.c",
+      "sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b"
+    },
+    {
+      "path": "tests/src/lua-math_reopen_tests.adb",
+      "sha256": "d268c079f5c31d9d093e5447a2bb77cd0c25208bca14f124cbeaf985faf59d7d"
+    },
+    {
+      "path": "tests/c/math_reopen_contract.c",
+      "sha256": "a2f702157d5a5b755f93bd594f929602ea8d3cc9a0612bddd11ee740c5085119"
+    },
+    {
+      "path": "tests/src/lua-library_opener_tests.adb",
+      "sha256": "2c6719b2b44561737dc0e691949ce05917d6a345ab0db1d0459f2c2f5a256890"
+    },
+    {
+      "path": "tests/c/library_opener_contract.c",
+      "sha256": "295a74a92127ea99f9fad99f307d70e45d8150722e0fbcc4c105ddc178eca426"
+    },
+    {
+      "path": "c_api/tests/foreign_api_contract.c",
+      "sha256": "aac33164afc2f48007b9b919eece945b47606cc0bee4019dcc59dea42e457431"
+    },
+    {
+      "path": "c_api/tests/consumer_allocator.h",
+      "sha256": "c888b195716ea9ea6023b01d06e9b21eb82035f6ee5beca1cf2bb7095749268c"
+    },
+    {
+      "path": "tests/c/conformance_api.c",
+      "sha256": "50e583644a8bd4345dd1ad6f237ee3ad8a7be40488ee1c2573c95ead820eade5"
+    },
+    {
+      "path": "tests/c/conformance_api.h",
+      "sha256": "c2069b39b0114a22c24ef1679932951bf535f54fe0723e5ea7fc9157f6f2e683"
+    },
+    {
+      "path": "tests/c/conformance_adapter.c",
+      "sha256": "f7ee6817ba2acbb3fcbf53192dd1e15781becb85e838755ad3a86bac9de92842"
+    },
+    {
+      "path": "references/lua/testes/coroutine.lua",
+      "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.adb",
+      "sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae"
+    },
+    {
+      "path": "tests/src/lua-condition_root_tests.ads",
+      "sha256": "e6fded8c7879538fd53fb4a92896d32158c85d2f783fb35a6e1a0466ffbb1c62"
+    },
+    {
+      "path": "references/lua/testes/closure.lua",
+      "sha256": "d03b641a7a7c4cb395762321200532f786e1554395e8499838e702b56d21880a"
+    },
+    {
+      "path": "tests/lua/condition_while_root.lua",
+      "sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9"
+    },
+    {
+      "path": "tests/lua/condition_if_root.lua",
+      "sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476"
+    },
+    {
+      "path": "tests/lua/condition_repeat_value_root.lua",
+      "sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228"
+    },
+    {
+      "path": "tests/lua/condition_repeat_root.lua",
+      "sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c"
+    },
+    {
+      "path": "tests/lua/condition_short_circuit_root.lua",
+      "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.adb",
+      "sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.ads",
+      "sha256": "49449173d1f133c1cdd3b86220afa307663d16cfb54766b36b7ab75e8e3b767d"
+    },
+    {
+      "path": "tests/lua/collector_scalar_weak_progress.lua",
+      "sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90"
+    },
+    {
+      "path": "c_api/tests/c_api_consumer.c",
+      "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
+    },
+    {
+      "path": "c_api/tests/io_contract.h",
+      "sha256": "9553a625db792889399df3aa246594018aed850a90404659fe189c0835c47f86"
+    },
+    {
+      "path": "c_api/tests/gc_contract.h",
+      "sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6"
+    },
+    {
+      "path": "tests/src/lua-collector_tests.adb",
+      "sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter_tests.adb",
+      "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+    },
+    {
+      "path": "tests/src/lua-physical_stack_tests.adb",
+      "sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd"
+    },
+    {
+      "path": "tests/src/lua-gc_control_tests.adb",
+      "sha256": "9e5a1dd3d16abe4e58d5fde4cfcd1f54d8f284458ca14b6d3a68492b63e4e1c8"
+    },
+    {
+      "path": "tests/src/lua-finalizer_runtime_tests.adb",
+      "sha256": "fa5110c03d1fe5d2d6fc21ddc40e08ac654c2c8b75f807c050e91ebff7ae9ff8"
+    },
+    {
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json",
+      "sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e"
+    },
+    {
+      "path": "tests/conformance/reviews/gc-parameter-api.mapping-proposal.json",
+      "sha256": "af5d3cf818dd164d073cdcf74dd89c03ef1f8390e73be34e1bb0021233fa02c4"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "8071c9872cc2244d59cc8de256b530262820e453cd802c5edbf6cee7db16c9e5"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "ae2e8b732e37f09edd0477c862d99950f3c00293aeff39405958dea804fb0ec2"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8"
+    },
+    {
+      "path": "scripts/check-aunit-evidence.ps1",
+      "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
+    }
+  ],
+  "entries": [
+    {
+      "case": "tests/src/lua-collector_tests.adb#Larger_Debt_Payments",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: larger byte payments finish sooner",
+      "required_stdout_line": "OK collector: larger byte payments finish sooner",
+      "registration_procedure": "Larger_Case",
+      "parameter_slots": [
+        3,
+        4
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Minor_Multiplier_Debt",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: minormul changes minor byte debt",
+      "required_stdout_line": "OK collector: minormul changes minor byte debt",
+      "registration_procedure": "Minor_Debt_Case",
+      "parameter_slots": [
+        0
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Parameter_Rounding",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: pinned parameter rounding",
+      "required_stdout_line": "OK collector: pinned parameter rounding",
+      "registration_procedure": "Rounding_Case",
+      "parameter_slots": [
+        4
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Parameter_Saturation",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: saturated parameter arithmetic",
+      "required_stdout_line": "OK collector: saturated parameter arithmetic",
+      "registration_procedure": "Saturation_Case",
+      "parameter_slots": [
+        3
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Positive_Step_Debt",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: positive steps pay byte debt",
+      "required_stdout_line": "OK collector: positive steps pay byte debt",
+      "registration_procedure": "Payment_Case",
+      "parameter_slots": [
+        3
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Promotion_And_Major",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: real promotion and major cycle",
+      "required_stdout_line": "OK collector: real promotion and major cycle",
+      "registration_procedure": "Major_Case",
+      "parameter_slots": [
+        0,
+        1,
+        2
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Remembered_Table",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: remembered old table graph",
+      "required_stdout_line": "OK collector: remembered old table graph",
+      "registration_procedure": "Remember_Case",
+      "parameter_slots": [
+        0
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Zero_Forces_Work",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: zero forces real basic work",
+      "required_stdout_line": "OK collector: zero forces real basic work",
+      "registration_procedure": "Force_Case",
+      "parameter_slots": [
+        4,
+        5
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Zero_Major_Threshold",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: zero disables major threshold",
+      "required_stdout_line": "OK collector: zero disables major threshold",
+      "registration_procedure": "Threshold_Case",
+      "parameter_slots": [
+        2
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Zero_Step_Size",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: zero stepsize completes cycles",
+      "required_stdout_line": "OK collector: zero stepsize completes cycles",
+      "registration_procedure": "Step_Case",
+      "parameter_slots": [
+        5
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Orphan_Cell",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: orphan cell survives atomic sweep",
+      "required_stdout_line": "OK collector: orphan cell survives atomic sweep",
+      "registration_procedure": "Atomic_Orphan_Cell",
+      "parameter_slots": [],
+      "equivalent_replacements": [
+        "stable-cell-color"
+      ],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Measured_Emergency_Headroom",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: measured emergency table headroom",
+      "required_stdout_line": "OK collector: measured emergency table headroom",
+      "registration_procedure": "Measured_Emergency_Headroom",
+      "parameter_slots": [],
+      "equivalent_replacements": [
+        "measured-emergency-headroom"
+      ],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Parameters",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "adapter: production parameter codec",
+      "required_stdout_line": "OK adapter: production parameter codec",
+      "registration_procedure": "Parameters",
+      "parameter_slots": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "equivalent_replacements": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: weak string payload reclamation",
+      "required_stdout_line": "OK collector: weak string payload reclamation",
+      "registration_procedure": "Weak_String_Payloads",
+      "parameter_slots": [],
+      "equivalent_replacements": [
+        "measure-live-payloads",
+        "reclaim-payloads"
+      ],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Frame_Reset",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "adapter: physical unused frame reset",
+      "required_stdout_line": "OK adapter: physical unused frame reset",
+      "registration_procedure": "Frame_Reset",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Release unused physical CallInfo storage through T.resetCI.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Stack_Resize",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "adapter: physical stack resize preserves cell",
+      "required_stdout_line": "OK adapter: physical stack resize preserves cell",
+      "registration_procedure": "Stack_Resize",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Resize real stack storage while a closure retains its live captured cell.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Finalizer_Frame_Refusal",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "finalizer: Lua frame refusal and later retry",
+      "required_stdout_line": "OK finalizer: Lua frame refusal and later retry",
+      "registration_procedure": "Finalizer_Frame_Refusal",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "After frame-cache reset, persistent refusal defers the callback until allocation resumes.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Finalizer_Stack_Refusal",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "finalizer: Lua stack refusal and later retry",
+      "required_stdout_line": "OK finalizer: Lua stack refusal and later retry",
+      "registration_procedure": "Finalizer_Stack_Refusal",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "After stack shrink, refused growth defers the same pending callback until a later collection.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Refusal_Reset",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "allocator: Lua restores persistent refusal",
+      "required_stdout_line": "OK allocator: Lua restores persistent refusal",
+      "registration_procedure": "Refusal_Reset",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0024",
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Lua clears real persistent refusal through the nonallocating restoration callback.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Actual_Stack_Release",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: actual paired memory release",
+      "required_stdout_line": "OK physical stack: actual paired memory release",
+      "registration_procedure": "Release_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Measure paired stack/cell arena release while retaining live contents.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Alternate_Cache_Release",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: alternate cache release",
+      "required_stdout_line": "OK physical stack: alternate cache release",
+      "registration_procedure": "Cache_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Distinct cached frames with owned builders release actual blocks and bytes.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#First_Copy_Refusal",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: first-copy refusal",
+      "required_stdout_line": "OK physical stack: first-copy refusal",
+      "registration_procedure": "First_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Refusal before the first replacement allocation preserves the original stack arenas.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Second_Copy_Refusal",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: second-copy transaction",
+      "required_stdout_line": "OK physical stack: second-copy transaction",
+      "registration_procedure": "Second_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Refusal during second arena copy preserves both original arrays and contents without leaking the first temporary.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Emergency_Keeps_Storage",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: emergency skips maintenance",
+      "required_stdout_line": "OK physical stack: emergency skips maintenance",
+      "registration_procedure": "Emergency_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0024",
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Emergency GC preserves physical reserve capacity during allocator recovery.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-physical_stack_tests.adb#Suspended_Thread_Shrink",
+      "source_sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd",
+      "registered_label": "physical stack: inactive thread atomic shrink",
+      "required_stdout_line": "OK physical stack: inactive thread atomic shrink",
+      "registration_procedure": "Suspended_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0019",
+        "LUA-GC-REVIEWED-BLOCK-0021"
+      ],
+      "mechanism": "Shrinking an inactive coroutine retains its live stack/cell windows.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Refusing_Full",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: refusing allocator emergency GC",
+      "required_stdout_line": "OK collector: refusing allocator emergency GC",
+      "registration_procedure": "Refusal_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0024"
+      ],
+      "mechanism": "Refusing allocator exercises real emergency reclamation under managed allocation pressure.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Emergency_Queue",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: emergency queues without calls",
+      "required_stdout_line": "OK collector: emergency queues without calls",
+      "registration_procedure": "Emergency_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0024",
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Emergency atomic queues a real unreachable finalizable without invoking its callback.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Pending_Finalizer",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: queued finalizer graph ownership",
+      "required_stdout_line": "OK collector: queued finalizer graph ownership",
+      "registration_procedure": "Finalizer_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0011",
+        "LUA-GC-REVIEWED-BLOCK-0025"
+      ],
+      "mechanism": "A pending finalizable strongly owns its child graph until queue ownership releases.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Weak_Before_Finalizer",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: weak values before finalization",
+      "required_stdout_line": "OK collector: weak values before finalization",
+      "registration_procedure": "Ordering_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0011",
+        "LUA-GC-REVIEWED-BLOCK-0014"
+      ],
+      "mechanism": "Weak edge clears before pending finalizer graph retention.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-gc_control_tests.adb#Finalizer_Resurrection",
+      "source_sha256": "9e5a1dd3d16abe4e58d5fde4cfcd1f54d8f284458ca14b6d3a68492b63e4e1c8",
+      "registered_label": "GC controls: real resurrection lifetime",
+      "required_stdout_line": "OK GC controls: real resurrection lifetime",
+      "registration_procedure": "Resurrection_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0025",
+        "LUA-GENGC-REVIEWED-BLOCK-0004"
+      ],
+      "mechanism": "Real handler publishes the target to a global and verifies one enrollment across subsequent collections.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-finalizer_runtime_tests.adb#Callback_Graph_Roots",
+      "source_sha256": "fa5110c03d1fe5d2d6fc21ddc40e08ac654c2c8b75f807c050e91ebff7ae9ff8",
+      "registered_label": "finalizer execution: callback graph survives collection",
+      "required_stdout_line": "OK finalizer execution: callback graph survives collection",
+      "registration_procedure": "Callback_Graph_Roots",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0011",
+        "LUA-GC-REVIEWED-BLOCK-0025"
+      ],
+      "mechanism": "Actual callback target retains a cycle and child through active collector control.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-finalizer_runtime_tests.adb#Unavailable_C_Stack_Defers",
+      "source_sha256": "fa5110c03d1fe5d2d6fc21ddc40e08ac654c2c8b75f807c050e91ebff7ae9ff8",
+      "registered_label": "finalizer execution: minimum space defers without starvation",
+      "required_stdout_line": "OK finalizer execution: minimum space defers without starvation",
+      "registration_procedure": "Unavailable_C_Stack_Defers",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0028"
+      ],
+      "mechanism": "Scheduler defers with insufficient callback storage and subsequently dispatches pending work.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Transient_Root",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: atomic transient root expires",
+      "required_stdout_line": "OK collector: atomic transient root expires",
+      "registration_procedure": "Atomic_Transient_Root",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0021"
+      ],
+      "mechanism": "A temporary API argument ceases to be a root at the next collector phase.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-conformance_adapter_tests.adb#Atomic_Retained_Root",
+      "source_sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8",
+      "registered_label": "collector: atomic live register survives",
+      "required_stdout_line": "OK collector: atomic live register survives",
+      "registration_procedure": "Atomic_Retained_Root",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0021"
+      ],
+      "mechanism": "A live activation register retains the referenced value across atomic collection.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-collector_tests.adb#Dead_Context_Cells",
+      "source_sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
+      "registered_label": "collector: dead context cell sweep order",
+      "required_stdout_line": "OK collector: dead context cell sweep order",
+      "registration_procedure": "Dead_Context_Case",
+      "runtime_obligation_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0019",
+        "LUA-GC-REVIEWED-BLOCK-0021"
+      ],
+      "mechanism": "Repeated suspended coroutine reclamation preserves separately retained closure cells.",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "historical_label_observations": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Synchronous_Call",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: synchronous call ignores continuation",
+      "required_stdout_line": "OK C K: synchronous call ignores continuation",
+      "registration_procedure": "Synchronous_Call",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 1
+      },
+      "semantic_basis": "A nonyieldable synchronous callk returns to its original C body and does not invoke K.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Synchronous_Error",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: synchronous protected error ignores K",
+      "required_stdout_line": "OK C K: synchronous protected error ignores K",
+      "registration_procedure": "Synchronous_Error",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 2
+      },
+      "semantic_basis": "A nonyieldable immediate pcallk error returns its real status/object to the original C body and ignores K.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Full_Context",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: full-width yielded context",
+      "required_stdout_line": "OK C K: full-width yielded context",
+      "registration_procedure": "Full_Context",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 3
+      },
+      "semantic_basis": "A C yieldk exposes one value and resumes its actual saved K with LUA_YIELD and the full-width INTPTR_MAX-17 context.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Repeated_Yield",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: repeated yielding continuation",
+      "required_stdout_line": "OK C K: repeated yielding continuation",
+      "registration_procedure": "Repeated_Yield",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 4
+      },
+      "semantic_basis": "A continuation can yield repeatedly with retained decreasing context and returns the final zero value exactly once.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Fixed_Result",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: fixed result after suspension",
+      "required_stdout_line": "OK C K: fixed result after suspension",
+      "registration_procedure": "Fixed_Result",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 5
+      },
+      "semantic_basis": "A yielded callk requests exactly one result; after resume K observes the adjusted single return.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Zero_Results",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: zero results after suspension",
+      "required_stdout_line": "OK C K: zero results after suspension",
+      "registration_procedure": "Zero_Results",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 6
+      },
+      "semantic_basis": "A yielded callk requests zero results and returns no accidental saved arguments or child results.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Multiple_Results",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: multiple results after suspension",
+      "required_stdout_line": "OK C K: multiple results after suspension",
+      "registration_procedure": "Multiple_Results",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 7
+      },
+      "semantic_basis": "A yielded callk with LUA_MULTRET retains both actual child results after suspension.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Protected_Error",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: protected error after suspension",
+      "required_stdout_line": "OK C K: protected error after suspension",
+      "registration_procedure": "Protected_Error",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 8
+      },
+      "semantic_basis": "A yielded protected call recovers the actual later Lua error through K with ERRRUN and its saved context.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Forbidden_Yield",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: noncontinuation boundary rejects yield",
+      "required_stdout_line": "OK C K: noncontinuation boundary rejects yield",
+      "registration_procedure": "Forbidden_Yield",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 9
+      },
+      "semantic_basis": "A call without K rejects a nested yield and leaves the actual error at the top of its retained traceback window; error result count is not assumed one.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Dead_Resume",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C resume: completed coroutine is dead",
+      "required_stdout_line": "OK C resume: completed coroutine is dead",
+      "registration_procedure": "Dead_Resume",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 10
+      },
+      "semantic_basis": "After removing old results, resuming a completed coroutine without a new body reports dead-state failure.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Captured_Root",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: closure root survives suspended collection",
+      "required_stdout_line": "OK C K: closure root survives suspended collection",
+      "registration_procedure": "Captured_Root",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 11
+      },
+      "semantic_basis": "The suspended C closure alone retains its actual captured table across collection and reads its token after K resumes.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Module_Identity",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C libraries: requiref module identity",
+      "required_stdout_line": "OK C libraries: requiref module identity",
+      "registration_procedure": "Module_Identity",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 12
+      },
+      "semantic_basis": "Repeated requiref invokes one opener and returns the identical loaded table; global publication identifies that same table.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#False_Module",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C libraries: false loaded entry reopens module",
+      "required_stdout_line": "OK C libraries: false loaded entry reopens module",
+      "registration_procedure": "False_Module",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 13
+      },
+      "semantic_basis": "A false loaded entry causes requiref to run the opener again and return a different actual module.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Preload_Mask",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C libraries: selected preload is lazy",
+      "required_stdout_line": "OK C libraries: selected preload is lazy",
+      "registration_procedure": "Preload_Mask",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 14
+      },
+      "semantic_basis": "Selected base/package opening with coroutine preload leaves the coroutine global absent until actual require and preserves require cache identity.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Open_Precedence",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C libraries: opening wins over preload",
+      "required_stdout_line": "OK C libraries: opening wins over preload",
+      "registration_procedure": "Open_Precedence",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 15
+      },
+      "semantic_basis": "Opening takes precedence over preloading for the same coroutine bit and publishes the same loaded/global module.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Metamethod_Indexing",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C indexing: handlers and raw bypass",
+      "required_stdout_line": "OK C indexing: handlers and raw bypass",
+      "registration_procedure": "Metamethod_Indexing",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 16
+      },
+      "semantic_basis": "Ordinary public getfield/setfield execute actual Lua index/newindex handlers; raw lookup bypasses the handler and preserves invocation count.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Immediate_Protected_Error",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: immediate error in yieldable frame",
+      "required_stdout_line": "OK C K: immediate error in yieldable frame",
+      "registration_procedure": "Immediate_Protected_Error",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 17
+      },
+      "semantic_basis": "An immediate protected error in a yieldable C frame abandons the original body and invokes K even before any yield.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Yieldable_Synchronous_Call",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: yieldable synchronous call ignores K",
+      "required_stdout_line": "OK C K: yieldable synchronous call ignores K",
+      "registration_procedure": "Yieldable_Synchronous_Call",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 18
+      },
+      "semantic_basis": "Synchronous success in a yieldable C frame still returns to the original C body and does not invoke K.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Independent_Resume_Source",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C resume: independent from state",
+      "required_stdout_line": "OK C resume: independent from state",
+      "registration_procedure": "Independent_Resume_Source",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 19
+      },
+      "semantic_basis": "An independent from state supplies C depth without changing the resumed coroutine universe or either public stack.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Nested_Continuation_Boundaries",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: three nested continuation boundaries",
+      "required_stdout_line": "OK C K: three nested continuation boundaries",
+      "registration_procedure": "Nested_Continuation_Boundaries",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 20
+      },
+      "semantic_basis": "Three nested C-call pumps retain distinct owning boundaries, yield one leaf value and execute each saved K exactly once.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Unprotected_Error_After_Yield",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: unprotected error after yield",
+      "required_stdout_line": "OK C K: unprotected error after yield",
+      "registration_procedure": "Unprotected_Error_After_Yield",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 21
+      },
+      "semantic_basis": "An unprotected callk callee error after suspension bypasses its K and reaches the external resume as the actual runtime error.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Child_Yield_Without_K",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C K: child yields without continuation",
+      "required_stdout_line": "OK C K: child yields without continuation",
+      "registration_procedure": "Child_Yield_Without_K",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 22
+      },
+      "semantic_basis": "An outer callk continuation remains suspendable when its real C child yields without its own K; resume arguments become adjusted child results observed by the outer K.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Lua_To_C_Resume",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C resume: Lua to C ownership transfer",
+      "required_stdout_line": "OK C resume: Lua to C ownership transfer",
+      "registration_procedure": "Lua_To_C_Resume",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 23
+      },
+      "semantic_basis": "A coroutine created and first resumed by Lua can be taken over by public C resume without overwriting retained Lua locals or its resumed argument.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Suspended_Dead_Temporaries",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C resume: suspended dead temporaries collect",
+      "required_stdout_line": "OK C resume: suspended dead temporaries collect",
+      "registration_procedure": "Suspended_Dead_Temporaries",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 24
+      },
+      "semantic_basis": "Full collection while a C-resumed thread is suspended clears dead high Lua temporaries rather than treating the detached public delivery as a root prefix.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_continuation_tests.adb#Hook_Discards_Resume_Arguments",
+      "source_sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d",
+      "registered_label": "C hooks: resume arguments are discarded",
+      "required_stdout_line": "OK C hooks: resume arguments are discarded",
+      "registration_procedure": "Hook_Discards_Resume_Arguments",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_continuation_contract.c",
+        "source_sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c",
+        "function": "lua_ada_test_continuation_contract",
+        "function_line": 212,
+        "function_sha256": "5f4316aca5419f98efaa141ffda42f107f55cce09b7b2745510516ee46c313fb",
+        "case_number": 25
+      },
+      "semantic_basis": "After a C hook yield, a supplied resume argument is discarded rather than retained in a hidden Lua result packet; the temporary public tail is retired before weak collection while original Lua registers remain intact.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Reflection",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C hooks: callback mask and count reflection",
+      "required_stdout_line": "OK C hooks: callback mask and count reflection",
+      "registration_procedure": "Reflection",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 1
+      },
+      "semantic_basis": "Real C callback identity, all four hook mask bits and the signed requested count are reflected per state.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Line_Events",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C hooks: actual line events and inspection",
+      "required_stdout_line": "OK C hooks: actual line events and inspection",
+      "registration_procedure": "Line_Events",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 2
+      },
+      "semantic_basis": "Actual line events report the interrupted Lua frame; valid getstack/getinfo line queries agree with the delivered record.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Count_Events",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C hooks: count-only instruction events",
+      "required_stdout_line": "OK C hooks: count-only instruction events",
+      "registration_procedure": "Count_Events",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 3
+      },
+      "semantic_basis": "A count-only mask dispatches repeatedly while real canonical Lua instructions execute.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Remove_Inside_Hook",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C hooks: callback removes itself",
+      "required_stdout_line": "OK C hooks: callback removes itself",
+      "registration_procedure": "Remove_Inside_Hook",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 4
+      },
+      "semantic_basis": "A C hook can remove itself, preventing subsequent deliveries and clearing callback/mask reflection.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Independent_States",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C hooks: independent state ownership",
+      "required_stdout_line": "OK C hooks: independent state ownership",
+      "registration_procedure": "Independent_States",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 5
+      },
+      "semantic_basis": "Two live independent states retain separate hook identities and delivery ownership.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Inactive_Frame",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C hooks: inactive frame token rejected",
+      "required_stdout_line": "OK C hooks: inactive frame token rejected",
+      "registration_procedure": "Inactive_Frame",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 6
+      },
+      "semantic_basis": "Ada safety extension rejects an expired frame token after its activation returns; the invalid native API use has no oracle execution requirement.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#C_Return_Close",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C close: normal return retains result",
+      "required_stdout_line": "OK C close: normal return retains result",
+      "registration_procedure": "C_Return_Close",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 7
+      },
+      "semantic_basis": "A real C to-be-closed slot closes once on return while collection in the closer preserves the outgoing result.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#C_Error_Close",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C close: error preserves object identity",
+      "required_stdout_line": "OK C close: error preserves object identity",
+      "registration_procedure": "C_Error_Close",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 8
+      },
+      "semantic_basis": "A C error closes its marked slot and preserves the actual table error identity through the handler and protected caller.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#C_Continuation_Close",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C close: continuation retains slot and result",
+      "required_stdout_line": "OK C close: continuation retains slot and result",
+      "registration_procedure": "C_Continuation_Close",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 9
+      },
+      "semantic_basis": "A marked C slot survives a suspended callk and closes only when K returns, preserving its retained result through collection.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#C_Error_Location",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C errors: logical caller location",
+      "required_stdout_line": "OK C errors: logical caller location",
+      "registration_procedure": "C_Error_Location",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 10
+      },
+      "semantic_basis": "A C caller of base.error contributes no fabricated Lua source location or internal scheduler holder.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#Combined_Yield_Events",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C hooks: combined events before yield",
+      "required_stdout_line": "OK C hooks: combined events before yield",
+      "registration_procedure": "Combined_Yield_Events",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 14
+      },
+      "semantic_basis": "A count and line hook due for one instruction are both delivered before one actual suspension, and the interrupted program completes with its real result.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#C_Set_Top_Close",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C close: settop closes before slot reuse",
+      "required_stdout_line": "OK C close: settop closes before slot reuse",
+      "registration_procedure": "C_Set_Top_Close",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 11
+      },
+      "semantic_basis": "Lowering the actual C stack top closes its marked slot immediately, retires that closer and permits the same depth to be marked and closed again on return.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#C_Explicit_Close",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C close: explicit slot becomes nil",
+      "required_stdout_line": "OK C close: explicit slot becomes nil",
+      "registration_procedure": "C_Explicit_Close",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 12
+      },
+      "semantic_basis": "The public closeslot operation invokes the real closer immediately and replaces that stack slot with nil before the C body continues.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#C_Refusal_Reuse",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C resume: refusal restores reusable owners",
+      "required_stdout_line": "OK C resume: refusal restores reusable owners",
+      "registration_procedure": "C_Refusal_Reuse",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 13
+      },
+      "semantic_basis": "A counted allocator refusal during resume preserves caller driver ownership and permits healthy caller protected-call recovery; actual allocator blocks and bytes balance at close.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-foreign_hook_tests.adb#C_Suspended_Indexing",
+      "source_sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce",
+      "registered_label": "C indexing: suspended thread retains frames",
+      "required_stdout_line": "OK C indexing: suspended thread retains frames",
+      "registration_procedure": "C_Suspended_Indexing",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/foreign_hook_contract.c",
+        "source_sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b",
+        "function": "lua_ada_test_hook_contract",
+        "function_line": 266,
+        "function_sha256": "e600dfc91685da0a1041b185a2476fab93dc35967b5241568657a1652114aea6",
+        "case_number": 15
+      },
+      "semantic_basis": "Public getfield/setfield run real Lua handlers and collection above a suspended coroutine while preserving its prior activation, public table stack, suspended status and eventual resumed result.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-math_reopen_tests.adb#Opening_Preserves_Stream",
+      "source_sha256": "d268c079f5c31d9d093e5447a2bb77cd0c25208bca14f124cbeaf985faf59d7d",
+      "registered_label": "C math: reopening preserves previous stream",
+      "required_stdout_line": "OK C math: reopening preserves previous stream",
+      "registration_procedure": "Opening_Preserves_Stream",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/math_reopen_contract.c",
+        "source_sha256": "a2f702157d5a5b755f93bd594f929602ea8d3cc9a0612bddd11ee740c5085119",
+        "function": "lua_ada_test_math_reopen_contract",
+        "function_line": 27,
+        "function_sha256": "89d8b3fe28ba7674d75484892005a70d42c70216f4e47c4683a77c79ba2fa2c5",
+        "case_number": 1
+      },
+      "semantic_basis": "Opening another math table does not reseed the existing table stream.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-math_reopen_tests.adb#Independent_Streams",
+      "source_sha256": "d268c079f5c31d9d093e5447a2bb77cd0c25208bca14f124cbeaf985faf59d7d",
+      "registered_label": "C math: reopened streams advance independently",
+      "required_stdout_line": "OK C math: reopened streams advance independently",
+      "registration_procedure": "Independent_Streams",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/math_reopen_contract.c",
+        "source_sha256": "a2f702157d5a5b755f93bd594f929602ea8d3cc9a0612bddd11ee740c5085119",
+        "function": "lua_ada_test_math_reopen_contract",
+        "function_line": 27,
+        "function_sha256": "89d8b3fe28ba7674d75484892005a70d42c70216f4e47c4683a77c79ba2fa2c5",
+        "case_number": 2
+      },
+      "semantic_basis": "Two opened tables seeded equally advance independently; reseeding one does not alter the other.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-math_reopen_tests.adb#Retained_Generator",
+      "source_sha256": "d268c079f5c31d9d093e5447a2bb77cd0c25208bca14f124cbeaf985faf59d7d",
+      "registered_label": "C math: retained generator survives collection",
+      "required_stdout_line": "OK C math: retained generator survives collection",
+      "registration_procedure": "Retained_Generator",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/math_reopen_contract.c",
+        "source_sha256": "a2f702157d5a5b755f93bd594f929602ea8d3cc9a0612bddd11ee740c5085119",
+        "function": "lua_ada_test_math_reopen_contract",
+        "function_line": 27,
+        "function_sha256": "89d8b3fe28ba7674d75484892005a70d42c70216f4e47c4683a77c79ba2fa2c5",
+        "case_number": 3
+      },
+      "semantic_basis": "Retained random/randomseed closures keep their original generator after module/global roots are replaced and collection runs.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-math_reopen_tests.adb#Shared_Userdata_Capture",
+      "source_sha256": "d268c079f5c31d9d093e5447a2bb77cd0c25208bca14f124cbeaf985faf59d7d",
+      "registered_label": "C math: actual shared RNG userdata capture",
+      "required_stdout_line": "OK C math: actual shared RNG userdata capture",
+      "registration_procedure": "Shared_Userdata_Capture",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/math_reopen_contract.c",
+        "source_sha256": "a2f702157d5a5b755f93bd594f929602ea8d3cc9a0612bddd11ee740c5085119",
+        "function": "lua_ada_test_math_reopen_contract",
+        "function_line": 27,
+        "function_sha256": "89d8b3fe28ba7674d75484892005a70d42c70216f4e47c4683a77c79ba2fa2c5",
+        "case_number": 4
+      },
+      "semantic_basis": "Actual debug upvalues expose one shared userdata for a module random pair and a distinct payload for another module.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-math_reopen_tests.adb#Refusal_Recovery",
+      "source_sha256": "d268c079f5c31d9d093e5447a2bb77cd0c25208bca14f124cbeaf985faf59d7d",
+      "registered_label": "C math: refused reopening preserves stream",
+      "required_stdout_line": "OK C math: refused reopening preserves stream",
+      "registration_procedure": "Refusal_Recovery",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/math_reopen_contract.c",
+        "source_sha256": "a2f702157d5a5b755f93bd594f929602ea8d3cc9a0612bddd11ee740c5085119",
+        "function": "lua_ada_test_math_reopen_contract",
+        "function_line": 27,
+        "function_sha256": "89d8b3fe28ba7674d75484892005a70d42c70216f4e47c4683a77c79ba2fa2c5",
+        "case_number": 5
+      },
+      "semantic_basis": "Sustained allocator refusal during protected math reopening preserves the old stream; recovery permits reopening and state close balances actual allocator blocks/bytes.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-library_opener_tests.adb#Debug_Module",
+      "source_sha256": "2c6719b2b44561737dc0e691949ce05917d6a345ab0db1d0459f2c2f5a256890",
+      "registered_label": "C openers: debug returns actual registry",
+      "required_stdout_line": "OK C openers: debug returns actual registry",
+      "registration_procedure": "Debug_Module",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/library_opener_contract.c",
+        "source_sha256": "295a74a92127ea99f9fad99f307d70e45d8150722e0fbcc4c105ddc178eca426",
+        "function": "lua_ada_test_library_opener_contract",
+        "function_line": 30,
+        "function_sha256": "8f3405b6892348b3456a06911d61d1789152ac2daeff12a66df74e60b8c48d21",
+        "case_number": 1
+      },
+      "semantic_basis": "The direct debug opener returns exactly one table with stack delta1, leaves its global absent and exposes the actual registry through its real getregistry export.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-library_opener_tests.adb#String_Module",
+      "source_sha256": "2c6719b2b44561737dc0e691949ce05917d6a345ab0db1d0459f2c2f5a256890",
+      "registered_label": "C openers: string bytes and type metatable",
+      "required_stdout_line": "OK C openers: string bytes and type metatable",
+      "registration_procedure": "String_Module",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/library_opener_contract.c",
+        "source_sha256": "295a74a92127ea99f9fad99f307d70e45d8150722e0fbcc4c105ddc178eca426",
+        "function": "lua_ada_test_library_opener_contract",
+        "function_line": 30,
+        "function_sha256": "8f3405b6892348b3456a06911d61d1789152ac2daeff12a66df74e60b8c48d21",
+        "case_number": 2
+      },
+      "semantic_basis": "The direct string opener returns exactly one table without publishing a global, slices embedded-zero bytes and installs the type metatable indexing that exact table.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-library_opener_tests.adb#Table_Module",
+      "source_sha256": "2c6719b2b44561737dc0e691949ce05917d6a345ab0db1d0459f2c2f5a256890",
+      "registered_label": "C openers: table pack preserves nil holes",
+      "required_stdout_line": "OK C openers: table pack preserves nil holes",
+      "registration_procedure": "Table_Module",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/library_opener_contract.c",
+        "source_sha256": "295a74a92127ea99f9fad99f307d70e45d8150722e0fbcc4c105ddc178eca426",
+        "function": "lua_ada_test_library_opener_contract",
+        "function_line": 30,
+        "function_sha256": "8f3405b6892348b3456a06911d61d1789152ac2daeff12a66df74e60b8c48d21",
+        "case_number": 3
+      },
+      "semantic_basis": "The direct table opener returns exactly one table without global publication; its actual pack export preserves a nil hole, both surrounding values and explicit n count.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-library_opener_tests.adb#UTF8_Module",
+      "source_sha256": "2c6719b2b44561737dc0e691949ce05917d6a345ab0db1d0459f2c2f5a256890",
+      "registered_label": "C openers: UTF8 decodes actual bytes",
+      "required_stdout_line": "OK C openers: UTF8 decodes actual bytes",
+      "registration_procedure": "UTF8_Module",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "c_contract": {
+        "source": "tests/c/library_opener_contract.c",
+        "source_sha256": "295a74a92127ea99f9fad99f307d70e45d8150722e0fbcc4c105ddc178eca426",
+        "function": "lua_ada_test_library_opener_contract",
+        "function_line": 30,
+        "function_sha256": "8f3405b6892348b3456a06911d61d1789152ac2daeff12a66df74e60b8c48d21",
+        "case_number": 4
+      },
+      "semantic_basis": "The direct utf8 opener returns exactly one table without global publication and its actual codepoint export decodes supplied multibyte input in a bare state.",
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#While_Guard",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: consumed while guard",
+      "required_stdout_line": "OK condition roots: consumed while guard",
+      "registration_procedure": "While_Guard",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A consumed truthy while guard must release its private weak-value temporary before an allocating RHS explicitly collects; the loop completes once and the weak entry becomes nil.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [
+        "LUA-CLOSURE-REVIEWED-BLOCK-0001"
+      ],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_while_root.lua",
+        "source_sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#If_Guard",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: consumed if guard",
+      "required_stdout_line": "OK condition roots: consumed if guard",
+      "registration_procedure": "If_Guard",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A consumed truthy if guard releases its private weak-value temporary before the selected body performs an explicit collection.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_if_root.lua",
+        "source_sha256": "d8f39a5fb858c681d2551d58628c3a29c39682a26bad3f460c5512e12121e476",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#Repeat_Guard",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: consumed repeat guard",
+      "required_stdout_line": "OK condition roots: consumed repeat guard",
+      "registration_procedure": "Repeat_Guard",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A consumed truthy until guard with no closing body local releases its weak-value temporary before a later allocating RHS explicitly collects.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_repeat_value_root.lua",
+        "source_sha256": "e33736801abbf20deb515150121a6ee8c69e90ceba86bd685a0e2df31020c228",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#Repeat_Closing",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: repeat closing local",
+      "required_stdout_line": "OK condition roots: repeat closing local",
+      "registration_procedure": "Repeat_Closing",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "Retiring a repeat guard must preserve the real body closing local; its actual __close callback receives its table and can collect before scope exit.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_repeat_root.lua",
+        "source_sha256": "020554d37b19635b9090e2acee30b6f28d1b0810be20bbcc3c483f8ed7f7ab7c",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-condition_root_tests.adb#Short_Circuit_Result",
+      "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
+      "registered_label": "condition roots: short circuit result",
+      "required_stdout_line": "OK condition roots: short circuit result",
+      "registration_procedure": "Short_Circuit_Result",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "Expression and/or tests retain their actual table-valued result through explicit collection; statement guard retirement cannot erase an operand still required as a result.",
+      "relationship": "Supplemental Ada Session/Execute regression for compiler temporary ownership. This case does not directly call a public C export and is not an upstream assertion replacement.",
+      "selected_lua_runtime_obligations": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/condition_short_circuit_root.lua",
+        "source_sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37",
+        "relationship": "Separately executed first-party Lua regression with corresponding setup/assertions; actual native observations require their own process evidence."
+      },
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Main_Transient_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: transient main scalar",
+      "required_stdout_line": "OK collector stack: transient main scalar",
+      "registration_procedure": "Main_Transient_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Main_Transient",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A transient uncaptured main-stack scalar publication during real incremental propagation does not rescue a weak value after its slot is cleared before atomic.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Main_Retained_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: retained main scalar",
+      "required_stdout_line": "OK collector stack: retained main scalar",
+      "registration_procedure": "Main_Retained_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Main_Retained",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "The actual main-stack scalar that remains live during propagation is discovered at atomic and preserves the weak target.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Suspended_Transient_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: transient suspended scalar",
+      "required_stdout_line": "OK collector stack: transient suspended scalar",
+      "registration_procedure": "Suspended_Transient_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Suspended_Transient",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A previously scanned reachable suspended thread awaits its real gray-again revisit; a scalar consumed before atomic does not rescue its weak target.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Suspended_Retained_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: retained suspended scalar",
+      "required_stdout_line": "OK collector stack: retained suspended scalar",
+      "registration_procedure": "Suspended_Retained_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Suspended_Retained",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "Atomic gray-again revisitation of a previously scanned reachable suspended thread preserves a scalar published there after the earlier scan.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Lua_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: incremental Lua weak lookup",
+      "required_stdout_line": "OK collector stack: incremental Lua weak lookup",
+      "registration_procedure": "Lua_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Incremental_Lua",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "The actual Lua program interleaves consumed weak reads with two thousand small real collector slices over a retained graph, preserving the graph while releasing the consumed target.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [
+        "LUA-CLOSURE-REVIEWED-BLOCK-0001"
+      ],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/collector_scalar_weak_progress.lua",
+        "source_sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90",
+        "relationship": "Separately executed first-party public Lua regression; actual native process observations require their own evidence."
+      }
+    }
+  ],
+  "required_contexts": [
+    "default/windows/development/static",
+    "default/windows/development/shared",
+    "default/windows/validation/static",
+    "default/windows/validation/shared",
+    "default/windows/release/static",
+    "default/windows/release/shared",
+    "upstream-test/windows/validation/static",
+    "upstream-test/windows/validation/shared",
+    "default/linux/development/static",
+    "default/linux/development/shared",
+    "default/linux/validation/static",
+    "default/linux/validation/shared",
+    "default/linux/release/static",
+    "default/linux/release/shared",
+    "upstream-test/linux/validation/static",
+    "upstream-test/linux/validation/shared",
+    "default/macos/development/static",
+    "default/macos/development/shared",
+    "default/macos/validation/static",
+    "default/macos/validation/shared",
+    "default/macos/release/static",
+    "default/macos/release/shared",
+    "upstream-test/macos/validation/static",
+    "upstream-test/macos/validation/shared",
+    "default/windows/validation/static-pic",
+    "upstream-test/windows/validation/static-pic"
+  ],
+  "requirements": [
+    "Require every exact registered label once in the complete real AUnit capture, zero failures/unexpected errors, matching source/runtime identity and physical shutdown provenance.",
+    "Retained35 collector/storage witnesses supplement unchanged source assertions. New C-driven cases use the real exported Ada functions; hook case6 is an explicitly Ada-only safety contract, not an invalid native invocation.",
+    "Five statement-condition regressions execute actual Ada Session programs and require the same focused lifetime observations; their native Lua counterparts are separately source-bound. They supplement real public C calls and cannot certify a C export independently.",
+    "Source registration, assertion bodies and direct underlying C selector must remain bound to their actual current bytes."
+  ],
+  "execution_evidence": []
+}

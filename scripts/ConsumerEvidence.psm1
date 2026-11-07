@@ -5,7 +5,8 @@ function Test-NamedConsumerEvidence {
     param([Collections.IDictionary] $Report,
           [Collections.IDictionary] $Mapping,
           [string] $Revision, [string] $Context,
-          [scriptblock] $ResolveCapture)
+          [scriptblock] $ResolveCapture,
+          [switch] $RequireForeignContract)
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
     $parts = $Context.Split('/')
@@ -25,6 +26,14 @@ function Test-NamedConsumerEvidence {
     $markers = @{'c-api'='PASS: real Ada C API bootstrap consumer';
         'gc-api'='PASS: public GC contract'; 'io-api'='PASS: public IO/OS contract';
         'gc-oracle'='PASS: public GC contract'; 'io-oracle'='PASS: public IO/OS contract'}
+    $contractKinds = @('gc','io')
+    $consumerKinds = @('c-api','gc-api','io-api')
+    if ($RequireForeignContract) {
+        $markers['foreign-api']='PASS: public foreign contract'
+        $markers['foreign-oracle']='PASS: public foreign contract'
+        $contractKinds += 'foreign'
+        $consumerKinds += 'foreign-api'
+    }
     foreach ($name in $markers.Keys) {
         $matches = @($Report.consumers | Where-Object { $_.name -ceq $name })
         if ($matches.Count -ne 1) { throw "Named consumer missing/duplicate: $name" }
@@ -44,7 +53,7 @@ function Test-NamedConsumerEvidence {
         }
         $outputs[$name] = @{text=$stdout; hash=$record.stdout_sha256}
     }
-    foreach ($kind in @('gc','io')) {
+    foreach ($kind in $contractKinds) {
         $contract = $Report["${kind}_contract"]
         if ($Report.reference_revision -cne '7579fc9d7ed90240487251dfb69168f8e64e9294' -or
             $null -eq $contract -or $contract.matching_output -ne $true -or
@@ -62,7 +71,7 @@ function Test-NamedConsumerEvidence {
     foreach ($case in $Mapping.cases) {
         $key = $case.source + '#' + $case.case_id
         if ($seen.ContainsKey($key) -or $case.expected_count -ne 1 -or
-            $case.consumer -cnotin @('c-api','gc-api','io-api')) {
+            $case.consumer -cnotin $consumerKinds) {
             throw "Invalid/duplicate named consumer mapping: $key"
         }
         $source = @($Report.consumer_sources | Where-Object { $_.file -ceq $case.source })

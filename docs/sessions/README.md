@@ -1,6 +1,8 @@
 # Session Records
 
-Current: [four-file GC/IO conformance](2026-11-07-gc-io-conformance.md).
+Current: [expanded T conformance](2026-11-07-expanded-t-conformance.md).
+
+Previous: [four-file GC/IO conformance](2026-11-07-gc-io-conformance.md).
 
 Previous checkpoint: [complete M3 upstream conformance](2026-11-06-m3-upstream-conformance.md).
 
