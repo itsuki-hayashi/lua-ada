@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "operation": "file:gc.lua",
+  "context": "default/windows/validation/static-pic",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_hashes": {
+    "gc.lua": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99"
+  },
+  "review": {
+    "author": "/root",
+    "reviewer": "/root/review_gc",
+    "artifact": "tests/conformance/reviews/gc.execution-contracts.cross-review.json",
+    "rationale": "Scoped protocol and omission mapping; matrix replays separate named cases, native counterparts and physical shutdown.",
+    "original_c_evidence": "lifecycle-Windows-validation-static/reports/gc-events/c1af2c7f5a5643d5a1954c61d69ba9f7/ReferenceC-gc.lua.json#sha256=8d4b10489a3d8f49dd7ccf4f0b596f1c5851f10eba6735ccc8e12712604a105a"
+  },
+  "completion_marker": "OK",
+  "stdout_required": [
+    {
+      "pattern": "(?m)^testing\\ incremental\\ garbage\\ collection\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^steps\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^creating\\ many\\ objects\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^functions\\ with\\ errors\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^long\\ strings\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^clearing\\ tables\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^weak\\ tables\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^long\\ list\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^self-referenced\\ threads\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^>>>\\ closing\\ state\\ <<<\\r?$",
+      "count": 1
+    }
+  ],
+  "stderr_expected": [],
+  "expected_skips": [
+    {
+      "message": ">>> testC not active: skipping userdata GC tests <<<",
+      "coverage_ids": [
+        "LUA-GC-REVIEWED-BLOCK-0014"
+      ],
+      "review_artifact": "tests/conformance/reviews/gc.execution-contracts.cross-review.json",
+      "original_c_evidence": "lifecycle-Windows-validation-static/reports/gc-events/c1af2c7f5a5643d5a1954c61d69ba9f7/ReferenceC-gc.lua.json#sha256=8d4b10489a3d8f49dd7ccf4f0b596f1c5851f10eba6735ccc8e12712604a105a"
+    }
+  ],
+  "disposition": "ada-internal-equivalent",
+  "equivalent_manifest_sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e",
+  "executed_sha256": "059aaafb1068bc4245b23f56b2e10a75a66301b0bf05eede8ce3e7fd8a56b6dd"
+}

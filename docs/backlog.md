@@ -10,6 +10,9 @@ This supersedes earlier branch instructions for this batch only. Existing M3
 IDs and all obligations outside the scope remain pending. See the
 [delivery contract](milestones/m3.md) and
 [current evidence](sessions/2026-11-07-gc-io-conformance.md).
+The four source partitions and 77 scoped API entries now have independently
+reviewed evidence in all applicable contexts. Final process acceptance is
+reported separately on [PR #9](https://github.com/itsuki-hayashi/lua-ada/pull/9).
 
 | ID         | Work                          | State          | Depends on                                   |
 | ---------- | ----------------------------- | -------------- | -------------------------------------------- |

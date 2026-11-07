@@ -1,0 +1,4590 @@
+{
+  "schema_version": 1,
+  "decision": "accepted",
+  "file": "gc.lua",
+  "reviewer": "/root/review_gc",
+  "author": "/root",
+  "revision": "ff93190fab42ffd39e2c7a8a34156fde10410a5d",
+  "workflow_run": "42327273160",
+  "review_scope": "Source-bound protocol and per-obligation adjudication of archived C and Ada runs. Unchanged span dispositions identify original Lua paths within the generated GC equivalent. Full-file dispositions appear for each process.",
+  "final_process_acceptance": false,
+  "source_packet_sha256": "d0a82ad491aeac272bc370d0b10f5fe6059f6c1779ccebcb9d7df56a3e3844b9",
+  "aunit_mapping_sha256": "8653f8e6c8d73bde9202f507ebdad3911c2e3f5f22fae8415de1b8dd3d6d0f9f",
+  "contracts": [
+    {
+      "file": "gc.lua",
+      "context": "default/linux/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "09b94bc51a74fe13f2fced55804b5ee0533ce67f2bd0028bb6acdf7e71784c35",
+      "aunit_report_sha256": "823b6c66728b901a47d46e05dc8ac3c5949856dead64ab6f8d2f960388f6200d",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Linux-development-relocatable/reports/gc-events/265a9eaac775480fa5ac47c1df8781e4/ReferenceC-gc.lua.json",
+          "sha256": "212fe06c7dad1df8b50f79f8fb0a04e8010a37d60ac6d9a610c63a93aef2154f",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "18c947b93e2510fdbb211cab0ef22cc57ce38f6d0108cff04bfa0ab70d4ca10c"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Linux-development-relocatable/reports/gc-events/265a9eaac775480fa5ac47c1df8781e4/Ada-gc.lua.json",
+          "sha256": "64daafccd3a39e55303648ba439bf646343a6664b31ec5b634fc4cc81675fc3e",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "8a88e1bcd57d309658f8cb363b20cf8f6da4b097baa18d8186ce3f56bc11df51"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-static/gc.json",
+      "decision": "accepted",
+      "sha256": "53f3cb4dce6160b57e3334054e029a25e20cf136a4e72dddc41bf9db2d68b3be",
+      "aunit_report_sha256": "20c2681be065d3a0705d515da09a4d84311113e0575c27ac79293fabf7959a95",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Linux-development-static/reports/gc-events/3aa69889843044beb0dff56669f943df/ReferenceC-gc.lua.json",
+          "sha256": "3e5e47d20ee6f55572f6303f0729aef42c761ab36b68465c75c8b89251d94968",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "5c20fbde8a68fe8a8642c2b91045fdc2e98ea090e3eee0bb7f305ed4d17eb386"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Linux-development-static/reports/gc-events/3aa69889843044beb0dff56669f943df/Ada-gc.lua.json",
+          "sha256": "3c51df29327a775a49f080b74063d330ad4b09b82023de66c0e3f515d7620e3e",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "c256ecf385567de8f6bcbf6612e7f68c2d88166905f91a0bf11735128f20fce4"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "4d4a85e165015b061726092b1d37ac079d8eb1d2f67c5ebe17a9d28f631f6fd0",
+      "aunit_report_sha256": "752f43087a52834e3a12c0b9573d33b48ed3551a71479881660c2119ca2c8675",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Linux-release-relocatable/reports/gc-events/9509365e7aeb402e853b63295c0987fd/ReferenceC-gc.lua.json",
+          "sha256": "098014776200e26a3762b2e1b5471df303c6c4cb3b980aeb42f7f01322ed7d41",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "a4134e8f0b2c39fa9a77720833dd387da474cd7ace5f0b33eebd9f338089a21d"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Linux-release-relocatable/reports/gc-events/9509365e7aeb402e853b63295c0987fd/Ada-gc.lua.json",
+          "sha256": "804ef1cf2a54917f79edafc055cd44a05900a6f04df487ba9c26c80cf6eb8282",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "cb59cec8f1b2b2094d525248a3b203884447c1483a3174138fbe37f6206f6e99"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-static/gc.json",
+      "decision": "accepted",
+      "sha256": "bf628db56a96af41854f83b1a50faf211c070d508ac66b4db909c134e78f0530",
+      "aunit_report_sha256": "1b2c690dbbb1f89433de1f4ffa59eca2711165a817e63767f7ea84e07a9c12df",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Linux-release-static/reports/gc-events/f91364a7fb6b4489a9a796a7d61aa24c/ReferenceC-gc.lua.json",
+          "sha256": "446519fb594e640cea583bce97539e90b0f52502387fbb37c95e4a57a48c9cff",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "f476b073fdc060e33d4622def3602c001d987aa78b3586b83a37d79c8de76ad2"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Linux-release-static/reports/gc-events/f91364a7fb6b4489a9a796a7d61aa24c/Ada-gc.lua.json",
+          "sha256": "a805687cecfb502f7ee04f45770d8a0e16e935751e2e16c9f4e73066c0f00ce3",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "0a8816412c471869c2372884dd442d16124a4615dfe9326135860f825effa5a4"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "5fa838dec5a49c0073b753937d49e65eb8ffe8fcd2d46f19249cdddbc32d413d",
+      "aunit_report_sha256": "d19c2d77d32f2d2a1653d0bda226fa597899063211c3592d11fedde1fa929943",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Linux-validation-relocatable/reports/gc-events/57712258ea1f40fba81660e0b37a8ee8/ReferenceC-gc.lua.json",
+          "sha256": "8f59b8a48527ad577ba395009ebe416e7f1c190e81935f75fa7f32419ca22861",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "f828c89b3e5463e8876b882f30289737ddec3c80b30c0e91f7439f29d175bd98"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Linux-validation-relocatable/reports/gc-events/57712258ea1f40fba81660e0b37a8ee8/Ada-gc.lua.json",
+          "sha256": "440424291b2df8f1983592a1003e37ea7a92f7db8d6bcbc56ee2e7ff4716e57f",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "e156d0b0de4b0992ba85544d412aefadcb2671b1d6ac50868f4be24103384c46"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-static/gc.json",
+      "decision": "accepted",
+      "sha256": "7e3f8093749ed30da26006d0f83e9a441813bfd84007eb08eec5c9e84510163e",
+      "aunit_report_sha256": "0676c4068dde79678c5ddb48af3b64530d054c102dbb511692c70ff8e2fb2405",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Linux-validation-static/reports/gc-events/9ba3b24dfc324b4d8a61621f3bf4bb02/ReferenceC-gc.lua.json",
+          "sha256": "0afdac2f1b9255f8a9c5bca9251978ed803e0f46edd7a7cba627c045a95c859f",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "a1a6e544714921d68c3f3e09d0ef793ce4e244d7a3020e4e30b851abfe8982fc"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Linux-validation-static/reports/gc-events/9ba3b24dfc324b4d8a61621f3bf4bb02/Ada-gc.lua.json",
+          "sha256": "acf201a5f20f603a93037e68b96744fa21deba5d436c39d5981f83879ab5f841",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "e6a82dced81763670f42e26bc64350fbb0b813174fcb351c8ee88ea6e98cf8d9"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "bfc28a75f2801584a264a8f87cbb1321269b16097c5d4e207a3b2476d9a781d4",
+      "aunit_report_sha256": "828914731db119370c754143bd759820bd89c6cd74e028bdd3aaa97185c94acb",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-macOS-development-relocatable/reports/gc-events/7d40fd752887465db4e42b51940cf63d/ReferenceC-gc.lua.json",
+          "sha256": "fde993f53bb823eb05d4ea5b325bc5525020d41152758d8566e5cc574a7ae2d1",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "be87ceb72cc3ec9663bba51b83c546e342777486267081939d87672763641d0d"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-macOS-development-relocatable/reports/gc-events/7d40fd752887465db4e42b51940cf63d/Ada-gc.lua.json",
+          "sha256": "aa3f918732c3ae6b8c29b57f7d9ed0cb19b6eb5548cd76ca605b42f4f1c1b4a3",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "848a12a38429a6fec29c5b6635e8b3ea05e2a2c1a254a5b837042a60ecf6d77a"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-static/gc.json",
+      "decision": "accepted",
+      "sha256": "b1a13a8f399e486ef589acc15af8cb807ad275321d3f63e17686624a94d04890",
+      "aunit_report_sha256": "748c98ec5a3926be99114602f5ac691a9a076fa95395765874a005e6569c4c66",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-macOS-development-static/reports/gc-events/41d58367463849e293a77b8235f8cbb3/ReferenceC-gc.lua.json",
+          "sha256": "d31d4f45659d74485f44762e11ac115194bc48291aef57fa8e2551414b727e6e",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "1bdb450ccf6dc421780c3d82931c2731c3d0c732fec5c2f2a71fcf151762a9b8"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-macOS-development-static/reports/gc-events/41d58367463849e293a77b8235f8cbb3/Ada-gc.lua.json",
+          "sha256": "8872f6aa7d8abc7cdb6b607652e171548916adfebb5bb90ef7427b0027547470",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "0754b3bf36c28918474d806eb71dc6f15538388510dd221a26fe833aa9b95cd0"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "8df148a5091938947b165b7d2a19194252a8de2256aac7331d1f3db0914dff4f",
+      "aunit_report_sha256": "43265b9a920635a51f766bcde69658729f1c0b271ce4343dd6ec5de32ed472a8",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-macOS-release-relocatable/reports/gc-events/c21d2592fe6f45039a1f49a2e8f4a969/ReferenceC-gc.lua.json",
+          "sha256": "c2a317617620599023d76e9d98742847fa9c6276fa2bbc3806630c7d526c96c8",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "db69bb85b448d62a19d3030b3c154d7bd0b8f48aa2353029b52cb958d4e19b5e"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-macOS-release-relocatable/reports/gc-events/c21d2592fe6f45039a1f49a2e8f4a969/Ada-gc.lua.json",
+          "sha256": "8f886fcacb29e22812ed7e06406e87c55b0b7a80f71717f9f9c5d0aec5c21eda",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "1f275740d7ba648edb98d0c606693009a4404425b836953b0b23351fbe0fd36e"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-static/gc.json",
+      "decision": "accepted",
+      "sha256": "e8d2f9d065e55c6d39ef6f3dce0373d60e6e4d68575df850b3e8eb61760f230f",
+      "aunit_report_sha256": "ec20e80bc610d5ea9efade87ca01c24ed43e5dcc82362f92aed0b7ebba10cef1",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-macOS-release-static/reports/gc-events/5d325f04d79b46b3823b826050ec3a2c/ReferenceC-gc.lua.json",
+          "sha256": "ea370349b967805d718ba0e6c9e1ba2713d02113dbd16476991f7f04f1249a20",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "f829cbc083cc36251a70ebae638b3cd022fd1e1ecbb13f30bdde1a1c91e7d8c0"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-macOS-release-static/reports/gc-events/5d325f04d79b46b3823b826050ec3a2c/Ada-gc.lua.json",
+          "sha256": "02f18ce04bc0a203b91efdcf827425f5ee96fe0e0c714f1839f611df2816d0a8",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "21d2eff2dd327436b1344010d45b67b67e5c2f75a40783dced24afb07ee76aa8"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "a2a45ca4d740935a9c277434a3de24cabb0575e4c7c9975c6149cfbed469de3c",
+      "aunit_report_sha256": "761896e0ea3ecb9983703105ce1cf6026975c4d84f3ee5098dbaa43577942cce",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-macOS-validation-relocatable/reports/gc-events/38dbb4b2f95c4b0bbf0b2036c4ae9020/ReferenceC-gc.lua.json",
+          "sha256": "f4fe5619706f61420ae3ca97a85c67f98cc79d0f24434f9a7b4b753b5cfe87d7",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "5f087979f1ea41ae14635cb2634cecf91e00093563c1a734bf6fb8af114107eb"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-macOS-validation-relocatable/reports/gc-events/38dbb4b2f95c4b0bbf0b2036c4ae9020/Ada-gc.lua.json",
+          "sha256": "38163d7cea50ec531f965592c05d176241ba63db1e6968e655d0f9f9cba56543",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "6770cc2e9ff3b20989fe451086c2f14420dad5c7ddd74f418c20b3351a165c8e"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-static/gc.json",
+      "decision": "accepted",
+      "sha256": "22e8a5269042525d0ac6e210470f297612f8dadf02060f000a9893e99d01f97b",
+      "aunit_report_sha256": "aef3b11968b65be3c397d34b039554279b4b89a0df4302b166e9b6fb469a5a7c",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-macOS-validation-static/reports/gc-events/6d474c3f06ae441883944e62bb56dd51/ReferenceC-gc.lua.json",
+          "sha256": "e7c4183f1e388f50c17e5a7de0ef37b3b7719ffdfd1e5c1ba81e5be9542fe514",
+          "disposition": "unchanged",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "af52d962f73beecfcfb11cad5e5ba71b2abf3b4f50815b69aa3b650a8df5b681"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-macOS-validation-static/reports/gc-events/6d474c3f06ae441883944e62bb56dd51/Ada-gc.lua.json",
+          "sha256": "7f7cb01fb05b870b079b8faf355b561f108f2257efb570d6e7d5b45b2732b2ad",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "3abea3387df0443840ca2d0c47acc9c9aeae2b6783591e360b1bc5d86d21e1de",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "b35f59e9d4afab07319620d28fec4d16e7fd60c93ad65127b0549941e9263250"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "905ae0eafb6f65a6bac051c878ce162fbfde8978e92317c65aca901bf6bce6a8",
+      "aunit_report_sha256": "ee70382d61eff2e35f94cff25a087da038a23bbe8671f8bf9f4020fb6f0798fa",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Windows-development-relocatable/reports/gc-events/6eb9d142a09f40509b1580a13a061ebf/ReferenceC-gc.lua.json",
+          "sha256": "e635cc8d8b5ff29b1284a0d504e0cb165df6a784f450bcce785659b9b0f0ff53",
+          "disposition": "unchanged",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "f4b32818ebde9b0d910e7c17c9068434bd0d76934ede1edd67d3a5981c2507fa"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Windows-development-relocatable/reports/gc-events/6eb9d142a09f40509b1580a13a061ebf/Ada-gc.lua.json",
+          "sha256": "c3f56921e62ce1ee696e8d1c8fdc0bd02eca2e2a0ba5ff827f2e8c82fd2ac59a",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "9b7f60ff6629bf6bda5a3151a94c8fda41162825754aad4a9659db273fb128b3"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-static/gc.json",
+      "decision": "accepted",
+      "sha256": "ded0083e7110333c66cf2e6ca5f564da9182fba5388e4ce1c48d2a1bc53b8d70",
+      "aunit_report_sha256": "81ff4e600d21104ed08b45e53d646a8dcfebb01d2517b634d8ba8892b057ec02",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Windows-development-static/reports/gc-events/e74209b0a4694a4b8b22eebb9b8d81d4/ReferenceC-gc.lua.json",
+          "sha256": "ef6527b9f2e64264128c02cb38e55f5a9fb265b986f89caba5633447c9472679",
+          "disposition": "unchanged",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "216238b0fb1f1944b81fb5196aa562e6c0ca282aea5bc97e542d0e1d1b03511b"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Windows-development-static/reports/gc-events/e74209b0a4694a4b8b22eebb9b8d81d4/Ada-gc.lua.json",
+          "sha256": "d0dc5188ce304c8a8dee12da2de2c1b9bb6da0eb8218d1ece670a8a63fdf42f4",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "114e5bd72bffc2f3e1908649aa72b401c6f37e5c266a46767e9e7f02f2210d24"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "67d05f272c914aa7b554e65b643ad44e0a53d0bfc7df73a419737d25f0b943da",
+      "aunit_report_sha256": "c66c4e707ef92521fdf99e07bc82c102cecca5fad2c6379609b1f2be39199212",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Windows-release-relocatable/reports/gc-events/6e95deecb5dc429a841b8f6885453bee/ReferenceC-gc.lua.json",
+          "sha256": "7738b12243d640f621d6045feed86be50e0cda22985f9dd67acf0c67d2abdf7d",
+          "disposition": "unchanged",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "7704d7eafaefc08c33462b9990d463b1022417b9578359cb14420c232244b233"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Windows-release-relocatable/reports/gc-events/6e95deecb5dc429a841b8f6885453bee/Ada-gc.lua.json",
+          "sha256": "14b08c8a87ad3879de6601a1c6db1cd69e39a3634e4555eab0ce4974a4c39ac6",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "35f91af697e598038ddacf33bfbbf20a903579bebd891609b45659badf97fbf4"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-static/gc.json",
+      "decision": "accepted",
+      "sha256": "7d5afcc5b5132fda68598c054218bfe6431cb9716eb1ec44ac9ba41b84add190",
+      "aunit_report_sha256": "917d9692e3332ff51a1cc57a0cf3376e441ea0dbbf1a3d61ee3d5729298c2ce2",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Windows-release-static/reports/gc-events/d8006b591b88460e896bafefc7d2fdf8/ReferenceC-gc.lua.json",
+          "sha256": "383326330632b0309aa7994dfd3b0a4dd60b2ef2127b0a67bfa12a4dd4791125",
+          "disposition": "unchanged",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "2ce049f2a1eb13902428c09328f6ec28bf8a560e7affbd8bcce6ad086be3ec66"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Windows-release-static/reports/gc-events/d8006b591b88460e896bafefc7d2fdf8/Ada-gc.lua.json",
+          "sha256": "397ad3559938678c385fa3121fee4ee80439726e586db68f874bcd2ae67e0622",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "47e9835384881a58d32098772a830ec96860ada1c74814b124e2dc13ce429de8"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "48e465412b95289c2b3dc0e3265aaa5dee5cbc40fb19b17cd181f60419ad1f3b",
+      "aunit_report_sha256": "b8ab2e54e9b3274897d8e036845607ae382a852841036444cd5e81c5cde9f82b",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Windows-validation-relocatable/reports/gc-events/ea5f2bcae9dd4f3d97525e9c53f4a44f/ReferenceC-gc.lua.json",
+          "sha256": "519d24dd6b705fdfa091b092ea08842e912b6260b2068058d113a1764d905fde",
+          "disposition": "unchanged",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "61ae535fcaa37bc5382613921d1b1bcdc4e936d79f3c89887c7faba0849eef59"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Windows-validation-relocatable/reports/gc-events/ea5f2bcae9dd4f3d97525e9c53f4a44f/Ada-gc.lua.json",
+          "sha256": "1b0b2175edbd081d29ff69b0217975b2be8b02874b67ebef3576045e4e7aa301",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "23e5cf975f996602ec21a6fd81c6537ba82dc48dd5537b09024ec1b640edd15c"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static/gc.json",
+      "decision": "accepted",
+      "sha256": "a93783200bb4d46caefa1bd6f6511a341deb849ba3ef58a91bf0a592bb73ae5b",
+      "aunit_report_sha256": "181005ec7b5aaafcc6f506d91f8ad76588f56a18748ee61506f7c01d84169bba",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Windows-validation-static/reports/gc-events/21d42ce01abe4cfd9242bcb31156f22f/ReferenceC-gc.lua.json",
+          "sha256": "63b0fffbcdc3de1e1e6ceaefca98be43f0efc1a04bfea83854c32036355c210e",
+          "disposition": "unchanged",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "0d4dbf82588f3168c0bcb1df1a20aa0b7c5aca3b7f7ee6fa1bf71911e8c78f00"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Windows-validation-static/reports/gc-events/21d42ce01abe4cfd9242bcb31156f22f/Ada-gc.lua.json",
+          "sha256": "8e5ccd77a7831130e690198b559b39859740e7001670188b3a5fa9236e0e54ce",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "96117f0b3510787c9f0efdce8bed13b537c91266f455907b0af30c3fb5658b2d"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static-pic/gc.json",
+      "decision": "accepted",
+      "sha256": "103d3fcd39abf2fbccaec17c0f1b9761762cdde1711f7145d4bbcec3ecfc0e55",
+      "aunit_report_sha256": "b25aa3b23b1b16f1966a74e3586a9e32e52a1301c31e1ab83a1383559c59b085",
+      "targets": [
+        {
+          "target": "c",
+          "report": "lifecycle-Windows-validation-static/reports/gc-events/c1af2c7f5a5643d5a1954c61d69ba9f7/ReferenceC-gc.lua.json",
+          "sha256": "8d4b10489a3d8f49dd7ccf4f0b596f1c5851f10eba6735ccc8e12712604a105a",
+          "disposition": "unchanged",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "a400770114d77a25fdfa1fd6858e049f856329590099cc89709f1864418e8a0f"
+        },
+        {
+          "target": "ada",
+          "report": "lifecycle-Windows-validation-static/reports/gc-events/c1af2c7f5a5643d5a1954c61d69ba9f7/Ada-gc.lua.json",
+          "sha256": "2ae26a3154b9e2c433444b6152df65c28ea365ba5c7a2e85819477a1e41c5668",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "d009500af92e36b0393e0a39c849583260b8d3fd4ffa179903b218293db47921",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "f366e1d1b1e10d46d31738e420bab8156b024b5f7c0d767737a8ab4bbc1b2f66"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "932b7487264dcfb496ef2986c0959df4de01f237a371808266ec4fdf38de0353",
+      "aunit_report_sha256": "e2abab54320fdad9557b23f80cfb1035aee2cf9deda88fee06e4912339814fec",
+      "targets": [
+        {
+          "target": "c",
+          "report": "instrumented-Linux-relocatable/reports/gc-events/9310316343954b12808cd8d480dd4027/ReferenceC-gc.lua.json",
+          "sha256": "8f9f19d1ad6f0192dd72814257d3db85e2f05415f17a0bbaa522b3170a3f9063",
+          "disposition": "unchanged",
+          "stdout_sha256": "380f1a9eba6d809cce44c6d8a6f202cf134405c6bd4bc4a36904bc07414ff329",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "0ecd0be4b0531578c3925ff0c93bbe05e99f9d1fdaec76e230bcc4f237f378c1"
+        },
+        {
+          "target": "ada",
+          "report": "instrumented-Linux-relocatable/reports/gc-events/9310316343954b12808cd8d480dd4027/Ada-gc.lua.json",
+          "sha256": "57aa9da356ccaee7085dfbf91ba20b1784e5f8ffe9689199bda60f203404ce30",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "380f1a9eba6d809cce44c6d8a6f202cf134405c6bd4bc4a36904bc07414ff329",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "1df577671d03350e2c267fa4e24b2bd46afd572ee76e622da57cedef4b37ae3f"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-static/gc.json",
+      "decision": "accepted",
+      "sha256": "f8d7bbc5b747b540e03a1dadb7aa73a3f69205d9c284ceb6544975fa8a6f8bde",
+      "aunit_report_sha256": "b6170e6105bbd1207585a7a0c58f0a7bfe49dda6c2b8fe2ec10dc5562460dcd9",
+      "targets": [
+        {
+          "target": "c",
+          "report": "instrumented-Linux-static/reports/gc-events/63725ed3b7b745f2ac4186f593f59b38/ReferenceC-gc.lua.json",
+          "sha256": "c0d08f008c3118878895a24d826f2c19347f785acc057651190f083f89693772",
+          "disposition": "unchanged",
+          "stdout_sha256": "380f1a9eba6d809cce44c6d8a6f202cf134405c6bd4bc4a36904bc07414ff329",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "be512643df910fa46ebf80d5d833ffad653ee59a2400d285ad29bb93c451d77f"
+        },
+        {
+          "target": "ada",
+          "report": "instrumented-Linux-static/reports/gc-events/63725ed3b7b745f2ac4186f593f59b38/Ada-gc.lua.json",
+          "sha256": "2baee7785ee5bfa33c45b9c11f86f27674b51fb4bd6c166b84023b4f8c0e3fe5",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "380f1a9eba6d809cce44c6d8a6f202cf134405c6bd4bc4a36904bc07414ff329",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "dce221678f49559c6b18c425c8fd317e0bb0791f0bbd28043196043644c4bdf0"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "6f7ecfc2f023c7dd8a6df3087f48b264b79cf103b85b96fcc0ff842ea5e25469",
+      "aunit_report_sha256": "876ae303582b4a04c12148260fbee282b1a91556525bd6b40c5b927a67deae45",
+      "targets": [
+        {
+          "target": "c",
+          "report": "instrumented-macOS-relocatable/reports/gc-events/0bc1581e737d475b86b1e2a7b63569f7/ReferenceC-gc.lua.json",
+          "sha256": "8092d801a03e00a7737d471e2e1bab3ad1f0ffb3582d6621232548e63da83ec2",
+          "disposition": "unchanged",
+          "stdout_sha256": "380f1a9eba6d809cce44c6d8a6f202cf134405c6bd4bc4a36904bc07414ff329",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "be7e040280ad51d8a897f9188efa499c2ad89d2ea10c9eb500b36a5225dc373d"
+        },
+        {
+          "target": "ada",
+          "report": "instrumented-macOS-relocatable/reports/gc-events/0bc1581e737d475b86b1e2a7b63569f7/Ada-gc.lua.json",
+          "sha256": "f3884eba7c9b6094c993da9f95c08a956ef3cbf0b789a039f97dae5d5ce9c9ff",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "380f1a9eba6d809cce44c6d8a6f202cf134405c6bd4bc4a36904bc07414ff329",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "262d6b590dbd0dfc15ba72547c31aef69e0912849a9a6ae828cf9e65740dd424"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-static/gc.json",
+      "decision": "accepted",
+      "sha256": "b130fe3e0e816e828e07423a11c8de18e6909c853c5df62e891ad8cf18634870",
+      "aunit_report_sha256": "424e607a29f16312604e1120fa29cf39217ea18074cc5296329af52db2119402",
+      "targets": [
+        {
+          "target": "c",
+          "report": "instrumented-macOS-static/reports/gc-events/baf239c6f7444712b0a4df4baa28720e/ReferenceC-gc.lua.json",
+          "sha256": "67808468ce198b7b5ec5dfde4b516be830b4f73863cb753359a662333f7c3631",
+          "disposition": "unchanged",
+          "stdout_sha256": "380f1a9eba6d809cce44c6d8a6f202cf134405c6bd4bc4a36904bc07414ff329",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "28fa9dd139fc49832bda1d242b2c42afe0defaff5175763ab5ed8b5227b93f27"
+        },
+        {
+          "target": "ada",
+          "report": "instrumented-macOS-static/reports/gc-events/baf239c6f7444712b0a4df4baa28720e/Ada-gc.lua.json",
+          "sha256": "ebe0c1e428cac85ac1ee4e3e1e12247be59a1277e86ae17b8b255520d7485caa",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "380f1a9eba6d809cce44c6d8a6f202cf134405c6bd4bc4a36904bc07414ff329",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "54c08987bc50ba5d9ed57d9117295b16c23c16f6e130db811a4fd0c0dd4045dc"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-shared/gc.json",
+      "decision": "accepted",
+      "sha256": "e5f30d450678cbbab0ade2851ad426d03a5296f33e5df4eead7230d5c70347f8",
+      "aunit_report_sha256": "2a44fbde989044e50a92d1cbfca53bce831a2cd85720b83120c827d832d40774",
+      "targets": [
+        {
+          "target": "c",
+          "report": "instrumented-Windows-relocatable/reports/gc-events/5b9fcbf73b0e4cec9e68d2346bf2fa60/ReferenceC-gc.lua.json",
+          "sha256": "bd2cad129a9db7706f1feb8aa360b3b54e63d03dfd522ec7685fb7f22a3caea3",
+          "disposition": "unchanged",
+          "stdout_sha256": "6f710e9cb22e5f8e937d5796103fd85c7074be85af357f3064e34b6bc17e91a3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "64dccab3013d9c7df2d2ccaf80ed9a16074ef2b681ad1a04a8b5e97e399e2214"
+        },
+        {
+          "target": "ada",
+          "report": "instrumented-Windows-relocatable/reports/gc-events/5b9fcbf73b0e4cec9e68d2346bf2fa60/Ada-gc.lua.json",
+          "sha256": "e6d88795dcbb5fc968be8775923a31e020e4fac9c14d5556256347e7a08a5560",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "6f710e9cb22e5f8e937d5796103fd85c7074be85af357f3064e34b6bc17e91a3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "ad0ed8d11c9e3ca704001426263af9c3df9644b9a2c795bcc21514c96c528e47"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static/gc.json",
+      "decision": "accepted",
+      "sha256": "a1f61401fc89fd53b132b09a51eefb1a7541cf0ac812d593306abc658257611a",
+      "aunit_report_sha256": "188547d904ffdbb00499f9a03d9a580824c30cb8bce26cb97f7dd189eec02245",
+      "targets": [
+        {
+          "target": "c",
+          "report": "instrumented-Windows-static/reports/gc-events/909db80b14834779851cf6bf237659d4/ReferenceC-gc.lua.json",
+          "sha256": "98b9fecfbbbf538ee48acfc6237383f636b7327ce27015831286d52ad71340d0",
+          "disposition": "unchanged",
+          "stdout_sha256": "6f710e9cb22e5f8e937d5796103fd85c7074be85af357f3064e34b6bc17e91a3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "77a08d0ac1a36768f457c725a6fbb63d4165570be60d4f8c7c52af8d39104365"
+        },
+        {
+          "target": "ada",
+          "report": "instrumented-Windows-static/reports/gc-events/909db80b14834779851cf6bf237659d4/Ada-gc.lua.json",
+          "sha256": "18419224b72a99ac2b99256ad8e454bc83ccd573800d0318339da7a92314222f",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "6f710e9cb22e5f8e937d5796103fd85c7074be85af357f3064e34b6bc17e91a3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "b43dca83b87596898a77de1958472d3155ca3e4b45a9ce7dcec123bbefbb6b26"
+        }
+      ]
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static-pic/gc.json",
+      "decision": "accepted",
+      "sha256": "7bdb37e259ebec99d672a1d299ebb9f1e20c48684c1a8734fab527e0a6fce484",
+      "aunit_report_sha256": "334e376888b92c4eef39c1dd120746d693d358d05f1a5256eff33eb37aa46480",
+      "targets": [
+        {
+          "target": "c",
+          "report": "instrumented-Windows-static/reports/gc-events/9d870e8b7e584e8db004307a211f9814/ReferenceC-gc.lua.json",
+          "sha256": "39d0f0cb9f36699d8d84bbfe25a7689c86add83ede53b85c1333754ad458e145",
+          "disposition": "unchanged",
+          "stdout_sha256": "6f710e9cb22e5f8e937d5796103fd85c7074be85af357f3064e34b6bc17e91a3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "a3e78a0fcdf3a0377d99cc1c78d8c7f8ecec8378979aa0c620abeaef7dfba752"
+        },
+        {
+          "target": "ada",
+          "report": "instrumented-Windows-static/reports/gc-events/9d870e8b7e584e8db004307a211f9814/Ada-gc.lua.json",
+          "sha256": "e864567adf9160438973fc56c2f1bb429472018d72a3d065143e14eb668a3d59",
+          "disposition": "ada-internal-equivalent",
+          "stdout_sha256": "6f710e9cb22e5f8e937d5796103fd85c7074be85af357f3064e34b6bc17e91a3",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "telemetry_sha256": "891672430b03bc6b54cd86ffc610b8018b148144a9fae7838d1b52d70eb48c9f"
+        }
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "id": "LUA-GC-MANUAL-AUDIT-0001",
+      "disposition": "inventory-reviewed",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "whole-file-semantic-audit",
+        "Ada-equivalent-span",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [
+        "measure-live-payloads",
+        "reclaim-payloads",
+        "stable-cell-color",
+        "measured-emergency-headroom"
+      ],
+      "source_span_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0001",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0002",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0003",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0004",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0005",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0006",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0007",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0008",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0009",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0010",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0011",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0012",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0013",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0014",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0015",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0016",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0017",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0018",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0019",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0020",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0021",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0022",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0023",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0024",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0025",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0026",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0027",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0028",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0029",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0030",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0031",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0032",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0033",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0034",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0035",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0036",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0037",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0038",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0039",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0040",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0041",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0042",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0043",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0044",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0045",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0046",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0047",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0048",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0049",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0050",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0051",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0052",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0053",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0054",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0055",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0056",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0057",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0058",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0059",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0060",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0061",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0062",
+      "disposition": "ada-internal-equivalent",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "Ada-equivalent-span",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [
+        "reclaim-payloads"
+      ],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0063",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0064",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0065",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0066",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0067",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0068",
+      "disposition": "ada-internal-equivalent",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "Ada-equivalent-span"
+      ],
+      "replacement_ids": [
+        "stable-cell-color"
+      ],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0069",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0070",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0071",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0072",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0073",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0074",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0075",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0076",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0077",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0078",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0079",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0080",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0081",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0082",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0083",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0084",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0085",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0086",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0087",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0088",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0089",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0090",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-ASSERT-CALL-0091",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0001",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "28922c9e6bdbdb7566acd11fe869607b258324f62b0c64aa5ccc078d6e324867"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0002",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "fe72b2fb5dae5cc1500fcfa1c649d2419cf571c4c81d9da18eb58330984f104c"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0003",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "49cf0e8f2055054ddf9eb904b7251769c2e7c15417e1d258291d406866e5d6b6"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0004",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "feb3c8e9c9612ac9e502bc2b90dfc674ee74af14fb51d9e85a21722e4635a10e"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0005",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "70a38f5d62786dd4767a70b52d132b4cce84db95a5dcae142349811b391ccd4b"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0006",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "034a3fad1d9a31c6ce1335bd474a6c26fdcc2e6130123bae09662cb7a2e1c503"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0007",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "4713d758ec3124bb8b691c2dfd3dbb11fab7f2822377f11b236a7d82ae6a8716"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0008",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "bdb8aaa7c139d0fecefed1fe323185d7e7fd0d3fcbaed5e95beb7a6e8a124b28"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0009",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "c2ac0f96cd0299bff17838f2bdea269356045e0cf4ad25e73484dedfee33d00a"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0010",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "809eb653ca2b4add1d34f6a233b9768f9e3eebd75d7c972b4ba0c22d47e96152"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0011",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "dfa5a0b496907690082ab2175e856dbf8cb6f39bbc9fac8b1a3686ee9b94cdff"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0012",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "b8508b3d515b5b457b076bd4640769795f802296f6f6326118e4b5f6b0703935"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0013",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "ea32a4cf26cc6b8fc03548020b33b9d4f1959840a170a8dc309b0ac37f626a5a"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0014",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "6c63f098efe009d1a261f4d5e6dea677b604dc305feed074ef4824f4d6600e3d"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0015",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "249388f5fb6873736f01d91c10958d82ad37eead047d1f223a58b53e2841414d"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0016",
+      "disposition": "ada-internal-equivalent",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "Ada-equivalent-span",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [
+        "measure-live-payloads",
+        "reclaim-payloads"
+      ],
+      "source_span_sha256": "860213c73b5389ca702caaaba333e0a0486f28afaa0dd262bb0660723b784e80"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0017",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "f9817fb72f1816ef6557d9e464e3e5652742d4284973f77df7ef311eb2f0008e"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0018",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "fa11ed81b6c5e856f3d6108fb95a8281149f5092e1226fc2f56bceb2c168b290"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0019",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "392f4cc6456110d120eb978f0735ea81223216502c882be8f636edcd9f4d216b"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0020",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "a3475540a3bb9692544d0c12cddbe15dbb196a63ad0846f4edd4e777a80d03ca"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0021",
+      "disposition": "ada-internal-equivalent",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "Ada-equivalent-span"
+      ],
+      "replacement_ids": [
+        "stable-cell-color"
+      ],
+      "source_span_sha256": "178809de1cb07a502d0e271ce44c6016ce038a2d2f0dfd7ed3e9e62a13dd1f2c"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0022",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "b67a6c0a8dff5cf1fbeff072aacf44671dd3386e98a0cef2b1670c0d39da5cfc"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0023",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "ff84a903ebde8b027113266f4f29c1ba8300536f5469618bd5a90808a69e0b94"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0024",
+      "disposition": "ada-internal-equivalent",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "Ada-equivalent-span",
+        "measured-storage-or-AUnit",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [
+        "measured-emergency-headroom"
+      ],
+      "source_span_sha256": "2946e815a8a2a8a5a00a4c98273115daf9831e11771c47bd9f3643912d5c43ec"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0025",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "705b262f7e414b766535e0e55c25332e8e4bd3a6f52126366c3b348350926a55"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0026",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "state-close"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "3d71a6ad6da07aec5933c1edc8ba807640ff7a4ed3655a328439adf52d7625db"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0027",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "312e91e3326fb8cbce8a591ad145117b81717805a58710a5521e8abb3b608e84"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0028",
+      "disposition": "unchanged",
+      "contexts": [
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "T-only",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "9fbd39d0ebe2c9bae5ad636cd1f9644a4657f1035e0678dc36b7a63acfb90ad6"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0029",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "warning-observed-callback",
+        "measured-storage-or-AUnit"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "15804548a950e310c6d45895dd46c245e44af6217d6ec20ba27673a3e0cbdbaf"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0030",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "044c8bfe7169216ab5a7f51c7e916c24068c366b1e41ca95abfdf0f352b18d05"
+    },
+    {
+      "id": "LUA-GC-REVIEWED-BLOCK-0031",
+      "disposition": "unchanged",
+      "contexts": [
+        "default/linux/development/shared",
+        "default/linux/development/static",
+        "default/linux/release/shared",
+        "default/linux/release/static",
+        "default/linux/validation/shared",
+        "default/linux/validation/static",
+        "default/macos/development/shared",
+        "default/macos/development/static",
+        "default/macos/release/shared",
+        "default/macos/release/static",
+        "default/macos/validation/shared",
+        "default/macos/validation/static",
+        "default/windows/development/shared",
+        "default/windows/development/static",
+        "default/windows/release/shared",
+        "default/windows/release/static",
+        "default/windows/validation/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/static-pic",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "basis": [
+        "source-path-assertions",
+        "dynamic-invocations"
+      ],
+      "replacement_ids": [],
+      "source_span_sha256": "14ebe7029327aecec8a8a882f2054638d60b965cdf04e6bd1a8d4e1f7bc59928"
+    }
+  ]
+}

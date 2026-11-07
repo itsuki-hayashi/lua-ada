@@ -73,9 +73,22 @@ Test-Rejected 'pending independent scope review' { param($d)
 Test-Rejected 'self-reviewed scope' { param($d)
     $d.review.status='reviewed'; $d.review.reviewer=$d.review.author; $d.review.artifact='synthetic-fixture'
 } 'independent review'
-Test-Rejected 'review does not resolve runtime coverage' { param($d)
-    $d.review.status='reviewed'; $d.review.reviewer='synthetic-independent-reviewer'; $d.review.artifact='synthetic-fixture'
-} 'Unresolved coverage' -Complete
+# Install a genuinely unfinished runtime assertion in the disposable ledger.
+# The negative must keep working after the real scoped ledger is complete.
+$eventsPath = Join-Path $temporary 'coverage/events.jsonl'
+$originalEvents = [IO.File]::ReadAllText($eventsPath)
+try {
+    $rows = [IO.File]::ReadAllLines($eventsPath)
+    $index = [Array]::FindIndex($rows, [Predicate[string]]{param($line) $line.Contains('"id":"LUA-EVENTS-ASSERT-CALL-0001"')})
+    if ($index -lt 0) { throw 'Missing scoped assertion fixture' }
+    $assertion = $rows[$index] | ConvertFrom-Json -AsHashtable -Depth 64
+    $assertion.status='pending'; $assertion.disposition='pending'; $assertion.evidence=@()
+    $rows[$index] = $assertion | ConvertTo-Json -Compress -Depth 64
+    [IO.File]::WriteAllText($eventsPath, ($rows -join "`n") + "`n")
+    Test-Rejected 'review does not resolve runtime coverage' { param($d)
+        $d.review.status='reviewed'; $d.review.reviewer='synthetic-independent-reviewer'; $d.review.artifact='synthetic-fixture'
+    } 'Unresolved coverage' -Complete
+} finally { [IO.File]::WriteAllText($eventsPath, $originalEvents) }
 # An out-of-scope source partition is still structurally mandatory.
 $outside = Join-Path $temporary 'coverage/strings.jsonl'
 $originalOutside = [IO.File]::ReadAllText($outside)

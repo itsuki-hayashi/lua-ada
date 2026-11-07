@@ -1,0 +1,637 @@
+{
+  "schema_version": 1,
+  "scope": "gc-io-events",
+  "review": {
+    "status": "accepted",
+    "author": "/root",
+    "reviewer": "/root/review_events_harness",
+    "artifact": "tests/conformance/reviews/gc-io-events.contract-index-approval.json",
+    "artifact_sha256": "26175da7b5fc8704ae484c259f8234eaeac439be62bda9bce92c8eab0d643d17"
+  },
+  "contracts": [
+    {
+      "file": "events.lua",
+      "context": "default/linux/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-shared/events.json",
+      "sha256": "57d28648ea80269d47dd522c45a858b69bc34d58897e6bfae885f30e98d9199c"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/linux/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-shared/files.json",
+      "sha256": "80bd05cd51a56f557a5ebd31e6ef9c061fb202b72c181120e025b72c759542d5"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-shared/gc.json",
+      "sha256": "09b94bc51a74fe13f2fced55804b5ee0533ce67f2bd0028bb6acdf7e71784c35"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/linux/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-shared/gengc.json",
+      "sha256": "04e6b39cac75809d91ac74837f1a487bee5b752103c2d6a24fa278f10c1c2257"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/linux/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-static/events.json",
+      "sha256": "05ec8f4fffa8cf2fb4ab05fd3c36ac06ff2e0b727b3947e4303371a9b8a20de1"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/linux/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-static/files.json",
+      "sha256": "b573224c2a1ccb14bab7f8a889d5a58b9eebf04594c084d14dc628447bbf412a"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-static/gc.json",
+      "sha256": "53f3cb4dce6160b57e3334054e029a25e20cf136a4e72dddc41bf9db2d68b3be"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/linux/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-static/gengc.json",
+      "sha256": "fc4a17e639193e73bf5e12bc38c6fb3e805370f0e6af46f48e0bf7c7599c97f8"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/linux/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-shared/events.json",
+      "sha256": "ef573bd74e82e137d35d00fdf57dd0db00d71b9c15c52932ec6731beae614a5d"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/linux/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-shared/files.json",
+      "sha256": "1f149e7faf731c7cd0346f705cd41cf8692ca7eef6fa4adceead9cc251ef27af"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-shared/gc.json",
+      "sha256": "4d4a85e165015b061726092b1d37ac079d8eb1d2f67c5ebe17a9d28f631f6fd0"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/linux/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-shared/gengc.json",
+      "sha256": "db6af9a8bd60867643329b8ce0026db4b98e823537e7cab7b383d761219c166a"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/linux/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-static/events.json",
+      "sha256": "1f4a5fd4bed621ccb8dadf3b91a7981842cf89411df31de457eb31db21fb4ac8"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/linux/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-static/files.json",
+      "sha256": "70990699a24ca5499c192c03a0e66a0160b28804a3dedc942bfda0987a683102"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-static/gc.json",
+      "sha256": "bf628db56a96af41854f83b1a50faf211c070d508ac66b4db909c134e78f0530"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/linux/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-static/gengc.json",
+      "sha256": "a7d349c42c49cadc6af4626c9581a4591fec9daa3a35b6bc39d75487aaf9ed15"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-shared/events.json",
+      "sha256": "8f5a9b0e7d2807497b618cefab204dd99dec41be31616a99996fa30ec4143db9"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-shared/files.json",
+      "sha256": "a16658af74caa19b88ae03750395722208c88fa10c8874840910bb98745f87f7"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-shared/gc.json",
+      "sha256": "5fa838dec5a49c0073b753937d49e65eb8ffe8fcd2d46f19249cdddbc32d413d"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-shared/gengc.json",
+      "sha256": "f286e1100ac50cd9067d29430901f10b005984670b5cea0a25cee6a73a805ca5"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-static/events.json",
+      "sha256": "4a84a03d19b4b13037b41269b9d00cf4228878c157723d961ef5fbdd43ba264f"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-static/files.json",
+      "sha256": "dc9a4d3b546689ebd4905b133de808619f4c700ab2bc9dc91e4900632aaacb39"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-static/gc.json",
+      "sha256": "7e3f8093749ed30da26006d0f83e9a441813bfd84007eb08eec5c9e84510163e"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-static/gengc.json",
+      "sha256": "ad7f54798b03be5ec3b25b5bcab91746e881bf7e6be50abcedadaeb5b3574911"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/macos/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-shared/events.json",
+      "sha256": "c92d7c83520f700fa62bf5c8928d961ec6e920b0aab7ac135d17129982509472"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/macos/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-shared/files.json",
+      "sha256": "6e29a3bcd0e42e72b69514601a9633fd17dd25464a0d7545e0968f4ad3c09125"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-shared/gc.json",
+      "sha256": "bfc28a75f2801584a264a8f87cbb1321269b16097c5d4e207a3b2476d9a781d4"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/macos/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-shared/gengc.json",
+      "sha256": "fe5a77d1f18aaebba10c6adf0ed29acdf1db293f05a72a51b8a92ba63f73cf62"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/macos/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-static/events.json",
+      "sha256": "78b93d586f1fceda99559e958d8f471b68db243f527b24bba24067bc6c300ab8"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/macos/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-static/files.json",
+      "sha256": "f73a4e39ff94a626005c5ca890d4c5757691f6311602e4f1494ff90331553ca9"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-static/gc.json",
+      "sha256": "b1a13a8f399e486ef589acc15af8cb807ad275321d3f63e17686624a94d04890"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/macos/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-static/gengc.json",
+      "sha256": "a38da112e78a106b8957aa1a81a1605a0280824cb052a817b0e0cd7abc2e8473"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/macos/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-shared/events.json",
+      "sha256": "1168649051cc488fb76bb98f817d71da87e9fda7857c617bb4d11a5eb72a16c2"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/macos/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-shared/files.json",
+      "sha256": "d028ecc9a4994e414d0f6fc925ceb6bf91ab2e04471985321de8ad952086631f"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-shared/gc.json",
+      "sha256": "8df148a5091938947b165b7d2a19194252a8de2256aac7331d1f3db0914dff4f"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/macos/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-shared/gengc.json",
+      "sha256": "823952ea2989c23657ebdb7cdf156d2e27d29c0d11c86328e8d1950c5d0eddce"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/macos/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-static/events.json",
+      "sha256": "37e1ee2088996657a380c455e6589c84c4cd4d97d3b6160b1a66edeb81b005b3"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/macos/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-static/files.json",
+      "sha256": "1b0dd84539b44f692d5169ea24501fab8a2a74933c4bb1901558b5bd45c080b1"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-static/gc.json",
+      "sha256": "e8d2f9d065e55c6d39ef6f3dce0373d60e6e4d68575df850b3e8eb61760f230f"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/macos/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-static/gengc.json",
+      "sha256": "b8e47e6619da41c0d91a4b5353c08e7a4fe576b25c071f40f9e79bc4ad1ae927"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-shared/events.json",
+      "sha256": "aa9f0af976058a552facd8536a0adc2052165411bdad5489c773f8290c9794bc"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-shared/files.json",
+      "sha256": "317feff5f0c233baa6e82b90b7e6411daf52d3a0350d10bb80720fc5fc580074"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-shared/gc.json",
+      "sha256": "a2a45ca4d740935a9c277434a3de24cabb0575e4c7c9975c6149cfbed469de3c"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-shared/gengc.json",
+      "sha256": "466e2cc1d0fb496ad7f71d34753a9d051c39de81becd9a1f5c31214f87867073"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-static/events.json",
+      "sha256": "e82f627c2132fcdd9b48484b0e2cb4b6bc67a3291cae14e05f1640596f25e030"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-static/files.json",
+      "sha256": "269d32b817936548598ce24c25fac963a70617f8304cecea879de397aa39b0b9"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-static/gc.json",
+      "sha256": "22e8a5269042525d0ac6e210470f297612f8dadf02060f000a9893e99d01f97b"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-static/gengc.json",
+      "sha256": "add808d0656cb6459c56bbb2e59e952a8aaddebb4cfd0dca6648f6e4f6e9adb3"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/windows/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-shared/events.json",
+      "sha256": "c2f61fd86651472c571d592a31795c998b07799080148ad9264597add6913866"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/windows/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-shared/files.json",
+      "sha256": "d4a7ff4778241009fa6c6bf7dfa82cd074757583a1d174be76edef7ae69ca6b0"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-shared/gc.json",
+      "sha256": "905ae0eafb6f65a6bac051c878ce162fbfde8978e92317c65aca901bf6bce6a8"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/windows/development/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-shared/gengc.json",
+      "sha256": "df0a6dd691e61ea041a1f4ea1ff095cc4e24db07f9707c0b366c25446554d5a1"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/windows/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-static/events.json",
+      "sha256": "718965403bb7b6778fcbac1f2aeb1c5f826c5222c78d044059104230e141cde7"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/windows/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-static/files.json",
+      "sha256": "bdb7412dce9c919fd85425dd3f80a0d9835c10ce525cf44910746f2ba378b3d2"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-static/gc.json",
+      "sha256": "ded0083e7110333c66cf2e6ca5f564da9182fba5388e4ce1c48d2a1bc53b8d70"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/windows/development/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-static/gengc.json",
+      "sha256": "3c7ea763f30b8c08a0f0c31e82cf789f03a837fefa0e8da134909a0a3bc48333"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/windows/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-shared/events.json",
+      "sha256": "1c5f3340343dbc5a7d318d5101fce21facbab76e2465a2a905268bf49b496f0b"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/windows/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-shared/files.json",
+      "sha256": "036b867636e06c457bccfdd50ae0a3c897357fb5ec0518dddb9dbae8dba1aab9"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-shared/gc.json",
+      "sha256": "67d05f272c914aa7b554e65b643ad44e0a53d0bfc7df73a419737d25f0b943da"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/windows/release/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-shared/gengc.json",
+      "sha256": "899ef4837e4fffdb366c9692392e1a7a7263c36a3aa44ae45859e92dec8b65b5"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/windows/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-static/events.json",
+      "sha256": "7a9c4110096038571507d24388e8d9f1e76e50c74821df269c3f4adf25a52624"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/windows/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-static/files.json",
+      "sha256": "90af4286734b492edade025b1433f5794c13026195c45fc28863fcdb28dd3ef1"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-static/gc.json",
+      "sha256": "7d5afcc5b5132fda68598c054218bfe6431cb9716eb1ec44ac9ba41b84add190"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/windows/release/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-static/gengc.json",
+      "sha256": "b4d482472187005537e30efb9d489c7d407eaea9157f36293c3e7f49b47d9fd1"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-shared/events.json",
+      "sha256": "c7b837b5f65699f21d575d14d491f418fa42122b357307faea69368bb9a70cc6"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-shared/files.json",
+      "sha256": "716005509190ed9c0cfd54ad20a820cc94bd08f8d90d27eeacc655910958a517"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-shared/gc.json",
+      "sha256": "48e465412b95289c2b3dc0e3265aaa5dee5cbc40fb19b17cd181f60419ad1f3b"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-shared/gengc.json",
+      "sha256": "9b9ab649278c3921e28835fa08d8d28fb903721abdb3e972345d905c6d11f303"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static/events.json",
+      "sha256": "e24fdf93db7dde6d6ca423a9c038bfeb78db587abdd9e696c16d4c5bb4c9a220"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static/files.json",
+      "sha256": "0ef9cdef996c8ae47f7c3d66d99e16bc21650b3c7978c78e0491a240535c2dea"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static/gc.json",
+      "sha256": "a93783200bb4d46caefa1bd6f6511a341deb849ba3ef58a91bf0a592bb73ae5b"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static/gengc.json",
+      "sha256": "03bdd80aa5782e015a54d10f5d59d8bc4921778dc4fdb39b57855abddcd810e0"
+    },
+    {
+      "file": "events.lua",
+      "context": "default/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static-pic/events.json",
+      "sha256": "fbf6e97ce8f616273b3d60a6ae3e32cdffcc6fd349bb39d41628cf099d9a00e0"
+    },
+    {
+      "file": "files.lua",
+      "context": "default/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static-pic/files.json",
+      "sha256": "2934e8945901fa1da7833f36cbeccc0c14d455f36c8cd83441062ecaaaee513f"
+    },
+    {
+      "file": "gc.lua",
+      "context": "default/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static-pic/gc.json",
+      "sha256": "103d3fcd39abf2fbccaec17c0f1b9761762cdde1711f7145d4bbcec3ecfc0e55"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "default/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static-pic/gengc.json",
+      "sha256": "c18261c45089bc400bbcedaa6c441f76385cab5024bcd460e9631cf584fdbe29"
+    },
+    {
+      "file": "events.lua",
+      "context": "upstream-test/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-shared/events.json",
+      "sha256": "5c85b4a2d330561180a83893c78812653125ced0a835ed36271ffeb4c468ba8d"
+    },
+    {
+      "file": "files.lua",
+      "context": "upstream-test/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-shared/files.json",
+      "sha256": "a579b90a9bd3b5cddc197116795329d7b043b3e69d644d3b999ece4ebad16be2"
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-shared/gc.json",
+      "sha256": "932b7487264dcfb496ef2986c0959df4de01f237a371808266ec4fdf38de0353"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "upstream-test/linux/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-shared/gengc.json",
+      "sha256": "abb739ec5e4bb3415789635b1d5aae7dd277e25a60556e17e2a4cf4dfc93ede2"
+    },
+    {
+      "file": "events.lua",
+      "context": "upstream-test/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-static/events.json",
+      "sha256": "f36412587150b20436f8771ffbf9d6dcc7cd8a3f1fc8de6efa105b5edbde02c3"
+    },
+    {
+      "file": "files.lua",
+      "context": "upstream-test/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-static/files.json",
+      "sha256": "d354a7601f4fc4d021ce15bcb76167063c1bb9ba5b26031486e10c8fee0e0969"
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-static/gc.json",
+      "sha256": "f8d7bbc5b747b540e03a1dadb7aa73a3f69205d9c284ceb6544975fa8a6f8bde"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "upstream-test/linux/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-static/gengc.json",
+      "sha256": "f6e090f1c47d3463f52ee70d489006e67cde0117e279f0a71ca1fcd00769c509"
+    },
+    {
+      "file": "events.lua",
+      "context": "upstream-test/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-shared/events.json",
+      "sha256": "82cc8776718862f7ec3ba0207d64abb2a98b34a4361d940237dbbb1b950b0134"
+    },
+    {
+      "file": "files.lua",
+      "context": "upstream-test/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-shared/files.json",
+      "sha256": "cf6d3666cd0417ee6ab18708ee4ceca155dc9fdc4c93e69de8a91e71bd072ff6"
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-shared/gc.json",
+      "sha256": "6f7ecfc2f023c7dd8a6df3087f48b264b79cf103b85b96fcc0ff842ea5e25469"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "upstream-test/macos/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-shared/gengc.json",
+      "sha256": "907a15bdbb6530949f402b45177f00419e83ee46696aff24159f5054dfeaad62"
+    },
+    {
+      "file": "events.lua",
+      "context": "upstream-test/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-static/events.json",
+      "sha256": "644b4dd3c7447f5367dd415a4524ca481d33bf4a378b00efd9d6bb557e0be639"
+    },
+    {
+      "file": "files.lua",
+      "context": "upstream-test/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-static/files.json",
+      "sha256": "c6abce039e1f2e031e1a63c762aec6d2d7196f8f3d819a65ccc349bd207e4a42"
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-static/gc.json",
+      "sha256": "b130fe3e0e816e828e07423a11c8de18e6909c853c5df62e891ad8cf18634870"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "upstream-test/macos/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-static/gengc.json",
+      "sha256": "49cb4aadd798a5809ade4e50bfc311846ef4df7721e1b76ccebf50ee2d3448de"
+    },
+    {
+      "file": "events.lua",
+      "context": "upstream-test/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-shared/events.json",
+      "sha256": "9493810f3aa0fe0d4007b153d789b1a390bf36043228f8301573344c959d4776"
+    },
+    {
+      "file": "files.lua",
+      "context": "upstream-test/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-shared/files.json",
+      "sha256": "6878554d7b5bb8a4f9cf7b0e27ac1651b48d090acc4a68dd86b0041a7934bac1"
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-shared/gc.json",
+      "sha256": "e5f30d450678cbbab0ade2851ad426d03a5296f33e5df4eead7230d5c70347f8"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "upstream-test/windows/validation/shared",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-shared/gengc.json",
+      "sha256": "a364b1e94cdaa9822aadfaf96d05cd3e2280596abab9da5f59d7f7a29ee537b6"
+    },
+    {
+      "file": "events.lua",
+      "context": "upstream-test/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static/events.json",
+      "sha256": "287daed6992dc6500e57599047f08756268a464e7e8ffe92a4d81c4bb9efcf8d"
+    },
+    {
+      "file": "files.lua",
+      "context": "upstream-test/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static/files.json",
+      "sha256": "d3f97bab0b3c62e892a4e1b85a7e7ab5ef967b7d672c0a485da7a9f9fe9e05f1"
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static/gc.json",
+      "sha256": "a1f61401fc89fd53b132b09a51eefb1a7541cf0ac812d593306abc658257611a"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "upstream-test/windows/validation/static",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static/gengc.json",
+      "sha256": "3c36992f78ca594a1493b7478cce926c88ad0400b43a8d24e7f57285fcd1f820"
+    },
+    {
+      "file": "events.lua",
+      "context": "upstream-test/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static-pic/events.json",
+      "sha256": "78db2854c0282ebea0dcb84cbe34f444f37ed2fc847cbd811230df6de406f4d4"
+    },
+    {
+      "file": "files.lua",
+      "context": "upstream-test/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static-pic/files.json",
+      "sha256": "537fdd71622af967fa3edaa351c0c1ccdfc47e016a2758f96c1d61086fe8cb16"
+    },
+    {
+      "file": "gc.lua",
+      "context": "upstream-test/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static-pic/gc.json",
+      "sha256": "7bdb37e259ebec99d672a1d299ebb9f1e20c48684c1a8734fab527e0a6fce484"
+    },
+    {
+      "file": "gengc.lua",
+      "context": "upstream-test/windows/validation/static-pic",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static-pic/gengc.json",
+      "sha256": "dc792d5640e1f49b52b492e4aaca22f2456e57ccc7bfc1dadc4993809f302fe4"
+    }
+  ]
+}

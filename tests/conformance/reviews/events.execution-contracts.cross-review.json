@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "kind": "independent-execution-contract-review",
+  "author": "/root",
+  "reviewer": "/root/review_events_harness",
+  "decision": "accepted",
+  "scope": "gc-io-events",
+  "file": "events.lua",
+  "source_revision": "ff93190fab42ffd39e2c7a8a34156fde10410a5d",
+  "workflow_run": "42327273160",
+  "runtime_acceptance": false,
+  "contracts": [
+    {
+      "context": "default/linux/development/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-shared/events.json",
+      "sha256": "57d28648ea80269d47dd522c45a858b69bc34d58897e6bfae885f30e98d9199c",
+      "c_report_sha256": "992366a3dc5d3db672fff153b98fbee6ed4324f425770f620ba4cf62776a663b",
+      "ada_report_sha256": "9c6726c03b77c7bd05260d0e4419aaddd6cccfd95e1df4f4cbc81437d0fbf86c"
+    },
+    {
+      "context": "upstream-test/windows/validation/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-shared/events.json",
+      "sha256": "9493810f3aa0fe0d4007b153d789b1a390bf36043228f8301573344c959d4776",
+      "c_report_sha256": "acea359ea0124781780ef7c09a24b2ff248a83ea27460bb0ca92d858a07dc6c9",
+      "ada_report_sha256": "d1dd5fc80db0554b0da7ad534d4412ed8de46781f023a3946f4744ab4c36d045"
+    },
+    {
+      "context": "upstream-test/macos/validation/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-static/events.json",
+      "sha256": "644b4dd3c7447f5367dd415a4524ca481d33bf4a378b00efd9d6bb557e0be639",
+      "c_report_sha256": "5ad9a6775bc8af31eac1f96ffcc726992ab8f2beefbca4091b30a17d1f0da95d",
+      "ada_report_sha256": "2cc8dfdb96d7ec7aa1266c4b04d5a55d2e10d8c1d779716bb5b95160fd1e432d"
+    },
+    {
+      "context": "upstream-test/macos/validation/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-macos-validation-shared/events.json",
+      "sha256": "82cc8776718862f7ec3ba0207d64abb2a98b34a4361d940237dbbb1b950b0134",
+      "c_report_sha256": "08db066c3bb9aff8e0b70507d53aeb4f11e321b503bd10fae43e2322f676dfea",
+      "ada_report_sha256": "957921ec553e89a15e0fee7f8b09a12dbdd069124d7e3e3a36479c67d2aef870"
+    },
+    {
+      "context": "upstream-test/linux/validation/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-static/events.json",
+      "sha256": "f36412587150b20436f8771ffbf9d6dcc7cd8a3f1fc8de6efa105b5edbde02c3",
+      "c_report_sha256": "48e7953e73f7931f2ba0b57a854537b2f05e867a370c10bdd9fdda277979194d",
+      "ada_report_sha256": "dc9713f19aabbc7ddc0e10b8eec05ba5187b4ad3d08433e2969646307f37cd92"
+    },
+    {
+      "context": "upstream-test/linux/validation/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-linux-validation-shared/events.json",
+      "sha256": "5c85b4a2d330561180a83893c78812653125ced0a835ed36271ffeb4c468ba8d",
+      "c_report_sha256": "2bf79b95376c88ad59b915f61410ad88aff2e6a3b3bac0cb418b1c3a07623b2b",
+      "ada_report_sha256": "b96c51a7dffa4c0d42f181e34c5402024222f5d23f4eba8ed3b614e2810c2fe0"
+    },
+    {
+      "context": "default/windows/validation/static-pic",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static-pic/events.json",
+      "sha256": "fbf6e97ce8f616273b3d60a6ae3e32cdffcc6fd349bb39d41628cf099d9a00e0",
+      "c_report_sha256": "851c29d8a5aff40d09584278adf98b742e75c3bbd1ae0e99086837c12d934b5f",
+      "ada_report_sha256": "cbff73151262d34609f62dcf1dfcbf1d1379fa600d790883b8125d782c48eab8"
+    },
+    {
+      "context": "default/windows/validation/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-static/events.json",
+      "sha256": "e24fdf93db7dde6d6ca423a9c038bfeb78db587abdd9e696c16d4c5bb4c9a220",
+      "c_report_sha256": "d5f05a47bff9a6668d575bf651159d59d303735c92a44ab0c05afca043561e3c",
+      "ada_report_sha256": "fea8fbca68d3b642e944c576d621a3b232d91bcc379c8fc44fb67e8cbec068fa"
+    },
+    {
+      "context": "default/windows/validation/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-validation-shared/events.json",
+      "sha256": "c7b837b5f65699f21d575d14d491f418fa42122b357307faea69368bb9a70cc6",
+      "c_report_sha256": "2331c6ed32175b44f211c0b9cfc37dee263522700379ce4f154e274edee4501e",
+      "ada_report_sha256": "c4b45e59661eecedef84d747b2bd8d00cdb474ba2b95bccf69642edbd50f7f29"
+    },
+    {
+      "context": "default/windows/release/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-static/events.json",
+      "sha256": "7a9c4110096038571507d24388e8d9f1e76e50c74821df269c3f4adf25a52624",
+      "c_report_sha256": "b557b2532bd404abd47b09b29c334b08f9d849ef012cfedfe98aeb0f670eb250",
+      "ada_report_sha256": "51850fb6791d85f04939bbf1f6993a78202831d53b57aa137733e749387ba86c"
+    },
+    {
+      "context": "default/windows/release/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-release-shared/events.json",
+      "sha256": "1c5f3340343dbc5a7d318d5101fce21facbab76e2465a2a905268bf49b496f0b",
+      "c_report_sha256": "55c841bdf723f89bc01e924a959689d464c2249c5a5bfdc2700ed2dbefe848ba",
+      "ada_report_sha256": "66b8982d6021445f761672f0718384ffba5e738a185273e22ee90358831b62df"
+    },
+    {
+      "context": "default/windows/development/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-static/events.json",
+      "sha256": "718965403bb7b6778fcbac1f2aeb1c5f826c5222c78d044059104230e141cde7",
+      "c_report_sha256": "ce79d9325be7c3f44806fa93581d62e5c7221b5e6893b2f293f5ff76a77c4f73",
+      "ada_report_sha256": "ae687140c1a165293b48d86b4defe3ae78a98a1ee69b298f2e3007e57b861b29"
+    },
+    {
+      "context": "default/windows/development/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-windows-development-shared/events.json",
+      "sha256": "c2f61fd86651472c571d592a31795c998b07799080148ad9264597add6913866",
+      "c_report_sha256": "8644176dd08f06fca390477916a29159a8767cba05348e84a9616ed0b54d0906",
+      "ada_report_sha256": "47a711dec77a566b2e64e3191f213f0adc06b342c6915b582fc96a04c04e5fb2"
+    },
+    {
+      "context": "default/macos/validation/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-static/events.json",
+      "sha256": "e82f627c2132fcdd9b48484b0e2cb4b6bc67a3291cae14e05f1640596f25e030",
+      "c_report_sha256": "1d89cf8ea7822d5d56ad8791631dc60f77c08dff5e67495b235c1d997e440da1",
+      "ada_report_sha256": "9ccec15e97a3de405ec452365c7255ff14b12a30910b472c4d05b6304de55db6"
+    },
+    {
+      "context": "default/macos/validation/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-validation-shared/events.json",
+      "sha256": "aa9f0af976058a552facd8536a0adc2052165411bdad5489c773f8290c9794bc",
+      "c_report_sha256": "25eaa624fb4dfac600230fffa116162e842a055923fbae39eb0eee35df254839",
+      "ada_report_sha256": "4341efea27ea04914aa21d67c30ec72de32fb8ddda806b034c50512c9641916a"
+    },
+    {
+      "context": "default/macos/release/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-static/events.json",
+      "sha256": "37e1ee2088996657a380c455e6589c84c4cd4d97d3b6160b1a66edeb81b005b3",
+      "c_report_sha256": "05abdbed2f0a6560a8d91416b32851bbeb2b5c705292ffdc9f3c3c10249fe336",
+      "ada_report_sha256": "b8c99bd7dc8a379b1765c1bd531464f9fc3d406c90519ddecf224c7d28d23c34"
+    },
+    {
+      "context": "default/macos/release/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-release-shared/events.json",
+      "sha256": "1168649051cc488fb76bb98f817d71da87e9fda7857c617bb4d11a5eb72a16c2",
+      "c_report_sha256": "36bcacd92669d2042b1ce6941ab8d1e4bb94f8a147c0326f1b7dcd638c274e1e",
+      "ada_report_sha256": "fd9ccee871c7ff91fa9870ce74db8589445077b7923c41ad67f759f0c97fcb5b"
+    },
+    {
+      "context": "default/macos/development/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-static/events.json",
+      "sha256": "78b93d586f1fceda99559e958d8f471b68db243f527b24bba24067bc6c300ab8",
+      "c_report_sha256": "3556fdd5e6b9866f8ee8e1efbeee93abf484f6cbff52a8ac9546587fa4eb10fd",
+      "ada_report_sha256": "e2ef4e22cc00ba76afb41978e6ce6afc468abf9294aab71345224ddfa5883909"
+    },
+    {
+      "context": "default/macos/development/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-macos-development-shared/events.json",
+      "sha256": "c92d7c83520f700fa62bf5c8928d961ec6e920b0aab7ac135d17129982509472",
+      "c_report_sha256": "1a8443535d8451706d77512177d13623aca58d2156bb0fee6de626f141a7a86c",
+      "ada_report_sha256": "c3fc9484b3ae0b1e28273b7dc95f57af75d28f91efcec9d0e771765d8f647e22"
+    },
+    {
+      "context": "default/linux/validation/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-static/events.json",
+      "sha256": "4a84a03d19b4b13037b41269b9d00cf4228878c157723d961ef5fbdd43ba264f",
+      "c_report_sha256": "243ee0cf6a79f3251c7729374683bd55403ef6f42bef18434da6cf3c13a832a9",
+      "ada_report_sha256": "12d333d61b7c4b99083265e39251b1aae918db40e23ded0f6996c730f9b8bd1a"
+    },
+    {
+      "context": "default/linux/validation/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-validation-shared/events.json",
+      "sha256": "8f5a9b0e7d2807497b618cefab204dd99dec41be31616a99996fa30ec4143db9",
+      "c_report_sha256": "647b7181daf6002d7e766831e3069d0ba16f36ab8a64b87a4c9750021f56acf9",
+      "ada_report_sha256": "55cdfc2461cc5cc991b4feef05d848c0bc3227fc92f1e8292f2a8280e8a57a52"
+    },
+    {
+      "context": "default/linux/release/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-static/events.json",
+      "sha256": "1f4a5fd4bed621ccb8dadf3b91a7981842cf89411df31de457eb31db21fb4ac8",
+      "c_report_sha256": "d12b12625c249301ab39814f778ed4c6cdd4c5e51cadaf7391b07a63dadf1100",
+      "ada_report_sha256": "bc0153bd51b989cfb30a747a2acc40822b4ebc308216845431fd197526794e3e"
+    },
+    {
+      "context": "default/linux/release/shared",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-release-shared/events.json",
+      "sha256": "ef573bd74e82e137d35d00fdf57dd0db00d71b9c15c52932ec6731beae614a5d",
+      "c_report_sha256": "8fc118bda42a62eae43ab53741ece9cb97d1ab97d9e297e3c86c0b254deea5eb",
+      "ada_report_sha256": "29f6f3ee5488388ba449950b7651cde39aa5481dd6000c648b7a0f49a83bb8d6"
+    },
+    {
+      "context": "default/linux/development/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/default-linux-development-static/events.json",
+      "sha256": "05ec8f4fffa8cf2fb4ab05fd3c36ac06ff2e0b727b3947e4303371a9b8a20de1",
+      "c_report_sha256": "4c5dfb5f498bb90947a6a1eff33eb051f9ef68dbf6345c2da1c186043385274a",
+      "ada_report_sha256": "ce39e41459affb091b8f9b3b32f41ed2a7c7ecc077c06f23f2ac1a05017d06c1"
+    },
+    {
+      "context": "upstream-test/windows/validation/static",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static/events.json",
+      "sha256": "287daed6992dc6500e57599047f08756268a464e7e8ffe92a4d81c4bb9efcf8d",
+      "c_report_sha256": "2c3a0e553d6c06b465e4047c4491fec66ca8ec5a0f54df7afe9cbb227aa388fc",
+      "ada_report_sha256": "09a565113f2c3b7472fe720fd2be6ee0263defcb52efc37229a8ef1b4ba0b685"
+    },
+    {
+      "context": "upstream-test/windows/validation/static-pic",
+      "file": "events.lua",
+      "decision": "accepted",
+      "path": "tests/conformance/contracts/gc-io-events/upstream-test-windows-validation-static-pic/events.json",
+      "sha256": "78db2854c0282ebea0dcb84cbe34f444f37ed2fc847cbd811230df6de406f4d4",
+      "c_report_sha256": "2ac9a98abb0cb15aa524dd20960a6da220815307f85e85899a8c5437cd0acf59",
+      "ada_report_sha256": "eee52c1f1c5b54ba5fee07facaaadb7331f017039b4a9afd344a27a2b3696cdc"
+    }
+  ],
+  "rationale": [
+    "All26 reviewed protocols match both observed targets, including source identity, C observation hash, required stdout and empty stderr.",
+    "Scoped process completion additionally verifies exact terminal OK/return witness order, instrumented refusal and balanced shutdown.",
+    "The printed default omission names the six instrumented userdata assertions. The silent allocation obligation is independently adjudicated through the two-configuration reviewed block."
+  ],
+  "source_adjudication_sha256": "0eac8f3a1c2b28dce8e6009bf15c804bb09d1e0c297d7b31927285e78f444817"
+}

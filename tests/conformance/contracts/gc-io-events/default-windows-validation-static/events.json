@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "operation": "file:events.lua",
+  "context": "default/windows/validation/static",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_hashes": {
+    "events.lua": "90449c1607a12a7c1841123a68237e0d23b7d6e109b8c445937fcd99306897c9"
+  },
+  "review": {
+    "author": "/root",
+    "reviewer": "/root/review_events_harness",
+    "artifact": "tests/conformance/reviews/events.execution-contracts.cross-review.json",
+    "rationale": "Scoped protocol and omission mapping; matrix replays separate named cases, native counterparts and physical shutdown.",
+    "original_c_evidence": "lifecycle-Windows-validation-static/reports/gc-events/21d42ce01abe4cfd9242bcb31156f22f/ReferenceC-events.lua.json#sha256=d5f05a47bff9a6668d575bf651159d59d303735c92a44ab0c05afca043561e3c"
+  },
+  "completion_marker": "OK",
+  "stdout_required": [
+    {
+      "pattern": "(?m)^testing\\ metatables\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^events\\ return\\ witness\\ OK\\r?$",
+      "count": 1
+    }
+  ],
+  "stderr_expected": [],
+  "expected_skips": [
+    {
+      "message": ">>> testC not active: skipping tests for userdata <<<",
+      "coverage_ids": [
+        "LUA-EVENTS-ASSERT-CALL-0110",
+        "LUA-EVENTS-ASSERT-CALL-0111",
+        "LUA-EVENTS-ASSERT-CALL-0112",
+        "LUA-EVENTS-ASSERT-CALL-0113",
+        "LUA-EVENTS-ASSERT-CALL-0114",
+        "LUA-EVENTS-ASSERT-CALL-0115"
+      ],
+      "review_artifact": "tests/conformance/reviews/events.execution-contracts.cross-review.json",
+      "original_c_evidence": "lifecycle-Windows-validation-static/reports/gc-events/21d42ce01abe4cfd9242bcb31156f22f/ReferenceC-events.lua.json#sha256=d5f05a47bff9a6668d575bf651159d59d303735c92a44ab0c05afca043561e3c"
+    }
+  ],
+  "disposition": "unchanged"
+}

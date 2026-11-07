@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "operation": "file:events.lua",
+  "context": "upstream-test/linux/validation/shared",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_hashes": {
+    "events.lua": "90449c1607a12a7c1841123a68237e0d23b7d6e109b8c445937fcd99306897c9"
+  },
+  "review": {
+    "author": "/root",
+    "reviewer": "/root/review_events_harness",
+    "artifact": "tests/conformance/reviews/events.execution-contracts.cross-review.json",
+    "rationale": "Scoped protocol and omission mapping; matrix replays separate named cases, native counterparts and physical shutdown.",
+    "original_c_evidence": "instrumented-Linux-relocatable/reports/gc-events/9310316343954b12808cd8d480dd4027/ReferenceC-events.lua.json#sha256=2bf79b95376c88ad59b915f61410ad88aff2e6a3b3bac0cb418b1c3a07623b2b"
+  },
+  "completion_marker": "OK",
+  "stdout_required": [
+    {
+      "pattern": "(?m)^testing\\ metatables\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^events\\ return\\ witness\\ OK\\r?$",
+      "count": 1
+    }
+  ],
+  "stderr_expected": [],
+  "expected_skips": [],
+  "disposition": "unchanged"
+}

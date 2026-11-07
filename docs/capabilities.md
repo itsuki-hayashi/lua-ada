@@ -15,12 +15,17 @@ does not establish platform acceptance or full conformance.
 | Results    | Scalar/list adjustment, nil padding, final expansion        | Packet/assignment/named-vararg cases           |
 | Tables     | Construction, mutation, identity, raw access, metatables    | Key/iteration and native-dispatch cases        |
 | Errors     | Diagnostics, pcall/xpcall, resources, callback recovery     | Lifecycle and native continuation cases        |
-| Lifetime   | Nonmoving iterative tracing; cycles and prototypes          | Cycle/capture/repeated-chunk cases             |
+| Lifetime   | Incremental/generational GC; weak tables and finalizers     | Barriers, physical storage and shutdown        |
+| IO and OS  | Native streams, iterators, children, calendar and exits     | Lua file tests, native and C stream cases      |
 | Ada host   | Unique sessions, persistent globals, output sink            | Lifecycle Ada consumer                         |
 | CLI        | Files, snippets, stdin, arguments, usage, checking/status   | 35 process cases                               |
 | Builds     | Static/shared, strict profiles                              | Acceptance matrix; see status                  |
 
 ## M2b export inventory
+
+The [four-file follow-up](status.md) tracks the new collector and IO/OS
+coverage separately from the earlier library inventory below. Its public
+C cases cover only the entries exercised by those files.
 
 Fresh sessions register the following library surface. This is the declared
 M2b implementation scope, verified in its acceptance matrix.

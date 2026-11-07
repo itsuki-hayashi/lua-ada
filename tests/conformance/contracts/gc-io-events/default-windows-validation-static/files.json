@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "operation": "file:files.lua",
+  "context": "default/windows/validation/static",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_hashes": {
+    "files.lua": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86"
+  },
+  "review": {
+    "author": "/root",
+    "reviewer": "/root/review_files",
+    "artifact": "tests/conformance/reviews/files.execution-contracts.cross-review.json",
+    "rationale": "Scoped protocol and omission mapping; matrix replays separate named cases, native counterparts and physical shutdown.",
+    "original_c_evidence": "lifecycle-Windows-validation-static/reports/scoped-files/e434d03aea4b4c9fba4f851263e1d234/ReferenceC-files.lua.json#sha256=e09f0d307a65684e304311b96eb5088a78a8ace76c04e119336e1f0f718243d2"
+  },
+  "completion_marker": "Lua 5.5",
+  "stdout_required": [
+    {
+      "pattern": "(?m)^native\\ unbuffered\\ visibility\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^native\\ C-int\\ field\\ boundary\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^native\\ time\\ range\\ recovery\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^native\\ DST\\ inference\\ counterpart\\ OK\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ i/o\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ flush\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ large\\ files\\ \\(>\\ BUFSIZ\\)\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ popen/pclose\\ and\\ execute\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^testing\\ date/time\\r?$",
+      "count": 1
+    },
+    {
+      "pattern": "(?m)^test done on \\d{2}/\\d{2}/\\d+, at \\d{2}:\\d{2}:\\d{2}\\r?\\nLua 5\\.5\\r?\\n\\z",
+      "count": 1
+    }
+  ],
+  "stderr_expected": [
+    {
+      "pattern": "^'not-to-be-found-command'\\ is\\ not\\ recognized\\ as\\ an\\ internal\\ or\\ external\\ command,\\r?$",
+      "count": 2
+    },
+    {
+      "pattern": "^operable\\ program\\ or\\ batch\\ file\\.\\r?$",
+      "count": 2
+    }
+  ],
+  "expected_skips": [],
+  "disposition": "native-platform-equivalent",
+  "equivalent_manifest_sha256": "b914b4572a90c7ad1b88ac8f8233e8b205b8fe4ee0042a89bbb3b864ed313970",
+  "executed_sha256": "3683ad7b602810b7bda0c0360e5f085e7edf6259c6c4ec0558bfbc1aceed4452"
+}

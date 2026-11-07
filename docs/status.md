@@ -1,82 +1,37 @@
 # Project Status
 
-## Active four-file follow-up (2026-11-07)
+## Four-file conformance follow-up (2026-11-07)
 
-The maintainer resumed implementation after merged PR #8 on
-codex/m3-gc-io-conformance. The target is complete events.lua, gc.lua,
-gengc.lua and files.lua coverage, including T obligations and all 26 contexts.
-PR #9 remains a draft. The [current handoff](sessions/2026-11-07-gc-io-conformance.md)
-records exact revisions, reports and limits. Local Windows default and
-instrumented validation/static AUnit runs pass 1,306 cases. Reviewed GC and
-Windows file equivalents execute against the actual Ada runtime; unchanged
-Linux file observations pass in both configurations. The C-specific GC byte
-allowance remains an explicitly reviewed Ada equivalent, never an unchanged pass.
-All Windows and Linux jobs at 04b9968 passed, including both Windows static-PIC
-steps. Mac C/Ada GC and events observations passed, and the Mac file oracle
-passed the repaired shell counterpart before reaching a calendar difference.
-At e028dae, the Mac C oracle normalized seconds 60 and 61 at maximum `tm_year`
-to midnight on the same date; direct input of the next year was rejected.
-The fifth Mac equivalent span now checks those native results, reverse conversion
-and recovery. Both the C oracle and Ada runtime passed the complete corrected
-Mac instrumented static file equivalent at 8196b80 with zero outstanding
-storage. Independent Linux artifact replay found that the named C consumers
-used a different runtime image from AUnit and the scoped file executions.
-The combined campaign now links each host against the one prebuilt runtime;
-fresh cross-platform hash reconciliation remains required.
-The scoped events launcher also verifies the unchanged file returns 12 through
-`dofile`, matching the check in upstream `all.lua`. The test warning observer
-measures all ten instrumented
-GC shutdown errors after their original ordering assertions; actual local C
-and Ada runs report ten with balanced storage. Independent semantic reviews
-are recorded separately from final-revision execution acceptance.
-These observations do not close
-any selected file's full coverage; complete T inspection, reviewed equivalents,
-scoped harness acceptance and the final 26-context matrix remain open.
-The C facade now exposes real IO/OS module openers with shared Ada export
-construction, stable file-metatable identity on reopen, and public FILE/closer
-consumer regressions. Both Linux instrumented jobs pass on published 915df28;
-final-revision acceptance remains outstanding.
-Real lua_gc controls now share the production collector, with C-owned finalizer
-calls and explicit state-close finalizer drainage. Seven shared public C
-contracts compare controls, steps, finalizers, warnings, allocator refusal and
-physical cleanup against the pinned oracle. Full scoped acceptance remains open.
-The gc-io-events scope now selects all four partitions (762 original anchors)
-and 77 direct API entries while preserving full-inventory validation. Its
-completion and per-operation acceptance commands remain fail-closed on pending
-reviews/coverage. The actual launcher supplies measured configuration reports
-for parent, bare-lua and arg-selected child checks. Both matrices now schedule
-all four selected files; this does not replace final-revision evidence or review.
-Independent classification review has now expanded those 762 original anchors
-with 137 source-hashed runtime blocks for generated code, helper invocations,
-callbacks and shutdown. All original identities and bytes are preserved.
-The ledger has 191 reviewed lexical entries and 708 pending runtime/audit
-entries; all 77 scoped API entries retain pending execution evidence. Native
-calendar counterparts record actual C/Ada guard facts separately from unchanged
-source execution. New direct C macro tests close identified mapping gaps, and
-a focused minormul regression checks actual minor collection debt sensitivity.
-These additions do not establish scoped completion or full M3 acceptance.
-File equivalents now use the same scoped operation/report path, with native
-counterpart tests retained separately. Platform launchers verify measured
-parent/bare-child/arg-child settings and balanced probe/main-child telemetry.
-Full local default and instrumented validation/static pipelines retain 1,305
-AUnit cases. Shared harness regressions total 40, scope regressions 38, plus
-two actual launcher-isolation regressions in each configuration.
-The subsequent reviewed macro/native-branch checkpoint passes the full local
-instrumented pipeline with 1,306 AUnit cases and a default AUnit rerun at the
-same count. Scope regressions are now 41, matrix regressions 33 and review
-binding regressions 32. All 18 Windows/Linux contexts passed at c247afb;
-macOS and the later checkpoint's complete matrix remain pending.
-The matrix reconciliation command requires all 104 file/context pairs and
-paired C/Ada reports. It rehashes captures, replays completion/acceptance checks,
-and verifies compiled runtime/launcher profiles and library type against each
-context. Thirty synthetic matrix and thirty review-artifact binding regressions
-pass; they establish harness behavior only. Accepted equivalent decisions now
-bind actual reviewed files, spans, replacement bytes and counterpart sources.
-The complete reviewed real matrix remains outstanding.
-The same three public IO/OS consumer cases now also run in an isolated C-oracle
-executable, comparing real FILE/closer layout, module reopening and native
-closure with Ada. The shared contract requires zero allocator bytes/blocks
-after state closure; it does not establish unrelated C exports.
+[PR #9](https://github.com/itsuki-hayashi/lua-ada/pull/9) covers
+`events.lua`, `gc.lua`, `gengc.lua` and `files.lua` on Windows, Linux and
+macOS. The [session record](sessions/2026-11-07-gc-io-conformance.md)
+retains intermediate failures and fixes. The suite contains 1,306 AUnit cases;
+the scoped replay selects 35 physical/runtime regressions and 41 named C
+consumer cases for the four files and their 77 directly exercised API entries.
+
+At ff93190 the combined pipeline builds one Ada runtime for the CLI, C
+consumers and AUnit. Candidate reports identify the binaries by hash.
+The events wrapper checks the unchanged chunk returns 12; the collector
+observer verifies ten instrumented shutdown warnings after the terminal
+`OK`. The collector equivalents replace reviewed implementation-specific
+assumptions, including a C byte allowance, with measured Ada behavior.
+File equivalents on Windows and macOS and supplemental native checks
+are identified separately from unchanged Linux file executions.
+
+The [candidate workflow](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42327273160)
+supplied raw evidence for all 26 contexts: 60 unchanged Ada executions,
+26 Ada collector equivalents and 18 native file equivalents. The
+[observation index](../tests/conformance/reviews/gc-io-events.observation-index.json)
+identifies the 42 archives and individual reports. Independent reviewers
+resolved 708 runtime/audit entries and 77 scoped API entries; 191 lexical
+entries retain their non-runtime classifications. The
+[contract index](../tests/conformance/scopes/gc-io-events.contracts.json)
+binds each operation to its approved protocol. Final scoped acceptance
+requires a fresh 26-context run against the resolved ledger and approved
+contracts, followed by independent reconciliation of all 208 process reports.
+Full M3, aggregate and heavy execution, and unrelated C ABI obligations remain
+outside this scope.
+
 The paused-checkpoint statements below retain the prior delivery's evidence.
 
 Updated: 2026-11-06 (Asia/Tokyo). **M0, M1, M2a, and M2b complete.**

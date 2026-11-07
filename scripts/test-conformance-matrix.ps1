@@ -238,9 +238,11 @@ Reject 'changed captured output' {param($m)} 'capture hash mismatch' -Full
 $failure=$null
 try { Test-ScopedMatrix -Root $root -ManifestPath $manifestPath -RequireScopedAcceptance | Out-Null }
 catch { $failure=$_.Exception.Message }
-if ($failure -notmatch 'independent review|Unresolved coverage') { throw "Pending ledger did not prevent acceptance: $failure" }
+if ($failure -notmatch 'Matrix requires independent reconciliation review|Unresolved coverage') {
+    throw "Synthetic matrix did not fail at the ledger or independent reconciliation gate: $failure"
+}
 $script:cases++
-Write-Output 'MATRIX TEST PASS: unresolved real ledger blocks synthetic acceptance'
+Write-Output 'MATRIX TEST PASS: synthetic matrix without independent reconciliation cannot establish acceptance'
 foreach ($field in @('runtime_build_profile','launcher_build_profile','launcher_library_type')) {
     $identity = @{runtime_build_profile='validation'; launcher_build_profile='validation'; launcher_library_type='static'}
     Assert-ScopedBuildIdentity -Observed $identity -Context 'default/windows/validation/static'

@@ -934,3 +934,31 @@ These are local diagnostics, not final clean-context acceptance. The collector
 replay mapping now selects 35 named regressions, including 21 witnesses for
 physical frame/stack release, rollback, deferred finalization, resurrection,
 root retention and recovery. The suite's registration count is unchanged.
+
+The fresh [candidate workflow](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42327273160)
+at ff93190 reproduced the library fix on Linux. In the instrumented shared
+job the C consumer, AUnit executable and scoped Ada launcher used liblua.so
+with SHA-256 6619dca3ca6122f3ebb52d832e6e83083e56b5c44c9a585765fa31dd571b42aa.
+The independent replay found all 41 named C cases and 35 AUnit witnesses,
+and both collectors closed with zero managed allocations outstanding.
+This workflow supplies observations for deciding individual obligations;
+the final matrix must replay reports generated with scoped acceptance enabled.
+
+All 24 candidate jobs passed (26 contexts including the two static-PIC
+executions). The [observation index](../../tests/conformance/reviews/gc-io-events.observation-index.json)
+binds the 42 verified archives, 208 file reports and 52 named-evidence
+reports to that revision. Offline replay verified all 104 operation pairs:
+60 unchanged Ada executions, 26 Ada collector equivalents and 18 native
+file equivalents. The C side had 86 unchanged and 18 native file executions.
+Every named consumer and AUnit campaign identified the same Ada runtime as
+its file executions; C consumer comparisons identified the same oracle.
+These counts describe observations on the candidate, not final acceptance.
+
+Independent source adjudication and the 104 contract reviews are complete.
+The promoted ledger passes `scripts/check-conformance-scope.ps1
+-RequireScopedComplete` (899 source records, 77 API entries, full inventory
+checked; full M3 remains false). For the frozen revision, use the PR workflow
+artifacts and run `scripts/check-conformance-matrix.ps1 -Manifest <manifest>
+-RequireScopedAcceptance`; the report must identify 104 accepted operations
+and 208 executions on that exact clean revision. Candidate observations must
+not be substituted for these accepted reports.
