@@ -651,6 +651,13 @@ selects and executes the probes instead of reporting a missing catalogue as
 compiled evidence. Generic historical compiled-witness callers retain their
 existing protocol.
 
+`remaining-diagnostics.yml` runs six early validation/static contexts on pushes
+to `codex/m3-remaining-upstream-compatibility`: default and T on Windows, Linux
+and macOS. It invokes explicit development observation mode and archives build
+and named regression diagnostics after failures. Its scope record always has
+false acceptance/coverage authority. It neither issues an acceptance envelope
+nor changes the final full-context workflow's independent review requirements.
+
 The implementation-facade projection additionally binds the committed private
 runtime configuration header, GPR inputs and selected Ada configuration source.
 It uses the real T-only `LUA_ADA_AUXILIARY_BUFFER_BYTES=23` flag after lua.h and
