@@ -71,13 +71,14 @@ static void raise_action(lua_State *state, int status,
         state->guard->error_handled = output->error_handled;
         longjmp(state->guard->target, status);
     }
-    if (status != ADA_ACTION_ABORT && state != NULL && state->main->panic != NULL)
-        state->main->panic(state);
-    fputs("Lua Ada: unprotected error", stderr);
-    if (status != ADA_ACTION_ABORT && output->pointer != NULL) {
-        fputs(": ", stderr);
-        fputs((const char *)output->pointer, stderr);
+    if (status != ADA_ACTION_ABORT) {
+        if (state != NULL && state->main->panic != NULL)
+            state->main->panic(state);
+        /* A returning (or absent) panic handler completes the public policy.
+         * Abort here without inventing a second diagnostic. */
+        abort();
     }
+    fputs("Lua Ada: unprotected error", stderr);
     fputc('\n', stderr);
     abort();
 }
@@ -566,12 +567,26 @@ lua_State *lua_newstate(lua_Alloc allocator, void *userdata, unsigned seed) {
     return (lua_State *)output.pointer;
 }
 
+static int default_panic(lua_State *state) {
+    const char *message = lua_type(state, -1) == LUA_TSTRING
+        ? lua_tostring(state, -1) : "error object is not a string";
+    fprintf(stderr, "PANIC: unprotected error in call to Lua API (%s)\n",
+            message);
+    return 0;
+}
+
 lua_State *luaL_newstate(void) {
     struct lua_ada_request input = request(ADA_CREATE_DEFAULT_STATE);
     struct lua_ada_response output;
     initialize();
+    input.allocator = luaL_alloc;
+    input.seed = luaL_makeseed(NULL);
     input.length = LUA_EXTRASPACE;
     if (ada_lua_dispatch(NULL, &input, &output) != LUA_OK) return NULL;
+    /* Keep default warning initialization in Ada, and install the public
+     * auxiliary panic policy only after constructor ownership commits. */
+    if (output.pointer != NULL)
+        lua_atpanic((lua_State *)output.pointer, default_panic);
     return (lua_State *)output.pointer;
 }
 

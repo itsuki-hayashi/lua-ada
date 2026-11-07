@@ -11,6 +11,14 @@ The installable headers under include/api are unchanged pinned copies with
 per-file hashes and retained notices; production include paths do not enter
 the reference-only tree.
 
+The [public allocator checkpoint](../docs/sessions/2026-11-08-public-auxiliary-allocator.md)
+exports the standard realloc/free callback and host seed function. The C
+auxiliary constructor uses their actual public identities and installs the
+allocation-free default panic diagnostic. Thirteen native-matched cases and
+two named panic probes have local static evidence; final ABI/allocator
+acceptance remains open.
+
+
 The [host base C closing checkpoint](../docs/sessions/2026-11-08-base-c-closing.md)
 supports direct idle-host `lua_toclose`, `lua_closeslot` and closing `lua_settop`
 through the actual scalar stack and shared iterative closer. Valid registration

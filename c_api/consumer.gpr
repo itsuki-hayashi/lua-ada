@@ -2,6 +2,16 @@ with "../lua_ada";
 with "../config/lua_ada_config.gpr";
 
 project Consumer is
+   C_Import_Defines := ();
+   case Lua_Ada_Config.Alire_Host_OS is
+      when "windows" =>
+         case Lua_Ada.Library_Mode is
+            when "relocatable" =>
+               C_Import_Defines := ("-DLUA_BUILD_AS_DLL");
+            when others => null;
+         end case;
+      when others => null;
+   end case;
    for Languages use ("C");
    for Source_Dirs use ("tests", "../tests/c");
    for Source_Files use
@@ -15,7 +25,7 @@ project Consumer is
       "conversion_api_contract.c", "operator_api_contract.c",
       "index_type_api_contract.c", "base_closing_api_contract.c",
       "native_module_contract.c", "buffer_api_contract.c",
-      "close_yield_contract.c");
+      "close_yield_contract.c", "allocator_api_contract.c");
    for Object_Dir use
      "../build/c-api/consumer/" & Lua_Ada.Configuration_Subdir &
        Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
@@ -31,7 +41,7 @@ project Consumer is
       "conversion_api_contract.c", "operator_api_contract.c",
       "index_type_api_contract.c", "base_closing_api_contract.c",
       "native_module_contract.c", "buffer_api_contract.c",
-      "close_yield_contract.c");
+      "close_yield_contract.c", "allocator_api_contract.c");
    for Create_Missing_Dirs use "True";
 
    package Compiler is
@@ -39,7 +49,7 @@ project Consumer is
         ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
          "-I" & Project'Project_Dir & "include",
          "-I" & Project'Project_Dir & "include/api") &
-        Lua_Ada.C_Platform_Defines;
+        Lua_Ada.C_Platform_Defines & C_Import_Defines;
    end Compiler;
    package Linker is
       case Lua_Ada_Config.Alire_Host_OS is

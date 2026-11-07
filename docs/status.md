@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [auxiliary allocator checkpoint](sessions/2026-11-08-public-auxiliary-allocator.md)
+completes the public allocator/seed and default-constructor identity locally.
+Thirteen shared-source cases match native default/T; 1,822 AUnit and eighteen
+standalone C consumers pass. Final instrumented/shared/platform evidence and
+the remaining file/traceback/substitution auxiliaries remain pending.
+
+
 The [concatenation operation checkpoint](sessions/2026-11-08-concat-operation-diagnostics.md)
 preserves actual operand capture, merged source events, primitive/index
 diagnostic names and rendered C name boundaries. Sixty-three named cases pass

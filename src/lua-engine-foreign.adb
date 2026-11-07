@@ -528,11 +528,13 @@ package body Lua.Engine.Foreign is
       Operation_Active : Boolean := False;
    begin
       State := new World;
-      if Input.Operation = Create_State then
-         if Input.Allocator = null then
-            Free_World (State);
-            return System.Null_Address;
-         end if;
+      if Input.Operation = Create_State and then Input.Allocator = null then
+         Free_World (State);
+         return System.Null_Address;
+      end if;
+      --  Both C constructors supply their actual public allocator. Ada
+      --  sessions keep the independent bounded-session default provider.
+      if Input.Allocator /= null then
          Memory.Set_Allocator
            (State.Memory, Input.Allocator, Input.Pointer);
       end if;

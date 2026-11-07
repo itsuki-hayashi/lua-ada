@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+Public allocator/seed now have [component evidence](sessions/2026-11-08-public-auxiliary-allocator.md),
+including default-constructor identity, inert seed behavior and thirteen
+native-matched C cases. Finish file/traceback/substitution helpers and the
+final allocator/lifecycle campaign across every required context.
+
+
 Concatenation has [local evaluation/diagnostic evidence](sessions/2026-11-08-concat-operation-diagnostics.md):
 sixty-three named primitive/index/name-boundary cases within 1,809 passing
 AUnit cases, two complete default four-way fixtures and a matching unchanged
