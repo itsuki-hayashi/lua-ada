@@ -9,8 +9,8 @@
   "coverage_authority": false,
   "source_snapshot": {
     "repository_dirty": true,
-    "kind": "repository-source-snapshot",
-    "revision": "a43740c4c3f5a8d666a5b920b32cbdfd9e6a0c6c"
+    "revision": "ebe91438b46ad2758dfa929e8e5f198d690b5dab",
+    "kind": "repository-source-snapshot"
   },
   "retained_api_routes": 159,
   "global_api_entries": 473,
@@ -511,7 +511,8 @@
       "named_c_cases": [
         "tests/c/math_reopen_contract.c#foreign-math-reopen-5",
         "c_api/tests/c_api_consumer.c#test_protected_callback_memory_failure",
-        "c_api/tests/c_api_consumer.c#test_guarded_allocator_refusal_and_recovery"
+        "c_api/tests/c_api_consumer.c#test_guarded_allocator_refusal_and_recovery",
+        "tests/c/foreign_hook_contract.c#foreign-hook-13"
       ],
       "named_aunit_cases": [
         "tests/src/lua-math_reopen_tests.adb#Refusal_Recovery",
@@ -4087,7 +4088,8 @@
       "retained_route": true,
       "named_c_cases": [
         "tests/c/foreign_continuation_contract.c#foreign-continuation-3",
-        "tests/c/foreign_continuation_contract.c#foreign-continuation-9"
+        "tests/c/foreign_continuation_contract.c#foreign-continuation-9",
+        "tests/c/foreign_hook_contract.c#foreign-hook-13"
       ],
       "named_aunit_cases": [
         "tests/src/lua-foreign_continuation_tests.adb#Full_Context",

@@ -1,32 +1,55 @@
-name: Build and test
+name: Build and full target observations
 
 on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      development_observations:
+        description: Collect diagnostic source proposals without claiming acceptance
+        required: false
+        type: boolean
+        default: false
+      execution_policy:
+        description: Repository relative reviewed transform selections (optional for diagnostics)
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
 
 jobs:
-  instrumented:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      build_matrix: ${{ steps.plan.outputs.build_matrix }}
+      execution_matrix: ${{ steps.plan.outputs.execution_matrix }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - id: plan
+        shell: pwsh
+        run: ./scripts/plan-target-workflow.ps1 -GitHubOutput
+
+  context:
+    needs: plan
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        library: [static, relocatable]
+      matrix: ${{ fromJSON(needs.plan.outputs.build_matrix) }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
     steps:
       - name: Preserve pinned source bytes
         shell: pwsh
         run: git config --global core.autocrlf false
       - uses: actions/checkout@v5
         with:
-          # Scoped matrix evidence must name the published implementation head.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
       - uses: alire-project/setup-alire@v6
-      - name: Record tools
+      - name: Select stable native toolchain
         shell: pwsh
         run: |
           alr --version
@@ -35,67 +58,38 @@ jobs:
           alr exec -- gcc --version
           alr exec -- gcc -dumpmachine
           alr exec -- gprbuild --version
-      - name: Instrumented runtime and adapter regressions
-        shell: pwsh
-        run: ./scripts/check-instrumented.ps1 -LibraryType '${{ matrix.library }}'
-      - name: Windows instrumented static-PIC regressions
-        if: matrix.os == 'windows-latest' && matrix.library == 'static'
-        shell: pwsh
-        run: ./scripts/check-instrumented.ps1 -LibraryType static-pic
-      - name: Preserve instrumented observations
-        if: always()
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: instrumented-${{ runner.os }}-${{ matrix.library }}
-          path: |
-            reports/instrumented/**
-            reports/windows-buffered-failure/**
-            reports/posix-files/**
-            reports/managed-telemetry/**
-            reports/launcher-selftest/**
-            reports/core-image/**
-            reports/gc-events/**
-            reports/expanded-conformance/**
-            reports/scoped-files/**
-            reports/conformance/**/*.json
-            reports/conformance/**/*.stdout
-            reports/conformance/**/*.stderr
-            reports/conformance/**/equivalent-*.lua
-          if-no-files-found: error
-  check:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        library: [static, relocatable]
-        profile: [development, validation, release]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Preserve pinned source bytes
-        shell: pwsh
-        run: git config --global core.autocrlf false
-      - uses: actions/checkout@v5
-        with:
-          # Keep all 26 contexts on the same reviewable source revision.
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          submodules: recursive
-      - uses: alire-project/setup-alire@v6
-      - name: Record tools
+      - name: Install Linux C oracle readline prerequisite
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libreadline-dev
+      - name: Retained ABI frontend and native layout gates
+        if: matrix.configuration == 'default' && matrix.profile == 'validation' && matrix.library_type == 'static'
         shell: pwsh
         run: |
-          alr --version
-          ./scripts/select-stable-toolchain.ps1
-          alr -n toolchain
-          [Runtime.InteropServices.RuntimeInformation]::OSDescription
-          [Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-          alr exec -- gcc --version
-          alr exec -- gcc -dumpmachine
-          alr exec -- gprbuild --version
-      - name: Build and exercise consumers
+          ./scripts/check-abi.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          alr exec -- pwsh -NoProfile -File scripts/check-frontend.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build one context and retain actual named regressions
         shell: pwsh
         run: |
-          ./scripts/check.ps1 -LibraryType '${{ matrix.library }}' -Profile '${{ matrix.profile }}'
-      - name: Conformance inventory and harness regressions
+          $development = '${{ github.event_name == 'workflow_dispatch' && inputs.development_observations }}' -ceq 'true'
+          ./scripts/build-target-context.ps1 -Context '${{ matrix.context }}' -DevelopmentObservation:$development
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Native layout and retained differential gates
+        if: matrix.configuration == 'default' && matrix.profile == 'validation' && matrix.library_type == 'static'
+        shell: pwsh
+        run: |
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          ./scripts/check-layout.ps1 -AdaProbe "$PWD/tests/bin/static/lua-codec_layout_probe$suffix"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/compare-libraries.ps1 -Interpreter "$PWD/cli/bin/static/lua_ada$suffix"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/compare-lifecycle.ps1 -Interpreter "$PWD/cli/bin/static/lua_ada$suffix"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Inventory and evidence validator regressions
         shell: pwsh
         run: |
           ./scripts/check-conformance-inventory.ps1
@@ -103,7 +97,9 @@ jobs:
           ./scripts/test-conformance-inventory.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/check-conformance-scope.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-scope.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-expanded-conformance.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-expanded-matrix-bundle.ps1
@@ -114,80 +110,119 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-runner.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Reference fixtures and ABI experiments
-        if: matrix.library == 'static' && matrix.profile == 'validation'
+          ./scripts/test-conformance-runner.ps1 -ReferenceInterpreter "$PWD/build/conformance/${{ matrix.configuration }}/bin/lua${{ runner.os == 'Windows' && '.exe' || '' }}"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve immutable context image
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: target-image-${{ matrix.id }}
+          path: reports/target-images/${{ matrix.id }}
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve context diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: target-build-diagnostics-${{ matrix.id }}
+          path: |
+            reports/target-builds/${{ matrix.id }}/**
+            reports/core-image/**
+            reports/instrumented/**
+            reports/windows-buffered-failure/**
+            reports/posix-files/**
+            reports/managed-telemetry/**
+            reports/launcher-selftest/**
+            reports/lifecycle/**
+            reports/m3-lifecycle-campaign*
+            reports/native-layout.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  execute:
+    needs: [plan, context]
+    if: always() && needs.plan.result == 'success'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.execution_matrix) }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 360
+    steps:
+      - name: Preserve pinned source bytes
         shell: pwsh
-        run: |
-          ./scripts/check-abi.ps1
-          alr exec -- pwsh -NoProfile -File scripts/check-frontend.ps1
-          ./scripts/check-layout.ps1 -AdaProbe "$PWD/tests/bin/static/lua-codec_layout_probe${{ runner.os == 'Windows' && '.exe' || '' }}"
-          ./scripts/compare-libraries.ps1 -Interpreter "$PWD/cli/bin/static/lua_ada${{ runner.os == 'Windows' && '.exe' || '' }}"
-          ./scripts/compare-lifecycle.ps1 -Interpreter "$PWD/cli/bin/static/lua_ada${{ runner.os == 'Windows' && '.exe' || '' }}"
-      - name: Install Linux C oracle readline prerequisite
-        if: matrix.os == 'ubuntu-latest' && matrix.library == 'static' && matrix.profile == 'validation'
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          submodules: recursive
+      - uses: alire-project/setup-alire@v6
+      - name: Select native fixture compiler
+        shell: pwsh
+        run: ./scripts/select-stable-toolchain.ps1
+      - name: Install Linux native prerequisite
+        if: runner.os == 'Linux'
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y libreadline-dev
-      - name: Isolated C conformance baselines
-        if: matrix.library == 'static' && matrix.profile == 'validation'
-        timeout-minutes: 160
+      - uses: actions/download-artifact@v8
+        with:
+          name: target-image-${{ matrix.id }}
+          path: reports/immutable-input/${{ matrix.id }}
+      - name: Execute exact context image without rebuilding the runtime
         shell: pwsh
         run: |
-          foreach ($configuration in @('default', 'upstream-test')) {
-            ./scripts/run-conformance.ps1 -Configuration $configuration -Mode Smoke -BuildReference
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            ./scripts/test-conformance-runner.ps1 -ReferenceInterpreter "$PWD/build/conformance/$configuration/bin/lua${{ runner.os == 'Windows' && '.exe' || '' }}"
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            # Collect native upstream failures/skips without calling them passes.
-            # Setup/capture failures remain failures even in report-only mode.
-            ./scripts/run-conformance.ps1 -Configuration $configuration -Mode Aggregate -ReportOnly
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            ./scripts/run-conformance.ps1 -Configuration $configuration -Mode Heavy -ReportOnly
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/run-target-partition.ps1 -Context '${{ matrix.context }}' -Partition '${{ matrix.partition }}' -ImageDirectory "$PWD/reports/immutable-input/${{ matrix.id }}" -ExecutionPolicy '${{ inputs.execution_policy || '' }}'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve complete raw observation subtree
+        if: always()
+        shell: pwsh
+        run: |
+          $destination = "$PWD/reports/target-upload/${{ matrix.id }}-${{ matrix.partition }}/reports"
+          New-Item -ItemType Directory -Path $destination -Force | Out-Null
+          if (Test-Path -LiteralPath reports/conformance) {
+            Copy-Item -LiteralPath reports/conformance -Destination "$destination/conformance" -Recurse
           }
-      - name: Preserve raw conformance observations
-        if: always() && matrix.library == 'static' && matrix.profile == 'validation'
-        uses: actions/upload-artifact@v7.0.2
+          $source = "$PWD/reports/target-partitions/${{ matrix.id }}/${{ matrix.partition }}"
+          if (Test-Path -LiteralPath $source) {
+            $parent = "$destination/target-partitions/${{ matrix.id }}"
+            New-Item -ItemType Directory -Path $parent -Force | Out-Null
+            Copy-Item -LiteralPath $source -Destination "$parent/${{ matrix.partition }}" -Recurse
+          }
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
         with:
-          name: conformance-${{ runner.os }}
-          path: |
-            reports/conformance/**/report.json
-            reports/conformance/**/*.stdout
-            reports/conformance/**/*.stderr
-            reports/conformance/**/equivalent-*.lua
+          name: target-observations-${{ matrix.id }}-${{ matrix.partition }}
+          path: reports/target-upload/${{ matrix.id }}-${{ matrix.partition }}
           if-no-files-found: error
-      - name: Windows static-PIC acceptance
-        if: matrix.os == 'windows-latest' && matrix.library == 'static' && matrix.profile == 'validation'
+          retention-days: 30
+
+  collect:
+    needs: [plan, context, execute]
+    if: always() && needs.plan.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          submodules: recursive
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: target-image-*
+          path: reports/downloaded-target
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: target-observations-*
+          path: reports/downloaded-target
+      - name: Reconcile complete observation collection
         shell: pwsh
         run: |
-          ./scripts/check.ps1 -LibraryType static-pic -Profile validation
-      - name: Preserve lifecycle observations
+          ./scripts/collect-target-observations.ps1 -ArtifactDirectory "$PWD/reports/downloaded-target" -OutputDirectory "$PWD/reports/full-target-observations"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Write-Output 'Captured observations only. Independent source, contract, native applicability, global API and post-observation envelope review remain separate acceptance gates.'
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
-        uses: actions/upload-artifact@v7.0.2
         with:
-          name: lifecycle-${{ runner.os }}-${{ matrix.profile }}-${{ matrix.library }}
-          path: |
-            reports/lifecycle/**
-            reports/m3-lifecycle-campaign*
-            reports/managed-telemetry/**
-            reports/launcher-selftest/**
-            reports/windows-buffered-failure/**
-            LICENSE
-            reports/posix-files/**
-            reports/gc-events/**
-            reports/expanded-conformance/**
-            reports/scoped-files/**
-            reports/conformance/**/*.json
-            reports/conformance/**/*.stdout
-            reports/conformance/**/*.stderr
-            reports/conformance/**/equivalent-*.lua
-            docs/licenses/lua.md
-          if-no-files-found: warn
-      - name: Preserve core-image observations
-        if: always()
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: core-image-${{ runner.os }}-${{ matrix.profile }}-${{ matrix.library }}
-          path: reports/core-image/**
-          if-no-files-found: warn
+          name: full-target-observation-bundle
+          path: reports/full-target-observations
+          if-no-files-found: error
+          retention-days: 30

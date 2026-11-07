@@ -295,3 +295,13 @@ if ($LASTEXITCODE -ne 0) { throw 'Development observer regressions failed' }
 if ($LASTEXITCODE -ne 0) { throw 'Target file completion regressions failed' }
 & (Join-Path $PSScriptRoot 'test-target-context.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Target context/image regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-witness-policy.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target source witness regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-observation-envelope.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Post-observation envelope regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-compiled-witnesses.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Compiled ABI/layout/header witness regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-workflow.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target workflow planning/preflight regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-observation-collection.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target observation bundle transport regressions failed' }

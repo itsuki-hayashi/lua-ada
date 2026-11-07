@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "kind": "additional-target-aunit-author-cases",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "entries": [
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-formatter_tests.adb#Shared_Work_Quota",
+      "registered_label": "C formatter: foreign scanning shares bounded work quota",
+      "required_stdout_line": "OK C formatter: foreign scanning shares bounded work quota",
+      "execution_evidence": []
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-formatter_tests.adb#String_Extent_Quota",
+      "registered_label": "C formatter: output obeys bounded string extent quota",
+      "required_stdout_line": "OK C formatter: output obeys bounded string extent quota",
+      "execution_evidence": []
+    }
+  ]
+}

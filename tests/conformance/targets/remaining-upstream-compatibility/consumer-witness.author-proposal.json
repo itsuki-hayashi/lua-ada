@@ -161,11 +161,15 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "dbce2a047d4e649700e20f5eae3bac42d3315cf108e14c4f36a398407131b3cd"
+      "sha256": "04b7d33770557c60e4340e58285ca4d85403b896a48b18ccec58792dec6bc861"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
       "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
+    },
+    {
+      "sha256": "4eb599a7ffde8dd13d5c723d1cda43cae7d31f4a4c29b0f0fb37a4bb157686e3",
+      "path": "c_api/tests/format_api_contract.c"
     }
   ],
   "cases": [
@@ -2078,6 +2082,62 @@
       "semantic_basis": "The direct utf8 opener returns exactly one table without global publication and its actual codepoint export decodes supplied multibyte input in a bare state.",
       "gap": null,
       "matching_oracle": "foreign-oracle executes the identical public-header contract case; actual captured stdout must match the Ada-linked foreign-api consumer."
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-1: scalar, counted binary and extended UTF-8 results"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "scalars",
+      "source_sha256": "4eb599a7ffde8dd13d5c723d1cda43cae7d31f4a4c29b0f0fb37a4bb157686e3"
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-2: native platform pointer rendering"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "pointers",
+      "source_sha256": "4eb599a7ffde8dd13d5c723d1cda43cae7d31f4a4c29b0f0fb37a4bb157686e3"
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-3: actual growth refusal sweep and recovery"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "allocation_sweep",
+      "source_sha256": "4eb599a7ffde8dd13d5c723d1cda43cae7d31f4a4c29b0f0fb37a4bb157686e3"
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-4: protected callback memory error class"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "error_class",
+      "source_sha256": "4eb599a7ffde8dd13d5c723d1cda43cae7d31f4a4c29b0f0fb37a4bb157686e3"
     }
   ],
   "entries": [
@@ -2193,7 +2253,8 @@
       "cases": [
         "tests/c/math_reopen_contract.c#foreign-math-reopen-5",
         "c_api/tests/c_api_consumer.c#test_protected_callback_memory_failure",
-        "c_api/tests/c_api_consumer.c#test_guarded_allocator_refusal_and_recovery"
+        "c_api/tests/c_api_consumer.c#test_guarded_allocator_refusal_and_recovery",
+        "tests/c/foreign_hook_contract.c#foreign-hook-13"
       ]
     },
     {
@@ -3157,7 +3218,8 @@
       "boundaries": "This invariant covers the actual selected public calls only; complete global C API acceptance remains pending.",
       "cases": [
         "tests/c/foreign_continuation_contract.c#foreign-continuation-3",
-        "tests/c/foreign_continuation_contract.c#foreign-continuation-9"
+        "tests/c/foreign_continuation_contract.c#foreign-continuation-9",
+        "tests/c/foreign_hook_contract.c#foreign-hook-13"
       ]
     },
     {

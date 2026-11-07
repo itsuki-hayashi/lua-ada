@@ -99,7 +99,7 @@ Case 'all 473 global API entries remain distinct from retained 159 routes and ne
         -not $api.runtime_acceptance -and -not $api.coverage_authority) 'Global author catalogue gained classification or acceptance'
     foreach ($entry in $consumer.entries) {
         $next = @($api.entries | Where-Object id -CEQ $entry.id)
-        Assert-True ($next.Count -eq 1 -and (@($next[0].named_c_cases) -join '|') -ceq (@($entry.cases) -join '|') -and
+        Assert-True ($next.Count -eq 1 -and @($entry.cases | Where-Object { $_ -cnotin $next[0].named_c_cases }).Count -eq 0 -and
             $next[0].invariant -ceq $entry.invariant -and $next[0].boundaries -ceq $entry.boundaries) 'Retained route was changed'
     }
     $new = @($api.entries | Where-Object retained_route -EQ $false)

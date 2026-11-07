@@ -35,11 +35,11 @@ $resolve = {param($path,$expected)
     return $path
 }
 $count = 0
-function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected,[switch]$Foreign) {
+function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected,[switch]$Foreign,[switch]$Format) {
     $report = $baseline | ConvertTo-Json -Depth 16 | ConvertFrom-Json -AsHashtable
     & $Mutation $report
     $failure = $null
-    try { $null = Test-NamedConsumerEvidence $report $mapping $revision $context $resolve -RequireForeignContract:$Foreign }
+    try { $null = Test-NamedConsumerEvidence $report $mapping $revision $context $resolve -RequireForeignContract:$Foreign -RequireFormatContract:$Format }
     catch { $failure = $_.Exception.Message }
     if (($Expected -eq '' -and $null -ne $failure) -or
         ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))) {
@@ -122,4 +122,24 @@ Run-Case 'expanded foreign named case cannot disappear behind completion' {param
     Replace-Capture $r 'foreign-api' stdout "PASS: public foreign contract`n"
     Replace-Capture $r 'foreign-oracle' stdout "PASS: public foreign contract`n"
 } 'witness missing' -Foreign
+$mapping.cases+=@{source='format.c';case_id='format-case';source_sha256=$hash;consumer='format-api';
+    expected_count=1;exact_witnesses=@('format-api-1: synthetic formatting case');pattern_witness=$null}
+$baseline.consumer_sources+=@{file='format.c';sha256=$hash}
+$baseline.format_contract=@{matching_output=$true;reference_library_files=@(@{sha256=$hash})}
+foreach($name in @('format-api','format-oracle')){
+    $record=$records[0].Clone();$record.name=$name;$out=Join-Path $directory "$name.stdout"
+    [IO.File]::WriteAllText($out,"format-api-1: synthetic formatting case`nPASS: public formatting contract`n")
+    $record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$baseline.consumers+=$record
+}
+Run-Case 'target formatting requires named actual counterpart observations' {} '' -Foreign -Format
+Run-Case 'target formatter cannot lose its C oracle' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE format-oracle)
+} 'missing/duplicate' -Foreign -Format
+Run-Case 'target formatter output must equal the C counterpart bytes' {param($r)
+    Replace-Capture $r format-oracle stdout "wrong observation`nPASS: public formatting contract`n"
+} 'oracle bytes differ' -Foreign -Format
+Run-Case 'target formatter completion alone is not its named case evidence' {param($r)
+    Replace-Capture $r format-api stdout "PASS: public formatting contract`n"
+    Replace-Capture $r format-oracle stdout "PASS: public formatting contract`n"
+} 'witness missing' -Foreign -Format
 Write-Output "PASS: $count named consumer evidence regressions; synthetic observations only"

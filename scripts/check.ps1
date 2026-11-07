@@ -2,7 +2,10 @@ param(
     [ValidateSet('static', 'static-pic', 'relocatable')]
     [string] $LibraryType = 'static',
     [ValidateSet('development', 'validation', 'release')]
-    [string] $Profile = 'validation'
+    [string] $Profile = 'validation',
+    [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy = '',
+    [string] $TargetWitnessPolicy = '',
+    [switch] $TargetDevelopmentObservation
 )
 
 $ErrorActionPreference = 'Stop'
@@ -19,6 +22,13 @@ Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 $scenario = '-XLUA_ADA_LIBRARY_TYPE=' + $LibraryType
 $profileArgument = '--' + $Profile
 $suffix = if ($IsWindows) { '.exe' } else { '' }
+$targetWitnesses = $null; $previousTargetReports = @()
+if ($TargetPolicy -ne '') {
+    if ($TargetWitnessPolicy -eq '') { throw 'Target build mode requires its explicit successor witness policy' }
+    Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
+    $targetWitnesses = Read-TargetWitnessPolicy -Root $projectRoot -Path $TargetWitnessPolicy -RequireReview:(-not $TargetDevelopmentObservation)
+    $previousTargetReports = @(Get-ChildItem (Join-Path $projectRoot 'reports/core-image') -Filter result.json -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object FullName)
+} elseif ($TargetWitnessPolicy -ne '' -or $TargetDevelopmentObservation) { throw 'Target witness/development flags require TargetPolicy' }
 
 function Invoke-Alire {
     param([string[]] $Arguments)
@@ -44,9 +54,11 @@ try {
     & (Join-Path $PSScriptRoot 'check-documentation.ps1')
     & (Join-Path $PSScriptRoot 'test-pe-unwind.ps1')
     Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario, '-XLUA_ADA_PREBUILT=false')
-    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
+    $coreArguments=@('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-core-image.ps1'),
         '-LibraryType', $LibraryType, '-Profile', $Profile, '-UseExistingRuntime')
+    if($TargetPolicy -ne ''){$coreArguments+=@('-TargetPolicy',$TargetPolicy)}
+    Invoke-Alire -Arguments $coreArguments
     foreach ($crateName in @('cli', 'tests')) {
         Set-Location (Join-Path $projectRoot $crateName)
         Invoke-Alire -Arguments @('-n', 'build', $profileArgument,
@@ -136,12 +148,20 @@ try {
         '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
         '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
         '-ReferenceLibraryDirectory', (Join-Path $projectRoot 'build/conformance/default/lib'))
+    if ($TargetPolicy -eq '') {
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-expanded-conformance.ps1'),
         '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
         '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
         '-RuntimeDirectory', $runtimePath, '-Configuration', 'default',
         '-Profile', $Profile, '-LibraryType', $LibraryType)
+    } else {
+        $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
+        $link = if ($LibraryType -ceq 'relocatable') { 'shared' } else { $LibraryType }
+        $null = Write-TargetBuildWitnesses -Root $projectRoot -Policy $targetWitnesses `
+            -Context "default/$platform/$Profile/$link" -PreviousReports $previousTargetReports
+        Write-Output 'Target build phase completed; File/Aggregate/Heavy executions belong to immutable-image partition jobs; target acceptance=False'
+    }
 
     Write-Output "PASS: $Profile / $LibraryType (AUnit and CLI contracts)"
 }

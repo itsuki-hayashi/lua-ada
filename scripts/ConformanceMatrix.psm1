@@ -651,7 +651,9 @@ function Test-RetainedMatrixWitnesses {
     param([Parameter(Mandatory)][string] $Root,
           [Parameter(Mandatory)][Collections.IDictionary] $Manifest,
           [Parameter(Mandatory)][string] $Bundle,
-          [Parameter(Mandatory)][Collections.IDictionary] $Suite)
+          [Parameter(Mandatory)][Collections.IDictionary] $Suite,
+          [Collections.IDictionary] $TargetWitnessPolicy = $null,
+          [Collections.IDictionary] $TargetBuildWitnesses = @{})
     # Full-target reconciliation reuses the actual named C/AUnit and warning
     # protocols from the retained expanded scope. Exposing this replay avoids
     # weakening them to a set of successful primary-file process exits.
@@ -666,7 +668,18 @@ function Test-RetainedMatrixWitnesses {
     foreach ($context in $Suite.acceptance_contexts) {
         if (-not $seenWarnings.ContainsKey($context)) { throw "Missing retained warning context: $context" }
     }
-    $consumers = Test-MatrixNamedEvidence -Root $Root -Manifest $Manifest -Bundle $Bundle -Suite $Suite
+    if($null -eq $TargetWitnessPolicy){
+        $consumers = Test-MatrixNamedEvidence -Root $Root -Manifest $Manifest -Bundle $Bundle -Suite $Suite
+    }else{
+        if($TargetWitnessPolicy.source_reviewed -ne $true){throw 'Retained target witnesses need independently reviewed current-source catalogues'}
+        $consumers=@{}
+        foreach($context in $Suite.acceptance_contexts){
+            if(-not $TargetBuildWitnesses.Contains($context) -or $TargetBuildWitnesses[$context].build_witnesses_verified -ne $true){
+                throw 'Retained target actual named build evidence is missing'
+            }
+            $consumers[$context]=$TargetBuildWitnesses[$context].consumer_report
+        }
+    }
     $warnings = @(Test-MatrixWarningEvidence -Root $Root -Manifest $Manifest -Bundle $Bundle)
     return @{consumers=$consumers;warnings=$warnings}
 }

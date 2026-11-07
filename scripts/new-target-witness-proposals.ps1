@@ -71,8 +71,8 @@ if ($AdditionalConsumerCases -ne '') {
     foreach ($case in $additional.cases) {
         $key = $case.source + '#' + $case.case_id
         if (@($consumer.cases | Where-Object { ($_.source + '#' + $_.case_id) -ceq $key }).Count -ne 0 -or
-            $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api') -or
-            $case.source -cnotmatch '^(c_api/tests|tests/c)/[a-zA-Z0-9_-]+\.c$' -or
+            $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api') -or
+            $case.source -cnotmatch '^(?:c_api/tests/[a-zA-Z0-9_-]+\.(?:c|h)|tests/c/[a-zA-Z0-9_-]+\.c)$' -or
             @($case.exact_witnesses).Count -eq 0 -or $case.expected_count -ne 1) { throw 'Invalid or duplicate additional consumer witness proposal' }
         $case.source_sha256 = Source-Hash $case.source
         $case['runtime_acceptance'] = $false; $case['execution_evidence'] = @(); $case['independent_review_status'] = 'pending'
@@ -107,8 +107,6 @@ foreach ($mapping in @($consumer,$unit)) {
 $consumer.kind = 'remaining-upstream-consumer-witness-author-proposal'
 $unit.kind = 'remaining-upstream-aunit-witness-author-proposal'
 [void][IO.Directory]::CreateDirectory($output)
-$consumerIdentity = Save-Proposal 'consumer-witness.author-proposal.json' $consumer
-$unitIdentity = Save-Proposal 'aunit-witness.author-proposal.json' $unit
 $globalRecords = @(Get-Content -LiteralPath (Join-Path $SourceRoot 'tests/conformance/c-api.jsonl') |
     Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_ | ConvertFrom-Json -AsHashtable -Depth 48 })
 $retainedApi = @(Get-Content -LiteralPath (Join-Path $root 'tests/conformance/scopes/expanded-t-conformance.api.jsonl') |
@@ -119,6 +117,16 @@ foreach ($record in $globalRecords) {
     $old = @($retainedApi | Where-Object id -CEQ $record.id)
     if ($old.Count -gt 1) { throw 'Retained API predecessor contains duplicate identities' }
     $previous = if ($old.Count -eq 1) { @($consumer.entries | Where-Object id -CEQ $record.id)[0] } else { $null }
+    if ($null -ne $previous) {
+        # The retained API projection can acquire a separately reviewed repair
+        # route after the frozen author catalogue (for example PR10's failed
+        # coroutine status witness). Preserve both predecessor route sets in
+        # the NEW pending successor; do not silently lose either expectation.
+        foreach ($case in $old[0].named_cases) {
+            $key = $case.source + '#' + $case.id
+            if ($key -cnotin $previous.cases) { $previous.cases += $key }
+        }
+    }
     # Preserve old semantic routes as proposals needing fresh current-source
     # review. Header kind alone does not classify a macro as a runtime call,
     # constant, conditional alternative, type or configuration declaration.
@@ -143,11 +151,18 @@ $api = [ordered]@{schema_version=1;kind='remaining-upstream-global-api-author-pr
         'Conditional declarations require independently reviewed original-source applicability and measured compiled-configuration witnesses.',
         'Preserve all 159 retained API routes and original 100 C/94 AUnit witness identities and protocols.',
         'No passed ledger status, token mention, registration or author proposal alone establishes execution or acceptance.')}
+$consumerIdentity = Save-Proposal 'consumer-witness.author-proposal.json' $consumer
+$unitIdentity = Save-Proposal 'aunit-witness.author-proposal.json' $unit
 $apiIdentity = Save-Proposal 'global-api.author-proposal.json' $api
+$policy = @{schema_version=1;kind='target-witness-policy';target='remaining-upstream-compatibility';
+    reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294';consumer=$consumerIdentity;aunit=$unitIdentity;global_api=$apiIdentity;
+    source_snapshot=$sourceSnapshot;runtime_acceptance=$false;coverage_authority=$false;
+    review=@{status='pending';author='Codex /root/validation_delivery';reviewer=$null;artifact=$null;artifact_sha256=$null}}
+$policyIdentity = Save-Proposal 'witness-policy.author-proposal.json' $policy
 $summary = @{schema_version=1;kind='remaining-upstream-witness-successor-author-index';target='remaining-upstream-compatibility';
     predecessors=$predecessors;source_snapshot=$sourceSnapshot;changed_source_bindings=$changed;retained_consumer_cases=100;retained_aunit_cases=94;
     proposed_consumer_cases=@($consumer.cases).Count;proposed_aunit_cases=@($unit.entries).Count;
-    consumer=$consumerIdentity;aunit=$unitIdentity;global_api=$apiIdentity;global_api_entries=473;retained_api_routes=159;
+    consumer=$consumerIdentity;aunit=$unitIdentity;global_api=$apiIdentity;witness_policy=$policyIdentity;global_api_entries=473;retained_api_routes=159;
     independent_review_status='pending';coverage_authority=$false;runtime_acceptance=$false}
 $index = Save-Proposal 'witnesses.author-index.json' $summary
 Write-Output "AUTHOR PROPOSALS ONLY: retained 100 C / 94 AUnit witnesses; proposed $($summary.proposed_consumer_cases) C / $($summary.proposed_aunit_cases) AUnit; changed sources=$($changed.Count); index=$($index.path)"

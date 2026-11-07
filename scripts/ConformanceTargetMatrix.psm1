@@ -8,11 +8,15 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceMatrix.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceFileProtocols.psm1')
+Import-Module (Join-Path $PSScriptRoot 'TargetObservationEnvelope.psm1')
+Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
+Import-Module (Join-Path $PSScriptRoot 'TargetCompiledWitnesses.psm1')
 
 function Assert-TargetTransformReplay {
     param([string] $Root, [string] $ArtifactRoot,
           [Collections.IDictionary] $Report, [Collections.IDictionary] $Entry,
           [Collections.IDictionary] $Contract, [Collections.IDictionary] $ResolvedExclusions,
+          [Collections.IDictionary] $ReviewedNativeApplicability = $null,
           [switch] $RequireAcceptance)
     if ($Report.execution_disposition -ceq 'unchanged') { return }
     $sourceName = if ($Entry.operation -ceq 'aggregate') { 'all.lua' }
@@ -50,11 +54,12 @@ function Assert-TargetTransformReplay {
                 throw 'Native platform transformation identifies another host'
             }
             if ($RequireAcceptance -or $Report.native_applicability_verified) {
-                if ($Report.native_applicability_verified -ne $true) {
+                if ($null -eq $ReviewedNativeApplicability -and $Report.native_applicability_verified -ne $true) {
                     throw 'Native transformation lacks source-linked original C applicability'
                 }
+                $nativeIdentity=if($null -ne $ReviewedNativeApplicability){$ReviewedNativeApplicability}else{$Report.native_applicability}
                 $null = Assert-ConformanceNativeApplicability -Root $Root -ArtifactRoot $ArtifactRoot `
-                    -Identity $Report.native_applicability -Specification $specification `
+                    -Identity $nativeIdentity -Specification $specification `
                     -ManifestSha256 $identity.manifest_sha256 -Configuration $Report.requested_configuration `
                     -Platform $Report.host.platform -Revision $Report.repository_revision `
                     -RequireRuntimeEvidence:$RequireAcceptance
@@ -391,7 +396,7 @@ function Test-FullTargetMatrix {
     }
     [void](Resolve-ReviewedFile -Root $Root -Path $manifest.exclusion_policy.path -Sha256 $manifest.exclusion_policy.sha256)
     $inventory = Test-ConformanceInventory -Root $Root -TargetPolicy $TargetPolicy
-    $retained = $null
+    $retained = $null; $witnessPolicy=$null; $verifiedBuilds=@{}; $imageIdentities=@{}
     if ($RequireTargetAcceptance) {
         if ($manifest.synthetic_fixture) { throw 'Synthetic fixture matrix cannot establish target acceptance' }
         Assert-TargetMatrixCoverage -Inventory $inventory
@@ -404,7 +409,35 @@ function Test-FullTargetMatrix {
         Assert-TargetMatrixReview -Root $Root -Manifest $manifest -Suite $suite
         $retainedIndex = Read-TargetHashedJson -Root $bundle -Identity $manifest.retained_evidence
         if ($retainedIndex.revision -cne $manifest.revision) { throw 'Retained witnesses have another revision' }
-        $retained = Test-RetainedMatrixWitnesses -Root $Root -Manifest $retainedIndex -Bundle $bundle -Suite $suite
+        if(-not $retainedIndex.Contains('witness_policy') -or $null -eq $retainedIndex.witness_policy){throw 'Full target requires its independently reviewed 473-entry witness policy'}
+        $witnessPolicy=Read-TargetWitnessPolicy -Root $Root -Path $retainedIndex.witness_policy.path -RequireReview
+        if($witnessPolicy.identity.sha256 -cne $retainedIndex.witness_policy.sha256){throw 'Full target witness policy hash differs'}
+        if(-not $manifest.Contains('context_images') -or @($manifest.context_images).Count -ne 26){throw 'Full target requires all 26 immutable context images'}
+        foreach($identity in $manifest.context_images){
+            if($identity.context -cnotin $suite.acceptance_contexts -or $verifiedBuilds.ContainsKey($identity.context) -or
+                $identity.path -cne ($identity.image_directory+'/image.json')){throw 'Duplicate or invalid immutable context image identity'}
+            $imageDirectory=Resolve-TargetBundlePath -Root $bundle -Relative $identity.image_directory
+            $verified=Test-TargetImageBuildWitnesses -Root $Root -ImageDirectory $imageDirectory -Context $identity.context `
+                -Revision $manifest.revision -WitnessPolicy $witnessPolicy
+            if($verified.image.sha256 -cne $identity.sha256){throw 'Reviewed context image manifest hash differs'}
+            $verifiedBuilds[$identity.context]=$verified
+            $imageIdentities[$identity.context]=@{path=$identity.path;sha256=$identity.sha256}
+            $compiled=@{}
+            $requiredCompiled=@($witnessPolicy.compiled.cases|Where-Object{$identity.context -cin $_.contexts})
+            if($requiredCompiled.Count -gt 0){
+                $matches=@($retainedIndex.compiled_observations|Where-Object context -CEQ $identity.context)
+                if($matches.Count -ne 1){throw 'Full target compiled ABI/layout/header context evidence is missing'}
+                $compiledReport=Read-TargetHashedJson -Root $bundle -Identity $matches[0] -PathField report
+                $compiledRoot=Resolve-TargetBundlePath -Root $bundle -Relative $matches[0].artifact_root
+                $compiled=Test-TargetCompiledWitnesses -Root $Root -Mapping $witnessPolicy.compiled -Report $compiledReport `
+                    -ArtifactRoot $compiledRoot -Context $identity.context -Revision $manifest.revision `
+                    -CompilerSha256 $verified.image.manifest.toolchain.compiler_sha256
+            }
+            [void](Assert-TargetGlobalApiRoutes -Policy $witnessPolicy -NamedEvidence $verified.named_evidence `
+                -CompiledCases $compiled -Context $identity.context)
+        }
+        $retained = Test-RetainedMatrixWitnesses -Root $Root -Manifest $retainedIndex -Bundle $bundle -Suite $suite `
+            -TargetWitnessPolicy $witnessPolicy -TargetBuildWitnesses $verifiedBuilds
     }
     $coverage = @{}
     $resolvedExclusions = @{}
@@ -426,8 +459,23 @@ function Test-FullTargetMatrix {
             $observed = Test-TargetMatrixReport -Report $report -Entry $entry -Suite $suite `
                 -Revision $manifest.revision -ArtifactRoot $artifacts -Target $expectedTarget `
                 -ExclusionPolicySha256 $manifest.exclusion_policy.sha256 -Exclusions $inventory.Exclusions
+            $reviewedNative=$null
+            if($RequireTargetAcceptance){
+                if($report.synthetic_fixture -or -not $identity.Contains('envelope') -or $null -eq $identity.envelope){
+                    throw 'Full target operation requires its exact independently reviewed post-observation envelope'
+                }
+                $envelope=Read-TargetHashedJson -Root $bundle -Identity $identity.envelope
+                $rawPath=Resolve-TargetBundlePath -Root $bundle -Relative $identity.report
+                $review=Assert-TargetObservationEnvelope -Root $Root -Envelope $envelope -Report $report -RawReportPath $rawPath `
+                    -RawIdentity @{path=$identity.report;sha256=$identity.sha256} -ContractIdentity $entry.contract `
+                    -ImageIdentity $imageIdentities[$entry.context] -Revision $manifest.revision -Context $entry.context `
+                    -Operation $entry.operation -Implementation $expectedTarget -Variant $report.variant
+                $reviewedNative=$review.native_applicability
+                Assert-TargetReportImageBinding -Image $verifiedBuilds[$entry.context].image.manifest -Report $report
+            }
             Assert-TargetTransformReplay -Root $Root -ArtifactRoot $artifacts -Report $report -Entry $entry `
-                -Contract $contract -ResolvedExclusions $resolvedExclusions -RequireAcceptance:$RequireTargetAcceptance
+                -Contract $contract -ResolvedExclusions $resolvedExclusions -RequireAcceptance:$RequireTargetAcceptance `
+                -ReviewedNativeApplicability $reviewedNative
             if ($entry.operation.StartsWith('file:',[StringComparison]::Ordinal) -and
                 $null -ne (Get-TargetFileProtocolDefinition -File $entry.operation.Substring(5))) {
                 if (-not $report.Contains('file_completion_protocol') -or $null -eq $report.file_completion_protocol) {
@@ -446,11 +494,6 @@ function Test-FullTargetMatrix {
             }
             $contextImages[$imageKey] = $signature
             if ($RequireTargetAcceptance) {
-                if ($report.synthetic_fixture -or
-                    ($target -ceq 'ada' -and ($report.report_only -ne $false -or $report.target_operation_acceptance -ne $true -or
-                        $report.execution_contract.sha256 -cne $entry.contract.sha256))) {
-                    throw 'Full-target operation lacks actual accepted execution evidence'
-                }
                 foreach ($library in $retained.consumers[$entry.context].library_files) {
                     if ($target -ceq 'ada' -and (-not $observed.images.ContainsKey($library.file) -or
                         $observed.images[$library.file] -cne $library.sha256)) {

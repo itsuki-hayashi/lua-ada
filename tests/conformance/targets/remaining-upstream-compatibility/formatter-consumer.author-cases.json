@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "kind": "additional-target-consumer-author-cases",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "cases": [
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-1: scalar, counted binary and extended UTF-8 results"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "scalars"
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-2: native platform pointer rendering"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "pointers"
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-3: actual growth refusal sweep and recovery"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "allocation_sweep"
+    },
+    {
+      "execution_evidence": [],
+      "consumer": "format-api",
+      "runtime_acceptance": false,
+      "exact_witnesses": [
+        "format-api-4: protected callback memory error class"
+      ],
+      "pattern_witness": null,
+      "source": "c_api/tests/format_api_contract.c",
+      "expected_count": 1,
+      "independent_review_status": "pending",
+      "case_id": "error_class"
+    }
+  ]
+}

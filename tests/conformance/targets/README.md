@@ -348,3 +348,81 @@ traversal/aliases, duplicate identities and reparse-point destinations reject.
 Payloads remain without runtime or coverage authority. Byte/mode verification
 before and after a partition protects the shared context image; successful
 transport is not evidence that any Lua, C or AUnit operation passed.
+
+The full-target workflow now builds these contexts once, freezes their selected
+Ada host/runtime and C oracle, and downloads that same image into the five
+execution partitions. Each File shard runs both implementations; constructs has
+its extra real-template pair, and files-1 owns the retained warning campaign.
+The build mode in `check.ps1` and `check-instrumented.ps1` is explicit through
+`-TargetPolicy` and `-TargetWitnessPolicy`. It retains the actual AUnit, native
+C, CLI, binary, allocator, lifecycle and consumer checks, then records fresh
+named C/AUnit observations through the successor policy. Its File campaigns
+move to the immutable-image jobs instead of invoking frozen historical scope
+acceptance on a changed runtime tree. The historical default commands retain
+their prior behavior. `-TargetDevelopmentObservation` permits author-only
+source mappings for diagnostic collection; it does not authorize acceptance.
+
+Target builds include the independently authored formatter consumer (four
+named C cases) and two formatter AUnit cases. They compare the same C source
+against the Ada SAL and the separate pinned C library, bind the actual source
+files and library images, and keep the original 100/94 witness identities and
+protocols. The staged successor proposals therefore contain 104 C and 96 AUnit
+names. These are mapping proposals, not executed-case counts. The retained
+API projection's separately added foreign-hook-13 memory-status route is
+preserved alongside its older consumer-catalogue routes in the new successor.
+
+`TargetWitnessPolicy.psm1` validates all 473 original declarations separately
+from the old 159-route projection. Accepted policies require an independent
+hash-bound decision for each complete mapping and all 26 context routes.
+Each context route states `runtime-observed`, `compiled-observed`, or a reviewed
+`compiled-not-applicable` condition, with explicit arrays of `named_c_cases`,
+`named_aunit_cases` and `compiled_witnesses`. Function/type classifications
+cannot substitute header compilation for a runtime function call or invent a
+call for a type. Empty routes, null-array camouflage, unknown case names,
+unreviewed changed function bindings and missing conditional proof reject.
+Actual named C/AUnit evidence and independently reviewed compiled ABI/layout/
+header probes must resolve every route; a passed ledger status is insufficient.
+
+Compiled probes have a target-owned `target-compiled-witness-mapping` with
+source/header hashes, applicable contexts, exact argument vectors and exact
+assertion output. `run-target-compiled-witnesses.ps1` records actual compiler
+and executable processes, output-image hashes and captures. The verifier binds
+them to the context's selected compiler hash and rejects source, argument,
+compiler, executable, capture, exit and output drift. No compiled probes are
+installed by the author catalogue generator: its unmapped declarations remain
+pending until meaningful source probes and independent review exist.
+
+`collect-target-observations.ps1` assembles raw images, 832 primary pairs, 26
+constructs supplements, all warning contexts and current build witnesses into
+an observation bundle. Its generated contracts and matrix remain author-only
+proposals. It does not turn observations into acceptance or derive semantic
+expectations from a successful stdout capture. The workflow's collection stage
+is therefore distinct from final independent reconciliation. Actual GitHub
+execution is required to validate the complete distributed campaign; local
+planner/validator fixtures do not establish that it ran.
+
+Final target reconciliation consumes a separately reviewed
+`target-post-observation-envelope` for every original raw report. The envelope
+binds its raw SHA, runtime revision, context, source/fixture hashes, measured
+configuration, host/library image hashes, reviewed contract and immutable
+context image. Its independent approval and narrative are content-addressed.
+The raw `report_only` and `target_operation_acceptance` flags remain unchanged.
+Source transformation/exclusion review still precedes adapted execution;
+native-platform applicability may independently review the exact original C
+baseline capture afterward. The envelope can bind that post-capture review.
+Runtime/harness changes require fresh captures at their real revision; there
+is no revision relabeling or implicit tree-diff waiver.
+
+The final image consumer requires four source-bound build inputs: the named
+receipt, actual C consumer report, actual AUnit/configuration report and full
+compiler/regression log. It replays named cases, native driver source hashes,
+capture hashes and runtime DLL/archive identity. `synthetic_fixture: false`
+and `repository_dirty: false` alone do not establish a build witness. Envelope
+validation alone also grants no runtime/coverage authority: the final matrix
+still requires complete source/global API review, every actual context route,
+all image/build/runtime protocols and every semantic execution contract.
+
+Artifact transport follows the official [upload-artifact v7 documentation](https://github.com/actions/upload-artifact/tree/v7.0.2)
+and [download-artifact v8 documentation](https://github.com/actions/download-artifact/tree/v8).
+Unix mode bits are restored from the content-bound image manifest because the
+artifact service transports file bytes without preserving executable modes.

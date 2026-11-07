@@ -5,7 +5,8 @@ param(
     [string] $Profile = 'validation',
     [ValidateSet('default', 'upstream-test')]
     [string] $Configuration = 'default',
-    [switch] $UseExistingRuntime
+    [switch] $UseExistingRuntime,
+    [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -169,6 +170,9 @@ try {
     } else { @() })
     Invoke-Consumer 'external-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/external_string_contract$suffix") 'PASS: public external string contract' $externalArguments
     Invoke-Consumer 'conversion-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/conversion_api_contract$suffix") 'PASS: public numeric conversion contract'
+    if($TargetPolicy -ne ''){
+        Invoke-Consumer 'format-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/format_api_contract$suffix") 'PASS: public formatting contract'
+    }
     # Compile the identical public-header contract against the isolated pinned
     # C library. No reference object is linked into either Ada consumer.
     Invoke-Build @('exec', '--', 'gprbuild', '-P', 'experiments/conformance/reference.gpr', '-p', "-XLUA_CONFORMANCE_CONFIGURATION=$Configuration")
@@ -220,6 +224,13 @@ try {
         '-I', (Join-Path $projectRoot 'c_api/include/api'),
         (Join-Path $projectRoot 'c_api/tests/conversion_api_contract.c'),
         '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceConversionConsumer)
+    $referenceFormatConsumer=$null
+    if($TargetPolicy -ne ''){
+        $referenceFormatConsumer=Join-Path $reportDirectory "format-oracle$suffix"
+        Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/format_api_contract.c'),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceFormatConsumer)
+    }
     try {
         $env:PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:PATH
         $env:LD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
@@ -232,6 +243,7 @@ try {
         Invoke-Consumer 'builtin-oracle' $referenceBuiltinConsumer 'PASS: public builtin contract'
         Invoke-Consumer 'external-oracle' $referenceExternalConsumer 'PASS: public external string contract' $externalArguments
         Invoke-Consumer 'conversion-oracle' $referenceConversionConsumer 'PASS: public numeric conversion contract'
+        if($TargetPolicy -ne ''){Invoke-Consumer 'format-oracle' $referenceFormatConsumer 'PASS: public formatting contract'}
     } finally {
         $env:PATH = $adaExecutionPath
         $env:LD_LIBRARY_PATH = $adaExecutionLdPath
@@ -277,6 +289,11 @@ try {
         throw 'C/Ada public numeric conversion contract output differs'
     }
     Write-Output 'PASS: identical public numeric conversion contract against C and Ada'
+    if($TargetPolicy -ne ''){
+        if([IO.File]::ReadAllText((Join-Path $reportDirectory 'format-api.stdout')) -cne
+            [IO.File]::ReadAllText((Join-Path $reportDirectory 'format-oracle.stdout'))){throw 'C/Ada public formatting contract output differs'}
+        Write-Output 'PASS: identical public formatting contract against C and Ada'
+    }
     $referenceLibraries = @(Get-ChildItem -LiteralPath $referenceDirectory -File |
         Where-Object { $_.Name -match '^libconformance_lua\.(dll|so(\.[0-9.]+)?|dylib)$' } |
         ForEach-Object { [ordered]@{ file=$_.Name;
@@ -317,6 +334,12 @@ try {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
+    $formatSources=@()
+    if($TargetPolicy -ne ''){
+        $formatSources=@(foreach($name in @('format_api_contract.c','consumer_allocator.h')){
+            @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+        })
+    }
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
     Invoke-Consumer 'c-startup' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/c_image_client$suffix") 'CORE IMAGE C STARTUP OK'
     # Old ignored products can remain after the library rename. Hash only the
@@ -330,12 +353,14 @@ try {
     if ((Get-FileHash -LiteralPath $imagePath).Hash -cne $inputHash) {
         throw 'Consumer execution changed the selected runtime image'
     }
+    $consumerSourceNames=@('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'load_dump_contract.h', 'consumer_allocator.h')
+    if($TargetPolicy -ne ''){$consumerSourceNames+='format_api_contract.c'}
     [ordered]@{ profile = $Profile; library_type = $LibraryType;
         repository_revision = $repositoryRevision;
         repository_dirty = ($repositoryChanges.Count -ne 0);
         platform = $(if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' });
         reference_revision = $referenceRevision;
-        consumer_sources = @(@(foreach ($name in @('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'load_dump_contract.h', 'consumer_allocator.h')) {
+        consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
         }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources);
@@ -358,7 +383,8 @@ try {
             skipped_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 5 } else { 0 });
             reference_library_files=$referenceLibraries };
         conversion_contract = [ordered]@{ matching_output=$true; sources=$conversionContractSources;
-            reference_library_files=$referenceLibraries } } | ConvertTo-Json -Depth 6 |
+            reference_library_files=$referenceLibraries };
+        format_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$formatSources;reference_library_files=$referenceLibraries}}else{$null}) } | ConvertTo-Json -Depth 6 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8
     Write-Output 'PASS: one production interpreter image; Ada/C state, pool, allocator and startup checks'
 }

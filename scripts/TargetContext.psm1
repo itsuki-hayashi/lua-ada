@@ -129,7 +129,8 @@ function New-TargetContextImage {
           [Parameter(Mandatory)][string] $OutputDirectory,
           [Parameter(Mandatory)][Collections.IDictionary] $Paths,
           [Parameter(Mandatory)][string[]] $Directories,
-          [Parameter(Mandatory)][string[]] $WitnessReports)
+          [Parameter(Mandatory)][string[]] $WitnessReports,
+          [Collections.IDictionary] $Toolchain = @{})
     $plan = Get-TargetContextPlan -Root $Root
     if (@($plan.contexts | Where-Object context -CEQ $Context).Count -ne 1) { throw 'Image context is not scheduled' }
     $head = (& git -C $Root rev-parse HEAD).Trim()
@@ -159,7 +160,7 @@ function New-TargetContextImage {
             if (-not $IsWindows) { [IO.File]::SetUnixFileMode($destination,[IO.UnixFileMode]$mode) }
             $hash = (Get-FileHash -LiteralPath $source.FullName).Hash.ToLowerInvariant()
             if ((Get-FileHash -LiteralPath $destination).Hash.ToLowerInvariant() -cne $hash) { throw 'Freezing context image changed bytes' }
-            $files += @{path=$relative;sha256=$hash;bytes=$source.Length;unix_mode=$mode}
+            $files += @{path=$relative;sha256=$hash;bytes=(Get-Item -LiteralPath $destination).Length;unix_mode=$mode}
         }
     }
     $witnesses = @($WitnessReports | ForEach-Object {
@@ -171,7 +172,7 @@ function New-TargetContextImage {
     $manifest = @{schema_version=1;kind='immutable-target-context-image';target=$plan.target;context=$Context;revision=$head;
         reference_revision=$plan.reference_revision;repository_dirty=$false;synthetic_fixture=$false;paths=$Paths;
         launcher_basename=$(if($Context.Split('/')[1] -ceq 'windows'){'lua.exe'}else{'lua'});
-        files=$files;build_witnesses=$witnesses;runtime_acceptance=$false;coverage_authority=$false}
+        files=$files;build_witnesses=$witnesses;toolchain=$Toolchain;runtime_acceptance=$false;coverage_authority=$false}
     [IO.File]::WriteAllText((Join-Path $output 'image.json'),
         (ConvertTo-Json -InputObject $manifest -Depth 48).Replace("`r`n","`n") + "`n",[Text.UTF8Encoding]::new($false))
     return Assert-TargetContextImage -ImageDirectory $output -Context $Context -Revision $head -RequireActual

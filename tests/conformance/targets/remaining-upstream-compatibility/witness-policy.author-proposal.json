@@ -1,0 +1,32 @@
+{
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_snapshot": {
+    "repository_dirty": true,
+    "revision": "ebe91438b46ad2758dfa929e8e5f198d690b5dab",
+    "kind": "repository-source-snapshot"
+  },
+  "consumer": {
+    "sha256": "2e422bb92bc8cf5ccd5a27d3ea34058d27b6538a37a11beeffac254308aa7e9a",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
+  },
+  "kind": "target-witness-policy",
+  "aunit": {
+    "sha256": "2747318be2b699e4a18810dc87ca9cbe94fbe12395b733bf5c4c12699c6c3266",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json"
+  },
+  "runtime_acceptance": false,
+  "target": "remaining-upstream-compatibility",
+  "schema_version": 1,
+  "global_api": {
+    "sha256": "cc8641b802c8383960de435bdf856e9aa5f6a9a9784e6be66ed8fcbe9a7347ec",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
+  },
+  "review": {
+    "status": "pending",
+    "reviewer": null,
+    "artifact": null,
+    "artifact_sha256": null,
+    "author": "Codex /root/validation_delivery"
+  },
+  "coverage_authority": false
+}

@@ -6,7 +6,8 @@ function Test-NamedConsumerEvidence {
           [Collections.IDictionary] $Mapping,
           [string] $Revision, [string] $Context,
           [scriptblock] $ResolveCapture,
-          [switch] $RequireForeignContract)
+          [switch] $RequireForeignContract,
+          [switch] $RequireFormatContract)
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
     $parts = $Context.Split('/')
@@ -33,6 +34,10 @@ function Test-NamedConsumerEvidence {
         $markers['foreign-oracle']='PASS: public foreign contract'
         $contractKinds += 'foreign'
         $consumerKinds += 'foreign-api'
+    }
+    if($RequireFormatContract){
+        $markers['format-api']='PASS: public formatting contract';$markers['format-oracle']='PASS: public formatting contract'
+        $contractKinds+='format';$consumerKinds+='format-api'
     }
     foreach ($name in $markers.Keys) {
         $matches = @($Report.consumers | Where-Object { $_.name -ceq $name })

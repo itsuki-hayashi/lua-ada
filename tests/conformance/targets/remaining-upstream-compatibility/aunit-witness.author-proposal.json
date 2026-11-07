@@ -158,11 +158,15 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "dbce2a047d4e649700e20f5eae3bac42d3315cf108e14c4f36a398407131b3cd"
+      "sha256": "04b7d33770557c60e4340e58285ca4d85403b896a48b18ccec58792dec6bc861"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
       "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
+    },
+    {
+      "sha256": "7ff9e34098a333affec5e09691cf117a5bd572b6a6540f9c6ba3e1262409250a",
+      "path": "tests/src/lua-formatter_tests.adb"
     }
   ],
   "entries": [
@@ -1939,6 +1943,22 @@
         "source_sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90",
         "relationship": "Separately executed first-party public Lua regression; actual native process observations require their own evidence."
       }
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-formatter_tests.adb#Shared_Work_Quota",
+      "registered_label": "C formatter: foreign scanning shares bounded work quota",
+      "required_stdout_line": "OK C formatter: foreign scanning shares bounded work quota",
+      "execution_evidence": [],
+      "source_sha256": "7ff9e34098a333affec5e09691cf117a5bd572b6a6540f9c6ba3e1262409250a"
+    },
+    {
+      "runtime_acceptance": false,
+      "case": "tests/src/lua-formatter_tests.adb#String_Extent_Quota",
+      "registered_label": "C formatter: output obeys bounded string extent quota",
+      "required_stdout_line": "OK C formatter: output obeys bounded string extent quota",
+      "execution_evidence": [],
+      "source_sha256": "7ff9e34098a333affec5e09691cf117a5bd572b6a6540f9c6ba3e1262409250a"
     }
   ],
   "required_contexts": [

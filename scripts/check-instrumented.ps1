@@ -1,6 +1,9 @@
 param(
     [ValidateSet('static', 'static-pic', 'relocatable')]
-    [string] $LibraryType = 'static'
+    [string] $LibraryType = 'static',
+    [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy = '',
+    [string] $TargetWitnessPolicy = '',
+    [switch] $TargetDevelopmentObservation
 )
 
 Set-StrictMode -Version Latest
@@ -17,6 +20,13 @@ $suffix = if ($IsWindows) { '.exe' } else { '' }
 $reportDirectory = Join-Path $root "reports/instrumented/$LibraryType"
 [void][IO.Directory]::CreateDirectory($reportDirectory)
 $observations = [Collections.Generic.List[object]]::new()
+$targetWitnesses = $null; $previousTargetReports = @()
+if ($TargetPolicy -ne '') {
+    if ($TargetWitnessPolicy -eq '') { throw 'Target build mode requires its explicit successor witness policy' }
+    Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
+    $targetWitnesses = Read-TargetWitnessPolicy -Root $root -Path $TargetWitnessPolicy -RequireReview:(-not $TargetDevelopmentObservation)
+    $previousTargetReports = @(Get-ChildItem (Join-Path $root 'reports/core-image') -Filter result.json -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object FullName)
+} elseif ($TargetWitnessPolicy -ne '' -or $TargetDevelopmentObservation) { throw 'Target witness/development flags require TargetPolicy' }
 
 function Invoke-CheckedAlire([string[]] $Arguments) {
     & alr @Arguments
@@ -137,9 +147,11 @@ try {
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua" `
             -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     }
+    if ($TargetPolicy -eq '') {
     & "$PSScriptRoot/check-expanded-conformance.ps1" -Interpreter $runner `
         -Configuration upstream-test -LibraryType $LibraryType -RuntimeDirectory $library `
         -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix"
+    }
     & "$PSScriptRoot/test-conformance-launcher.ps1" -Interpreter $runner `
         -Configuration upstream-test `
         -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
@@ -149,8 +161,15 @@ try {
     # configuration only, preserves the existing SAL and owns no second build.
     # Keep Alire invocations serialized with the test and oracle builds above.
     & "$PSScriptRoot/test-prebuilt-runtime-profile.ps1" -Profile validation `
-        -LibraryType $LibraryType -Configuration upstream-test
+        -LibraryType $LibraryType -Configuration upstream-test -TargetPolicy $TargetPolicy
     if ($LASTEXITCODE -ne 0) { throw 'Instrumented C consumer checks failed' }
+    if ($TargetPolicy -ne '') {
+        $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
+        $link = if ($LibraryType -ceq 'relocatable') { 'shared' } else { $LibraryType }
+        $null = Write-TargetBuildWitnesses -Root $root -Policy $targetWitnesses `
+            -Context "upstream-test/$platform/validation/$link" -PreviousReports $previousTargetReports
+        Write-Output 'Target build phase completed; File/Aggregate/Heavy executions belong to immutable-image partition jobs; target acceptance=False'
+    }
     Write-Output "PASS: instrumented validation/$LibraryType regressions; scope acceptance remains pending"
 } finally {
     [ordered]@{ schema_version=1; configuration='upstream-test'; library=$LibraryType;
