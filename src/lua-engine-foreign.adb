@@ -6,6 +6,7 @@ with Interfaces.C.Strings;
 with Lua.Canonical_Compiler;
 with Lua.Chunks;
 with Lua.Engine.Canonical;
+with Lua.Engine.C_Operators;
 with Lua.Engine.Stacks;
 with Lua.Engine.IO_Libraries;
 with Lua.Engine.Garbage_Collection;
@@ -1455,6 +1456,74 @@ package body Lua.Engine.Foreign is
                   Push (Owner.Universe.all, Context,
                         New_Native (Owner.Universe.all, "@length"));
                   Push (Owner.Universe.all, Context, Item);
+                  Output.Length := 1;
+               end if;
+            end;
+         when Prepare_Arithmetic | Prepare_Comparison =>
+            declare
+               Is_Comparison : constant Boolean :=
+                 Input.Operation = Prepare_Comparison;
+               Kind : C_Operators.Operation;
+               Left, Right, Result : Value;
+               Needed : Natural := 0;
+            begin
+               if Is_Comparison then
+                  if Input.Error_Index not in 0 .. 2 then
+                     raise Foreign_Error with "invalid comparison operation";
+                  elsif not Valid_Index (Context, Input.Index) or else
+                    not Valid_Index (Context, Input.Count)
+                  then
+                     --  Absent acceptable indices compare false, even when
+                     --  both otherwise map to the facade's nil sentinel.
+                     Leave_Context;
+                     return Action_Done;
+                  end if;
+                  Kind := C_Operators.Operation'Val
+                    (C_Operators.Operation'Pos (C_Operators.Equal) +
+                     Input.Error_Index);
+                  Left := Get_Value (Input.Index);
+                  Right := Get_Value (Input.Count);
+               else
+                  if Input.Index not in 0 .. 13 then
+                     raise Foreign_Error with "invalid arithmetic operation";
+                  end if;
+                  Kind := C_Operators.Operation'Val (Input.Index);
+                  Needed := (if C_Operators.Unary (Kind) then 1 else 2);
+                  if Context.Foreign_Top - Context.Foreign_Base < Needed then
+                     raise Foreign_Error with "not enough arithmetic operands";
+                  end if;
+                  Left := Get_Value (-C.int (Needed));
+                  Right := Get_Value (-1);
+               end if;
+               if C_Operators.Primitive (Kind, Left, Right) then
+                  Result :=
+                    (if C_Operators.Unary (Kind) then VM.Unary_Value
+                       (Owner.Universe.all, C_Operators.Token (Kind), Left)
+                     else VM.Binary_Value
+                       (Owner.Universe.all, C_Operators.Token (Kind),
+                        Left, Right));
+                  if Is_Comparison then
+                     Output.Integer_Data := Boolean'Pos (Truth (Result));
+                  else
+                     Stacks.Write
+                       (Owner.Universe.all, Context,
+                        Context.Foreign_Top - Needed + 1, Result);
+                     Pop (Context, Needed - 1);
+                  end if;
+               else
+                  if not Is_Comparison and then C_Operators.Unary (Kind)
+                  then
+                     --  lua_arith exposes its fake second unary operand
+                     --  as the same caller's next actual C temporary slot.
+                     Push (Owner.Universe.all, Context, Left);
+                  end if;
+                  --  Keep originals in their actual C slots. The helper and
+                  --  copied operands start above that top, preserving the
+                  --  caller window and real debug.setlocal writes through MM.
+                  Push (Owner.Universe.all, Context, New_Native
+                    (Owner.Universe.all, C_Operators.Helper_Name (Kind)));
+                  Push (Owner.Universe.all, Context, Left);
+                  Push (Owner.Universe.all, Context, Right);
                   Output.Length := 1;
                end if;
             end;

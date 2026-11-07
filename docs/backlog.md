@@ -2,6 +2,10 @@
 
 ## Active remaining-suite delivery
 
+Public C arithmetic/comparison have [caller-window evidence](sessions/2026-11-08-c-operator-windows.md):
+seventeen native-default/T matched cases and 1,678 passing local AUnit cases.
+Thread reset, host-base C closing slots and integrated full acceptance remain.
+
 `lua_stringtonumber`, numeric-string C conversions under refusal, and exported
 `lua_ident` have [scoped evidence](sessions/2026-11-08-c-numeric-conversion.md):
 eleven C cases match both native configurations and 1,641 AUnit cases pass.

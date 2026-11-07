@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [C operator checkpoint](sessions/2026-11-08-c-operator-windows.md) adds
+arithmetic/comparison with actual caller slots and unary duplicate operands.
+Seventeen C cases match both native configurations; strict local default
+builds and 1,678 AUnit cases pass. Thread reset, host-base C closers and
+integrated final acceptance remain open.
+
 The [public value/auxiliary checkpoint](sessions/2026-11-08-public-value-auxiliary.md)
 has matching local C/Ada evidence for three core and 28 auxiliary exports.
 Its 20,000-value binary64 text fingerprint matches both C configurations;

@@ -38,6 +38,14 @@ integration audit. C table capacity arguments remain hints, pending wiring.
 Both constructors leave standard libraries closed, as C Lua does; Ada embedding
 retains its separate eager default environment.
 
+`lua_arith` and `lua_compare` use the shared primitive/metamethod engine.
+Primitive operations require no allocator growth. Handler calls preserve real
+caller operands and unary duplicate slots during debug reads/writes, use the
+same nonyieldable C portal, and retain the existing host budget. Seventeen
+cases match default and native T; the
+[session](../docs/sessions/2026-11-08-c-operator-windows.md) records scope and
+remaining thread-reset/base-closer/final acceptance obligations.
+
 `lua_stringtonumber` borrows the actual C extent and shares the exact runtime
 parser's fixed local numeric scratch. Numeric-string `lua_tonumberx`,
 `lua_tointegerx` and `lua_isnumber` use that path too: no Lua allocator growth

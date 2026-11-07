@@ -61,6 +61,7 @@ package Lua.Engine.Foreign is
       Upvalue_Id, Join_Upvalues, Begin_Builtin, Push_External_String,
       Prepare_External_Release, Complete_External_Release,
       Prepare_Length, Prepare_Concatenation, Number_To_C_String,
+      Prepare_Arithmetic, Prepare_Comparison,
       String_To_Number,
       Create_Formatter, Append_Format_Value, Append_Format_UTF8,
       Finish_Formatter, Release_Formatter, Charge_Aux_Work);
@@ -101,6 +102,7 @@ package Lua.Engine.Foreign is
       Prepare_External_Release => 95, Complete_External_Release => 96,
       Prepare_Length => 100, Prepare_Concatenation => 101,
       Number_To_C_String => 102,
+      Prepare_Arithmetic => 103, Prepare_Comparison => 104,
       String_To_Number => 106,
       Create_Formatter => 120, Append_Format_Value => 121,
       Append_Format_UTF8 => 122, Finish_Formatter => 123,

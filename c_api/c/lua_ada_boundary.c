@@ -825,6 +825,28 @@ int lua_rawequal(lua_State *state, int first, int second) {
     input.index = first; input.count = second;
     return (int)dispatch(state, input).integer_data;
 }
+void lua_arith(lua_State *state, int operation) {
+    struct lua_ada_request input = request(ADA_PREPARE_ARITHMETIC);
+    int top = lua_gettop(state);
+    int operands = (operation == LUA_OPUNM || operation == LUA_OPBNOT) ? 1 : 2;
+    input.index = operation;
+    if (dispatch(state, input).length != 0) {
+        lua_call(state, 2, 1);
+        lua_copy(state, -1, top - operands + 1);
+        lua_settop(state, top - operands + 1);
+    }
+}
+int lua_compare(lua_State *state, int first, int second, int operation) {
+    struct lua_ada_request input = request(ADA_PREPARE_COMPARISON);
+    struct lua_ada_response output;
+    int result;
+    input.index = first; input.count = second; input.error_index = operation;
+    output = dispatch(state, input);
+    if (output.length == 0) return (int)output.integer_data;
+    lua_call(state, 2, 1);
+    result = lua_toboolean(state, -1); lua_pop(state, 1);
+    return result;
+}
 int lua_next(lua_State *state, int index) {
     return (int)indexed(state, ADA_NEXT_ITEM, index).integer_data;
 }

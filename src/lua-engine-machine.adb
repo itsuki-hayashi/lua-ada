@@ -27,6 +27,7 @@ with Lua.Engine.Sorting;
 with Lua.Engine.Inspection;
 with Lua.Engine.Hooks;
 with Lua.Engine.Canonical;
+with Lua.Engine.C_Operators;
 with Lua.Engine.Call_Names;
 with Lua.Engine.Stacks;
 with Lua.Engine.Foreign;
@@ -301,8 +302,17 @@ package body Lua.Engine.Machine is
          then
             return Lua.Numbers.Less (Numeric (State, A), Numeric (State, B));
          end if;
-         Fail (State, "attempt to compare " & Diagnostic_Type (State, A) &
-                 " with " & Diagnostic_Type (State, B));
+         declare
+            A_Type : constant String := Diagnostic_Type (State, A);
+            B_Type : constant String := Diagnostic_Type (State, B);
+         begin
+            --  Native order errors distinguish two values with the same
+            --  diagnostic name from two different named categories. This
+            --  also honors a table/userdata's actual raw __name spelling.
+            Fail (State, "attempt to compare " &
+              (if A_Type = B_Type then "two " & A_Type & " values"
+               else A_Type & " with " & B_Type));
+         end;
          return False;
       end Ordered;
    begin
@@ -2479,6 +2489,8 @@ package body Lua.Engine.Machine is
       Activation : constant Frame_Access :=
         State.Current.Stack.Last_Element;
       Name : constant String := Native_Operation_Name (Activation);
+      API_Operation : constant C_Operators.Lookup_Result :=
+        C_Operators.Find (Name);
       function Arg (Index : Positive) return Value is
         (if Index <= Natural (Activation.Native_Arguments.Length)
          then Activation.Native_Arguments (Index) else Nil_Value);
@@ -3006,8 +3018,11 @@ package body Lua.Engine.Machine is
                  State.Current.Non_Yieldable > 0 or else
                  State.Current.Phase = Closing
                then
-                  Fail (State, "attempt to yield across a non-yieldable " &
-                          "boundary");
+                  Fail (State,
+                    (if State.Current = State.Main_Context and then
+                        not State.Current.C_Resuming then
+                       "attempt to yield from outside a coroutine"
+                     else "attempt to yield across a C-call boundary"));
                end if;
                Activation.Native_Stage := 1;
                State.Current.Transfer.Kind := Yielded;
@@ -3263,6 +3278,21 @@ package body Lua.Engine.Machine is
       if Name = "@invoke" then
          Handler := First (Activation.Native_Captures);
          Invoke (Handler, Activation.Native_Arguments);
+      elsif API_Operation.Found then
+         if Activation.Native_Stage = 0 then
+            --  This metadata holder is private transport, not a public C
+            --  activation. Actual caller operands stay below its function
+            --  slot while the ordinary shared operator dispatches handlers.
+            Activation.Native_Stage := 1;
+            Schedule
+              (Self,
+               (if C_Operators.Unary (API_Operation.Kind) then "@unary"
+                else "@binary"), Activation.Native_Arguments, 0,
+               C_Operators.Token (API_Operation.Kind));
+         else
+            Handler := First (Activation.Native_Results);
+            Return_Native (Handler);
+         end if;
       elsif Name = "@api.concat" then
          if Activation.Native_Stage = 0 then
             Activation.Native_Index :=
@@ -3577,11 +3607,23 @@ package body Lua.Engine.Machine is
             then
                Return_Native ((Boolean_Kind, Operator = Not_Equal));
                return;
-            elsif Left.Kind = String_Kind and then
-              Operator not in Concatenate | Equal | Not_Equal |
-                Less | Less_Equal | Greater | Greater_Equal
+            elsif Operator in Plus | Minus | Star | Slash | Floor_Divide |
+              Percent | Power | Bit_And | Bit_Or | Bit_Xor | Shift_Left |
+              Shift_Right and then
+              (Left.Kind not in Integer_Kind | Real_Kind or else
+               Right.Kind not in Integer_Kind | Real_Kind)
             then
-               Fail (State, "no arithmetic metamethod for string");
+               --  Raw arithmetic does not coerce strings. The installed
+               --  string-library handler owns that conversion. Once both
+               --  handler lookups fail, select the first non-number exactly
+               --  as luaG_opinterror does, including a wrong right operand.
+               Handler := (if Left.Kind in Integer_Kind | Real_Kind then
+                             Right else Left);
+               Fail (State, "attempt to perform " &
+                 (if Operator in Bit_And | Bit_Or | Bit_Xor | Shift_Left |
+                     Shift_Right then "bitwise operation"
+                  else "arithmetic") & " on a " &
+                 Diagnostic_Type (State, Handler) & " value");
             end if;
          end if;
          Return_Native ((if Name = "@unary"
