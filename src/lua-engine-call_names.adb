@@ -15,8 +15,12 @@ package body Lua.Engine.Call_Names is
          when Method_Call => "method", when Iterator_Call => "for iterator",
          when Metamethod_Call => "metamethod");
 
-   function From_Caller
-     (State : in out World; Caller : Frame_Access) return Identity
+   function Resolve_Name
+     (State : in out World; Caller : Frame_Access; Operand_Index : Natural)
+      return Identity;
+   function Resolve_Name
+     (State : in out World; Caller : Frame_Access; Operand_Index : Natural)
+      return Identity
    is
       Code : Prototype_Access renames Caller.Code;
       Model : constant Lua.Prototypes.Prototype_Access := Code.Canonical_Node;
@@ -63,7 +67,7 @@ package body Lua.Engine.Call_Names is
          end Publish;
       begin
          if Id = Lua.Prototypes.No_String then
-            return (New_String (State, "(no name)"), Kind);
+            return (New_String (State, "?"), Kind);
          end if;
          Lua.Prototypes.Query_String
            (Code.Canonical_Owner.Model, Id, Publish'Access);
@@ -198,6 +202,7 @@ package body Lua.Engine.Call_Names is
                      Key_Name := Literal_Name (Part (Item, C));
                   end if;
                   Kind := (if Operation_Id = Op_SELF then Method_Call
+                           elsif Operation_Id = Op_GETI then Table_Field
                            elsif Is_Environment (Part (Item, B), Limit,
                              Operation_Id = Op_GETTABUP) then Global_Field
                            else Table_Field);
@@ -213,6 +218,25 @@ package body Lua.Engine.Call_Names is
       Instruction := Model.Code (PC + 1);
       if not Valid (Instruction) then return (others => <>); end if;
       Op := Lua.Opcodes.Operation (Instruction);
+      if Operand_Index /= 0 then
+         --  Arithmetic fallbacks retain their original argument order. An
+         --  immediate/constant can be flipped in front of its register; only
+         --  the register has a source binding to explain in the diagnostic.
+         case Op is
+            when Op_MMBIN =>
+               return Resolve
+                 (Part (Instruction, (if Operand_Index = 1 then A else B)),
+                  PC, Expanded => True);
+            when Op_MMBINI | Op_MMBINK =>
+               if (Operand_Index = 1) = (Part (Instruction, K) = 0) then
+                  return Resolve (Part (Instruction, A), PC, True);
+               end if;
+            when Op_BNOT | Op_UNM =>
+               return Resolve (Part (Instruction, B), PC, True);
+            when others => null;
+         end case;
+         return (others => <>);
+      end if;
       case Op is
          when Op_CALL | Op_TAILCALL =>
             return Resolve (Part (Instruction, A), PC, Expanded => True);
@@ -220,5 +244,14 @@ package body Lua.Engine.Call_Names is
             return (New_String (State, "for iterator"), Iterator_Call);
          when others => return (others => <>);
       end case;
-   end From_Caller;
+   end Resolve_Name;
+
+   function From_Caller
+     (State : in out World; Caller : Frame_Access) return Identity is
+     (Resolve_Name (State, Caller, 0));
+
+   function From_Operand
+     (State : in out World; Caller : Frame_Access; Index : Arithmetic_Operand)
+      return Identity is
+     (Resolve_Name (State, Caller, Index));
 end Lua.Engine.Call_Names;

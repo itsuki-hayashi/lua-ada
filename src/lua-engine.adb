@@ -1,7 +1,6 @@
+with Lua.Engine.Library_Openers;
 with Lua.Engine.Canonical;
 with Lua.Engine.Finalizers;
-with Lua.Engine.IO_Libraries;
-with Lua.Engine.Operating_System;
 with Lua.Engine.Warnings;
 with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
@@ -9,8 +8,6 @@ with Lua.Number_Parsing;
 with Ada.Exceptions;
 with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
-with Ada.Numerics;
-with Lua.Engine.Unicode;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
@@ -18,7 +15,6 @@ with Ada.Unchecked_Conversion;
 with Lua_Ada_Config;
 with Lua.Engine.Compiler;
 with Lua.Engine.Tables;
-with Lua.Engine.Mathematics;
 with Lua.Engine.Machine;
 
 package body Lua.Engine is
@@ -1116,6 +1112,13 @@ package body Lua.Engine is
       Item.Native_Operator := Lua.Lexers.End_Of_Input;
       Item.Foreign_Handler := System.Null_Address;
       Item.Foreign_Ticket := 0;
+      Item.Foreign_Continuation := System.Null_Address;
+      Item.Foreign_KContext := 0;
+      Item.Foreign_KStatus := 0;
+      Item.Foreign_Yield_Count := 0;
+      Item.Foreign_Suspended := False;
+      Item.Foreign_Wanted := 0;
+      Item.Foreign_Protected := False;
       Item.Warning_Phase := No_Pending_Warning;
       Item.Warning_Previous := null;
       Item.Warning_Window := null;
@@ -1332,6 +1335,8 @@ package body Lua.Engine is
       Context.Message_Depth := 0;
       Context.Cleanup_Depth := 0;
       Context.Hook_Frame := null;
+      Context.Hook_Suspended := False;
+      Context.Hook_Yield_Pending := False;
       Context.Foreign_Activation := null;
       Context.Stack_Window := null;
    end Destroy_Frames;
@@ -2052,42 +2057,6 @@ package body Lua.Engine is
 
    procedure Initialize (State : in out World; Bounds : Limits) is
       Table : Value;
-      procedure Install (Name : String; Native : Native_Kind);
-      procedure Library (Name, Members : String);
-      procedure Arithmetic (Meta : Value; Name : String);
-      function Directory_Separator (Host : String) return String;
-      function Directory_Separator (Host : String) return String is
-        (if Host = "windows" then "\" else "/");
-      procedure Arithmetic (Meta : Value; Name : String) is
-      begin
-         Set (State, Meta, New_String (State, Name),
-              New_Native (State, "arith." & Name));
-      end Arithmetic;
-      procedure Library (Name, Members : String) is
-         Module : constant Value := New_Table (State);
-         First : Positive := Members'First;
-         Last : Natural;
-      begin
-         Set (State, Table, New_String (State, Name), Module);
-         Set (State, (Table_Kind, State.Loaded_Modules),
-              New_String (State, Name), Module);
-         while First <= Members'Last loop
-            Last := First;
-            while Last < Members'Last and then Members (Last + 1) /= ' ' loop
-               Last := Last + 1;
-            end loop;
-            Set (State, Module,
-                 New_String (State, Members (First .. Last)),
-                 New_Native (State, Name & "." & Members (First .. Last)));
-            First := Last + 2;
-         end loop;
-      end Library;
-
-      procedure Install (Name : String; Native : Native_Kind) is
-         Key : constant Value := New_String (State, Name);
-      begin
-         Set (State, Table, Key, (Native_Kind_Value, Native));
-      end Install;
    begin
       --  Ownership indexes and temporary roots exist before bootstrap can
       --  allocate a context or heap object. No registry grows implicitly.
@@ -2111,9 +2080,6 @@ package body Lua.Engine is
       State.Warning_Data := System.Null_Address;
       State.Warning_Head := null;
       State.Saved_Bounds := Bounds;
-      if State.Open_Standard_Libraries then
-         Mathematics.Reset (State);
-      end if;
       State.Memory_Error_Value := New_String (State, "not enough memory");
       State.Handling_Error_Value :=
         New_String (State, "error in error handling");
@@ -2142,143 +2108,10 @@ package body Lua.Engine is
          --  or other libraries is a separate explicit public C operation.
          return;
       end if;
-      --  Bootstrap performs no collection. The globals table becomes the
-      --  permanent root before any builtins or version strings are installed.
-      Install ("print", Print_Function);
-      Install ("assert", Assert_Function);
-      Install ("error", Error_Function);
-      Install ("pcall", Pcall_Function);
-      Install ("type", Type_Function);
-      Install ("tonumber", Tonumber_Function);
-      Install ("tostring", Tostring_Function);
-      Install ("select", Select_Function);
-      Install ("next", Next_Function);
-      Install ("pairs", Pairs_Function);
-      Install ("ipairs", Ipairs_Function);
-      Install ("rawequal", Rawequal_Function);
-      Install ("rawget", Rawget_Function);
-      Install ("rawset", Rawset_Function);
-      Install ("rawlen", Rawlen_Function);
-      declare
-         Key : Value := New_String (State, "_G");
-         Version : constant Value := New_String (State, Language_Version);
-      begin
-         Set (State, Table, Key, Table);
-         Key := New_String (State, "_VERSION");
-         Set (State, Table, Key, Version);
-      end;
-      Set (State, Table, New_String (State, "collectgarbage"),
-           New_Native (State, "base.collectgarbage"));
-      Library ("debug", "getinfo getlocal setlocal getupvalue setupvalue " &
-                 "upvalueid upvaluejoin getregistry " &
-                 "getmetatable setmetatable getuservalue setuservalue " &
-                 "sethook gethook traceback");
-      Library ("coroutine",
-               "create resume yield wrap status running isyieldable close");
-      Library ("string", "byte char len lower upper sub reverse rep dump " &
-               "format find match gmatch gsub pack packsize unpack");
-      Library ("utf8", "char len codepoint offset codes");
-      Library ("table", "concat create insert remove move pack sort unpack");
-      Library ("math",
-        "abs ceil floor fmod max min modf tointeger type ult " &
-        "acos asin atan cos deg exp frexp ldexp log rad sin sqrt tan " &
-        "random randomseed" &
-        (if State.Math_Compatibility then
-           " atan2 cosh sinh tanh pow log10" else ""));
-      --  Install native streams only after the registry owns globals and
-      --  library tables. Their userdata retain real per-world finalizers.
-      IO_Libraries.Install (State);
-      declare
-         Module : constant Value := Operating_System.Open_Module (State);
-      begin
-         Set (State, Table, New_String (State, "os"), Module);
-         Set (State, (Table_Kind, State.Loaded_Modules),
-              New_String (State, "os"), Module);
-      end;
-      declare
-         Math : constant Value := Get (Table, New_String (State, "math"));
-         Package_Value : constant Value := New_Table (State);
-         Searchers : constant Value := New_Table (State);
-         Captures : constant Values.Vector :=
-           One_Value (State, Package_Value);
-      begin
-         --  Capture the original package object. Public field replacement
-         --  must not retarget the registry roots used by require/preload.
-         Set (State, Table, New_String (State, "package"), Package_Value);
-         Set (State, (Table_Kind, State.Loaded_Modules),
-              New_String (State, "package"), Package_Value);
-         Set (State, Package_Value, New_String (State, "loaded"),
-              (Table_Kind, State.Loaded_Modules));
-         Set (State, Package_Value, New_String (State, "preload"),
-              (Table_Kind, State.Preload_Modules));
-         Set (State, Package_Value, New_String (State, "path"),
-              New_String (State, "./?.lua;./?/init.lua"));
-         Set (State, Package_Value, New_String (State, "config"),
-              New_String (State,
-                Directory_Separator (Lua_Ada_Config.Alire_Host_OS) &
-                Character'Val (10) & ";" &
-                Character'Val (10) & "?" & Character'Val (10) & "!" &
-                Character'Val (10) & "-" & Character'Val (10)));
-         Set (State, Package_Value,
-              New_String (State, "searchers"), Searchers);
-         Set (State, Package_Value, New_String (State, "searchpath"),
-              New_Native (State, "package.searchpath", Captures));
-         Set (State, Searchers, (Integer_Kind, 1),
-              New_Native (State, "package.preload_searcher", Captures));
-         Set (State, Searchers, (Integer_Kind, 2),
-              New_Native (State, "package.lua_searcher", Captures));
-         Set (State, Table, New_String (State, "require"),
-              New_Native (State, "base.require", Captures));
-         Set (State, Table, New_String (State, "load"),
-              New_Native (State, "base.load"));
-         Set (State, Table, New_String (State, "warn"),
-              New_Native (State, "base.warn"));
-         Set (State, Table, New_String (State, "xpcall"),
-              New_Native (State, "base.xpcall"));
-         Set (State, Table, New_String (State, "loadfile"),
-              New_Native (State, "base.loadfile"));
-         Set (State, Table, New_String (State, "dofile"),
-              New_Native (State, "base.dofile"));
-         Set (State, Math, New_String (State, "maxinteger"),
-              (Integer_Kind, Integer_Value'Last));
-         Set (State, Math, New_String (State, "mininteger"),
-              (Integer_Kind, Integer_Value'First));
-         Set (State, Math, New_String (State, "pi"),
-              (Real_Kind, Ada.Numerics.Pi));
-         Set (State, Math, New_String (State, "huge"),
-              (Real_Kind, Read_Number
-                (Lua.Storage.Reference (State.Memory), "1e999").Real_Item));
-      end;
-      declare
-         Strings : constant Value := Get (Table, New_String (State, "string"));
-         Unicode : constant Value := Get (Table, New_String (State, "utf8"));
-         Meta : constant Value := New_Table (State);
-      begin
-         State.String_Metatable := Meta.Reference;
-         Set (State, Meta, New_String (State, "__index"), Strings);
-         Arithmetic (Meta, "__add");
-         Arithmetic (Meta, "__sub");
-         Arithmetic (Meta, "__mul");
-         Arithmetic (Meta, "__mod");
-         Arithmetic (Meta, "__pow");
-         Arithmetic (Meta, "__div");
-         Arithmetic (Meta, "__idiv");
-         Arithmetic (Meta, "__unm");
-         Set (State, Unicode, New_String (State, "charpattern"),
-              New_String (State, Lua.Engine.Unicode.Charpattern));
-         Set (State, Table, New_String (State, "getmetatable"),
-              New_Native (State, "base.getmetatable"));
-         Set (State, Table, New_String (State, "setmetatable"),
-              New_Native (State, "base.setmetatable"));
-         Set (State, Table, New_String (State, "tostring"),
-              New_Native (State, "base.tostring"));
-         Set (State, Table, New_String (State, "print"),
-              New_Native (State, "base.print"));
-         Set (State, Table, New_String (State, "pairs"),
-              New_Native (State, "base.pairs"));
-         Set (State, Table, New_String (State, "ipairs"),
-              New_Native (State, "base.ipairs"));
-      end;
+      --  Both eager sessions and explicit C opening use the same Ada
+      --  constructors. This bootstrap operation cannot collect until globals
+      --  and the loaded registry own all returned module tables.
+      Lua.Engine.Library_Openers.Open_All (State);
       --  Bootstrap replaces several M1 bindings and creates temporary lookup
       --  keys. Publish a stable live baseline before returning the session;
       --  later heap quotas and collection statistics must describe its owned

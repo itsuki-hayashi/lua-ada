@@ -406,7 +406,7 @@ private package Lua.Engine is
    end record;
    package Close_Lists is new Lua.Storage.Vectors (Close_Entry);
    type Unwind_Reason is
-     (No_Unwind, Scope_Exit, Jump_Exit, Return_Exit, Error_Exit,
+     (No_Unwind, Scope_Exit, C_Slot_Exit, Jump_Exit, Return_Exit, Error_Exit,
       Coroutine_Exit);
    type Failure_Kind is
      (No_Failure, Language_Failure, Memory_Failure, Handling_Failure,
@@ -455,6 +455,15 @@ private package Lua.Engine is
       Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
       Foreign_Handler : System.Address := System.Null_Address;
       Foreign_Ticket : Interfaces.C.unsigned_long_long := 0;
+      Foreign_Continuation : System.Address := System.Null_Address;
+      Foreign_KContext : Interfaces.C.ptrdiff_t := 0;
+      Foreign_KStatus : Interfaces.C.int := 0;
+      Foreign_Yield_Count : Natural := 0;
+      Foreign_Suspended : Boolean := False;
+      Foreign_Wanted : Integer := 0;
+      Foreign_Protected : Boolean := False;
+      --  C continuations retain scalar metadata, never an abandoned C stack.
+      --  A suspended boundary owns its result adjustment until resumption.
       Warning_Phase : Warning_Event_Phase := No_Pending_Warning;
       Warning_Previous : Frame_Access;
       Warning_Window : Frame_Access;
@@ -591,6 +600,17 @@ private package Lua.Engine is
       Foreign_Control : System.Address := System.Null_Address;
       Foreign_Base : Natural := 0;
       Foreign_Activation : Frame_Access;
+      Resume_Foreign_Activation : Frame_Access;
+      Resume_Foreign_Base : Natural := 0;
+      Resume_Foreign_Top : Natural := 0;
+      Resume_Stack_Used : Natural := 0;
+      Resume_Host_Stack_Top : Natural := 0;
+      Resume_Return_Base : Natural := 0;
+      Resume_Return_Top : Natural := 0;
+      Detached_Resume_Window : Boolean := False;
+      --  Suspended C-resumed threads expose results in a detached host
+      --  window above their retained activation windows. Restore this real
+      --  C view only after the next resume arguments have entered roots.
       --  The public C stack is rooted independently of initial Lua arguments.
       --  A synchronous foreign call borrows it without changing ownership.
       Failure      : Value;
@@ -618,13 +638,21 @@ private package Lua.Engine is
       Native_Depth : Natural := 0;
       Hook : Value;
       Hook_Mask : Unbounded_String;
+      Foreign_Hook : System.Address := System.Null_Address;
+      Foreign_Hook_Mask : Interfaces.C.int := 0;
       Hook_Count : Natural := 0;
       Hook_Reported_Count : Integer_Value := 0;
       Hook_Remaining : Natural := 0;
       Hook_Active : Boolean := False;
+      Hook_Suspended : Boolean := False;
+      Hook_Yield_Pending : Boolean := False;
+      --  A count hook can request a yield before the same instruction's
+      --  line event. Deliver both events before publishing one suspension.
       Finalizer_Hook_Suppression : Natural := 0;
       Hook_Frame : Frame_Access;
       Hook_Transfer : Boolean := False;
+      C_Resuming : Boolean := False;
+      --  An explicit lua_resume boundary can drive even a fresh main thread.
       Cleanup_Depth : Natural := 0;
    end record;
    --  Contexts own frames and transient argument/error roots. Referenced

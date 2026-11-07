@@ -88,6 +88,11 @@ package Lua.Engine.Machine is
    --  Release a completed/failed borrow. Idempotent for an idle driver; an
    --  active unfinished driver is a misuse, rather than silent abandonment.
 
+   procedure Cancel (Self : in out Driver);
+   --  Release an interrupted foreign pump's borrow after an exceptional
+   --  boundary exit. No callback executes here; retained root frames remain
+   --  available to the ordinary context close/recovery protocol.
+
    procedure Deliver_Owned
      (Self : Driver; Activation : Frame_Access; Destination : Natural;
       Packet : in out Values.Vector; Failure : Failure_Kind := No_Failure;
@@ -113,14 +118,28 @@ package Lua.Engine.Machine is
      (Self : in out Driver; State : not null World_Access;
       Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
-      Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
+      Retained_Depth : Natural := 0);
    --  Start a C-entry call behind an owned protected holder. Its handler runs
    --  above intact failed frames; the terminal packet has a success boolean.
+
+   procedure Start_Resume
+     (Self : in out Driver; State : in out World;
+      Callee : Value; Arguments : Values.Vector;
+      Fresh : Boolean; Call_Base : Natural := 0);
+   --  Borrow an addressed context for the C lua_resume protocol. A suspended
+   --  activation receives its actual resume arguments; no executor recurses.
+   --  The limited world is passed by reference and must outlive this drive.
+   --  Its terminal packet is the actual return/yield/error sequence without
+   --  an invented protected-call boolean.
 
    function Needs_Foreign_Call (Self : Driver) return Boolean;
    function Foreign_Handler (Self : Driver) return System.Address;
    function Foreign_Token (Self : Driver) return Callback_Identity;
    function Foreign_Context (Self : Driver) return Context_Access;
+   function Foreign_Continuation (Self : Driver) return System.Address;
+   function Foreign_KContext (Self : Driver) return Interfaces.C.ptrdiff_t;
+   function Foreign_KStatus (Self : Driver) return Interfaces.C.int;
    --  Inspect a suspended C callback request after Step has returned. The
    --  C-owned pump invokes its handler; no Ada activation may span that call.
    --  Arguments are rooted on the addressed context's base-relative C stack.
@@ -138,7 +157,9 @@ package Lua.Engine.Machine is
    procedure Start_Foreign_Boundary
      (Self : Driver; Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
-      Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
+      Yieldable : Boolean := False; Wanted : Integer := 0;
+      Protected_Call : Boolean := False);
    function Has_Foreign_Result (Self : Driver) return Boolean;
    procedure Take_Foreign_Result
      (Self : Driver; Packet : in out Values.Vector; Error_Status : out Natural;
@@ -155,7 +176,8 @@ package Lua.Engine.Machine is
    --  Drive an idle main thread's TBC/finalizer close protocol, leaving
    --  physical ownership with the caller. Never call from an active drive.
 
-   procedure Clear_Frames (State : in out World);
+   procedure Clear_Frames
+     (State : in out World; Retained_Depth : Natural := 0);
    --  Release all frame-owned packets after success or failed execution.
 
 private
@@ -163,6 +185,7 @@ private
    type Driver is limited record
       Universe : World_View;
       Root_Context : Context_Access;
+      Entry_Depth : Natural := 0;
       Done : Boolean := False;
       Failed : Boolean := False;
    end record;

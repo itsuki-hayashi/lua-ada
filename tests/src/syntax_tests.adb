@@ -397,12 +397,15 @@ package body Syntax_Tests is
    end Duplicate_Close;
 
    procedure Unknown_Attribute is
-      --  Reject this invalid grammar/resolution boundary without runtime work.
-      --  The separately named case makes this regression visible in reports.
+      Result : constant Check_Result :=
+        Check ("local x<other>", "attribute-case");
    begin
-      Require
-        ("local x<other>",
-         False);
+      --  Keep the rejected attribute's spelling so callers can distinguish
+      --  this contextual-name error from an incomplete declaration. This
+      --  protects the load diagnostic asserted by upstream constructs.lua.
+      Assert (Result.Status = Syntax_Error, "unknown attribute rejected");
+      Assert (To_String (Result.Error.Message) = "unknown attribute 'other'",
+              "unknown attribute diagnostic preserves its name");
    end Unknown_Attribute;
 
    procedure Named_Vararg_Assignment is

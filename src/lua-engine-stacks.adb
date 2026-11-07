@@ -252,11 +252,15 @@ package body Lua.Engine.Stacks is
       Mark_Cell : not null access procedure (Item : Object_Access))
    is
       Prefix : constant Natural :=
-        (if Context.Stack.Is_Empty then Context.Foreign_Top
+        (if Context.Detached_Resume_Window then Context.Resume_Host_Stack_Top
+         elsif Context.Stack.Is_Empty then Context.Foreign_Top
          else Context.Host_Stack_Top);
       Initialized : constant Natural :=
         Natural (Context.Foreign_Stack.Length);
       Previous_First, Visited : Natural := 0;
+      Public_First : constant Natural := Context.Resume_Stack_Used + 1;
+      Public_Last : constant Natural := Context.Host_Stack_Top;
+      Public_Visited : Boolean := not Context.Detached_Resume_Window;
 
       procedure Bounds
         (Activation : not null Frame_Access; First, Last : out Natural);
@@ -322,6 +326,12 @@ package body Lua.Engine.Stacks is
       if Prefix > Initialized then
          raise Program_Error with "host prefix exceeds scalar arena";
       end if;
+      if Context.Detached_Resume_Window and then
+        (Public_Last < Context.Resume_Stack_Used or else
+         Public_Last > Initialized)
+      then
+         raise Program_Error with "invalid detached public stack window";
+      end if;
       --  Validate the complete ordering before clearing anything. Eagerly
       --  clearing a gap and only later discovering an out-of-order window
       --  could destroy a live child value before reporting the invariant.
@@ -352,10 +362,24 @@ package body Lua.Engine.Stacks is
                First, Last : Natural;
             begin
                Bounds (Activation, First, Last);
+               if not Public_Visited and then Public_First < First then
+                  Visit (Public_First, Public_Last);
+                  Public_Visited := True;
+               end if;
                Visit (First, Last);
+               if not Public_Visited and then Public_First <= Last + 1 then
+                  Visit (Public_First, Public_Last);
+                  Public_Visited := True;
+               end if;
             end;
          end if;
       end loop;
+      if not Public_Visited then
+         --  A public yield/argument window is a separate live interval. Its
+         --  high address cannot turn gaps or dead Lua temporaries below it
+         --  into an artificial host prefix retaining weakly reachable data.
+         Visit (Public_First, Public_Last);
+      end if;
       if Visited < Initialized then
          Clear_Range (Context, Visited + 1, Initialized);
       end if;

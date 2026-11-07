@@ -32,9 +32,12 @@ Handlers run before failed frames and closing declarations unwind; recursive
 handler errors reuse the same protected boundary. A non-yieldable call accepts
 an unused continuation and returns synchronously to its original C body, as
 pinned Lua does. Main/secondary-thread `lua_isyieldable` reports the actual
-execution barrier. Yieldable non-null continuations still return explicit
-unsupported errors before execution.
-Continuation/yield/resume support, reader-based loading,
+execution barrier. The expanded-T draft extends this portal with explicit
+yieldable continuations, public resume windows and C hooks; its
+[session record](../docs/sessions/2026-11-07-expanded-t-conformance.md) owns
+actual verification and remaining failures. These additions are not accepted
+full C API evidence. See [ADR 0017](../docs/decisions/0017-c-continuations-and-resume.md).
+Reader-based loading,
 dumping, full auxiliaries, debug APIs, builtin C trampolines and
 remaining exports are pending. In particular, `lua_tocfunction` currently exposes
 real foreign callbacks; Ada native-library functions need their own stable C

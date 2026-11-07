@@ -505,8 +505,25 @@ package body Lua.Canonical_Compiler is
                   when Name_Reference | Index_Expression =>
                      Where := Address (Fn, Id);
                      if Where.Is_Table then
-                        Put (Fn, ABC (Op_GETTABLE, Destination,
-                                      Where.Table, Where.Key));
+                        if Item.Kind = Index_Expression and then
+                          Fetch (Item.Children (2)).Kind = Literal and then
+                          Fetch (Item.Children (2)).Value.Kind =
+                            Integer_Literal and then
+                          Fetch (Item.Children (2)).Value.Numeric.Integer_Item
+                            in 0 .. 255
+                        then
+                           --  An immediate integer lookup has field
+                           --  provenance even for _ENV. Retain the shared
+                           --  frontend's evaluated receiver/key order, but
+                           --  encode its literal using the real GETI word
+                           --  instead of losing that distinction in GETTABLE.
+                           Put (Fn, ABC (Op_GETI, Destination, Where.Table,
+                             Natural (Fetch (Item.Children (2)).Value.Numeric.
+                               Integer_Item)));
+                        else
+                           Put (Fn, ABC (Op_GETTABLE, Destination,
+                                         Where.Table, Where.Key));
+                        end if;
                      else
                         Read (Fn, Where.Where, Destination);
                      end if;

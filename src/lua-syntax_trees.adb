@@ -374,7 +374,10 @@ package body Lua.Syntax_Trees is
          elsif Matches (Name, "close") then
             return Closing_Name;
          else
-            Error ("unknown variable attribute");
+            --  Retain the attribute spelling in the diagnostic. Attributes
+            --  are contextual names, so an unknown one must not be reported
+            --  as a general declaration failure (lparser.c:1807).
+            Error ("unknown attribute '" & Image (Name) & "'");
             return Regular;
          end if;
       end Get_Attribute;

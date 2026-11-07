@@ -26,9 +26,11 @@ with Lua.Engine.Table_Drivers;
 with Lua.Engine.Sorting;
 with Lua.Engine.Inspection;
 with Lua.Engine.Canonical;
+with Lua.Engine.Call_Names;
 with Lua.Engine.Stacks;
 with Lua.Engine.Foreign;
 with Lua.Engine.Warnings;
+with Lua.Engine.Mathematics;
 
 package body Lua.Engine.Machine is
    GC_Warning_Start_Text : aliased constant String :=
@@ -67,6 +69,7 @@ package body Lua.Engine.Machine is
    use type Lua.Prototypes.Prototype_Access;
    use type System.Address;
    use type Interfaces.C.unsigned_long_long;
+   use type Interfaces.C.int;
    use type Real_Value;
    use type Interfaces.Unsigned_64;
    use type Lua.Numbers.Number_Kind;
@@ -105,7 +108,17 @@ package body Lua.Engine.Machine is
                      return Lua.Numbers.Number;
    function Diagnostic_Type (State : in out World; Item : Value)
                             return String;
-   function Integral (State : in out World; Item : Value) return Integer_Value;
+   function Integral
+     (State : in out World; Item : Value; Operand_Index : Natural := 0)
+      return Integer_Value;
+   function Primitive_Integer (Item : Value) return Boolean is
+     (Item.Kind = Integer_Kind or else
+      (Item.Kind = Real_Kind and then Item.Real_Data >= -(2.0 ** 63) and then
+       Item.Real_Data < 2.0 ** 63 and then
+       Real_Value'Truncation (Item.Real_Data) = Item.Real_Data));
+   --  A numeric type alone does not make bitwise arithmetic primitive. A
+   --  nonintegral float must still get its numeric type's metamethod before
+   --  the conversion diagnostic is issued by the fallback operation.
    procedure Put_Packet
      (State : in out World; Activation : Frame_Access; Register_Id : Positive;
       Packet : Values.Vector)
@@ -201,7 +214,9 @@ package body Lua.Engine.Machine is
       return (Kind => Lua.Numbers.Invalid);
    end Numeric;
 
-   function Integral (State : in out World; Item : Value) return Integer_Value
+   function Integral
+     (State : in out World; Item : Value; Operand_Index : Natural := 0)
+      return Integer_Value
    is
       Number : constant Lua.Numbers.Number := Numeric (State, Item);
       Real : Real_Value;
@@ -213,6 +228,38 @@ package body Lua.Engine.Machine is
       if Real /= Real or else Real < -2.0 ** 63 or else Real >= 2.0 ** 63
         or else Real_Value'Truncation (Real) /= Real
       then
+         if Operand_Index /= 0 and then State.Current.Stack.Length >= 2 then
+            --  The native arithmetic phase has already tried the applicable
+            --  metamethod. Explain a failed conversion using the real Lua
+            --  caller's reaching definition, never a value-based guess (two
+            --  different bindings can hold the same infinity or NaN).
+            declare
+               Top : constant Positive := State.Current.Stack.Last_Index;
+               Helper : constant Frame_Access := State.Current.Stack (Top);
+               Caller : constant Frame_Access :=
+                 State.Current.Stack (Top - 1);
+            begin
+               --  Only a helper directly requested by Lua can attribute its
+               --  operands to that caller. A nested C/library arithmetic
+               --  request must not borrow a name from an older Lua frame.
+               if Helper.Is_Native and then not Caller.Is_Native and then
+                 To_String (Helper.Native_Name) in "@binary" | "@unary"
+               then
+                  declare
+                     Name : constant Call_Names.Identity :=
+                       Call_Names.From_Operand
+                         (State, Caller, Operand_Index);
+                     use type Call_Names.Name_Kind;
+                  begin
+                     if Name.Kind /= Call_Names.Unknown then
+                        Fail (State, "number has no integer representation (" &
+                          Call_Names.Kind_Image (Name.Kind) & " '" &
+                          Image (State.Current.Memory, Name.Item) & "')");
+                     end if;
+                  end;
+               end if;
+            end;
+         end if;
          Fail (State, "number has no integer representation");
       end if;
       return Integer_Value (Real);
@@ -285,8 +332,8 @@ package body Lua.Engine.Machine is
          if Left.Kind = String_Kind or else Right.Kind = String_Kind then
             Fail (State, "attempt to perform bitwise operation on a string");
          end if;
-         IL := Integral (State, Left);
-         IR := Integral (State, Right);
+         IL := Integral (State, Left, 1);
+         IR := Integral (State, Right, 2);
          case Operator is
             when Bit_And =>
                return (Integer_Kind, Signed (Bits (IL) and Bits (IR)));
@@ -360,7 +407,11 @@ package body Lua.Engine.Machine is
       return (Real_Kind, Result);
    exception
       when Lua.Integers.Arithmetic_Error =>
-         Fail (State, "attempt to divide or perform modulo by zero");
+         --  Both integer primitives reject zero, but their Lua diagnostics
+         --  identify the operation separately (lvm.c:775 and lvm.c:795).
+         Fail (State, (if Operator = Floor_Divide then
+                 "attempt to divide by zero" else
+                 "attempt to perform 'n%0'"));
          return Nil_Value;
    end Binary_Value;
 
@@ -393,7 +444,7 @@ package body Lua.Engine.Machine is
                  (State, "attempt to perform bitwise operation on a string");
             end if;
             return (Integer_Kind,
-                    Lua.Integers.Subtract (-1, Integral (State, Item)));
+                    Lua.Integers.Subtract (-1, Integral (State, Item, 1)));
          when others => raise Program_Error with "invalid unary opcode";
       end case;
       return Nil_Value;
@@ -732,9 +783,11 @@ package body Lua.Engine.Machine is
       --  value before it becomes part of the actual activation's root range.
       Pin (State, Item);
       Set_Native_Top (State, Activation, Count + 1);
-      Replace_Root
-        (State, Activation.Native_Arguments,
-         Count + 1, Item);
+      if Activation.Foreign_Handler = System.Null_Address then
+         Replace_Root
+           (State, Activation.Native_Arguments,
+            Count + 1, Item);
+      end if;
       Stacks.Write
         (State, Activation.Context, Activation.Stack_Live_Top, Item);
    end Push_Native_Value;
@@ -770,6 +823,9 @@ package body Lua.Engine.Machine is
       end if;
       if Item.Is_Native and then Item.Native_Name = "@hook" then
          State.Current.Hook_Active := False;
+         if State.Current.Has_Failure_Value then
+            State.Current.Hook_Yield_Pending := False;
+         end if;
          State.Current.Hook_Frame := null;
       elsif Item.Unwind_Charge then
          State.Current.Cleanup_Depth := State.Current.Cleanup_Depth - 1;
@@ -816,9 +872,10 @@ package body Lua.Engine.Machine is
       end if;
    end Reserve_Frame;
 
-   procedure Clear_Frames (State : in out World) is
+   procedure Clear_Frames
+     (State : in out World; Retained_Depth : Natural := 0) is
    begin
-      while not State.Current.Stack.Is_Empty loop
+      while Natural (State.Current.Stack.Length) > Retained_Depth loop
          declare
             Item : Frame_Access := State.Current.Stack.Last_Element;
          begin
@@ -832,7 +889,8 @@ package body Lua.Engine.Machine is
      System.Address_To_Access_Conversions (World);
 
    procedure Prepare
-     (Self : in out Driver; Universe : not null World_View);
+     (Self : in out Driver; Universe : not null World_View;
+      Retained_Depth : Natural := 0);
    procedure Start_Borrowed
      (Self : in out Driver; Universe : not null World_View;
       Code : Prototype_Access; Function_Value : Value;
@@ -1006,8 +1064,12 @@ package body Lua.Engine.Machine is
         "return";
       State.Current.Hook_Active := True;
       Schedule (Self, "@hook", Values.Empty_Vector, 0);
-      State.Current.Stack.Last_Element.Blocks_Yield := True;
-      State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
+      State.Current.Stack.Last_Element.Blocks_Yield :=
+        State.Current.Foreign_Hook = System.Null_Address or else
+        State.Current.Hook_Transfer;
+      if State.Current.Stack.Last_Element.Blocks_Yield then
+         State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
+      end if;
       Dispatch (Self, State.Current.Hook, Args, 0);
    end Hook_Event;
 
@@ -1016,8 +1078,12 @@ package body Lua.Engine.Machine is
       Item : constant Frame_Access := State.Current.Stack.Last_Element;
       function Wants (Mask : Character) return Boolean is
         (State.Current.Hook.Kind /= Nil_Kind and then
-         Ada.Strings.Fixed.Index
-           (To_String (State.Current.Hook_Mask), "" & Mask) /= 0);
+         (if State.Current.Foreign_Hook /= System.Null_Address then
+             (State.Current.Foreign_Hook_Mask /
+                (case Mask is when 'c' => 1, when 'r' => 2,
+                   when 'l' => 4, when others => 8)) mod 2 /= 0
+          else Ada.Strings.Fixed.Index
+            (To_String (State.Current.Hook_Mask), "" & Mask) /= 0));
       Line : Natural;
    begin
       if State.Current.Hook_Active or else
@@ -1176,21 +1242,47 @@ package body Lua.Engine.Machine is
         Natural (State.Current.Stack.Length)
       then
          declare
-            Activation : constant Frame_Access := State.Current.Stack
-              (State.Current.Stack.Last_Index - Level + 1);
-            Line : constant Positive :=
-              (if Activation.Is_Native then Activation.Call_Site.Line
-               else Positive'Max
-                 (1, Line_At (Activation,
-                     Positive'Max (1, Activation.PC - 1))));
+            Activation : Frame_Access;
+            Remaining : Positive := Level;
+            Skip_Raiser : Boolean := True;
          begin
-            Error_Value := New_String
-              (State, (if Activation.Is_Native then "(native)"
-                       elsif Activation.Code.Canonical_Node /= null then
-                          To_String (Canonical.Source_Bytes (Activation.Code))
-                       else To_String (Activation.Code.Name)) & ":" &
-               Ada.Strings.Fixed.Trim (Line'Image, Ada.Strings.Both) &
-               ": " & Image (State.Current.Memory, Item));
+            --  Internal holders are scheduler transport, not public debug
+            --  levels. luaL_where contributes a location only for a real Lua
+            --  caller; a C caller (including testC/pcallk) adds no fabricated
+            --  '(native)' source prefix to an arbitrary error string.
+            for Candidate of reverse State.Current.Stack loop
+               if not Candidate.Is_Native or else
+                 Length (Candidate.Native_Name) = 0 or else
+                 Element (Candidate.Native_Name, 1) /= '@'
+               then
+                  if Skip_Raiser then
+                     --  The error/assert/wrap activation itself is level
+                     --  zero. The requested level begins at its caller.
+                     Skip_Raiser := False;
+                  elsif Remaining = 1 then
+                     Activation := Candidate;
+                     exit;
+                  else
+                     Remaining := Remaining - 1;
+                  end if;
+               end if;
+            end loop;
+            if Activation /= null and then not Activation.Is_Native then
+               declare
+                  Line : constant Positive := Positive'Max
+                    (1, Line_At (Activation,
+                        Positive'Max (1, Activation.PC - 1)));
+               begin
+                  Error_Value := New_String
+                    (State,
+                     Inspection.Short_Source
+                       ((if Activation.Code.Canonical_Node /= null then
+                         To_String (Canonical.Source_Bytes (Activation.Code))
+                         else To_String (Activation.Code.Name))) & ":" &
+                     Ada.Strings.Fixed.Trim (Line'Image, Ada.Strings.Both) &
+                     ": " & Image (State.Current.Memory, Item));
+               end;
+            end if;
          end;
       end if;
       State.Current.Failure := Error_Value;
@@ -1493,8 +1585,10 @@ package body Lua.Engine.Machine is
         State.Current.Finalizer_Hook_Suppression = 0 and then
         not Activation.Return_Hook_Done and then
         State.Current.Hook.Kind /= Nil_Kind and then
-        Ada.Strings.Fixed.Index
-          (To_String (State.Current.Hook_Mask), "r") /= 0 and then
+        (if State.Current.Foreign_Hook /= System.Null_Address then
+            (State.Current.Foreign_Hook_Mask / 2) mod 2 /= 0
+         else Ada.Strings.Fixed.Index
+           (To_String (State.Current.Hook_Mask), "r") /= 0) and then
         (not Activation.Is_Native or else
            Element (Activation.Native_Name, 1) /= '@')
       then
@@ -1514,7 +1608,10 @@ package body Lua.Engine.Machine is
       --  The outermost chunk has no consumer and intentionally discards it.
       State.Current.Stack.Delete_Last;
       Release_Frame (State, Activation);
-      if not State.Current.Stack.Is_Empty then
+      if not State.Current.Stack.Is_Empty and then
+        (State.Current /= Self.Root_Context or else
+         Natural (State.Current.Stack.Length) > Self.Entry_Depth)
+      then
          if Policy = Deliver_Results then
             Deliver
               (Self, State.Current.Stack.Last_Element, Destination, Packet);
@@ -2189,15 +2286,147 @@ package body Lua.Engine.Machine is
             Activation.Native_Stage := 1;
             --  Returning exposes an explicit C request. Invoking its function
             --  pointer here would let longjmp cross these live Ada frames.
+         elsif Activation.Native_Stage = 5 then
+            declare
+               Context : constant Context_Access := State.Current;
+               Top : constant Natural :=
+                 Activation.Stack_Live_Top -
+                   Activation.Foreign_Yield_Count;
+            begin
+               --  Resume arguments replace the yielded tail of the C stack.
+               --  Prefix arguments/upvalues remain actual rooted slots for K.
+               Set_Native_Top
+                 (State, Activation, Top - Activation.Stack_Base);
+               Context.Foreign_Top := Top;
+               for Item of Activation.Native_Results loop
+                  Push_Native_Value (State, Activation, Item);
+               end loop;
+               Context.Foreign_Top := Activation.Stack_Live_Top;
+               Activation.Foreign_Yield_Count := 0;
+               if Activation.Foreign_Continuation = System.Null_Address then
+                  Context.Foreign_Top := Activation.Saved_Foreign_Top;
+                  Context.Foreign_Base := Activation.Foreign_Previous_Base;
+                  Context.Foreign_Activation :=
+                    Activation.Foreign_Previous_Frame;
+                  Activation.Foreign_Entered := False;
+                  Activation.Native_Stage := 2;
+               else
+                  Activation.Foreign_KStatus := 1;
+                  --  K observes the reconstructed scalar C stack. Retaining
+                  --  shadow argument/result packets would keep values alive
+                  --  after K removes them from its actual public window.
+                  Activation.Native_Arguments.Clear;
+                  Activation.Native_Results.Clear;
+                  Activation.Native_Stage := 1;
+               end if;
+            end;
          elsif Activation.Native_Stage = 2 then
-            Complete (Self, Activation.Native_Results);
+            if Activation.Closers.Is_Empty then
+               Complete (Self, Activation.Native_Results);
+            else
+               Start_Unwind
+                 (Self, Activation, Return_Exit, Activation.Native_Results);
+            end if;
          elsif Activation.Native_Stage = 3 then
             raise Language_Error;
          else
             raise Program_Error with "foreign callback awaits its C pump";
          end if;
          return;
+      elsif Name = "@foreign.close" then
+         if Activation.Native_Stage = 0 then
+            declare
+               Owner : Frame_Access;
+               Identity : constant Value := Activation.Native_Captures (1);
+               Depth : constant Value := Activation.Native_Captures (2);
+            begin
+               for Candidate of State.Current.Stack loop
+                  if Candidate.all'Address = Identity.Identity then
+                     Owner := Candidate;
+                     exit;
+                  end if;
+               end loop;
+               if Owner = null or else Depth.Kind /= Integer_Kind then
+                  raise Program_Error with "inactive foreign close owner";
+               end if;
+               --  This helper is entered only after the C dispatcher has
+               --  returned. The normal iterative close driver can therefore
+               --  invoke Lua/C handlers without crossing a live Ada frame.
+               Activation.Native_Stage := 1;
+               Start_Unwind
+                 (Self, Owner, C_Slot_Exit,
+                  Depth => Natural (Depth.Integer_Data));
+            end;
+         else
+            Complete (Self, Values.Empty_Vector);
+         end if;
+         return;
       elsif Name = "@foreign.boundary" then
+         if Activation.Foreign_Suspended then
+            if Activation.Native_Stage = 0 then
+               --  A successful child delivers raw results. Error recovery
+               --  has already installed its false/error packet at stage one.
+               Copy_Roots
+                 (State, Activation.Native_Results,
+                  Wrap (State, Activation.Native_Results, 1));
+               Activation.Native_Stage := 1;
+            end if;
+            declare
+               Caller : constant Frame_Access :=
+                 Activation.Foreign_Previous_Frame;
+               Success : constant Boolean :=
+                 Activation.Native_Results.First_Element.Boolean_Data;
+               Count : constant Natural :=
+                 (if not Success then 1
+                  elsif Activation.Foreign_Wanted = -1 then
+                    Natural (Activation.Native_Results.Length) - 1
+                  else Natural (Activation.Foreign_Wanted));
+               Old : Frame_Access := Activation;
+               Context : constant Context_Access := State.Current;
+            begin
+               --  The suspended C body has no live C stack. Its protected
+               --  child now owns a complete packet; publish the adjusted
+               --  results directly into the retained caller window before
+               --  retiring the holder and requesting the saved K function.
+               Context.Foreign_Base := Caller.Stack_Base;
+               Set_Native_Top
+                 (State, Caller, Activation.Native_Index - Caller.Stack_Base);
+               Context.Foreign_Top := Activation.Native_Index;
+               Context.Foreign_Activation := Caller;
+               for Index in 1 .. Count loop
+                  Push_Native_Value
+                    (State, Caller,
+                     (if Index < Natural (Activation.Native_Results.Length)
+                      then Activation.Native_Results (Index + 1)
+                      else Nil_Value));
+               end loop;
+               Context.Foreign_Top := Caller.Stack_Live_Top;
+               Caller.Native_Arguments.Clear;
+               Caller.Native_Results.Clear;
+               if not Success and then not Activation.Foreign_Protected then
+                  --  callk retains a continuation for suspension, not an
+                  --  error handler. Its child failure must unwind this C
+                  --  activation and reach an outer real protected boundary.
+                  Context.Failure := Stacks.Read
+                    (Context, Context.Foreign_Top);
+                  Root_Barrier (State, Context.Failure);
+                  Context.Has_Failure_Value := True;
+                  Context.Failure_Text := To_Unbounded_String
+                    (Image (Context.Memory, Context.Failure));
+                  Context.Failure_Class := Activation.Result_Failure_Class;
+                  Context.Failure_Handled := Activation.Result_Handler_Called;
+                  Caller.Native_Stage := 3;
+               else
+                  Caller.Foreign_KStatus :=
+                    (if Success then 1 else Interfaces.C.int
+                       (Natural'Max (2, Activation.Native_Aux)));
+                  Caller.Native_Stage := 1;
+               end if;
+               State.Current.Stack.Delete_Last;
+               Release_Frame (State, Old);
+            end;
+            return;
+         end if;
          --  A protected child has delivered one wrapped packet. Leave it in
          --  this sentinel until the nested C pump publishes the results onto
          --  the caller's C stack, then explicitly removes the sentinel.
@@ -2381,7 +2610,12 @@ package body Lua.Engine.Machine is
                      Handler := New_Native (State, "@invalid.close");
                   end if;
                   Packet.Append (Left);
-                  Packet.Append (Activation.Unwind_Error);
+                  --  Lua 5.5 supplies only self on normal close. A genuine
+                  --  error adds its second argument; an explicit nil value
+                  --  would change select('#', ...) in a C/Lua close handler.
+                  if Activation.Unwind_Has_Error then
+                     Packet.Append (Activation.Unwind_Error);
+                  end if;
                   Activation.Native_Stage := 1;
                   --  Protection is a cleanup boundary, not a public pcall
                   --  activation. Logical debug frames expose the original
@@ -2458,7 +2692,7 @@ package body Lua.Engine.Machine is
                      end loop;
                      Owner.PC := PC;
                   when Error_Exit => Recover (Self);
-                  when Coroutine_Exit => null;
+                  when Coroutine_Exit | C_Slot_Exit => null;
                   when No_Unwind => raise Program_Error;
                end case;
             end;
@@ -2490,8 +2724,10 @@ package body Lua.Engine.Machine is
             Complete (Self, Packet);
          elsif Name = "coroutine.yield" then
             if Activation.Native_Stage = 0 then
-               if State.Current = State.Main_Context or else
-                 State.Current.Resumer = null or else
+               if (State.Current = State.Main_Context and then
+                   not State.Current.C_Resuming) or else
+                 (State.Current.Resumer = null and then
+                   not State.Current.C_Resuming) or else
                  State.Current.Non_Yieldable > 0 or else
                  State.Current.Phase = Closing
                then
@@ -2937,8 +3173,9 @@ package body Lua.Engine.Machine is
          if Name = "@unary" then
             Primitive := Operator = Not_Word or else
               (Operator = Length and then Left.Kind = String_Kind) or else
-              (Operator in Minus | Bit_Xor and then
-                 Left.Kind in Integer_Kind | Real_Kind);
+              (Operator = Minus and then
+                 Left.Kind in Integer_Kind | Real_Kind) or else
+              (Operator = Bit_Xor and then Primitive_Integer (Left));
             Event := To_Unbounded_String
               ((case Operator is
                    when Minus => "__unm", when Bit_Xor => "__bnot",
@@ -2951,7 +3188,12 @@ package body Lua.Engine.Machine is
               (Operator in Concatenate | Less | Less_Equal |
                  Greater | Greater_Equal and then
                  Left.Kind = String_Kind and then Right.Kind = String_Kind);
-            if Operator = Concatenate then
+            if Operator in Bit_And | Bit_Or | Bit_Xor |
+              Shift_Left | Shift_Right
+            then
+               Primitive := Primitive_Integer (Left) and then
+                 Primitive_Integer (Right);
+            elsif Operator = Concatenate then
                Primitive := Left.Kind in String_Kind | Integer_Kind |
                  Real_Kind and then Right.Kind in String_Kind |
                  Integer_Kind | Real_Kind;
@@ -3108,6 +3350,13 @@ package body Lua.Engine.Machine is
                Invoke (Handler, Packet);
             end if;
          end;
+      elsif Name in "math.random" | "math.randomseed" then
+         --  Each opened math table owns one shared generator capture. The
+         --  activation keeps that userdata rooted through all charged RNG
+         --  work and rejection retries; another module cannot mutate it.
+         Complete (Self, Mathematics.Run
+           (State, Name, Activation.Native_Arguments,
+            First (Activation.Native_Captures)));
       elsif Name'Length > 5 and then
         (Name (1 .. 5) = "math." or else Name (1 .. 6) = "table.")
       then
@@ -3614,6 +3863,20 @@ package body Lua.Engine.Machine is
             State.Native_Depth := State.Native_Depth +
               Target.Native_Depth;
             Target.Status := Running_Context;
+            Target.Hook_Suspended := False;
+            if Target.Detached_Resume_Window then
+               --  A thread last driven by lua_resume exposes its delivery
+               --  in a detached public window. Lua resume/close can also
+               --  take over that thread; restore its retained activation
+               --  view before supplying arguments or starting cleanup.
+               Target.Foreign_Activation := Target.Resume_Foreign_Activation;
+               Target.Foreign_Base := Target.Resume_Foreign_Base;
+               Target.Foreign_Top := Target.Resume_Foreign_Top;
+               Target.Stack_Used := Target.Resume_Stack_Used;
+               Target.Host_Stack_Top := Target.Resume_Host_Stack_Top;
+               Target.Resume_Foreign_Activation := null;
+               Target.Detached_Resume_Window := False;
+            end if;
             if Request.Kind = Close_Requested then
                Target.Phase := Closing;
                Target.Entry_Function := Nil_Value;
@@ -3623,10 +3886,15 @@ package body Lua.Engine.Machine is
                Dispatch (Self, Target.Entry_Function, Request.Results, 0);
                Target.Entry_Function := Nil_Value;
                Root_Barrier (State, Target.Entry_Function);
-            else
+            elsif Target.Stack.Last_Element.Is_Native then
                Copy_Roots
                  (State, Target.Stack.Last_Element.Native_Results,
                   Request.Results);
+            else
+               --  A yielded C hook interrupts a Lua instruction rather than
+               --  a call result. Resume arguments are discarded, not retained
+               --  as invisible roots on that Lua frame.
+               Target.Stack.Last_Element.Native_Results.Clear;
             end if;
          end;
       elsif State.Current.Transfer.Kind in Completed | Yielded |
@@ -3647,6 +3915,23 @@ package body Lua.Engine.Machine is
             Child.Status :=
               (if Transfer.Kind = Yielded then Suspended_Context
                else Dead_Context);
+            if Transfer.Kind = Yielded and then Parent /= null then
+               --  Lua's resumer consumes the yielded values. Expose an empty
+               --  C API window above the retained frames so later public
+               --  pushes (or a C takeover of resume) cannot overwrite them.
+               Child.Resume_Foreign_Activation := Child.Foreign_Activation;
+               Child.Resume_Foreign_Base := Child.Foreign_Base;
+               Child.Resume_Foreign_Top := Child.Foreign_Top;
+               Child.Resume_Stack_Used := Child.Stack_Used;
+               Child.Resume_Host_Stack_Top := Child.Host_Stack_Top;
+               Child.Resume_Return_Base := 0;
+               Child.Resume_Return_Top := Child.Host_Stack_Top;
+               Child.Foreign_Activation := null;
+               Child.Foreign_Base := Child.Stack_Used;
+               Child.Foreign_Top := Child.Foreign_Base;
+               Child.Host_Stack_Top := Child.Foreign_Top;
+               Child.Detached_Resume_Window := True;
+            end if;
             if Transfer.Kind /= Yielded then
                --  Closing is an execution phase, not a permanent dead
                --  thread attribute observed by later boundary queries.
@@ -3693,6 +3978,17 @@ package body Lua.Engine.Machine is
                  (Self, State.Current.Stack.Last_Element.Native_Results);
             elsif Before_Step (Self) then
                null;
+            elsif State.Current.Hook_Yield_Pending and then
+              not State.Current.Hook_Active
+            then
+               --  Native traceexec delivers a due count and line event for
+               --  one instruction before acting on a hook's yield request.
+               --  The interrupted instruction has still not executed.
+               State.Current.Hook_Yield_Pending := False;
+               State.Current.Hook_Suspended := True;
+               State.Current.Hook_Frame := State.Current.Stack.Last_Element;
+               State.Current.Transfer.Kind := Yielded;
+               State.Current.Transfer.Results.Clear;
             elsif State.Current.Stack.Last_Element.Is_Native then
                Native_Step (Self);
             else
@@ -3807,16 +4103,18 @@ package body Lua.Engine.Machine is
    end Abandon;
 
    procedure Prepare
-     (Self : in out Driver; Universe : not null World_View)
+     (Self : in out Driver; Universe : not null World_View;
+      Retained_Depth : Natural := 0)
    is
    begin
       if Self.Universe /= null or else Universe.Current = null or else
-        not Universe.Current.Stack.Is_Empty
+        Natural (Universe.Current.Stack.Length) /= Retained_Depth
       then
          raise Program_Error with "invalid VM driver start";
       end if;
       Self.Universe := Universe;
       Self.Root_Context := Universe.Current;
+      Self.Entry_Depth := Retained_Depth;
       Self.Done := False;
       Self.Failed := False;
    end Prepare;
@@ -3878,12 +4176,13 @@ package body Lua.Engine.Machine is
      (Self : in out Driver; State : not null World_Access;
       Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
-      Call_Base : Natural := 0; Has_Call_Window : Boolean := False)
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
+      Retained_Depth : Natural := 0)
    is
       Packet : Values.Vector := Owned_Values (State.all);
       Prepared : Boolean := False;
    begin
-      Prepare (Self, World_View (State));
+      Prepare (Self, World_View (State), Retained_Depth);
       Prepared := True;
       Begin_Operation (State.all);
       State.Current.Transfer.Kind := No_Transfer;
@@ -3918,6 +4217,46 @@ package body Lua.Engine.Machine is
          end if;
          raise;
    end Start_Foreign;
+
+   procedure Start_Resume
+     (Self : in out Driver; State : in out World;
+      Callee : Value; Arguments : Values.Vector;
+      Fresh : Boolean; Call_Base : Natural := 0)
+   is
+   begin
+      if Self.Universe /= null then
+         raise Program_Error with "active C resume driver";
+      end if;
+      Self.Universe := World_View
+        (World_Addresses.To_Pointer (State'Address));
+      Self.Root_Context := State.Current;
+      Self.Done := False;
+      Self.Failed := False;
+      Begin_Operation (State);
+      State.Current.Transfer.Kind := No_Transfer;
+      State.Current.Transfer.Results.Clear;
+      State.Current.Status := Running_Context;
+      State.Current.Hook_Suspended := False;
+      State.Current.C_Resuming := True;
+      State.Current.Resumer := null;
+      if Fresh then
+         Dispatch (Self, Callee, Arguments, 0,
+                   Call_Base => Call_Base, Has_Call_Window => True);
+         State.Current.Entry_Function := Nil_Value;
+      elsif State.Current.Stack.Last_Element.Is_Native then
+         Copy_Roots
+           (State, State.Current.Stack.Last_Element.Native_Results,
+            Arguments);
+      else
+         State.Current.Stack.Last_Element.Native_Results.Clear;
+      end if;
+      End_Operation (State);
+   exception
+      when others =>
+         End_Operation (State);
+         Self.Failed := True;
+         raise;
+   end Start_Resume;
 
    procedure Deliver_Owned
      (Self : Driver; Activation : Frame_Access; Destination : Natural;
@@ -4051,6 +4390,13 @@ package body Lua.Engine.Machine is
       return Self.Universe.Current;
    end Foreign_Context;
 
+   function Foreign_Continuation (Self : Driver) return System.Address is
+     (Foreign_Context (Self).Stack.Last_Element.Foreign_Continuation);
+   function Foreign_KContext (Self : Driver) return Interfaces.C.ptrdiff_t is
+     (Foreign_Context (Self).Stack.Last_Element.Foreign_KContext);
+   function Foreign_KStatus (Self : Driver) return Interfaces.C.int is
+     (Foreign_Context (Self).Stack.Last_Element.Foreign_KStatus);
+
    procedure Complete_Foreign_Call
      (Self : Driver; Result_Count : Natural; Error_Status : Natural := 0;
       Handler_Called : Boolean := False;
@@ -4120,12 +4466,39 @@ package body Lua.Engine.Machine is
       Context.Failure_Class := No_Failure;
       Context.Failure_Handled := False;
       Activation.Native_Stage := 2;
+      if Context.Hook_Active and then Activation.Foreign_Suspended then
+         --  A line/count C hook resumes the interrupted Lua instruction,
+         --  without retaining artificial hook/C frames in debug inspection.
+         Context.Stack.Delete_Last;
+         Release_Frame (State, Activation);
+         Activation := Context.Stack.Last_Element;
+         Context.Stack.Delete_Last;
+         Release_Frame (State, Activation);
+         Context.Hook_Active := False;
+         --  A yielded hook interrupted the next instruction before its PC
+         --  advanced. Public suspended-frame inspection must keep observing
+         --  that instruction until a real resumer continues execution.
+         Context.Hook_Suspended := True;
+         Context.Hook_Frame := Context.Stack.Last_Element;
+         if not Context.Hook_Frame.Line_Hook_Checked then
+            --  Count comes before line. Delay only publication of the yield;
+            --  the original C callback is already abandoned and retired.
+            Context.Hook_Yield_Pending := True;
+            Context.Hook_Suspended := False;
+            Context.Transfer.Kind := No_Transfer;
+            Context.Transfer.Results.Clear;
+         else
+            Context.Hook_Yield_Pending := False;
+         end if;
+      end if;
    end Complete_Foreign_Call;
 
    procedure Start_Foreign_Boundary
      (Self : Driver; Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
-      Call_Base : Natural := 0; Has_Call_Window : Boolean := False)
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
+      Yieldable : Boolean := False; Wanted : Integer := 0;
+      Protected_Call : Boolean := False)
    is
       State : World renames Self.Universe.all;
       Original_Depth : constant Natural :=
@@ -4145,13 +4518,21 @@ package body Lua.Engine.Machine is
       --  lua_call without a continuation cannot suspend its C activation.
       --  A future continuation-aware boundary must make that choice explicit,
       --  rather than treating every scheduler continuation as yieldable.
-      State.Current.Stack.Last_Element.Blocks_Yield := True;
+      State.Current.Stack.Last_Element.Blocks_Yield := not Yieldable;
+      State.Current.Stack.Last_Element.Foreign_Suspended := False;
+      State.Current.Stack.Last_Element.Foreign_Wanted := Wanted;
+      State.Current.Stack.Last_Element.Foreign_Protected := Protected_Call;
+      State.Current.Stack.Last_Element.Foreign_Previous_Frame :=
+        State.Current.Foreign_Activation;
+      State.Current.Stack.Last_Element.Native_Index := Call_Base - 1;
       State.Current.Stack.Last_Element.Protection := 1;
       State.Current.Stack.Last_Element.Message_Handler := Message_Handler;
       Root_Barrier
         (State, State.Current.Stack.Last_Element.Message_Handler);
       State.Current.Stack.Last_Element.Retain_On_Failure := True;
-      State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
+      if not Yieldable then
+         State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
+      end if;
       begin
          Dispatch (Self, Callee, Arguments, 0,
                    Call_Base => Call_Base,
@@ -4184,6 +4565,7 @@ package body Lua.Engine.Machine is
       Self.Universe.Current.Stack.Last_Element.Is_Native and then
       Self.Universe.Current.Stack.Last_Element.Native_Name =
         "@foreign.boundary" and then
+      not Self.Universe.Current.Stack.Last_Element.Foreign_Suspended and then
       Self.Universe.Current.Stack.Last_Element.Native_Stage = 1);
 
    procedure Take_Foreign_Result
@@ -4273,9 +4655,19 @@ package body Lua.Engine.Machine is
       end if;
       Self.Universe := null;
       Self.Root_Context := null;
+      Self.Entry_Depth := 0;
       Self.Done := False;
       Self.Failed := False;
    end Finish;
+
+   procedure Cancel (Self : in out Driver) is
+   begin
+      if Self.Universe /= null then
+         Self.Failed := True;
+         Abandon (Self);
+         Finish (Self);
+      end if;
+   end Cancel;
 
    procedure Run (State : in out World; Code : Prototype_Access) is
       Self : Driver;

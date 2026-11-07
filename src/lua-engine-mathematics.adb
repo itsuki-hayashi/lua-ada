@@ -5,6 +5,7 @@ with Interfaces.C;
 with Lua.Platform_Mathematics;
 with Lua.Platform_Numerics;
 with Lua_Ada_Config;
+with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
 
 package body Lua.Engine.Mathematics is
@@ -13,10 +14,54 @@ package body Lua.Engine.Mathematics is
    use type Integer_Value;
    use type Real_Value;
    use type Lua.Numbers.Number_Kind;
+   use type Lua.Storage.Byte_Count;
    subtype Word is Interfaces.Unsigned_64;
    subtype Half is Interfaces.Unsigned_32;
    subtype C_Real is Interfaces.C.double;
    package Host renames Lua.Platform_Mathematics;
+   package Generator_Views is new System.Address_To_Access_Conversions
+     (Random_State);
+
+   Generator_Bytes : constant Lua.Storage.Byte_Count :=
+     Random_State'Object_Size / System.Storage_Unit;
+   --  Payload storage is at least C long-double aligned, so an array of
+   --  modular RNG words has its natural alignment without a second owner.
+   pragma Assert (Random_State'Alignment <= Native_Payload_Alignment);
+
+   function Read_Words (State : World; Generator : Value) return Random_State;
+   procedure Write_Words
+     (State : in out World; Generator : Value; Words : Random_State);
+
+   function Read_Words
+     (State : World; Generator : Value) return Random_State is
+   begin
+      if Generator.Kind = Nil_Kind then
+         return State.Random_Words;
+      elsif Generator.Kind /= Userdata_Kind or else
+        Generator.Reference.Userdata_Size /= Generator_Bytes
+      then
+         raise Program_Error with "invalid math generator capture";
+      end if;
+      --  The caller retains Generator in the current native activation.
+      --  All payload bits are modular integers, with no invalid scalar
+      --  representation or separately allocated object to trace/release.
+      return Generator_Views.To_Pointer (Userdata_Address (Generator)).all;
+   end Read_Words;
+
+   procedure Write_Words
+     (State : in out World; Generator : Value; Words : Random_State) is
+   begin
+      if Generator.Kind = Nil_Kind then
+         State.Random_Words := Words;
+      elsif Generator.Kind /= Userdata_Kind or else
+        Generator.Reference.Userdata_Size /= Generator_Bytes
+      then
+         raise Program_Error with "invalid math generator capture";
+      else
+         Generator_Views.To_Pointer (Userdata_Address (Generator)).all :=
+           Words;
+      end if;
+   end Write_Words;
 
    function To_Word is new Ada.Unchecked_Conversion (Integer_Value, Word);
    function To_Integer is new Ada.Unchecked_Conversion (Word, Integer_Value);
@@ -92,70 +137,78 @@ package body Lua.Engine.Mathematics is
    end Add;
 
    function Next_Word
-     (State : in out World; Charge_Work : Boolean := True) return Word;
+     (State : in out World; Charge_Work : Boolean := True;
+      Generator : Value := Nil_Value) return Word;
    function Next_Word
-     (State : in out World; Charge_Work : Boolean := True) return Word
+     (State : in out World; Charge_Work : Boolean := True;
+      Generator : Value := Nil_Value) return Word
    is
       Result : Word;
+      Words : Random_State := Read_Words (State, Generator);
    begin
       if Charge_Work then
          Charge (State);
       end if;
       if State.Random_Use_32_Bits then
          declare
-            A : constant Split_Word := Split (State.Random_Words (0));
-            B : constant Split_Word := Split (State.Random_Words (1));
+            A : constant Split_Word := Split (Words (0));
+            B : constant Split_Word := Split (Words (1));
             C : constant Split_Word :=
-              Exclusive (Split (State.Random_Words (2)), A);
+              Exclusive (Split (Words (2)), A);
             D : constant Split_Word :=
-              Exclusive (Split (State.Random_Words (3)), B);
+              Exclusive (Split (Words (3)), B);
             Times_Five : constant Split_Word := Add (Left_Shift (B, 2), B);
             Rotated : constant Split_Word := Rotate (Times_Five, 7);
          begin
             Result := Join (Add (Left_Shift (Rotated, 3), Rotated));
-            State.Random_Words (0) := Join (Exclusive (A, D));
-            State.Random_Words (1) := Join (Exclusive (B, C));
-            State.Random_Words (2) := Join (Exclusive (C, Left_Shift (B, 17)));
-            State.Random_Words (3) := Join (Rotate (D, 45));
+            Words (0) := Join (Exclusive (A, D));
+            Words (1) := Join (Exclusive (B, C));
+            Words (2) := Join (Exclusive (C, Left_Shift (B, 17)));
+            Words (3) := Join (Rotate (D, 45));
          end;
       else
          declare
-            A : constant Word := State.Random_Words (0);
-            B : constant Word := State.Random_Words (1);
-            C : constant Word := State.Random_Words (2) xor A;
-            D : constant Word := State.Random_Words (3) xor B;
+            A : constant Word := Words (0);
+            B : constant Word := Words (1);
+            C : constant Word := Words (2) xor A;
+            D : constant Word := Words (3) xor B;
          begin
             --  The old second word must survive every assignment: it feeds
             --  both the output scrambler and the 17-bit transition term.
             --  Modular types express xoshiro's intentional wraparound.
             Result := Interfaces.Rotate_Left (B * 5, 7) * 9;
-            State.Random_Words (0) := A xor D;
-            State.Random_Words (1) := B xor C;
-            State.Random_Words (2) := C xor Interfaces.Shift_Left (B, 17);
-            State.Random_Words (3) := Interfaces.Rotate_Left (D, 45);
+            Words (0) := A xor D;
+            Words (1) := B xor C;
+            Words (2) := C xor Interfaces.Shift_Left (B, 17);
+            Words (3) := Interfaces.Rotate_Left (D, 45);
          end;
       end if;
+      Write_Words (State, Generator, Words);
       return Result;
    end Next_Word;
 
    procedure Seed
      (State : in out World; First, Second : Word;
-      Charge_Work : Boolean := True);
+      Charge_Work : Boolean := True; Generator : Value := Nil_Value);
    procedure Seed
      (State : in out World; First, Second : Word;
-      Charge_Work : Boolean := True)
+      Charge_Work : Boolean := True; Generator : Value := Nil_Value)
    is
       Discarded : Word;
       pragma Unreferenced (Discarded);
    begin
-      State.Random_Seeded := False;
-      State.Random_Words := [First, 16#FF#, Second, 0];
+      if Generator.Kind = Nil_Kind then
+         State.Random_Seeded := False;
+      end if;
+      Write_Words (State, Generator, [First, 16#FF#, Second, 0]);
       --  Sixteen transitions diffuse both seed words. This exact warmup and
       --  the nonzero second state word are part of pinned Lua reproducibility.
       for Index in 1 .. 16 loop
-         Discarded := Next_Word (State, Charge_Work);
+         Discarded := Next_Word (State, Charge_Work, Generator);
       end loop;
-      State.Random_Seeded := True;
+      if Generator.Kind = Nil_Kind then
+         State.Random_Seeded := True;
+      end if;
    end Seed;
 
    function Entropy (State : World) return Word;
@@ -185,6 +238,18 @@ package body Lua.Engine.Mathematics is
       Seed (State, Entropy (State), 0, Charge_Work => False);
    end Reset;
 
+   function New_Generator (State : in out World) return Value is
+      Item : constant Value := New_Userdata (State, Generator_Bytes);
+   begin
+      --  Construction pins the actual userdata before another closure or
+      --  capture vector can allocate. Plain modular words need no finalizer;
+      --  ordinary traced ownership frees the one stable payload allocation.
+      Pin (State, Item);
+      Seed (State, Entropy (State), 0, Charge_Work => False,
+            Generator => Item);
+      return Item;
+   end New_Generator;
+
    function Quotient (Numerator, Denominator : Real_Value) return Real_Value;
    function Quotient (Numerator, Denominator : Real_Value) return Real_Value is
    begin
@@ -196,7 +261,8 @@ package body Lua.Engine.Mathematics is
    end Quotient;
 
    function Run
-     (State : in out World; Name : String; Arguments : Values.Vector)
+     (State : in out World; Name : String; Arguments : Values.Vector;
+      Generator : Value := Nil_Value)
       return Values.Vector
    is
       Result : Values.Vector := Owned_Values (State);
@@ -278,7 +344,7 @@ package body Lua.Engine.Mathematics is
          loop
             Candidate := Candidate and Mask;
             exit when Candidate <= Upper;
-            Candidate := Next_Word (State);
+            Candidate := Next_Word (State, Generator => Generator);
          end loop;
          return Candidate;
       end Project;
@@ -289,27 +355,27 @@ package body Lua.Engine.Mathematics is
       First, Second, Random : Word;
    begin
       if Name = "math.randomseed" then
-         if not State.Random_Seeded then
+         if Generator.Kind = Nil_Kind and then not State.Random_Seeded then
             Reset (State);
          end if;
          if Arguments.Is_Empty then
             First := Entropy (State);
-            Second := Next_Word (State);
+            Second := Next_Word (State, Generator => Generator);
          else
             First := To_Word (Integral (1));
             Second := (if Arg (2).Kind = Nil_Kind then 0
                        else To_Word (Integral (2)));
          end if;
-         Seed (State, First, Second);
+         Seed (State, First, Second, Generator => Generator);
          Result.Append (Value'(Integer_Kind, To_Integer (First)));
          Result.Append (Value'(Integer_Kind, To_Integer (Second)));
       elsif Name = "math.random" then
-         if not State.Random_Seeded then
+         if Generator.Kind = Nil_Kind and then not State.Random_Seeded then
             Reset (State);
          end if;
          --  Pinned Lua draws before validating argument count or types. Even
-         --  a protected invalid call therefore advances this universe's RNG.
-         Random := Next_Word (State);
+         --  a protected invalid call therefore advances this module's RNG.
+         Random := Next_Word (State, Generator => Generator);
          case Natural (Arguments.Length) is
             when 0 =>
                Push (Real_Value (Interfaces.Shift_Right (Random, 11)) *

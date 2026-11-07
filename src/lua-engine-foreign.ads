@@ -16,6 +16,11 @@ package Lua.Engine.Foreign is
      (Data, Message : System.Address; To_Continue : Interfaces.C.int)
      with Convention => C;
 
+   type C_Continuation is access function
+     (State : System.Address; Status : Interfaces.C.int;
+      Context : Interfaces.C.ptrdiff_t) return Interfaces.C.int
+     with Convention => C;
+
    type IO_Close_Kind is
      (Regular_File_Close, Pipe_File_Close, Borrowed_File_Close);
    function IO_Close_Handler (Kind : IO_Close_Kind) return C_Function;
@@ -38,7 +43,11 @@ package Lua.Engine.Foreign is
       Create_Userdata, Get_Uservalue, Set_Uservalue,
       Get_Metatable, Set_Metatable, Close_IO_Primitive, Get_Yieldability,
       Set_Warning_Function, Issue_Warning, Complete_Warning,
-      Open_IO_Module, Open_OS_Module, Collector_Control, Push_Collector_Drain);
+      Open_IO_Module, Open_OS_Module, Collector_Control, Push_Collector_Drain,
+      Yield_Call, Get_Status, Begin_Resume, Open_Standard_Module,
+      Prepare_Index, Mark_Close, Close_Slot,
+      Set_Hook, Get_Hook, Get_Hook_Mask, Get_Hook_Count,
+      Get_Debug_Frame, Get_Debug_Line);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
       Create_Thread => 3, Get_Top => 4, Set_Top => 5,
@@ -61,7 +70,13 @@ package Lua.Engine.Foreign is
       Get_Yieldability => 50, Set_Warning_Function => 51,
       Issue_Warning => 52, Complete_Warning => 53,
       Open_IO_Module => 54, Open_OS_Module => 55,
-      Collector_Control => 56, Push_Collector_Drain => 57);
+      Collector_Control => 56, Push_Collector_Drain => 57,
+      Yield_Call => 58, Get_Status => 59, Begin_Resume => 60,
+      Open_Standard_Module => 61,
+      Prepare_Index => 62, Mark_Close => 63,
+      Close_Slot => 64,
+      Set_Hook => 80, Get_Hook => 81, Get_Hook_Mask => 82,
+      Get_Hook_Count => 83, Get_Debug_Frame => 84, Get_Debug_Line => 85);
    for Operation_Code'Size use Interfaces.C.int'Size;
    pragma Convention (C, Operation_Code);
 
@@ -85,6 +100,8 @@ package Lua.Engine.Foreign is
       Warning_Data : System.Address := System.Null_Address;
       Warning_Message : System.Address := System.Null_Address;
       Warning_Continuation : Interfaces.C.int := 0;
+      Continuation : C_Continuation := null;
+      KContext : Interfaces.C.ptrdiff_t := 0;
    end record with Convention => C;
 
    type Response is record
@@ -100,16 +117,19 @@ package Lua.Engine.Foreign is
       Warning_Data : System.Address := System.Null_Address;
       Warning_Message : System.Address := System.Null_Address;
       Warning_Continuation : Interfaces.C.int := 0;
+      Continuation : C_Continuation := null;
+      KContext : Interfaces.C.ptrdiff_t := 0;
+      KStatus : Interfaces.C.int := 0;
    end record with Convention => C;
 
    type Action_Status is
      (Action_Done, Action_Call, Action_Raise, Action_Memory,
-      Action_Handling, Action_Abort, Action_Warning);
+      Action_Handling, Action_Abort, Action_Warning, Action_Suspend);
    for Action_Status use
      (Action_Done => 0, Action_Call => 1,
       Action_Raise => 2, Action_Memory => 4,
       Action_Handling => 5,
-      Action_Abort => 6, Action_Warning => 7);
+      Action_Abort => 6, Action_Warning => 7, Action_Suspend => 8);
    for Action_Status'Size use Interfaces.C.int'Size;
    pragma Convention (C, Action_Status);
 
