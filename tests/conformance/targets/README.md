@@ -291,8 +291,10 @@ The production exclusion overlay is not changed by these author packets.
 entry protocols. `target-file-completion.lua` runs the selected original or
 exact reviewed derived chunk once using all.lua's entry operation: dump/load,
 stripped dump/load, direct text loading, or the two big.lua coroutine resumes.
-It observes calls.lua's exported deep result, attrib.lua's 27, locals.lua's 5
-and verybig.lua's 10 without treating discarded extra returns as failures.
+It observes calls.lua's single exported deep function, attrib.lua's single
+integer 27, locals.lua's integer 5 plus a function, and verybig.lua's single
+integer 10. Other non-coroutine chunks, including T-absent early returns, must
+return zero values. Extra results and one nil are distinct return protocols.
 The original source marker must precede the wrapper's terminal return witness.
 big.lua must suspend with b before its OK and die after returning a. memerr.lua
 uses its actual case-sensitive Ok and a consecutive numbered stderr progress
@@ -311,6 +313,14 @@ actual entry arguments, selected original/derived chunk hash and captured
 return/yield/warning phases. Existing thirteen-file protocols remain unchanged.
 Default api/code/memerr witnesses say T absent and retain the ordinary coverage
 omission links; they never certify their omitted instrumented bodies.
+The wrapper receives the original source name and selected chunk path as its
+two positive CLI arguments and invokes the original chunk with no varargs,
+matching all.lua's chunk call. It preserves the actual global arg table: arg[0]
+names the wrapper, while positive entries describe those wrapper arguments.
+main.lua obtains its selected executable by walking the unchanged negative
+argument chain; the wrapper does not replace its raw child commands or their
+argument assertions. Other remaining originals do not read these wrapper
+arguments outside the subprocess source strings tested by main.lua.
 
 `test-target-file-protocols.ps1` uses explicitly synthetic byte/capture/review
 fixtures. Its optional `-ReferenceInterpreter` cases run tiny synthetic chunks

@@ -284,6 +284,29 @@ if ($ReferenceInterpreter -ne '') {
         $null = Assert-TargetFileCompletion verybig.lua default $p
         $script:LuaCases++
     }
+    Case 'real wrapper rejects extra missing nil and wrong-type return values' {
+        foreach ($item in @(
+            @{file='attrib.lua';source="print('OK'); return 27, nil"},
+            @{file='attrib.lua';source="print('OK'); return"},
+            @{file='attrib.lua';source="print('OK'); return 27.0"},
+            @{file='literals.lua';source="print('OK'); return nil"},
+            @{file='calls.lua';source="deep=true; print('OK'); return deep"},
+            @{file='calls.lua';source="deep=function() end; print('OK'); return deep, nil"},
+            @{file='verybig.lua';source="print('OK'); return 10, false"},
+            @{file='api.lua';source='return nil'},
+            @{file='code.lua';source='return nil'},
+            @{file='memerr.lua';source='return nil'},
+            @{file='locals.lua';source="print('OK'); return 5, nil"},
+            @{file='locals.lua';source="print('OK'); return 5, function() end, false"}
+        )) {
+            $p = Run-Chunk $item.file $item.source
+            Assert-True ($p.exit_code -ne 0) "Wrapper accepted wrong return protocol for $($item.file)"
+            $script:LuaCases++
+        }
+        $p = Run-Chunk locals.lua "print('OK'); return 5, function() end"
+        $null = Assert-TargetFileCompletion locals.lua default $p
+        $script:LuaCases++
+    }
 }
 Write-Output "PASS: $script:Cases file completion regressions; $script:LuaCases synthetic Lua chunk processes; no upstream coverage acceptance"
 if ($ReferenceInterpreter -eq '') { Write-Output 'NOT RUN: optional C wrapper execution checks (ReferenceInterpreter not supplied)' }

@@ -7,7 +7,7 @@
   "coverage_authority": false,
   "wrapper": {
     "path": "tests/conformance/target-file-completion.lua",
-    "sha256": "702b638a6ca0d3a54c29b72b1ce6648c6914ab0eb175dc5851d308a3157327a3"
+    "sha256": "d366c500a8f08baa0f4f9673cbe01dff165b9ad3bec90093221c93af7ea7739c"
   },
   "orchestrator": {
     "path": "references/lua/testes/all.lua",
@@ -53,7 +53,8 @@
           "text": "-- testing warnings\nT.testC([[\n  warningC \"#This should be a\"\n  warningC \" single \"\n  warning \"warning\"\n  warningC \"#This should be \"\n  warning \"another one\"\n]])",
           "rationale": "Continued warning fragments must form exactly two complete warning lines."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "attrib.lua",
@@ -89,7 +90,8 @@
           "text": "return res",
           "rationale": "all.lua explicitly checks the first returned result equals 27."
         }
-      ]
+      ],
+      "return_protocol": "one-integer-27"
     },
     {
       "file": "big.lua",
@@ -126,7 +128,8 @@
           "text": "return 'a'",
           "rationale": "The second resume must return a and terminate the coroutine."
         }
-      ]
+      ],
+      "return_protocol": "one-yield-b-one-return-a"
     },
     {
       "file": "calls.lua",
@@ -155,7 +158,8 @@
           "text": "return deep",
           "rationale": "all.lua compares the returned exported deep function and requires it to be truthy."
         }
-      ]
+      ],
+      "return_protocol": "one-deep-function"
     },
     {
       "file": "code.lua",
@@ -182,7 +186,8 @@
           "text": "if T==nil then\n  (Message or print)('\\n >>> testC not active: skipping opcode tests <<<\\n')\n  return\nend",
           "rationale": "A literal T-absence return is an omission, never complete instrumented execution."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "cstack.lua",
@@ -202,7 +207,8 @@
           "text": "print'OK'",
           "rationale": "The original terminal source marker must precede the wrapper return completion."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "db.lua",
@@ -222,7 +228,8 @@
           "text": "print\"OK\"",
           "rationale": "The original terminal source marker must precede the wrapper return completion."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "errors.lua",
@@ -242,7 +249,8 @@
           "text": "print('OK')",
           "rationale": "The original terminal source marker must precede the wrapper return completion."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "literals.lua",
@@ -262,7 +270,8 @@
           "text": "print('OK')",
           "rationale": "The original terminal source marker must precede the wrapper return completion."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "locals.lua",
@@ -289,9 +298,10 @@
           "length_bytes": 10,
           "sha256": "bcaf0e37c87d2f76afd10f8df3b58b78ea5652acd9feb08b215c3a8aff4a19e1",
           "text": "return 5,f",
-          "rationale": "all.lua checks the first result is 5; it intentionally ignores the second result."
+          "rationale": "The original returns integer 5 and the local function f; preserve both values and arity."
         }
-      ]
+      ],
+      "return_protocol": "integer-5-and-function"
     },
     {
       "file": "main.lua",
@@ -325,7 +335,8 @@
           "text": "print('testing Ctrl C')\ndo\n  -- interrupt a script\n  local function kill (pid)\n    return os.execute(string.format('kill -INT %s 2> /dev/null', pid))\n  end\n\n  -- function to run a script in background, returning its output file\n  -- descriptor and its pid\n  local function runback (luaprg)\n    -- shell script to run 'luaprg' in background and echo its pid\n    local shellprg = string.format('%s -e \"%s\" & echo $!', progname, luaprg)\n    local f = io.popen(shellprg, \"r\")   -- run shell script\n    local pid = f:read()   -- get pid for Lua script\n    print(\"(if test fails now, it may leave a Lua script running in \\z\n            background, pid \" .. pid .. \")\")\n    return f, pid\n  end\n\n  -- Lua script that runs protected infinite loop and then prints '42'\n  local f, pid = runback[[\n    pcall(function () print(12); while true do end end); print(42)]]\n  -- wait until script is inside 'pcall'\n  assert(f:read() == \"12\")\n  kill(pid)  -- send INT signal to Lua script\n  -- check that 'pcall' captured the exception and script continued running\n  assert(f:read() == \"42\")  -- expected output\n  assert(f:close())\n  print(\"done\")\n\n  -- Lua script in a long unbreakable search\n  local f, pid = runback[[\n    print(15); string.find(string.rep('a', 100000), '.*b')]]\n  -- wait (so script can reach the loop)\n  assert(f:read() == \"15\")\n  assert(os.execute(\"sleep 1\"))\n  -- must send at least two INT signals to stop this Lua script\n  local n = 100\n  for i = 0, 100 do   -- keep sending signals\n    if not kill(pid) then   -- until it fails\n      n = i   -- number of non-failed kills\n      break\n    end\n  end\n  assert(f:close())\n  assert(n >= 2)\n  print(string.format(\"done (with %d kills)\", n))\n\nend",
           "rationale": "Both original interrupt subprocesses must reach their asserted terminal messages and close pipes."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "memerr.lua",
@@ -359,7 +370,8 @@
           "text": "local Count = 0\ntestamem(\"finalizers\", function ()\n  local X = false\n  local obj = setmetatable({}, {__gc = function ()  X = true end})\n  obj = nil\n  T.resetCI()   -- remove extra CallInfos\n  T.reallocstack(18)   -- remove extra stack slots\n  Count = Count + 1\n  io.stderr:write(Count, \"\\n\")",
           "rationale": "The dynamic stderr progress counter starts at one and increases without gaps."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "nextvar.lua",
@@ -379,7 +391,8 @@
           "text": "print\"OK\"",
           "rationale": "The original terminal source marker must precede the wrapper return completion."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "sort.lua",
@@ -399,7 +412,8 @@
           "text": "print\"OK\"",
           "rationale": "The original terminal source marker must precede the wrapper return completion."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "strings.lua",
@@ -419,7 +433,8 @@
           "text": "print('OK')",
           "rationale": "The original terminal source marker must precede the wrapper return completion."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "vararg.lua",
@@ -439,7 +454,8 @@
           "text": "print('OK')",
           "rationale": "The original terminal source marker must precede the wrapper return completion."
         }
-      ]
+      ],
+      "return_protocol": "no-values"
     },
     {
       "file": "verybig.lua",
@@ -475,7 +491,8 @@
           "text": "return result",
           "rationale": "all.lua requires the generated source result to be 10 and then collects."
         }
-      ]
+      ],
+      "return_protocol": "one-integer-10"
     }
   ],
   "limitations": [

@@ -23,7 +23,15 @@ function Get-TargetFileProtocolDefinition {
         'verybig.lua' { @('returned 10') }
         default { @() }
     }
-    return @{file=$File;entry=$entry;source_marker=$(if($File -ceq 'memerr.lua'){'Ok'}else{'OK'});
+    $returns = switch -CaseSensitive ($File) {
+        'big.lua' { 'one-yield-b-one-return-a' }
+        'calls.lua' { 'one-deep-function' }
+        'attrib.lua' { 'one-integer-27' }
+        'locals.lua' { 'integer-5-and-function' }
+        'verybig.lua' { 'one-integer-10' }
+        default { 'no-values' }
+    }
+    return @{file=$File;entry=$entry;return_protocol=$returns;source_marker=$(if($File -ceq 'memerr.lua'){'Ok'}else{'OK'});
         phases=@($phase);t_absent_return=($File -cin @('api.lua','code.lua','memerr.lua'))}
 }
 
@@ -55,7 +63,7 @@ function Read-TargetFileProtocolManifest {
         if ($item.file -cnotin $expected -or $seen.ContainsKey($item.file)) { throw 'Target completion source missing or duplicated' }
         $seen[$item.file] = $true
         $definition = Get-TargetFileProtocolDefinition -File $item.file
-        foreach ($field in @('entry','source_marker','t_absent_return')) {
+        foreach ($field in @('entry','return_protocol','source_marker','t_absent_return')) {
             if ($item[$field] -cne $definition[$field]) { throw "Target completion definition differs: $($item.file)/$field" }
         }
         if ((@($item.phases) -join '|') -cne (@($definition.phases) -join '|') -or

@@ -18,7 +18,8 @@ assert(type(path) == 'string')
 assert(_soft == nil and _port == nil and _U == nil and _nomsg == nil)
 -- Retain primitives before source execution: tests deliberately replace globals
 -- and debug hooks. Do not install substitute assertions or catch their errors.
-local check, emit, pack = assert, print, table.pack
+local check, emit, pack, kind, numberkind =
+  assert, print, table.pack, type, math.type
 local absent = T == nil and
   (name == 'api.lua' or name == 'code.lua' or name == 'memerr.lua')
 local chunk = check(loadfile(path))
@@ -40,19 +41,27 @@ if entry == 'coroutine' then
 else
   local result = pack(chunk())
   if name == 'calls.lua' then
+    check(result.n == 1 and kind(result[1]) == 'function')
     check(result[1] == deep and deep)
     _G.deep = nil  -- all.lua clears its exported recursion witness too.
     emit('target file phase calls.lua: returned deep')
   elseif name == 'attrib.lua' then
-    check(result[1] == 27)
+    check(result.n == 1 and result[1] == 27)
+    check(numberkind(result[1]) == 'integer')
     emit('target file phase attrib.lua: returned 27')
   elseif name == 'locals.lua' then
-    check(result[1] == 5)
+    check(result.n == 2 and result[1] == 5)
+    check(numberkind(result[1]) == 'integer' and kind(result[2]) == 'function')
     emit('target file phase locals.lua: returned 5')
   elseif name == 'verybig.lua' then
-    check(result[1] == 10)
+    check(result.n == 1 and result[1] == 10)
+    check(numberkind(result[1]) == 'integer')
     collectgarbage()  -- match all.lua's post-return collection.
     emit('target file phase verybig.lua: returned 10')
+  else
+    -- An implicit return produces zero values, which differs from one nil.
+    -- This also checks the original T-absent early-return branch exactly.
+    check(result.n == 0)
   end
 end
 if absent then
