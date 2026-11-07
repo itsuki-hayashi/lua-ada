@@ -8,7 +8,7 @@ function Test-NamedConsumerEvidence {
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
           [switch] $RequireFormatContract,
-          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module')]
+          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer')]
           [string[]] $AdditionalContracts=@())
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
@@ -42,7 +42,7 @@ function Test-NamedConsumerEvidence {
     $additionalMarkers=@{format='PASS: public formatting contract';value='PASS: public value operation contract';auxiliary='PASS: public auxiliary contract';
         'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';external='PASS: public external string contract';
         conversion='PASS: public numeric conversion contract';operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract';
-        'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external'}
+        'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external';buffer='PASS: public luaL_Buffer contract'}
     foreach($kind in $additional|Sort-Object -Unique){
         $markers["$kind-api"]=$additionalMarkers[$kind];$markers["$kind-oracle"]=$additionalMarkers[$kind]
         $contractKinds+=$kind;$consumerKinds+="$kind-api"
@@ -131,6 +131,20 @@ function Test-NamedConsumerEvidence {
                 $record.arguments[0].Replace('\','/') -cne $directory.Replace('\','/') -or
                 $outputs[$name].text.Replace("`r`n","`n") -cne $expected){
                 throw 'Named native module actual fixture argument or complete ordered lifetime protocol differs'
+            }
+        }
+    }
+    if('buffer' -cin $additional){
+        $names=@('empty-result','fixed-binary-nul','zero-null-add','addstring-terminator','direct-prep-addsize','buffinitsize-small',
+            'buffinitsize-heap','addvalue-growth-gc','large-growth-prefix','buffsub-addchar','nested-buffers','callback-result',
+            'callback-error-closes','abandoned-closeslot','fault-sweep-growth','pushresult-header-refusal','captured-deallocator-pair')
+        $expected=(@($names|ForEach-Object{'PASS: buffer-'+$_}) -join "`n")+"`nPASS: public luaL_Buffer contract`n"
+        if(($Report.buffer_contract.matched_cases -isnot [int] -and $Report.buffer_contract.matched_cases -isnot [long]) -or
+            $Report.buffer_contract.matched_cases -ne 17){throw 'Named buffer contract requires seventeen actual cases'}
+        foreach($name in @('buffer-api','buffer-oracle')){
+            $record=@($Report.consumers|Where-Object name -CEQ $name)[0]
+            if($record.arguments -isnot [Array] -or $record.arguments.Count -ne 0 -or $outputs[$name].text.Replace("`r`n","`n") -cne $expected){
+                throw 'Named buffer actual arguments or complete ordered ownership protocol differ'
             }
         }
     }

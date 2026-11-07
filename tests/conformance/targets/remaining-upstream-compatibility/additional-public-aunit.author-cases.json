@@ -75,6 +75,222 @@
       "required_stdout_line": "OK C auxiliary: default length scanning shares host quota",
       "case": "tests/src/lua-formatter_tests.adb#Default_Length_Quota",
       "runtime_acceptance": false
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: empty result and placeholder",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: empty result and placeholder",
+      "case": "tests/src/lua-c_buffer_tests.adb#Empty_Result"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: fixed scratch binary bytes",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: fixed scratch binary bytes",
+      "case": "tests/src/lua-c_buffer_tests.adb#Fixed_Binary_Nul"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: zero length null append",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: zero length null append",
+      "case": "tests/src/lua-c_buffer_tests.adb#Zero_Null_Add"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: C string terminator",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: C string terminator",
+      "case": "tests/src/lua-c_buffer_tests.adb#Addstring_Terminator"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: prepared space and size",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: prepared space and size",
+      "case": "tests/src/lua-c_buffer_tests.adb#Direct_Prep_Addsize"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: initial small space",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: initial small space",
+      "case": "tests/src/lua-c_buffer_tests.adb#Initial_Small"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: initial heap space",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: initial heap space",
+      "case": "tests/src/lua-c_buffer_tests.adb#Initial_Heap"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: addvalue survives collection",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: addvalue survives collection",
+      "case": "tests/src/lua-c_buffer_tests.adb#Addvalue_Collection"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: growth preserves each prefix",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: growth preserves each prefix",
+      "case": "tests/src/lua-c_buffer_tests.adb#Growth_Prefix"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: subtract and append characters",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: subtract and append characters",
+      "case": "tests/src/lua-c_buffer_tests.adb#Sub_And_Character"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: nested buffer ownership",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: nested buffer ownership",
+      "case": "tests/src/lua-c_buffer_tests.adb#Nested_Buffers"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: callback result window",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: callback result window",
+      "case": "tests/src/lua-c_buffer_tests.adb#Callback_Result"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: callback error closes box",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: callback error closes box",
+      "case": "tests/src/lua-c_buffer_tests.adb#Callback_Error"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: explicit abandoned close",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: explicit abandoned close",
+      "case": "tests/src/lua-c_buffer_tests.adb#Abandoned_Close"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: each actual refused growth",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: each actual refused growth",
+      "case": "tests/src/lua-c_buffer_tests.adb#Growth_Refusal"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: publication header refusal",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: publication header refusal",
+      "case": "tests/src/lua-c_buffer_tests.adb#Header_Refusal"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: captured allocator and data",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: captured allocator and data",
+      "case": "tests/src/lua-c_buffer_tests.adb#Captured_Provider"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: bounded foreign scan",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: bounded foreign scan",
+      "case": "tests/src/lua-c_buffer_tests.adb#Scan_Quota"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: bounded result extent",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: bounded result extent",
+      "case": "tests/src/lua-c_buffer_tests.adb#Extent_Quota"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: bounded heap abort cleanup",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: bounded heap abort cleanup",
+      "case": "tests/src/lua-c_buffer_tests.adb#Heap_Abort_Cleanup"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: bounded near-limit growth",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: bounded near-limit growth",
+      "case": "tests/src/lua-c_buffer_tests.adb#Near_Limit_Growth"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "C buffer: heap disposal without Lua",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK C buffer: heap disposal without Lua",
+      "case": "tests/src/lua-c_buffer_tests.adb#Heap_Disposal_Without_Lua"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "storage: retained provider release",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK storage: retained provider release",
+      "case": "tests/src/lua-storage_tests.adb#Retained_Provider_Release"
+    },
+    {
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "registered_label": "storage: retained provider data",
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "required_stdout_line": "OK storage: retained provider data",
+      "case": "tests/src/lua-storage_tests.adb#Retained_Provider_Data"
     }
   ]
 }

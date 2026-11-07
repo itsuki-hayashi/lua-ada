@@ -259,4 +259,27 @@ Run-Case 'native lifetime process cannot reuse another fixture directory or omit
 Run-Case 'native lifetime summary count must be the actual integer nine' {param($r)
     $r.native_module_contract.matched_cases='9'
 } 'all nine actual lifetime cases' -Foreign -Format -Additional $extended
+$bufferNames=@('empty-result','fixed-binary-nul','zero-null-add','addstring-terminator','direct-prep-addsize','buffinitsize-small','buffinitsize-heap',
+    'addvalue-growth-gc','large-growth-prefix','buffsub-addchar','nested-buffers','callback-result','callback-error-closes','abandoned-closeslot',
+    'fault-sweep-growth','pushresult-header-refusal','captured-deallocator-pair')
+$bufferFull=(@($bufferNames|ForEach-Object{'PASS: buffer-'+$_}) -join "`n")+"`nPASS: public luaL_Buffer contract`n"
+$baseline.buffer_contract=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=17}
+foreach($name in @('buffer-api','buffer-oracle')){
+    $record=$records[0].Clone();$record.name=$name;$out=Join-Path $directory "$name.stdout";[IO.File]::WriteAllText($out,$bufferFull)
+    $record.arguments=@();$record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$baseline.consumers+=$record
+}
+$extended+='buffer'
+Run-Case 'buffer contract requires all seventeen actual ordered ownership cases and its C counterpart' {} '' -Foreign -Format -Additional $extended
+Run-Case 'buffer ownership contract cannot lose the actual native process' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE buffer-oracle)
+} 'missing/duplicate' -Foreign -Format -Additional $extended
+Run-Case 'buffer count and final completion cannot replace the captured allocator case' {param($r)
+    foreach($name in @('buffer-api','buffer-oracle')){Replace-Capture $r $name stdout ($bufferFull.Replace('PASS: buffer-captured-deallocator-pair','PASS: buffer-invented-case'))}
+} 'complete ordered ownership protocol' -Foreign -Format -Additional $extended
+Run-Case 'buffer contract rejects an unreviewed mode argument and string summary count' {param($r)
+    @($r.consumers|Where-Object name -CEQ buffer-api)[0].arguments=@('--skip-refusal')
+} 'actual arguments' -Foreign -Format -Additional $extended
+Run-Case 'buffer case summary must remain the actual integer seventeen' {param($r)
+    $r.buffer_contract.matched_cases='17'
+} 'seventeen actual cases' -Foreign -Format -Additional $extended
 Write-Output "PASS: $count named consumer evidence regressions; synthetic observations only"

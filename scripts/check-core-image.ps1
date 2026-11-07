@@ -200,6 +200,7 @@ try {
     Invoke-Consumer 'operator-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/operator_api_contract$suffix") 'PASS: public C operator contract'
     Invoke-Consumer 'index-type-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/index_type_api_contract$suffix") 'PASS: public integer-index and type contract'
     Invoke-Consumer 'base-closing-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/base_closing_api_contract$suffix") 'PASS: public host base C closing contract'
+    Invoke-Consumer 'buffer-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/buffer_api_contract$suffix") 'PASS: public luaL_Buffer contract'
     $compilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
     if($LASTEXITCODE -ne 0){throw 'Cannot identify selected native module fixture compiler'}
     $fixtureCompiler=($compilerOutput -join '').Trim()
@@ -292,6 +293,10 @@ try {
         (Join-Path $projectRoot 'c_api/tests/base_closing_api_contract.c'),
         '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceBaseClosingConsumer)
     $referenceNativeModuleConsumer=Join-Path $reportDirectory "native-module-oracle$suffix"
+    $referenceBufferConsumer=Join-Path $reportDirectory "buffer-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/buffer_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceBufferConsumer)
     $nativeSystemLibraries=if($IsLinux){@('-ldl')}else{@()}
     Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/native_module_contract.c'),
@@ -311,6 +316,7 @@ try {
         Invoke-Consumer 'operator-oracle' $referenceOperatorConsumer 'PASS: public C operator contract'
         Invoke-Consumer 'index-type-oracle' $referenceIndexTypeConsumer 'PASS: public integer-index and type contract'
         Invoke-Consumer 'base-closing-oracle' $referenceBaseClosingConsumer 'PASS: public host base C closing contract'
+        Invoke-Consumer 'buffer-oracle' $referenceBufferConsumer 'PASS: public luaL_Buffer contract'
         $nativeModuleC=Invoke-NativeModuleConsumer -Name native-module-oracle -Executable $referenceNativeModuleConsumer `
             -Implementation ReferenceC -RuntimePath $referenceDirectory -Compiler $fixtureCompiler
         if($TargetPolicy -ne ''){
@@ -391,6 +397,9 @@ try {
     if([IO.File]::ReadAllText((Join-Path $reportDirectory 'native-module-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'native-module-oracle.stdout'))){throw 'C/Ada native module lifetime output differs'}
     Write-Output 'PASS: identical native module lifetime contract against C and Ada'
+    if([IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-oracle.stdout'))){throw 'C/Ada public buffer contract output differs'}
+    Write-Output 'PASS: identical public luaL_Buffer contract against C and Ada'
     $referenceLibraries = @(Get-ChildItem -LiteralPath $referenceDirectory -File |
         Where-Object { $_.Name -match '^libconformance_lua\.(dll|so(\.[0-9.]+)?|dylib)$' } |
         ForEach-Object { [ordered]@{ file=$_.Name;
@@ -458,6 +467,9 @@ try {
     $nativeModuleContractSources=@(foreach($name in @('native_module_contract.c','consumer_allocator.h')){
         @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
     })
+    $bufferContractSources=@(foreach($name in @('buffer_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
     Invoke-Consumer 'c-startup' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/c_image_client$suffix") 'CORE IMAGE C STARTUP OK'
     # Old ignored products can remain after the library rename. Hash only the
@@ -481,7 +493,7 @@ try {
         consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources);
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources);
         configuration = $Configuration; consumers = $records.ToArray();
         library_files = $libraries;
         gc_contract = [ordered]@{ matching_output=$true; sources=$contractSources;
@@ -513,6 +525,7 @@ try {
             reference_library_files=$referenceLibraries;ada_linkage=$nativeModuleAda.identity;c_linkage=$nativeModuleC.identity;
             ada_fixture_directory=$nativeModuleAda.library_directory;c_fixture_directory=$nativeModuleC.library_directory;
             ada_fixture_records=$nativeModuleAda.records;c_fixture_records=$nativeModuleC.records};
+        buffer_contract=@{matching_output=$true;sources=$bufferContractSources;matched_cases=17;reference_library_files=$referenceLibraries};
         value_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$valueSources;reference_library_files=$referenceLibraries}}else{$null});
         auxiliary_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$auxiliarySources;platform_defines=$platformDefines;reference_library_files=$referenceLibraries}}else{$null}) } | ConvertTo-Json -Depth 6 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8

@@ -614,6 +614,16 @@ anchors retain behavioral obligations. No compiled cases are installed by this
 generator, and the existing global catalogue, acceptance policy and historical
 scopes remain the authorities for their respective validation modes.
 
+The successor also schedules the committed seventeen-case public buffer
+consumer against both Ada and native C. Its exact ordered protocol includes
+real growth/refusal recovery, callback error closing, publication refusal and
+retained allocator/data ownership; completion and count fields alone cannot
+replace those cases. The author catalogue adds seventeen C and twenty-four
+AUnit names, including separate host-budget and retained-storage cases, plus
+eight function and six behavioral buffer-macro route proposals. This brings
+the pending named source catalogues to 354 C and 128 AUnit cases. All semantic
+review and global/API acceptance remain pending.
+
 `new-target-attrib-windows-proposal.ps1` reconstructs a pending native-platform
 mapping for ten expected path literals in the pinned attrib.lua. Nine use its
 existing `D` helper; the P1/init.lua expectation retains the literal slash from

@@ -3335,6 +3335,244 @@
       "case_id": "explicit-lib2-newstr-external",
       "runtime_acceptance": false,
       "source": "c_api/tests/native_module_contract.c"
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "empty-result",
+      "exact_witnesses": [
+        "PASS: buffer-empty-result"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "fixed-binary-nul",
+      "exact_witnesses": [
+        "PASS: buffer-fixed-binary-nul"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "zero-null-add",
+      "exact_witnesses": [
+        "PASS: buffer-zero-null-add"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "addstring-terminator",
+      "exact_witnesses": [
+        "PASS: buffer-addstring-terminator"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "direct-prep-addsize",
+      "exact_witnesses": [
+        "PASS: buffer-direct-prep-addsize"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "buffinitsize-small",
+      "exact_witnesses": [
+        "PASS: buffer-buffinitsize-small"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "buffinitsize-heap",
+      "exact_witnesses": [
+        "PASS: buffer-buffinitsize-heap"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "addvalue-growth-gc",
+      "exact_witnesses": [
+        "PASS: buffer-addvalue-growth-gc"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "large-growth-prefix",
+      "exact_witnesses": [
+        "PASS: buffer-large-growth-prefix"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "buffsub-addchar",
+      "exact_witnesses": [
+        "PASS: buffer-buffsub-addchar"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "nested-buffers",
+      "exact_witnesses": [
+        "PASS: buffer-nested-buffers"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "callback-result",
+      "exact_witnesses": [
+        "PASS: buffer-callback-result"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "callback-error-closes",
+      "exact_witnesses": [
+        "PASS: buffer-callback-error-closes"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "abandoned-closeslot",
+      "exact_witnesses": [
+        "PASS: buffer-abandoned-closeslot"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "fault-sweep-growth",
+      "exact_witnesses": [
+        "PASS: buffer-fault-sweep-growth"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "pushresult-header-refusal",
+      "exact_witnesses": [
+        "PASS: buffer-pushresult-header-refusal"
+      ],
+      "runtime_acceptance": false
+    },
+    {
+      "execution_evidence": [],
+      "source": "c_api/tests/buffer_api_contract.c",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "expected_count": 1,
+      "consumer": "buffer-api",
+      "coverage_authority": false,
+      "case_id": "captured-deallocator-pair",
+      "exact_witnesses": [
+        "PASS: buffer-captured-deallocator-pair"
+      ],
+      "runtime_acceptance": false
     }
   ],
   "source_measurements": {
