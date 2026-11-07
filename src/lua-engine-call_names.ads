@@ -17,6 +17,10 @@ package Lua.Engine.Call_Names is
    --  Infer through the same reaching-definition walk without allocating.
    --  Bytes are NUL-terminated immutable graph/constant storage, or static
    --  markers; the caller must retain its actual activation/prototype owner.
+   function Name_Image (Item : Borrowed_Identity) return String;
+   --  Render the C name prefix for Lua/debug/error text, ending at the first
+   --  NUL. Raw C metadata can borrow the original address without this scan;
+   --  the underlying field key retains all of its counted bytes.
    function Finalizer_Name return Byte_String;
    --  Borrow the static NUL-terminated __gc origin marker. Its lifetime is
    --  the package lifetime and no allocation or prototype owner is needed.
@@ -34,10 +38,7 @@ package Lua.Engine.Call_Names is
       return Borrowed_Identity;
    --  Borrow a failed operand's real reaching-definition name, including the
    --  active right-fold pair of CONCAT. No query allocation is required.
-   function From_Operand
-     (State : in out World; Caller : Frame_Access; Index : Arithmetic_Operand)
-      return Identity;
-   --  Resolve a failed primitive operand from the saved canonical word.
    --  Index is the logical left/right operand (one/two), including flipped
-   --  immediate fallbacks. Unknown or stripped names remain unknown.
+   --  immediate fallbacks and index receivers. Unknown/stripped names stay
+   --  unknown; Name_Image provides the C string view for diagnostic text.
 end Lua.Engine.Call_Names;

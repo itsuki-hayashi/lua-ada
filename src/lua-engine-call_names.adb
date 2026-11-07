@@ -370,6 +370,24 @@ package body Lua.Engine.Call_Names is
                end if;
             when Op_BNOT | Op_UNM | Op_LEN =>
                return Resolve (Part (Instruction, B), PC, True);
+            when Op_GETTABUP | Op_SETTABUP =>
+               --  These two operations index the actual upvalue cell
+               --  directly. varinfo checks that identity before registers;
+               --  do not describe its key as the failing table object.
+               declare
+                  Index : constant Natural := Part
+                    (Instruction, (if Op = Op_GETTABUP then B else A));
+               begin
+                  if Index >= Natural (Model.Upvalues.Length) then
+                     return (others => <>);
+                  end if;
+                  return Text
+                    (Model.Upvalues (Index + 1).Name, Upvalue_Binding);
+               end;
+            when Op_GETTABLE | Op_GETI | Op_GETFIELD | Op_SELF =>
+               return Resolve (Part (Instruction, B), PC, True);
+            when Op_SETTABLE | Op_SETI | Op_SETFIELD =>
+               return Resolve (Part (Instruction, A), PC, True);
             when Op_CONCAT =>
                if Caller.Canonical_Pending = Concat_Canonical_Result and then
                  Caller.Canonical_Concat_Last > 0
@@ -415,6 +433,35 @@ package body Lua.Engine.Call_Names is
       end case;
    end Resolve_Name;
 
+   function C_Name_View (Item : Borrowed_Identity) return Borrowed_Identity;
+   function C_Name_View (Item : Borrowed_Identity) return Borrowed_Identity is
+      Result : Borrowed_Identity := Item;
+   begin
+      --  Lua debug names and varinfo cross a C string boundary upstream.
+      --  A string-literal field key may contain NUL even though identifiers
+      --  cannot. Retain the immutable owner/address and shorten only this
+      --  borrowed view; the original Lua key keeps all its counted bytes.
+      if Item.Item.Address /= System.Null_Address and then
+        Item.Item.Size /= 0
+      then
+         declare
+            Text : String (1 .. Item.Item.Size)
+              with Import, Address => Item.Item.Address;
+         begin
+            for Index in Text'Range loop
+               if Text (Index) = Character'Val (0) then
+                  Result.Item.Size := Index - 1;
+                  exit;
+               end if;
+            end loop;
+         end;
+      end if;
+      return Result;
+   end C_Name_View;
+
+   function Name_Image (Item : Borrowed_Identity) return String is
+     (To_String (C_Name_View (Item).Item));
+
    function View_From_Caller
      (State : in out World; Caller : Frame_Access)
       return Borrowed_Identity is
@@ -425,16 +472,11 @@ package body Lua.Engine.Call_Names is
    function Materialize
      (State : in out World; Item : Borrowed_Identity) return Identity is
      ((if Item.Item.Address = System.Null_Address then Nil_Value else
-         New_String (State, To_String (Item.Item))), Item.Kind);
+         New_String (State, Name_Image (Item))), Item.Kind);
 
    function From_Caller
      (State : in out World; Caller : Frame_Access) return Identity is
      (Materialize (State, View_From_Caller (State, Caller)));
-
-   function From_Operand
-     (State : in out World; Caller : Frame_Access; Index : Arithmetic_Operand)
-      return Identity is
-     (Materialize (State, View_From_Operand (State, Caller, Index)));
 
    function View_From_Operand
      (State : in out World; Caller : Frame_Access; Index : Arithmetic_Operand)

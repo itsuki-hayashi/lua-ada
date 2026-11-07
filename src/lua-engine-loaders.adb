@@ -188,7 +188,7 @@ package body Lua.Engine.Loaders is
               (State, State.Current, Activation));
          Label.Set_Value
            ((if Identity.Kind = Call_Names.Unknown then Name
-             else To_String (Identity.Item)));
+             else Call_Names.Name_Image (Identity)));
          Meta := Raw_Metatable (State, Arg (Index));
          if Meta /= null then
             Type_Label := Get
@@ -680,6 +680,16 @@ package body Lua.Engine.Loaders is
          if Activation.Native_Stage = 1 then
             Result.Results := Activation.Native_Results;
             return Result;
+         end if;
+         --  luaB_loadfile validates its optional filename before its mode,
+         --  then opens the file. dofile validates only the filename and
+         --  ignores later arguments. Nil retains the stdin path; numeric
+         --  names still use the existing string coercion/copy below.
+         if Arg (1).Kind /= Nil_Kind then Check_String_Argument (1); end if;
+         if Name in "base.loadfile" | "loadfile" and then
+           Arg (2).Kind /= Nil_Kind
+         then
+            Check_String_Argument (2);
          end if;
          if Name in "base.dofile" | "dofile" or else Arg (2).Kind = Nil_Kind
          then

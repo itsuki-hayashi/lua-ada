@@ -536,6 +536,285 @@ package body Operation_Error_Tests is
          "],tostring(e))");
    end Number_Name_Ignored;
 
+   procedure Index_Global;
+   procedure Index_Global is
+   begin
+      --  A missing global used as receiver keeps the global binding.
+      Check
+        ("  local f=assert(load([=[bad_index=nil;return ba" &
+         "d_index.x]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a nil value (global 'bad" &
+         "_index')]=],tostring(e))");
+   end Index_Global;
+
+   procedure Index_Upvalue;
+   procedure Index_Upvalue is
+   begin
+      --  A captured nil receiver retains the nested upvalue name.
+      Check
+        ("  local f=assert(load([=[local x;return(function" &
+         "()return x[1]end)()]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a nil value (upvalue 'x'" &
+         ")]=],tostring(e))");
+   end Index_Upvalue;
+
+   procedure Index_Field;
+   procedure Index_Field is
+   begin
+      --  A missing field used as receiver keeps its field provenance.
+      Check
+        ("  local f=assert(load([=[local t={};return t.x.y" &
+         "]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a nil value (field 'x')]" &
+         "=],tostring(e))");
+   end Index_Field;
+
+   procedure Index_Set;
+   procedure Index_Set is
+   begin
+      --  A false assignment receiver names the actual local.
+      Check
+        ("  local f=assert(load([=[local x=false;x.y=1]=]," &
+         "'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a boolean value (local '" &
+         "x')]=],tostring(e))");
+   end Index_Set;
+
+   procedure Index_Environment;
+   procedure Index_Environment is
+   begin
+      --  A local nil environment is the failing table operand.
+      Check
+        ("  local f=assert(load([=[local _ENV=nil;return x" &
+         "]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a nil value (local '_ENV" &
+         "')]=],tostring(e))");
+   end Index_Environment;
+
+   procedure Index_Get_Chain;
+   procedure Index_Get_Chain is
+   begin
+      --  A redirected __index object cannot borrow the original local
+      --  name.
+      Check
+        ("  local f=assert(load([=[local x=setmetatable({}" &
+         ",{__index=false});return x.a]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a boolean value]=],tostr" &
+         "ing(e))");
+   end Index_Get_Chain;
+
+   procedure Index_Set_Chain;
+   procedure Index_Set_Chain is
+   begin
+      --  A redirected __newindex object cannot borrow the original local
+      --  name.
+      Check
+        ("  local f=assert(load([=[local x=setmetatable({}" &
+         ",{__newindex=false});x.a=1]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a boolean value]=],tostr" &
+         "ing(e))");
+   end Index_Set_Chain;
+
+   procedure Index_Nested_Chain;
+   procedure Index_Nested_Chain is
+   begin
+      --  Nested table delegation still attributes only the final primitive
+      --  type.
+      Check
+        ("  local f=assert(load([=[local x=setmetatable({}" &
+         ",{__index=setmetatable({},{__index=false})});ret" &
+         "urn x.a]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a boolean value]=],tostr" &
+         "ing(e))");
+   end Index_Nested_Chain;
+
+   procedure Index_Primitive_Name;
+   procedure Index_Primitive_Name is
+   begin
+      --  A primitive metatable name does not rename the failing boolean
+      --  receiver.
+      Check
+        ("  local f=assert(load([=[debug.setmetatable(fals" &
+         "e,{__name='Flag'});local ok,e=pcall(function()lo" &
+         "cal x=false;return x.a end);debug.setmetatable(f" &
+         "alse,nil);error(e,0)]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a boolean value (local '" &
+         "x')]=],tostring(e))");
+   end Index_Primitive_Name;
+
+   procedure Index_Environment_Capture;
+   procedure Index_Environment_Capture is
+   begin
+      --  Direct environment indexing identifies the actual captured
+      --  upvalue cell.
+      Check
+        ("  local f=assert(load([=[local _ENV=nil;return(f" &
+         "unction()return x end)()]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a nil value (upvalue '_E" &
+         "NV')]=],tostring(e))");
+   end Index_Environment_Capture;
+
+   procedure Index_Method;
+   procedure Index_Method is
+   begin
+      --  A missing method receiver names its preceding field access.
+      Check
+        ("  local f=assert(load([=[local t={};return t.x:y" &
+         "()]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a nil value (field 'x')]" &
+         "=],tostring(e))");
+   end Index_Method;
+
+   procedure Index_Set_Global;
+   procedure Index_Set_Global is
+   begin
+      --  Deferred assignment still identifies its original global
+      --  receiver.
+      Check
+        ("  local f=assert(load([=[bad_index=nil;bad_index" &
+         ".x=1]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a nil value (global 'bad" &
+         "_index')]=],tostring(e))");
+   end Index_Set_Global;
+
+   procedure Index_Set_Environment;
+   procedure Index_Set_Environment is
+   begin
+      --  A nil local environment remains the actual deferred store target.
+      Check
+        ("  local f=assert(load([=[local _ENV=nil;x=1]=],'" &
+         "=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a nil value (local '_ENV" &
+         "')]=],tostring(e))");
+   end Index_Set_Environment;
+
+   procedure Arithmetic_Nul_Field;
+   procedure Arithmetic_Nul_Field is
+   begin
+      --  Operand varinfo uses a C name view without changing its counted
+      --  table key.
+      Check
+        ("  local f=assert(load([=[local t={['a\0b']={}};r" &
+         "eturn t['a\0b']+1]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to perform arithmetic on a tab" &
+         "le value (field 'a')]=],tostring(e))");
+   end Arithmetic_Nul_Field;
+
+   procedure Index_Nul_Field;
+   procedure Index_Nul_Field is
+   begin
+      --  Indexing a field result reports the prefix before its embedded
+      --  NUL.
+      Check
+        ("  local f=assert(load([=[local t={['a\0b']=false" &
+         "};return t['a\0b'].x]=],'=index'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[in" &
+         "dex:1: attempt to index a boolean value (field '" &
+         "a')]=],tostring(e))");
+   end Index_Nul_Field;
+
+   procedure Concat_Nul_Field;
+   procedure Concat_Nul_Field is
+   begin
+      --  A failed concatenation has the same C view of a field name.
+      Check
+        ("  local f=assert(load([=[local t={['a\0b']={}};r" &
+         "eturn 'x'..t['a\0b']]=],'=concat'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[co" &
+         "ncat:1: attempt to concatenate a table value (fi" &
+         "eld 'a')]=],tostring(e))");
+   end Concat_Nul_Field;
+
+   procedure Call_Nul_Field;
+   procedure Call_Nul_Field is
+   begin
+      --  Invalid-call diagnostics share the counted owner's C name view.
+      Check
+        ("  local f=assert(load([=[local t={['a\0b']=false" &
+         "};t['a\0b']()]=],'=operator'))" & ASCII.LF &
+         "  local ok,e=pcall(f);assert(not ok and e==[=[op" &
+         "erator:1: attempt to call a boolean value (field" &
+         " 'a')]=],tostring(e))");
+   end Call_Nul_Field;
+
+   procedure Info_Nul_Field;
+   procedure Info_Nul_Field is
+   begin
+      --  Lua getinfo and C metadata share the same borrowed field-name
+      --  prefix.
+      Check
+        ("  local t={};t['a\0b']=function()local i=debug.g" &
+         "etinfo(1,'n');assert(i.namewhat=='field' and i.n" &
+         "ame=='a')end" & ASCII.LF &
+         "  t['a\0b']();assert(t.a==nil and type(t['a\0b']" &
+         ")=='function')");
+   end Info_Nul_Field;
+
+   procedure Loader_Nul_Field;
+   procedure Loader_Nul_Field is
+   begin
+      --  Loader argument diagnostics render the same NUL-terminated
+      --  borrowed call name.
+      Check
+        ("  local t={['a\0b']=loadfile};local ok,e=pcall(f" &
+         "unction()t['a\0b']({})end)" & ASCII.LF &
+         "  assert(not ok and e:find(""bad argument #1 to '" &
+         "a' (string expected, got table)"",1,true) and not" &
+         " e:find('\0',1,true),tostring(e))");
+   end Loader_Nul_Field;
+
+   procedure Filename_Before_Mode;
+   procedure Filename_Before_Mode is
+   begin
+      --  Loadfile validates a wrong filename before inspecting a wrong
+      --  mode.
+      Check
+        ("  local ok,e=pcall(function()loadfile({},{})end)" & ASCII.LF &
+         "  assert(not ok and e:find(""bad argument #1 to '" &
+         "loadfile' (string expected, got table)"",1,true)," &
+         "tostring(e))");
+   end Filename_Before_Mode;
+
+   procedure Mode_Before_Open;
+   procedure Mode_Before_Open is
+   begin
+      --  A wrong optional mode is rejected before opening a missing
+      --  filename.
+      Check
+        ("  local ok,e=pcall(function()loadfile('__missing" &
+         "_loader_file__',{})end)" & ASCII.LF &
+         "  assert(not ok and e:find(""bad argument #2 to '" &
+         "loadfile' (string expected, got table)"",1,true)," &
+         "tostring(e))");
+   end Mode_Before_Open;
+
+   procedure Dofile_Nul_Field;
+   procedure Dofile_Nul_Field is
+   begin
+      --  Dofile validates its optional filename with the same borrowed C
+      --  call name.
+      Check
+        ("  local t={['a\0b']=dofile};local ok,e=pcall(fun" &
+         "ction()t['a\0b']({},{})end)" & ASCII.LF &
+         "  assert(not ok and e:find(""bad argument #1 to '" &
+         "a' (string expected, got table)"",1,true) and not" &
+         " e:find('\0',1,true),tostring(e))");
+   end Dofile_Nul_Field;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -661,5 +940,71 @@ package body Operation_Error_Tests is
       Test_Support.Add
         (Suite, "operation error: Number_Name_Ignored",
          Number_Name_Ignored'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Global",
+         Index_Global'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Upvalue",
+         Index_Upvalue'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Field",
+         Index_Field'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Set",
+         Index_Set'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Environment",
+         Index_Environment'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Get_Chain",
+         Index_Get_Chain'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Set_Chain",
+         Index_Set_Chain'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Nested_Chain",
+         Index_Nested_Chain'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Primitive_Name",
+         Index_Primitive_Name'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Environment_Capture",
+         Index_Environment_Capture'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Method",
+         Index_Method'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Set_Global",
+         Index_Set_Global'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Set_Environment",
+         Index_Set_Environment'Access);
+      Test_Support.Add
+        (Suite, "operation error: Arithmetic_Nul_Field",
+         Arithmetic_Nul_Field'Access);
+      Test_Support.Add
+        (Suite, "operation error: Index_Nul_Field",
+         Index_Nul_Field'Access);
+      Test_Support.Add
+        (Suite, "operation error: Concat_Nul_Field",
+         Concat_Nul_Field'Access);
+      Test_Support.Add
+        (Suite, "operation error: Call_Nul_Field",
+         Call_Nul_Field'Access);
+      Test_Support.Add
+        (Suite, "operation error: Info_Nul_Field",
+         Info_Nul_Field'Access);
+      Test_Support.Add
+        (Suite, "operation error: Loader_Nul_Field",
+         Loader_Nul_Field'Access);
+      Test_Support.Add
+        (Suite, "operation error: Filename_Before_Mode",
+         Filename_Before_Mode'Access);
+      Test_Support.Add
+        (Suite, "operation error: Mode_Before_Open",
+         Mode_Before_Open'Access);
+      Test_Support.Add
+        (Suite, "operation error: Dofile_Nul_Field",
+         Dofile_Nul_Field'Access);
    end Register;
 end Operation_Error_Tests;

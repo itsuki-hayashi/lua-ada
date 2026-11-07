@@ -250,7 +250,8 @@ package body Lua.Engine.Machine is
          begin
             Caller := State.Current.Stack (State.Current.Stack.Last_Index - 1);
             if not Helper.Is_Native or else Caller.Is_Native or else
-              To_String (Helper.Native_Name) not in "@binary" | "@unary"
+              To_String (Helper.Native_Name) not in
+                "@binary" | "@unary" | "@get" | "@set"
             then
                Caller := null;
             end if;
@@ -266,7 +267,7 @@ package body Lua.Engine.Machine is
             if Name.Kind /= Call_Names.Unknown then
                Append (Description, " (" &
                  Call_Names.Kind_Image (Name.Kind) & " '" &
-                 To_String (Name.Item) & "')");
+                 Call_Names.Name_Image (Name) & "')");
             end if;
          end;
       end if;
@@ -292,10 +293,10 @@ package body Lua.Engine.Machine is
 
    procedure Operand_Error
      (State : in out World; Item : Value; Operation : String;
-      Operand_Index : Call_Names.Arithmetic_Operand);
+      Operand_Index : Natural);
    procedure Operand_Error
      (State : in out World; Item : Value; Operation : String;
-      Operand_Index : Call_Names.Arithmetic_Operand) is
+      Operand_Index : Natural) is
    begin
       Operation_Error
         (State, "attempt to " & Operation & " a " &
@@ -2137,7 +2138,7 @@ package body Lua.Engine.Machine is
             if Origin.Kind /= Call_Names.Unknown then
                Append (Description, " (" &
                  Call_Names.Kind_Image (Origin.Kind) & " '" &
-                 To_String (Origin.Item) & "')");
+                 Call_Names.Name_Image (Origin) & "')");
             end if;
          end if;
          if Caller /= null and then not Caller.Is_Native then
@@ -3958,7 +3959,13 @@ package body Lua.Engine.Machine is
             end if;
             if Handler.Kind = Nil_Kind then
                if Left.Kind /= Table_Kind then
-                  Fail (State, "attempt to index a " & Type_Name (Left));
+                  --  Initial lookup still names its real register/upvalue.
+                  --  A noncallable __index/__newindex redirects lookup to a
+                  --  different object outside that operand slot, so pinned
+                  --  varinfo cannot attribute the later object to the first.
+                  Operand_Error
+                    (State, Left, "index",
+                     (if Activation.Native_Aux = 0 then 1 else 0));
                elsif Name = "@get" then
                   Return_Native (Nil_Value);
                else

@@ -102,3 +102,40 @@ Full unchanged default errors.lua now reaches indexing diagnostics. Its next
 failure is `aaa.bbb:ddd(9)`: expected `global 'aaa'`, actual
 `attempt to index a nil`. Index operand/source attribution, actual C concat
 windows and full-file/T/final-matrix acceptance remain open.
+
+## Indexing and C name-boundary followup
+
+Index failures now identify the actual receiver register or directly indexed
+upvalue cell. Redirected noncallable `__index`/`__newindex` chains still report
+the final primitive object and cannot borrow the initial receiver's name.
+This follows `ldebug.c:varinfo`'s distinction between actual stack/upvalue
+addresses and objects stored elsewhere. Get/set operations use their real
+opcode operands, including deferred assignment receivers and environments.
+
+Rendered Lua debug/error names now end at the first embedded NUL in a field
+key, matching upstream's C name view. The immutable field key keeps every
+counted byte. `Name_Image` performs that scan only for rendered text; raw
+public C metadata still borrows the original stable pointer without a scan
+or allocation. The now-unused operand materializer was removed. Call errors,
+Lua getinfo, primitive varinfo and loader call names share the renderer.
+
+The loader regression exposed an existing path which bypassed argument
+validation and reported `string expected in base.loadfile`. Optional filename
+validation now precedes mode validation and opening, following
+`lbaselib.c:luaB_loadfile`; dofile validates its filename and ignores extra
+arguments. Nil retains stdin and numbers retain existing string coercion.
+The failing assertion was kept and now passes, alongside independent
+filename-before-mode, mode-before-open and dofile-name cases.
+
+Twenty-two new named cases pass within all 1,809 AUnit cases. Native default/T
+pass both complete sixty-three-case fixtures, and all four default
+compiler/runtime combinations pass both fixtures. Strict serial root/tests/C
+builds, thirty-six retained four-way cases and seventeen retained C consumers
+pass. Unchanged db.lua again has the recorded matching stdout and empty
+stderr. Reference sources/pins remain untouched and git diff --check is clean.
+
+Full unchanged default errors.lua now reaches the numeric-for diagnostics:
+`for i = {}, 10 do end` expects the offending table type, while the current
+message is still `'for' initial value must be a number`. Actual C concat
+windows, numeric-for/library diagnostics, T file paths and final matrices
+remain unfinished. These focused checkpoints do not close the file ledger.

@@ -257,4 +257,136 @@ do
   local ok,e=pcall(f);assert(not ok and e==[=[operator:1: attempt to compare number with table]=],tostring(e))
 end
 
+-- Index_Global: A missing global used as receiver keeps the global binding.
+do
+  local f=assert(load([=[bad_index=nil;return bad_index.x]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a nil value (global 'bad_index')]=],tostring(e))
+end
+
+-- Index_Upvalue: A captured nil receiver retains the nested upvalue name.
+do
+  local f=assert(load([=[local x;return(function()return x[1]end)()]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a nil value (upvalue 'x')]=],tostring(e))
+end
+
+-- Index_Field: A missing field used as receiver keeps its field provenance.
+do
+  local f=assert(load([=[local t={};return t.x.y]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a nil value (field 'x')]=],tostring(e))
+end
+
+-- Index_Set: A false assignment receiver names the actual local.
+do
+  local f=assert(load([=[local x=false;x.y=1]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a boolean value (local 'x')]=],tostring(e))
+end
+
+-- Index_Environment: A local nil environment is the failing table operand.
+do
+  local f=assert(load([=[local _ENV=nil;return x]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a nil value (local '_ENV')]=],tostring(e))
+end
+
+-- Index_Get_Chain: A redirected __index object cannot borrow the original local name.
+do
+  local f=assert(load([=[local x=setmetatable({},{__index=false});return x.a]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a boolean value]=],tostring(e))
+end
+
+-- Index_Set_Chain: A redirected __newindex object cannot borrow the original local name.
+do
+  local f=assert(load([=[local x=setmetatable({},{__newindex=false});x.a=1]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a boolean value]=],tostring(e))
+end
+
+-- Index_Nested_Chain: Nested table delegation still attributes only the final primitive type.
+do
+  local f=assert(load([=[local x=setmetatable({},{__index=setmetatable({},{__index=false})});return x.a]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a boolean value]=],tostring(e))
+end
+
+-- Index_Primitive_Name: A primitive metatable name does not rename the failing boolean receiver.
+do
+  local f=assert(load([=[debug.setmetatable(false,{__name='Flag'});local ok,e=pcall(function()local x=false;return x.a end);debug.setmetatable(false,nil);error(e,0)]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a boolean value (local 'x')]=],tostring(e))
+end
+
+-- Index_Environment_Capture: Direct environment indexing identifies the actual captured upvalue cell.
+do
+  local f=assert(load([=[local _ENV=nil;return(function()return x end)()]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a nil value (upvalue '_ENV')]=],tostring(e))
+end
+
+-- Index_Method: A missing method receiver names its preceding field access.
+do
+  local f=assert(load([=[local t={};return t.x:y()]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a nil value (field 'x')]=],tostring(e))
+end
+
+-- Index_Set_Global: Deferred assignment still identifies its original global receiver.
+do
+  local f=assert(load([=[bad_index=nil;bad_index.x=1]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a nil value (global 'bad_index')]=],tostring(e))
+end
+
+-- Index_Set_Environment: A nil local environment remains the actual deferred store target.
+do
+  local f=assert(load([=[local _ENV=nil;x=1]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a nil value (local '_ENV')]=],tostring(e))
+end
+
+-- Arithmetic_Nul_Field: Operand varinfo uses a C name view without changing its counted table key.
+do
+  local f=assert(load([=[local t={['a\0b']={}};return t['a\0b']+1]=],'=operator'))
+  local ok,e=pcall(f);assert(not ok and e==[=[operator:1: attempt to perform arithmetic on a table value (field 'a')]=],tostring(e))
+end
+
+-- Index_Nul_Field: Indexing a field result reports the prefix before its embedded NUL.
+do
+  local f=assert(load([=[local t={['a\0b']=false};return t['a\0b'].x]=],'=index'))
+  local ok,e=pcall(f);assert(not ok and e==[=[index:1: attempt to index a boolean value (field 'a')]=],tostring(e))
+end
+
+-- Concat_Nul_Field: A failed concatenation has the same C view of a field name.
+do
+  local f=assert(load([=[local t={['a\0b']={}};return 'x'..t['a\0b']]=],'=concat'))
+  local ok,e=pcall(f);assert(not ok and e==[=[concat:1: attempt to concatenate a table value (field 'a')]=],tostring(e))
+end
+
+-- Call_Nul_Field: Invalid-call diagnostics share the counted owner's C name view.
+do
+  local f=assert(load([=[local t={['a\0b']=false};t['a\0b']()]=],'=operator'))
+  local ok,e=pcall(f);assert(not ok and e==[=[operator:1: attempt to call a boolean value (field 'a')]=],tostring(e))
+end
+
+-- Info_Nul_Field: Lua getinfo and C metadata share the same borrowed field-name prefix.
+do
+  local t={};t['a\0b']=function()local i=debug.getinfo(1,'n');assert(i.namewhat=='field' and i.name=='a')end
+  t['a\0b']();assert(t.a==nil and type(t['a\0b'])=='function')
+end
+
+-- Loader_Nul_Field: Loader argument diagnostics render the same NUL-terminated borrowed call name.
+do
+  local t={['a\0b']=loadfile};local ok,e=pcall(function()t['a\0b']({})end)
+  assert(not ok and e:find("bad argument #1 to 'a' (string expected, got table)",1,true) and not e:find('\0',1,true),tostring(e))
+end
+
+-- Filename_Before_Mode: Loadfile validates a wrong filename before inspecting a wrong mode.
+do
+  local ok,e=pcall(function()loadfile({},{})end)
+  assert(not ok and e:find("bad argument #1 to 'loadfile' (string expected, got table)",1,true),tostring(e))
+end
+
+-- Mode_Before_Open: A wrong optional mode is rejected before opening a missing filename.
+do
+  local ok,e=pcall(function()loadfile('__missing_loader_file__',{})end)
+  assert(not ok and e:find("bad argument #2 to 'loadfile' (string expected, got table)",1,true),tostring(e))
+end
+
+-- Dofile_Nul_Field: Dofile validates its optional filename with the same borrowed C call name.
+do
+  local t={['a\0b']=dofile};local ok,e=pcall(function()t['a\0b']({},{})end)
+  assert(not ok and e:find("bad argument #1 to 'a' (string expected, got table)",1,true) and not e:find('\0',1,true),tostring(e))
+end
+
 print('operation error phases OK')
