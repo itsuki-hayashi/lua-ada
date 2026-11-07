@@ -155,6 +155,7 @@ package body Lua.Lexer_Core is
       procedure Long_String
         (Level : Natural; Text : out Buffer; Keep : Boolean := True)
       is
+         Initial_Line : constant String := Cursor.Line'Image;
       begin
          --  Comments and long strings share delimiter/newline rules. Drop
          --  one initial line break, then preserve all bytes except newline
@@ -168,7 +169,9 @@ package body Lua.Lexer_Core is
          end if;
          loop
             if Cursor.Offset > Input'Last then
-               Fail ("unfinished long string or comment");
+               Fail ("unfinished long " &
+                 (if Keep then "string" else "comment") &
+                 " (starting at line" & Initial_Line & ") near <eof>");
             end if;
             if Peek = ']' then
                declare
@@ -226,6 +229,36 @@ package body Lua.Lexer_Core is
          Value : Natural;
          Count : Natural;
          Code  : Character;
+         Escape_Start : Natural := 0;
+
+         procedure String_Error
+           (Message : String; Include_Current : Boolean := True);
+
+         procedure String_Error
+           (Message : String; Include_Current : Boolean := True)
+         is
+            Diagnostic : Buffer;
+         begin
+            --  Lua reports the partially decoded token, including its opening
+            --  delimiter and the failing escape's current byte. Keep this
+            --  builder with the scanner's owner: malformed input must not
+            --  allocate an unmanaged source-sized diagnostic temporary.
+            Diagnostic.Set_Owner (Lua.Frontend_Text.Owner_Of (Texts));
+            Diagnostic.Append (Message);
+            Diagnostic.Append (" near '");
+            Diagnostic.Append (Quote);
+            Diagnostic.Append (Text);
+            if Escape_Start > 0 then
+               Diagnostic.Append
+                 (Input (Escape_Start .. Natural'Min (Input'Last,
+                   Cursor.Offset - (if Include_Current then 0 else 1))));
+            end if;
+            Diagnostic.Append (''');
+            Result.Status := Syntax_Error;
+            Result.Location := Cursor;
+            Result.Message := Lua.Frontend_Text.Store (Texts, Diagnostic);
+            raise Failed;
+         end String_Error;
       begin
          --  Decode escapes as bytes during scanning. Decimal/hex escapes
          --  are bounded before Character conversion; Unicode escapes use
@@ -233,16 +266,21 @@ package body Lua.Lexer_Core is
          Text.Clear;
          Advance;
          while Peek /= Quote loop
-            if Cursor.Offset > Input'Last or else
-              Peek in Latin.CR | Latin.LF
-            then
-               Fail ("unfinished string");
+            if Cursor.Offset > Input'Last then
+               Fail ("unfinished string near <eof>");
+            elsif Peek in Latin.CR | Latin.LF then
+               Escape_Start := 0;
+               String_Error ("unfinished string");
             end if;
             if Peek /= '\' then
                Append (Text, Peek);
                Advance;
             else
+               Escape_Start := Cursor.Offset;
                Advance;
+               if Cursor.Offset > Input'Last then
+                  Fail ("unfinished string near <eof>");
+               end if;
                Code := Peek;
                case Code is
                   when 'a' => Append (Text, Latin.BEL); Advance;
@@ -266,7 +304,7 @@ package body Lua.Lexer_Core is
                      Value := 0;
                      for Index in 1 .. 2 loop
                         if Hex_Value (Peek) < 0 then
-                           Fail ("hexadecimal digit expected");
+                           String_Error ("hexadecimal digit expected");
                         end if;
                         Value := Value * 16 + Hex_Value (Peek);
                         Advance;
@@ -275,23 +313,26 @@ package body Lua.Lexer_Core is
                   when 'u' =>
                      Advance;
                      if Peek /= '{' then
-                        Fail ("missing '{' in Unicode escape");
+                        String_Error ("missing '{'");
                      end if;
                      Advance;
                      Value := 0;
                      Count := 0;
+                     if Hex_Value (Peek) < 0 then
+                        String_Error ("hexadecimal digit expected");
+                     end if;
                      while Hex_Value (Peek) >= 0 loop
                         if Value > (16#7FFF_FFFF# -
                           Hex_Value (Peek)) / 16
                         then
-                           Fail ("Unicode escape is too large");
+                           String_Error ("UTF-8 value too large");
                         end if;
                         Value := Value * 16 + Hex_Value (Peek);
                         Count := Count + 1;
                         Advance;
                      end loop;
                      if Count = 0 or else Peek /= '}' then
-                        Fail ("invalid Unicode escape");
+                        String_Error ("missing '}'");
                      end if;
                      Advance;
                      Append_UTF8 (Text, Value);
@@ -305,10 +346,10 @@ package body Lua.Lexer_Core is
                         Advance;
                      end loop;
                      if Value > 255 then
-                        Fail ("decimal escape is too large");
+                        String_Error ("decimal escape too large");
                      end if;
                      Append (Text, Character'Val (Value));
-                  when others => Fail ("invalid escape sequence");
+                  when others => String_Error ("invalid escape sequence");
                end case;
             end if;
          end loop;
