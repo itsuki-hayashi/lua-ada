@@ -91,6 +91,7 @@ package body Lua.Engine.Call_Names is
 
       function Setter (Register_Id, Before : Natural) return Natural is
          Found : Natural := 0;
+         Limit : Natural := Before;
          Conditional_Until : Long_Long_Integer := 0;
          Item : Word;
          Operation_Id : Opcode;
@@ -98,10 +99,22 @@ package body Lua.Engine.Call_Names is
          Base : Natural;
          Changes : Boolean;
       begin
+         if Before > 0 and then Before < Model.Code.Last_Index and then
+           Valid (Model.Code (Before + 1)) and then
+           Lua.Opcodes.Operation (Model.Code (Before + 1)) in
+             Op_MMBIN | Op_MMBINI | Op_MMBINK
+         then
+            --  A reached metamethod companion means its preceding arithmetic
+            --  operation did not write the result. In-place lowering can use
+            --  that same register as an operand, so treating the failed word
+            --  as a setter would erase its actual field/upvalue provenance.
+            --  This is ldebug.c:findsetreg's testMMMode(lastpc) adjustment.
+            Limit := Before - 1;
+         end if;
          --  Forward edges can make an apparent last setter conditional. Keep
          --  that uncertainty rather than attributing a name from one branch.
          --  This follows pinned ldebug's reaching-write rule over real words.
-         for Index in 0 .. Integer (Before) - 1 loop
+         for Index in 0 .. Integer (Limit) - 1 loop
             Charge;
             Item := Model.Code (Index + 1);
             if not Valid (Item) then return 0; end if;
@@ -115,7 +128,7 @@ package body Lua.Engine.Call_Names is
                when Op_JMP =>
                   Destination := Long_Long_Integer (Index) + 1 +
                     Long_Long_Integer (Get (Item, SJ).Value);
-                  if Destination <= Long_Long_Integer (Before) then
+                  if Destination <= Long_Long_Integer (Limit) then
                      Conditional_Until := Long_Long_Integer'Max
                        (Conditional_Until, Destination);
                   end if;

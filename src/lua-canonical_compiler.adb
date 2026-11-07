@@ -723,6 +723,20 @@ package body Lua.Canonical_Compiler is
                end if;
                Reserve (Fn, Destination + Natural (Integer'Max (1, Wanted)));
                Mark := Fn.Next;
+               if Item.Kind in Unary_Expression | Binary_Expression and then
+                 Destination >= Fn.Base and then Fn.Next =
+                   Destination + Natural (Integer'Max (1, Wanted))
+               then
+                  --  Reserving the eventual result establishes capacity,
+                  --  not a live value before the operands execute. Reuse its
+                  --  still-empty top span for computed operands, as
+                  --  luaK_exp2nextreg/exp2anyreg do. Otherwise a callback on
+                  --  the RHS sees an artificial nil hole before the real
+                  --  pending left operand, and setlocal edits the wrong
+                  --  register. Never reclaim active bindings or another
+                  --  already-live temporary above the requested result span.
+                  Fn.Next := Destination;
+               end if;
                case Item.Kind is
                   when Literal =>
                      case Item.Value.Kind is

@@ -44,6 +44,39 @@ package body Lua.Engine.Inspection is
         (if Truncated then "..." else "") & """]";
    end Short_Source;
 
+   function Visible_Local_Top
+     (Context : not null Context_Access; Item : not null Frame_Access)
+      return Natural
+   is
+      Window : Frame_Access := Context.Stack_Window;
+      Child : Frame_Access;
+      Limit : constant Natural :=
+        (if not Item.Is_Native then Item.Canonical_GC_Top
+         elsif Item.Has_Stack_Window then
+            Item.Stack_Live_Top - Item.Stack_Base
+         else Natural (Item.Native_Arguments.Length));
+   begin
+      --  ldebug.c:luaG_findlocal distinguishes a frame's live top from the
+      --  next function's slot. Our collector must root that slot, but debug
+      --  temporaries cannot expose the child's callee/arguments as the
+      --  parent's locals. Follow the real window links, not opcode guesses
+      --  or a fabricated stack layout. A C hook borrows its interrupted
+      --  frame, so its immutable transport marker contributes no boundary.
+      while Window /= null and then Window /= Item loop
+         if not Window.Is_C_Hook_Transport then
+            Child := Window;
+         end if;
+         Window := Window.Previous_Stack_Window;
+      end loop;
+      if Window = Item and then Child /= null then
+         return (if Child.Call_Base > Item.Stack_Base then
+                   Natural'Min
+                     (Limit, Child.Call_Base - Item.Stack_Base - 1)
+                 else 0);
+      end if;
+      return Limit;
+   end Visible_Local_Top;
+
    function Inspect
      (State : in out World; Activation : Frame_Access;
       Target_Frame : Frame_Access := null) return Values.Vector
@@ -698,7 +731,7 @@ package body Lua.Engine.Inspection is
                end if;
                if Selected.Code.Canonical_Node /= null then
                   if Index > 0 and then Index <= Integer_Value
-                    (Selected.Canonical_GC_Top)
+                    (Visible_Local_Top (Context, Selected))
                   then
                      declare
                         Local : Value := Canonical.Local_Name
@@ -747,9 +780,7 @@ package body Lua.Engine.Inspection is
                end if;
             elsif Index > 0 and then
               Index <= Integer_Value
-                ((if Selected.Has_Stack_Window then
-                     Selected.Stack_Live_Top - Selected.Stack_Base else
-                     Natural (Selected.Native_Arguments.Length)))
+                (Visible_Local_Top (Context, Selected))
             then
                Append (New_String (State, "(C temporary)"));
                if Name = "debug.setlocal" then
