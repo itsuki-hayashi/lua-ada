@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [combined public-boundary check](sessions/2026-11-08-public-boundary-integration.md)
+passes 2,094 AUnit cases in each local configuration after fixing a checked
+I/O argument-borrow interaction. All twenty-six ordinary standalone C
+consumers pass in both configurations; the separate private T buffer caller
+also passes. The native-module campaign was not rerun in this check. This
+combined evidence remains distinct from full-target acceptance.
+
 The [scalar NOT checkpoint](sessions/2026-11-08-scalar-not-refusal.md) removes
 an allocation from logical negation under provider refusal. Six named cases
 pass both local configurations and all four native/Ada producer/VM combinations

@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [combined public-boundary replay](sessions/2026-11-08-public-boundary-integration.md)
+passes 2,094 AUnit cases per local configuration after preserving the checked
+argument-borrow lifetime. Continue original string/self diagnostics, the
+plain-find refusal result path, borrowed Lua CI/hooks, traceback registry
+callbacks and the remaining source/helper/aggregate/final-platform campaigns.
+
 The [scalar NOT correction](sessions/2026-11-08-scalar-not-refusal.md) has six
 native-paired refusal cases and clean strict builds. Correct the six integrated
 I/O borrowed-operand diagnostic failures without weakening the borrow check,

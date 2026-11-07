@@ -643,15 +643,18 @@ package body Lua.Engine.IO_Libraries is
       begin
          for Index in First .. Activation.Native_Arguments.Last_Index loop
             Work (State);
-            if Activation.Native_Arguments (Index).Kind not in
-              String_Kind | Integer_Kind | Real_Kind
-            then
-               Diagnostics.Type_Error
-                 (State, Index, "string",
-                  Activation.Native_Arguments (Index));
-            end if;
-            Strings.Query_Argument
-              (State, Activation.Native_Arguments (Index), Write'Access);
+            declare
+               --  The diagnostic can retire this failed builtin's packet
+               --  after transferring its actual scalar window to the C
+               --  owner. End the vector element borrow before entering it;
+               --  the real frame/window still roots this scalar value.
+               Item : constant Value := Arg (Index);
+            begin
+               if Item.Kind not in String_Kind | Integer_Kind | Real_Kind then
+                  Diagnostics.Type_Error (State, Index, "string", Item);
+               end if;
+               Strings.Query_Argument (State, Item, Write'Access);
+            end;
             if Failed then
                Result.Results := Failure (Error);
                Result.Results.Append ((Integer_Kind, Signed_Total (Total)));
