@@ -5,16 +5,16 @@
   "author": "Codex /root/expanded_source_audit",
   "independent_approval": {
     "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-    "sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429"
+    "sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234"
   },
   "proposal": {
     "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-author-proposal.json",
-    "sha256": "dc5c06b1f7b6e52429c8c72547bcdcc1990ffb30ab504c2f1b896e0d5317a35c"
+    "sha256": "730a2a50224ff898350eaf1172f36968d2e81cfdf50b1bf78ab509413a1688f3"
   },
   "ledger": {
     "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
     "before_sha256": "c85827e4f7446f7a31b368b9131d9688e66d481ee13d0f84c83cce88b98d1258",
-    "after_sha256": "3d5119a070f3d40e2787fc1574edab255712b8ca42dd48addeda717f5e2b751f"
+    "after_sha256": "5c3b40faa112c9926c32fd628f430026acd076ec0b96f0236548fa59c2eb86cf"
   },
   "api_entries": 159,
   "pending_entries": 159,
@@ -46,5 +46,22 @@
       "lua_gc#selected_lua_runtime_obligations"
     ],
     "reason": "Five separately named Ada-only lifetime regressions supplement the existing public GC C witnesses; require unchanged closure block0001. All159 invariants/boundaries/header anchors and100Ccase relations remain unchanged; statuses/evidence remain pending/empty."
+  },
+  "scalar_stack_root_delta": {
+    "previous": {
+      "proposal_sha256": "dc5c06b1f7b6e52429c8c72547bcdcc1990ffb30ab504c2f1b896e0d5317a35c",
+      "approval_sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429",
+      "ledger_sha256": "3d5119a070f3d40e2787fc1574edab255712b8ca42dd48addeda717f5e2b751f"
+    },
+    "current": {
+      "proposal_sha256": "730a2a50224ff898350eaf1172f36968d2e81cfdf50b1bf78ab509413a1688f3",
+      "approval_sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234",
+      "ledger_sha256": "5c3b40faa112c9926c32fd628f430026acd076ec0b96f0236548fa59c2eb86cf"
+    },
+    "changed_semantic_fields": [
+      "LUA_GCCOLLECT#named_aunit_cases",
+      "lua_gc#named_aunit_cases"
+    ],
+    "reason": "Five separately named Ada-only incremental collector root/lifetime regressions supplement the existing public GC C witnesses; the Lua step fixture additionally supports the already required unchanged closure block0001. All159 invariants/boundaries/header anchors and100Ccase relations remain unchanged; statuses/evidence remain pending/empty."
   }
 }

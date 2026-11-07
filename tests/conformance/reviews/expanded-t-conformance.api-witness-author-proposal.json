@@ -95,6 +95,18 @@
       "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
     },
     {
+      "path": "tests/src/lua-collector_stack_tests.adb",
+      "sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.ads",
+      "sha256": "49449173d1f133c1cdd3b86220afa307663d16cfb54766b36b7ab75e8e3b767d"
+    },
+    {
+      "path": "tests/lua/collector_scalar_weak_progress.lua",
+      "sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90"
+    },
+    {
       "path": "c_api/tests/c_api_consumer.c",
       "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
     },
@@ -144,7 +156,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "93a2d0d3f9ab57df8bc30419303ec38e7521c986941e23ddc3d6e0c8d65976e3"
+      "sha256": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -9668,6 +9680,41 @@
           "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
           "registered_label": "condition roots: short circuit result",
           "relationship": "Supporting Ada-only full-collection root/lifetime regression; the existing named public C calls remain the export evidence. Expression and/or tests retain their actual table-valued result through explicit collection; statement guard retirement cannot erase an operand still required as a result."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Main_Transient_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: transient main scalar",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. A transient uncaptured main-stack scalar publication during real incremental propagation does not rescue a weak value after its slot is cleared before atomic."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Main_Retained_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: retained main scalar",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. The actual main-stack scalar that remains live during propagation is discovered at atomic and preserves the weak target."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Suspended_Transient_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: transient suspended scalar",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. A previously scanned reachable suspended thread awaits its real gray-again revisit; a scalar consumed before atomic does not rescue its weak target."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Suspended_Retained_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: retained suspended scalar",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. Atomic gray-again revisitation of a previously scanned reachable suspended thread preserves a scalar published there after the earlier scan."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Lua_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: incremental Lua weak lookup",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. The actual Lua program interleaves consumed weak reads with two thousand small real collector slices over a retained graph, preserving the graph while releasing the consumed target."
         }
       ],
       "selected_lua_runtime_obligations": [
@@ -11275,6 +11322,41 @@
           "source_sha256": "721cdfdc04dc1baf75aabbfb26516f9c72b984899f4a3d3413e7f893a9deacae",
           "registered_label": "condition roots: short circuit result",
           "relationship": "Supporting Ada-only full-collection root/lifetime regression; the existing named public C calls remain the export evidence. Expression and/or tests retain their actual table-valued result through explicit collection; statement guard retirement cannot erase an operand still required as a result."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Main_Transient_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: transient main scalar",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. A transient uncaptured main-stack scalar publication during real incremental propagation does not rescue a weak value after its slot is cleared before atomic."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Main_Retained_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: retained main scalar",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. The actual main-stack scalar that remains live during propagation is discovered at atomic and preserves the weak target."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Suspended_Transient_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: transient suspended scalar",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. A previously scanned reachable suspended thread awaits its real gray-again revisit; a scalar consumed before atomic does not rescue its weak target."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Suspended_Retained_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: retained suspended scalar",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. Atomic gray-again revisitation of a previously scanned reachable suspended thread preserves a scalar published there after the earlier scan."
+        },
+        {
+          "source": "tests/src/lua-collector_stack_tests.adb",
+          "id": "Lua_Case",
+          "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+          "registered_label": "collector stack: incremental Lua weak lookup",
+          "relationship": "Supporting Ada-only incremental collector root/lifetime regression; the existing named public C calls remain the export evidence. The actual Lua program interleaves consumed weak reads with two thousand small real collector slices over a retained graph, preserving the graph while releasing the consumed target."
         }
       ],
       "selected_lua_runtime_obligations": [

@@ -108,11 +108,11 @@
     },
     {
       "path": "tests/conformance/scopes/expanded-t-conformance.json",
-      "sha256": "7eb7c36afa22c965fe58938d69ee98839f24f8826adf92725145696beacf701d"
+      "sha256": "c9d4b05b943d6864b8bee90e51c6536313f91ec9a434b368c5c7d9d4309c1210"
     },
     {
       "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
-      "sha256": "3d5119a070f3d40e2787fc1574edab255712b8ca42dd48addeda717f5e2b751f"
+      "sha256": "5c3b40faa112c9926c32fd628f430026acd076ec0b96f0236548fa59c2eb86cf"
     },
     {
       "path": "tests/conformance/scopes/expanded-t-conformance.contracts.json",
@@ -120,7 +120,7 @@
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-author-proposal.json",
-      "sha256": "d9064fe1b4dc5b5ac9dbc72fe494ff8f5a24d8b072a5c79a445ee5c409ad5c7c"
+      "sha256": "8c7b762d69202c581f297c978ddacafe5a6e72382eef474657f78d33faa9d7a9"
     },
     {
       "path": "scripts/ExpandedMatrixBundle.psm1",
@@ -136,15 +136,15 @@
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-author-proposal.json",
-      "sha256": "dc5c06b1f7b6e52429c8c72547bcdcc1990ffb30ab504c2f1b896e0d5317a35c"
+      "sha256": "730a2a50224ff898350eaf1172f36968d2e81cfdf50b1bf78ab509413a1688f3"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-      "sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429"
+      "sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json",
-      "sha256": "a03a6018d809d03f52247ebb889e300d46bc3f1105a5952a37d3b516159eb402"
+      "sha256": "7282928161c9aff1a5fcec553e4a26022a5c3714f365d574b8c74ceef1da60bc"
     },
     {
       "path": "scripts/ScopedWarnings.psm1",
@@ -172,7 +172,7 @@
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-mapping-installation.json",
-      "sha256": "76ac8f16edd3d999af3356b5fdd95ecdd2fe5eaac3b66004b58fae04adf4ded3"
+      "sha256": "2a48276be643b773b99aa2c8376a51077583cc22fc0b59fa96b9c3994e096874"
     },
     {
       "path": "src/lua-canonical_compiler.adb",
@@ -188,7 +188,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "93a2d0d3f9ab57df8bc30419303ec38e7521c986941e23ddc3d6e0c8d65976e3"
+      "sha256": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8"
     },
     {
       "path": "tests/conformance/reviews/expanded-condition-roots.cross-review.json",
@@ -196,19 +196,19 @@
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-author-proposal.json",
-      "sha256": "b320cc94b82c29fb83350a7d014d6b9de42e4aff9a86e0ee23425979376eed21"
+      "sha256": "f89fd3127e44266863dbf44e6e01863c2f590536a906325936a6f0bc1435813e"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness.cross-review.json",
-      "sha256": "e5f9d01167687f5580c23c4ef7f9df363140ad9da0b1c20a1be2eb902dbe269a"
+      "sha256": "6224fa2d19c8f957be9c960093a8b584d997dab69bf7179659f560b044f30f7d"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness-author-proposal.json",
-      "sha256": "2661d5b532fe92f09813cd1d532b2fafc8a45e867c607a02a0213ad92631b15c"
+      "sha256": "21005e003734cd3419a84b8e61f87ff8458b22eab85f439744181e8c6f159de6"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.aunit-witness.cross-review.json",
-      "sha256": "d1b464513518a05110fd793ee05c438541291b5e006eeb287310058518fb646e"
+      "sha256": "611de9ec3cfd798f10b650a2372ab0a279649de3a04383a1e69066ddbd9a8d9b"
     },
     {
       "path": "tests/lua/condition_if_root.lua",
@@ -229,15 +229,39 @@
     {
       "path": "tests/lua/condition_while_root.lua",
       "sha256": "866ec750a5e92efbb633be475abc47118269f1f270a3b19ac2a7ce569d151ef9"
+    },
+    {
+      "path": "src/lua-engine-stacks.adb",
+      "sha256": "5756806521ec2fc798d126e728fc44829b2ce9e51ebf634492d61a91b8ec5dd8"
+    },
+    {
+      "path": "src/lua-engine-stacks.ads",
+      "sha256": "939309a0ebddfc02228787fb432049ce23ee15eee53d4feefaa11a620b8a44a3"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.adb",
+      "sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.ads",
+      "sha256": "49449173d1f133c1cdd3b86220afa307663d16cfb54766b36b7ab75e8e3b767d"
+    },
+    {
+      "path": "tests/lua/collector_scalar_weak_progress.lua",
+      "sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-scalar-stack-roots.cross-review.json",
+      "sha256": "89b58933919c783541ae193df18953e58d7c789cf6350bd87c22af60b4a0e0fe"
     }
   ],
   "input_manifest": {
-    "sha256": "6fa368b25739796462d1521dfbbd498dcca04bec4b58f5b2d11b3973ad4846ab",
+    "sha256": "dfbeb1a47d4643d35d0373207da98f01c49e0b520a7dfdbd9b5422811b3aac8e",
     "path": "reports/expanded-harness-review-inputs.json"
   },
   "scope_selection": {
     "result": "Installed selection metadata validates 13 actual primary files, 2493 source anchors, one helper and 159 APIs; 142 source and 159 API obligations remain pending.",
-    "sha256": "a03a6018d809d03f52247ebb889e300d46bc3f1105a5952a37d3b516159eb402",
+    "sha256": "7282928161c9aff1a5fcec553e4a26022a5c3714f365d574b8c74ceef1da60bc",
     "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json"
   },
   "resolved_findings": [
@@ -290,7 +314,7 @@
     "expanded_harness_regressions": 58,
     "native_mapping_regressions": 18,
     "notes": "Synthetic protocol regressions plus current source/hash checks. Fourteen existing final-runtime Windows captures independently pass the new shared verifier as diagnostic corroboration. No foreign-platform or final runtime/context acceptance is inferred.",
-    "source_input_hashes": 55,
+    "source_input_hashes": 61,
     "review_binding_regressions": 46,
     "git_diff_check": "passed",
     "bundle_collector_regressions": 10,
@@ -310,7 +334,8 @@
     "reports/expanded-t-conformance/independent-bundle-collector-2.log",
     "reports/expanded-t-conformance/independent-warning-evidence-review-2.log",
     "reports/expanded-t-conformance/independent-review-bindings-3.log",
-    "reports/expanded-t-conformance/independent-condition-witness-mapping-verification.log"
+    "reports/expanded-t-conformance/independent-condition-witness-mapping-verification.log",
+    "reports/expanded-t-conformance/independent-scalar-witness-mapping-verification.log"
   ],
   "findings": [],
   "remaining_gates": [
@@ -319,7 +344,7 @@
     "Full M3, unselected primary files, aggregate/heavy and unrelated global ABI/ecosystem claims remain outside this bounded decision."
   ],
   "newline_identity": "Reviewed as exact UTF-8 without BOM and LF repository bytes. Captured stdout/stderr retain original native bytes and hashes.",
-  "supersedes_sha256": "f3dbf7240c00b66f561d78cd5b264da07eef275aceb2f11d22b07135dcebf11c",
+  "supersedes_sha256": "c53509c090c71cfd42b80a0880d137d6c243837cbfa00db78a00f2f3b0a838ba",
   "condition_root_delta": {
     "scoped_api_entries": 159,
     "independent_production_review": {
@@ -329,14 +354,33 @@
     },
     "runtime_acceptance": false,
     "source_identity_verification": "All55 current file hashes, installed13-file/2493-anchor/159-API scope selection and exactLF metadata validated.142source and159API runtime obligations remain pending.",
-    "named_aunit_cases": 89,
+    "named_aunit_cases": 94,
     "decision": "accepted-harness-and-witness-identity-refresh-only",
     "rationale": "The actual Mac closure timeout exposed a consumed statement-condition root. The condition compiler and five focused cases are bound for identity only and approved by their separate independent production reviewer. This harness/mapping certificate does not self-review that production implementation. The five new Ada Session lifetime supports remain distinct from real public C export witnesses; all prior API claims and scope identities are retained.",
     "api_mapping_approval": {
-      "sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429",
+      "sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234",
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json"
     },
     "harness_implementation_unchanged": true,
     "named_c_cases": 100
+  },
+  "scalar_stack_delta": {
+    "source_identity_verification": "All61 current source hashes,installed13-file/2493-anchor/159-API scope and exactLF metadata validate.142source/159API runtime obligations and fresh complete platform correction remain pending.",
+    "rationale": "Five additional separately registered Ada-only supports exercise actual incremental main/suspended root publication and weak progress. They supplement mandatory public C evidence; all existing API invariants,boundaries,C cases and original-source obligations are unchanged. Stack production sources are identity-bound only and independently reviewed by Codex /root/conformance_scope. This mechanism/mapping certificate does not self-review their implementation or promote runtime obligations.",
+    "named_c_cases": 100,
+    "independent_production_review": {
+      "reviewer": "Codex /root/conformance_scope",
+      "path": "tests/conformance/reviews/expanded-scalar-stack-roots.cross-review.json",
+      "sha256": "89b58933919c783541ae193df18953e58d7c789cf6350bd87c22af60b4a0e0fe"
+    },
+    "harness_implementation_unchanged": true,
+    "decision": "accepted-harness-and-witness-identity-refresh-only",
+    "named_aunit_cases": 94,
+    "runtime_acceptance": false,
+    "scoped_api_entries": 159,
+    "api_mapping_approval": {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
+      "sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234"
+    }
   }
 }

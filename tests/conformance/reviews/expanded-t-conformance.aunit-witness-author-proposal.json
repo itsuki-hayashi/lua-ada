@@ -97,6 +97,18 @@
       "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
     },
     {
+      "path": "tests/src/lua-collector_stack_tests.adb",
+      "sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.ads",
+      "sha256": "49449173d1f133c1cdd3b86220afa307663d16cfb54766b36b7ab75e8e3b767d"
+    },
+    {
+      "path": "tests/lua/collector_scalar_weak_progress.lua",
+      "sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90"
+    },
+    {
       "path": "c_api/tests/c_api_consumer.c",
       "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
     },
@@ -146,7 +158,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "93a2d0d3f9ab57df8bc30419303ec38e7521c986941e23ddc3d6e0c8d65976e3"
+      "sha256": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -1835,6 +1847,98 @@
       "historical_label_observations": [],
       "runtime_acceptance": false,
       "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Main_Transient_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: transient main scalar",
+      "required_stdout_line": "OK collector stack: transient main scalar",
+      "registration_procedure": "Main_Transient_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Main_Transient",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A transient uncaptured main-stack scalar publication during real incremental propagation does not rescue a weak value after its slot is cleared before atomic.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Main_Retained_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: retained main scalar",
+      "required_stdout_line": "OK collector stack: retained main scalar",
+      "registration_procedure": "Main_Retained_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Main_Retained",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "The actual main-stack scalar that remains live during propagation is discovered at atomic and preserves the weak target.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Suspended_Transient_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: transient suspended scalar",
+      "required_stdout_line": "OK collector stack: transient suspended scalar",
+      "registration_procedure": "Suspended_Transient_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Suspended_Transient",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "A previously scanned reachable suspended thread awaits its real gray-again revisit; a scalar consumed before atomic does not rescue its weak target.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Suspended_Retained_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: retained suspended scalar",
+      "required_stdout_line": "OK collector stack: retained suspended scalar",
+      "registration_procedure": "Suspended_Retained_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Suspended_Retained",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "Atomic gray-again revisitation of a previously scanned reachable suspended thread preserves a scalar published there after the earlier scan.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": []
+    },
+    {
+      "case": "tests/src/lua-collector_stack_tests.adb#Lua_Case",
+      "source_sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859",
+      "registered_label": "collector stack: incremental Lua weak lookup",
+      "required_stdout_line": "OK collector stack: incremental Lua weak lookup",
+      "registration_procedure": "Lua_Case",
+      "generic_fixture": "Fixture",
+      "fixture_behavior": "Incremental_Lua",
+      "parameter_slots": [],
+      "equivalent_replacements": [],
+      "semantic_basis": "The actual Lua program interleaves consumed weak reads with two thousand small real collector slices over a retained graph, preserving the graph while releasing the consumed target.",
+      "relationship": "Supporting Ada-only collector/root regression, not direct invocation of a public C export or an upstream assertion replacement. The fixture checks actual owned heap serials and balanced physical release.",
+      "selected_lua_runtime_obligations": [
+        "LUA-CLOSURE-REVIEWED-BLOCK-0001"
+      ],
+      "historical_label_observations": [],
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "native_lua_counterpart": {
+        "source": "tests/lua/collector_scalar_weak_progress.lua",
+        "source_sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90",
+        "relationship": "Separately executed first-party public Lua regression; actual native process observations require their own evidence."
+      }
     }
   ],
   "required_contexts": [

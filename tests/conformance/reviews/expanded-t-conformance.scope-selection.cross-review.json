@@ -7,7 +7,7 @@
   "reviewer": "Codex /root/draft_assessment",
   "decision": "accepted",
   "proposal": {
-    "sha256": "d9064fe1b4dc5b5ac9dbc72fe494ff8f5a24d8b072a5c79a445ee5c409ad5c7c",
+    "sha256": "8c7b762d69202c581f297c978ddacafe5a6e72382eef474657f78d33faa9d7a9",
     "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-author-proposal.json"
   },
   "approved_identity": {
@@ -246,7 +246,7 @@
     },
     "api_semantic_review": {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-      "sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429"
+      "sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234"
     }
   },
   "scope_of_decision": "Source selection and semantic obligation boundary only. This approval does not pass any runtime obligation, API, execution contract or final matrix.",
@@ -286,5 +286,6 @@
   "runtime_acceptance": false,
   "findings": [],
   "newline_identity": "Reviewed as UTF-8 without BOM and LF; these exact bytes are required in the repository and review hash.",
-  "condition_root_mapping_delta": "Selection remains exactly13primary sources,one helper and159API anchors. The updated immutable API semantic review binds five separately registered Ada-only condition-lifetime supports and unchanged closure block0001, without broadening existing public C claims or promoting runtime obligations."
+  "condition_root_mapping_delta": "Selection remains exactly13primary sources,one helper and159API anchors. The updated immutable API semantic review binds five separately registered Ada-only condition-lifetime supports and unchanged closure block0001, without broadening existing public C claims or promoting runtime obligations.",
+  "scalar_stack_mapping_delta": "Selection remains exactly13primary sources,one helper and159API anchors. Updated immutable API semantic review adds five Ada-only incremental scalar-root phase/progress supports, preserving all existing public C claims and original-source obligations. No runtime status or platform-context promotion."
 }

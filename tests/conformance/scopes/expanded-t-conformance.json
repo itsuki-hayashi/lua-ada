@@ -234,7 +234,7 @@
     "author": "Codex /root/conformance_scope",
     "reviewer": "Codex /root/draft_assessment",
     "artifact": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json",
-    "artifact_sha256": "a03a6018d809d03f52247ebb889e300d46bc3f1105a5952a37d3b516159eb402",
+    "artifact_sha256": "7282928161c9aff1a5fcec553e4a26022a5c3714f365d574b8c74ceef1da60bc",
     "rationale": "Independent source and obligation selection review only. All actual runtime obligations, API execution evidence, contracts and final matrix reconciliation remain pending."
   },
   "api_coverage_file": "scopes/expanded-t-conformance.api.jsonl",
@@ -244,6 +244,6 @@
   },
   "api_semantic_review": {
     "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-    "sha256": "c650506504d14b73121e992c1a843870565ff812cc40bbd22bae001cfc4eb429"
+    "sha256": "88a8269d9713dbbbec8cef2a66a77d7306925622ac0b5cd58468304d1d071234"
   }
 }

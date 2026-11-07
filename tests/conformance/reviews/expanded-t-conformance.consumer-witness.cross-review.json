@@ -7,7 +7,7 @@
   "reviewer": "Codex /root/draft_assessment",
   "decision": "accepted-semantic-witness-mapping",
   "proposal": {
-    "sha256": "b320cc94b82c29fb83350a7d014d6b9de42e4aff9a86e0ee23425979376eed21",
+    "sha256": "f89fd3127e44266863dbf44e6e01863c2f590536a906325936a6f0bc1435813e",
     "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-author-proposal.json"
   },
   "source_bindings": [
@@ -100,6 +100,18 @@
       "sha256": "533c51baffef9dc13584b010c1da8de91e91031c50cf2210104c3eaf1caade37"
     },
     {
+      "path": "tests/src/lua-collector_stack_tests.adb",
+      "sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.ads",
+      "sha256": "49449173d1f133c1cdd3b86220afa307663d16cfb54766b36b7ab75e8e3b767d"
+    },
+    {
+      "path": "tests/lua/collector_scalar_weak_progress.lua",
+      "sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90"
+    },
+    {
       "path": "c_api/tests/c_api_consumer.c",
       "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
     },
@@ -149,7 +161,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "93a2d0d3f9ab57df8bc30419303ec38e7521c986941e23ddc3d6e0c8d65976e3"
+      "sha256": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -167,7 +179,7 @@
   ],
   "verified_counts": {
     "retained_c_cases": 52,
-    "named_aunit_cases": 89,
+    "named_aunit_cases": 94,
     "foreign_c_cases": 48,
     "api_entries": 159,
     "named_c_cases": 100
@@ -182,10 +194,10 @@
     "All author proposal runtime statuses and evidence remain pending; final clean revision, all26 contexts and independent matrix review are separate gates."
   ],
   "verification": {
-    "script_sha256": "89a503f976939e6cc2b1eec97a13344ed792fd50808afc5dbad2d568b5ef599a",
-    "log": "reports/expanded-t-conformance/independent-condition-witness-mapping-verification.log",
-    "result": "159 original header anchors,100 C links,89 exact fresh AUnit labels,current source hashes and48 separately native C contracts in both configurations verified. Existing API invariants,boundaries,anchors and C witnesses are unchanged.",
-    "log_sha256": "fd22f0b6b265bb773d7a94473a3316613ba2fdc100cd411234ff8feead88cb77",
+    "script_sha256": "c576c5bd37b025fa902e0d5656c47115d1088724b205eb5967501b98929ccedd",
+    "log": "reports/expanded-t-conformance/independent-scalar-witness-mapping-verification.log",
+    "result": "159 original header anchors,100 C links,94 exact fresh AUnit labels,current source hashes and48 separately native C contracts in both configurations verified. Existing API invariants,boundaries,anchors,C witnesses and source obligations are unchanged.",
+    "log_sha256": "bf2d5442739acc11fbe805a2f204b846ebff8147ff1ac3457b3a6c5d24e33021",
     "script": "reports/expanded-t-conformance/verify-independent-witness-mappings.ps1"
   },
   "condition_root_delta": {
@@ -205,5 +217,22 @@
     "all_existing_c_cases_unchanged": true,
     "runtime_acceptance": false,
     "all_existing_api_claims_unchanged": true
+  },
+  "scalar_stack_delta": {
+    "rationale": "Five separately registered Ada-only supports cover real main/suspended incremental phase transitions for transient versus retained uncaptured scalar roots and native-matched Lua weak progress across many small slices. These are incremental collector lifetime supports, not full-collection command or C export invocations. Existing real public C witnesses remain mandatory. Stack implementation and publication safety have a separate independent production review, outside this mapping decision.",
+    "decision": "accepted-source-mapping-delta-only",
+    "new_aunit_cases": 5,
+    "all_existing_api_claims_unchanged": true,
+    "independent_production_review": {
+      "sha256": "89b58933919c783541ae193df18953e58d7c789cf6350bd87c22af60b4a0e0fe",
+      "reviewer": "Codex /root/conformance_scope",
+      "path": "tests/conformance/reviews/expanded-scalar-stack-roots.cross-review.json"
+    },
+    "changed_api_fields": [
+      "lua_gc/named_aunit_cases",
+      "LUA_GCCOLLECT/named_aunit_cases"
+    ],
+    "all_existing_c_cases_unchanged": true,
+    "runtime_acceptance": false
   }
 }
