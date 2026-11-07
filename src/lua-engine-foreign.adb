@@ -27,6 +27,8 @@ package body Lua.Engine.Foreign is
    package C renames Interfaces.C;
    package Memory renames Lua.Storage;
    package VM renames Lua.Engine.Machine;
+   function Auxiliary_Buffer_Size return C.size_t is
+     (C.size_t (Lua.Runtime_Configuration.Auxiliary_Buffer_Bytes));
    type Formatting_Data is record
       Owner : Memory.Owner_Access;
       Bytes : Owned_Buffer;

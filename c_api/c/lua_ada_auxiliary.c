@@ -39,7 +39,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "lua.h"
+#include "lua_ada_runtime_configuration.h"
 #include "lauxlib.h"
 
 /* Waiting statuses are interpreted only where the platform defines the

@@ -4,6 +4,12 @@ with Lua.Storage;
 with System;
 
 package Lua.Engine.Foreign is
+   function Auxiliary_Buffer_Size return Interfaces.C.size_t
+     with Export, Convention => C,
+          External_Name => "lua_ada_auxiliary_buffer_size";
+   --  Borrow the selected configuration's initial scratch capacity without
+   --  a state access or allocation. C buffer callers can use the ordinary
+   --  SDK layout or the pinned tiny T layout at their common public prefix.
    use type Interfaces.C.int;
    --  C entrypoints belong to the small C-owned boundary in c_api/. This
    --  package performs state operations and returns a typed result before

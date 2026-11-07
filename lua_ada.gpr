@@ -28,6 +28,12 @@ library project Lua_Ada is
       when others => null;
    end case;
    C_ABI_Defines := ();
+   C_Runtime_Defines := ();
+   case Runtime_Configuration.Configuration is
+      when "default" => null;
+      when "upstream-test" =>
+         C_Runtime_Defines := ("-DLUA_ADA_AUXILIARY_BUFFER_BYTES=23");
+   end case;
    C_Platform_Defines := ();
    Module_Link_Options := ();
    C_Unwind_Options := ();
@@ -199,7 +205,8 @@ library project Lua_Ada is
         ("-std=c99", "-Wall", "-Wextra", "-Werror", "-pedantic",
          "-I" & Project'Project_Dir & "c_api/include",
          "-I" & Project'Project_Dir & "c_api/include/api") &
-        C_Platform_Defines & C_ABI_Defines & C_Unwind_Options;
+        C_Platform_Defines & C_ABI_Defines & C_Runtime_Defines &
+        C_Unwind_Options;
    end Compiler;
 
    package Binder is

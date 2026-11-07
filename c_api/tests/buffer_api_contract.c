@@ -192,6 +192,7 @@ static int repeat_callback(lua_State *L) {
 static void empty_result(lua_State *L) {
     luaL_Buffer B;
     luaL_buffinit(L, &B);
+    if (B.b == B.init.b) assert(B.size <= sizeof B.init.b);
     assert(lua_gettop(L) == 1);
     assert(luaL_bufflen(&B) == 0);
     luaL_pushresult(&B);

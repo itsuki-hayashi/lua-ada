@@ -4,7 +4,7 @@
 /* First-party ABI glue. Interpreter state and all value operations remain
  * Ada-owned. Keep these operation IDs synchronized with Engine.Foreign and
  * validate this ordinary C layout during standalone-library elaboration. */
-#include "lua.h"
+#include "lua_ada_runtime_configuration.h"
 
 enum lua_ada_operation {
     ADA_CREATE_STATE, ADA_CREATE_DEFAULT_STATE, ADA_CLOSE_STATE,
@@ -153,6 +153,7 @@ size_t lua_ada_surface_size(void);
 size_t lua_ada_request_size(void);
 size_t lua_ada_response_size(void);
 size_t lua_ada_extra_space(void);
+size_t lua_ada_auxiliary_buffer_size(void);
 int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
                             const struct lua_ada_response *pending,
                             struct lua_ada_response *completion);

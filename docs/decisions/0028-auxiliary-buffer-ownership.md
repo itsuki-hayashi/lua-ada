@@ -52,6 +52,15 @@ checks required content rather than optional growth slack; capacity is capped
 when needed so an otherwise valid near-limit string can still be built.
 C-compatible states retain the normal native growth behavior.
 
+The instrumented facade compiles its buffer type with the pinned 23-byte
+scratch extent through a first-party configuration header. Ordinary public
+SDK headers remain unchanged. An allocation-free Ada C leaf returns the
+selected initial capacity, checked against that C type's configured extent.
+This prevents a private T caller's smaller stack object from being treated
+as a 1,024-byte scratch array. No private C state or lock header is imported
+into the runtime. SDK, private-T caller and implementation-facade header
+roles remain distinct; matching a header probe alone is not runtime evidence.
+
 ## Alternatives and consequences
 
 An unmanaged C buffer would hide input-sized bytes from the selected owner.

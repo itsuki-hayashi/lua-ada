@@ -101,7 +101,12 @@ void luaL_buffinit(lua_State *L, luaL_Buffer *B) {
     B->L = L;
     B->b = B->init.b;
     B->n = 0;
-    B->size = LUAL_BUFFERSIZE;
+    /* Private T callers have only 23 scratch bytes. The common prefix and
+     * scratch offset agree with ordinary SDK callers, but capacity must
+     * follow the selected implementation configuration, including the C
+     * facade's type extent. No C VM/test internals are used. */
+    B->size = lua_ada_auxiliary_buffer_size();
+    assert(B->size == (size_t)LUAL_BUFFERSIZE);
     lua_pushlightuserdata(L, B);
 }
 

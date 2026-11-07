@@ -57,3 +57,27 @@ matrix replay. The remaining auxiliary file, trace, substitution and allocator
 exports, relevant T drivers, remaining primary files, aggregate/stress/helper
 execution, global reconciliation, GitHub review and authorized merge remain
 unfinished. Reference sources, pins and public headers stay unchanged.
+
+## Instrumented caller ABI correction
+
+The pinned T header overrides `LUAL_BUFFERSIZE` to 23, while the ordinary SDK
+array is 1,024 bytes on this host. The facade now compiles its actual buffer
+type with that selected extent, using a private first-party configuration
+header and the explicit instrumented C flag
+`LUA_ADA_AUXILIARY_BUFFER_BYTES=23`. A nonallocating exported Ada leaf selects
+capacity from the existing runtime configuration, and the constructor checks
+agreement with the C extent. Public SDK and reference headers stay unchanged;
+no private C interpreter or lock code is linked.
+
+Serial strict default/instrumented Windows validation/static runtime and C
+consumer builds pass. The same seventeen cases pass for default Ada, ordinary
+SDK callers against Ada T, and actual `LUA_USER_H=<ltests.h>` private callers
+against Ada T. Private native C T callers also pass, all with the existing
+`881b6d5a...cc2d7c` stdout hash. The empty-buffer case now checks that an initial
+scratch capacity fits its actual caller array before any writes occur. Raw
+logs are `reports/remaining-buffer-abi-*` and
+`reports/remaining-aux-buffer-C-private-upstream-test.log`.
+
+This is buffer ABI/operation evidence, not complete instrumented acceptance.
+Private T extraspace reserves its lock representation and needs separate
+source review/counterparts; this fix does not emulate that C representation.

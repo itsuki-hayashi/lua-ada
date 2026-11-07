@@ -4,7 +4,7 @@
  * follow pinned Lua 5.5.1 lauxlib.c:1000-1047 and linit.c:27-70.
  * Copyright (C) 1994-2026 Lua.org, PUC-Rio. See lua.h for the MIT notice.
  */
-#include "lua.h"
+#include "lua_ada_runtime_configuration.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include "lua_ada_boundary.h"
