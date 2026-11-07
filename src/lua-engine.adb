@@ -260,7 +260,7 @@ package body Lua.Engine is
          end if;
          State.Steps := State.Steps + Text'Length;
       end if;
-      return Read_Number (Lua.Storage.Reference (State.Memory), Text, Base);
+      return Read_Number (Text, Base);
    end Read_Number;
 
    function Read_Number
@@ -278,7 +278,23 @@ package body Lua.Engine is
          end if;
          State.Steps := State.Steps + Text.Size;
       end if;
-      return Read_Number (Lua.Storage.Reference (State.Memory), Text, Base);
+      return Read_Number (Text, Base);
+   end Read_Number;
+
+   function Read_Number
+     (Text : String; Base : Natural := 0) return Lua.Numbers.Number is
+   begin
+      return Lua.Number_Parsing.Read_Without_Allocation
+        (Text, Base, Current_Decimal_Point);
+   end Read_Number;
+
+   function Read_Number
+     (Text : Byte_String; Base : Natural := 0) return Lua.Numbers.Number
+   is
+      View : constant String (1 .. Text.Size)
+        with Import, Address => Text.Address;
+   begin
+      return Read_Number (View, Base);
    end Read_Number;
 
    function Owned_Values

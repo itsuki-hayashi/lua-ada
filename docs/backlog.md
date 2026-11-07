@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+`lua_stringtonumber`, numeric-string C conversions under refusal, and exported
+`lua_ident` have [scoped evidence](sessions/2026-11-08-c-numeric-conversion.md):
+eleven C cases match both native configurations and 1,641 AUnit cases pass.
+Arithmetic/comparison/thread-close and integrated final acceptance remain open.
+
 The [fixed numeric scratch primitive](sessions/2026-11-08-fixed-numeric-scratch.md)
 passes strict local builds and 1,640 AUnit cases. Its shared exact parser has
 bounded local backing; the public C conversions still require wiring and

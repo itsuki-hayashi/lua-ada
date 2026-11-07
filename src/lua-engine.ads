@@ -877,13 +877,18 @@ private package Lua.Engine is
      (Memory : not null Lua.Storage.Owner_Access; Text : Byte_String;
       Base : Natural := 0) return Lua.Numbers.Number;
    function Read_Number
+     (Text : String; Base : Natural := 0) return Lua.Numbers.Number;
+   function Read_Number
+     (Text : Byte_String; Base : Natural := 0) return Lua.Numbers.Number;
+   function Read_Number
      (State : in out World; Text : String; Base : Natural := 0)
       return Lua.Numbers.Number;
    function Read_Number
      (State : in out World; Text : Byte_String; Base : Natural := 0)
       return Lua.Numbers.Number;
-   --  Runtime conversions borrow source bytes and route every growable exact
-   --  conversion temporary through their explicit universe allocator.
+   --  Explicit-owner conversions retain their selected scratch provider.
+   --  No-owner/state conversions borrow source bytes and use fixed exact
+   --  numeric scratch. State overloads charge the shared linear scan budget.
 
    function Owned_Values
      (State : in out World; Source : Values.Vector := Values.Empty_Vector)

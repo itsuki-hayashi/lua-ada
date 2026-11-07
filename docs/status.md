@@ -8,6 +8,12 @@ Its 20,000-value binary64 text fingerprint matches both C configurations;
 the six scalar and two auxiliary quota regressions pass within 1,664 AUnit
 cases. Full surface, runtime matrix and whole-target acceptance remain pending.
 
+The [public C numeric checkpoint](sessions/2026-11-08-c-numeric-conversion.md)
+adds allocation-free string conversion and exact `lua_ident` data. Eleven
+identical-source C cases match default and native T, including refusal and
+two thousand seeded round trips. Strict local default builds and 1,641 AUnit
+cases pass; integrated T/shared/platform and full acceptance remain pending.
+
 The [fixed numeric scratch checkpoint](sessions/2026-11-08-fixed-numeric-scratch.md)
 reuses the exact parser with a bounded local provider. Strict local default
 builds and 1,640 AUnit cases pass. Public C conversion wiring, integrated T,

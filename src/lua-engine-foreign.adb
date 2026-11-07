@@ -249,7 +249,7 @@ package body Lua.Engine.Foreign is
                          return Boolean;
    function Type_Code (Item : Value) return C.int;
    function Numeric
-     (Arena : not null Memory.Owner_Access; Item : Value)
+     (Universe : in out World; Item : Value)
       return Lua.Numbers.Number;
    procedure Publish_Top (Context : not null Context_Access; Top : Natural);
    procedure Set_C_Top
@@ -743,7 +743,7 @@ package body Lua.Engine.Foreign is
    end Type_Code;
 
    function Numeric
-     (Arena : not null Memory.Owner_Access; Item : Value)
+     (Universe : in out World; Item : Value)
       return Lua.Numbers.Number is
    begin
       case Item.Kind is
@@ -752,7 +752,7 @@ package body Lua.Engine.Foreign is
          when Real_Kind =>
             return (Lua.Numbers.Real_Number, Item.Real_Data);
          when String_Kind =>
-            return Read_Number (Arena, Item.Reference.Bytes);
+            return Read_Number (Universe, Item.Reference.Bytes);
          when others => return (Kind => Lua.Numbers.Invalid);
       end case;
    end Numeric;
@@ -2093,7 +2093,7 @@ package body Lua.Engine.Foreign is
          when To_Integer | To_Number =>
             declare
                Number : constant Lua.Numbers.Number :=
-                 Numeric (Context.Memory, Get_Value (Input.Index));
+                 Numeric (Owner.Universe.all, Get_Value (Input.Index));
             begin
                case Number.Kind is
                   when Lua.Numbers.Invalid => null;
@@ -2115,6 +2115,34 @@ package body Lua.Engine.Foreign is
                           (Number.Real_Item);
                         Output.Length := 1;
                      end if;
+               end case;
+            end;
+         when String_To_Number =>
+            if Input.Pointer = System.Null_Address or else
+              Input.Length >= C.size_t (Natural'Last)
+            then
+               raise Foreign_Error with "invalid numeric string extent";
+            end if;
+            declare
+               --  The C boundary already supplies strlen. Borrow that exact
+               --  terminated extent instead of returning an input-sized Ada
+               --  String copy from Read_Bytes. Fixed exact scratch preserves
+               --  native conversion when the Lua allocator refuses growth.
+               Text : constant String (1 .. Natural (Input.Length))
+                 with Import, Address => Input.Pointer;
+               Number : constant Lua.Numbers.Number :=
+                 Read_Number (Owner.Universe.all, Text);
+            begin
+               case Number.Kind is
+                  when Lua.Numbers.Invalid => null;
+                  when Lua.Numbers.Integer_Number =>
+                     Push (Owner.Universe.all, Context,
+                           (Integer_Kind, Number.Integer_Item));
+                     Output.Length := Input.Length + 1;
+                  when Lua.Numbers.Real_Number =>
+                     Push (Owner.Universe.all, Context,
+                           (Real_Kind, Number.Real_Item));
+                     Output.Length := Input.Length + 1;
                end case;
             end;
          when To_String =>

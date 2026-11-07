@@ -38,6 +38,14 @@ integration audit. C table capacity arguments remain hints, pending wiring.
 Both constructors leave standard libraries closed, as C Lua does; Ada embedding
 retains its separate eager default environment.
 
+`lua_stringtonumber` borrows the actual C extent and shares the exact runtime
+parser's fixed local numeric scratch. Numeric-string `lua_tonumberx`,
+`lua_tointegerx` and `lua_isnumber` use that path too: no Lua allocator growth
+is needed after stack reservation, and state calls retain the shared scan
+budget. The exported `lua_ident` data uses the pinned metadata macro format.
+Eleven native-default/T paired C cases and 1,641 local AUnit cases pass; the
+[session](../docs/sessions/2026-11-08-c-numeric-conversion.md) records scope.
+
 External `lua_pushexternalstring` payloads preserve their original buffer even
 at short/zero lengths. Their original allocator/userdata receives the exact
 pointer and length-plus-one once, including header-refusal cleanup. Collection

@@ -36,6 +36,7 @@ into one major PR. Historical session results retain their original scope.
 | 2026-11-08 | [Public value and auxiliary](2026-11-08-public-value-auxiliary.md)   |
 | 2026-11-08 | [External string ownership](2026-11-08-external-string-ownership.md) |
 | 2026-11-08 | [Fixed numeric scratch](2026-11-08-fixed-numeric-scratch.md)         |
+| 2026-11-08 | [C numeric conversion](2026-11-08-c-numeric-conversion.md)           |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,

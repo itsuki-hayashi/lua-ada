@@ -13,6 +13,15 @@
 
 extern void luainit(void);
 
+/* lua.h declares this metadata without LUA_API. Explicitly retain its data
+ * export in a Windows DLL, where exporting functions disables auto-export. */
+#if defined(LUA_BUILD_AS_DLL)
+LUA_API
+#endif
+const char lua_ident[] =
+    "$LuaVersion: " LUA_COPYRIGHT " $"
+    "$LuaAuthors: " LUA_AUTHORS " $";
+
 struct lua_ada_guard {
     jmp_buf target;
     struct lua_ada_guard *previous;
@@ -671,6 +680,12 @@ lua_Number lua_tonumberx(lua_State *state, int index, int *valid) {
     struct lua_ada_response output = indexed(state, ADA_TO_NUMBER, index);
     if (valid != NULL) *valid = output.length != 0;
     return (lua_Number)output.number_data;
+}
+size_t lua_stringtonumber(lua_State *state, const char *text) {
+    struct lua_ada_request input = request(ADA_STRING_TO_NUMBER);
+    input.pointer = (void *)text;
+    input.length = strlen(text);
+    return dispatch(state, input).length;
 }
 const char *lua_tolstring(lua_State *state, int index, size_t *length) {
     struct lua_ada_response output = indexed(state, ADA_TO_STRING, index);
