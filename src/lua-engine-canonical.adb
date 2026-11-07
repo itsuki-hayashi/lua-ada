@@ -741,8 +741,9 @@ package body Lua.Engine.Canonical is
         (if Results.Is_Empty then Nil_Value else Results.First_Element);
    begin
       --  This is called only after the scheduler has rooted the returned
-      --  packet. Clear pending callback arguments after publishing the result
-      --  or deciding the branch, so a collection sees one owner throughout.
+      --  packet. The producer bridge transfers helper/call packets once the
+      --  next activation owns them. The final clears below also retire any
+      --  remaining legacy request/result roots after delivery is published.
       case Activation.Canonical_Pending is
          when Store_Canonical_Results | Store_Call_Results =>
             declare

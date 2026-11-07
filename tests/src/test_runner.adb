@@ -26,6 +26,7 @@ with Loop_Close_Tests;
 with Error_Closing_Tests;
 with Operation_Error_Tests;
 with Argument_Error_Tests;
+with Metamethod_Root_Tests;
 with Call_Error_Tests;
 with Comparison_Branch_Tests;
 with String_Constant_Tests;
@@ -127,6 +128,7 @@ procedure Test_Runner is
       Error_Closing_Tests.Register (Result);
       Operation_Error_Tests.Register (Result);
       Argument_Error_Tests.Register (Result);
+      Metamethod_Root_Tests.Register (Result);
       Call_Error_Tests.Register (Result);
       Comparison_Branch_Tests.Register (Result);
       String_Constant_Tests.Register (Result);

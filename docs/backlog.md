@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+Metamethod request packets now have [actual ownership evidence](sessions/2026-11-08-metamethod-argument-roots.md):
+seven before/after weak-lifetime cases, 1,935 passing local AUnit cases and
+twenty-one passing public C consumers. Complete actual C concatenation
+windows using these transfers, then the remaining source/T/final matrices.
+
 Public file loading has [component evidence](sessions/2026-11-08-public-file-loading.md):
 twenty-one native-matched cases, actual-growth refusal/recovery and sixteen
 text/binary child processes. Both configurations pass 1,898 local AUnit cases.

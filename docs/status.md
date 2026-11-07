@@ -2,6 +2,11 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [metamethod argument ownership prerequisite](sessions/2026-11-08-metamethod-argument-roots.md)
+retires copied request inputs after the next activation owns them. Seven
+independently failing regressions now match native default/T and pass within
+1,935 local AUnit cases. Actual C concat windows and final acceptance remain.
+
 The [public file checkpoint](sessions/2026-11-08-public-file-loading.md)
 completes the auxiliary file export through owned shared input. Twenty-one
 C cases match both native configurations; both default and T local builds

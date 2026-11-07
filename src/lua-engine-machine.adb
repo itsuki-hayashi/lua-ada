@@ -2910,6 +2910,13 @@ package body Lua.Engine.Machine is
          --  may return immediately; Lua closures suspend this frame.
          Activation.Native_Stage := 1;
          Dispatch (Self, Function_Value, Args, 0);
+         if Name in "@binary" | "@unary" | "@get" | "@set" then
+            --  The actual handler activation now owns its arguments. These
+            --  metadata-only operator holders need only the returned packet;
+            --  a stale input copy would keep objects alive after a handler
+            --  drops its parameters and edits the real caller's slots.
+            Activation.Native_Arguments.Clear;
+         end if;
       end Invoke;
    begin
       State.Current.Failure_At := Activation.Call_Site;
@@ -4609,6 +4616,10 @@ package body Lua.Engine.Machine is
             when Canonical.Invoke_Helper =>
                Schedule (Self, To_String (Next.Helper), Next.Arguments,
                          Next.Destination, Next.Operator);
+               --  Schedule published its owned packet before this bridge
+               --  retires the request. Original register/upvalue edges stay
+               --  authoritative, including debug mutations during handlers.
+               Activation.Native_Arguments.Clear;
             when Canonical.Invoke_Function =>
                Dispatch (Self, Next.Function_Value, Next.Arguments,
                          Next.Destination,
