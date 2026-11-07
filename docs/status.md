@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [runtime numeric locale checkpoint](sessions/2026-11-08-runtime-numeric-locale.md)
+adds native-point string conversion while retaining source grammar and exact
+rounding. Its strict Windows validation/static component build passes 1,418
+AUnit cases, including eight new focused cases. Final integrated acceptance
+remains pending.
+
 Implementation resumes from merged PR #10 on
 codex/m3-remaining-upstream-compatibility. The approved target includes all
 remaining primary files, aggregate, heavy case, helpers and native fixtures.

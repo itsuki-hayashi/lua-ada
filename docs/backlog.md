@@ -13,6 +13,11 @@ component progress. The binary Lua searcher now accepts native chunks and its
 focused caching/loader-data regression passes within 1,391 local AUnit cases.
 Full target and all original unfinished M3 gates remain open.
 
+Runtime numeric-string locale conversion now has eight focused regressions
+within a passing 1,418-case component run. See its dated
+[checkpoint](sessions/2026-11-08-runtime-numeric-locale.md); this does not close
+literals.lua or the full library gate without fresh integrated execution.
+
 IDs are stable. Completion requires evidence, including relevant platform gates.
 M1 is complete; [all five gates passed](validation.md).
 

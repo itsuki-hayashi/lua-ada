@@ -31,11 +31,13 @@ package body Lua.Number_Parsing is
      (Bits : Interfaces.Unsigned_64; Negative : Boolean) return Integer_Value;
    function Exact_Real
      (Mantissa : String; Radix : Positive; Exponent : Long_Long_Integer;
-      Memory : not null Lua.Storage.Owner_Access) return Real_Value;
+      Point : Character; Memory : not null Lua.Storage.Owner_Access)
+      return Real_Value;
 
    function Exact_Real
      (Mantissa : String; Radix : Positive; Exponent : Long_Long_Integer;
-      Memory : not null Lua.Storage.Owner_Access) return Real_Value
+      Point : Character; Memory : not null Lua.Storage.Owner_Access)
+      return Real_Value
    is
       Numerator, Denominator, Quotient, Residue, Shifted : Big.Number;
       Prefix : String (1 .. 1_100) := [others => '0'];
@@ -51,8 +53,12 @@ package body Lua.Number_Parsing is
       --  midpoints have terminating decimal expansions within 1075 places;
       --  1100 significant digits therefore decide every tie. Fixed stack
       --  prefix storage is independent of input length and needs no allocator.
+      --  Point is the one separator the grammar consumed (either the ASCII dot
+      --  or the caller's locale byte). The grammar guarantees the mantissa has
+      --  no other non-digit, so the scan treats only Point as the boundary and
+      --  never feeds a separator into the digit accumulator.
       for Character_Value of Mantissa loop
-         if Character_Value = '.' then
+         if Character_Value = Point then
             After_Point := True;
          else
             if After_Point then
@@ -185,10 +191,14 @@ package body Lua.Number_Parsing is
 
    function Read
      (Text : String; Memory : not null Lua.Storage.Owner_Access;
-      Base : Natural := 0) return Number
+      Base : Natural := 0; Decimal_Point : Character := '.') return Number
    is
       Source : constant String (1 .. Text'Length)
         with Import, Address => Text'Address;
+      --  Point receives the separator consumed by the fractional grammar. It
+      --  stays the ASCII dot when no fraction is present; it is passed to the
+      --  exact rounding routine so that rounding sees the same boundary.
+      Point : Character := '.';
       First  : Positive := 1;
       Last   : Natural := Source'Last;
       Start  : Positive;
@@ -265,9 +275,27 @@ package body Lua.Number_Parsing is
       end if;
 
       --  Validate the fractional/exponent grammar independently of Ada's
-      --  converter. A second dot, missing digits, underscores, and trailing
+      --  converter. A second point, missing digits, underscores, and trailing
       --  garbage are rejected rather than accepted as Ada literal syntax.
-      if First <= Last and then Source (First) = '.' then
+      --  Exactly one point is consumed here. A mixed point such as "1.5,5"
+      --  under comma decimal leaves a stray separator after the fraction,
+      --  which the trailing-text check below rejects. Explicit bases never
+      --  reach this code, so they reject every fraction.
+      if First <= Last and then
+        (Source (First) = '.' or else Source (First) = Decimal_Point)
+      then
+         --  Remember the byte actually used so exact rounding treats it as
+         --  the radix point, and not as a digit of the significand.
+         Point := Source (First);
+         --  Lua's alternate-dot retry uses L_MAXLENNUM bytes. Although this
+         --  parser needs no copy, retain the observable refusal for a long
+         --  dot spelling under a non-dot locale. A native-point spelling
+         --  still follows the first conversion and has no such retry limit.
+         if Point = '.' and then Decimal_Point /= '.' and then
+           Source'Length > 200
+         then
+            return (Kind => Invalid);
+         end if;
          First := First + 1;
          while First <= Last and then Digit (Source (First)) >= 0 and then
            Digit (Source (First)) < Radix
@@ -319,7 +347,9 @@ package body Lua.Number_Parsing is
            (if Exp_At = 0 then Last else Exp_At - 1);
          Mantissa : String renames Source (Start .. Mantissa_Last);
       begin
-         Value := Exact_Real (Mantissa, Radix, Exponent, Memory);
+         --  The mantissa is digits plus at most the single Point byte, so
+         --  rounding sees exactly the grammar that was just validated.
+         Value := Exact_Real (Mantissa, Radix, Exponent, Point, Memory);
       end;
       if Negative then
          Value := -Value;

@@ -5,6 +5,7 @@ with Lua.Engine.Warnings;
 with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
 with Lua.Number_Parsing;
+with Lua.Platform_Locales;
 with Ada.Exceptions;
 with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
@@ -29,6 +30,7 @@ package body Lua.Engine is
    use type Interfaces.Unsigned_64;
    use type Lua.Prototypes.Prototype_Access;
    use type Lua.Storage.Owner_Access;
+   package Locales renames Lua.Platform_Locales;
 
    package Characters is new
      System.Address_To_Access_Conversions (Character);
@@ -165,11 +167,23 @@ package body Lua.Engine is
       Release_Object (Item);
    end Free_Object;
 
+   function Current_Decimal_Point return Character is
+     (Character'Val (Integer (Locales.Decimal_Point)));
+   --  Read the native localeconv()->decimal_point[0] byte at each runtime
+   --  conversion, so an os.setlocale change is seen by the next tonumber or
+   --  arithmetic coercion. Nothing is cached, allocated or charged here: the
+   --  call only supplies one byte to the existing shared parser. Callers that
+   --  change locale elsewhere must serialize it with this read, as documented
+   --  in Lua.Platform_Locales.
+
    function Read_Number
      (Memory : not null Lua.Storage.Owner_Access; Text : String;
       Base : Natural := 0) return Lua.Numbers.Number is
    begin
-      return Lua.Number_Parsing.Read (Text, Memory, Base);
+      --  The parser retains its exact-decimal default for every other caller;
+      --  only this runtime boundary passes the current native separator.
+      return Lua.Number_Parsing.Read
+        (Text, Memory, Base, Current_Decimal_Point);
    end Read_Number;
 
    function Read_Number
@@ -182,7 +196,8 @@ package body Lua.Engine is
       --  The caller's frame, stack window or operation root retains this
       --  immutable string object throughout conversion. The parser owns only
       --  its limb scratch; it neither copies nor caches the borrowed payload.
-      return Lua.Number_Parsing.Read (View, Memory, Base);
+      return Lua.Number_Parsing.Read
+        (View, Memory, Base, Current_Decimal_Point);
    end Read_Number;
 
    function Read_Number

@@ -4,6 +4,8 @@ Current: [remaining upstream compatibility](2026-11-07-remaining-upstream-compat
 
 Previous: [expanded T conformance](2026-11-07-expanded-t-conformance.md).
 
+Component: [runtime numeric locale](2026-11-08-runtime-numeric-locale.md).
+
 Previous: [four-file GC/IO conformance](2026-11-07-gc-io-conformance.md).
 
 Previous checkpoint: [complete M3 upstream conformance](2026-11-06-m3-upstream-conformance.md).
