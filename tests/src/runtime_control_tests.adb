@@ -20,6 +20,11 @@ package body Runtime_Control_Tests is
    procedure Weak_Mode_Nul_Boundary;
    procedure Debug_Split_Function_Lines;
    procedure Hook_Implicit_Return_Line;
+   procedure Hook_Main_Implicit_Return_Line;
+   procedure Hook_Closure_Creation_Line;
+   procedure Hook_Main_Return_Trailing_Trivia;
+   procedure Hook_Empty_Main_Return_Line;
+   procedure Hook_Nested_Return_Trailing_Trivia;
    procedure Debug_Tail_Frame;
    procedure Debug_Extra_Argument_Count;
    procedure Debug_Extra_Argument_Suspension;
@@ -1214,6 +1219,70 @@ package body Runtime_Control_Tests is
          "assert(t[1]==2 and t[2]==3 and #t==2)");
    end Hook_Implicit_Return_Line;
 
+   procedure Hook_Main_Implicit_Return_Line is
+      --  The taken then branch ends before the final else and end tokens.
+      --  Hook a separately loaded root chunk. Its implicit return reports
+      --  the closing end line, not the last lowered else assignment line.
+      --  This is the first line trace required by upstream db.lua:124-132.
+   begin
+      Check
+        ("local f=assert(load('if\nmath.sin(1)\nthen\na=1\nelse\n" &
+         "a=2\nend\n'));local co=coroutine.create(f);local t={};" &
+         "debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "assert(coroutine.resume(co));" &
+         "assert(#t==3 and t[1]==2 and t[2]==4 and t[3]==7)");
+   end Hook_Main_Implicit_Return_Line;
+
+   procedure Hook_Closure_Creation_Line is
+      --  Creating a multiline closure is attributed to its consumed end
+      --  token. Calling it then visits its own return on that same line.
+      --  Observe the separate parent/child events required by db.lua:135-142
+      --  without changing the function's definition range or debug lifetime.
+   begin
+      Check
+        ("local f=assert(load('local function foo()\nend\nfoo()\n" &
+         "A=1\nA=2\nA=3\n'));local co=coroutine.create(f);local t={};" &
+         "debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "assert(coroutine.resume(co));local expected={2,3,2,4,5,6};" &
+         "assert(#t==#expected);for i=1,#t do assert(t[i]==expected[i])end");
+   end Hook_Closure_Creation_Line;
+
+   procedure Hook_Main_Return_Trailing_Trivia is
+      --  Comments and whitespace after the final token never execute.
+      --  Load a one-line assignment followed by trailing comment lines;
+      --  the root return shares line one and emits no extra line event.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load(" &
+         "'local x=1\n-- trailing comment\n\n')));local t={};" &
+         "debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "assert(coroutine.resume(co));assert(#t==1 and t[1]==1)");
+   end Hook_Main_Return_Trailing_Trivia;
+
+   procedure Hook_Empty_Main_Return_Line is
+      --  An empty root still executes its implicit return on initial line
+      --  one. Its scanner can reach EOF many comment lines later without
+      --  moving that return or inventing source events for the comment.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load('\n-- comment\n\n')));" &
+         "local t={};debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "assert(coroutine.resume(co));assert(#t==1 and t[1]==1)");
+   end Hook_Empty_Main_Return_Line;
+
+   procedure Hook_Nested_Return_Trailing_Trivia is
+      --  A nested function retains its own closing end position while the
+      --  enclosing chunk scans trailing comments. Observe its body and final
+      --  return to guard the existing nested-function attribution boundary.
+   begin
+      Check
+        ("local f=assert(load('return function()\nlocal x=1\nend\n" &
+         "-- trailing comment\n\n'))();local co=coroutine.create(f);" &
+         "local t={};debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "assert(coroutine.resume(co));" &
+         "assert(#t==2 and t[1]==2 and t[2]==3)");
+   end Hook_Nested_Return_Trailing_Trivia;
+
    procedure Debug_Tail_Frame is
       --  Tail replacement is retained as real frame metadata.
       --  Inspect the leaf of a tail call from a coroutine.
@@ -1789,6 +1858,21 @@ package body Runtime_Control_Tests is
       Test_Support.Add
         (Suite, "control: Hook_Implicit_Return_Line",
          Hook_Implicit_Return_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Main_Implicit_Return_Line",
+         Hook_Main_Implicit_Return_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Closure_Creation_Line",
+         Hook_Closure_Creation_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Main_Return_Trailing_Trivia",
+         Hook_Main_Return_Trailing_Trivia'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Empty_Main_Return_Line",
+         Hook_Empty_Main_Return_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Nested_Return_Trailing_Trivia",
+         Hook_Nested_Return_Trailing_Trivia'Access);
       Test_Support.Add
         (Suite, "control: Debug_Tail_Frame",
          Debug_Tail_Frame'Access);

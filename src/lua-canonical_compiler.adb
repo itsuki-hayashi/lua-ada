@@ -679,6 +679,12 @@ package body Lua.Canonical_Compiler is
                         Index := Natural (Fn.Code.Children.Length);
                         Fn.Code.Children.Append (Child.Code);
                         Site := Item.Site;
+                        --  body consumes the closing end before codeclosure
+                        --  emits the parent's instruction (lparser.c). The
+                        --  closure creation line is therefore the child's
+                        --  end, while its own defined line stays the opening
+                        --  function token retained in the prototype.
+                        Site.Line := Item.End_Line;
                         Put (Fn, ABx (Op_CLOSURE, Destination, Index));
                      end;
                   when Table_Expression =>
@@ -1023,6 +1029,12 @@ package body Lua.Canonical_Compiler is
                      elsif not Item.Children.Is_Empty and then
                        Fetch (Item.Children (1)).Kind = Function_Expression
                      then
+                        --  Recursive local setup is part of creating this
+                        --  closure on its closing end line. Keep the nil
+                        --  initialization for capture/root safety, but do
+                        --  not expose an extra opening-line hook event for
+                        --  this internal step before the closure instruction.
+                        Site.Line := Fetch (Item.Children (1)).End_Line;
                         Bind (Fn, Item.Symbols (1), Base);
                         Load (Fn, Base,
                               Constant_Value'(Kind => Nil_Constant));
@@ -1316,7 +1328,12 @@ package body Lua.Canonical_Compiler is
                end if;
                Block (Fn, (if Id = No_Node then Unit.Root else
                             Item.Children (1)), Own_Scope => False);
-               if Id /= No_Node then Site.Line := Item.End_Line; end if;
+               --  close_func emits its final luaK_ret with the parser's
+               --  last consumed token line (lcode.c:luaK_code). Functions
+               --  retain their closing end line; the root retains its last
+               --  token before EOF. The final lowered child may be an else
+               --  expression on an earlier line and cannot supply this site.
+               Site.Line := Item.End_Line;
                Put (Fn, ABC (Op_RETURN, Fn.Base, 1,
                  (if (Fn.Code.Flags and 1) /= 0 then
                    Natural (Fn.Code.Parameters) + 1 else 0), Flag => True));

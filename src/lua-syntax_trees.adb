@@ -1046,8 +1046,19 @@ package body Lua.Syntax_Trees is
       Unit.Environment := New_Name (Own ("_ENV"));
       Active.Append (Unit.Environment);
       Unit.Root := Block;
+      declare
+         Root : constant Nodes.Reference_Type :=
+           Unit.Tree.Reference (Positive (Unit.Root));
+      begin
+         --  The main function's implicit return belongs to its final consumed
+         --  token, not the final expression visited during lowering or the
+         --  EOF after trailing trivia. Retain the scanner's existing position
+         --  without copying the root's input-sized child list or rescanning.
+         --  Empty input keeps the initial line one, matching luaK_code's
+         --  ls.lastline when mainfunc closes without consuming TK_EOS.
+         Root.End_Line := Last_Line;
+      end;
       Expect (End_Of_Input);
-      pragma Unreferenced (Last_Line);
    exception
       when Abandon =>
          Unit.Tree.Clear;
