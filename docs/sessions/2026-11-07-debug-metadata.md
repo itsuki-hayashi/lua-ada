@@ -201,3 +201,46 @@ large-gap expression trace and reaches the hook callback inspection at line
 metadata is the next debug task. These component results do not establish a
 whole-file debug pass, final instrumented Ada/platform acceptance, or a full
 upstream completion claim.
+
+## Hook origin and traceback checkpoint
+
+Hook callbacks now carry their real `hook '?'` call origin across the explicit
+hook continuation, following `ldebug.c:funcnamefromcall`. Ordinary descendant
+calls retain their own names, and Lua tail replacement loses the callback's
+name while retaining its real tail flag. Both getinfo and traceback share the
+same lazy call-site inference; the interrupted opcode cannot supply the hook
+callback's name.
+
+Traceback now describes actual logical frames using `lauxlib.c:pushfuncname`
+and `luaL_traceback`: inferred/stored names, main chunks, raw function identity
+in the actual loaded-module registry, anonymous definition locations, unknown
+native functions, unavailable-line omission, tail markers and the pinned
+ten/eleven deep-stack split and skip count. Negative levels select no frame.
+The temporary borrowed-frame snapshots use context-owned storage and preserve
+the existing scheduler/error-owner exclusions. Table searches are bounded to
+two levels, charge the shared work budget, ignore non-string keys and execute
+no Lua callbacks. Empty string fields remain valid identities.
+
+Fifteen separately named AUnit cases and `debug_traceback_phases.lua` protect
+these behaviors. All thirteen initial probes failed with assertion diagnostics
+against the pre-fix Ada binary, and the full fixture passes pinned native C in
+both default and instrumented configurations. The initial strict build caught
+an incorrect owner argument type in the new snapshots; using the existing
+context owner fixed it without suppression. Final local evidence:
+
+- Strict default Windows validation/static root and test builds pass with
+  GNAT 16.1.0 and the retained required compiler switches/checks.
+- All 1,450 AUnit cases pass, with zero failed assertions or unexpected errors.
+- The fixture's C/Ada source executions have byte-identical stdout, successful
+  exits and empty stderr.
+- Both producers' chunks pass on both C and Ada, with the same native fixture
+  output and empty stderr in all four combinations.
+- `git diff --check` reports no whitespace errors.
+
+The unchanged-source `@db.lua` diagnostic now passes the hook-origin,
+traceback and exact four-event checks through line 322. It stops at line 328
+because the real registry `_HOOKKEY` table is not yet implemented. The next
+checkpoint must implement its actual weak-key callback storage, including
+public registry mutation and coroutine lifetime semantics; an unused shape
+placeholder would not establish that behavior. This is component evidence,
+not full debug-file or final instrumented Ada/platform acceptance.

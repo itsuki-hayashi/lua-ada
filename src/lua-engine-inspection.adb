@@ -59,7 +59,10 @@ package body Lua.Engine.Inspection is
         (if Index <= Natural (Args.Length) then Args (Index) else Nil_Value);
       function Integer_Arg (Index : Positive) return Integer_Value;
       function Logical_Frame (Level : Natural) return Frame_Access;
+      function Public_Frame (Item : Frame_Access) return Boolean;
       function Caller_Of (Callee : Frame_Access) return Frame_Access;
+      function Inferred_Name
+        (Item : Frame_Access) return Call_Names.Identity;
       function Symbol_Text
         (Prototype : Prototype_Access; Symbol : Positive) return String;
       procedure Append (Item : Value);
@@ -96,6 +99,14 @@ package body Lua.Engine.Inspection is
          return Strings.Integer_Argument (State, Arg (Index));
       end Integer_Arg;
 
+      function Public_Frame (Item : Frame_Access) return Boolean is
+        (not (Context.Hook_Active and then
+              Context.Foreign_Hook /= System.Null_Address and then
+              Item.Is_Native and then Item.Callee = Context.Hook) and then
+         (not Item.Is_Native or else
+          (Length (Item.Native_Name) > 0 and then
+           Element (Item.Native_Name, 1) /= '@')));
+
       function Logical_Frame (Level : Natural) return Frame_Access is
          Remaining : Natural := Level;
          function Failed_Owner (Candidate : Frame_Access) return Boolean;
@@ -118,14 +129,7 @@ package body Lua.Engine.Inspection is
          --  stack frames. Public native closures retain their logical frame.
          for Item of reverse Context.Stack loop
             Work;
-            if not Failed_Owner (Item) and then not
-              (Context.Hook_Active and then
-               Context.Foreign_Hook /= System.Null_Address and then
-               Item.Is_Native and then Item.Callee = Context.Hook) and then
-              (not Item.Is_Native or else
-               (Length (Item.Native_Name) > 0 and then
-                Element (Item.Native_Name, 1) /= '@'))
-            then
+            if Public_Frame (Item) and then not Failed_Owner (Item) then
                if Remaining = 0 then
                   return Item;
                end if;
@@ -154,6 +158,27 @@ package body Lua.Engine.Inspection is
          end loop;
          return null;
       end Caller_Of;
+
+      function Inferred_Name
+        (Item : Frame_Access) return Call_Names.Identity
+      is
+         Caller : Frame_Access;
+      begin
+         --  Both getinfo and traceback derive the name from the actual call
+         --  site. Tail replacement has lost that caller; synthetic calls
+         --  such as hooks and metamethods carry their own explicit origin.
+         if Item /= null and then Length (Item.Name_Kind) = 0 and then
+           not Item.Is_Tail_Call
+         then
+            Caller := Caller_Of (Item);
+            if Caller /= null and then not Caller.Is_Native and then
+              Caller.Code.Canonical_Node /= null
+            then
+               return Call_Names.From_Caller (State, Caller);
+            end if;
+         end if;
+         return (others => <>);
+      end Inferred_Name;
 
       function Symbol_Text
         (Prototype : Prototype_Access; Symbol : Positive) return String
@@ -499,21 +524,10 @@ package body Lua.Engine.Inspection is
             end if;
             if Wants ('n') then
                declare
-                  Caller : Frame_Access;
-                  Inferred : Call_Names.Identity;
+                  Inferred : constant Call_Names.Identity :=
+                    Inferred_Name (Selected);
                   use type Call_Names.Name_Kind;
                begin
-                  if Selected /= null and then
-                    Length (Selected.Name_Kind) = 0 and then
-                    not Selected.Is_Tail_Call
-                  then
-                     Caller := Caller_Of (Selected);
-                     if Caller /= null and then not Caller.Is_Native and then
-                       Caller.Code.Canonical_Node /= null
-                     then
-                        Inferred := Call_Names.From_Caller (State, Caller);
-                     end if;
-                  end if;
                   if Inferred.Kind /= Call_Names.Unknown then
                      Field (Info, "namewhat", New_String
                        (State, Call_Names.Kind_Image (Inferred.Kind)));
@@ -760,7 +774,116 @@ package body Lua.Engine.Inspection is
          declare
             Text : Unbounded_String;
             Level : Natural := (if Context = State.Current then 1 else 0);
-            Item : Frame_Access;
+            No_Frames : Boolean := False;
+            Visible, Failed : Frames.Vector;
+            Shown : Natural := 0;
+            Shortened : Boolean := False;
+            type Located_Name is record
+               Found : Boolean := False;
+               Text : Unbounded_String;
+            end record;
+
+            function Decimal (Number : Natural) return String is
+              (Ada.Strings.Fixed.Trim
+                 (Natural'Image (Number), Ada.Strings.Both));
+
+            function Source (Item : Frame_Access) return String is
+              (Short_Source
+                 ((if Item.Code.Canonical_Node /= null then
+                     To_String (Canonical.Source_Bytes (Item.Code))
+                   else To_String (Item.Code.Name))));
+
+            function Find_Field
+              (Table : Object_Access; Target : Value; Depth : Natural)
+               return Located_Name;
+
+            function Find_Field
+              (Table : Object_Access; Target : Value; Depth : Natural)
+               return Located_Name
+            is
+            begin
+               if Table = null or else Depth = 0 then
+                  return (others => <>);
+               end if;
+               --  lauxlib.c:findfield searches only string keys, with raw
+               --  identity and two table levels. Use the actual loaded
+               --  modules registry; replaceable package.loaded fields and
+               --  metamethods must not affect this diagnostic traversal.
+               for Row of Table.Members loop
+                  Work;
+                  if Row.Key.Kind = String_Kind and then
+                    Row.Item.Kind /= Nil_Kind
+                  then
+                     if Equal (Row.Item, Target) then
+                        return (True, To_Unbounded_String
+                          (Image (State.Current.Memory, Row.Key)));
+                     elsif Row.Item.Kind = Table_Kind and then Depth > 1 then
+                        declare
+                           Suffix : constant Located_Name :=
+                             Find_Field
+                               (Row.Item.Reference, Target, Depth - 1);
+                        begin
+                           if Suffix.Found then
+                              return (True, To_Unbounded_String
+                                (Image (State.Current.Memory, Row.Key) &
+                                 "." & To_String (Suffix.Text)));
+                           end if;
+                        end;
+                     end if;
+                  end if;
+               end loop;
+               return (others => <>);
+            end Find_Field;
+
+            procedure Describe (Item : Frame_Access);
+
+            procedure Describe (Item : Frame_Access) is
+               Inferred : constant Call_Names.Identity :=
+                 Inferred_Name (Item);
+               use type Call_Names.Name_Kind;
+            begin
+               --  Prefer a real call-site name, then a main chunk, then a
+               --  loaded-module identity. Anonymous Lua functions retain
+               --  their definition location, while unknown native functions
+               --  remain '?'. Internal native dispatch labels are not public
+               --  function names (lauxlib.c:pushfuncname).
+               if Length (Item.Name_Kind) > 0 then
+                  Append (Text, To_String (Item.Name_Kind) & " '" &
+                    To_String (Item.Call_Name) & "'");
+               elsif Inferred.Kind /= Call_Names.Unknown then
+                  Append (Text, Call_Names.Kind_Image (Inferred.Kind) &
+                    " '" & Image (State.Current.Memory, Inferred.Item) & "'");
+               elsif not Item.Is_Native and then
+                 (if Item.Code.Canonical_Node /= null then
+                     Item.Code.Canonical_Node.First_Line = 0
+                  else Item.Code.Is_Main)
+               then
+                  Append (Text, "main chunk");
+               else
+                  declare
+                     Global : constant Located_Name :=
+                       Find_Field (State.Loaded_Modules, Item.Callee, 2);
+                  begin
+                     if Global.Found then
+                        Append (Text, "function '");
+                        if Length (Global.Text) >= 3 and then
+                          Slice (Global.Text, 1, 3) = "_G."
+                        then
+                           Append (Text, Slice
+                             (Global.Text, 4, Length (Global.Text)));
+                        else
+                           Append (Text, Global.Text);
+                        end if;
+                        Append (Text, "'");
+                     elsif Item.Is_Native then
+                        Append (Text, "?");
+                     else
+                        Append (Text, "function <" & Source (Item) & ":" &
+                          Decimal (Item.Code.First_Line) & ">");
+                     end if;
+                  end;
+               end if;
+            end Describe;
          begin
             if Arg (Base).Kind not in Nil_Kind | String_Kind |
               Integer_Kind | Real_Kind
@@ -777,34 +900,81 @@ package body Lua.Engine.Inspection is
                if Integer_Arg (Base + 1) > Integer_Value (Natural'Last) then
                   Fail (State, "level out of range");
                end if;
-               Level := Natural (Integer_Value'Max
-                 (0, Integer_Arg (Base + 1)));
+               No_Frames := Integer_Arg (Base + 1) < 0;
+               if not No_Frames then
+                  Level := Natural (Integer_Arg (Base + 1));
+               end if;
             end if;
             Append (Text, "stack traceback:");
-            loop
-               Item := Logical_Frame (Level);
-               exit when Item = null;
-               Append (Text, Character'Val (10) & Character'Val (9));
-               if Item.Is_Native then
-                  Append (Text, "[C]: in function '" &
-                    To_String (Item.Native_Name) & "'");
-               else
-                  Append (Text, Short_Source
-                    ((if Item.Code.Canonical_Node /= null then
-                       To_String (Canonical.Source_Bytes (Item.Code))
-                      else To_String (Item.Code.Name))) &
-                    ":" &
-                    Ada.Strings.Fixed.Trim
-                      (Natural'Image
-                        (Line_At (Item, Current_PC (Item) + 1)),
-                       Ada.Strings.Both) & ": in " &
-                    (if (if Item.Code.Canonical_Node /= null then
-                           Item.Code.Canonical_Node.First_Line = 0
-                         else Item.Code.Is_Main) then "main chunk"
-                     else "function"));
-               end if;
-               Level := Level + 1;
-            end loop;
+            if not No_Frames then
+               --  Snapshot borrowed frame identities once. Their context
+               --  owns them throughout this synchronous, callback-free
+               --  operation; both temporary vectors use its storage owner.
+               --  Finding each level afresh would repeatedly traverse a deep
+               --  stack. Error owners are excluded just as in getinfo.
+               Frames.Set_Owner (Visible, Context.Memory);
+               Frames.Set_Owner (Failed, Context.Memory);
+               for Driver of Context.Stack loop
+                  Work;
+                  if Driver.Is_Native and then
+                    Driver.Native_Name = "@unwind" and then
+                    Driver.Unwind = Error_Exit
+                  then
+                     Failed.Append (Driver.Unwind_Owner);
+                  end if;
+               end loop;
+               for Item of reverse Context.Stack loop
+                  Work;
+                  if Public_Frame (Item) and then
+                    not Failed.Contains (Item)
+                  then
+                     Visible.Append (Item);
+                  end if;
+               end loop;
+               Shortened := Level < Visible.Last_Index and then
+                 Visible.Last_Index - Level > 22;
+               while Level < Visible.Last_Index loop
+                  Work;
+                  if Shortened and then Shown = 10 then
+                     declare
+                        Skipped : constant Natural :=
+                          Visible.Last_Index - Level - 12;
+                     begin
+                        --  Match the pinned lauxlib.c skip count, including
+                        --  its already-fetched eleventh frame. Resume at the
+                        --  final eleven actual frames, not synthetic entries.
+                        Append (Text, Character'Val (10) & Character'Val (9) &
+                          "..." & Character'Val (9) & "(skipping " &
+                          Decimal (Skipped) & " levels)");
+                        Level := Visible.Last_Index - 11;
+                        Shortened := False;
+                     end;
+                  else
+                     declare
+                        Item : constant Frame_Access := Visible (Level + 1);
+                        Line : constant Natural :=
+                          (if Item.Is_Native then 0 else
+                             Line_At (Item, Current_PC (Item) + 1));
+                     begin
+                        Append (Text, Character'Val (10) & Character'Val (9));
+                        Append (Text,
+                          (if Item.Is_Native then "[C]" else Source (Item)));
+                        if Line > 0 then
+                           Append (Text, ":" & Decimal (Line));
+                        end if;
+                        Append (Text, ": in ");
+                        Describe (Item);
+                        if Item.Is_Tail_Call then
+                           Append (Text,
+                             Character'Val (10) & Character'Val (9) &
+                             "(...tail calls...)");
+                        end if;
+                     end;
+                     Level := Level + 1;
+                     Shown := Shown + 1;
+                  end if;
+               end loop;
+            end if;
             Append (New_String (State, To_String (Text)));
          end;
       else

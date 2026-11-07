@@ -1070,7 +1070,15 @@ package body Lua.Engine.Machine is
       if State.Current.Stack.Last_Element.Blocks_Yield then
          State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
       end if;
-      Dispatch (Self, State.Current.Hook, Args, 0);
+      --  This is a real hook call, not a call expression in the interrupted
+      --  function. Pinned ldebug.c:funcnamefromcall reports hook '?' for the
+      --  callback while its caller carries CIST_HOOKED. Preserve that origin
+      --  across our explicit @hook continuation instead of inferring a name
+      --  from the interrupted opcode.
+      Dispatch
+        (Self, State.Current.Hook, Args, 0,
+         Call_Name => To_Unbounded_String ("?"),
+         Name_Kind => To_Unbounded_String ("hook"));
    end Hook_Event;
 
    function Before_Step (Self : Driver) return Boolean is

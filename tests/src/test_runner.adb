@@ -17,6 +17,7 @@ with Session_Tests;
 with Lifecycle_Tests;
 with Runtime_Control_Tests;
 with Assignment_Phase_Tests;
+with Debug_Traceback_Tests;
 with Runtime_Inspection_Tests;
 with Lua.Opcode_Tests;
 with Lua.Context_Tests;
@@ -87,6 +88,7 @@ procedure Test_Runner is
       Lifecycle_Tests.Register (Result);
       Runtime_Control_Tests.Register (Result);
       Assignment_Phase_Tests.Register (Result);
+      Debug_Traceback_Tests.Register (Result);
       Runtime_Inspection_Tests.Register (Result);
       Lua.Opcode_Tests.Register (Result);
       Lua.Context_Tests.Register (Result);
