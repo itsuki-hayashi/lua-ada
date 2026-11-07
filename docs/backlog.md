@@ -2,6 +2,13 @@
 
 ## Active remaining-suite delivery
 
+External payload ownership, guarded deallocator reentry and weak short-string
+identities have a scoped local checkpoint: 1,557 passing AUnit cases, eighteen
+native-default paired C cases, and thirteen native-T ownership cases with five
+explicit reentry skips caused by the reference instrumentation's lock.
+See [evidence and remaining gates](sessions/2026-11-08-external-string-ownership.md).
+This does not establish integrated Ada-T, module-unload or full-suite acceptance.
+
 The 2026-11-07 approved remaining-upstream-compatibility delivery resumes from
 merged PR #10 on codex/m3-remaining-upstream-compatibility. It supersedes older
 pause and branch instructions below for this task. Complete the remaining 17

@@ -98,7 +98,7 @@ package body Lua.Engine.Library_Openers is
                       Character'Val (10) & "-" & Character'Val (10)));
                Set (State, Module, New_String (State, "searchers"), Searchers);
                Set (State, Module, New_String (State, "searchpath"),
-                    New_Native (State, "package.searchpath", Captures));
+                    New_Native (State, "package.searchpath"));
                Set (State, Searchers, (Integer_Kind, 1),
                     New_Native (State, "package.preload_searcher", Captures));
                Set (State, Searchers, (Integer_Kind, 2),

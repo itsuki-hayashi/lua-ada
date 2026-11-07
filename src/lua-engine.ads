@@ -89,8 +89,8 @@ private package Lua.Engine is
       Address : System.Address := System.Null_Address;
       Size : Natural := 0;
    end record;
-   --  Immutable borrowed view of a string object's managed, NUL-terminated
-   --  payload. Copies do not own or extend its lifetime: retain the Lua value
+   --  Immutable borrowed view of a string object's owned/external payload,
+   --  always NUL-terminated. Copies do not extend it: retain the Lua value
    --  in traced storage whenever a view must survive a collection point.
    function To_String (Item : Byte_String) return String;
    function Length (Item : Byte_String) return Natural;
@@ -116,6 +116,12 @@ private package Lua.Engine is
      (Kind : Heap_Kind; Payload_Length : Lua.Storage.Byte_Count);
    type Object_Access is access Heap_Object;
    for Object_Access'Storage_Pool use Lua.Storage.Pool;
+   type Execution_Context;
+   type Context_Access is access Execution_Context;
+   for Context_Access'Storage_Pool use Lua.Storage.Pool;
+   type Frame;
+   type Frame_Access is access Frame;
+   for Frame_Access'Storage_Pool use Lua.Storage.Pool;
    type Prototype;
    type Prototype_Access is access Prototype;
    for Prototype_Access'Storage_Pool use Lua.Storage.Pool;
@@ -324,8 +330,26 @@ private package Lua.Engine is
          when String_Object =>
             Bytes : Byte_String;
             C_Bytes : System.Address := System.Null_Address;
-            --  Optional stable NUL-terminated view owned by Memory.
+            --  The immutable NUL-terminated payload is either selected-owner
+            --  storage or an external borrow. A nonnull external allocator
+            --  releases the original pointer/length exactly once through a
+            --  guarded C portal. Lua API reentry uses the same active driver.
+            External_String : Boolean := False;
+            String_Allocator : Lua.Storage.Allocation_Function := null;
+            String_Allocator_Data : System.Address := System.Null_Address;
             String_Hash : Interfaces.Unsigned_64 := 0;
+            Intern_Next : Object_Access;
+            Interned : Boolean := False;
+            String_Root_Next : Object_Access;
+            String_Rooted : Boolean := False;
+            Release_Queued : Boolean := False;
+            Release_Next, Release_Active_Previous : Object_Access;
+            Release_Context : Context_Access;
+            Release_Window, Release_Previous_Frame : Frame_Access;
+            Release_Previous_Base, Release_Previous_Top : Natural := 0;
+            --  Bucket membership is weak. The second intrusive list roots
+            --  reused strings during one API/compiler operation without an
+            --  allocation on a successful short-string lookup.
          when Table_Object =>
             Members : Entries.Vector;
             Array_Index : Table_Indexes.Vector;
@@ -443,13 +467,7 @@ private package Lua.Engine is
    type Failure_Kind is
      (No_Failure, Language_Failure, Memory_Failure, Handling_Failure,
       Syntax_Failure, Unsupported_Failure, Host_Abort);
-   type Execution_Context;
-   type Context_Access is access Execution_Context;
-   for Context_Access'Storage_Pool use Lua.Storage.Pool;
    type Frame_Lifecycle is (Available, Active, Retiring);
-   type Frame;
-   type Frame_Access is access Frame;
-   for Frame_Access'Storage_Pool use Lua.Storage.Pool;
    package Frames is new Lua.Storage.Vectors (Frame_Access);
 
    type Frame is record
@@ -595,6 +613,10 @@ private package Lua.Engine is
       --  Calls start at one; canonical/C returns retain their real offset.
       Entry_Hook_Done : Boolean := False;
       Return_Hook_Done : Boolean := False;
+      External_Return_Pending : Boolean := False;
+      External_Return_Independent : Boolean := False;
+      --  Unwind_Results owns a completed raw packet while external release
+      --  callbacks borrow this still-live actual departing activation.
       Hook_Line : Natural := 0;
       Hook_PC : Natural := 0;
       Last_Executed_PC : Natural := 0;
@@ -773,6 +795,11 @@ private package Lua.Engine is
       Program_Free_Head : Natural := 0;
       Live_Programs : Natural := 0;
       Heap         : Objects.Vector;
+      Short_Strings : Objects.Vector;
+      Short_String_Count : Natural := 0;
+      String_Root_Head : Object_Access;
+      External_Release_Head, External_Release_Tail : Object_Access;
+      External_Release_Active : Object_Access;
       Programs     : Prototypes.Vector;
       Foreign_Registry : Object_Access;
       Memory_Error_Value : Value;
@@ -1062,6 +1089,18 @@ private package Lua.Engine is
    --  Bind every frame-owned managed container before any capacity grows.
 
    function New_String (State : in out World; Text : String) return Value;
+   function New_External_String
+     (State : in out World; Address : System.Address; Size : Natural;
+      Allocator : Lua.Storage.Allocation_Function;
+      Data : System.Address) return Value;
+   --  Adopt an immutable external NUL-terminated payload. The allocator's
+   --  address/data must outlive the string. The callback frees the original
+   --  payload and returns null; it may make ordinary synchronous Lua calls.
+   --  Before adoption, failure leaves ownership with the C boundary guard.
+   procedure Release_Detached_String
+     (State : in out World; Item : in out Object_Access);
+   --  Release a detached header after its C deallocator has acknowledged the
+   --  payload. The external release portal is its sole caller/owner.
    function New_String
      (State : in out World; Text : in out Owned_Buffer) return Value;
    --  Publish a managed builder through a borrowed view, avoiding an

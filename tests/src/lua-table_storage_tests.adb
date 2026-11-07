@@ -94,10 +94,12 @@ package body Lua.Table_Storage_Tests is
 
    procedure String_Keys (State : in out World) is
       Item : constant Value := New_Table (State);
-      First : constant Value := New_String (State, "a" & ASCII.NUL & "z");
-      Other : constant Value := New_String (State, "a" & ASCII.NUL & "z");
+      Text : constant String :=
+        "a" & ASCII.NUL & "z" & String'(1 .. 40 => 'p');
+      First : constant Value := New_String (State, Text);
+      Other : constant Value := New_String (State, Text);
    begin
-      --  Separate equal byte strings must share a hash bucket and binding.
+      --  Separate equal long byte strings share a hash bucket and binding.
       --  A zero byte is part of the key, not an option-string terminator.
       Assert (First.Reference /= Other.Reference, "fixture string identity");
       Set (State, Item, First, Int (42));

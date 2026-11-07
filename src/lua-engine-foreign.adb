@@ -13,6 +13,7 @@ with Lua.Engine.Foreign_Hooks;
 with Lua.Engine.Library_Openers;
 with Lua.Engine.Operating_System;
 with Lua.Engine.Warnings;
+with Lua.Engine.External_Releases;
 with Lua.Prototypes;
 with Lua.Inputs;
 with Lua.Runtime_Configuration;
@@ -464,6 +465,22 @@ package body Lua.Engine.Foreign is
          return System.Null_Address;
    end New_State;
 
+   procedure External_Request (State : in out World; Output : out Response);
+
+   procedure External_Request (State : in out World; Output : out Response)
+   is
+      Item : constant Object_Access :=
+        External_Releases.Begin_Callback (State);
+   begin
+      Output := (others => <>);
+      Output.Allocator := Item.String_Allocator;
+      Output.Warning_Data := Item.String_Allocator_Data;
+      Output.Warning_Message := Item.C_Bytes;
+      Output.Length := C.size_t (Item.Bytes.Size) + 1;
+      Output.Callback_Token :=
+        (Item.all'Address, C.unsigned_long_long (Item.Serial));
+   end External_Request;
+
    procedure Invoke_Borrowed
      (State : in out World; Driver : in out VM.Driver)
    is
@@ -479,7 +496,9 @@ package body Lua.Engine.Foreign is
       Action, Status : Action_Status;
       Raw_Status : C.int;
       Attached : Boolean := False;
-      Is_Warning : constant Boolean := Warnings.Pending (State);
+      Is_Release : constant Boolean := External_Releases.Pending (State);
+      Is_Warning : constant Boolean :=
+        not Is_Release and then Warnings.Pending (State);
 
       procedure Restore;
       procedure Allocation_Failed;
@@ -501,7 +520,12 @@ package body Lua.Engine.Foreign is
       begin
          Restore;
          Record_Memory_Error (State);
-         if Is_Warning then
+         if Is_Release then
+            --  The payload remains queued if the borrowed C surface cannot
+            --  be obtained. In particular, never lose/free an uncalled
+            --  allocator packet while handling permanent memory refusal.
+            raise Language_Error;
+         elsif Is_Warning then
             State.Warning_Head.Warning_Failed := True;
             Warnings.Discard (State, State.Warning_Head);
          else
@@ -537,7 +561,10 @@ package body Lua.Engine.Foreign is
         Driver_View (Driver_Views.To_Pointer (Driver'Address));
       Owner.Driver_Borrowed := True;
       Attached := True;
-      if Is_Warning then
+      if Is_Release then
+         Target := State.Current;
+         Action := Action_External_Release;
+      elsif Is_Warning then
          Target := State.Warning_Head.Context;
          Input.Warning_Function :=
            Address_Warning (State.Warning_Head.Warning_Handler);
@@ -561,6 +588,10 @@ package body Lua.Engine.Foreign is
       Callback_State := Create_Surface
         (Universe, Context_Id (Target.Thread.Context_Index),
          Owner.Extra, Owner.Seed, Main_State, Owns_Universe => False);
+      if Is_Release then
+         External_Request (State, Input);
+         Token := Input.Callback_Token;
+      end if;
       Input.Callback_Token := Token;
       Raw_Status := C_Invoke_Borrowed
         (Callback_State, Action, Input'Access, Output'Access);
@@ -574,7 +605,16 @@ package body Lua.Engine.Foreign is
          when others =>
             raise Program_Error with "invalid borrowed C callback transfer";
       end case;
-      if Status = Action_Abort then
+      if Is_Release then
+         --  Even a nonreturning, invalid allocator must not leak its header
+         --  or leave a foreign stack borrow installed. The ordinary guarded
+         --  status is handled only after this ownership acknowledgment.
+         External_Releases.Complete (State, Token);
+         if Status /= Action_Done then
+            Restore;
+            raise Language_Error;
+         end if;
+      elsif Status = Action_Abort then
          Restore;
          if State.Current.Failure_Class /= Host_Abort then
             State.Current.Failure_Class := Host_Abort;
@@ -584,7 +624,9 @@ package body Lua.Engine.Foreign is
          end if;
          raise Language_Error;
       end if;
-      if Is_Warning then
+      if Is_Release then
+         null;
+      elsif Is_Warning then
          if Status /= Action_Done then
             Target.Failure := Stacks.Read (Target, Target.Foreign_Top);
             Root_Barrier (State, Target.Failure);
@@ -968,6 +1010,19 @@ package body Lua.Engine.Foreign is
                      (Owner.Universe.Current.Failure_Text))));
          end if;
          loop
+            if External_Releases.Pending (Owner.Universe.all) then
+               declare
+                  Surface : constant System.Address := Create_Surface
+                    (Owner.Universe, Context_Id
+                       (Owner.Universe.Current.Thread.Context_Index),
+                     Main_Owner.Extra, Main_Owner.Seed,
+                     Surfaces.To_Pointer (State).Main);
+               begin
+                  External_Request (Owner.Universe.all, Output.all);
+                  Output.Pointer := Surface;
+                  return Action_External_Release;
+               end;
+            end if;
             exit when Error_Status /= 0 or else VM.Is_Complete (Driver) or else
               VM.Has_Foreign_Result (Driver);
             if Warnings.Pending (Owner.Universe.all) then
@@ -1287,6 +1342,27 @@ package body Lua.Engine.Foreign is
          when Create_Formatter | Append_Format_Value | Append_Format_UTF8 |
            Finish_Formatter | Release_Formatter | Charge_Aux_Work =>
             Format_API (Owner.Universe.all, Context, Input.all, Output.all);
+         when Prepare_External_Release =>
+            if External_Releases.Pending (Owner.Universe.all) then
+               External_Request (Owner.Universe.all, Output.all);
+               Output.Pointer := State;
+               Leave_Context;
+               return Action_External_Release;
+            end if;
+         when Complete_External_Release =>
+            External_Releases.Complete
+              (Owner.Universe.all, Input.Callback_Token);
+            if Input.Index /= 0 then
+               Leave_Context;
+               return Action_Status'Enum_Val (Input.Index);
+            elsif Input.Count /= 0 then
+               declare
+                  Result : constant Action_Status := Pump;
+               begin
+                  Leave_Context;
+                  return Result;
+               end;
+            end if;
          when Set_Hook | Get_Hook | Get_Hook_Mask | Get_Hook_Count |
            Get_Debug_Frame | Get_Debug_Line =>
             Foreign_Hooks.Handle
@@ -2021,9 +2097,7 @@ package body Lua.Engine.Foreign is
                           (Item.Native_Data);
                      when Userdata_Kind =>
                         Output.Pointer := Userdata_Address (Item);
-                     when String_Kind =>
-                        Output.Pointer := Item.Reference.C_Bytes;
-                     when Table_Kind | Closure_Kind |
+                     when String_Kind | Table_Kind | Closure_Kind |
                        Native_Closure_Kind =>
                         Output.Pointer := Item.Reference.all'Address;
                      when others => null;
@@ -2047,6 +2121,21 @@ package body Lua.Engine.Foreign is
                  (Owner.Universe.all,
                   Read_Bytes (Input.Pointer, Input.Length));
             begin
+               Push (Owner.Universe.all, Context, Item);
+               Output.Pointer := Item.Reference.C_Bytes;
+            end;
+         when Push_External_String =>
+            if Input.Pointer = System.Null_Address or else
+              Input.Length >= C.size_t (Natural'Last)
+            then
+               raise Foreign_Error with "invalid external string extent";
+            end if;
+            declare
+               Item : constant Value := New_External_String
+                 (Owner.Universe.all, Input.Pointer, Natural (Input.Length),
+                  Input.Allocator, Input.Warning_Data);
+            begin
+               Output.Integer_Data := 1;
                Push (Owner.Universe.all, Context, Item);
                Output.Pointer := Item.Reference.C_Bytes;
             end;

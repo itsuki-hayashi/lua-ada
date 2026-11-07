@@ -193,6 +193,9 @@ package Lua.Engine.Machine is
    procedure Close_Lua_State (State : in out World);
    --  Drive an idle main thread's TBC/finalizer close protocol, leaving
    --  physical ownership with the caller. Never call from an active drive.
+   procedure Drain_External_Releases (State : in out World);
+   --  Borrow an idle driver to release queued external payloads before
+   --  physical teardown. No executor step spans a C allocator callback.
 
    procedure Clear_Frames
      (State : in out World; Retained_Depth : Natural := 0);

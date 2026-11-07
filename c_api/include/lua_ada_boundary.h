@@ -34,6 +34,8 @@ enum lua_ada_operation {
     ADA_GET_DEBUG_FRAME, ADA_GET_DEBUG_LINE, ADA_GET_DEBUG_INFO,
     ADA_GET_LOCAL, ADA_SET_LOCAL, ADA_GET_UPVALUE, ADA_SET_UPVALUE,
     ADA_UPVALUE_ID, ADA_JOIN_UPVALUES, ADA_BEGIN_BUILTIN,
+    ADA_PUSH_EXTERNAL_STRING = 94, ADA_PREPARE_EXTERNAL_RELEASE,
+    ADA_COMPLETE_EXTERNAL_RELEASE,
     ADA_CREATE_FORMATTER = 120, ADA_APPEND_FORMAT_VALUE,
     ADA_APPEND_FORMAT_UTF8, ADA_FINISH_FORMATTER,
     ADA_RELEASE_FORMATTER, ADA_CHARGE_AUX_WORK
@@ -120,7 +122,8 @@ enum lua_ada_action {
     ADA_ACTION_HANDLING = LUA_ERRERR,
     ADA_ACTION_ABORT = 6,
     ADA_ACTION_WARNING = 7,
-    ADA_ACTION_SUSPEND = 8
+    ADA_ACTION_SUSPEND = 8,
+    ADA_ACTION_EXTERNAL_RELEASE = 9
 };
 
 /* This is an opaque state surface, not C Lua's private lua_State layout.
@@ -158,6 +161,7 @@ int lua_ada_invoke_builtin(lua_State *state, int id);
 /* Identity of the real private finalizer-pump transport, not a callable Lua
  * API. Its lifetime is the loaded library; no Lua allocation is involved. */
 void *lua_ada_collector_drain_address(void);
+void lua_ada_drain_external_releases(lua_State *state);
 
 /* Test-only C guard probe. It demonstrates that a failing exported operation
  * returned through Ada before C unwinds. It is not a lua_pcall replacement. */

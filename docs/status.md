@@ -9,6 +9,14 @@ instrumented C Lua, including actual growth-refusal sweeps and recovery.
 This completes two exports locally; full C surface and target acceptance
 remain open.
 
+The [external string checkpoint](sessions/2026-11-08-external-string-ownership.md)
+passes strict local Windows/default/static builds and 1,557 AUnit cases.
+Eighteen public C/Ada ownership/reentry cases match pinned default C;
+thirteen ownership cases match native T, with five reentry cases explicitly
+skipped because the native instrumented lock rejects them. Ordinary short
+strings now have weak universe-wide identity. Integrated Ada T, native-module
+unload ordering, all platforms and full acceptance remain pending.
+
 The [syntax diagnostic checkpoint](sessions/2026-11-08-syntax-diagnostic-tokens.md)
 passes strict Windows validation/static builds and 1,534 AUnit cases. Its
 focused Lua witness matches both C configurations; unchanged unreduced

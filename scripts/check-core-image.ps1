@@ -33,7 +33,8 @@ function Invoke-Build {
 }
 
 function Invoke-Consumer {
-    param([string] $Name, [string] $Executable, [string] $Marker)
+    param([string] $Name, [string] $Executable, [string] $Marker,
+        [string[]] $ConsumerArguments = @())
     $unwind = $null
     if ($IsWindows) {
         # The final image, rather than an intermediate object or successful
@@ -54,6 +55,7 @@ function Invoke-Consumer {
     foreach ($argument in @('exec', '--', $Executable)) {
         $start.ArgumentList.Add($argument)
     }
+    foreach ($argument in $ConsumerArguments) { $start.ArgumentList.Add($argument) }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $start
     if (-not $process.Start()) { throw "Cannot start $Name consumer" }
@@ -66,6 +68,7 @@ function Invoke-Consumer {
     [IO.File]::WriteAllText((Join-Path $reportDirectory "$Name.stdout"), $stdout)
     [IO.File]::WriteAllText((Join-Path $reportDirectory "$Name.stderr"), $stderr)
     $record = [ordered]@{ name = $Name; executable = $Executable;
+        arguments = $ConsumerArguments;
         executable_sha256 = (Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant();
         stdout = (Join-Path $reportDirectory "$Name.stdout");
         stdout_sha256 = (Get-FileHash -LiteralPath (Join-Path $reportDirectory "$Name.stdout") -Algorithm SHA256).Hash.ToLowerInvariant();
@@ -158,6 +161,13 @@ try {
     Invoke-Consumer 'load-dump-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/load_dump_api_contract$suffix") 'PASS: public reader/writer contract'
     Invoke-Consumer 'debug-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/debug_api_contract$suffix") 'PASS: public debug contract'
     Invoke-Consumer 'builtin-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/builtin_api_contract$suffix") 'PASS: public builtin contract'
+    # The pinned T lock instrumentation itself aborts deallocator API reentry.
+    # Keep that observed native limit explicit: ownership/refusal still run in
+    # both configurations; ordinary C/Ada reentry is paired in default only.
+    $externalArguments = $(if ($Configuration -eq 'upstream-test') {
+        @('--ownership-only')
+    } else { @() })
+    Invoke-Consumer 'external-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/external_string_contract$suffix") 'PASS: public external string contract' $externalArguments
     # Compile the identical public-header contract against the isolated pinned
     # C library. No reference object is linked into either Ada consumer.
     Invoke-Build @('exec', '--', 'gprbuild', '-P', 'experiments/conformance/reference.gpr', '-p', "-XLUA_CONFORMANCE_CONFIGURATION=$Configuration")
@@ -199,6 +209,11 @@ try {
         '-I', (Join-Path $projectRoot 'c_api/include/api'),
         (Join-Path $projectRoot 'c_api/tests/builtin_api_contract.c'),
         '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceBuiltinConsumer)
+    $referenceExternalConsumer = Join-Path $reportDirectory "external-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/external_string_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceExternalConsumer)
     try {
         $env:PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:PATH
         $env:LD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
@@ -209,6 +224,7 @@ try {
         Invoke-Consumer 'load-dump-oracle' $referenceLoadDumpConsumer 'PASS: public reader/writer contract'
         Invoke-Consumer 'debug-oracle' $referenceDebugConsumer 'PASS: public debug contract'
         Invoke-Consumer 'builtin-oracle' $referenceBuiltinConsumer 'PASS: public builtin contract'
+        Invoke-Consumer 'external-oracle' $referenceExternalConsumer 'PASS: public external string contract' $externalArguments
     } finally {
         $env:PATH = $adaExecutionPath
         $env:LD_LIBRARY_PATH = $adaExecutionLdPath
@@ -244,6 +260,11 @@ try {
         throw 'C/Ada public builtin contract output differs'
     }
     Write-Output 'PASS: identical public builtin contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'external-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'external-oracle.stdout'))) {
+        throw 'C/Ada public external string contract output differs'
+    }
+    Write-Output 'PASS: identical scoped external string contract against C and Ada'
     $referenceLibraries = @(Get-ChildItem -LiteralPath $referenceDirectory -File |
         Where-Object { $_.Name -match '^libconformance_lua\.(dll|so(\.[0-9.]+)?|dylib)$' } |
         ForEach-Object { [ordered]@{ file=$_.Name;
@@ -276,6 +297,10 @@ try {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
+    $externalContractSources = @(foreach ($name in @('external_string_contract.c', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
     Invoke-Consumer 'c-startup' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/c_image_client$suffix") 'CORE IMAGE C STARTUP OK'
     # Old ignored products can remain after the library rename. Hash only the
@@ -297,7 +322,7 @@ try {
         consumer_sources = @(@(foreach ($name in @('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'load_dump_contract.h', 'consumer_allocator.h')) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources);
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources);
         configuration = $Configuration; consumers = $records.ToArray();
         library_files = $libraries;
         gc_contract = [ordered]@{ matching_output=$true; sources=$contractSources;
@@ -311,6 +336,10 @@ try {
         debug_contract = [ordered]@{ matching_output=$true; sources=$debugContractSources;
             reference_library_files=$referenceLibraries };
         builtin_contract = [ordered]@{ matching_output=$true; sources=$builtinContractSources;
+            reference_library_files=$referenceLibraries };
+        external_contract = [ordered]@{ matching_output=$true; sources=$externalContractSources;
+            matched_cases=$(if ($Configuration -eq 'upstream-test') { 13 } else { 18 });
+            skipped_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 5 } else { 0 });
             reference_library_files=$referenceLibraries } } | ConvertTo-Json -Depth 6 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8
     Write-Output 'PASS: one production interpreter image; Ada/C state, pool, allocator and startup checks'

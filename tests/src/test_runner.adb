@@ -71,6 +71,8 @@ with Syntax_Diagnostic_Tests;
 with Incremental_Lexer_Tests;
 with Lua.Library_Codec_Tests;
 with Lua.String_Helper_Tests;
+with Lua.String_Identity_Tests;
+with Lua.External_Release_Tests;
 with Library_Runtime_Tests;
 with Native_Tests;
 with Message_Handler_Tests;
@@ -157,6 +159,8 @@ procedure Test_Runner is
       Incremental_Lexer_Tests.Register (Result);
       Lua.Library_Codec_Tests.Register (Result);
       Lua.String_Helper_Tests.Register (Result);
+      Lua.String_Identity_Tests.Register (Result);
+      Lua.External_Release_Tests.Register (Result);
       Library_Runtime_Tests.Register (Result);
       Native_Tests.Register (Result);
       Message_Handler_Tests.Register (Result);

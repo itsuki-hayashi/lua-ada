@@ -27,6 +27,21 @@ integration audit. C table capacity arguments remain hints, pending wiring.
 Both constructors leave standard libraries closed, as C Lua does; Ada embedding
 retains its separate eager default environment.
 
+External `lua_pushexternalstring` payloads preserve their original buffer even
+at short/zero lengths. Their original allocator/userdata receives the exact
+pointer and length-plus-one once, including header-refusal cleanup. Collection
+queues existing headers without allocation; a guarded C portal runs release
+callbacks after Ada steps return. Callback Lua reentry shares the actual driver,
+roots, allocator and work budget. State teardown drains releases before deleting
+globals/code. Ordinary short strings use a weak per-universe intern index;
+external short keys normalize only when inserted as new table keys.
+String `lua_topointer` identifies the actual header while `lua_tolstring`
+borrows the original payload. See [ADR 0021](../docs/decisions/0021-external-string-ownership.md).
+The focused external consumer passes eighteen cases against default C/Ada.
+Its native T ownership-only mode passes thirteen and explicitly skips five
+reentry cases rejected by the reference lock instrumentation; these skips are
+not passing tests. Integrated Ada T and loader/unload/platform gates remain open.
+
 The call portal accepts null continuations and real Lua/C message handlers.
 Handlers run before failed frames and closing declarations unwind; recursive
 handler errors reuse the same protected boundary. A non-yieldable call accepts

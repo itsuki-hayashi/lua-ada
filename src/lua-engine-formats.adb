@@ -645,7 +645,11 @@ package body Lua.Engine.Formats is
                Fail (State, "value has no literal form");
             end if;
          when 'p' =>
-            if Item.Kind in String_Kind | Table_Kind | Closure_Kind |
+            if Item.Kind = String_Kind then
+               Text.Set_Value ("0x" & Unsigned_Image
+                 (Interfaces.Unsigned_64 (System.Storage_Elements.To_Integer
+                    (Item.Reference.all'Address)), 16));
+            elsif Item.Kind in Table_Kind | Closure_Kind |
                 Native_Closure_Kind | Thread_Kind | Userdata_Kind
             then
                Text.Set_Value ("0x" & Unsigned_Image

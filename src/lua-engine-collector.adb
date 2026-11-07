@@ -548,6 +548,8 @@ package body Collector is
    end Trace_Context;
 
    procedure Trace_Roots (State : in out World) is
+      String_Root : Object_Access := State.String_Root_Head;
+      Release : Object_Access;
       procedure Mark (Item : Object_Access);
       procedure Mark (Item : Object_Access) is
       begin
@@ -565,6 +567,20 @@ package body Collector is
       end loop;
       for Item of State.Operation_Roots loop
          Shade_Value (State, Item);
+      end loop;
+      while String_Root /= null loop
+         Mark (String_Root);
+         String_Root := String_Root.String_Root_Next;
+      end loop;
+      Release := State.External_Release_Head;
+      while Release /= null loop
+         if Release.Registry_Slot /= 0 then Mark (Release); end if;
+         Release := Release.Release_Next;
+      end loop;
+      Release := State.External_Release_Active;
+      while Release /= null loop
+         if Release.Registry_Slot /= 0 then Mark (Release); end if;
+         Release := Release.Release_Active_Previous;
       end loop;
       if State.Operation_Active or else State.GC.Emergency then
          for Item of State.Heap loop
@@ -708,6 +724,23 @@ package body Collector is
          Shade_Value (State, Item);
       end if;
    end Root_Barrier;
+
+   procedure Revive_String
+     (State : in out World; Item : not null Object_Access) is
+   begin
+      --  The intern chain can still contain a string whose old-white color
+      --  was declared dead at atomic, but whose sweep slot has not run. As
+      --  in luaS_internshrstr, finding its bytes makes that same header live
+      --  again. Strings have no outgoing edges, so whitening is sufficient
+      --  after the marking wave; during propagation use its ordinary queue.
+      if State.GC.Phase in Sweeping_Objects | Sweeping_Programs |
+        Finishing_Sweep | Finalizers_Ready
+      then
+         Item.Color := State.GC.Current_White;
+      else
+         Root_Barrier (State, Item);
+      end if;
+   end Revive_String;
 
    procedure Root_Barrier (State : in out World; Item : Object_Access) is
    begin

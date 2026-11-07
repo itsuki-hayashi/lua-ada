@@ -73,10 +73,27 @@ static void raise_action(lua_State *state, int status,
     abort();
 }
 
+static int dispatch_raw(lua_State *state,
+                         const struct lua_ada_request *input,
+                         struct lua_ada_response *output) {
+    int action = ada_lua_dispatch(state, input, output);
+    /* Completed API results remain on the real stack while release
+     * callbacks reenter Lua. Keep every original scalar/status/token field
+     * intact; the drainer uses independent transport records. Close frees
+     * this surface itself and therefore drains in its pre-teardown phase. */
+    if (state && input->operation != ADA_CLOSE_STATE &&
+        input->operation != ADA_PREPARE_EXTERNAL_RELEASE &&
+        input->operation != ADA_COMPLETE_EXTERNAL_RELEASE &&
+        action != ADA_ACTION_CALL && action != ADA_ACTION_WARNING &&
+        action != ADA_ACTION_EXTERNAL_RELEASE && action != ADA_ACTION_SUSPEND)
+        lua_ada_drain_external_releases(state);
+    return action;
+}
+
 static struct lua_ada_response dispatch(lua_State *state,
                                         struct lua_ada_request input) {
     struct lua_ada_response output;
-    int status = ada_lua_dispatch(state, &input, &output);
+    int status = dispatch_raw(state, &input, &output);
     raise_action(state, status, &output);
     return output;
 }
@@ -84,7 +101,7 @@ static struct lua_ada_response dispatch(lua_State *state,
 int lua_ada_debug_dispatch(lua_State *state,
                            const struct lua_ada_request *input,
                            struct lua_ada_response *output) {
-    int status = ada_lua_dispatch(state, input, output);
+    int status = dispatch_raw(state, input, output);
     raise_action(state, status, output);
     return status;
 }
@@ -144,7 +161,10 @@ int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
      * dispatcher, scheduler step or value operation. */
     status = setjmp(guard.target);
     if (status == 0) {
-        if (action == ADA_ACTION_WARNING)
+        if (action == ADA_ACTION_EXTERNAL_RELEASE)
+            pending->allocator(pending->warning_data,
+                (void *)pending->warning_message, pending->length, 0);
+        else if (action == ADA_ACTION_WARNING)
             pending->warning_function(pending->warning_data,
                 pending->warning_message, pending->warning_continuation);
         else if (pending->continuation != NULL)
@@ -159,10 +179,31 @@ int lua_ada_invoke_borrowed(lua_State *state, enum lua_ada_action action,
     return status;
 }
 
+void lua_ada_drain_external_releases(lua_State *state) {
+    struct lua_ada_request input = request(ADA_PREPARE_EXTERNAL_RELEASE);
+    struct lua_ada_response pending, completion, output;
+    int action;
+    /* No header/array allocation is needed to free one payload. Detached
+     * headers themselves retain the FIFO/LIFO ownership and stack borrow;
+     * this guard owns only the live nonlocal-transfer checkpoint. */
+    while ((action = ada_lua_dispatch(state, &input, &pending)) ==
+           ADA_ACTION_EXTERNAL_RELEASE) {
+        int status = lua_ada_invoke_borrowed(state,
+            ADA_ACTION_EXTERNAL_RELEASE, &pending, &completion);
+        struct lua_ada_request done = request(ADA_COMPLETE_EXTERNAL_RELEASE);
+        done.index = status;
+        done.callback_token = pending.callback_token;
+        action = ada_lua_dispatch(state, &done, &output);
+        raise_action(state, action, &output);
+    }
+    raise_action(state, action, &pending);
+}
+
 static int pump_callbacks(int action, struct lua_ada_response *pending) {
     struct lua_ada_request input;
     struct lua_ada_response output = *pending;
-    while (action == ADA_ACTION_CALL || action == ADA_ACTION_WARNING) {
+    while (action == ADA_ACTION_CALL || action == ADA_ACTION_WARNING ||
+           action == ADA_ACTION_EXTERNAL_RELEASE) {
         lua_State *callback_state = (lua_State *)output.pointer;
         lua_CFunction callback = output.function_data;
         lua_KFunction pending_k = output.continuation;
@@ -170,6 +211,9 @@ static int pump_callbacks(int action, struct lua_ada_response *pending) {
         int pending_status = output.kstatus;
         lua_WarnFunction warning = output.warning_function;
         int is_warning = action == ADA_ACTION_WARNING;
+        int is_release = action == ADA_ACTION_EXTERNAL_RELEASE;
+        lua_Alloc allocator = output.allocator;
+        size_t release_size = output.length;
         void *warning_data = output.warning_data;
         const char *warning_message = output.warning_message;
         int warning_continuation = output.warning_continuation;
@@ -186,7 +230,10 @@ static int pump_callbacks(int action, struct lua_ada_response *pending) {
         callback_state->guard = &guard;
         status = setjmp(guard.target);
         if (status == 0) {
-            if (is_warning)
+            if (is_release)
+                allocator(warning_data, (void *)warning_message,
+                          release_size, 0);
+            else if (is_warning)
                 warning(warning_data, warning_message, warning_continuation);
             else if (pending_k != NULL)
                 count = pending_k(callback_state, pending_status,
@@ -194,19 +241,20 @@ static int pump_callbacks(int action, struct lua_ada_response *pending) {
             else count = callback(callback_state);
         }
         callback_state->guard = guard.previous;
-        if (status == ADA_ACTION_ABORT) {
+        if (status == ADA_ACTION_ABORT && !is_release) {
             /* Host abort is not a protected Lua error. Abandon each live C
              * body until the outer borrowed invoke returns it to Ada; a
              * C-owned outer boundary retains its ordinary abort behavior. */
             raise_action(callback_state, status, &output);
         }
-        input = request(is_warning ? ADA_COMPLETE_WARNING
-                                   : ADA_COMPLETE_CALLBACK);
+        input = request(is_release ? ADA_COMPLETE_EXTERNAL_RELEASE :
+                        is_warning ? ADA_COMPLETE_WARNING :
+                                     ADA_COMPLETE_CALLBACK);
         input.index = status;
-        input.count = count;
+        input.count = is_release ? 1 : count;
         input.error_handled = guard.error_handled;
         input.callback_token = guard.callback_token;
-        action = ada_lua_dispatch(callback_state, &input, &output);
+        action = dispatch_raw(callback_state, &input, &output);
     }
     *pending = output;
     return action;
@@ -225,7 +273,7 @@ static int drive_call(lua_State *state, int arguments, int results,
     input.error_index = error_function;
     input.continuation = continuation;
     input.kcontext = context;
-    action = ada_lua_dispatch(state, &input, &output);
+    action = dispatch_raw(state, &input, &output);
     action = pump_callbacks(action, &output);
     if (protected_call &&
         (action == ADA_ACTION_RAISE || action == ADA_ACTION_MEMORY ||
@@ -264,7 +312,7 @@ int lua_ada_invoke_builtin(lua_State *state, int id) {
     input.count = LUA_MULTRET;
     input.continuation = builtin_continuation;
     input.kcontext = lua_gettop(state);
-    action = ada_lua_dispatch(state, &input, &output);
+    action = dispatch_raw(state, &input, &output);
     action = pump_callbacks(action, &output);
     raise_action(state, action, &output);
     return (int)output.length;
@@ -334,7 +382,7 @@ int lua_resume(lua_State *state, lua_State *from, int arguments, int *results) {
     int action;
     input.index = arguments;
     input.pointer = from;
-    action = ada_lua_dispatch(state, &input, &output);
+    action = dispatch_raw(state, &input, &output);
     action = pump_callbacks(action, &output);
     if (action == ADA_ACTION_RAISE || action == ADA_ACTION_MEMORY ||
         action == ADA_ACTION_HANDLING) {
@@ -577,7 +625,7 @@ void lua_warning(lua_State *state, const char *message, int to_continue) {
     input.pointer = (void *)message;
     input.length = strlen(message);
     input.count = to_continue;
-    action = ada_lua_dispatch(state, &input, &output);
+    action = dispatch_raw(state, &input, &output);
     /* The caller retains its C string, including through nested warnings.
      * No new Lua allocation or logical debug frame is introduced here. */
     if (action == ADA_ACTION_WARNING)
@@ -687,6 +735,40 @@ const char *lua_pushlstring(lua_State *state, const char *text, size_t length) {
 const char *lua_pushstring(lua_State *state, const char *text) {
     if (text == NULL) { lua_pushnil(state); return NULL; }
     return lua_pushlstring(state, text, strlen(text));
+}
+const char *lua_pushexternalstring(lua_State *state, const char *text,
+                                  size_t length, lua_Alloc allocator,
+                                  void *data) {
+    struct lua_ada_request input = request(ADA_PUSH_EXTERNAL_STRING);
+    struct lua_ada_response output;
+    int original_top = lua_gettop(state);
+    int status;
+    input.pointer = (void *)text;
+    input.length = length;
+    input.allocator = allocator;
+    input.warning_data = data;
+    status = ada_lua_dispatch(state, &input, &output);
+    if (status != LUA_OK && output.integer_data == 0 && allocator) {
+        struct lua_ada_response pending, completion;
+        int callback_status;
+        /* No header was allocated to own the payload. This live C guard
+         * retains that sole ownership, including permanent refusal. Native
+         * cleanup runs before its memory error is placed on the stack. */
+        lua_settop(state, original_top);
+        memset(&pending, 0, sizeof pending);
+        pending.allocator = allocator;
+        pending.warning_data = data;
+        pending.warning_message = text;
+        pending.length = length + 1;
+        callback_status = lua_ada_invoke_borrowed(state,
+            ADA_ACTION_EXTERNAL_RELEASE, &pending, &completion);
+        if (callback_status != LUA_OK)
+            raise_action(state, callback_status, &completion);
+        if (status == LUA_ERRMEM) lua_pushliteral(state, "not enough memory");
+    }
+    lua_ada_drain_external_releases(state);
+    raise_action(state, status, &output);
+    return (const char *)output.pointer;
 }
 void lua_pushlightuserdata(lua_State *state, void *pointer) {
     struct lua_ada_request input = request(ADA_PUSH_POINTER);

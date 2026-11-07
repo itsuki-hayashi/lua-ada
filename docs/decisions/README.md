@@ -1,6 +1,6 @@
 # Architecture Decision Log
 
-Latest: [ADR 0020: Callable builtin identities](0020-callable-builtin-identities.md), final acceptance pending.
+Latest: [ADR 0021: External string ownership](0021-external-string-ownership.md), final acceptance pending.
 
 ADR 0007 records explicit native continuation frames, traced library/module
 state, shared budgets, and text loading. Its implementation passed M2b acceptance.
@@ -29,6 +29,7 @@ its runtime changes are planned, not implemented by the foundation gate.
 | 0018 | [Compatibility-relevant T coverage](0018-relevant-t-compatibility.md)          | accepted policy       |
 | 0019 | [Demand-driven frontend input](0019-demand-driven-input.md)                    | scoped implementation |
 | 0020 | [Callable builtin identities](0020-callable-builtin-identities.md)             | scoped implementation |
+| 0021 | [External strings and weak identities](0021-external-string-ownership.md)      | scoped implementation |
 | 0022 | [Owned C varargs formatting](0022-c-varargs-formatting.md)                     | scoped implementation |
 
 ADR 0009 records the approved combined delivery order, iterative scheduler,

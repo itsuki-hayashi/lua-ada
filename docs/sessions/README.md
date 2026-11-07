@@ -33,6 +33,7 @@ into one major PR. Historical session results retain their original scope.
 | 2026-11-08 | [Public C debug identity](2026-11-08-c-debug-identity.md)    |
 | 2026-11-08 | [Callable builtins](2026-11-08-callable-builtins.md)         |
 | 2026-11-08 | [C varargs formatting](2026-11-08-c-varargs-formatting.md)   |
+| 2026-11-08 | [External string ownership](2026-11-08-external-string-ownership.md) |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,

@@ -31,6 +31,7 @@ with Lua.Engine.Call_Names;
 with Lua.Engine.Stacks;
 with Lua.Engine.Foreign;
 with Lua.Engine.Warnings;
+with Lua.Engine.External_Releases;
 with Lua.Engine.Mathematics;
 
 package body Lua.Engine.Machine is
@@ -1704,6 +1705,17 @@ package body Lua.Engine.Machine is
          Release_Frame (State, Activation);
       end Complete_Owned;
    begin
+      if External_Releases.Pending (State) then
+         --  Collection can finish inside the operation that is returning.
+         --  Its external allocators must still observe this real frame and
+         --  result owner. Retain an explicit packet, return from Step, then
+         --  finish only after the guarded release portal has acknowledged it.
+         Copy_Roots (State, Activation.Unwind_Results, Result);
+         Activation.External_Return_Pending := True;
+         Activation.External_Return_Independent :=
+           Result'Address = Packet'Address;
+         return;
+      end if;
       Pin (State, Result);
       Pin (State, Packet);
       if Activation.Is_Native and then
@@ -4221,7 +4233,14 @@ package body Lua.Engine.Machine is
             State.Steps := State.Steps + 1;
          end if;
          begin
-            if State.Current.Stack.Last_Element.Native_Tail_State =
+            if State.Current.Stack.Last_Element.External_Return_Pending then
+               State.Current.Stack.Last_Element.External_Return_Pending :=
+                 False;
+               Complete
+                 (Self, State.Current.Stack.Last_Element.Unwind_Results,
+                  Independent => State.Current.Stack.Last_Element.
+                    External_Return_Independent);
+            elsif State.Current.Stack.Last_Element.Native_Tail_State =
               Ready_Native_Tail
             then
                Complete
@@ -4773,6 +4792,7 @@ package body Lua.Engine.Machine is
       --  activation has no marker and cannot inherit the hook's name.
    begin
       if not Needs_Foreign_Call (Self) and then
+        State.External_Release_Active = null and then
         (State.Warning_Head = null or else
          State.Warning_Head.Warning_Phase /= Warning_Callback_Active)
       then
@@ -4958,8 +4978,11 @@ package body Lua.Engine.Machine is
       Start_Borrowed
         (Self, World_View (World_Addresses.To_Pointer (State'Address)),
          Code, Nil_Value, State.Current.Arguments);
-      while not Is_Complete (Self) loop
-         if Needs_Foreign_Call (Self) or else Warnings.Pending (State) then
+      while not Is_Complete (Self) or else External_Releases.Pending (State)
+      loop
+         if External_Releases.Pending (State) or else
+           Needs_Foreign_Call (Self) or else Warnings.Pending (State)
+         then
             --  The helper installs its C guard above this waiting host
             --  activation. No internal Ada step spans the foreign callback;
             --  nested C API work continues on this same explicit driver.
@@ -4983,8 +5006,11 @@ package body Lua.Engine.Machine is
       --  Same iterative loop as Run: one scheduler step per iteration, and
       --  foreign/warning callbacks are serviced above this waiting host
       --  activation. No executor entry is ever nested.
-      while not Is_Complete (Self) loop
-         if Needs_Foreign_Call (Self) or else Warnings.Pending (State) then
+      while not Is_Complete (Self) or else External_Releases.Pending (State)
+      loop
+         if External_Releases.Pending (State) or else
+           Needs_Foreign_Call (Self) or else Warnings.Pending (State)
+         then
             Lua.Engine.Foreign.Invoke_Borrowed (State, Self);
          else
             Step (Self);
@@ -5060,8 +5086,11 @@ package body Lua.Engine.Machine is
       Prepare
         (Self, World_View (World_Addresses.To_Pointer (State'Address)));
       Request_Process_Exit (State, 0, Close_State => True);
-      while not Is_Complete (Self) loop
-         if Needs_Foreign_Call (Self) or else Warnings.Pending (State) then
+      while not Is_Complete (Self) or else External_Releases.Pending (State)
+      loop
+         if External_Releases.Pending (State) or else
+           Needs_Foreign_Call (Self) or else Warnings.Pending (State)
+         then
             Lua.Engine.Foreign.Invoke_Borrowed (State, Self);
          else
             Step (Self);
@@ -5074,4 +5103,25 @@ package body Lua.Engine.Machine is
          Finish (Self);
          raise;
    end Close_Lua_State;
+
+   procedure Drain_External_Releases (State : in out World) is
+      Self : Driver;
+   begin
+      --  Teardown calls this before deleting contexts or code. Reentrant
+      --  lua_call schedules an ordinary foreign boundary on this same idle
+      --  borrow; the original executor is not recursively entered.
+      Prepare
+        (Self, World_View (World_Addresses.To_Pointer (State'Address)),
+         Retained_Depth => Natural (State.Current.Stack.Length));
+      while External_Releases.Pending (State) loop
+         Lua.Engine.Foreign.Invoke_Borrowed (State, Self);
+      end loop;
+      Self.Failed := True;
+      Finish (Self);
+   exception
+      when others =>
+         Self.Failed := True;
+         Finish (Self);
+         raise;
+   end Drain_External_Releases;
 end Lua.Engine.Machine;

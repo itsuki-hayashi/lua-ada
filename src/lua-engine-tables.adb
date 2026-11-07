@@ -356,12 +356,22 @@ package body Lua.Engine.Tables is
                   Key, Item : Value)
    is
       Index : Natural := Find (Table, Key);
-      Number : constant Value := Canonical (Key);
+      Number : Value := Canonical (Key);
       Dense : Natural;
    begin
       if Index = 0 then
          if Item.Kind = Nil_Kind then
             return;
+         end if;
+         if Key.Kind = String_Kind and then
+           Key.Reference.External_String and then
+           Key.Reference.Bytes.Size <= 40
+         then
+            --  Only a new key needs normalization. Existing-key updates
+            --  retain their original header; long external keys retain
+            --  their original buffer. The operation's transient short root
+            --  protects this copied value through table growth/refusal GC.
+            Number := New_String (State, To_String (Key.Reference.Bytes));
          end if;
          --  Reusing a deleted dense row for a sparse key can need its first
          --  hash bucket, even though member capacity already exists. Reserve

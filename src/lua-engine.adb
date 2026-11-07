@@ -2,6 +2,7 @@ with Lua.Engine.Library_Openers;
 with Lua.Engine.Canonical;
 with Lua.Engine.Finalizers;
 with Lua.Engine.Warnings;
+with Lua.Engine.External_Releases;
 with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
 with Lua.Number_Parsing;
@@ -30,6 +31,7 @@ package body Lua.Engine is
    use type Interfaces.Unsigned_64;
    use type Lua.Prototypes.Prototype_Access;
    use type Lua.Storage.Owner_Access;
+   use type Lua.Storage.Allocation_Function;
    package Locales renames Lua.Platform_Locales;
 
    package Characters is new
@@ -159,13 +161,58 @@ package body Lua.Engine is
       end if;
       --  C observes this immutable view only while the Lua string is live.
       --  Release it with the string, never through a permanent facade cache.
-      if Item /= null and then Item.Kind = String_Object and then
-        Item.C_Bytes /= System.Null_Address
-      then
-         Lua.Storage.Release (State.Memory, Item.C_Bytes);
+      if Item /= null and then Item.Kind = String_Object then
+         if Item.Interned then
+            declare
+               Bucket : constant Positive := Natural
+                 (Item.String_Hash mod Interfaces.Unsigned_64
+                    (State.Short_Strings.Length)) + 1;
+               Cursor : Object_Access := State.Short_Strings (Bucket);
+               Previous : Object_Access;
+            begin
+               --  Unlink while the header and chain are still valid. The
+               --  weak index never marks a string or delays its collection.
+               while Cursor /= Item loop
+                  Previous := Cursor;
+                  Cursor := Cursor.Intern_Next;
+               end loop;
+               if Previous = null then
+                  State.Short_Strings.Replace_Element
+                    (Bucket, Item.Intern_Next);
+               else
+                  Previous.Intern_Next := Item.Intern_Next;
+               end if;
+               State.Short_String_Count := State.Short_String_Count - 1;
+               Item.Interned := False;
+               Item.Intern_Next := null;
+            end;
+         end if;
+         if Item.External_String then
+            if Item.Release_Queued or else Item.String_Allocator /= null then
+               --  The collector detaches ownership before this call. Keep
+               --  the existing header as an allocation-free release packet;
+               --  no foreign code executes inside this Ada sweep/teardown.
+               External_Releases.Enqueue (State, Item);
+               Item := null;
+               return;
+            end if;
+         elsif Item.C_Bytes /= System.Null_Address then
+            Lua.Storage.Release (State.Memory, Item.C_Bytes);
+         end if;
       end if;
       Release_Object (Item);
    end Free_Object;
+
+   procedure Release_Detached_String
+     (State : in out World; Item : in out Object_Access) is
+   begin
+      if Item = null or else Item.Registry_Slot /= 0 or else
+        Item.String_Allocator /= null or else Item.Release_Queued
+      then
+         raise Program_Error with "invalid external header retirement";
+      end if;
+      Free_Object (State, Item);
+   end Release_Detached_String;
 
    function Current_Decimal_Point return Character is
      (Character'Val (Integer (Locales.Decimal_Point)));
@@ -392,14 +439,20 @@ package body Lua.Engine is
 
    procedure Begin_Operation (State : in out World) is
    begin
-      State.Operation_Roots.Clear;
-      State.Operation_Programs.Clear;
+      End_Operation (State);
       State.Operation_Start := State.Next_Object;
       State.Operation_Active := True;
    end Begin_Operation;
 
    procedure End_Operation (State : in out World) is
+      Item : Object_Access;
    begin
+      while State.String_Root_Head /= null loop
+         Item := State.String_Root_Head;
+         State.String_Root_Head := Item.String_Root_Next;
+         Item.String_Root_Next := null;
+         Item.String_Rooted := False;
+      end loop;
       State.Operation_Roots.Clear;
       State.Operation_Programs.Clear;
       State.Operation_Active := False;
@@ -476,6 +529,8 @@ package body Lua.Engine is
       procedure Root_Barrier (State : in out World; Item : Value);
       procedure Root_Barrier
         (State : in out World; Item : Object_Access);
+      procedure Revive_String
+        (State : in out World; Item : not null Object_Access);
       procedure Code_Barrier
         (State : in out World; Item : Prototype_Access);
       procedure Write_Barrier
@@ -553,6 +608,7 @@ package body Lua.Engine is
       --  provider callbacks can never observe a deallocated stale identity.
       Collector.Unregister_Object (State, Item);
       Return_Heap_Slot (State, Slot);
+      Item.Registry_Slot := 0;
       State.Live_Objects := State.Live_Objects - 1;
       if Item.Kind = Table_Object then
          State.Entry_Count :=
@@ -1222,6 +1278,8 @@ package body Lua.Engine is
       Item.Transfer_First := 1;
       Item.Entry_Hook_Done := False;
       Item.Return_Hook_Done := False;
+      Item.External_Return_Pending := False;
+      Item.External_Return_Independent := False;
       Item.Hook_Line := 0;
       Item.Hook_PC := 0;
       Item.Last_Executed_PC := 0;
@@ -1447,14 +1505,98 @@ package body Lua.Engine is
       return Result;
    end New_String;
 
+   procedure String_Work (State : in out World; Count : Natural);
+   procedure Grow_String_Index (State : in out World);
+
+   procedure String_Work (State : in out World; Count : Natural) is
+   begin
+      if State.Policy /= Bounded or else not State.Memory_Ready then
+         return;
+      elsif Count > State.Bounds.Instructions -
+        Natural'Min (State.Steps, State.Bounds.Instructions)
+      then
+         Fail (State, "instruction limit exceeded", Resource => True);
+      end if;
+      State.Steps := State.Steps + Count;
+   end String_Work;
+
+   procedure Grow_String_Index (State : in out World) is
+      Buckets : Objects.Vector;
+      Retried : Boolean := False;
+      Size : constant Positive :=
+        (if State.Short_Strings.Is_Empty then 128
+         else State.Short_Strings.Last_Index * 2);
+      Item, Next : Object_Access;
+      Target : Positive;
+   begin
+      Buckets.Set_Owner (Lua.Storage.Reference (State.Memory));
+      String_Work (State, Size);
+      String_Work (State, State.Short_String_Count);
+      --  Allocate the replacement first. Refusal/emergency collection may
+      --  unlink dead strings from the old chains; no chain is rewritten
+      --  until allocation has succeeded and the complete new index exists.
+      loop
+         begin
+            Buckets.Reserve_Capacity (Ada.Containers.Count_Type (Size));
+            exit;
+         exception
+            when Lua.Storage.Allocation_Error =>
+               if not Retry_Allocation (State, Retried) then raise; end if;
+         end;
+      end loop;
+      for Index in 1 .. Size loop
+         Buckets.Append (null);
+      end loop;
+      for Head of State.Short_Strings loop
+         Item := Head;
+         while Item /= null loop
+            Next := Item.Intern_Next;
+            Target := Natural
+              (Item.String_Hash mod Interfaces.Unsigned_64 (Size)) + 1;
+            Item.Intern_Next := Buckets (Target);
+            Buckets.Replace_Element (Target, Item);
+            Item := Next;
+         end loop;
+      end loop;
+      Objects.Move (State.Short_Strings, Buckets);
+   end Grow_String_Index;
+
    function New_String (State : in out World; Text : String) return Value is
       Item : Object_Access;
       Retried : Boolean := False;
+      Hash : Interfaces.Unsigned_64;
+      Bucket : Positive;
    begin
       if Text'Length = Natural'Last then
          Fail (State, "string length overflow");
       elsif Text'Length > State.Bounds.String_Bytes then
          Fail (State, "string byte limit exceeded", Resource => True);
+      end if;
+      Hash := Tables.Hash_Bytes (Text);
+      if Text'Length <= 40 then
+         if not State.Short_Strings.Is_Empty then
+            Bucket := Natural
+              (Hash mod Interfaces.Unsigned_64
+                 (State.Short_Strings.Length)) + 1;
+            Item := State.Short_Strings (Bucket);
+            while Item /= null loop
+               String_Work (State, 1);
+               if Item.String_Hash = Hash and then Item.Bytes = Text then
+                  Collector.Revive_String (State, Item);
+                  if State.Operation_Active and then not Item.String_Rooted
+                  then
+                     Item.String_Root_Next := State.String_Root_Head;
+                     State.String_Root_Head := Item;
+                     Item.String_Rooted := True;
+                  end if;
+                  return (String_Kind, Item);
+               end if;
+               Item := Item.Intern_Next;
+            end loop;
+         end if;
+         if State.Short_String_Count >= State.Short_Strings.Last_Index then
+            Grow_String_Index (State);
+         end if;
       end if;
       Item := Allocate (State, String_Object);
       loop
@@ -1477,9 +1619,51 @@ package body Lua.Engine is
          View (1 .. Text'Length) := Text;
          View (View'Last) := ASCII.NUL;
       end;
-      Item.String_Hash := Tables.Hash_Bytes (Text);
+      Item.String_Hash := Hash;
+      if Text'Length <= 40 then
+         Bucket := Natural
+           (Hash mod Interfaces.Unsigned_64 (State.Short_Strings.Length)) + 1;
+         Item.Intern_Next := State.Short_Strings (Bucket);
+         State.Short_Strings.Replace_Element (Bucket, Item);
+         Item.Interned := True;
+         State.Short_String_Count := State.Short_String_Count + 1;
+      end if;
       return (String_Kind, Item);
    end New_String;
+
+   function New_External_String
+     (State : in out World; Address : System.Address; Size : Natural;
+      Allocator : Lua.Storage.Allocation_Function;
+      Data : System.Address) return Value
+   is
+      Item : Object_Access;
+   begin
+      if Size = Natural'Last then
+         Fail (State, "string length overflow");
+      elsif Size > State.Bounds.String_Bytes then
+         Fail (State, "string byte limit exceeded", Resource => True);
+      end if;
+      --  Hashing an external payload is actual shared runtime work. Charge
+      --  before adopting the caller's ownership so quota failure remains a
+      --  C-guard cleanup path, without a partially adopted header.
+      String_Work (State, Size);
+      Item := Allocate (State, String_Object);
+      --  External strings are deliberately never interned here, including
+      --  zero-length/short buffers. The exact caller payload remains the
+      --  returned C view until release. Table insertion normalizes a short
+      --  external key separately, matching Lua 5.5's luaS_normstr boundary.
+      Item.External_String := True;
+      Item.Bytes := (Address, Size);
+      Item.C_Bytes := Address;
+      Item.String_Allocator := Allocator;
+      Item.String_Allocator_Data := Data;
+      declare
+         Text : constant String (1 .. Size) with Import, Address => Address;
+      begin
+         Item.String_Hash := Tables.Hash_Bytes (Text);
+      end;
+      return (String_Kind, Item);
+   end New_External_String;
 
    function Userdata_Address (Item : Value) return System.Address is
      (if Item.Kind = Userdata_Kind then Item.Reference.Payload'Address
@@ -2122,6 +2306,7 @@ package body Lua.Engine is
       --  allocate a context or heap object. No registry grows implicitly.
       State.Contexts.Set_Owner (Lua.Storage.Reference (State.Memory));
       State.Heap.Set_Owner (Lua.Storage.Reference (State.Memory));
+      State.Short_Strings.Set_Owner (Lua.Storage.Reference (State.Memory));
       State.Heap_Free_Next.Set_Owner (Lua.Storage.Reference (State.Memory));
       State.Program_Free_Next.Set_Owner
         (Lua.Storage.Reference (State.Memory));
@@ -2190,6 +2375,22 @@ package body Lua.Engine is
      (State : in out World;
       Reason : Resource_Release_Reason := Host_Disposal) is
    begin
+      End_Operation (State);
+      loop
+         External_Releases.Prepare_Close (State);
+         exit when not External_Releases.Pending (State);
+         State.Current := State.Main_Context;
+         begin
+            Machine.Drain_External_Releases (State);
+         exception
+            when Language_Error =>
+               --  A host quota/error may stop Lua called by a deallocator.
+               --  Its C guard has already acknowledged/released the active
+               --  header. Physical disposal still owns every remaining
+               --  packet and must finish rather than abandon this universe.
+               null;
+         end;
+      end loop;
       --  A session is the unique allocator owner, so finalization can release
       --  all remaining objects without tracing or invoking user code.
       for Context of State.Contexts loop
@@ -2216,6 +2417,8 @@ package body Lua.Engine is
          end;
       end loop;
       State.Heap.Release;
+      State.Short_Strings.Release;
+      State.Short_String_Count := 0;
       State.Heap_Free_Next.Release;
       State.Live_Objects := 0;
       State.Heap_Free_Head := 0;
