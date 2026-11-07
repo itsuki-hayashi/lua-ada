@@ -517,6 +517,30 @@ The post-observation envelope may supply that index after original C baseline
 capture. Final replay checks every proof and original C host/library image;
 the index itself is transport metadata and confers no semantic approval.
 
+`NativeModuleLinkage.psm1` provides structural Windows image tools independently
+of Alire/profile selection. `Get-PEImageExports` and `Get-PEImageImports` parse
+actual PE byte snapshots. `New-PEHostImportLibrary -Root -ImagePath -DllTool
+-OutputDirectory` creates a definition and import archive from the actual
+linked image, using its final filesystem basename. It does not inherit the
+old name embedded in a copied executable's export directory. Data markers
+come from the actual nonexecuting image section; forwarded/missing exports and
+unsupported machine identities fail. The default selection is the actual
+`lua_`, `luaL_` and `luaopen_` export set. An explicit `-ExportNames` supports
+small non-Lua tool regression fixtures. Outputs must be new paths under
+`reports/`, and tool/image/definition/import bytes and invocation are retained.
+
+`Assert-PEModuleOwner` reparses actual owner, module and dependency bytes. It
+rejects imported APIs from another image, an embedded interpreter export set,
+missing dependency symbols and dependency graphs with no route to the selected
+owner. This includes transitive fixture imports such as lib11/lib21. These
+checks grant no runtime authority; the separately named native module driver
+still has to execute the actual host/module ownership and lifetime protocol.
+`test-native-module-linkage.ps1` uses synthetic PE parser fixtures; its optional
+absolute `-Compiler` runs a non-Lua C loader experiment that compares both real
+function and data pointers, rejects an old import after renaming the host and
+then rebuilds the import for that exact new basename. It builds no Ada code
+and acquires no Alire/profile lease.
+
 Artifact transport follows the official [upload-artifact v7 documentation](https://github.com/actions/upload-artifact/tree/v7.0.2)
 and [download-artifact v8 documentation](https://github.com/actions/download-artifact/tree/v8).
 Unix mode bits are restored from the content-bound image manifest because the
