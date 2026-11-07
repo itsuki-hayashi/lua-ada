@@ -246,6 +246,10 @@
     {
       "sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806",
       "path": "c_api/tests/macro_compat_api_contract.c"
+    },
+    {
+      "path": "c_api/tests/buffer_private_t_contract.c",
+      "sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
     }
   ],
   "cases": [
@@ -8484,6 +8488,414 @@
       "coverage_authority": false,
       "case_id": "compat-optlong",
       "source_sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "empty-result",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-empty-result"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "fixed-binary-nul",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-fixed-binary-nul"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "zero-null-add",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-zero-null-add"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "addstring-terminator",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-addstring-terminator"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "direct-prep-addsize",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-direct-prep-addsize"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "buffinitsize-small",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-buffinitsize-small"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "buffinitsize-heap",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-buffinitsize-heap"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "addvalue-growth-gc",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-addvalue-growth-gc"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "large-growth-prefix",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-large-growth-prefix"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "buffsub-addchar",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-buffsub-addchar"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "nested-buffers",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-nested-buffers"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "callback-result",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-callback-result"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "callback-error-closes",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-callback-error-closes"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "abandoned-closeslot",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-abandoned-closeslot"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "fault-sweep-growth",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-fault-sweep-growth"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "pushresult-header-refusal",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-pushresult-header-refusal"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
+    },
+    {
+      "source": "c_api/tests/buffer_private_t_contract.c",
+      "case_id": "captured-deallocator-pair",
+      "consumer": "buffer-private-t-api",
+      "contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: buffer-captured-deallocator-pair"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "cfdc13f5164b19ebe225d7f5584f3269619c4967b8d83c8ad840902085b20871"
     }
   ],
   "entries": [

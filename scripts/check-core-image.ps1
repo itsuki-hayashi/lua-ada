@@ -218,6 +218,9 @@ try {
     Invoke-Consumer 'index-type-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/index_type_api_contract$suffix") 'PASS: public integer-index and type contract'
     Invoke-Consumer 'base-closing-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/base_closing_api_contract$suffix") 'PASS: public host base C closing contract'
     Invoke-Consumer 'buffer-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/buffer_api_contract$suffix") 'PASS: public luaL_Buffer contract'
+    if($Configuration -ceq 'upstream-test'){
+        Invoke-Consumer 'buffer-private-t-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/buffer_private_t_contract$suffix") 'PASS: public luaL_Buffer contract'
+    }
     $allocatorConsumer=Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/allocator_api_contract$suffix"
     Invoke-Consumer 'allocator-api' $allocatorConsumer 'PASS: public allocator contract'
     foreach($mode in @('string','number')){
@@ -335,6 +338,15 @@ try {
     Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/buffer_api_contract.c'),
         '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceBufferConsumer)
+    $referencePrivateBufferConsumer=$null
+    if($Configuration -ceq 'upstream-test'){
+        $referencePrivateBufferConsumer=Join-Path $reportDirectory "buffer-private-t-oracle$suffix"
+        $privatePlatform=if($IsLinux){@('-DLUA_USE_LINUX')}elseif($IsMacOS){@('-DLUA_USE_MACOSX')}else{@()}
+        Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic')+$privatePlatform+@(
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),'-I',(Join-Path $projectRoot 'references/lua'),
+            (Join-Path $projectRoot 'c_api/tests/buffer_private_t_contract.c'),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referencePrivateBufferConsumer))
+    }
     $referenceAllocatorConsumer=Join-Path $reportDirectory "allocator-oracle$suffix"
     Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/allocator_api_contract.c'),
@@ -389,6 +401,9 @@ try {
         Invoke-Consumer 'index-type-oracle' $referenceIndexTypeConsumer 'PASS: public integer-index and type contract'
         Invoke-Consumer 'base-closing-oracle' $referenceBaseClosingConsumer 'PASS: public host base C closing contract'
         Invoke-Consumer 'buffer-oracle' $referenceBufferConsumer 'PASS: public luaL_Buffer contract'
+        if($Configuration -ceq 'upstream-test'){
+            Invoke-Consumer 'buffer-private-t-oracle' $referencePrivateBufferConsumer 'PASS: public luaL_Buffer contract'
+        }
         Invoke-Consumer 'allocator-oracle' $referenceAllocatorConsumer 'PASS: public allocator contract'
         foreach($mode in @('string','number')){
             $message=if($mode -ceq 'string'){'allocator panic witness'}else{'error object is not a string'}
@@ -495,6 +510,13 @@ try {
     if([IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-oracle.stdout'))){throw 'C/Ada public buffer contract output differs'}
     Write-Output 'PASS: identical public luaL_Buffer contract against C and Ada'
+    if($Configuration -ceq 'upstream-test'){
+        foreach($stream in @('stdout','stderr')){
+            if((Get-FileHash (Join-Path $reportDirectory "buffer-private-t-api.$stream")).Hash -cne
+                (Get-FileHash (Join-Path $reportDirectory "buffer-private-t-oracle.$stream")).Hash){throw "C/Ada private T buffer receiver $stream differs"}
+        }
+        Write-Output 'PASS: identical private T23 caller buffer operations against C and Ada'
+    }
     foreach($kind in @('allocator','substitution','loadfile','pointer-identity','concat','macro','macro-compat')){
         foreach($stream in @('stdout','stderr')){
             if((Get-FileHash (Join-Path $reportDirectory "$kind-api.$stream")).Hash -cne
@@ -588,6 +610,15 @@ try {
     $bufferContractSources=@(foreach($name in @('buffer_api_contract.c','consumer_allocator.h')){
         @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
     })
+    $privateBufferContract=$null;$privateBufferSources=@()
+    if($Configuration -ceq 'upstream-test'){
+        $privateBufferSources=@(foreach($path in @('c_api/tests/buffer_private_t_contract.c','references/lua/ltests.h',
+            'c_api/include/lua_ada_runtime_configuration.h')){
+            @{file=$path;sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot $path)).Hash.ToLowerInvariant()}
+        })
+        $privateBufferContract=@{matching_output=$true;sources=(@($bufferContractSources)+$privateBufferSources);
+            matched_cases=17;reference_library_files=$referenceLibraries;header_role='native-private-T-caller-header-role'}
+    }
     $allocatorContractSources=@(@{file='c_api/tests/allocator_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/allocator_api_contract.c')).Hash.ToLowerInvariant()})
     $substitutionContractSources=@(@{file='c_api/tests/substitution_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/substitution_api_contract.c')).Hash.ToLowerInvariant()})
     $loadfileContractSources=@(foreach($name in @('loadfile_api_contract.c','consumer_allocator.h')){
@@ -630,7 +661,7 @@ try {
         consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources + $pointerContractSources + $concatContractSources + $macroContractSources + @($macroCompatSource));
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $privateBufferSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources + $pointerContractSources + $concatContractSources + $macroContractSources + @($macroCompatSource));
         configuration = $Configuration; consumers = $records.ToArray();
         reference_compiler_defines=$referenceCompilerDefines;
         library_files = $libraries;
@@ -664,6 +695,7 @@ try {
             ada_fixture_directory=$nativeModuleAda.library_directory;c_fixture_directory=$nativeModuleC.library_directory;
             ada_fixture_records=$nativeModuleAda.records;c_fixture_records=$nativeModuleC.records};
         buffer_contract=@{matching_output=$true;sources=$bufferContractSources;matched_cases=17;reference_library_files=$referenceLibraries};
+        buffer_private_t_contract=$privateBufferContract;
         allocator_contract=@{matching_output=$true;sources=$allocatorContractSources;matched_cases=13;panic_modes=@('string','number');reference_library_files=$referenceLibraries};
         substitution_contract=@{matching_output=$true;sources=$substitutionContractSources;matched_cases=16;reference_library_files=$referenceLibraries};
         loadfile_contract=@{matching_output=$true;sources=$loadfileContractSources;matched_cases=21;stdin_io=$fileIO;reference_library_files=$referenceLibraries};

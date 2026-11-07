@@ -10,7 +10,7 @@ function Test-NamedConsumerEvidence {
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
           [switch] $RequireFormatContract,
-          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','allocator','substitution','loadfile','pointer-identity','concat','thread-reset','macro','macro-compat')]
+          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','buffer-private-t','allocator','substitution','loadfile','pointer-identity','concat','thread-reset','macro','macro-compat')]
           [string[]] $AdditionalContracts=@(),
           [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy='')
     # This replay checks actual observations, not review authority. Its caller
@@ -42,10 +42,12 @@ function Test-NamedConsumerEvidence {
     }
     $additional=@($AdditionalContracts)
     if($RequireFormatContract){$additional+='format'}
+    if($TargetPolicy -ceq 'remaining-upstream-compatibility' -and $parts[0] -ceq 'upstream-test' -and
+        'buffer-private-t' -cnotin $additional){$additional+='buffer-private-t'}
     $additionalMarkers=@{format='PASS: public formatting contract';value='PASS: public value operation contract';auxiliary='PASS: public auxiliary contract';
         'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';external='PASS: public external string contract';
         conversion='PASS: public numeric conversion contract';operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract';
-        'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external';buffer='PASS: public luaL_Buffer contract';
+        'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external';buffer='PASS: public luaL_Buffer contract';'buffer-private-t'='PASS: public luaL_Buffer contract';
         allocator='PASS: public allocator contract';substitution='PASS: public luaL_addgsub and luaL_gsub contract';loadfile='PASS: public luaL_loadfilex contract';
         'pointer-identity'='PASS: public pointer identity contract';concat='PASS: public lua_concat contract';
         'thread-reset'='PASS: public thread reset/base closing contract';macro='PASS: public SDK macro contract';'macro-compat'='PASS: public SDK macro contract'}
@@ -140,20 +142,25 @@ function Test-NamedConsumerEvidence {
             }
         }
     }
-    if('buffer' -cin $additional){
+    foreach($kind in @('buffer','buffer-private-t')){if($kind -cin $additional){
         $names=@('empty-result','fixed-binary-nul','zero-null-add','addstring-terminator','direct-prep-addsize','buffinitsize-small',
             'buffinitsize-heap','addvalue-growth-gc','large-growth-prefix','buffsub-addchar','nested-buffers','callback-result',
             'callback-error-closes','abandoned-closeslot','fault-sweep-growth','pushresult-header-refusal','captured-deallocator-pair')
         $expected=(@($names|ForEach-Object{'PASS: buffer-'+$_}) -join "`n")+"`nPASS: public luaL_Buffer contract`n"
-        if(($Report.buffer_contract.matched_cases -isnot [int] -and $Report.buffer_contract.matched_cases -isnot [long]) -or
-            $Report.buffer_contract.matched_cases -ne 17){throw 'Named buffer contract requires seventeen actual cases'}
-        foreach($name in @('buffer-api','buffer-oracle')){
+        if($kind -ceq 'buffer-private-t'){
+            if($parts[0] -cne 'upstream-test'){throw 'Private T buffer receiver cannot run in a default context'}
+            $expected="BUFFER-RECEIVER: private-t-c LUAL_BUFFERSIZE=23 SIZEOF_BUFFER=64 LUA_EXTRASPACE=16`n"+$expected
+        }
+        $contract=$Report[$kind.Replace('-','_')+'_contract']
+        if(($contract.matched_cases -isnot [int] -and $contract.matched_cases -isnot [long]) -or
+            $contract.matched_cases -ne 17){throw 'Named buffer contract requires seventeen actual cases'}
+        foreach($name in @("$kind-api","$kind-oracle")){
             $record=@($Report.consumers|Where-Object name -CEQ $name)[0]
             if($record.arguments -isnot [Array] -or $record.arguments.Count -ne 0 -or $outputs[$name].text.Replace("`r`n","`n") -cne $expected){
                 throw 'Named buffer actual arguments or complete ordered ownership protocol differ'
             }
         }
-    }
+    }}
     foreach($kind in @('allocator','substitution','loadfile','pointer-identity','concat')){if($kind -cin $additional){
         $names=if($kind -ceq 'allocator'){
             @('null-block-ignores-old-size','zero-size-frees-and-returns-null','grow-preserves-prefix','shrink-preserves-prefix',

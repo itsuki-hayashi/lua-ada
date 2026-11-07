@@ -306,19 +306,23 @@ function Test-TargetNamedContextEvidence {
     # Same-image imports and unload-after-close are mandatory whole-target
     # behavior, including when no individual API row chooses these witnesses.
     $additional=@('native-module')
+    $privateBufferRequired=$Context.StartsWith('upstream-test/',[StringComparison]::Ordinal)
+    if($privateBufferRequired){$additional+='buffer-private-t'}
     $driverNames=@{format='format_api_contract.c';value='value_api_contract.c';auxiliary='auxiliary_api_contract.c';
         'load-dump'='load_dump_api_contract.c';debug='debug_api_contract.c';external='external_string_contract.c';
         conversion='conversion_api_contract.c';operator='operator_api_contract.c';'index-type'='index_type_api_contract.c';
-        'base-closing'='base_closing_api_contract.c';'native-module'='native_module_contract.c';buffer='buffer_api_contract.c';
+        'base-closing'='base_closing_api_contract.c';'native-module'='native_module_contract.c';buffer='buffer_api_contract.c';'buffer-private-t'='buffer_private_t_contract.c';
         allocator='allocator_api_contract.c';substitution='substitution_api_contract.c';loadfile='loadfile_api_contract.c';
         'pointer-identity'='pointer_identity_contract.c';concat='concat_api_contract.c';'thread-reset'='thread_reset_api_contract.c';
         macro='macro_api_contract.c';'macro-compat'='macro_compat_api_contract.c'}
-    foreach($kind in $driverNames.Keys){if($kind -ceq 'native-module' -or @($Policy.consumer.cases|Where-Object consumer -CEQ "$kind-api").Count -gt 0){
+    foreach($kind in $driverNames.Keys){if($kind -ceq 'native-module' -or ($kind -ceq 'buffer-private-t' -and $privateBufferRequired) -or
+        @($Policy.consumer.cases|Where-Object{ $_.consumer -ceq "$kind-api" -and (-not $_.Contains('contexts') -or $Context -cin $_.contexts) }).Count -gt 0){
         if($kind -cnotin $additional){$additional+=$kind}
         $names=@(('c_api/tests/'+$driverNames[$kind]))
         if($kind -cne 'allocator'){$names+='c_api/tests/consumer_allocator.h'}
         if($kind -ceq 'load-dump'){$names+='c_api/tests/load_dump_contract.h'}
         if($kind -ceq 'macro-compat'){$names+='c_api/tests/macro_api_contract.c'}
+        if($kind -ceq 'buffer-private-t'){$names+=@('c_api/tests/buffer_api_contract.c','references/lua/ltests.h','c_api/include/lua_ada_runtime_configuration.h')}
         foreach($name in $names){
             $source=@($consumer[$kind.Replace('-','_')+'_contract'].sources|Where-Object file -CEQ $name)
             if($source.Count -ne 1){throw 'Target additional oracle source binding is missing or duplicated'}

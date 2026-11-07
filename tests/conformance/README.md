@@ -69,6 +69,15 @@ decisions. The audit does not classify them as declaration-only or grant pass
 evidence. Its C rows and all 473 global classifications remain pending until
 review and fresh paired observations in the required immutable contexts.
 
+T target contexts also require a separate private-header buffer executable.
+It includes the actual pinned `ltests.h`, reports its 23-byte scratch and
+64-byte `luaL_Buffer` declarations, and executes the same 17 ownership,
+growth/refusal and cleanup cases as the ordinary SDK client. The default
+configuration never builds or executes this smaller receiver. The final
+consumer requires the private C/Ada pair even if no individual global API
+route selects it. Its declared extraspace value describes the header role;
+the buffer witness does not access or certify native T lock storage.
+
 ## Candidate anchors and manual coverage
 
 The 34 `coverage/*.jsonl` partitions currently contain 4,490 pending anchors.

@@ -421,6 +421,32 @@ Run-Case 'T reset count cannot promote the skipped warning to actual execution' 
 } 'native-lock mode' -Foreign -Additional thread-reset
 $context='default/windows/validation/static'
 $mapping.cases=$defaultMappedCases
+$privateBuffer="BUFFER-RECEIVER: private-t-c LUAL_BUFFERSIZE=23 SIZEOF_BUFFER=64 LUA_EXTRASPACE=16`n"+$bufferFull
+$baseline.buffer_private_t_contract=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=17}
+foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){
+    $record=$records[0].Clone();$record.name=$name;$record.arguments=@();$out=Join-Path $directory "$name.stdout"
+    [IO.File]::WriteAllText($out,$privateBuffer);$record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant()
+    $baseline.consumers+=$record
+}
+Run-Case 'private23 buffer cannot run against an ordinary default context' {} 'cannot run in a default' -Additional buffer-private-t
+$context='upstream-test/windows/validation/static'
+$mapping.cases=@($mapping.cases|Where-Object consumer -CIn @('c-api','foreign-api'))
+function Set-SyntheticTContext($Report){$Report.configuration='upstream-test';foreach($child in $Report.consumers){$child.configuration='upstream-test'}}
+Run-Case 'T target requires the actual private23 buffer receiver without relying on an API route choosing it' {param($r) Set-SyntheticTContext $r} '' -Foreign -RemainingTarget
+Run-Case 'T target cannot omit the native private23 counterpart' {param($r)
+    Set-SyntheticTContext $r;$r.consumers=@($r.consumers|Where-Object name -CNE buffer-private-t-oracle)
+} 'missing/duplicate' -Foreign -RemainingTarget
+Run-Case 'ordinary1024 buffer markers cannot replace a private23 caller' {param($r)
+    Set-SyntheticTContext $r;foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){Replace-Capture $r $name stdout $bufferFull}
+} 'complete ordered ownership' -Foreign -RemainingTarget
+Run-Case 'matching private buffer markers cannot alter the actually compiled header capacity' {param($r)
+    Set-SyntheticTContext $r;foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){Replace-Capture $r $name stdout ($privateBuffer.Replace('LUAL_BUFFERSIZE=23','LUAL_BUFFERSIZE=1024'))}
+} 'complete ordered ownership' -Foreign -RemainingTarget
+Run-Case 'private buffer memory recovery is required after its exact header marker' {param($r)
+    Set-SyntheticTContext $r;foreach($name in @('buffer-private-t-api','buffer-private-t-oracle')){Replace-Capture $r $name stdout ($privateBuffer.Replace("PASS: buffer-fault-sweep-growth`n",''))}
+} 'complete ordered ownership' -Foreign -RemainingTarget
+$context='default/windows/validation/static'
+$mapping.cases=$defaultMappedCases
 function New-SyntheticMacroProtocol([string]$Role){
     # Deliberately fabricated protocol bytes exercise the final consumer's
     # rejection rules; they are not compiler or Lua execution observations.

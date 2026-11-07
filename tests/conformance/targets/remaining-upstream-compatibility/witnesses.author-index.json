@@ -1,6 +1,6 @@
 {
   "global_api": {
-    "sha256": "b971ac1eca2c2216fc2e57a7fcd2d6d84f7b8ac9e0c9e8d35f3b13c2c5f983ef",
+    "sha256": "158b099454a3f12eb071d3494376c326ac9c74151f91fb315d8df98be16ab3e4",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
   },
   "retained_api_routes": 159,
@@ -64,20 +64,20 @@
   "retained_consumer_cases": 100,
   "proposed_aunit_cases": 260,
   "consumer": {
-    "sha256": "fd34d163c49a65b3f2e0b670d83eef555c17bbaf892cdf2ec70f41e319f91312",
+    "sha256": "9320f1129a2182521ac657b8e655262c328bf08c5c0e0f68d915aa9e4217952e",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
   },
   "retained_aunit_cases": 94,
-  "proposed_consumer_cases": 517,
+  "proposed_consumer_cases": 534,
   "independent_review_status": "pending",
   "runtime_acceptance": false,
   "global_api_entries": 473,
   "witness_policy": {
-    "sha256": "353a361c9438058d321d70ee1c3e1d81b0da2fe357be9f36eb83c05e297c0802",
+    "sha256": "ede9f189d790e0a739da9ef6ba4b6c83479193d16b526efb794917ca5dbd1f40",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/witness-policy.author-proposal.json"
   },
   "source_snapshot": {
-    "revision": "03df62a4ba93934a58078e664872dd88fa2bbd42",
+    "revision": "413953a834e9068b818f22e0a0aadbdbb0abffeb",
     "repository_dirty": true,
     "kind": "repository-source-snapshot"
   },

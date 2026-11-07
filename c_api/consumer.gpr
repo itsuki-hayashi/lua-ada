@@ -3,6 +3,12 @@ with "../config/lua_ada_config.gpr";
 
 project Consumer is
    C_Import_Defines := ();
+   Private_T_Mains := ();
+   case Lua_Ada.Configuration_Subdir is
+      when "upstream-test/" =>
+         Private_T_Mains := ("buffer_private_t_contract.c");
+      when others => null;
+   end case;
    case Lua_Ada_Config.Alire_Host_OS is
       when "windows" =>
          case Lua_Ada.Library_Mode is
@@ -29,7 +35,8 @@ project Consumer is
       "substitution_api_contract.c", "thread_reset_api_contract.c",
       "loadfile_api_contract.c", "pointer_identity_contract.c",
       "concat_api_contract.c", "traceback_api_contract.c",
-      "macro_api_contract.c", "macro_compat_api_contract.c");
+      "macro_api_contract.c", "macro_compat_api_contract.c") &
+      Private_T_Mains;
    for Object_Dir use
      "../build/c-api/consumer/" & Lua_Ada.Configuration_Subdir &
        Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
@@ -49,7 +56,8 @@ project Consumer is
       "substitution_api_contract.c", "thread_reset_api_contract.c",
       "loadfile_api_contract.c", "pointer_identity_contract.c",
       "concat_api_contract.c", "traceback_api_contract.c",
-      "macro_api_contract.c", "macro_compat_api_contract.c");
+      "macro_api_contract.c", "macro_compat_api_contract.c") &
+      Private_T_Mains;
    for Create_Missing_Dirs use "True";
 
    package Compiler is
@@ -58,6 +66,13 @@ project Consumer is
          "-I" & Project'Project_Dir & "include",
          "-I" & Project'Project_Dir & "include/api") &
         Lua_Ada.C_Platform_Defines & C_Import_Defines;
+      case Lua_Ada.Configuration_Subdir is
+         when "upstream-test/" =>
+            for Switches ("buffer_private_t_contract.c") use
+              Consumer.Compiler'Default_Switches ("C") &
+              ("-I" & Project'Project_Dir & "../references/lua");
+         when others => null;
+      end case;
    end Compiler;
    package Linker is
       case Lua_Ada_Config.Alire_Host_OS is
