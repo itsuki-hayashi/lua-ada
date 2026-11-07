@@ -560,6 +560,32 @@ build/linkage observations with false runtime/coverage authority. A successful
 build does not establish that the module's Lua/C operations or lifetime driver
 ran. POSIX host export/lookup behavior still needs actual platform execution.
 
+The full-target runner requires an explicit `-FixtureCompiler` for native
+operations before it starts Lua. `-FixtureCompilerSha256` binds that compiler
+to the immutable image; partition jobs require the exact frozen compiler hash.
+The image also records the companion `dlltool` (Windows) or selected `nm`
+(POSIX) hash. The runner records `native_fixture_linkage` separately from the
+flat artifact list and adds the fixture library directory to child loader
+paths. Aggregate, attrib.lua and main.lua final acceptance require exactly one
+receipt. `NativeLuaFixtureEvidence.psm1` replays source/header bindings, exact
+compile/tool arguments and captures, module and alias bytes, final host name,
+and actual frozen owner. Windows replay reconstructs the complete definition
+including data markers, reparses PE imports and validates transitive fixture
+dependencies. POSIX replay reconstructs symbol sets from the hashed tool
+captures and checks owner/dependency lookup routes without an archive fallback.
+Neither structural replay nor a successful compiler process replaces the
+separate actual native module lifetime driver. The fixture evidence regression
+script can compile original modules with explicit compiler/oracle paths; those
+tests launch no Lua interpreter and grant no execution coverage.
+
+An explicit `ReferenceC`, `native-original`, `ReportOnly` observation preserves
+ordinary Lua assertion failures as failed native applicability inputs. It
+retains the wrapper, original source, failure captures and allocator telemetry,
+while recording `source_completed=false` and an original-baseline disposition.
+Transforms and acceptance flags are forbidden for that variant. Successful
+file/branch/child completion checks remain mandatory for primary observations;
+native baseline transport grants no passing source or omission evidence.
+
 Artifact transport follows the official [upload-artifact v7 documentation](https://github.com/actions/upload-artifact/tree/v7.0.2)
 and [download-artifact v8 documentation](https://github.com/actions/download-artifact/tree/v8).
 Unix mode bits are restored from the content-bound image manifest because the

@@ -174,7 +174,10 @@ jobs:
           TARGET_EXECUTION_POLICY: ${{ inputs.execution_policy || '' }}
         run: |
           $development = '${{ github.event_name == 'workflow_dispatch' && inputs.development_observations }}' -ceq 'true'
-          ./scripts/run-target-partition.ps1 -Context '${{ matrix.context }}' -Partition '${{ matrix.partition }}' -ImageDirectory "$PWD/reports/immutable-input/${{ matrix.id }}" -ExecutionPolicy $env:TARGET_EXECUTION_POLICY -DevelopmentObservation:$development
+          $compilerOutput = & alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve selected partition compiler' }
+          $fixtureCompiler = ($compilerOutput -join '').Trim()
+          ./scripts/run-target-partition.ps1 -Context '${{ matrix.context }}' -Partition '${{ matrix.partition }}' -ImageDirectory "$PWD/reports/immutable-input/${{ matrix.id }}" -ExecutionPolicy $env:TARGET_EXECUTION_POLICY -FixtureCompiler $fixtureCompiler -DevelopmentObservation:$development
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Preserve complete raw observation subtree
         if: always()

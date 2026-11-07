@@ -305,3 +305,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Compiled ABI/layout/header witness regressions
 if ($LASTEXITCODE -ne 0) { throw 'Target workflow planning/preflight regressions failed' }
 & (Join-Path $PSScriptRoot 'test-target-observation-collection.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Target observation bundle transport regressions failed' }
+& (Join-Path $PSScriptRoot 'test-native-module-linkage.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Native image linkage regressions failed' }
+& (Join-Path $PSScriptRoot 'test-native-lua-fixture-evidence.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Native fixture evidence regressions failed' }

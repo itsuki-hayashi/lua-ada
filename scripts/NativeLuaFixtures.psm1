@@ -153,8 +153,15 @@ function Build-NativeLuaFixtures {
         }
         $bindings+=@{source=$record.source;artifact=$artifact;artifact_sha256=$hash;compile=$compile;binding=$binding}
     }
-    $evidence=@{schema_version=1;kind='same-image-native-fixture-observations';plan=$plan;configuration=$Configuration;
+    $evidence=@{schema_version=1;kind='same-image-native-fixture-observations';plan=$plan;configuration=$Configuration;synthetic_fixture=$false;
+        source_root=[IO.Path]::GetFullPath($Root);
+        source_bindings=@(foreach($relative in @('scripts/NativeLuaFixtures.psm1','scripts/NativeModuleLinkage.psm1')){
+            @{path=$relative;sha256=(Get-FileHash (Join-Path $Root $relative)).Hash.ToLowerInvariant()}
+        });
         forced_header=@{path='experiments/conformance/c/module_exports.h';sha256=(Get-FileHash $header).Hash.ToLowerInvariant()};
+        dependency_import_libraries=@(if($Platform -ceq 'windows'){foreach($name in @('lib1','lib2')){
+            $archive=Join-Path $libraries ($name+'.a');@{path=$archive;sha256=(Get-FileHash $archive).Hash.ToLowerInvariant()}
+        }});
         modules=$bindings;artifacts=$records;runtime_acceptance=$false;coverage_authority=$false}
     $path=Join-Path $RecordDirectory 'linkage.json'
     [IO.File]::WriteAllText($path,(ConvertTo-Json $evidence -Depth 64).Replace("`r`n","`n")+"`n",[Text.UTF8Encoding]::new($false))

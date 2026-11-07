@@ -7,6 +7,8 @@ param(
     [string] $Report = '',
     [string] $RuntimeDirectory = '',
     [string] $NativeLibraryDirectory = '',
+    [string] $FixtureCompiler = '',
+    [string] $FixtureCompilerSha256 = '',
     [string] $AcceptanceContract = '',
     [string] $Context = '',
     [switch] $BuildReference,
@@ -36,6 +38,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceFileProtocols.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceAggregateReplay.psm1')
+Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
 $root = Split-Path -Parent $PSScriptRoot
 $original = Get-Location
 $revision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
@@ -78,6 +81,11 @@ if ($Scope -ne '') {
     }
 }
 $acceptanceRequested = $RequireAcceptance -or $RequireScopedAcceptance -or $RequireTargetAcceptance
+$nativeOriginalObservation = $TargetPolicy -ne '' -and $Target -ceq 'ReferenceC' -and $Variant -ceq 'native-original'
+if ($Variant -ceq 'native-original' -and (-not $nativeOriginalObservation -or -not $ReportOnly -or $acceptanceRequested -or
+    $EquivalentManifest -ne '' -or $TAdaptationManifest -ne '' -or $AggregateManifest -ne '')) {
+    throw 'Native-original observations require unmodified ReferenceC ReportOnly target execution'
+}
 if ($TargetPolicy -ne '' -and $AllowUnreviewedEquivalent) {
     throw 'Full-target execution never permits unreviewed equivalents'
 }
@@ -160,6 +168,7 @@ $evidence = [ordered]@{
     file_completion_protocol = $null
     native_applicability = $null
     native_applicability_verified = $false
+    native_original_observation = $nativeOriginalObservation
     aggregate_replay = $null
     repl_preflight_process = $null
     reference_source_records = @()
@@ -168,6 +177,7 @@ $evidence = [ordered]@{
     runtime_library_records = @()
     build_processes = @()
     native_fixture_records = @()
+    native_fixture_linkage = @()
     native_branch_facts = $null
     source_profile_facts = $null
     source_condition_results = $null
@@ -186,10 +196,22 @@ function Invoke-BuildProcess {
     # Keep compiler output and its exact argument vector alongside execution
     # evidence. In particular, a fixture link failure is a setup failure, not
     # a Lua-platform equivalent or an unexplained skipped test.
-    $alire = (Get-Command alr -ErrorAction Stop).Source
-    $build = Invoke-ConformanceProcess -Executable $alire -Arguments $BuildArguments `
+    # Frozen target jobs supply the compiler explicitly. Other build tools
+    # keep their existing Alire invocation and profile selection.
+    $executable = ''
+    $arguments = $BuildArguments
+    $buildEnvironment = @{}
+    if ($BuildArguments.Count -ge 3 -and $BuildArguments[0] -ceq 'exec' -and
+        $BuildArguments[1] -ceq '--' -and $BuildArguments[2] -ceq 'gcc' -and $FixtureCompiler -ne '') {
+        $executable = Resolve-FixtureCompiler
+        $arguments = @($BuildArguments | Select-Object -Skip 3)
+        $buildEnvironment.PATH = (Split-Path -Parent $executable) + [IO.Path]::PathSeparator + $env:PATH
+    } else {
+        $executable = (Get-Command alr -ErrorAction Stop).Source
+    }
+    $build = Invoke-ConformanceProcess -Executable $executable -Arguments $arguments `
         -Directory $root -OutputPrefix (Join-Path $runRoot ('build-' + $evidence.build_processes.Count)) `
-        -TimeoutSeconds 900
+        -TimeoutSeconds 900 -Environment $buildEnvironment
     $evidence.build_processes += $build
     if ($build.exit_code -ne 0 -or $build.timed_out -or $build.capture_exceeded -or
         $build.pipe_drain_failed -or $build.process_tree_kill_error) {
@@ -201,43 +223,35 @@ function Invoke-BuildProcess {
     }
 }
 
+function Resolve-FixtureCompiler {
+    if ($FixtureCompiler -eq '') {
+        if ($TargetPolicy -ne '') { throw 'Full-target native fixtures require an explicit frozen FixtureCompiler' }
+        $output = & alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
+        if ($LASTEXITCODE -ne 0) { throw 'Cannot identify selected native fixture compiler' }
+        $script:FixtureCompiler = ($output -join '').Trim()
+    }
+    $path = (Resolve-Path -LiteralPath $FixtureCompiler).Path
+    if ($FixtureCompilerSha256 -ne '' -and
+        (Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant() -cne $FixtureCompilerSha256) {
+        throw 'Native fixture compiler differs from its frozen context'
+    }
+    return $path
+}
+
 function Build-Fixtures {
-    param([string] $Directory, [string] $LibraryDirectory,
-          [string] $LibraryName = 'conformance_lua')
-    # Match the upstream fixture filenames even on Windows: LoadLibrary can
-    # load a PE DLL with an explicit .so suffix. Sources remain byte-identical.
-    $include = Join-Path $root 'references/lua'
-    $exports = Join-Path $root 'experiments/conformance/c/module_exports.h'
-    $common = @('-std=c99', '-O2', '-I', $include, '-include', $exports)
-    if ($Configuration -eq 'upstream-test') { $common += '-DLUA_USER_H=<ltests.h>' }
-    if (-not $IsWindows) { $common += '-fPIC' }
-    $shared = if ($IsMacOS) { '-dynamiclib' } else { '-shared' }
-    $cases = @(
-        @{ Name='lib1'; Source='lib1.c' },
-        @{ Name='lib11'; Source='lib11.c' },
-        @{ Name='lib2'; Source='lib2.c' },
-        @{ Name='lib21'; Source='lib21.c' },
-        @{ Name='lib2-v2'; Source='lib22.c' }
-    )
-    foreach ($case in $cases) {
-        $args = $common + @($shared, (Join-Path $Directory ('libs/' + $case.Source)),
-            '-o', (Join-Path $Directory ('libs/' + $case.Name + '.so')),
-            '-L', $LibraryDirectory, ('-l' + $LibraryName))
-        if ($IsWindows -and $case.Name -in @('lib1', 'lib2')) {
-            $args += '-Wl,--out-implib,' + (Join-Path $Directory ('libs/' + $case.Name + '.a'))
-        }
-        if ($IsWindows -and $case.Name -eq 'lib11') { $args += Join-Path $Directory 'libs/lib1.a' }
-        if ($IsWindows -and $case.Name -eq 'lib21') { $args += Join-Path $Directory 'libs/lib2.a' }
-        if ($IsMacOS) { $args += @('-Wl,-undefined,dynamic_lookup') }
-        Invoke-BuildProcess (@('exec', '--', 'gcc') + $args)
-        $artifact = Join-Path $Directory ('libs/' + $case.Name + '.so')
-        $source = Join-Path $Directory ('libs/' + $case.Source)
-        $evidence.native_fixture_records += [ordered]@{
-            source = 'libs/' + $case.Source
-            source_sha256 = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
-            artifact = $artifact
-            artifact_sha256 = (Get-FileHash -LiteralPath $artifact -Algorithm SHA256).Hash.ToLowerInvariant()
-        }
+    param([string] $Directory, [string] $LibraryDirectory)
+    # A static archive would embed a second Ada interpreter inside each DLL.
+    # Build against the actual final host exports, or the selected shared
+    # runtime image, and retain the parsed import graph for final replay.
+    $libraryType = if ($Target -ceq 'ReferenceC') { 'shared' } else { $evidence.observed_configuration.launcher_library_type }
+    $built = Build-NativeLuaFixtures -Root $root -HostPath $Interpreter -RuntimeDirectory $LibraryDirectory `
+        -Compiler (Resolve-FixtureCompiler) -CompilerSha256 $FixtureCompilerSha256 -Implementation $Target `
+        -LibraryType $libraryType -Platform $evidence.host.platform -Configuration $Configuration `
+        -FixtureDirectory $Directory -RecordDirectory (Join-Path $runRoot 'native-linkage')
+    $evidence.native_fixture_records += @($built.records)
+    $evidence.native_fixture_linkage += $built.identity
+    foreach ($name in @('PATH','LD_LIBRARY_PATH','DYLD_LIBRARY_PATH')) {
+        $environment[$name] = $built.library_directory + [IO.Path]::PathSeparator + $environment[$name]
     }
 }
 
@@ -300,7 +314,7 @@ try {
     foreach ($relative in @('scripts/run-conformance.ps1', 'scripts/ConformanceRunner.psm1',
         'scripts/ConformanceInventory.psm1', 'scripts/ConformanceScope.psm1',
         'scripts/ManagedTelemetry.psm1', 'scripts/ConformanceReview.psm1',
-        'scripts/ConformanceFileProtocols.psm1',
+        'scripts/ConformanceFileProtocols.psm1', 'scripts/NativeLuaFixtures.psm1', 'scripts/NativeModuleLinkage.psm1',
         'scripts/ConformanceTransforms.psm1','scripts/ConformanceAggregateReplay.psm1','scripts/New-ConformanceTTransform.ps1',
         'scripts/New-ConformanceEquivalent.ps1', 'tests/conformance/suite.json')) {
         $evidence.harness_source_records += [ordered]@{
@@ -379,11 +393,18 @@ try {
         if ($File -in @('all.lua', 'heavy.lua')) { throw 'Use Aggregate or Heavy for this file' }
     }
     elseif ($File -ne '') { throw 'File is only valid in File mode' }
+    if ($Scope -eq '' -and $TargetPolicy -ne '' -and $requiresNativeFixtures) {
+        # A missing or stale frozen compiler is a setup failure before any
+        # Lua process runs, including an original C applicability capture.
+        $null = Resolve-FixtureCompiler
+    }
     if ($BuildReference) {
         Invoke-BuildProcess @('exec', '--', 'gprbuild', '-P', 'experiments/conformance/oracle.gpr',
             "-XLUA_CONFORMANCE_CONFIGURATION=$Configuration")
     }
-    $libraryDirectory = Join-Path $root "build/conformance/$Configuration/lib"
+    $libraryDirectory = if ($Target -ceq 'ReferenceC' -and $RuntimeDirectory -ne '') {
+        (Resolve-Path -LiteralPath $RuntimeDirectory).Path
+    } else { Join-Path $root "build/conformance/$Configuration/lib" }
     if ($Interpreter -eq '') {
         if ($Target -ne 'ReferenceC') { throw 'Ada observation requires an explicit Interpreter' }
         $Interpreter = Join-Path $root "build/conformance/$Configuration/bin/lua$suffix"
@@ -544,11 +565,12 @@ try {
             throw 'Default Ada REPL prerequisite failed'
         }
         }
-        if ($Scope -eq '' -and $requiresNativeFixtures -and $NativeLibraryDirectory -ne '') {
+        $fixtureRuntimeDirectory = if ($NativeLibraryDirectory -ne '') { $NativeLibraryDirectory } else { $RuntimeDirectory }
+        if ($Scope -eq '' -and $requiresNativeFixtures -and $fixtureRuntimeDirectory -ne '') {
             Build-Fixtures -Directory $fixtureDirectory `
-                -LibraryDirectory (Resolve-Path -LiteralPath $NativeLibraryDirectory).Path -LibraryName lua
+                -LibraryDirectory (Resolve-Path -LiteralPath $fixtureRuntimeDirectory).Path
         }
-        elseif ($Scope -eq '' -and $requiresNativeFixtures -and ($RequireAcceptance -or $RequireTargetAcceptance)) {
+        elseif ($Scope -eq '' -and $requiresNativeFixtures -and ($RequireAcceptance -or $TargetPolicy -ne '')) {
             throw 'Ada acceptance needs NativeLibraryDirectory for actual upstream C fixture modules'
         }
     }
@@ -879,11 +901,19 @@ try {
         -Directory $executionDirectory -OutputPrefix (Join-Path $runRoot 'execution') `
         -TimeoutSeconds $evidence.timeout_seconds -Environment $environment
     $evidence.outcome = Get-ConformanceOutcome -Process $evidence.process -Marker $marker
-    if ($null -ne $evidence.file_completion_protocol) {
+    if ($null -ne $evidence.file_completion_protocol -and -not $nativeOriginalObservation) {
         $completed = Assert-TargetFileCompletion -File $File -Configuration $Configuration -Process $evidence.process
         foreach ($field in @('disposition','terminal_witness','source_completed')) {
             $evidence.file_completion_protocol[$field] = $completed[$field]
         }
+    } elseif ($null -ne $evidence.file_completion_protocol) {
+        # Original C native assumptions are allowed to fail as captured Lua
+        # errors. Keep protocol/source bytes and failure telemetry, while
+        # explicitly withholding successful completion. This observation
+        # cannot enter a primary matrix row or an acceptance path.
+        $evidence.file_completion_protocol.source_completed = $false
+        $evidence.file_completion_protocol.disposition = 'original-native-baseline-observation'
+        $evidence.file_completion_protocol.terminal_witness = $null
     }
     if ($hasProfileWitness) {
         $evidence.source_profile_facts = Get-ScopedSourceProfileFacts `
@@ -894,7 +924,7 @@ try {
         $evidence.source_condition_results = Get-ScopedMeasuredConditionResults `
             -Records $sourceConditions -Facts $evidence.source_profile_facts
     }
-    if ($File -ceq 'constructs.lua' -and $hasProfileWitness) {
+    if ($File -ceq 'constructs.lua' -and $hasProfileWitness -and -not $nativeOriginalObservation) {
         $branchOutput = [IO.File]::ReadAllText($evidence.process.stdout_path)
         $pattern = '(?m)^testing short-circuit optimizations \(' + $ConstructsBranch + '\)\r?$'
         if ([regex]::Matches($branchOutput, $pattern).Count -ne 1) {
@@ -912,13 +942,14 @@ try {
         $telemetry = Get-Content -LiteralPath $telemetryPath -Raw | ConvertFrom-Json -AsHashtable
         Assert-ManagedTelemetry -Telemetry $telemetry -RunId $runId -ProcessId $evidence.process.process_id `
             -Configuration $Configuration -LimitBytes $evidence.allocator_limit_bytes -RequireShutdown:($Target -ceq 'Ada')
-        if ($Scope -ne '' -or ($Mode -ceq 'File' -and $File -cin (Get-ConformanceScopePolicy -Scope expanded-t-conformance).Files)) {
+        if (-not $nativeOriginalObservation -and ($Scope -ne '' -or
+            ($Mode -ceq 'File' -and $File -cin (Get-ConformanceScopePolicy -Scope expanded-t-conformance).Files))) {
             Assert-ScopedProcessCompletion -File $File -Process $evidence.process `
                 -Telemetry $telemetry -RunId $runId -Configuration $Configuration -Platform $evidence.host.platform -NativeOracle:($Target -eq 'ReferenceC')
         }
         $evidence.allocator_telemetry = [ordered]@{ path=$telemetryPath;
             sha256=(Get-FileHash -LiteralPath $telemetryPath -Algorithm SHA256).Hash.ToLowerInvariant(); data=$telemetry }
-        if ($File -eq 'files.lua') {
+        if ($File -eq 'files.lua' -and -not $nativeOriginalObservation) {
             $evidence.native_branch_facts = Get-ScopedNativeBranchFacts -Output ([IO.File]::ReadAllText($evidence.process.stdout_path))
             Assert-NativeBranchWitnesses -Mapping $nativeMapping -Output ([IO.File]::ReadAllText($evidence.process.stdout_path))
         }
@@ -937,7 +968,7 @@ try {
             # POSIX has two empty commands, four exits, and (with T) a pipe
             # receiver. Windows substitutes two Lua cat counterparts instead.
             # C exits bypass its writer; Ada typed exits always dispose/record.
-            if ($File -eq 'files.lua') {
+            if ($File -eq 'files.lua' -and -not $nativeOriginalObservation) {
                 $expectedChildren = if ($IsWindows) { 4 } else { 2 }
                 if (-not $IsWindows -and $Configuration -eq 'upstream-test') { $expectedChildren++ }
                 if ($Target -eq 'Ada') { $expectedChildren += 4 }

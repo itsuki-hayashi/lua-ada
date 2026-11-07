@@ -559,6 +559,20 @@ Case 'target context mismatch blocks every operation before a compiler or Lua pr
         }
     }
 }
+Case 'full-target native fixture compiler omissions and frozen hash drift reject before Lua' {
+    $platform=if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}
+    foreach($selection in @(@(),@('-FixtureCompiler',$shell,'-FixtureCompilerSha256',('0'*64)))) {
+        $reportPath=Join-Path $temporary ('target-native-compiler-'+[Guid]::NewGuid().ToString('N')+'.json')
+        $arguments=@('-NoProfile','-File',(Join-Path $PSScriptRoot 'run-conformance.ps1'),'-Target','ReferenceC',
+            '-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','attrib.lua',
+            '-Context',('default/'+$platform+'/validation/static'),'-Report',$reportPath,'-Interpreter','unused')+@($selection)
+        $process=Invoke-ConformanceProcess -Executable $shell -Arguments $arguments -Directory $root `
+            -OutputPrefix (Join-Path $temporary ('native-compiler-'+[Guid]::NewGuid().ToString('N'))) -TimeoutSeconds 60
+        $report=Get-Content $reportPath -Raw|ConvertFrom-Json -AsHashtable
+        Assert-True ($process.exit_code -ne 0 -and $report.setup_error -match 'fixture.*compiler|frozen FixtureCompiler' -and
+            $null -eq $report.configuration_process -and $null -eq $report.process -and $report.build_processes.Count -eq 0) 'Missing/stale compiler entered a Lua or build process'
+    }
+}
 Case 'full-target smoke and mixed acceptance flags reject before setup' {
     foreach ($arguments in @(
         @('-TargetPolicy','remaining-upstream-compatibility','-Mode','Smoke'),
@@ -566,7 +580,10 @@ Case 'full-target smoke and mixed acceptance flags reject before setup' {
         @('-RequireTargetAcceptance','-Target','Ada','-Mode','File','-File','api.lua'),
         @('-AggregateManifest','unreviewed.json','-Mode','Aggregate'),
         @('-AggregateManifest','unreviewed.json','-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','code.lua'),
-        @('-AggregateManifest','unreviewed.json','-TargetPolicy','remaining-upstream-compatibility','-Mode','Aggregate','-TAdaptationManifest','unreviewed-t.json')
+        @('-AggregateManifest','unreviewed.json','-TargetPolicy','remaining-upstream-compatibility','-Mode','Aggregate','-TAdaptationManifest','unreviewed-t.json'),
+        @('-Variant','native-original','-Target','Ada','-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','attrib.lua','-ReportOnly'),
+        @('-Variant','native-original','-Target','ReferenceC','-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','attrib.lua'),
+        @('-Variant','native-original','-Target','ReferenceC','-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','attrib.lua','-ReportOnly','-EquivalentManifest','unreviewed.json')
     )) {
         $process = Invoke-ConformanceProcess -Executable $shell `
             -Arguments (@('-NoProfile','-File',(Join-Path $PSScriptRoot 'run-conformance.ps1')) + $arguments) `

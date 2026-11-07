@@ -3,6 +3,7 @@ param(
     [Parameter(Mandatory)][ValidateSet('files-1','files-2','files-3','aggregate','heavy')][string] $Partition,
     [string] $ImageDirectory = '',
     [string] $ExecutionPolicy = '',
+    [string] $FixtureCompiler = '',
     [switch] $DevelopmentObservation,
     [switch] $PlanOnly
 )
@@ -39,6 +40,11 @@ if($LASTEXITCODE -ne 0){throw 'Cannot identify target partition revision'}
 $dirty=@(& git -C $root -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal)
 if($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0){throw 'Target partition requires a clean checkout'}
 $image=Restore-TargetContextImage -Root $root -ImageDirectory $ImageDirectory -Context $Context -Revision $revision
+if ($FixtureCompiler -eq '') { throw 'Target partitions require an explicit FixtureCompiler from the selected toolchain' }
+$FixtureCompiler = (Resolve-Path -LiteralPath $FixtureCompiler).Path
+if ((Get-FileHash -LiteralPath $FixtureCompiler).Hash.ToLowerInvariant() -cne $image.manifest.toolchain.compiler_sha256) {
+    throw 'Target partition compiler differs from its frozen context image'
+}
 $policy=$null
 if($ExecutionPolicy -ne ''){
     $full=if([IO.Path]::IsPathRooted($ExecutionPolicy)){$ExecutionPolicy}else{Join-Path $root $ExecutionPolicy}
@@ -66,11 +72,14 @@ try{
         $arguments=@{Target=$operation.target;Configuration=$parts[0];Context=$Context;
             Mode=$(if($entry.operation -ceq 'file'){'File'}else{$entry.operation});File=$operation.file;
             TargetPolicy='remaining-upstream-compatibility';Variant=$operation.variant;ConstructsBranch=$operation.constructs_branch;
-            Report=$report;ReportOnly=$true;
+            Report=$report;ReportOnly=$true;FixtureCompiler=$FixtureCompiler;
+            FixtureCompilerSha256=$image.manifest.toolchain.compiler_sha256;
             Interpreter=(Join-Path $root $(if($operation.target -ceq 'Ada'){$image.manifest.paths.ada_launcher}else{$image.manifest.paths.c_oracle}))}
         if($operation.target -ceq 'Ada'){
             $arguments.RuntimeDirectory=Join-Path $root $image.manifest.paths.ada_runtime
             $arguments.NativeLibraryDirectory=$arguments.RuntimeDirectory
+        } else {
+            $arguments.RuntimeDirectory=Join-Path $root $image.manifest.paths.c_runtime
         }
         if($null -ne $policy){
             $selected=@($policy.operations|Where-Object{

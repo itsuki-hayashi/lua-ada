@@ -106,7 +106,16 @@ $directories = @((Split-Path -Parent $paths.ada_launcher).Replace('\','/'),
     (Split-Path -Parent $paths.c_oracle).Replace('\','/'),$paths.ada_runtime,$paths.c_runtime,
     ('reports/target-builds/' + $selected.id),$paths.compiler_support)
 $imageDirectory = Join-Path $root ('reports/target-images/' + $selected.id)
+$toolchain = @{compiler_sha256=(Get-FileHash -LiteralPath $compiler).Hash.ToLowerInvariant()}
+if ($IsWindows) {
+    $dlltool = Join-Path (Split-Path -Parent $compiler) 'dlltool.exe'
+    $toolchain.dlltool_sha256 = (Get-FileHash -LiteralPath $dlltool).Hash.ToLowerInvariant()
+} else {
+    $nm = Join-Path (Split-Path -Parent $compiler) 'nm'
+    if (-not (Test-Path -LiteralPath $nm -PathType Leaf)) { $nm = (Get-Command nm -ErrorAction Stop).Source }
+    $toolchain.nm_sha256 = (Get-FileHash -LiteralPath $nm).Hash.ToLowerInvariant()
+}
 $image = New-TargetContextImage -Root $root -Context $Context -OutputDirectory $imageDirectory -Paths $paths `
     -Directories $directories -WitnessReports @($receiptPath,$receipt.consumer.path,$receipt.aunit.path,$buildLogPath) `
-    -Toolchain @{compiler_sha256=(Get-FileHash -LiteralPath $compiler).Hash.ToLowerInvariant()}
+    -Toolchain $toolchain
 Write-Output "FROZEN: $Context image=$imageDirectory sha256=$($image.sha256); target acceptance=False"

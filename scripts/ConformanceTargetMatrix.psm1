@@ -12,6 +12,7 @@ Import-Module (Join-Path $PSScriptRoot 'TargetObservationEnvelope.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetCompiledWitnesses.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceAggregateReplay.psm1')
+Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtureEvidence.psm1')
 
 function Assert-TargetNativeOriginalImageBindings {
     param([string] $ArtifactRoot,[Collections.IDictionary] $Proof,[Collections.IDictionary] $ContextImage)
@@ -503,6 +504,11 @@ function Test-FullTargetMatrix {
                     -Operation $entry.operation -Implementation $expectedTarget -Variant $report.variant
                 $reviewedNative=$review.native_applicability
                 Assert-TargetReportImageBinding -Image $verifiedBuilds[$entry.context].image.manifest -Report $report
+                if($entry.operation -cin @('aggregate','file:attrib.lua','file:main.lua')){
+                    $imagePayload=Join-Path (Split-Path -Parent $verifiedBuilds[$entry.context].image.manifest_path) 'payload'
+                    $null=Assert-NativeLuaFixtureEvidence -Root $Root -ArtifactRoot $artifacts -ImagePayload $imagePayload `
+                        -Image $verifiedBuilds[$entry.context].image.manifest -Report $report
+                }
             }
             Assert-TargetTransformReplay -Root $Root -ArtifactRoot $artifacts -Report $report -Entry $entry `
                 -Contract $contract -ResolvedExclusions $resolvedExclusions -RequireAcceptance:$RequireTargetAcceptance `
