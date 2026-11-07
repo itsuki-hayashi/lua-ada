@@ -416,6 +416,72 @@ static void stripped_metadata(lua_State *L) {
     lua_settop(L, 0);
 }
 
+static int inspect_pending_temporary(lua_State *L) {
+    lua_Debug ar;
+    const char *name;
+    int top = lua_gettop(L);
+    /* The actual caller keeps (a+1) pending below this function's call slot.
+     * Read and edit that real operand, then verify neither the function nor
+     * its arguments appear as caller temporaries. A rejected setter retains
+     * its own pushed value, as required by the public C stack protocol. */
+    assert(top == 1 && lua_tointeger(L, 1) == 9);
+    assert(lua_getstack(L, 1, &ar));
+    name = lua_getlocal(L, &ar, 3);
+    assert(name && strcmp(name, "(temporary)") == 0);
+    assert(lua_tointeger(L, -1) == 1); lua_pop(L, 1);
+    assert(lua_getlocal(L, &ar, 4) == NULL && lua_gettop(L) == top);
+    assert(lua_getlocal(L, &ar, 5) == NULL && lua_gettop(L) == top);
+    lua_pushinteger(L, 10);
+    name = lua_setlocal(L, &ar, 3);
+    assert(name && strcmp(name, "(temporary)") == 0);
+    assert(lua_gettop(L) == top);
+    lua_pushinteger(L, 99);
+    assert(lua_setlocal(L, &ar, 4) == NULL);
+    assert(lua_gettop(L) == top + 1 && lua_tointeger(L, -1) == 99);
+    lua_pop(L, 1);
+    lua_pushinteger(L, 20);
+    return 1;
+}
+
+static void caller_temporary_extent(lua_State *L) {
+    lua_pushcfunction(L, inspect_pending_temporary);
+    lua_setglobal(L, "temporary_probe");
+    run(L, "local function g(a,b) return (a+1)+temporary_probe(9) end "
+           "return g(0,0)");
+    assert(lua_gettop(L) == 1 && lua_tointeger(L, 1) == 30);
+    lua_settop(L, 0);
+}
+
+static void suspended_pending_temporary(lua_State *L) {
+    lua_State *co = lua_newthread(L);
+    lua_Debug ar;
+    const char *name;
+    int results = -1;
+    /* Suspension retains both actual windows. Collection cannot replace the
+     * pending scalar or invalidate the child-function boundary. Resume must
+     * consume the same register that lua_setlocal changes here. */
+    assert(luaL_loadstring(co,
+           "local function f() coroutine.yield(); return 20 end "
+           "local function g(a,b) return (a+1)+f() end return g(0,0)") == 0);
+    assert(lua_resume(co, L, 0, &results) == LUA_YIELD && results == 0);
+    lua_gc(L, LUA_GCCOLLECT);
+    assert(lua_getstack(co, 2, &ar));
+    name = lua_getlocal(co, &ar, 3);
+    assert(name && strcmp(name, "(temporary)") == 0);
+    assert(lua_tointeger(co, -1) == 1); lua_pop(co, 1);
+    assert(lua_getlocal(co, &ar, 4) == NULL && lua_gettop(co) == 0);
+    lua_pushinteger(co, 10);
+    name = lua_setlocal(co, &ar, 3);
+    assert(name && strcmp(name, "(temporary)") == 0);
+    lua_pushinteger(co, 99);
+    assert(lua_setlocal(co, &ar, 4) == NULL);
+    assert(lua_gettop(co) == 1 && lua_tointeger(co, -1) == 99);
+    lua_pop(co, 1);
+    assert(lua_resume(co, L, 0, &results) == LUA_OK && results == 1);
+    assert(lua_tointeger(co, -1) == 30);
+    lua_settop(L, 0);
+}
+
 static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     assert(lua_gettop(L) == 0);
     body(L);
@@ -444,6 +510,8 @@ int main(void) {
     check("stripped-metadata", stripped_metadata, L);
     check("c-return-transfer-metadata", c_return_transfer_metadata, L);
     check("suspended-capture-local", suspended_capture_local, L);
+    check("caller-temporary-extent", caller_temporary_extent, L);
+    check("suspended-pending-temporary", suspended_pending_temporary, L);
     lua_close(L); assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public debug contract");
     return 0;
