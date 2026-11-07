@@ -9,6 +9,12 @@ fixtures load into the static host. A disposable Windows-corrected attrib.lua
 matches C output; its adaptation is not yet reviewed acceptance evidence.
 Native image receipts, lifetime/fault campaigns and final matrix remain open.
 
+The [host base C closing checkpoint](sessions/2026-11-08-base-c-closing.md)
+adds actual idle C closing slots and allocation-free registration/thread
+pointer queries. Thirteen C cases match both native configurations; strict
+local default builds and 1,695 AUnit cases pass. Thread reset/self-close,
+fresh coroutine function slots and integrated full acceptance remain open.
+
 The [C operator checkpoint](sessions/2026-11-08-c-operator-windows.md) adds
 arithmetic/comparison with actual caller slots and unary duplicate operands.
 Seventeen C cases match both native configurations; strict local default

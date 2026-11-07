@@ -82,6 +82,7 @@ with Lua.External_Release_Tests;
 with Lua.Fixed_Numeric_Tests;
 with Lua.C_Conversion_Tests;
 with Lua.C_Operator_Tests;
+with Lua.C_Base_Closing_Tests;
 with Library_Runtime_Tests;
 with Native_Tests;
 with Message_Handler_Tests;
@@ -179,6 +180,7 @@ procedure Test_Runner is
       Lua.Fixed_Numeric_Tests.Register (Result);
       Lua.C_Conversion_Tests.Register (Result);
       Lua.C_Operator_Tests.Register (Result);
+      Lua.C_Base_Closing_Tests.Register (Result);
       Library_Runtime_Tests.Register (Result);
       Native_Tests.Register (Result);
       Message_Handler_Tests.Register (Result);

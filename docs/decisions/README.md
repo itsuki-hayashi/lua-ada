@@ -53,3 +53,6 @@ ownership while preserving one parser and existing host convenience APIs.
 Add numbered records for consequential choices. Include date, status, context,
 decision, alternatives, consequences, and verification implications. Supersede
 records explicitly instead of silently rewriting historical rationale.
+
+ADR 0026 records [real base C closing ownership](0026-base-c-closing-ownership.md)
+and stack-reserved closing links without registration allocation.

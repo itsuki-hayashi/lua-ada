@@ -864,6 +864,10 @@ package body Lua.Engine.Machine is
          State.Native_Depth := State.Native_Depth - 1;
       end if;
       Retire_Stack_Window (Item);
+      if State.Current.Base_C_Frame = Item then
+         State.Current.Foreign_Activation := null;
+         State.Current.Foreign_Base := 0;
+      end if;
       Return_Frame (Item);
    end Release_Frame;
 
@@ -1295,7 +1299,10 @@ package body Lua.Engine.Machine is
                   (Reason = Jump_Exit and then Closing.Symbol /= 0 and then
                    not Live.Contains (Closing.Symbol)));
                if not Closing.Frozen then
-                  Closing.Frozen_Value := Closing.Cell.Cell_Value;
+                  Closing.Frozen_Value :=
+                    (if Closing.Stack_Level /= 0 then
+                        Stacks.Read (Owner.Context, Closing.Stack_Level)
+                     else Closing.Cell.Cell_Value);
                   Closing.Frozen := True;
                end if;
             end;
@@ -2186,7 +2193,9 @@ package body Lua.Engine.Machine is
             for Index in reverse State.Current.Stack.First_Index ..
               State.Current.Stack.Last_Index
             loop
-               if not State.Current.Stack (Index).Closers.Is_Empty then
+               if not State.Current.Stack (Index).Closers.Is_Empty or else
+                 State.Current.Stack (Index).C_Closing_Level /= 0
+               then
                   while State.Current.Stack.Last_Index > Index loop
                      declare
                         Old : Frame_Access :=
@@ -2216,7 +2225,9 @@ package body Lua.Engine.Machine is
       for Index in reverse Protected_Index ..
         State.Current.Stack.Last_Index
       loop
-         if not State.Current.Stack (Index).Closers.Is_Empty then
+         if not State.Current.Stack (Index).Closers.Is_Empty or else
+           State.Current.Stack (Index).C_Closing_Level /= 0
+         then
             while State.Current.Stack.Last_Index > Index loop
                declare
                   Old : Frame_Access := State.Current.Stack.Last_Element;
@@ -2593,7 +2604,9 @@ package body Lua.Engine.Machine is
                end if;
             end;
          elsif Activation.Native_Stage = 2 then
-            if Activation.Closers.Is_Empty then
+            if Activation.Closers.Is_Empty and then
+              Activation.C_Closing_Level = 0
+            then
                Complete (Self, Activation.Native_Results);
             else
                Start_Unwind
@@ -2885,17 +2898,35 @@ package body Lua.Engine.Machine is
                Activation.Native_Results.Clear;
                Activation.Native_Stage := 0;
             end if;
-            while not Owner.Closers.Is_Empty loop
-               Closing := Owner.Closers.Last_Element;
+            while not Owner.Closers.Is_Empty or else
+              Owner.C_Closing_Level /= 0
+            loop
+               if Owner.C_Closing_Level /= 0 then
+                  Closing :=
+                    (Cell => null, Stack_Level => Owner.C_Closing_Level,
+                     Depth => Owner.C_Closing_Level, others => <>);
+               else
+                  Closing := Owner.Closers.Last_Element;
+               end if;
                Need_Close := Reason in Return_Exit | Error_Exit |
                  Coroutine_Exit or else
                  Closing.Depth > Activation.Unwind_Depth or else
                  (Reason = Jump_Exit and then Closing.Symbol /= 0 and then
                   not Activation.Unwind_Live.Contains (Closing.Symbol));
                exit when not Need_Close;
-               Owner.Closers.Delete_Last;
-               Left := (if Closing.Frozen then Closing.Frozen_Value else
-                          Closing.Cell.Cell_Value);
+               if Owner.C_Closing_Level /= 0 then
+                  Owner.C_Closing_Level := State.Current.C_Close_Links
+                    (Closing.Stack_Level).Previous;
+                  State.Current.C_Close_Links.Replace_Element
+                    (Closing.Stack_Level, (Previous => 0));
+               else
+                  Owner.Closers.Delete_Last;
+               end if;
+               Left :=
+                 (if Closing.Frozen then Closing.Frozen_Value
+                  elsif Closing.Stack_Level /= 0 then
+                    Stacks.Read (Owner.Context, Closing.Stack_Level)
+                  else Closing.Cell.Cell_Value);
                if Truth (Left) then
                   Handler := Metafield (State, Left, "__close");
                   --  Re-read the current handler, including nil/noncallable
@@ -5241,7 +5272,12 @@ package body Lua.Engine.Machine is
       --  is entered recursively and no physical storage is freed here.
       State.Current := State.Main_Context;
       Prepare
-        (Self, World_View (World_Addresses.To_Pointer (State'Address)));
+        (Self, World_View (World_Addresses.To_Pointer (State'Address)),
+         Retained_Depth => Natural (State.Current.Stack.Length));
+      --  The idle API base owns genuine C closing slots, but must itself be
+      --  consumed by state close. Ordinary root calls retain that activation;
+      --  this teardown driver deliberately includes it in its close walk.
+      Self.Entry_Depth := 0;
       Request_Process_Exit (State, 0, Close_State => True);
       while not Is_Complete (Self) or else External_Releases.Pending (State)
       loop

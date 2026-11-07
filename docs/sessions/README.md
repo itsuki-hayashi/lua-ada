@@ -39,6 +39,7 @@ into one major PR. Historical session results retain their original scope.
 | 2026-11-08 | [C numeric conversion](2026-11-08-c-numeric-conversion.md)           |
 | 2026-11-08 | [C operator windows](2026-11-08-c-operator-windows.md)               |
 | 2026-11-08 | [Native module loading](2026-11-08-native-module-loading.md)         |
+| 2026-11-08 | [Host base C closing](2026-11-08-base-c-closing.md)                  |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,

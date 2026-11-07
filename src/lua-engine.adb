@@ -20,6 +20,7 @@ with Lua_Ada_Config;
 with Lua.Engine.Compiler;
 with Lua.Engine.Tables;
 with Lua.Engine.Machine;
+with Lua.Engine.Foreign;
 
 package body Lua.Engine is
    use type Ada.Containers.Count_Type;
@@ -372,6 +373,7 @@ package body Lua.Engine is
       Item.Boundary_Results.Set_Owner (Item.Memory);
       Item.Foreign_Stack.Set_Owner (Item.Memory);
       Item.Stack_Cells.Set_Owner (Item.Memory);
+      Item.C_Close_Links.Set_Owner (Item.Memory);
       Item.Transfer.Results.Set_Owner (Item.Memory);
       --  Registration transfers ownership. Failed vector growth leaves the
       --  allocation local, so release it before propagating Storage_Error.
@@ -379,6 +381,13 @@ package body Lua.Engine is
          --  Error publication must work after provider refusal. Reserve its
          --  bounded packet while context construction can still fail cleanly.
          Item.Boundary_Results.Reserve_Capacity (2);
+         Item.Stack.Reserve_Capacity (1);
+         --  A valid lua_toclose cannot request allocator storage. Reserve
+         --  the actual base CallInfo and stack-resident closing links
+         --  during context construction; it acquires a window only on use.
+         Item.Base_C_Frame := New_Frame (State, Item);
+         Item.Base_C_Frame.Native_Name :=
+           To_Unbounded_String ("@host.base");
          Stacks.Reserve
            (State, Item, Initial_Stack_Size + Extra_Stack);
          Item.Stack_Used := Minimum_C_Stack;
@@ -393,6 +402,9 @@ package body Lua.Engine is
          State.Contexts.Append (Item);
       exception
          when others =>
+            if Item.Base_C_Frame /= null then
+               Free_Frame (Item.Base_C_Frame);
+            end if;
             Free_Context (Item);
             raise;
       end;
@@ -1122,6 +1134,7 @@ package body Lua.Engine is
       Origin : constant Context_Access :=
         (if Parent = null then State.Current else Parent);
    begin
+      Lua.Engine.Foreign.Prepare_Thread_Surface (State, Id);
       Thread := Allocate (State, Thread_Object);
       Thread.Context_Index := Positive (Id);
       Context.Thread := Thread;
@@ -1150,6 +1163,7 @@ package body Lua.Engine is
          declare
             Abandoned : Context_Access := Context;
          begin
+            Destroy_Frames (State, Abandoned);
             Release_Foreign_Context (State, Abandoned);
             Free_Context (Abandoned);
             State.Contexts.Replace_Element (Positive (Id), null);
@@ -1218,6 +1232,7 @@ package body Lua.Engine is
       Item.Native_Index := 0;
       Item.Native_Aux := 0;
       Item.Native_Operator := Lua.Lexers.End_Of_Input;
+      Item.C_Closing_Level := 0;
       Item.Foreign_Handler := System.Null_Address;
       Item.Foreign_Ticket := 0;
       Item.Foreign_Continuation := System.Null_Address;
@@ -1403,6 +1418,14 @@ package body Lua.Engine is
       Context := Item.Context;
       Item.Lifecycle := Retiring;
       Clear_Frame (Item);
+      if Context.Base_C_Frame = Item then
+         --  The base CallInfo has its own lifetime, equal to the context's.
+         --  Keep its empty reserved metadata outside the ordinary cache so
+         --  collection cannot shrink away allocation-free C registration.
+         Item.Lifecycle := Active;
+         Item := null;
+         return;
+      end if;
       --  This link publishes only an empty record. Cached frames are never
       --  traced as roots, and no user callback runs during this transition.
       Item.Cache_Next := Context.Cache_Head;
@@ -1432,9 +1455,15 @@ package body Lua.Engine is
       while not Context.Stack.Is_Empty loop
          Item := Context.Stack.Last_Element;
          Context.Stack.Delete_Last;
+         if Context.Base_C_Frame = Item then
+            Context.Base_C_Frame := null;
+         end if;
          Clear_Frame (Item);
          Free_Frame (Item);
       end loop;
+      if Context.Base_C_Frame /= null then
+         Free_Frame (Context.Base_C_Frame);
+      end if;
       while Context.Cache_Head /= null loop
          Item := Context.Cache_Head;
          Context.Cache_Head := Item.Cache_Next;
@@ -1454,6 +1483,7 @@ package body Lua.Engine is
       Context.Hook_Suspended := False;
       Context.Hook_Yield_Pending := False;
       Context.Foreign_Activation := null;
+      Context.Base_C_Frame := null;
       Context.Stack_Window := null;
    end Destroy_Frames;
 

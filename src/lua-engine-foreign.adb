@@ -420,6 +420,28 @@ package body Lua.Engine.Foreign is
          raise;
    end Create_Surface;
 
+   procedure Prepare_Thread_Surface
+     (State : in out World; Context : Context_Id)
+   is
+      Main : System.Address;
+      Owner : Controls.Object_Pointer;
+      Prepared : System.Address;
+   begin
+      if State.Main_Context = null or else
+        State.Main_Context.Foreign_State = System.Null_Address
+      then
+         return;
+      end if;
+      Main := State.Main_Context.Foreign_State;
+      Owner := Controls.To_Pointer (Surfaces.To_Pointer (Main).Owner);
+      Prepared := Create_Surface
+        (World_View (World_Views.To_Pointer (State'Address)), Context,
+         Owner.Extra, Owner.Seed, Main);
+      if Prepared = System.Null_Address then
+         raise Program_Error with "missing prepared C thread surface";
+      end if;
+   end Prepare_Thread_Surface;
+
    function New_State (Input : Request) return System.Address is
       State : World_Access;
       Result : System.Address;
@@ -552,6 +574,15 @@ package body Lua.Engine.Foreign is
         (Universe, Context_Id (State.Main_Thread.Context_Index),
          Storage_Count (C_Extra_Space), 0, System.Null_Address,
          Owns_Universe => False);
+      --  An Ada session can have created coroutines before its first C
+      --  callback. This entry is allowed to allocate; once native code runs,
+      --  converting one of those thread values must be a pure pointer read.
+      for Index in State.Contexts.First_Index .. State.Contexts.Last_Index
+      loop
+         if State.Contexts (Index) /= null then
+            Prepare_Thread_Surface (State, Context_Id (Index));
+         end if;
+      end loop;
       Owner := Controls.To_Pointer (Surfaces.To_Pointer (Main_State).Owner);
       if Owner.Calls /= System.Null_Address or else Owner.Driver_Borrowed then
          raise Program_Error with "Ada execution already owns a C borrow";
@@ -757,6 +788,42 @@ package body Lua.Engine.Foreign is
          when others => return (Kind => Lua.Numbers.Invalid);
       end case;
    end Numeric;
+
+   procedure Ensure_Base_C_Frame
+     (State : in out World; Context : not null Context_Access);
+   procedure Ensure_Base_C_Frame
+     (State : in out World; Context : not null Context_Access)
+   is
+      Item : Frame_Access;
+   begin
+      if Context.Foreign_Activation /= null then
+         return;
+      elsif not Context.Stack.Is_Empty or else Context.Stack_Window /= null
+      then
+         raise Foreign_Error with "C closing slot has no current C frame";
+      end if;
+      --  An idle C API stack already owns these scalar slots. Materialize
+      --  only its missing activation metadata: no function slot is inserted,
+      --  no value is copied, and no C function pointer is manufactured. The
+      --  same ordinary close list/cells then serve host and callback slots.
+      Item := Context.Base_C_Frame;
+      if Item = null or else Item.Has_Stack_Window then
+         raise Program_Error with "missing idle base C activation";
+      end if;
+      Context.Stack.Append (Item);
+      Item.Is_Native := True;
+      Item.Native_Name := To_Unbounded_String ("@host.base");
+      Item.Stack_Base := 0;
+      Item.Call_Base := 1;
+      Item.Stack_Live_Top := Context.Foreign_Top;
+      VM.Resize_Stack_Window (State, Item, Context.Stack_Used);
+      --  Retiring the base must restore an empty API stack, rather than the
+      --  historical top at first registration. Its window now traces the
+      --  actual values; an old host prefix would retain popped weak values.
+      Item.Saved_Foreign_Top := 0;
+      Context.Host_Stack_Top := 0;
+      Context.Foreign_Activation := Item;
+   end Ensure_Base_C_Frame;
 
    procedure Publish_Top (Context : not null Context_Access; Top : Natural) is
    begin
@@ -1583,16 +1650,15 @@ package body Lua.Engine.Foreign is
             end;
          when Mark_Close =>
             declare
-               Frame : constant Frame_Access := Context.Foreign_Activation;
+               Frame : Frame_Access := Context.Foreign_Activation;
                Slot : constant Natural := Position (Context, Input.Index);
                Item : constant Value := Get_Value (Input.Index);
             begin
-               if Frame = null or else not Valid_Index
+               if not Valid_Index
                  (Context, Input.Index) or else Slot <= Context.Foreign_Base
                then
                   raise Foreign_Error with "invalid to-be-closed C slot";
-               elsif not Frame.Closers.Is_Empty and then
-                 Slot <= Frame.Closers.Last_Element.Depth
+               elsif Frame /= null and then Slot <= Frame.C_Closing_Level
                then
                   raise Foreign_Error with "C close slots are out of order";
                end if;
@@ -1603,11 +1669,11 @@ package body Lua.Engine.Foreign is
                      raise Foreign_Error with
                        "variable '(C temporary)' got a non-closable value";
                   end if;
-                  Frame.Closers.Append
-                    (Close_Entry'
-                       (Cell => Stacks.Capture
-                          (Owner.Universe.all, Context, Slot),
-                        Depth => Slot, others => <>));
+                  Ensure_Base_C_Frame (Owner.Universe.all, Context);
+                  Frame := Context.Foreign_Activation;
+                  Context.C_Close_Links.Replace_Element
+                    (Slot, (Previous => Frame.C_Closing_Level));
+                  Frame.C_Closing_Level := Slot;
                end if;
             end;
          when Close_Slot =>
@@ -1620,8 +1686,7 @@ package body Lua.Engine.Foreign is
                then
                   raise Foreign_Error with "invalid C close slot";
                elsif Input.Count = 0 then
-                  if Frame.Closers.Is_Empty or else
-                    Frame.Closers.Last_Element.Depth /= Slot
+                  if Frame.C_Closing_Level /= Slot
                   then
                      raise Foreign_Error with "C slot is not marked to close";
                   end if;
@@ -2013,9 +2078,7 @@ package body Lua.Engine.Foreign is
                   raise Foreign_Error with "invalid stack top";
                end if;
                if Context.Foreign_Activation /= null and then
-                 not Context.Foreign_Activation.Closers.Is_Empty and then
-                 Context.Foreign_Activation.Closers.Last_Element.Depth >
-                   Natural (Count)
+                 Context.Foreign_Activation.C_Closing_Level > Natural (Count)
                then
                   Prepare_C_Slots
                     (Context.Foreign_Activation, Natural (Count));
@@ -2258,11 +2321,11 @@ package body Lua.Engine.Foreign is
                Item : constant Value := Get_Value (Input.Index);
             begin
                if Item.Kind = Thread_Kind then
-                  Output.Pointer := Create_Surface
-                    (Owner.Universe, Context_Id
-                       (Item.Reference.Context_Index),
-                     Owner.Extra, Owner.Seed,
-                     Surfaces.To_Pointer (State).Main);
+                  Output.Pointer := Owner.Universe.Contexts
+                    (Item.Reference.Context_Index).Foreign_State;
+                  if Output.Pointer = System.Null_Address then
+                     raise Program_Error with "unprepared C thread query";
+                  end if;
                elsif Input.Operation = To_Pointer then
                   case Item.Kind is
                      when Light_Identity_Kind | Foreign_Function_Kind =>

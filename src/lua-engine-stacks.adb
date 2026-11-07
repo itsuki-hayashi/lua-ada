@@ -1,6 +1,7 @@
 with Ada.Containers;
 
 package body Lua.Engine.Stacks is
+   use type Ada.Containers.Count_Type;
    use type Lua.Storage.Owner_Access;
 
    procedure Check_Owner
@@ -16,7 +17,8 @@ package body Lua.Engine.Stacks is
    begin
       if Context.Memory /= Lua.Storage.Reference (State.Memory) or else
         Context.Foreign_Stack.Owner_Of /= Context.Memory or else
-        Context.Stack_Cells.Owner_Of /= Context.Memory
+        Context.Stack_Cells.Owner_Of /= Context.Memory or else
+        Context.C_Close_Links.Owner_Of /= Context.Memory
       then
          raise Program_Error with "scalar arena has another allocator";
       end if;
@@ -28,7 +30,8 @@ package body Lua.Engine.Stacks is
    begin
       Check_Owner (State, Context);
       if Natural (Context.Foreign_Stack.Length) /=
-        Natural (Context.Stack_Cells.Length)
+        Natural (Context.Stack_Cells.Length) or else
+        Context.Foreign_Stack.Length /= Context.C_Close_Links.Length
       then
          raise Program_Error with "mismatched scalar arena lengths";
       elsif Index > Natural (Context.Foreign_Stack.Length) then
@@ -42,8 +45,10 @@ package body Lua.Engine.Stacks is
       if Context.Memory = null or else
         Context.Foreign_Stack.Owner_Of /= Context.Memory or else
         Context.Stack_Cells.Owner_Of /= Context.Memory or else
+        Context.C_Close_Links.Owner_Of /= Context.Memory or else
         Natural (Context.Foreign_Stack.Length) /=
-          Natural (Context.Stack_Cells.Length)
+          Natural (Context.Stack_Cells.Length) or else
+        Context.Foreign_Stack.Length /= Context.C_Close_Links.Length
       then
          raise Program_Error with "invalid parallel scalar arena";
       elsif First <= Last and then
@@ -66,19 +71,26 @@ package body Lua.Engine.Stacks is
       Check_Owner (State, Context);
       loop
          begin
-            --  Reserve both buffers before publishing either new length.
-            --  Value/cell elements are scalar and initialize without further
+            --  Reserve every buffer before publishing any new length.
+            --  Value/cell/link rows initialize without further
             --  allocation, so refusal preserves the old logical lengths and
             --  live slots. A successful first reserve may leave spare
-            --  physical capacity if the second fails; no semantic top is
+            --  physical capacity if another fails; no semantic top is
             --  published here. Emergency GC may clear already dead slots.
             Context.Foreign_Stack.Reserve_Capacity
               (Ada.Containers.Count_Type (Needed));
             Context.Stack_Cells.Reserve_Capacity
               (Ada.Containers.Count_Type (Needed));
+            --  Closing predecessors are actual stack metadata, like the
+            --  cell association above. Reserve before publishing lengths;
+            --  marking a C slot and reusing a cached frame allocate nothing.
+            Context.C_Close_Links.Reserve_Capacity
+              (Ada.Containers.Count_Type (Needed));
             Context.Foreign_Stack.Set_Length
               (Ada.Containers.Count_Type (Needed));
             Context.Stack_Cells.Set_Length
+              (Ada.Containers.Count_Type (Needed));
+            Context.C_Close_Links.Set_Length
               (Ada.Containers.Count_Type (Needed));
             return;
          exception
@@ -225,7 +237,8 @@ package body Lua.Engine.Stacks is
          raise Program_Error with "physical stack shrink cannot grow";
       elsif Last = Initialized and then
         Natural (Context.Foreign_Stack.Capacity) = Last and then
-        Natural (Context.Stack_Cells.Capacity) = Last
+        Natural (Context.Stack_Cells.Capacity) = Last and then
+        Natural (Context.C_Close_Links.Capacity) = Last
       then
          return True;
       end if;
@@ -240,9 +253,13 @@ package body Lua.Engine.Stacks is
          New_Cells : Cell_References.Vector := Cell_References.Copy_Prefix
            (Context.Stack_Cells, Ada.Containers.Count_Type (Last),
             Ada.Containers.Count_Type (Last));
+         New_Links : Closing_Links.Vector := Closing_Links.Copy_Prefix
+           (Context.C_Close_Links, Ada.Containers.Count_Type (Last),
+            Ada.Containers.Count_Type (Last));
       begin
          Values.Move (Context.Foreign_Stack, New_Values);
          Cell_References.Move (Context.Stack_Cells, New_Cells);
+         Closing_Links.Move (Context.C_Close_Links, New_Links);
       end;
       return True;
    exception

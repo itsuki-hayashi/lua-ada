@@ -7,6 +7,12 @@ Complete immutable same-image fixtures, reviewed platform counterparts,
 explicit unload/provider fault witnesses and instrumented/shared/POSIX gates.
 The diagnostic attrib.lua pair does not close its source or runtime ledger.
 
+Host base C slots have [scoped closing evidence](sessions/2026-11-08-base-c-closing.md):
+thirteen identical-source cases match native default/T and 1,695 AUnit cases
+pass. Stack-reserved links preserve allocation-free registration and retained
+refusal recovery. Thread reset, fresh coroutine function slots, public buffers
+and integrated target acceptance remain separate unfinished obligations.
+
 Public C arithmetic/comparison have [caller-window evidence](sessions/2026-11-08-c-operator-windows.md):
 seventeen native-default/T matched cases and 1,678 passing local AUnit cases.
 Thread reset, host-base C closing slots and integrated full acceptance remain.

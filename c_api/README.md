@@ -11,6 +11,14 @@ The installable headers under include/api are unchanged pinned copies with
 per-file hashes and retained notices; production include paths do not enter
 the reference-only tree.
 
+The [host base C closing checkpoint](../docs/sessions/2026-11-08-base-c-closing.md)
+supports direct idle-host `lua_toclose`, `lua_closeslot` and closing `lua_settop`
+through the actual scalar stack and shared iterative closer. Valid registration
+and thread-pointer queries make no selected-allocator request. Thirteen
+same-source cases match both native configurations locally; thread reset and
+full public auxiliary-buffer acceptance remain pending. See
+[ADR 0026](../docs/decisions/0026-base-c-closing-ownership.md) for ownership.
+
 The [public value/auxiliary checkpoint](../docs/sessions/2026-11-08-public-value-auxiliary.md)
 adds lua_len, lua_concat and lua_numbertocstring, plus 28 argument, option,
 metatable, userdata, reference, registration and error/result helpers. All

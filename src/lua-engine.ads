@@ -465,6 +465,9 @@ private package Lua.Engine is
      (Values.Vector, "=" => Values."=");
    type Close_Entry is record
       Cell : Object_Access;
+      Stack_Level : Natural := 0;
+      --  A C temporary closes the actual absolute scalar slot without
+      --  allocating an upvalue. Zero retains the private backend cell path.
       Symbol : Natural := 0;
       Depth : Natural := 0;
       Frozen_Value : Value := Nil_Value;
@@ -474,6 +477,10 @@ private package Lua.Engine is
       --  not replace a later handler's already departing stack-slot value.
    end record;
    package Close_Lists is new Lua.Storage.Vectors (Close_Entry);
+   type Closing_Link is record
+      Previous : Natural := 0;
+   end record;
+   package Closing_Links is new Lua.Storage.Vectors (Closing_Link);
    type Unwind_Reason is
      (No_Unwind, Scope_Exit, C_Slot_Exit, Jump_Exit, Return_Exit, Error_Exit,
       Coroutine_Exit);
@@ -525,6 +532,9 @@ private package Lua.Engine is
       Native_Index : Natural := 0;
       Native_Aux : Natural := 0;
       Native_Operator : Lua.Lexers.Token_Kind := Lua.Lexers.End_Of_Input;
+      C_Closing_Level : Natural := 0;
+      --  Intrusive C closing links live with their actual scalar slots.
+      --  This head borrows those indices; it owns no copied value or cell.
       Foreign_Handler : System.Address := System.Null_Address;
       Foreign_Ticket : Interfaces.C.unsigned_long_long := 0;
       Foreign_Continuation : System.Address := System.Null_Address;
@@ -695,6 +705,9 @@ private package Lua.Engine is
       Boundary_Results : Values.Vector;
       Foreign_Stack : Values.Vector;
       Stack_Cells : Cell_References.Vector;
+      C_Close_Links : Closing_Links.Vector;
+      --  Stack-reserved predecessor indices make valid lua_toclose marking
+      --  allocation-free, including when a cached Lua frame becomes C.
       Stack_Used : Natural := 0;
       Foreign_Top : Natural := 0;
       Host_Stack_Top : Natural := 0;
@@ -706,6 +719,10 @@ private package Lua.Engine is
       Foreign_Control : System.Address := System.Null_Address;
       Foreign_Base : Natural := 0;
       Foreign_Activation : Frame_Access;
+      Base_C_Frame : Frame_Access;
+      --  Reserved base C activation lazily owns API-level closing slots.
+      --  Its real scalar window starts at zero; like Lua's base CallInfo it
+      --  has no public debug frame and carries no native-call depth charge.
       Resume_Foreign_Activation : Frame_Access;
       Resume_Foreign_Base : Natural := 0;
       Resume_Foreign_Top : Natural := 0;

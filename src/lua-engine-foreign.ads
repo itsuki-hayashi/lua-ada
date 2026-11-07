@@ -209,6 +209,13 @@ package Lua.Engine.Foreign is
    procedure Initialize_Bridge;
    --  Verify the C/Ada surface contract during library elaboration.
 
+   procedure Prepare_Thread_Surface
+     (State : in out World; Context : Context_Id);
+   --  Reserve the addressed thread's C surface while thread construction
+   --  may allocate. An Ada-only world without a C main surface does nothing;
+   --  its first borrowed C entry prepares existing threads before invocation.
+   --  Public thread-pointer queries subsequently borrow without allocation.
+
    function Contract_Size (Part : Interfaces.C.int)
                           return Interfaces.C.size_t
      with Export, Convention => C, External_Name => "ada_lua_contract";
