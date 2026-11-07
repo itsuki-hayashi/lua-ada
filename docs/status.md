@@ -9,6 +9,11 @@ fixtures load into the static host. A disposable Windows-corrected attrib.lua
 matches C output; its adaptation is not yet reviewed acceptance evidence.
 Native image receipts, lifetime/fault campaigns and final matrix remain open.
 
+The [closing-prefix prerequisite](sessions/2026-11-08-closing-stack-prefix.md)
+retains actual departing scalars while execution ownership retires. Five
+new VM lifetime/refusal cases pass within 1,705 AUnit cases. Automatic error
+and thread-reset callers still require integration and public verification.
+
 The [host base C closing checkpoint](sessions/2026-11-08-base-c-closing.md)
 adds actual idle C closing slots and allocation-free registration/thread
 pointer queries. Thirteen C cases match both native configurations; strict

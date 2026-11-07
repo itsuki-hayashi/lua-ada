@@ -37,6 +37,16 @@ preparing typed prefix owners before moving any of them. Closing links are
 metadata, never a second set of value roots. Collection traces the actual
 scalar windows and independently owned lexical cells as before.
 
+Reset/error cleanup additionally has a context-owned `Closing_Stack_Prefix`.
+Its setter publishes only a live interval and recomputes real stack bounds;
+it copies no values and blindly clears no former interval. Window retirement
+clears only above that prefix, and union tracing includes both the prefix
+and all surviving real windows. Canonical closing entries record their actual
+absolute slot. A cleanup owner must preserve its previous floor, lower the
+prefix to each pending close level and restore that floor on completion.
+This primitive is implemented; automatic error/reset callers are separate
+checkpoints and are not certified by its internal lifetime tests alone.
+
 Thread C surfaces are prepared during thread construction when the world's
 main C surface exists. The first borrowed C entry into an Ada-only session
 prepares existing contexts before invoking native code. `lua_tothread` and

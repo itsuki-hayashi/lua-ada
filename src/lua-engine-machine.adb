@@ -741,15 +741,22 @@ package body Lua.Engine.Machine is
       --  The actual call interval, including a hidden-vararg prefix, belongs
       --  to this departing frame. Outgoing values must already be rooted in
       --  a result/error holder before this allocation-free clear occurs.
-      Stacks.Clear_Range (Context, Activation.Call_Base, Last);
+      Stacks.Clear_Range
+        (Context,
+         Natural'Max (Activation.Call_Base, Context.Closing_Stack_Prefix + 1),
+         Last);
       Context.Stack_Window := Previous;
       Context.Stack_Used :=
-        (if Previous = null then Activation.Saved_Stack_Used else
-           Previous.Stack_Base + Previous.Stack_Window_Length);
+        Natural'Max
+          (Context.Closing_Stack_Prefix,
+           (if Previous = null then Activation.Saved_Stack_Used else
+              Previous.Stack_Base + Previous.Stack_Window_Length));
       Context.Foreign_Top :=
-        (if Previous = null then Activation.Saved_Foreign_Top
-         elsif Previous.Is_Native then Previous.Stack_Live_Top else
-           Previous.Stack_Base + Previous.Canonical_Top);
+        Natural'Max
+          (Context.Closing_Stack_Prefix,
+           (if Previous = null then Activation.Saved_Foreign_Top
+            elsif Previous.Is_Native then Previous.Stack_Live_Top else
+              Previous.Stack_Base + Previous.Canonical_Top));
       Activation.Previous_Stack_Window := null;
       Activation.Has_Stack_Window := False;
       --  Retain physical capacity. Clearing everything above an old parent
@@ -955,6 +962,43 @@ package body Lua.Engine.Machine is
       Item.Warning_Root := Nil_Value;
       Item.Logically_Unwound := True;
    end Retire_Frame_Execution;
+
+   function Pending_Closing_Level
+     (Item : not null Frame_Access) return Natural
+   is
+      Last : Natural := Item.C_Closing_Level;
+   begin
+      for Closing of Item.Closers loop
+         Last := Natural'Max (Last, Closing.Stack_Level);
+      end loop;
+      return Last;
+   end Pending_Closing_Level;
+
+   procedure Set_Closing_Stack_Prefix
+     (State : in out World; Level : Natural)
+   is
+      Context : constant Context_Access := State.Current;
+      Window : constant Frame_Access := Context.Stack_Window;
+      Used : Natural;
+      Top : Natural;
+   begin
+      --  A nested cleanup can restore a lower floor while an outer closer
+      --  still has a genuine window above it. Preserve that actual window;
+      --  clearing the old prefix tail here would destroy its live locals.
+      --  The normal ordered union trace clears only truly abandoned gaps.
+      if Window = null then
+         Used := Natural'Max (Minimum_C_Stack, Context.Host_Stack_Top);
+         Top := Context.Host_Stack_Top;
+      else
+         Used := Window.Stack_Base + Window.Stack_Window_Length;
+         Top :=
+           (if Window.Is_Native then Window.Stack_Live_Top else
+              Window.Stack_Base + Window.Canonical_Top);
+      end if;
+      Context.Closing_Stack_Prefix := Level;
+      Context.Stack_Used := Natural'Max (Used, Level);
+      Context.Foreign_Top := Natural'Max (Top, Level);
+   end Set_Closing_Stack_Prefix;
 
    procedure Reserve_Frame (State : in out World; Cost : Natural);
    procedure Reserve_Frame (State : in out World; Cost : Natural) is

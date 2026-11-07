@@ -34,6 +34,7 @@ its runtime changes are planned, not implemented by the foundation gate.
 | 0023 | [Public value and auxiliary operations](0023-public-value-auxiliary-operations.md) | scoped implementation |
 | 0024 | [Fixed numeric scratch](0024-fixed-numeric-scratch.md)                             | scoped implementation |
 | 0025 | [Native module lifetimes](0025-native-module-lifetimes.md)                         | scoped implementation |
+| 0026 | [Real base C closing ownership](0026-base-c-closing-ownership.md)                  | scoped implementation |
 
 ADR 0009 records the approved combined delivery order, iterative scheduler,
 stable cells, explicit cleanup, weak thread ownership and execution policies.

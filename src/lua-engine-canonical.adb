@@ -942,6 +942,8 @@ package body Lua.Engine.Canonical is
          --  Scope depth in a private frame remains its separate old meaning.
          Activation.Closers.Append
            (Close_Entry'(Cell => Capture_Cell (State, Activation, Index),
+                         Stack_Level =>
+                           Absolute_Register (State, Activation, Index),
                          Symbol => Index + 1, Depth => Index + 1,
                          others => <>));
       end Mark_Closing;

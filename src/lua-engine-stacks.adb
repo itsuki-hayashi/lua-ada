@@ -281,9 +281,12 @@ package body Lua.Engine.Stacks is
       Mark_Cell : not null access procedure (Item : Object_Access))
    is
       Prefix : constant Natural :=
-        (if Context.Detached_Resume_Window then Context.Resume_Host_Stack_Top
-         elsif Context.Stack.Is_Empty then Context.Foreign_Top
-         else Context.Host_Stack_Top);
+        Natural'Max
+          (Context.Closing_Stack_Prefix,
+           (if Context.Detached_Resume_Window then
+               Context.Resume_Host_Stack_Top
+            elsif Context.Stack.Is_Empty then Context.Foreign_Top
+            else Context.Host_Stack_Top));
       Initialized : constant Natural :=
         Natural (Context.Foreign_Stack.Length);
       Previous_First, Visited : Natural := 0;

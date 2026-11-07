@@ -7,6 +7,11 @@ Complete immutable same-image fixtures, reviewed platform counterparts,
 explicit unload/provider fault witnesses and instrumented/shared/POSIX gates.
 The diagnostic attrib.lua pair does not close its source or runtime ledger.
 
+Actual scalar [closing-prefix support](sessions/2026-11-08-closing-stack-prefix.md)
+has five scoped VM lifetime/refusal regressions within 1,705 passing AUnit
+cases. Wire saved cleanup floors into error/reset drivers before claiming
+those public behaviors; standalone helper coverage does not complete them.
+
 Host base C slots have [scoped closing evidence](sessions/2026-11-08-base-c-closing.md):
 thirteen identical-source cases match native default/T and 1,695 AUnit cases
 pass. Stack-reserved links preserve allocation-free registration and retained

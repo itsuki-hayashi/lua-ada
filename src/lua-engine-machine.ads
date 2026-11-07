@@ -215,6 +215,22 @@ package Lua.Engine.Machine is
    --  Never call across a live foreign body: acknowledge its typed C transfer
    --  first. An already retired activation is harmless; reuse resets it.
 
+   function Pending_Closing_Level
+     (Item : not null Frame_Access) return Natural;
+   --  Highest actual C/Lua closing slot retained by this frame. The private
+   --  packet backend has no scalar level and continues owning its cells.
+   --  This reads pending metadata in linear time without allocation.
+
+   procedure Set_Closing_Stack_Prefix
+     (State : in out World; Level : Natural)
+     with Pre => State.Current /= null and then
+       Level <= Natural (State.Current.Foreign_Stack.Length);
+   --  Publish an actual scalar prefix and recompute its physical/public
+   --  high-water marks without allocation. Callers save/restore the previous
+   --  floor and never lower below another active cleanup owner's prefix.
+   --  No blind range clear occurs: union tracing preserves real surviving
+   --  closer windows while discarding abandoned gaps at the next collection.
+
    procedure Clear_Frames
      (State : in out World; Retained_Depth : Natural := 0);
    --  Release all frame-owned packets after success or failed execution.

@@ -1485,6 +1485,7 @@ package body Lua.Engine is
       Context.Hook_Yield_Pending := False;
       Context.Foreign_Activation := null;
       Context.Base_C_Frame := null;
+      Context.Closing_Stack_Prefix := 0;
       Context.Stack_Window := null;
    end Destroy_Frames;
 

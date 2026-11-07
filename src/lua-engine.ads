@@ -712,6 +712,10 @@ private package Lua.Engine is
       --  Stack-reserved predecessor indices make valid lua_toclose marking
       --  allocation-free, including when a cached Lua frame becomes C.
       Stack_Used : Natural := 0;
+      Closing_Stack_Prefix : Natural := 0;
+      --  Actual departing slots retained while reset/error cleanup invokes
+      --  closers. Cleanup owners save/restore their previous prefix floor;
+      --  this is a live scalar interval, never a copied value workspace.
       Foreign_Top : Natural := 0;
       Host_Stack_Top : Natural := 0;
       Stack_Window : Frame_Access;
