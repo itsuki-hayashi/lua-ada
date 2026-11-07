@@ -40,11 +40,32 @@ if ((Get-FileHash -LiteralPath (Join-Path $checkoutFixture 'counterpart.lua')).H
 }
 $script:cases++
 Write-Output 'PASS: missing Lua EOL rule reproduces autocrlf byte mismatch'
+# Reproduce the review-authoring failure too: eol=lf normalizes a CRLF JSON
+# input while staging, although its locally supplied SHA256 matched exactly.
+$reviewInput=Join-Path $checkoutFixture 'review.json'
+[IO.File]::WriteAllText($reviewInput,"{}`r`n",[Text.UTF8Encoding]::new($false))
+& git -C $checkoutFixture -c core.safecrlf=false add review.json
+if($LASTEXITCODE -ne 0) { throw 'Cannot stage review byte regression' }
+$reviewOutput=(Join-Path $checkoutFixture 'normalized-review').Replace('\','/')+'/'
+& git -C $checkoutFixture -c core.autocrlf=true checkout-index --all --prefix=$reviewOutput
+if($LASTEXITCODE -ne 0) { throw 'Cannot materialize review byte regression' }
+if((Get-FileHash $reviewInput).Hash -ceq (Get-FileHash (Join-Path $reviewOutput 'review.json')).Hash) {
+    throw 'CRLF review input failed to reproduce committed-byte drift'
+}
+$failure=$null
+try { Resolve-ReviewedFile -Root $checkoutFixture -Path 'review.json' `
+    -Sha256 (Get-FileHash $reviewInput).Hash.ToLowerInvariant() | Out-Null }
+catch { $failure=$_.Exception.Message }
+if($null -eq $failure -or $failure -notmatch 'first-party text') {
+    throw 'Review validator accepted a hash that cannot identify committed bytes'
+}
+$script:cases++
+Write-Output 'PASS: CRLF review hashes reject before Git can change their repository bytes'
 function Hash-Text([string] $Text) {
     [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($Text))).ToLowerInvariant()
 }
 function Write-Json([string] $Path, $Value) {
-    [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 32) + "`n")
+    [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 32).Replace("`r`n","`n") + "`n")
     (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 function New-Fixture {
@@ -145,6 +166,8 @@ function Expand-MatrixFixture($Fixture) {
     $Fixture.Matrix.operations[0].supplemental=@(@{variant='constructs-branch-1';
         c=$Fixture.Matrix.operations[0].c.Clone(); ada=$Fixture.Matrix.operations[0].ada.Clone()})
     $Fixture.MatrixApproval.scope='expanded-t-conformance'
+    $Fixture.Matrix.warning_regressions=@(@{context='default/windows/validation/static';sha256=('8'*64)})
+    $Fixture.MatrixApproval.warning_regressions=@(@{context='default/windows/validation/static';sha256=('8'*64);decision='accepted'})
     $Fixture.MatrixApproval.operations[0].file='constructs.lua'
     $Fixture.MatrixApproval.operations[0].supplemental=@(@{variant='constructs-branch-1'; decision='accepted';
         c_report_sha256=$Fixture.Matrix.operations[0].c.sha256;
@@ -165,5 +188,31 @@ Reject 'matrix altered supplemental report' {param($f)
     Expand-MatrixFixture $f
     $f.Matrix.operations[0].supplemental[0].ada.sha256='4'*64
 } 'supplemental report review' -Matrix
+Reject 'matrix omitted warning review' {param($f)
+    Expand-MatrixFixture $f
+    $f.MatrixApproval.warning_regressions=@()
+    $f.Matrix.review.artifact_sha256=Write-Json (Join-Path $f.Root 'matrix-approval.json') $f.MatrixApproval
+} 'warning review set' -Matrix
+Reject 'matrix altered warning report' {param($f)
+    Expand-MatrixFixture $f
+    $f.Matrix.warning_regressions[0].sha256='4'*64
+} 'warning report review' -Matrix
+foreach($bytesCase in @('crlf','bom','invalid-utf8')) {
+    $fixture=New-Fixture
+    $path=Join-Path $fixture.Root 'repository-bytes.json'
+    $bytes=switch($bytesCase) {
+        'crlf' { [Text.Encoding]::UTF8.GetBytes("{}`r`n") }
+        'bom' { [byte[]]@(239,187,191,123,125,10) }
+        'invalid-utf8' { [byte[]]@(123,125,255,10) }
+    }
+    [IO.File]::WriteAllBytes($path,$bytes)
+    $hash=(Get-FileHash $path).Hash.ToLowerInvariant()
+    $failure=$null
+    try { Resolve-ReviewedFile -Root $fixture.Root -Path 'repository-bytes.json' -Sha256 $hash | Out-Null }
+    catch { $failure=$_.Exception.Message }
+    if($null -eq $failure -or $failure -notmatch 'first-party text') { throw 'Invalid repository bytes retained review authority' }
+    $script:cases++
+    Write-Output "REVIEW TEST PASS: $bytesCase cannot bind an immutable first-party review"
+}
 Write-Output "PASS: $script:cases review-artifact binding regressions; synthetic authority only"
 & (Join-Path $PSScriptRoot 'test-native-branch-review.ps1')

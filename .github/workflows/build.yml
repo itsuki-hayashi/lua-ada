@@ -108,6 +108,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-expanded-matrix-bundle.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/test-scoped-warning-evidence.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-matrix.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-runner.ps1

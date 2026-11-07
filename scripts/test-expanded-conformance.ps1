@@ -24,6 +24,9 @@ if ($policy.Files.Count -ne 13 -or $policy.Helpers.Count -ne 1 -or
     $policy.Helpers[0] -cne 'bwcoercion.lua') { throw 'Expanded scope boundary differs' }
 $identity = @{report='synthetic/report.json'; artifact_root='synthetic'; sha256=('a'*64)}
 $baseline = @{schema_version=1; scope='expanded-t-conformance'; revision=('b'*40);
+    warning_regressions=@(foreach($context in $suite.acceptance_contexts) {
+        @{context=$context;report=$identity.report;artifact_root=$identity.artifact_root;sha256=$identity.sha256}
+    });
     operations=@(foreach ($context in $suite.acceptance_contexts) {
         foreach ($file in $policy.Files) {
             $entry = @{file=$file; context=$context; c=$identity.Clone(); ada=$identity.Clone()}
@@ -44,6 +47,8 @@ MatrixCase 'missing primary pair' {param($m) $m.operations=@($m.operations | Sel
 MatrixCase 'duplicate primary pair' {param($m) $m.operations += $m.operations[0]} 'Duplicate scoped matrix'
 MatrixCase 'helper cannot masquerade as primary' {param($m) $m.operations[0].file='bwcoercion.lua'} 'Unknown scoped matrix'
 MatrixCase 'unknown scope rejected' {param($m) $m.scope='invented'} 'Invalid scoped matrix'
+MatrixCase 'missing warning context rejected' {param($m) $m.warning_regressions=@($m.warning_regressions | Select-Object -Skip 1)} 'Missing warning regression context'
+MatrixCase 'duplicate warning context rejected' {param($m) $m.warning_regressions+=$m.warning_regressions[0]} 'duplicate or incomplete warning'
 MatrixCase 'wrong context rejected' {param($m) $m.operations[0].context='upstream-test/linux/release/static'} 'Unknown scoped matrix'
 MatrixCase 'second constructs template required' {param($m)
     ($m.operations | Where-Object file -CEQ 'constructs.lua' | Select-Object -First 1).Remove('supplemental')

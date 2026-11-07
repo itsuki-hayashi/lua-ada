@@ -55,8 +55,15 @@ foreach($context in $contexts) {
     }
     $groupRows=@(foreach($name in @('files','gc-events')) {
         $path=Join-Path $job "reports/expanded-conformance/run/$name/index.json"
-        @{kind=$name;path=$path;sha256=(Save $path @{scope='expanded-t-conformance';context=$context;
-            configuration=$parts[0];observations=$groups[$name]})}
+        $child=@{scope='expanded-t-conformance';context=$context;
+            configuration=$parts[0];observations=$groups[$name]}
+        if($name -ceq 'gc-events') {
+            $warningPath=Join-Path $job 'reports/expanded-conformance/run/gc-events/warnings/index.json'
+            $child.warning_regressions=@{report=$warningPath;sha256=(Save $warningPath @{
+                scope='expanded-t-conformance';context=$context;configuration=$parts[0];
+                repository_revision=$revision;repository_dirty=$false})}
+        }
+        @{kind=$name;path=$path;sha256=(Save $path $child)}
     })
     $null=Save $batch @{scope='expanded-t-conformance';context=$context;configuration=$parts[0];
         completed=$true;groups=$groupRows;observations=$observations}
@@ -91,6 +98,7 @@ Case 'all26contexts become338pairs plus26supplements without review authority' {
         $manifest.named_consumers.Count -ne 26 -or $manifest.named_aunit.Count -ne 26 -or
         $manifest.review -ne $null -or $manifest.scoped_acceptance -or $manifest.full_m3_acceptance -or
         $manifest.consumer_mapping.review -ne $null -or
+        $manifest.warning_regressions.Count -ne 26 -or
         @($manifest.operations | Where-Object {$null -ne $_.contract}).Count) {
         throw 'Candidate fabricated authority or wrong cardinality'
     }
@@ -132,6 +140,17 @@ try {
     $null=Save $first $index
     Case 'partial batch index cannot become a matrix row' { Build } 'index is incomplete'
 } finally { [IO.File]::WriteAllText($first,$saved) }
+$index=$saved | ConvertFrom-Json -AsHashtable -Depth 64
+$gcGroup=$index.groups | Where-Object kind -CEQ 'gc-events'
+$childPath=$gcGroup.path
+$savedChild=[IO.File]::ReadAllText($childPath)
+try {
+    $child=$savedChild | ConvertFrom-Json -AsHashtable -Depth 64
+    $child.Remove('warning_regressions')
+    $gcGroup.sha256=Save $childPath $child
+    $null=Save $first $index
+    Case 'missing child warning index cannot disappear during collection' { Build } 'mandatory warning regressions'
+} finally { [IO.File]::WriteAllText($childPath,$savedChild);[IO.File]::WriteAllText($first,$saved) }
 Case 'candidate output cannot escape artifact bundle' {
     New-ExpandedMatrixCandidate -Root $repository -ArtifactsDirectory $artifacts -Revision $revision `
         -Output (Join-Path $directory 'outside.json')

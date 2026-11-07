@@ -7,7 +7,7 @@ $directory=Join-Path $root ('reports/contract-index-selftest/'+[guid]::NewGuid()
 [void][IO.Directory]::CreateDirectory($directory)
 $files=@('events.lua','gc.lua','gengc.lua','files.lua')
 $context='default/windows/validation/static'
-function Save($path,$value){[IO.File]::WriteAllText($path,($value | ConvertTo-Json -Depth 32),[Text.UTF8Encoding]::new($false));return (Get-FileHash $path).Hash.ToLowerInvariant()}
+function Save($path,$value){[IO.File]::WriteAllText($path,($value | ConvertTo-Json -Depth 32).Replace("`r`n","`n"),[Text.UTF8Encoding]::new($false));return (Get-FileHash $path).Hash.ToLowerInvariant()}
 $entries=@(foreach($file in $files){
     $contract=@{schema_version=1;operation="file:$file";context=$context;reference_revision='7579fc9d7ed90240487251dfb69168f8e64e9294'}
     @{file=$file;context=$context;path="$file.json";sha256=(Save (Join-Path $directory "$file.json") $contract)}

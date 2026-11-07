@@ -23,7 +23,8 @@ try {
     $policy=Get-ScopedAcceptancePolicy -Root $root -Context $context -Scope $Scope
     & "$PSScriptRoot/test-scoped-warnings.ps1" -Interpreter $Interpreter `
         -ReferenceInterpreter $ReferenceInterpreter -RuntimeDirectory $RuntimeDirectory `
-        -Configuration $Configuration -OutputDirectory (Join-Path $directory 'warnings')
+        -Configuration $Configuration -Scope $Scope -Profile $Profile -LibraryType $LibraryType `
+        -OutputDirectory (Join-Path $directory 'warnings')
     foreach ($file in @('events.lua','gengc.lua','gc.lua')) {
         foreach ($target in @('ReferenceC','Ada')) {
             $contract=$null

@@ -18,6 +18,20 @@ function Resolve-ReviewedFile {
     if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant() -cne $Sha256) {
         throw 'Review file hash differs'
     }
+    if(-not $relative.Replace('\','/').StartsWith('references/',[StringComparison]::Ordinal) -and
+        [IO.Path]::GetExtension($file) -cin @('.json','.jsonl','.lua','.ps1','.psm1','.adb','.ads','.c','.h','.md')) {
+        # Git's eol=lf clean filter can change a locally reviewed CRLF file
+        # during staging. Such a hash would never identify the committed blob.
+        # Reject it even when the supplied hash matches the worktree bytes;
+        # never normalize a review input silently inside the verifier.
+        $bytes=[IO.File]::ReadAllBytes($file)
+        if($bytes -contains 13 -or
+            ($bytes.Length -ge 3 -and $bytes[0] -eq 239 -and $bytes[1] -eq 187 -and $bytes[2] -eq 191)) {
+            throw 'Reviewed first-party text must use LF and UTF-8 without a BOM'
+        }
+        try { [void]([Text.UTF8Encoding]::new($false,$true).GetString($bytes)) }
+        catch { throw 'Reviewed first-party text must use valid UTF-8' }
+    }
     return $file
 }
 
@@ -125,6 +139,22 @@ function Assert-MatrixReviewBinding {
             $decision.ada_report_sha256 -cne $entry.ada.sha256 -or
             $decision.contract_sha256 -cne $entry.contract.sha256) {
             throw 'Matrix reviewed report or contract differs'
+        }
+    }
+    if($Manifest.scope -ceq 'expanded-t-conformance') {
+        $entries=@($Manifest.warning_regressions)
+        $approved=@($approval.warning_regressions)
+        if($entries.Count -eq 0 -or $entries.Count -ne $approved.Count) {
+            throw 'Matrix warning review set differs'
+        }
+        $seen=@{}
+        foreach($entry in $entries) {
+            $matches=@($approved | Where-Object context -CEQ $entry.context)
+            if($matches.Count -ne 1 -or $seen.ContainsKey($entry.context) -or
+                $matches[0].decision -cne 'accepted' -or $matches[0].sha256 -cne $entry.sha256) {
+                throw 'Matrix warning report review differs'
+            }
+            $seen[$entry.context]=$true
         }
     }
     # Named regressions are evidence inputs in their own right. Bind their

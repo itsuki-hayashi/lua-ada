@@ -10,7 +10,7 @@ $unitPath='tests/conformance/reviews/gc-aunit-context-replay.proposal.json'
 $unitReview='tests/conformance/reviews/gc-aunit-context-replay.cross-review.json'
 function Read-Json($path){Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 64}
 function Hash($path){(Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()}
-function Save-Json($path,$value){[IO.File]::WriteAllText($path,($value | ConvertTo-Json -Depth 64),[Text.UTF8Encoding]::new($false))}
+function Save-Json($path,$value){[IO.File]::WriteAllText($path,($value | ConvertTo-Json -Depth 64).Replace("`r`n","`n"),[Text.UTF8Encoding]::new($false))}
 $cm=Read-Json (Join-Path $root $consumerPath)
 $cr=Read-Json (Join-Path $root $consumerReview)
 $am=Read-Json (Join-Path $root $unitPath)

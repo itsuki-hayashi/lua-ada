@@ -16,11 +16,11 @@
     },
     {
       "path": "scripts/ConformanceMatrix.psm1",
-      "sha256": "cd8cc1c48bba34b883de358474c8e3e6a43dfd047e76cfa87bd554f9c04a1d84"
+      "sha256": "336005ea70cf3c46b315e3682e1a10d25c7d4a295ab27d46ead94c198fedd9a7"
     },
     {
       "path": "scripts/ConformanceReview.psm1",
-      "sha256": "26b6bb7d7c62cf0abb05d80cf0f28883ade0e31b9df6e4add21ec701275e281f"
+      "sha256": "c2aa53e9d8eaa825f34ac0ee45bfbebdf4755c6afa60d7c2709d9218f6e29e9c"
     },
     {
       "path": "scripts/ScopedAcceptancePolicy.psm1",
@@ -52,7 +52,7 @@
     },
     {
       "path": "scripts/check-gc-events.ps1",
-      "sha256": "07998adbf91636d939b3e8b4dffd4da30fa7ab7b3f0c0aeca6423a9fc268c3c9"
+      "sha256": "720c91882360a1a81b1b1e022df5ce5c288c09474396afa567ac9b5def8afaad"
     },
     {
       "path": "scripts/check-files-scoped.ps1",
@@ -72,7 +72,7 @@
     },
     {
       "path": "scripts/test-expanded-conformance.ps1",
-      "sha256": "a9cbf720179373307ee068dff63608742fcb93d60c9dd8e952561a3aa81fa534"
+      "sha256": "57aec3613fb1bbeba2d80381882611c2a422a0f49e363102ef39385b7c9ba1f5"
     },
     {
       "path": "scripts/test-consumer-evidence.ps1",
@@ -84,15 +84,15 @@
     },
     {
       "path": "scripts/test-conformance-review.ps1",
-      "sha256": "eb24dfaab468450d63ee8cf9f0aa6216eb2c4ba533ef5898af0175d92e055bf9"
+      "sha256": "cf691875c831864fd8ee91ae38e9d75ae192d5bb7d70a9bb24caf0980537c6a9"
     },
     {
       "path": "scripts/test-matrix-named-evidence.ps1",
-      "sha256": "1ae97293708bc5476f8758f35e1598a6b611f9fd09640a7fe8fcf2e99251661c"
+      "sha256": "96ecf80a3ad2fdcf2671763e37a97695952667dfcf24bd06d1a005d3e21b0670"
     },
     {
       "path": ".github/workflows/build.yml",
-      "sha256": "27a3cc6d88be6ff74c8e266cf3f0c2878bf6177035b6af6b9131431d0e93a4b6"
+      "sha256": "3d872c6a3005d0a4eea70e8d52b61ad7f4d484a36c1c46f0f0d13efc636dec2b"
     },
     {
       "path": "tests/conformance/constructs-seeded.lua",
@@ -108,11 +108,11 @@
     },
     {
       "path": "tests/conformance/scopes/expanded-t-conformance.json",
-      "sha256": "edd4a6733654bc0d29f911163fd85d31f5061f4020afd62ddf432d21b4e443f2"
+      "sha256": "668df0f7e4770dd337c18a4f1049b0b171ddc1bef24225e6e755bacff117ff76"
     },
     {
       "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
-      "sha256": "327d24a7dbf6c547f4d12448cbb75fd77aeff862b597830fc4b5ce9fdb8a867c"
+      "sha256": "fbcd24a25da8393326281787bc22c4235b98fce633768dd502e96f05a50664a6"
     },
     {
       "path": "tests/conformance/scopes/expanded-t-conformance.contracts.json",
@@ -120,11 +120,11 @@
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-author-proposal.json",
-      "sha256": "a896d7cac17c784203f15a6fac4c79031e2ee56bad9e432b2023fd1826b44c0a"
+      "sha256": "e964df0c8d5f33a23ab030660633e2f20d65cc95341bf6232ce0694ad392d36d"
     },
     {
       "path": "scripts/ExpandedMatrixBundle.psm1",
-      "sha256": "78da99ce7e006a6ba8f9e4edc8cde903bcc7e50a57caea7717673a06dc7ffc1f"
+      "sha256": "561e70aca784288166bbd4c8fd058485bf7618720404141325c5f504a4eaa069"
     },
     {
       "path": "scripts/new-expanded-matrix.ps1",
@@ -132,7 +132,7 @@
     },
     {
       "path": "scripts/test-expanded-matrix-bundle.ps1",
-      "sha256": "49bc0cb5e9c3750cf6071c93d87f2a3c5a331468afebde5b8d1b3f73dc09e6a1"
+      "sha256": "7dbd7f896f55bf5f6fe203306564e053df80739e37683796ba76ec452ba5fc38"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-author-proposal.json",
@@ -140,20 +140,48 @@
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-      "sha256": "4e68af414df9eda74c36d551f6ef2674891c7f052355d45588e8289bac7d77b6"
+      "sha256": "f66b29f58ea51ec2d405018d97c834aae0861422466d1d65ed7a93666d4cc80f"
     },
     {
       "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json",
-      "sha256": "f9bc35a5860b7df04c4e713d77035c10e664a45eadb444dab1973a27be1bb143"
+      "sha256": "7c8563b1ac7293ce368b8065d3b3f8d01de9785cc65d0875bb4628dbc72a8989"
+    },
+    {
+      "path": "scripts/ScopedWarnings.psm1",
+      "sha256": "78b40d69355d1dab854415a30a869f8baa8411b6171161da89ed8cc83a5d5fc4"
+    },
+    {
+      "path": "scripts/test-scoped-warnings.ps1",
+      "sha256": "6ab13300d4535979deef1292bdbeecfa3c462cb0b6788dd8fe3d142d13dd3aa4"
+    },
+    {
+      "path": "scripts/test-scoped-warning-evidence.ps1",
+      "sha256": "52dd4fb651e09a80764c88e54dd8e7982a47769d679a1d39682bcb521005d400"
+    },
+    {
+      "path": "scripts/test-conformance-matrix.ps1",
+      "sha256": "1761ffc84ed45bb2bff8687a652e5fec100cf85b06fe464921a6ea4db3eb3021"
+    },
+    {
+      "path": "scripts/test-scoped-acceptance-policy.ps1",
+      "sha256": "64d9c8bde20892fa8715471ac097f3035c21e7c31ab055c17a17bb98f090ade0"
+    },
+    {
+      "path": "scripts/test-native-branch-review.ps1",
+      "sha256": "4243eb9989260d76e9eff398110fd1a72934a8aafb8759ffe62dde590785b330"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-mapping-installation.json",
+      "sha256": "2ad59ecb0462ee30e3e8f0411f4c7efbbab12840bfe21b1c27bfcfbb61334d85"
     }
   ],
   "input_manifest": {
-    "sha256": "f8456217f5cceca6cc1a04c1103cc4d933515ef027c12b07995f99f0be7549e1",
+    "sha256": "98b9f9cc070fba99e50860645261c0f1eb2ba27538195f9c3562dd0066ce0979",
     "path": "reports/expanded-harness-review-inputs.json"
   },
   "scope_selection": {
     "result": "Installed selection metadata validates 13 actual primary files, 2493 source anchors, one helper and 159 APIs; 142 source and 159 API obligations remain pending.",
-    "sha256": "f9bc35a5860b7df04c4e713d77035c10e664a45eadb444dab1973a27be1bb143",
+    "sha256": "7c8563b1ac7293ce368b8065d3b3f8d01de9785cc65d0875bb4628dbc72a8989",
     "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json"
   },
   "resolved_findings": [
@@ -168,6 +196,18 @@
       "problem": "API invariant/scoped boundary text could otherwise broaden while approved named-case IDs remained unchanged.",
       "id": "H2",
       "resolution": "The scope and its selection approval now bind the independently reviewed API proposal. All159 current invariant,boundary,C/AUnit references and selected Lua obligation projections must match immutable approved bytes; status/evidence remain independently adjudicated."
+    },
+    {
+      "problem": "Windows pretty JSON CRLF bytes could be reviewed locally but normalized to LF during Git staging, invalidating every dependent review hash on clean CI.",
+      "id": "H3",
+      "resolution": "The five owned reviews and math review were normalized to exact LF bytes, all dependent API and selection identities cascaded, and first-party reviewed inputs now reject CRLF, BOM and invalid UTF-8. Synthetic metadata writers emit LF; native process captures are preserved unchanged.",
+      "regression": "Actual Git staging/checkout reproduces changed CRLF review bytes, and three raw-byte invalid forms are rejected even when the supplied worktree hash matches."
+    },
+    {
+      "problem": "Expanded final matrix replay could otherwise omit separate warning-regression indices retained by the GC/events child campaign.",
+      "id": "H4",
+      "resolution": "Collection and matrix shape now require exactly one warning index per each of 26 contexts. Independent matrix approval binds their hashes; replay derives six default or eight instrumented target/case pairs, checks actual scripts, payloads, phase, abort/control transport, source and executable/library identities, and rebases hashed captures.",
+      "regression": "Missing child/context warning evidence, changed reviewed hashes and rejected process/source/payload/noise/phase/runtime mutations fail. The shared active verifier has 21 focused regressions, including Linux converted normal and shutdown signals."
     }
   ],
   "reviewed_guarantees": [
@@ -180,7 +220,10 @@
     "Final matrix acceptance requires 26 distinct contexts, clean final checkout revision, reviewed source/contract/equivalent identities, actual measured launcher configurations, 900 second / 2 GiB policy, balanced allocator shutdown and matching runtime/oracle libraries across files, C consumers and AUnit.",
     "Independent reconciliation binds all primary/supplemental process reports, contracts and named consumer/AUnit identities. A successful observation or pending author mapping alone carries no acceptance authority.",
     "The artifact collector requires every context and named report, verifies original reports paths/hashes/revisions, refuses duplicates/partial indices and cannot overwrite a matrix with review metadata. Its output remains diagnostic until separately reviewed.",
-    "CI jobs select one PR head revision and preserve raw reports, captures, equivalents and process evidence for later independent replay."
+    "CI jobs select one PR head revision and preserve raw reports, captures, equivalents and process evidence for later independent replay.",
+    "Mandatory warning replay covers 26 unique context indices and 170 actual process cases across the supported context matrix: six cases in each default context and eight in each instrumented context. A record cannot waive rejection by changing its expected flag.",
+    "One shared case generator and active verifier govern warning capture and replay. Exact normal/shutdown payloads distinguish Ada and native chunk names; controls require empty stderr, shutdown requires prior OK, and platform abort transports cannot hide unrelated diagnostics.",
+    "Reviewed first-party text must be UTF-8 without BOM and LF, matching immutable repository bytes; source hashes are never silently normalized. Native captured output remains untouched."
   ],
   "independent_checks": {
     "final_scope_selection_check": "passed after installed reviewed metadata",
@@ -188,15 +231,17 @@
     "consumer_evidence_regressions": 29,
     "contract_policy_regressions": 11,
     "legacy_matrix_regressions": 35,
-    "expanded_harness_regressions": 56,
+    "expanded_harness_regressions": 58,
     "native_mapping_regressions": 18,
-    "notes": "Synthetic protocol regressions and source/hash checks only. Production runtime/context acceptance is not inferred.",
-    "source_input_hashes": 34,
-    "review_binding_regressions": 40,
+    "notes": "Synthetic protocol regressions plus current source/hash checks. Fourteen existing final-runtime Windows captures independently pass the new shared verifier as diagnostic corroboration. No foreign-platform or final runtime/context acceptance is inferred.",
+    "source_input_hashes": 41,
+    "review_binding_regressions": 46,
     "git_diff_check": "passed",
-    "bundle_collector_regressions": 9,
+    "bundle_collector_regressions": 10,
     "macos_output_regressions": 10,
-    "named_matrix_regressions": 12
+    "named_matrix_regressions": 12,
+    "warning_evidence_regressions": 21,
+    "actual_windows_warning_captures_replayed": 14
   },
   "independent_check_logs": [
     "reports/expanded-t-conformance/independent-expanded-harness-review-2.log",
@@ -204,12 +249,18 @@
     "reports/expanded-t-conformance/independent-aunit-harness-review-2.log",
     "reports/expanded-t-conformance/independent-full-matrix-harness.log",
     "reports/expanded-t-conformance/independent-bundle-collector.log",
-    "reports/expanded-t-conformance/independent-final-scope-selection.log"
+    "reports/expanded-t-conformance/independent-final-scope-selection.log",
+    "reports/expanded-t-conformance/independent-expanded-harness-review-3.log",
+    "reports/expanded-t-conformance/independent-bundle-collector-2.log",
+    "reports/expanded-t-conformance/independent-warning-evidence-review-2.log",
+    "reports/expanded-t-conformance/independent-review-bindings-3.log"
   ],
   "findings": [],
   "remaining_gates": [
     "All 142 source obligations and 159 selected API obligations still need actual clean-revision evidence in their required contexts.",
     "Execution-contract review, source/API runtime adjudication, all 26 contexts and final independent matrix acceptance remain separate obligations.",
     "Full M3, unselected primary files, aggregate/heavy and unrelated global ABI/ecosystem claims remain outside this bounded decision."
-  ]
+  ],
+  "newline_identity": "Reviewed as exact UTF-8 without BOM and LF repository bytes. Captured stdout/stderr retain original native bytes and hashes.",
+  "supersedes_sha256": "ef35c25b233cef9f895f92900401fb3da91e7670c57eb9cf0ef5c1df4e26a66e"
 }

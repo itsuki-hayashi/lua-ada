@@ -154,3 +154,38 @@ differential, warning and shutdown checks also pass. Runtime implementation is
 committed as dc55aae; the local observations span the dirty draft and that
 checkpoint, so they are diagnostic evidence rather than frozen-tree acceptance.
 The complete upstream-test pipeline and clean 26-context candidate remain next.
+
+## Evidence freeze corrections
+
+Candidate f6b96b0 starts workflow 42341677097. Its first Linux and macOS logs
+pass strict builds, 1,380 AUnit cases and the retained preceding pipeline, then
+reject stale review hashes before expanded execution. Six locally authored
+review JSON files used Windows line endings while Git published LF bytes.
+Normalize the review artifacts before hashing and cascade all bound identities;
+the rejected candidate is not conformance acceptance.
+
+The first complete local upstream-test pipeline likewise stops on a stale
+review binding after passing the focused T script, eight actual warning probes
+and unchanged GC/events executions. Its retained log is
+reports/expanded-t-conformance/instrumented-full-check-1.log. It is incomplete.
+
+Independent adjudication preparation also found that the matrix collector
+did not require the retained warning-regression index. Bind and replay all
+26 context indices, including exact per-target diagnostics, real return and
+shutdown behavior, source identity and captures, before final acceptance.
+
+The retained local Windows campaigns pass in
+reports/expanded-t-conformance/retained-campaigns-1.log: isolated ABI checks,
+pinned frontend/opcode comparisons, native C99/Ada layout equality, all 1,120
+seeded library cases and all 1,024 seeded lifecycle cases. Frontend lexing and
+parsing of other upstream sources is syntax evidence, not runtime acceptance
+for files outside the selected 13.
+
+The corrected harness has independent approval f3dbf724, bound to 41 actual
+LF source/review inputs. It now requires all 26 warning indices and 170 named
+warning processes (19 default contexts with six probes and seven T contexts
+with eight). Validation passes 21 warning-evidence, 58 expanded-scope, 46
+review-binding, 18 native-mapping and ten bundle-collector regressions, plus
+the retained suites. Fourteen actual Windows default/T warning captures pass
+the shared exact-byte verifier. Foreign-platform verifier fixtures remain
+synthetic until the replacement CI campaign executes them.

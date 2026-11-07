@@ -7,7 +7,7 @@
   "reviewer": "Codex /root/draft_assessment",
   "decision": "accepted",
   "proposal": {
-    "sha256": "a896d7cac17c784203f15a6fac4c79031e2ee56bad9e432b2023fd1826b44c0a",
+    "sha256": "e964df0c8d5f33a23ab030660633e2f20d65cc95341bf6232ce0694ad392d36d",
     "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-author-proposal.json"
   },
   "approved_identity": {
@@ -246,7 +246,7 @@
     },
     "api_semantic_review": {
       "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-      "sha256": "4e68af414df9eda74c36d551f6ef2674891c7f052355d45588e8289bac7d77b6"
+      "sha256": "f66b29f58ea51ec2d405018d97c834aae0861422466d1d65ed7a93666d4cc80f"
     }
   },
   "scope_of_decision": "Source selection and semantic obligation boundary only. This approval does not pass any runtime obligation, API, execution contract or final matrix.",
@@ -284,5 +284,6 @@
   ],
   "coverage_authority": false,
   "runtime_acceptance": false,
-  "findings": []
+  "findings": [],
+  "newline_identity": "Reviewed as UTF-8 without BOM and LF; these exact bytes are required in the repository and review hash."
 }

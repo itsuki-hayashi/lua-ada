@@ -63,6 +63,7 @@ function New-ExpandedMatrixCandidate {
     $indices=@{}
     $indexEvidence=@()
     $observations=@{}
+    $warnings=@{}
     $named=@{consumer=@{};aunit=@{}}
     function Relative([string] $Path) { return [IO.Path]::GetRelativePath($bundle,$Path).Replace('\','/') }
     function Identity([string] $Path,[string] $ArtifactRoot) {
@@ -90,6 +91,22 @@ function New-ExpandedMatrixCandidate {
             $child=Read-ExpandedBundleJson $childPath
             if ($child.scope -cne $index.scope -or $child.context -cne $index.context -or
                 $child.configuration -cne $index.configuration) { throw 'Expanded child index identity differs' }
+            if($group.kind -ceq 'gc-events') {
+                if(-not $child.Contains('warning_regressions') -or $null -eq $child.warning_regressions) {
+                    throw 'Expanded GC/events child lacks mandatory warning regressions'
+                }
+                $warningPath=Resolve-ExpandedBundleInput -Original $child.warning_regressions.report `
+                    -ArtifactRoot $artifactRoot -Sha256 $child.warning_regressions.sha256
+                $warning=Read-ExpandedBundleJson $warningPath
+                if($warning.scope -cne $index.scope -or $warning.context -cne $index.context -or
+                    $warning.configuration -cne $index.configuration -or
+                    $warning.repository_revision -cne $Revision -or $warning.repository_dirty -ne $false) {
+                    throw 'Warning index revision or context differs'
+                }
+                $warningIdentity=Identity $warningPath $artifactRoot
+                $warningIdentity.context=$index.context
+                $warnings[$index.context]=$warningIdentity
+            }
             $rows+=@($child.observations)
         }
         foreach ($row in $rows) {
@@ -191,10 +208,11 @@ function New-ExpandedMatrixCandidate {
         diagnostic_only=$true;scoped_acceptance=$false;full_m3_acceptance=$false;
         operations=$operations;named_consumers=@($contexts | ForEach-Object { $named.consumer[$_] });
         named_aunit=@($contexts | ForEach-Object { $named.aunit[$_] });
+        warning_regressions=@($contexts | ForEach-Object { $warnings[$_] });
         consumer_mapping=(Pending-Mapping $ConsumerMapping);aunit_mapping=(Pending-Mapping $AUnitMapping);
         contract_mapping=@{path=$contracts;sha256=(Get-ExpandedBundleHash (Join-Path $Root $contracts));review_status='pending'};
         collection=@{contexts=26;primary_pairs=338;supplemental_pairs=26;process_reports=728;
-            named_consumer_reports=26;named_aunit_reports=26;batch_indices=$indexEvidence}}
+            named_consumer_reports=26;named_aunit_reports=26;warning_indices=26;batch_indices=$indexEvidence}}
     Assert-ScopedMatrixIndex -Manifest $manifest -Contexts $contexts
     [void][IO.Directory]::CreateDirectory($bundle)
     [IO.File]::WriteAllText($outputPath,($manifest | ConvertTo-Json -Depth 32)+"`n",[Text.UTF8Encoding]::new($false))

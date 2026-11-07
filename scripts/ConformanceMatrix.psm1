@@ -7,6 +7,7 @@ Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConsumerEvidence.psm1')
 Import-Module (Join-Path $PSScriptRoot 'AUnitEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ScopedWarnings.psm1')
 
 function Assert-MatrixReview {
     param([Collections.IDictionary] $Review)
@@ -70,6 +71,21 @@ function Assert-ScopedMatrixIndex {
             }
         }
     }
+    if($Manifest.scope -ceq 'expanded-t-conformance') {
+        $warnings=@{}
+        foreach($identity in $Manifest.warning_regressions) {
+            if($identity.context -cnotin $Contexts -or $warnings.ContainsKey($identity.context) -or
+                [string]::IsNullOrWhiteSpace([string]$identity.report) -or
+                [string]::IsNullOrWhiteSpace([string]$identity.artifact_root) -or
+                $identity.sha256 -cnotmatch '^[0-9a-f]{64}$') {
+                throw 'Unknown, duplicate or incomplete warning regression identity'
+            }
+            $warnings[$identity.context]=$true
+        }
+        foreach($context in $Contexts) {
+            if(-not $warnings.ContainsKey($context)) { throw "Missing warning regression context: $context" }
+        }
+    }
 }
 
 function Read-MatrixHashedJson {
@@ -110,6 +126,69 @@ function Set-MatrixProcessCaptures {
             throw 'Matrix process capture length mismatch'
         }
     }
+}
+
+function Test-MatrixWarningEvidence {
+    param([string] $Root,[Collections.IDictionary] $Manifest,[string] $Bundle)
+    $results=@()
+    foreach($identity in $Manifest.warning_regressions) {
+        $report=Read-MatrixHashedJson -Path (Join-Path $Bundle $identity.report) -Hash $identity.sha256
+        $parts=$identity.context.Split('/')
+        if($report.schema_version -ne 1 -or $report.scope -cne $Manifest.scope -or
+            $report.context -cne $identity.context -or $report.configuration -cne $parts[0] -or
+            $report.repository_revision -cne $Manifest.revision -or $report.repository_dirty -ne $false -or
+            @($report.repository_status).Count -ne 0) { throw 'Warning index revision or context differs' }
+        $requiredSources=@(Get-ScopedWarningSources | Sort-Object)
+        if((@($report.source_records.path | Sort-Object) -join '|') -cne ($requiredSources -join '|')) {
+            throw 'Warning source binding set differs'
+        }
+        foreach($source in $report.source_records) {
+            [void](Resolve-ReviewedFile -Root $Root -Path $source.path -Sha256 $source.sha256)
+        }
+        $expected=@(Get-ScopedWarningCases -Configuration $parts[0])
+        if(@($report.cases).Count -ne 2*$expected.Count) { throw 'Warning case set incomplete' }
+        $artifactRoot=[IO.Path]::GetFullPath((Join-Path $Bundle $identity.artifact_root))
+        $seen=@{}
+        $fileEntry=@($Manifest.operations | Where-Object { $_.context -ceq $identity.context -and $_.file -ceq 'events.lua' })
+        if($fileEntry.Count -ne 1) { throw 'Warning runtime counterpart missing' }
+        if(@($report.library_records | Where-Object { $_.target -cnotin @('Ada','ReferenceC') }).Count) {
+            throw 'Unknown warning library target'
+        }
+        foreach($target in @('Ada','ReferenceC')) {
+            $key=if($target -ceq 'Ada'){'ada'}else{'c'}
+            $fileReport=Read-MatrixHashedJson -Path (Join-Path $Bundle $fileEntry[0][$key].report) -Hash $fileEntry[0][$key].sha256
+            # The main matrix separately binds these exact file runtimes to
+            # named C/AUnit consumers. Requiring the complete library set here
+            # keeps warning behavior in that same runtime/oracle identity.
+            $libraries=if($target -ceq 'Ada'){@($fileReport.runtime_library_records)}else{@($fileReport.reference_library_records)}
+            $actual=@($report.library_records | Where-Object target -CEQ $target | ForEach-Object {
+                [IO.Path]::GetFileName($_.path.Replace('\','/'))+'#'+$_.sha256
+            } | Sort-Object)
+            $wanted=@($libraries | ForEach-Object {
+                [IO.Path]::GetFileName($_.path.Replace('\','/'))+'#'+$_.sha256
+            } | Sort-Object)
+            if($wanted.Count -eq 0 -or ($actual -join '|') -cne ($wanted -join '|')) {
+                throw 'Warning and file runtime libraries differ'
+            }
+            foreach($case in $expected) {
+                $matches=@($report.cases | Where-Object { $_.target -ceq $target -and $_.name -ceq $case.name })
+                $caseKey=$target+'/'+$case.name
+                if($matches.Count -ne 1 -or $seen.ContainsKey($caseKey) -or
+                    $matches[0].expected_rejection -isnot [bool] -or
+                    $matches[0].expected_rejection -ne $case.reject) { throw 'Warning case identity or rejection claim differs' }
+                $seen[$caseKey]=$true
+                $process=$matches[0].process
+                if($process.executable_sha256 -cne $fileReport.launcher_identity.sha256) {
+                    throw 'Warning and file executable identities differ'
+                }
+                Set-MatrixProcessCaptures -Process $process -ArtifactRoot $artifactRoot
+                Assert-ScopedWarningProcess -Process $process -Case $case -Target $target `
+                    -Configuration $parts[0] -Platform $parts[1]
+            }
+        }
+        $results+=@{context=$identity.context;sha256=$identity.sha256;cases=$seen.Count}
+    }
+    return $results
 }
 
 function Test-MatrixNamedEvidence {
@@ -560,9 +639,12 @@ function Test-ScopedMatrix {
                 supplemental_native_equivalents=$(if($entry.file -eq 'files.lua'){@($nativeMapping.branches.id)}else{@()})}
         }
     }
+    $warningResults=if($manifest.scope -ceq 'expanded-t-conformance') {
+        @(Test-MatrixWarningEvidence -Root $Root -Manifest $manifest -Bundle $bundle)
+    } else { @() }
     return [ordered]@{scope=$manifest.scope; revision=$manifest.revision; contexts=$suite.acceptance_contexts.Count;
         operations=$manifest.operations.Count; executions=$records; scoped_acceptance=[bool]$RequireScopedAcceptance;
-        full_m3_acceptance=$false}
+        warning_regressions=$warningResults;full_m3_acceptance=$false}
 }
 
 Export-ModuleMember -Function Assert-ScopedMatrixIndex, Test-ScopedMatrix

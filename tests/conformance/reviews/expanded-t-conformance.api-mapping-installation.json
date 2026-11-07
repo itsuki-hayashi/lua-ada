@@ -5,7 +5,7 @@
   "author": "Codex /root/expanded_source_audit",
   "independent_approval": {
     "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
-    "sha256": "4e68af414df9eda74c36d551f6ef2674891c7f052355d45588e8289bac7d77b6"
+    "sha256": "f66b29f58ea51ec2d405018d97c834aae0861422466d1d65ed7a93666d4cc80f"
   },
   "proposal": {
     "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-author-proposal.json",
@@ -14,7 +14,7 @@
   "ledger": {
     "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
     "before_sha256": "c85827e4f7446f7a31b368b9131d9688e66d481ee13d0f84c83cce88b98d1258",
-    "after_sha256": "327d24a7dbf6c547f4d12448cbb75fd77aeff862b597830fc4b5ce9fdb8a867c"
+    "after_sha256": "fbcd24a25da8393326281787bc22c4235b98fce633768dd502e96f05a50664a6"
   },
   "api_entries": 159,
   "pending_entries": 159,
@@ -22,5 +22,10 @@
   "added_execution_evidence": 0,
   "coverage_authority": false,
   "runtime_acceptance": false,
-  "action": "Copied only the independently approved invariants, scoped boundaries, named C/AUnit witness relations and selected Lua obligation links. Preserved all public header anchors, pending status and empty evidence."
+  "action": "Copied only the independently approved invariants, scoped boundaries, named C/AUnit witness relations and selected Lua obligation links. Preserved all public header anchors, pending status and empty evidence.",
+  "review_byte_normalization_delta": {
+    "previous_mapped_ledger_sha256": "327d24a7dbf6c547f4d12448cbb75fd77aeff862b597830fc4b5ce9fdb8a867c",
+    "current_mapped_ledger_sha256": "fbcd24a25da8393326281787bc22c4235b98fce633768dd502e96f05a50664a6",
+    "reason": "The independently authored review was normalized to repository-required LF bytes; only its per-row artifact hash reference changed. All159 header anchors, semantic descriptors, pending statuses and empty evidence remain unchanged."
+  }
 }
