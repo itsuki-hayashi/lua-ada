@@ -68,6 +68,14 @@ static void raise_action(lua_State *state, int status,
     /* This function is reached only after ada_lua_dispatch has returned.
      * Its checkpoint belongs to C; no abandoned Ada activation is retained. */
     if (status == LUA_OK) return;
+    if (status == ADA_ACTION_ABORT && state != NULL && state->guard == NULL &&
+        output->abort_state != NULL) {
+        /* A call/resume on another addressed context can have no local C
+         * callback. Its scalar driver switch retained the genuine calling
+         * context. Ada dispatch has returned; propagate through that live C
+         * guard rather than turning the embedding's host stop into panic. */
+        state = output->abort_state;
+    }
     if (status == ADA_ACTION_SELF_CLOSE && state != NULL) {
         struct lua_ada_guard *item;
         /* Mark the live C chain before unwinding its nearest checkpoint.
@@ -114,7 +122,7 @@ static int dispatch_raw(lua_State *state,
         input->operation != ADA_COMPLETE_EXTERNAL_RELEASE &&
         action != ADA_ACTION_CALL && action != ADA_ACTION_WARNING &&
         action != ADA_ACTION_EXTERNAL_RELEASE && action != ADA_ACTION_SUSPEND &&
-        action != ADA_ACTION_SELF_CLOSE)
+        action != ADA_ACTION_SELF_CLOSE && action != ADA_ACTION_ABORT)
         lua_ada_drain_external_releases(state);
     return action;
 }

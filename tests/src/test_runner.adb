@@ -1,5 +1,6 @@
 with Binary_Runtime_Tests;
 with Lua.Conformance_Adapter_Tests;
+with Lua.API_Command_Tests;
 with Lua.Foreign_Hook_Tests;
 with Lua.Foreign_Continuation_Tests;
 with Lua.Math_Reopen_Tests;
@@ -149,6 +150,7 @@ procedure Test_Runner is
       Lua.Finalizer_Runtime_Tests.Register (Result);
       Lua.Collector_Tests.Register (Result);
       Lua.Conformance_Adapter_Tests.Register (Result);
+      Lua.API_Command_Tests.Register (Result);
       Lua.Foreign_Hook_Tests.Register (Result);
       Lua.Foreign_Continuation_Tests.Register (Result);
       Lua.Math_Reopen_Tests.Register (Result);

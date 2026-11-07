@@ -14,6 +14,14 @@ Complete traceback, relevant T drivers and final shared/platform matrices;
 none of these local observations closes the full source/API ledger.
 
 
+Public T commands now have [scoped driver evidence](sessions/2026-11-08-public-api-driver.md):
+94 implemented names (not 94 passing command contracts), ten real helpers,
+nineteen native-T paired witnesses and 1,896 passing AUnit cases in both local
+configurations. The actual cross-context C call and host-stop ownership gap is
+fixed. Next implement checkpanic/shared alloccount and public loadfile/traceback
+driver routes, replay unchanged api.lua/memerr.lua, and retain unresolved private
+inspection candidates for independent review. No missing driver is an exclusion.
+
 Literal substitution has [component evidence](sessions/2026-11-08-auxiliary-substitution.md):
 sixteen native-matched C cases and three bounded policy/cleanup witnesses.
 Complete the public traceback helper and final instrumented/shared/platform

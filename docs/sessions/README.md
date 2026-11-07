@@ -53,7 +53,10 @@ into one major PR. Historical session results retain their original scope.
 | 2026-11-08 | [Library argument diagnostics](2026-11-08-library-argument-diagnostics.md) |
 | 2026-11-08 | [Metamethod argument roots](2026-11-08-metamethod-argument-roots.md) |
 
+| 2026-11-08 | [Concat operations](2026-11-08-concat-operation-diagnostics.md)      |
+
 | 2026-11-08 | [Public thread reset](2026-11-08-thread-reset.md)                    |
+| 2026-11-08 | [Public API command driver](2026-11-08-public-api-driver.md)         |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,

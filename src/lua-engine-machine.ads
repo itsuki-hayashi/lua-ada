@@ -129,6 +129,15 @@ package Lua.Engine.Machine is
       Message_Handler : Value := Nil_Value;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
       Retained_Depth : Natural := 0; Direct_Builtin : Boolean := False);
+   procedure Start_Foreign
+     (Self : in out Driver; State : in out World;
+      Callee : Value; Arguments : Values.Vector;
+      Message_Handler : Value := Nil_Value;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
+      Retained_Depth : Natural := 0; Direct_Builtin : Boolean := False);
+   --  Both forms borrow one real world until Finish/Cancel. The in-out form
+   --  also supports C calls on another context of an Ada-owned session; it
+   --  never transfers universe ownership or resets the existing work budget.
    --  Start a C-entry call behind an owned protected holder. Its handler runs
    --  above intact failed frames; the terminal packet has a success boolean.
 

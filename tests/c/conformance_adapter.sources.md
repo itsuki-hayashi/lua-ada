@@ -18,22 +18,33 @@ Pinned `ltests.c` SHA-256:
 | `test_warning` | `ltests.c:85`, `warnf` | Per-state registry-owned userdata replaces static state; public raw global access replaces private locking/auxiliary calls; same controls, fragment bound, unconsumed `_WARN` rejection and unexpected-warning abort. |
 | `inspect` | Original Ada adapter boundary | Returns scalars from private Ada inspection before C API publication; no foreign nonlocal jump crosses the Ada inspection call. |
 | `nonblock` | `ltests.c:2154`, `nonblock` | Validate real public stream payload/metatable with exported APIs; use actual POSIX descriptor flags; report native errors. Absent on Windows, matching the pinned driver's platform guard. |
-| `conformance_api.c` command driver | `ltests.c:1496-2060`, `runC`, `testC`, `Cfunc`, `Cfunck`, `makeCfunc` | Retain the public-API commands exercised by coroutine.lua. Replace private auxiliary checks with explicit public checks; bound tokens/numeric parsing; unsupported commands raise. Continuation contexts refer to the actual retained stack/upvalue script. |
+| `conformance_api.c` command driver | `ltests.c:1496-2060`, `runC`, `testC`, `Cfunc`, `Cfunck`, `makeCfunc` | Delegate 94 command names to actual exports. Bound token/int parsing; permit registry U0 and absent U256; unsupported commands raise. Continuation contexts refer to the actual retained stack/upvalue script. Lexical implementation is not execution coverage. |
 | `set_hook`, `command_hook`, `resume_thread` | `ltests.c:2075-2144`, `Chook`, `sethookaux`, `sethook`, `coresume` | Registry-owned scripts, actual public hooks and resume; explicit event and argument checks. The error branch copies the resumed coroutine's actual error object text. |
 | Independent-state drivers | `ltests.c:1338-1399`, `newstate`, `getstate`, `loadlib`, `closestate`, `doremote` | Real seeded construction using the parent allocator; selected public library opening and repeated requiref identity assertion. Remote T exposes this public driver subset. No private C state or fabricated return values. |
+| Public API helpers | `ltests.c:1223-1324,1469-1490`, reference/upvalue/address/double/new-stack/external-string helpers | Use the real reference free list, capture cells, C addresses, host-double bytes, same-world thread calls and original external payload allocator. Replace unaligned double dereference with memcpy and reject short input before reading. |
 
-The command driver implements `pushint`, `pushnum`, `pushstring`, `pushvalue`,
-`pushupvalueindex`, `pushnil`, `pushbool`, `pushstatus`, `newthread`, `rawgeti`,
-`gettop`, `settop`, `pop`, `remove`, `getglobal`, `setglobal`, `isyieldable`,
-`resume`, `xmove`, `call`, `callk`, `pcall`, `pcallk`, `yield`, `yieldk`,
-`toclose`, and `return`. These are the public-API commands required by the
-selected coroutine source, rather than a claim to implement every `runC`
-command. Unsupported commands raise an actual Lua error. Operands retain
+The driver now implements 94 of the pinned runC's 98 nonempty command names.
+The remaining commands are `alloccount`, `loadfile`, `traceback` and the private
+`printstack` inspection. Unsupported commands raise an actual Lua error.
+No requirement is excluded merely because its driver is still missing.
+The implemented groups cover stack/index/rotation, scalar/type/conversion,
+raw/handler table operations, arithmetic/comparison/length/concatenation,
+buffers/formatting, userdata/metatables, text-buffer loading, errors, hooks,
+warnings, closing and the retained coroutine/continuation commands. Operands retain
 the source driver's stack-top (`.`), stack-count (`*`), registry (`R`, `!M`,
 `!G`) and closure-upvalue (`U`) behavior. Tokens and native-int conversions
 have explicit bounds. Rejection of an overflowing operand is an additional
 first-party driver safety regression; native `ltests.c` does not enforce that
-same bound and is not its behavioral oracle.
+same bound and is not its behavioral oracle. Invalid comparison options and
+short double byte strings also have explicit first-party safety rejection.
+
+Public C helpers install as real light C function values with no hidden heap
+wrapper or captures. Only Ada inspection callbacks retain the operation/world
+pair they actually consume. TestC's U1 is therefore absent, U0 is the real
+registry, and a zero-upvalue pushcclosure round-trips to testC's genuine address.
+Status strings are rooted in the actual registry before refusal campaigns,
+matching regcodes' purpose. Added helper names are d2s, s2d, pushuserdata,
+udataval, ref, getref, unref, upvalue, doonnewstack and externstr.
 
 Continuation scripts remain in actual rooted stack/upvalue slots. The Ada
 runtime retains their explicit continuation pointer, context, result adjustment
@@ -51,8 +62,8 @@ public consumer cases check immediate closure, slot reuse and nil publication.
 Hook scripts are registry-owned per addressed thread. They execute real public
 hooks, and line/count yields preserve the interrupted frame and register window.
 The C trampoline is transport and does not become a public debug stack level.
-Frame/line inspection uses actual active frames; the exported C `lua_getinfo`
-surface currently implements selector `l` only. A separate stale-frame rejection
+Frame/line inspection uses actual active frames and the implemented public
+debug selectors. A separate stale-frame rejection
 regression is an Ada safety extension, not a portable native C witness.
 Independent-state drivers construct separate real universes, preserve the
 source allocator and use public library openers and module registries. Remote
@@ -60,7 +71,17 @@ scalar results retain the pinned driver's textual transfer behavior. A resume
 source state supplies C-call depth without sharing values or registry ownership.
 New states retain the exported runtime's ordinary panic policy; the source's
 private `tpanic` test callback is not installed. The remote `T` table contains
-only the eight public drivers listed above.
+the eighteen public drivers/helpers listed above. It does not pretend to expose
+the Ada-specific inspection operations of a different world.
+
+A protected C call on another context uses a genuine entry drive while scalar
+metadata preserves the suspended caller's driver/context/depth. Completion
+restores that ownership before result publication; host abort carries the exact
+saved C caller surface through a typed response when the target has no guard.
+The same iterative executor, allocator and host budget remain authoritative.
+The [component record](../../docs/sessions/2026-11-08-public-api-driver.md)
+separates nineteen native-paired witnesses, twenty-three named AUnit cases,
+actual api.lua progress and the still-missing panic/refusal drivers.
 
 Collector color, age, phase, allocation statistics, parameter codec and physical
 storage controls use real Ada state. They do not emulate C private layouts.

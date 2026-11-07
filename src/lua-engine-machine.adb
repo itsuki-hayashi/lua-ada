@@ -5122,24 +5122,26 @@ package body Lua.Engine.Machine is
    end Start;
 
    procedure Start_Foreign
-     (Self : in out Driver; State : not null World_Access;
+     (Self : in out Driver; State : in out World;
       Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
       Retained_Depth : Natural := 0; Direct_Builtin : Boolean := False)
    is
-      Packet : Values.Vector := Owned_Values (State.all);
+      Packet : Values.Vector := Owned_Values (State);
       Prepared : Boolean := False;
    begin
-      Prepare (Self, World_View (State), Retained_Depth);
+      Prepare
+        (Self, World_View (World_Addresses.To_Pointer (State'Address)),
+         Retained_Depth);
       Prepared := True;
-      Begin_Operation (State.all);
+      Begin_Operation (State);
       State.Current.Transfer.Kind := No_Transfer;
       State.Current.Transfer.Target := 0;
       State.Current.Transfer.Results.Clear;
-      Pin (State.all, Callee);
-      Pin (State.all, Arguments);
-      Pin (State.all, Message_Handler);
+      Pin (State, Callee);
+      Pin (State, Arguments);
+      Pin (State, Message_Handler);
       Packet.Append (Callee);
       for Argument of Arguments loop
          Packet.Append (Argument);
@@ -5159,16 +5161,29 @@ package body Lua.Engine.Machine is
       State.Current.Stack.Last_Element.Protection := 1;
       State.Current.Stack.Last_Element.Message_Handler := Message_Handler;
       Root_Barrier
-        (State.all, State.Current.Stack.Last_Element.Message_Handler);
-      End_Operation (State.all);
+        (State, State.Current.Stack.Last_Element.Message_Handler);
+      End_Operation (State);
    exception
       when others =>
          if Prepared then
-            End_Operation (State.all);
+            End_Operation (State);
             Self.Failed := True;
             Abandon (Self);
          end if;
          raise;
+   end Start_Foreign;
+
+   procedure Start_Foreign
+     (Self : in out Driver; State : not null World_Access;
+      Callee : Value; Arguments : Values.Vector;
+      Message_Handler : Value := Nil_Value;
+      Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
+      Retained_Depth : Natural := 0; Direct_Builtin : Boolean := False)
+   is
+   begin
+      Start_Foreign
+        (Self, State.all, Callee, Arguments, Message_Handler, Call_Base,
+         Has_Call_Window, Retained_Depth, Direct_Builtin);
    end Start_Foreign;
 
    procedure Start_Resume

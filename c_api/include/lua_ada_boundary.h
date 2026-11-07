@@ -120,6 +120,7 @@ struct lua_ada_response {
     lua_KFunction continuation;
     lua_KContext kcontext;
     int kstatus;
+    lua_State *abort_state;
 };
 
 enum lua_ada_action {

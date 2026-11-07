@@ -202,6 +202,9 @@ package body Lua.Engine.Foreign is
       Activation : Frame_Access;
       Is_Resume : Boolean := False;
       Is_Close : Boolean := False;
+      Is_Cross_Call : Boolean := False;
+      --  A C call can address another context in this same universe. Its
+      --  entry drive suspends only scalar driver ownership, not a Lua resume.
       Direct_Builtin : Boolean := False;
       Saved_Driver : Driver_View;
       Saved_Owned_Driver : VM.Driver_Access;
@@ -364,8 +367,17 @@ package body Lua.Engine.Foreign is
       --  Raw pending metadata owns a driver switch, not just an allocation.
       --  Restore those fields before freeing the record on every exceptional
       --  exit, including a host abort caught by an Ada borrowed callback.
-      if Pending.Is_Resume then
+      if Pending.Is_Resume or else Pending.Is_Cross_Call then
          VM.Cancel (Owner.Driver.all);
+         if Pending.Is_Cross_Call then
+            State.Current := Target;
+            VM.Clear_Frames (State, Pending.Entry_Depth);
+            Target.Non_Yieldable := Target.Non_Yieldable - 1;
+            Target.Status := Pending.Saved_Status;
+            Target.Foreign_Base := Pending.Original_Base;
+            Target.Foreign_Top := Pending.Original_Top;
+            Target.Host_Stack_Top := Pending.Original_Top;
+         end if;
          if Pending.Is_Close then
             Controls.To_Pointer
               (Target.Foreign_Control).Reset_Live := False;
@@ -378,8 +390,10 @@ package body Lua.Engine.Foreign is
          Owner.Calls := Pending.Saved_Calls;
          State.Current := Pending.Saved_Context;
          State.Native_Depth := Pending.Saved_Native_Depth;
-         Target.C_Resuming := False;
-         Target.Status := Dead_Context;
+         if Pending.Is_Resume then
+            Target.C_Resuming := False;
+            Target.Status := Dead_Context;
+         end if;
       else
          Owner.Calls := Pending.Previous;
          if Pending.Is_Root then
@@ -797,6 +811,20 @@ package body Lua.Engine.Foreign is
             raise Language_Error;
          end if;
       elsif Status = Action_Abort then
+         if State.Current /= Target and then
+           State.Current.Failure_Class = Host_Abort
+         then
+            --  A cross-context C entry exhausted this same host budget.
+            --  Preserve its actual failure while the saved outer driver and
+            --  C caller are still rooted; Restore then releases only scalar
+            --  switch ownership and the abandoned addressed execution.
+            Target.Failure := State.Current.Failure;
+            Root_Barrier (State, Target.Failure);
+            Target.Has_Failure_Value := State.Current.Has_Failure_Value;
+            Target.Failure_Text := State.Current.Failure_Text;
+            Target.Failure_Class := Host_Abort;
+            Target.Failure_At := State.Current.Failure_At;
+         end if;
          Restore;
          if State.Current.Failure_Class /= Host_Abort then
             State.Current.Failure_Class := Host_Abort;
@@ -1241,8 +1269,31 @@ package body Lua.Engine.Foreign is
       end Prepare_C_Slots;
 
       procedure Leave_Context is
+         Cursor : System.Address;
+         Pending : Calls.Object_Pointer;
       begin
          if Active_World /= null then
+            --  Ordinary Lua errors stay on their addressed API stack. A
+            --  host stop additionally needs the genuine live calling C guard
+            --  when a scalar call/resume/reset switch addresses another
+            --  context. The nearest switch owns that saved origin. Resolve
+            --  it without allocation before C receives this typed response.
+            if Main_Owner /= null and then
+              Output.Abort_State = System.Null_Address
+            then
+               Cursor := Main_Owner.Calls;
+               while Cursor /= System.Null_Address loop
+                  Pending := Calls.To_Pointer (Cursor);
+                  if (Pending.Is_Resume or else Pending.Is_Cross_Call) and then
+                    Pending.Saved_Context /= null
+                  then
+                     Output.Abort_State :=
+                       Pending.Saved_Context.Foreign_State;
+                     exit;
+                  end if;
+                  Cursor := Pending.Previous;
+               end loop;
+            end if;
             if Operation_Active then
                End_Operation (Active_World.all);
                Operation_Active := False;
@@ -1324,6 +1375,7 @@ package body Lua.Engine.Foreign is
          Pending : constant Calls.Object_Pointer :=
            Calls.To_Pointer (Main_Owner.Calls);
          Is_Resume_Entry : constant Boolean := Pending.Is_Resume;
+         Is_Cross_Entry : constant Boolean := Pending.Is_Cross_Call;
          Caller : constant Context_Access := Owner.Universe.Contexts
            (Positive (Pending.Context));
          Packet : Values.Vector renames Caller.Boundary_Results;
@@ -1595,6 +1647,7 @@ package body Lua.Engine.Foreign is
             Protected_Call : constant Boolean := Pending.Protected_Call;
             Is_Resume : constant Boolean := Pending.Is_Resume;
             Is_Close : constant Boolean := Pending.Is_Close;
+            Is_Cross_Call : constant Boolean := Pending.Is_Cross_Call;
             Direct_Builtin : constant Boolean := Pending.Direct_Builtin;
             Saved_Driver : constant Driver_View := Pending.Saved_Driver;
             Saved_Owned : constant VM.Driver_Access :=
@@ -1604,10 +1657,18 @@ package body Lua.Engine.Foreign is
             Saved_Context : constant Context_Access := Pending.Saved_Context;
             Saved_Depth : constant Natural := Pending.Saved_Native_Depth;
          begin
+            if (Is_Resume or else Is_Cross_Call) and then
+              Saved_Context /= null
+            then
+               --  Publication below can itself exhaust host policy after
+               --  this scalar record is gone. Keep its exact still-live C
+               --  caller origin, rather than a farther outer switch.
+               Output.Abort_State := Saved_Context.Foreign_State;
+            end if;
             if not Is_Close then
                Memory.Release (Owner.Universe.Memory, Address);
             end if;
-            if Is_Resume then
+            if Is_Resume or else Is_Cross_Call then
                --  Release/restore scalar driver ownership before result
                --  publication can allocate. A refused host-window growth
                --  must not strand the caller under a completed child drive.
@@ -1623,11 +1684,13 @@ package body Lua.Engine.Foreign is
                Main_Owner.Driver_Borrowed := Saved_Borrowed;
                Owner.Universe.Current := Saved_Context;
                Owner.Universe.Native_Depth := Saved_Depth;
-               Output.Length := C.size_t
-                 (Count + (if Caller.C_Reset_Self and then
-                   Error_Status not in 0 | 1 and then not Is_Close then
-                      Caller.Resume_Return_Top - Caller.Resume_Return_Base
-                   else 0));
+               if Is_Resume then
+                  Output.Length := C.size_t
+                    (Count + (if Caller.C_Reset_Self and then
+                      Error_Status not in 0 | 1 and then not Is_Close then
+                         Caller.Resume_Return_Top - Caller.Resume_Return_Base
+                      else 0));
+               end if;
             end if;
             if not Held_Error_View then
                for Index in 1 .. Count loop
@@ -1693,6 +1756,10 @@ package body Lua.Engine.Foreign is
                --  recently returned control to this pump.
                Caller.C_Resuming := False;
                Caller.Status := Dead_Context;
+               Context := Caller;
+            elsif Is_Cross_Entry then
+               --  A refused result publication still belongs to the
+               --  addressed API stack after its outer driver was restored.
                Context := Caller;
             end if;
             raise;
@@ -3021,9 +3088,13 @@ package body Lua.Engine.Foreign is
                Arguments : Values.Vector :=
                  Owned_Values (Owner.Universe.all);
                Address : System.Address;
+               Cross_Context : constant Boolean :=
+                 Previous /= Context and then Main_Owner.Driver /= null;
                Root_Call : constant Boolean :=
-                 Main_Owner.Calls = System.Null_Address and then
-                 not Main_Owner.Driver_Borrowed;
+                 Cross_Context or else
+                   (Main_Owner.Calls = System.Null_Address and then
+                    not Main_Owner.Driver_Borrowed);
+               New_Driver : VM.Driver_Access;
                Next : Calls.Object_Pointer;
                Result : Action_Status;
                Start_Error : Boolean := False;
@@ -3064,10 +3135,22 @@ package body Lua.Engine.Foreign is
                     VM.New_Driver (Owner.Universe.all);
                   Main_Owner.Driver := Driver_View (Main_Owner.Owned_Driver);
                end if;
-               Address := Memory.Allocate
-                 (Owner.Universe.Memory,
-                  Call_Record'Object_Size / System.Storage_Unit,
-                  Call_Record'Alignment);
+               if Cross_Context then
+                  --  The addressed context has no current C body beneath
+                  --  this call. Give it a real entry drive while preserving
+                  --  the suspended caller's exact driver/records/borrow.
+                  --  Both metadata allocations precede publication, so
+                  --  refusal cannot strand the outer driver halfway switched.
+                  New_Driver := VM.New_Driver (Owner.Universe.all);
+               end if;
+               begin
+                  Address := Memory.Allocate
+                    (Owner.Universe.Memory,
+                     Call_Record'Object_Size / System.Storage_Unit,
+                     Call_Record'Alignment);
+               exception
+                  when others => VM.Free_Driver (New_Driver); raise;
+               end;
                Next := Calls.To_Pointer (Address);
                Next.all := (Previous => Main_Owner.Calls, Base => Slot - 1,
                  Wanted => Input.Count,
@@ -3079,6 +3162,18 @@ package body Lua.Engine.Foreign is
                  Original_Top => Context.Foreign_Top,
                  Original_Base => Context.Foreign_Base,
                  Saved_Status => Context.Status, others => <>);
+               if Cross_Context then
+                  Next.Is_Cross_Call := True;
+                  Next.Saved_Driver := Main_Owner.Driver;
+                  Next.Saved_Owned_Driver := Main_Owner.Owned_Driver;
+                  Next.Saved_Calls := Main_Owner.Calls;
+                  Next.Saved_Borrowed := Main_Owner.Driver_Borrowed;
+                  Next.Saved_Context := Previous;
+                  Next.Saved_Native_Depth := Owner.Universe.Native_Depth;
+                  Main_Owner.Driver := Driver_View (New_Driver);
+                  Main_Owner.Owned_Driver := New_Driver;
+                  Main_Owner.Driver_Borrowed := False;
+               end if;
                Main_Owner.Calls := Address;
                begin
                   if Root_Call then
@@ -3090,7 +3185,7 @@ package body Lua.Engine.Foreign is
                      Context.Protected_Handler_Called := False;
                      Context.Non_Yieldable := Context.Non_Yieldable + 1;
                      VM.Start_Foreign
-                       (Main_Owner.Driver.all, Main_Owner.Owned_Universe,
+                       (Main_Owner.Driver.all, Owner.Universe.all,
                         Callee, Arguments, Message_Handler,
                         Call_Base => Slot,
                         Has_Call_Window => Input.Operation /= Begin_Builtin,

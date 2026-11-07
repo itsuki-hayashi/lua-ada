@@ -64,3 +64,6 @@ actual C guard acknowledgement and retained failed-coroutine scope ownership.
 
 ADR 0029 records [owned file input](0029-owned-file-input.md), native stream
 cleanup before compilation and shared file/stdin/preamble policy.
+
+ADR 0030 records [cross-context C entry](0030-cross-context-c-entry.md),
+actual scalar driver ownership and typed routing to a genuine C caller guard.

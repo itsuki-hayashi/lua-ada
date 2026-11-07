@@ -185,6 +185,9 @@ package Lua.Engine.Foreign is
       Continuation : C_Continuation := null;
       KContext : Interfaces.C.ptrdiff_t := 0;
       KStatus : Interfaces.C.int := 0;
+      Abort_State : System.Address := System.Null_Address;
+      --  Actual saved C caller surface for a host stop on a different
+      --  addressed context. It names no saved Ada stack or fabricated guard.
    end record with Convention => C;
 
    type Action_Status is

@@ -148,7 +148,7 @@ lua_CFunction lua_ada_test_adapter_callback(int operation) {
     if (operation == 11) return install_warning;
     if (operation >= 14 && operation <= 16)
         return lua_ada_test_platform_callback(operation);
-    if (operation >= 17 && operation <= 24)
+    if (operation >= 17 && operation <= 34)
         return lua_ada_test_api_callback(operation);
     return inspect;
 }

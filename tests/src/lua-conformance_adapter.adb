@@ -481,17 +481,31 @@ package body Lua.Conformance_Adapter is
 
    procedure Install (State : in out World) is
       Module : Value;
+      procedure Keep_Status (Name : String);
       procedure Add (Name : String; Operation : C.int);
+      procedure Keep_Status (Name : String) is
+      begin
+         Set (State, (Table_Kind, State.Foreign_Registry),
+              New_String (State, Name), (Boolean_Kind, True));
+      end Keep_Status;
       procedure Add (Name : String; Operation : C.int) is
          Captures : Values.Vector := Owned_Values (State);
          Item : Value;
       begin
-         Append_Root (State, Captures,
-                      (Integer_Kind, Integer_Value (Operation)));
-         Append_Root (State, Captures,
-                      (Light_Identity_Kind, State'Address));
-         Item := New_Native (State, "foreign.callback", Captures);
-         Item.Reference.Foreign_Handler := Address (Callback (Operation));
+         --  Only Ada inspection callbacks consume the operation/world pair.
+         --  Public C test drivers are actual light C functions: hidden
+         --  captures would make testC's absent-upvalue queries observe two
+         --  values and change its C identity and allocation behavior.
+         if Operation in 1 .. 10 | 12 | 13 then
+            Append_Root (State, Captures,
+                         (Integer_Kind, Integer_Value (Operation)));
+            Append_Root (State, Captures,
+                         (Light_Identity_Kind, State'Address));
+            Item := New_Native (State, "foreign.callback", Captures);
+            Item.Reference.Foreign_Handler := Address (Callback (Operation));
+         else
+            Item := (Foreign_Function_Kind, Address (Callback (Operation)));
+         end if;
          Set (State, Module, New_String (State, Name), Item);
       end Add;
    begin
@@ -521,6 +535,25 @@ package body Lua.Conformance_Adapter is
       Add ("loadlib", 22);
       Add ("doremote", 23);
       Add ("closestate", 24);
+      Add ("d2s", 25);
+      Add ("s2d", 26);
+      Add ("pushuserdata", 27);
+      Add ("udataval", 28);
+      Add ("ref", 29);
+      Add ("getref", 30);
+      Add ("unref", 31);
+      Add ("upvalue", 32);
+      Add ("doonnewstack", 33);
+      Add ("externstr", 34);
+      --  The source's regcodes roots these actual status strings before
+      --  refusal tests. The driver can then push them without resurrecting
+      --  an unrooted weak short string while allocator growth is disabled.
+      Keep_Status ("OK");
+      Keep_Status ("YIELD");
+      Keep_Status ("ERRRUN");
+      Keep_Status ("ERRSYNTAX");
+      Keep_Status ("not enough memory");
+      Keep_Status ("ERRERR");
       End_Operation (State);
    exception
       when others => End_Operation (State); raise;
