@@ -109,6 +109,15 @@ function Build-NativeLuaFixtures {
     }
     $plan=New-NativeLuaFixturePlan -Root $Root -HostPath $HostPath -RuntimeDirectory $RuntimeDirectory -Compiler $Compiler `
         -Implementation $Implementation -LibraryType $LibraryType -Platform $Platform -RecordDirectory $RecordDirectory -CompilerSha256 $CompilerSha256
+    # Preserve the exact linked host as evidence even when the caller runs a
+    # C consumer from build/. The snapshot keeps its real basename so final
+    # PE import replay cannot inherit a different launcher's identity.
+    $hostDirectory=Join-Path $RecordDirectory 'host'
+    [void][IO.Directory]::CreateDirectory($hostDirectory)
+    $hostCapture=Join-Path $hostDirectory $plan.host.basename
+    [IO.File]::Copy($HostPath,$hostCapture)
+    $hostHash=(Get-FileHash $hostCapture).Hash.ToLowerInvariant()
+    if($hostHash -cne $plan.host.sha256){throw 'Native fixture host changed while its evidence snapshot was copied'}
     $include=Join-Path $Root 'references/lua';$header=Join-Path $Root 'experiments/conformance/c/module_exports.h'
     $common=@('-std=c99','-O2','-I',$include,'-include',$header)
     if($Configuration -ceq 'upstream-test'){$common+='-DLUA_USER_H=<ltests.h>'}
@@ -154,6 +163,7 @@ function Build-NativeLuaFixtures {
         $bindings+=@{source=$record.source;artifact=$artifact;artifact_sha256=$hash;compile=$compile;binding=$binding}
     }
     $evidence=@{schema_version=1;kind='same-image-native-fixture-observations';plan=$plan;configuration=$Configuration;synthetic_fixture=$false;
+        host_capture=@{path=$hostCapture;sha256=$hostHash};
         source_root=[IO.Path]::GetFullPath($Root);
         source_bindings=@(foreach($relative in @('scripts/NativeLuaFixtures.psm1','scripts/NativeModuleLinkage.psm1')){
             @{path=$relative;sha256=(Get-FileHash (Join-Path $Root $relative)).Hash.ToLowerInvariant()}

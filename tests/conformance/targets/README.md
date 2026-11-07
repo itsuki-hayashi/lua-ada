@@ -586,6 +586,25 @@ Transforms and acceptance flags are forbidden for that variant. Successful
 file/branch/child completion checks remain mandatory for primary observations;
 native baseline transport grants no passing source or omission evidence.
 
+The core image campaign runs `native_module_contract.c` against each selected
+Ada image and the isolated C library with separate unchanged fixture builds.
+Its nine ordered cases include missing-open results, cached symbol lookup,
+both dependency pairs, C-root and hyphen loaders, native finalizer retention,
+registry-owned external strings and provider release after close. Exact C/Ada
+stdout equality, one actual fixture-directory argument per process, empty
+stderr, and every named case are required. Each receipt also snapshots its
+actual consumer host under the report subtree. Final image replay requires
+those snapshots and receipt artifacts inside the immutable image and replays
+both ownership graphs; a raw fixture build is insufficient. Historical scoped
+consumer callers retain their existing protocol selection.
+
+The pending successor catalogue now adds thirteen committed host base closing
+cases and nine native lifetime cases. It retains all predecessor tuples and
+keeps semantic approval, execution evidence and coverage authority pending.
+Regeneration preserves existing JSON key order so fresh source bindings and
+new proposals remain reviewable without unrelated changes across the 473 API
+entries and their future context routes.
+
 Artifact transport follows the official [upload-artifact v7 documentation](https://github.com/actions/upload-artifact/tree/v7.0.2)
 and [download-artifact v8 documentation](https://github.com/actions/download-artifact/tree/v8).
 Unix mode bits are restored from the content-bound image manifest because the

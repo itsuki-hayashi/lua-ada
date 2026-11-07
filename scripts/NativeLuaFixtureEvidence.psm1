@@ -67,7 +67,7 @@ function Read-NativeSymbolCapture {
 function Assert-NativeLuaFixtureEvidence {
     param([Parameter(Mandatory)][string] $Root,[Parameter(Mandatory)][string] $ArtifactRoot,
           [Parameter(Mandatory)][string] $ImagePayload,[Parameter(Mandatory)][Collections.IDictionary] $Image,
-          [Parameter(Mandatory)][Collections.IDictionary] $Report)
+          [Parameter(Mandatory)][Collections.IDictionary] $Report,[switch] $ConsumerHost)
     # Rebuild the structural ownership facts from content-addressed bytes.
     # No receipt flag establishes execution, semantic review or lifetime
     # correctness. Those remain obligations of the named runtime witnesses.
@@ -78,6 +78,7 @@ function Assert-NativeLuaFixtureEvidence {
     $path=Resolve-NativeFixtureCapture -Root $ArtifactRoot -Original $identity.path -Sha256 $identity.sha256
     $receipt=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -AsHashtable -Depth 64
     $plan=$receipt.plan;$parts=$Report.acceptance_context.Split('/')
+    $expectedBasename=if($ConsumerHost){[IO.Path]::GetFileName($Report.process.executable.Replace('\','/'))}else{$Image.launcher_basename}
     $static=$Report.target -ceq 'Ada' -and $parts[3] -cin @('static','static-pic')
     $libraryType=if($Report.target -ceq 'ReferenceC'){'shared'}elseif($parts[3] -ceq 'shared'){'relocatable'}else{$parts[3]}
     if($receipt.schema_version -ne 1 -or $receipt.kind -cne 'same-image-native-fixture-observations' -or
@@ -87,7 +88,7 @@ function Assert-NativeLuaFixtureEvidence {
         $plan.platform -cne $parts[1] -or $plan.implementation -cne $Report.target -or
         $plan.library_type -cne $libraryType -or $plan.mode -cne $(if($static){'exported-host'}else{'shared-runtime'}) -or
         $plan.compiler.sha256 -cne $Image.toolchain.compiler_sha256 -or
-        $plan.host.sha256 -cne $Report.process.executable_sha256 -or $plan.host.basename -cne $Image.launcher_basename -or
+        $plan.host.sha256 -cne $Report.process.executable_sha256 -or $plan.host.basename -cne $expectedBasename -or
         $plan.host.path.Replace('\','/') -cne $Report.process.executable.Replace('\','/')){
         throw 'Native fixture receipt context compiler host or runtime mode differs'
     }
@@ -100,7 +101,15 @@ function Assert-NativeLuaFixtureEvidence {
     }
     if($receipt.forced_header.path -cne 'experiments/conformance/c/module_exports.h'){throw 'Native fixture forced header differs'}
     [void](Resolve-ReviewedFile -Root $Root -Path $receipt.forced_header.path -Sha256 $receipt.forced_header.sha256)
-    $host=Resolve-NativeFixtureCapture -Root $ArtifactRoot -Original $plan.host.path -Sha256 $plan.host.sha256
+    if($receipt.host_capture.sha256 -cne $plan.host.sha256){throw 'Native fixture host snapshot differs from the actual executed host'}
+    $host=Resolve-NativeFixtureCapture -Root $ArtifactRoot -Original $receipt.host_capture.path -Sha256 $receipt.host_capture.sha256
+    if($ConsumerHost){
+        $normalized=$receipt.host_capture.path.Replace('\','/');$offset=$normalized.LastIndexOf('/reports/',[StringComparison]::Ordinal)
+        $relative=$normalized.Substring($offset+1)
+        if(@($Image.files|Where-Object{ $_.path -ceq $relative -and $_.sha256 -ceq $plan.host.sha256 }).Count -ne 1){
+            throw 'Native consumer host snapshot is outside its exact frozen context image'
+        }
+    }
     $owner=$host
     if(-not $static){
         $directory=$Image.paths[$(if($Report.target -ceq 'Ada'){'ada_runtime'}else{'c_runtime'})]
@@ -175,6 +184,9 @@ function Assert-NativeLuaFixtureEvidence {
         if($records.Count -ne 1 -or $records[0].source -cne $module.source -or $records[0].source_sha256 -cne $sourceHash -or
             $records[0].artifact_sha256 -cne $module.artifact_sha256){throw 'Native fixture compiled source or artifact binding differs'}
         $artifactDirectory=Get-NativeRecordedDirectory $module.artifact
+        if($ConsumerHost -and $artifactDirectory -cne $Report.native_fixture_directory.Replace('\','/')){
+            throw 'Native consumer loaded a fixture directory different from its compiled module receipt'
+        }
         $source=Join-NativeRecordedPath $artifactDirectory $case.source
         $null=Resolve-NativeFixtureCapture -Root $ArtifactRoot -Original $source -Sha256 $sourceHash
         $compile=$module.compile;$originalRoot=$receipt.source_root

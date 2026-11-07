@@ -129,7 +129,7 @@ Case 'new value auxiliary and scalar source routes remain proposals with no exec
     $relative=[IO.Path]::GetRelativePath($root,(Join-Path $path 'witness-policy.author-proposal.json')).Replace('\','/')
     $r=Read-TargetWitnessPolicy -Root $root -Path $relative
     $new=@($r.global_api.entries|Where-Object{ $_.Contains('proposed_classification') })
-    Assert-True ($r.consumer.cases.Count -eq 315 -and $r.aunit.entries.Count -eq 104 -and $new.Count -eq 63 -and
+    Assert-True ($r.consumer.cases.Count -eq 337 -and $r.aunit.entries.Count -eq 104 -and $new.Count -eq 63 -and
         @($new|Where-Object{ $_.classification -cne 'pending-semantic-review' -or $_.review_status -cne 'pending' -or
             $_.runtime_acceptance -or $_.execution_evidence.Count }).Count -eq 0 -and -not $r.source_reviewed -and -not $r.runtime_acceptance) 'Source routes invented acceptance'
     foreach($entry in $new){Assert-True ($entry.proposed_context_witnesses.Count -eq 26 -and -not $entry.Contains('context_witnesses')) 'A future route became an actual context observation'}
@@ -148,5 +148,15 @@ Case 'API author routes reject invented witnesses declaration-only calls and smu
         $path=Join-Path $temporary ('invalid-route-'+$change+'.json');$null=Save $path $routes
         Reject {New-PublicProposals $path} 'unknown actual C witness|Declaration-only|distinct pending actual named'
     }
+}
+Case 'unchanged proposal regeneration preserves exact reviewable bytes and key order'{
+    $routes=Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/additional-public-api.author-routes.json'
+    $path=New-PublicProposals $routes
+    $hashes=@{};foreach($file in Get-ChildItem -LiteralPath $path -File){$hashes[$file.Name]=(Get-FileHash $file.FullName).Hash}
+    & (Join-Path $PSScriptRoot 'new-target-witness-proposals.ps1') -OutputDirectory $path `
+        -AdditionalConsumerCases (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/additional-public-consumer.author-cases.json') `
+        -AdditionalAUnitCases (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility/additional-public-aunit.author-cases.json') `
+        -AdditionalApiRoutes $routes|Out-Null
+    foreach($file in Get-ChildItem -LiteralPath $path -File){Assert-True ((Get-FileHash $file.FullName).Hash -ceq $hashes[$file.Name]) 'Unchanged source proposals acquired unrelated byte changes'}
 }
 Write-Output "PASS: $script:Cases target witness policy regressions; synthetic source/capture objects only, no executed API acceptance"

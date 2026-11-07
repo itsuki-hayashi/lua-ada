@@ -27,6 +27,34 @@ Case 'linkage transport rejects a path outside reports before parsing its claims
     $r=Clone $report;$r.native_fixture_linkage=@(@{path=(Join-Path $root 'alire.toml');sha256=('3'*64)})
     Reject {Replay $r $image} 'outside reports'
 }
+Case 'synthetic ELF symbol captures reconstruct versioned names and reject invented parsed exports'{
+    $out=Join-Path $directory 'synthetic-elf.stdout';$err=Join-Path $directory 'synthetic-elf.stderr'
+    [IO.File]::WriteAllText($out,"0000000000001000 T lua_gettop@@LUA_5.5`n0000000000002000 D lua_ident`n",$utf8)
+    [IO.File]::WriteAllText($err,'',$utf8)
+    $record=@{tool=@{sha256=('1'*64)};symbols=@('lua_gettop','lua_ident');process=@{executable_sha256=('1'*64);
+        arguments=@('-D','--defined-only','/synthetic/host');exit_code=0;timed_out=$false;capture_exceeded=$false;pipe_drain_failed=$false;
+        process_tree_kill_error=$null;abnormal_exit_kind=$null;stdout_path=$out;stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();
+        stdout_bytes=(Get-Item $out).Length;stderr_path=$err;stderr_sha256=(Get-FileHash $err).Hash.ToLowerInvariant();stderr_bytes=0}}
+    $result=& (Get-Module NativeLuaFixtureEvidence) {param($r,$root) Read-NativeSymbolCapture -Record $r -ArtifactRoot $root -ToolHash ('1'*64) -ImagePath /synthetic/host -Platform linux} $record $root
+    Assert-True (($result -join '|') -ceq 'lua_gettop|lua_ident') 'Versioned ELF names were not reconstructed from capture bytes'
+    $record.symbols=@('invented')
+    Reject {& (Get-Module NativeLuaFixtureEvidence) {param($r,$root) Read-NativeSymbolCapture -Record $r -ArtifactRoot $root -ToolHash ('1'*64) -ImagePath /synthetic/host -Platform linux} $record $root} 'recorded symbols differ'
+}
+Case 'synthetic Mach-O lookup captures preserve exact nm modes and frozen tool binding'{
+    $out=Join-Path $directory 'synthetic-macho.stdout';$err=Join-Path $directory 'synthetic-macho.stderr'
+    [IO.File]::WriteAllText($out,"                 U _lua_gettop`n                 U _lib1_export`n",$utf8)
+    [IO.File]::WriteAllText($err,'',$utf8)
+    $record=@{tool=@{sha256=('1'*64)};symbols=@('lib1_export','lua_gettop');process=@{executable_sha256=('1'*64);
+        arguments=@('-g','-u','/synthetic/module.so');exit_code=0;timed_out=$false;capture_exceeded=$false;pipe_drain_failed=$false;
+        process_tree_kill_error=$null;abnormal_exit_kind=$null;stdout_path=$out;stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();
+        stdout_bytes=(Get-Item $out).Length;stderr_path=$err;stderr_sha256=(Get-FileHash $err).Hash.ToLowerInvariant();stderr_bytes=0}}
+    $result=& (Get-Module NativeLuaFixtureEvidence) {param($r,$root) Read-NativeSymbolCapture -Record $r -ArtifactRoot $root -ToolHash ('1'*64) -ImagePath /synthetic/module.so -Platform macos -Undefined} $record $root
+    Assert-True (($result -join '|') -ceq 'lib1_export|lua_gettop') 'Mach-O underscore or lookup capture mode changed'
+    $record.process.arguments[1]='-U'
+    Reject {& (Get-Module NativeLuaFixtureEvidence) {param($r,$root) Read-NativeSymbolCapture -Record $r -ArtifactRoot $root -ToolHash ('1'*64) -ImagePath /synthetic/module.so -Platform macos -Undefined} $record $root} 'tool identity invocation'
+    $record.process.arguments[1]='-u';$record.tool.sha256='0'*64
+    Reject {& (Get-Module NativeLuaFixtureEvidence) {param($r,$root) Read-NativeSymbolCapture -Record $r -ArtifactRoot $root -ToolHash ('1'*64) -ImagePath /synthetic/module.so -Platform macos -Undefined} $record $root} 'symbol tool differs'
+}
 if($Compiler -ne ''){
     if(-not $IsWindows -or $ReferenceInterpreter -eq '' -or $ReferenceRuntimeDirectory -eq ''){
         throw 'Actual fixture replay regressions require Windows and explicit compiler/oracle/runtime paths'
@@ -57,6 +85,16 @@ if($Compiler -ne ''){
     Case 'actual compiled original fixtures replay their source tool exports dependency graph and aliases without Lua execution'{
         $result=Replay $report $image
         Assert-True ($result.verified -and $result.modules -eq 5 -and $result.artifacts -eq 10 -and -not $result.runtime_acceptance) 'Structural replay promoted or narrowed its observations'
+    }
+    Case 'consumer host replay requires its exact frozen snapshot and loaded fixture directory'{
+        $r=Clone $report;$i=Clone $image;$r.native_fixture_directory=$built.library_directory
+        Reject {Assert-NativeLuaFixtureEvidence -Root $root -ArtifactRoot $root -ImagePayload $payload -Image $i -Report $r -ConsumerHost} 'outside its exact frozen context image'
+        $normalized=$built.evidence.host_capture.path.Replace('\','/');$offset=$normalized.LastIndexOf('/reports/',[StringComparison]::Ordinal)
+        $i.files+=@{path=$normalized.Substring($offset+1);sha256=$built.evidence.plan.host.sha256}
+        $result=Assert-NativeLuaFixtureEvidence -Root $root -ArtifactRoot $root -ImagePayload $payload -Image $i -Report $r -ConsumerHost
+        Assert-True ($result.verified -and -not $result.runtime_acceptance) 'Consumer snapshot granted lifetime evidence'
+        $r.native_fixture_directory='C:/synthetic/wrong/libs'
+        Reject {Assert-NativeLuaFixtureEvidence -Root $root -ArtifactRoot $root -ImagePayload $payload -Image $i -Report $r -ConsumerHost} 'different from its compiled module receipt'
     }
     Case 'stale frozen compiler and dlltool hashes reject an otherwise exact receipt'{
         Mutate {param($v,$r,$i) $i.toolchain.compiler_sha256='0'*64} 'context compiler'

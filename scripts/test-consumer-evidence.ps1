@@ -229,4 +229,34 @@ Run-Case 'instrumented external mode records its exact native lock omission with
     }
 } '' -Foreign -Format -Additional $extended
 $context='default/windows/validation/static'
+$nativeNames=@('loadlib-missing-open-stage3values','loadlib-cached-missing-symbol-init-then-lookup','lib1-lib11-native-exports',
+    'croot-lib1-sub-args-globals','hyphen-lib2-v2-loader-data','lib2-lib21-global-dependency','gc-retained-native-callback',
+    'registry-lib22-external-string','explicit-lib2-newstr-external')
+$nativeFull=(@($nativeNames|ForEach-Object{'PASS: native-module-'+$_}) -join "`n")+"`n"
+$baseline.native_module_contract=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=9;
+    ada_fixture_directory='C:/synthetic/ada/libs';c_fixture_directory='C:/synthetic/c/libs'}
+foreach($name in @('native-module-api','native-module-oracle')){
+    $record=$records[0].Clone();$record.name=$name;$out=Join-Path $directory "$name.stdout";[IO.File]::WriteAllText($out,$nativeFull)
+    $record.arguments=@($(if($name -ceq 'native-module-api'){'C:/synthetic/ada/libs'}else{'C:/synthetic/c/libs'}))
+    $record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$baseline.consumers+=$record
+}
+$extended+='native-module'
+Run-Case 'native lifetime protocol retains nine ordered cases and exact separate fixture arguments' {} '' -Foreign -Format -Additional $extended
+Run-Case 'native lifetime protocol cannot lose its actual C counterpart process' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE native-module-oracle)
+} 'missing/duplicate' -Foreign -Format -Additional $extended
+Run-Case 'matching counts and bytes cannot replace the retained native finalizer lifetime case' {param($r)
+    foreach($name in @('native-module-api','native-module-oracle')){
+        Replace-Capture $r $name stdout ($nativeFull.Replace('native-module-gc-retained-native-callback','native-module-invented-case'))
+    }
+} 'complete ordered lifetime protocol' -Foreign -Format -Additional $extended
+Run-Case 'duplicate native lifetime records cannot hide behind the final case marker' {param($r)
+    foreach($name in @('native-module-api','native-module-oracle')){Replace-Capture $r $name stdout ("PASS: native-module-lib1-lib11-native-exports`n"+$nativeFull)}
+} 'complete ordered lifetime protocol' -Foreign -Format -Additional $extended
+Run-Case 'native lifetime process cannot reuse another fixture directory or omit its argument' {param($r)
+    @($r.consumers|Where-Object name -CEQ native-module-api)[0].arguments=@('C:/synthetic/c/libs')
+} 'fixture argument' -Foreign -Format -Additional $extended
+Run-Case 'native lifetime summary count must be the actual integer nine' {param($r)
+    $r.native_module_contract.matched_cases='9'
+} 'all nine actual lifetime cases' -Foreign -Format -Additional $extended
 Write-Output "PASS: $count named consumer evidence regressions; synthetic observations only"

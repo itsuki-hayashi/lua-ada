@@ -158,7 +158,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "ce424d701956d39845b8d27c0b6779e4360c46b718b000e2954e84ca43849530"
+      "sha256": "74e8d063f914a0b6b0f141568ac04e7bc44af94265b17d324f156e6f2605f694"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",

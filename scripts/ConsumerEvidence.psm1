@@ -8,7 +8,7 @@ function Test-NamedConsumerEvidence {
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
           [switch] $RequireFormatContract,
-          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type')]
+          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module')]
           [string[]] $AdditionalContracts=@())
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
@@ -41,7 +41,8 @@ function Test-NamedConsumerEvidence {
     if($RequireFormatContract){$additional+='format'}
     $additionalMarkers=@{format='PASS: public formatting contract';value='PASS: public value operation contract';auxiliary='PASS: public auxiliary contract';
         'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';external='PASS: public external string contract';
-        conversion='PASS: public numeric conversion contract';operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract'}
+        conversion='PASS: public numeric conversion contract';operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract';
+        'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external'}
     foreach($kind in $additional|Sort-Object -Unique){
         $markers["$kind-api"]=$additionalMarkers[$kind];$markers["$kind-oracle"]=$additionalMarkers[$kind]
         $contractKinds+=$kind;$consumerKinds+="$kind-api"
@@ -110,6 +111,26 @@ function Test-NamedConsumerEvidence {
                 if([regex]::Matches($outputs[$name].text,'(?m)^PASS: external-'+$caseName+'\r?$').Count -ne [int](-not $instrumented)){
                     throw 'Named external consumer actual release-reentry witnesses differ'
                 }
+            }
+        }
+    }
+    if('native-module' -cin $additional){
+        $names=@('loadlib-missing-open-stage3values','loadlib-cached-missing-symbol-init-then-lookup','lib1-lib11-native-exports',
+            'croot-lib1-sub-args-globals','hyphen-lib2-v2-loader-data','lib2-lib21-global-dependency','gc-retained-native-callback',
+            'registry-lib22-external-string','explicit-lib2-newstr-external')
+        $expected=(@($names|ForEach-Object{'PASS: native-module-'+$_}) -join "`n")+"`n"
+        $contract=$Report.native_module_contract
+        if(($contract.matched_cases -isnot [int] -and $contract.matched_cases -isnot [long]) -or $contract.matched_cases -ne 9){
+            throw 'Named native module driver requires all nine actual lifetime cases'
+        }
+        foreach($implementation in @('ada','c')){
+            $name=if($implementation -ceq 'ada'){'native-module-api'}else{'native-module-oracle'}
+            $record=@($Report.consumers|Where-Object name -CEQ $name)[0]
+            $directory=$contract[$implementation+'_fixture_directory']
+            if([string]::IsNullOrWhiteSpace([string]$directory) -or $record.arguments -isnot [Array] -or @($record.arguments).Count -ne 1 -or
+                $record.arguments[0].Replace('\','/') -cne $directory.Replace('\','/') -or
+                $outputs[$name].text.Replace("`r`n","`n") -cne $expected){
+                throw 'Named native module actual fixture argument or complete ordered lifetime protocol differs'
             }
         }
     }

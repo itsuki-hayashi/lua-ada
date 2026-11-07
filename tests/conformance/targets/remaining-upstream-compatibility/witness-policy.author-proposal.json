@@ -1,18 +1,18 @@
 {
   "consumer": {
-    "sha256": "0b9dc1ba772ee57d1b2466cd5830af1aeef14dc37d2aa8c487b6a7f80576d24c",
+    "sha256": "79cb9d6ed623ffeef227d23d5d4fc70c0166df9c74eed482d88c49f1e01eee55",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
   },
   "schema_version": 1,
   "coverage_authority": false,
   "source_snapshot": {
-    "revision": "e3ac387729bb5e0bd0979f33d75616823adb2a51",
+    "revision": "fe0b4eac2904459df122959970a90447eb6eac66",
     "repository_dirty": true,
     "kind": "repository-source-snapshot"
   },
   "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
   "global_api": {
-    "sha256": "92884aa59de02dead07b0b17a48e1022dbfaa23bc1da656dd5bc86a18d91402a",
+    "sha256": "9e6faa450f9fdbb3b453c732c0a4e547674f458c97932fd98d668315ddea4ed9",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
   },
   "runtime_acceptance": false,
@@ -24,7 +24,7 @@
     "status": "pending"
   },
   "aunit": {
-    "sha256": "6f1e5c58f3e1c8ccb13719aeef17aabe1b5a47e9d3954b7a1e177ef4dbac4104",
+    "sha256": "50a58d9143f98e2e7627f359eb5c03b2711bf77772fc31b7c4d3ca4e766332e1",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json"
   },
   "kind": "target-witness-policy",

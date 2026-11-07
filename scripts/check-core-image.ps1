@@ -26,6 +26,28 @@ $scenarios = @("-XLUA_ADA_LIBRARY_TYPE=$LibraryType",
     "-XLUA_ADA_CONFIGURATION=$Configuration")
 Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'PEUnwind.psm1') -Force
+Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
+
+function Invoke-NativeModuleConsumer {
+    param([string] $Name,[string] $Executable,[string] $Implementation,[string] $RuntimePath,[string] $Compiler)
+    $native=Build-NativeLuaFixtures -Root $projectRoot -HostPath $Executable -RuntimeDirectory $RuntimePath -Compiler $Compiler `
+        -Implementation $Implementation -LibraryType $(if($Implementation -ceq 'Ada'){$LibraryType}else{'shared'}) `
+        -Platform $(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}) -Configuration $Configuration `
+        -FixtureDirectory (Join-Path $reportDirectory ($Name+'-fixtures')) -RecordDirectory (Join-Path $reportDirectory ($Name+'-linkage'))
+    $variables=@('PATH','LD_LIBRARY_PATH','DYLD_LIBRARY_PATH');$before=@{}
+    foreach($variable in $variables){
+        $before[$variable]=[Environment]::GetEnvironmentVariable($variable)
+        [Environment]::SetEnvironmentVariable($variable,$native.library_directory+[IO.Path]::PathSeparator+$before[$variable])
+    }
+    try{
+        # This is the last of nine separately named actual lifetime cases.
+        # The evidence consumer below checks their complete ordered set;
+        # this marker only rejects a failed/incomplete child immediately.
+        Invoke-Consumer $Name $Executable 'PASS: native-module-explicit-lib2-newstr-external' @($native.library_directory) |
+            ForEach-Object { Write-Host $_ }
+    }finally{foreach($variable in $variables){[Environment]::SetEnvironmentVariable($variable,$before[$variable])}}
+    return $native
+}
 
 function Invoke-Build {
     param([string[]] $Arguments)
@@ -178,6 +200,12 @@ try {
     Invoke-Consumer 'operator-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/operator_api_contract$suffix") 'PASS: public C operator contract'
     Invoke-Consumer 'index-type-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/index_type_api_contract$suffix") 'PASS: public integer-index and type contract'
     Invoke-Consumer 'base-closing-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/base_closing_api_contract$suffix") 'PASS: public host base C closing contract'
+    $compilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
+    if($LASTEXITCODE -ne 0){throw 'Cannot identify selected native module fixture compiler'}
+    $fixtureCompiler=($compilerOutput -join '').Trim()
+    $nativeModuleAda=Invoke-NativeModuleConsumer -Name native-module-api `
+        -Executable (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/native_module_contract$suffix") `
+        -Implementation Ada -RuntimePath $runtimeDirectory -Compiler $fixtureCompiler
     # Compile the identical public-header contract against the isolated pinned
     # C library. No reference object is linked into either Ada consumer.
     Invoke-Build @('exec', '--', 'gprbuild', '-P', 'experiments/conformance/reference.gpr', '-p', "-XLUA_CONFORMANCE_CONFIGURATION=$Configuration")
@@ -263,6 +291,11 @@ try {
         '-I', (Join-Path $projectRoot 'c_api/include/api'),
         (Join-Path $projectRoot 'c_api/tests/base_closing_api_contract.c'),
         '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceBaseClosingConsumer)
+    $referenceNativeModuleConsumer=Join-Path $reportDirectory "native-module-oracle$suffix"
+    $nativeSystemLibraries=if($IsLinux){@('-ldl')}else{@()}
+    Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/native_module_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceNativeModuleConsumer)+$nativeSystemLibraries)
     try {
         $env:PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:PATH
         $env:LD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:LD_LIBRARY_PATH
@@ -278,6 +311,8 @@ try {
         Invoke-Consumer 'operator-oracle' $referenceOperatorConsumer 'PASS: public C operator contract'
         Invoke-Consumer 'index-type-oracle' $referenceIndexTypeConsumer 'PASS: public integer-index and type contract'
         Invoke-Consumer 'base-closing-oracle' $referenceBaseClosingConsumer 'PASS: public host base C closing contract'
+        $nativeModuleC=Invoke-NativeModuleConsumer -Name native-module-oracle -Executable $referenceNativeModuleConsumer `
+            -Implementation ReferenceC -RuntimePath $referenceDirectory -Compiler $fixtureCompiler
         if($TargetPolicy -ne ''){
             Invoke-Consumer 'format-oracle' $referenceFormatConsumer 'PASS: public formatting contract'
             Invoke-Consumer 'value-oracle' $referenceValueConsumer 'PASS: public value operation contract'
@@ -353,6 +388,9 @@ try {
         throw 'C/Ada public host base closing contract output differs'
     }
     Write-Output 'PASS: identical public host base closing contract against C and Ada'
+    if([IO.File]::ReadAllText((Join-Path $reportDirectory 'native-module-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'native-module-oracle.stdout'))){throw 'C/Ada native module lifetime output differs'}
+    Write-Output 'PASS: identical native module lifetime contract against C and Ada'
     $referenceLibraries = @(Get-ChildItem -LiteralPath $referenceDirectory -File |
         Where-Object { $_.Name -match '^libconformance_lua\.(dll|so(\.[0-9.]+)?|dylib)$' } |
         ForEach-Object { [ordered]@{ file=$_.Name;
@@ -417,6 +455,9 @@ try {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
+    $nativeModuleContractSources=@(foreach($name in @('native_module_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
     Invoke-Consumer 'c-startup' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/c_image_client$suffix") 'CORE IMAGE C STARTUP OK'
     # Old ignored products can remain after the library rename. Hash only the
@@ -440,7 +481,7 @@ try {
         consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources);
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources);
         configuration = $Configuration; consumers = $records.ToArray();
         library_files = $libraries;
         gc_contract = [ordered]@{ matching_output=$true; sources=$contractSources;
@@ -468,6 +509,10 @@ try {
             reference_library_files=$referenceLibraries };
         base_closing_contract = [ordered]@{ matching_output=$true; sources=$baseClosingContractSources;
             reference_library_files=$referenceLibraries };
+        native_module_contract = @{matching_output=$true;sources=$nativeModuleContractSources;matched_cases=9;
+            reference_library_files=$referenceLibraries;ada_linkage=$nativeModuleAda.identity;c_linkage=$nativeModuleC.identity;
+            ada_fixture_directory=$nativeModuleAda.library_directory;c_fixture_directory=$nativeModuleC.library_directory;
+            ada_fixture_records=$nativeModuleAda.records;c_fixture_records=$nativeModuleC.records};
         value_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$valueSources;reference_library_files=$referenceLibraries}}else{$null});
         auxiliary_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$auxiliarySources;platform_defines=$platformDefines;reference_library_files=$referenceLibraries}}else{$null}) } | ConvertTo-Json -Depth 6 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8

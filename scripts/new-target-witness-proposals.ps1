@@ -27,8 +27,34 @@ if ($relativeOutput -cne 'tests/conformance/targets/remaining-upstream-compatibi
     throw 'Successor witness proposals must not overwrite historical scope artifacts'
 }
 $utf8 = [Text.UTF8Encoding]::new($false)
+function Preserve-ProposalKeyOrder([object] $Value,[object] $Previous) {
+    # A proposal regeneration changes source facts, not object semantics.
+    # Retain existing JSON key order so 473 entries and their 26 future
+    # routes do not acquire thousands of unrelated formatting changes from
+    # PowerShell's randomized Hashtable enumeration.
+    if($Value -is [Collections.IDictionary]){
+        $ordered=[ordered]@{};$keys=@()
+        if($Previous -is [Collections.IDictionary]){$keys+=@($Previous.Keys|Where-Object{$Value.Contains($_)})}
+        $keys+=@($Value.Keys|Where-Object{$_ -cnotin $keys})
+        foreach($key in $keys){$old=if($Previous -is [Collections.IDictionary] -and $Previous.Contains($key)){$Previous[$key]}else{$null}
+            $ordered[$key]=Preserve-ProposalKeyOrder $Value[$key] $old}
+        return $ordered
+    }
+    if($Value -is [Array]){
+        $items=@(for($i=0;$i -lt $Value.Count;$i++){
+            $old=if($Previous -is [Array] -and $i -lt $Previous.Count){$Previous[$i]}else{$null}
+            Preserve-ProposalKeyOrder $Value[$i] $old
+        })
+        return ,$items
+    }
+    return $Value
+}
 function Save-Proposal([string] $Name,[object] $Value) {
     $path = Join-Path $output $Name
+    if(Test-Path -LiteralPath $path){
+        $previous=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+        $Value=Preserve-ProposalKeyOrder $Value $previous
+    }
     [IO.File]::WriteAllText($path,(ConvertTo-Json -InputObject $Value -Depth 64).Replace("`r`n","`n") + "`n",$utf8)
     return @{path=[IO.Path]::GetRelativePath($root,$path).Replace('\','/');sha256=(Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()}
 }
@@ -73,7 +99,7 @@ if ($AdditionalConsumerCases -ne '') {
         $key = $case.source + '#' + $case.case_id
         if (@($consumer.cases | Where-Object { ($_.source + '#' + $_.case_id) -ceq $key }).Count -ne 0 -or
             $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api','value-api','auxiliary-api',
-                'load-dump-api','debug-api','external-api','conversion-api','operator-api','index-type-api') -or
+                'load-dump-api','debug-api','external-api','conversion-api','operator-api','index-type-api','base-closing-api','native-module-api') -or
             $case.source -cnotmatch '^(?:c_api/tests/[a-zA-Z0-9_-]+\.(?:c|h)|tests/c/[a-zA-Z0-9_-]+\.c)$' -or
             (@($case.exact_witnesses).Count -eq 0 -and ($null -eq $case.pattern_witness -or
                 -not $case.pattern_witness.StartsWith('^') -or -not $case.pattern_witness.EndsWith('$'))) -or

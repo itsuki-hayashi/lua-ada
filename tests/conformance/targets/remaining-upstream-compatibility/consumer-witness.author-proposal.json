@@ -161,7 +161,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "ce424d701956d39845b8d27c0b6779e4360c46b718b000e2954e84ca43849530"
+      "sha256": "74e8d063f914a0b6b0f141568ac04e7bc44af94265b17d324f156e6f2605f694"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -202,6 +202,14 @@
     {
       "sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989",
       "path": "c_api/tests/load_dump_contract.h"
+    },
+    {
+      "path": "c_api/tests/base_closing_api_contract.c",
+      "sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "path": "c_api/tests/native_module_contract.c",
+      "sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
     }
   ],
   "cases": [
@@ -5351,6 +5359,336 @@
       "consumer": "load-dump-api",
       "runtime_acceptance": false,
       "source_sha256": "b5cdfdc3d447e74bfc3b40e9e5345b5941a5ca41783abead67950b537f8c2989"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-settop"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "settop",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-closeslot"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "closeslot",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-reverse-order"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "reverse-order",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-actual-slot"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "actual-slot",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-registration-refusal"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "registration-refusal",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-grown-registration-refusal"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "grown-registration-refusal",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-callback-registration-refusal"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "callback-registration-refusal",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-false-registration"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "false-registration",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-thread-query-refusal"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "thread-query-refusal",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-prefix-collection"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "prefix-collection",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-state-close"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "state-close",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-callback-return-value"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "callback-return-value",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: base-C-callback-error-value"
+      ],
+      "consumer": "base-closing-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "callback-error-value",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/base_closing_api_contract.c",
+      "source_sha256": "efd4598bc1ffe21946f301a0a30de316982b2994c10c2906cb719fc69f1a14a6"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: native-module-loadlib-missing-open-stage3values"
+      ],
+      "consumer": "native-module-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "loadlib-missing-open-stage3values",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/native_module_contract.c",
+      "source_sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: native-module-loadlib-cached-missing-symbol-init-then-lookup"
+      ],
+      "consumer": "native-module-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "loadlib-cached-missing-symbol-init-then-lookup",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/native_module_contract.c",
+      "source_sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: native-module-lib1-lib11-native-exports"
+      ],
+      "consumer": "native-module-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "lib1-lib11-native-exports",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/native_module_contract.c",
+      "source_sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: native-module-croot-lib1-sub-args-globals"
+      ],
+      "consumer": "native-module-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "croot-lib1-sub-args-globals",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/native_module_contract.c",
+      "source_sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: native-module-hyphen-lib2-v2-loader-data"
+      ],
+      "consumer": "native-module-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "hyphen-lib2-v2-loader-data",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/native_module_contract.c",
+      "source_sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: native-module-lib2-lib21-global-dependency"
+      ],
+      "consumer": "native-module-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "lib2-lib21-global-dependency",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/native_module_contract.c",
+      "source_sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: native-module-gc-retained-native-callback"
+      ],
+      "consumer": "native-module-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "gc-retained-native-callback",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/native_module_contract.c",
+      "source_sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: native-module-registry-lib22-external-string"
+      ],
+      "consumer": "native-module-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "registry-lib22-external-string",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/native_module_contract.c",
+      "source_sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
+    },
+    {
+      "execution_evidence": [],
+      "exact_witnesses": [
+        "PASS: native-module-explicit-lib2-newstr-external"
+      ],
+      "consumer": "native-module-api",
+      "independent_review_status": "pending",
+      "pattern_witness": null,
+      "coverage_authority": false,
+      "expected_count": 1,
+      "case_id": "explicit-lib2-newstr-external",
+      "runtime_acceptance": false,
+      "source": "c_api/tests/native_module_contract.c",
+      "source_sha256": "567f506413d9fa8ed94e6496cbcf526a81ba6ec1e2b8a474dee870d4fd84c10b"
     }
   ],
   "entries": [

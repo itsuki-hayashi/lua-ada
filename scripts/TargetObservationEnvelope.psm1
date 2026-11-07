@@ -3,6 +3,7 @@ $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetContext.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
+Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtureEvidence.psm1')
 
 function Get-TargetObservationClaims {
     param([Parameter(Mandatory)][Collections.IDictionary] $Report,
@@ -147,6 +148,16 @@ function Test-TargetImageBuildWitnesses {
         -Context $Context -Revision $Revision -ConsumerArtifactRoot $payload -AUnitArtifactRoot $payload
     $consumer=Get-Content -LiteralPath $consumerPath -Raw|ConvertFrom-Json -AsHashtable -Depth 48
     Assert-TargetBuildRuntimeBindings -Image $image -ConsumerReport $consumer
+    foreach($implementation in @('ada','c')){
+        $name=if($implementation -ceq 'ada'){'native-module-api'}else{'native-module-oracle'}
+        $process=@($consumer.consumers|Where-Object name -CEQ $name)
+        if($process.Count -ne 1){throw 'Frozen image lacks its actual named native module lifetime consumer'}
+        $nativeReport=@{acceptance_context=$Context;target=$(if($implementation -ceq 'ada'){'Ada'}else{'ReferenceC'});
+            process=$process[0];native_fixture_linkage=@($consumer.native_module_contract[$implementation+'_linkage']);
+            native_fixture_records=$consumer.native_module_contract[$implementation+'_fixture_records'];
+            native_fixture_directory=$consumer.native_module_contract[$implementation+'_fixture_directory']}
+        $null=Assert-NativeLuaFixtureEvidence -Root $Root -ArtifactRoot $payload -ImagePayload $payload -Image $image -Report $nativeReport -ConsumerHost
+    }
     return @{image=$identity;named_evidence=$named;consumer_report=$consumer;build_witnesses_verified=$true;
         runtime_acceptance=$false;coverage_authority=$false}
 }
@@ -162,7 +173,7 @@ function Assert-TargetBuildRuntimeBindings {
         }
     }
     $kinds=@('gc','io','foreign')
-    foreach($kind in @('format','value','auxiliary','load_dump','debug','builtin','external','conversion','operator','index_type')){
+    foreach($kind in @('format','value','auxiliary','load_dump','debug','builtin','external','conversion','operator','index_type','base_closing','native_module')){
         if($ConsumerReport.Contains("${kind}_contract") -and $null -ne $ConsumerReport["${kind}_contract"]){$kinds+=$kind}
     }
     foreach($kind in $kinds){
