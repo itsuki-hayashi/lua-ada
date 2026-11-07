@@ -158,7 +158,7 @@
     },
     {
       "path": "tests/src/test_runner.adb",
-      "sha256": "db3b36bb954a8a96626aae35bf76784f7bb67389f038ca5846f215693de325f3"
+      "sha256": "a8360e2ccbd3cc68bf8224ff7356a03d69ea8057651960c72b557dd285258c76"
     },
     {
       "path": "scripts/check-aunit-evidence.ps1",
@@ -179,6 +179,14 @@
     {
       "path": "tests/src/lua-storage_tests.adb",
       "sha256": "604a3f2e0b51848a637aa49d8a3913a9e8441f7d0cfc0a5b673c671a9a30f4f6"
+    },
+    {
+      "path": "tests/src/lua-c_allocator_tests.adb",
+      "sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "path": "tests/src/lua-c_substitution_tests.adb",
+      "sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
     }
   ],
   "entries": [
@@ -2275,6 +2283,326 @@
       "required_stdout_line": "OK storage: retained provider data",
       "case": "tests/src/lua-storage_tests.adb#Retained_Provider_Data",
       "source_sha256": "604a3f2e0b51848a637aa49d8a3913a9e8441f7d0cfc0a5b673c671a9a30f4f6"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+      "registered_label": "C allocator: null old size ignored",
+      "required_stdout_line": "OK C allocator: null old size ignored",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Free_Null",
+      "registered_label": "C allocator: zero size frees",
+      "required_stdout_line": "OK C allocator: zero size frees",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+      "registered_label": "C allocator: growth preserves prefix",
+      "required_stdout_line": "OK C allocator: growth preserves prefix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+      "registered_label": "C allocator: shrink preserves prefix",
+      "required_stdout_line": "OK C allocator: shrink preserves prefix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+      "registered_label": "C allocator: fresh after free",
+      "required_stdout_line": "OK C allocator: fresh after free",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+      "registered_label": "C allocator: numeric alignment",
+      "required_stdout_line": "OK C allocator: numeric alignment",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+      "registered_label": "C allocator: refusal preserves old bytes",
+      "required_stdout_line": "OK C allocator: refusal preserves old bytes",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+      "registered_label": "C allocator: public allocator identity",
+      "required_stdout_line": "OK C allocator: public allocator identity",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Default_Identity",
+      "registered_label": "C allocator: default state allocator identity",
+      "required_stdout_line": "OK C allocator: default state allocator identity",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+      "registered_label": "C allocator: live seed leaves state intact",
+      "required_stdout_line": "OK C allocator: live seed leaves state intact",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Null_Seed",
+      "registered_label": "C allocator: null seed accepted",
+      "required_stdout_line": "OK C allocator: null seed accepted",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+      "registered_label": "C allocator: counted state cleanup",
+      "required_stdout_line": "OK C allocator: counted state cleanup",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup",
+      "registered_label": "C allocator: live stack cleanup",
+      "required_stdout_line": "OK C allocator: live stack cleanup",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "3fc2890c25e327d57b9a7e7c6e103b7c03fd43cb9fc11b9945bbdda3e5feafff"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+      "registered_label": "C substitution: literal metacharacters",
+      "required_stdout_line": "OK C substitution: literal metacharacters",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+      "registered_label": "C substitution: nonoverlapping matches",
+      "required_stdout_line": "OK C substitution: nonoverlapping matches",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+      "registered_label": "C substitution: replacement not rescanned",
+      "required_stdout_line": "OK C substitution: replacement not rescanned",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Shrink",
+      "registered_label": "C substitution: shrinking replacement",
+      "required_stdout_line": "OK C substitution: shrinking replacement",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Grow",
+      "registered_label": "C substitution: growing replacement",
+      "required_stdout_line": "OK C substitution: growing replacement",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+      "registered_label": "C substitution: empty replacement",
+      "required_stdout_line": "OK C substitution: empty replacement",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#No_Match",
+      "registered_label": "C substitution: no match",
+      "required_stdout_line": "OK C substitution: no match",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+      "registered_label": "C substitution: empty subject",
+      "required_stdout_line": "OK C substitution: empty subject",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+      "registered_label": "C substitution: prefix and suffix",
+      "required_stdout_line": "OK C substitution: prefix and suffix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+      "registered_label": "C substitution: NUL subject",
+      "required_stdout_line": "OK C substitution: NUL subject",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+      "registered_label": "C substitution: NUL pattern",
+      "required_stdout_line": "OK C substitution: NUL pattern",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Append_Reuse",
+      "registered_label": "C substitution: buffer append reuse",
+      "required_stdout_line": "OK C substitution: buffer append reuse",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+      "registered_label": "C substitution: large growth prefix",
+      "required_stdout_line": "OK C substitution: large growth prefix",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+      "registered_label": "C substitution: callback result",
+      "required_stdout_line": "OK C substitution: callback result",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+      "registered_label": "C substitution: callback error cleanup",
+      "required_stdout_line": "OK C substitution: callback error cleanup",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+      "registered_label": "C substitution: refusal and recovery",
+      "required_stdout_line": "OK C substitution: refusal and recovery",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+      "registered_label": "C substitution: empty pattern quota",
+      "required_stdout_line": "OK C substitution: empty pattern quota",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+      "registered_label": "C substitution: actual comparison quota",
+      "required_stdout_line": "OK C substitution: actual comparison quota",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
+    },
+    {
+      "case": "tests/src/lua-c_substitution_tests.adb#Heap_Disposal",
+      "registered_label": "C substitution: heap disposal without Lua",
+      "required_stdout_line": "OK C substitution: heap disposal without Lua",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "source_sha256": "5670a14a66890bad3467fa0e823f25950bc156ab2baa36c2a60bbe4571a28aba"
     }
   ],
   "required_contexts": [

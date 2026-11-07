@@ -3573,6 +3573,442 @@
         "PASS: buffer-captured-deallocator-pair"
       ],
       "runtime_acceptance": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "null-block-ignores-old-size",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-0 null-block-ignores-old-size"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "zero-size-frees-and-returns-null",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-1 zero-size-frees-and-returns-null"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "grow-preserves-prefix",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-2 grow-preserves-prefix"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "shrink-preserves-prefix",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-3 shrink-preserves-prefix"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "fresh-allocation-after-free",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-4 fresh-allocation-after-free"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "numeric-userdata-alignment",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-5 numeric-userdata-alignment"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "huge-refusal-preserves-old-block",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-6 huge-refusal-preserves-old-block"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "public-allocator-identity-and-use",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-7 public-allocator-identity-and-use"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "default-state-allocator-identity",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-8 default-state-allocator-identity"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "makeseed-live-state-is-inert",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-9 makeseed-live-state-is-inert"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "makeseed-accepts-null",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-10 makeseed-accepts-null"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "counted-state-closes-balanced",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-11 counted-state-closes-balanced"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "close-with-live-stack-balances",
+      "consumer": "allocator-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: allocator-api-12 close-with-live-stack-balances"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "installed-panic-string",
+      "consumer": "allocator-panic-string-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PANIC: unprotected error in call to Lua API (allocator panic witness)"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "witness_stream": "stderr"
+    },
+    {
+      "source": "c_api/tests/allocator_api_contract.c",
+      "case_id": "installed-panic-number",
+      "consumer": "allocator-panic-number-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PANIC: unprotected error in call to Lua API (error object is not a string)"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "witness_stream": "stderr"
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "literal-metachars",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-literal-metachars"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "nonoverlap-matches",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-nonoverlap-matches"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "replacement-not-rescanned",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-replacement-not-rescanned"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "shrinking-replacement",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-shrinking-replacement"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "growing-replacement",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-growing-replacement"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "empty-replacement",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-empty-replacement"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "no-match",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-no-match"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "empty-subject",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-empty-subject"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "prefix-suffix",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-prefix-suffix"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "embedded-nul-subject",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-embedded-nul-subject"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "embedded-nul-pattern",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-embedded-nul-pattern"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "buffer-append-reuse",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-buffer-append-reuse"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "large-growth-prefix",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-large-growth-prefix"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "callback-result",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-callback-result"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "callback-error-cleanup",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-callback-error-cleanup"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/substitution_api_contract.c",
+      "case_id": "allocator-refusal-recovery",
+      "consumer": "substitution-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: substitution-allocator-refusal-recovery"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
     }
   ],
   "source_measurements": {

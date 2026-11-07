@@ -9,7 +9,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'HeaderDeclarationProbes.psm1')
 $policy=Read-TargetWitnessPolicy -Root $root -Path $WitnessPolicy -RequireReview:(-not $DevelopmentObservation)
 $cases=@($policy.compiled.cases|Where-Object{ $Context -cin $_.contexts })
-if($cases.Count -eq 0){Write-Output 'NOT RUN: no reviewed compiled declaration witnesses are installed; global API acceptance remains pending';exit 0}
+if($cases.Count -eq 0){throw 'NOT RUN: no compiled declaration witnesses are installed; global API acceptance remains pending'}
 $revision=(& git -C $root rev-parse HEAD).Trim()
 $changes=@(& git -C $root -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal)
 if($LASTEXITCODE -ne 0 -or $changes.Count -ne 0){throw 'Compiled context witnesses require clean committed sources'}
@@ -51,6 +51,8 @@ foreach($case in $cases){
 }
 $report=@{schema_version=1;kind='target-compiled-context-observations';context=$Context;revision=$revision;
     source_root=$root;repository_dirty=$false;synthetic_fixture=$false;
+    development_observation=[bool]$DevelopmentObservation;
+    source_review_status=$(if($policy.source_reviewed){'accepted'}else{'pending'});
     compiler_sha256=(Get-FileHash -LiteralPath $Compiler).Hash.ToLowerInvariant();cases=$records;
     runtime_acceptance=$false;coverage_authority=$false}
 $path=Join-Path $directory 'observations.json'

@@ -621,7 +621,8 @@ retained allocator/data ownership; completion and count fields alone cannot
 replace those cases. The author catalogue adds seventeen C and twenty-four
 AUnit names, including separate host-budget and retained-storage cases, plus
 eight function and six behavioral buffer-macro route proposals. This brings
-the pending named source catalogues to 354 C and 128 AUnit cases. All semantic
+the pending named source catalogues at that checkpoint to 354 C and 128 AUnit
+cases. All semantic
 review and global/API acceptance remain pending.
 
 `new-target-attrib-windows-proposal.ps1` reconstructs a pending native-platform
@@ -658,6 +659,18 @@ and named regression diagnostics after failures. Its scope record always has
 false acceptance/coverage authority. It neither issues an acceptance envelope
 nor changes the final full-context workflow's independent review requirements.
 
+The auxiliary allocator/substitution successor adds thirteen allocator cases,
+two separately invoked installed-panic operations and sixteen literal
+substitution cases, with 32 separately registered AUnit witnesses. The pending
+catalogues contain 385 C and 160 AUnit identities while retaining the original
+100 C/94 AUnit protocols. Core observations require exact C/Ada counterpart
+bytes. Both panic operations require their exact actual argument and stderr,
+empty stdout and successful return; the stderr exception cannot be borrowed
+by other operations. Windows oracle consumers use actual DLL imports so a
+local function thunk cannot masquerade as public allocator identity. These
+source routes remain proposals requiring independent semantic review and
+fresh complete context evidence, with no passing global API statuses.
+
 The implementation-facade projection additionally binds the committed private
 runtime configuration header, GPR inputs and selected Ada configuration source.
 It uses the real T-only `LUA_ADA_AUXILIARY_BUFFER_BYTES=23` flag after lua.h and
@@ -666,6 +679,16 @@ the C VM's ltests header into the implementation. Ordinary SDK, private T
 caller and implementation-facade profiles retain their distinct extraspace
 and buffer layouts. Agreement within a header pair does not establish safe
 extraspace mutation or runtime representation across different roles.
+The facade receiver is C99-only, matching the implementation's C sources;
+public and private caller C++ roles remain separate probes. The selected
+64-bit header assertions require ordinary/facade extraspace 8 and private T
+lock declaration 16, with buffer extents 1024/23 as appropriate. They do not
+claim that the Ada implementation stores the reference instrumentation lock.
+SDK probes search only the SDK public tree; private T includes the exact
+original ltests.h without an oracle public-header fallback. Candidate category
+decisions and the final classification verifier source are hash-bound by the
+review claims. Compiled reports explicitly retain their development and source
+review status, and an absent compiled schedule is a failed/not-run phase.
 
 Final image replay also binds the actual selected C/C++ frontend identities,
 the compiler/query processes, both executables and every capture. Declaration

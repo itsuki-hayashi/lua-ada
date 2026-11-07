@@ -298,10 +298,12 @@ function Test-TargetNamedContextEvidence {
     $driverNames=@{format='format_api_contract.c';value='value_api_contract.c';auxiliary='auxiliary_api_contract.c';
         'load-dump'='load_dump_api_contract.c';debug='debug_api_contract.c';external='external_string_contract.c';
         conversion='conversion_api_contract.c';operator='operator_api_contract.c';'index-type'='index_type_api_contract.c';
-        'base-closing'='base_closing_api_contract.c';'native-module'='native_module_contract.c';buffer='buffer_api_contract.c'}
+        'base-closing'='base_closing_api_contract.c';'native-module'='native_module_contract.c';buffer='buffer_api_contract.c';
+        allocator='allocator_api_contract.c';substitution='substitution_api_contract.c'}
     foreach($kind in $driverNames.Keys){if($kind -ceq 'native-module' -or @($Policy.consumer.cases|Where-Object consumer -CEQ "$kind-api").Count -gt 0){
         if($kind -cnotin $additional){$additional+=$kind}
-        $names=@(('c_api/tests/'+$driverNames[$kind]),'c_api/tests/consumer_allocator.h')
+        $names=@(('c_api/tests/'+$driverNames[$kind]))
+        if($kind -cne 'allocator'){$names+='c_api/tests/consumer_allocator.h'}
         if($kind -ceq 'load-dump'){$names+='c_api/tests/load_dump_contract.h'}
         foreach($name in $names){
             $source=@($consumer[$kind.Replace('-','_')+'_contract'].sources|Where-Object file -CEQ $name)

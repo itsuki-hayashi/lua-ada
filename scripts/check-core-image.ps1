@@ -27,6 +27,7 @@ $scenarios = @("-XLUA_ADA_LIBRARY_TYPE=$LibraryType",
 Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'PEUnwind.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
+$referenceCompilerDefines=if($IsWindows){@('-DLUA_BUILD_AS_DLL')}else{@()}
 
 function Invoke-NativeModuleConsumer {
     param([string] $Name,[string] $Executable,[string] $Implementation,[string] $RuntimePath,[string] $Compiler)
@@ -51,13 +52,20 @@ function Invoke-NativeModuleConsumer {
 
 function Invoke-Build {
     param([string[]] $Arguments)
+    if($IsWindows -and $Arguments.Count -ge 3 -and $Arguments[0] -ceq 'exec' -and $Arguments[1] -ceq '--' -and
+        $Arguments[2] -ceq 'gcc' -and '-lconformance_lua' -cin $Arguments -and '-DLUA_BUILD_AS_DLL' -cnotin $Arguments){
+        # Public function/data identity must refer to the actual oracle DLL.
+        # Plain extern declarations can create local import thunks whose
+        # address differs even though the call reaches the correct function.
+        $Arguments=@($Arguments[0..2])+$referenceCompilerDefines+@($Arguments|Select-Object -Skip 3)
+    }
     & alr @Arguments
     if ($LASTEXITCODE -ne 0) { throw "Core-image build failed: $($Arguments -join ' ')" }
 }
 
 function Invoke-Consumer {
     param([string] $Name, [string] $Executable, [string] $Marker,
-        [string[]] $ConsumerArguments = @())
+        [string[]] $ConsumerArguments = @(), [string] $ExpectedStandardError = '')
     $unwind = $null
     if ($IsWindows) {
         # The final image, rather than an intermediate object or successful
@@ -69,7 +77,9 @@ function Invoke-Consumer {
         Write-Output "PASS: $Name PE unwind table ($($unwind.Entries) entries)"
     }
     # Redirect both pipes before waiting so even an unexpected diagnostic flood
-    # cannot deadlock the driver. Empty stderr is part of this consumer contract.
+    # cannot deadlock the driver. Only the two explicitly named default-panic
+    # operations have a nonempty stderr protocol; all other consumers retain
+    # their empty-stderr requirement and actual stdout completion marker.
     $start = [Diagnostics.ProcessStartInfo]::new('alr')
     $start.WorkingDirectory = $projectRoot
     $start.UseShellExecute = $false
@@ -102,8 +112,13 @@ function Invoke-Consumer {
         configuration = $Configuration;
         pe_unwind_entries = $(if ($null -eq $unwind) { $null } else { $unwind.Entries }) }
     $records.Add($record)
-    if ($timedOut -or $process.ExitCode -ne 0 -or $stderr.Length -ne 0 -or
-        -not $stdout.Contains($Marker)) {
+    $protocolMatches=if($ExpectedStandardError -eq ''){
+        $stderr.Length -eq 0 -and $Marker -ne '' -and $stdout.Contains($Marker)
+    }else{
+        $Name -cmatch '^allocator-panic-(string|number)-(api|oracle)$' -and $Marker -eq '' -and
+            $stdout.Length -eq 0 -and $stderr.Replace("`r`n","`n") -ceq $ExpectedStandardError
+    }
+    if ($timedOut -or $process.ExitCode -ne 0 -or -not $protocolMatches) {
         # Captures must also be visible in the job log when a build fails
         # before later campaigns. Do not hide the actual loader/assertion
         # diagnostic behind a report path that CI may not yet have uploaded.
@@ -201,6 +216,14 @@ try {
     Invoke-Consumer 'index-type-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/index_type_api_contract$suffix") 'PASS: public integer-index and type contract'
     Invoke-Consumer 'base-closing-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/base_closing_api_contract$suffix") 'PASS: public host base C closing contract'
     Invoke-Consumer 'buffer-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/buffer_api_contract$suffix") 'PASS: public luaL_Buffer contract'
+    $allocatorConsumer=Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/allocator_api_contract$suffix"
+    Invoke-Consumer 'allocator-api' $allocatorConsumer 'PASS: public allocator contract'
+    foreach($mode in @('string','number')){
+        $message=if($mode -ceq 'string'){'allocator panic witness'}else{'error object is not a string'}
+        Invoke-Consumer "allocator-panic-$mode-api" $allocatorConsumer '' @("--panic-$mode") `
+            ("PANIC: unprotected error in call to Lua API ($message)`n")
+    }
+    Invoke-Consumer 'substitution-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/substitution_api_contract$suffix") 'PASS: public luaL_addgsub and luaL_gsub contract'
     $compilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
     if($LASTEXITCODE -ne 0){throw 'Cannot identify selected native module fixture compiler'}
     $fixtureCompiler=($compilerOutput -join '').Trim()
@@ -304,6 +327,14 @@ try {
     Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/buffer_api_contract.c'),
         '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceBufferConsumer)
+    $referenceAllocatorConsumer=Join-Path $reportDirectory "allocator-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/allocator_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceAllocatorConsumer)
+    $referenceSubstitutionConsumer=Join-Path $reportDirectory "substitution-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/substitution_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceSubstitutionConsumer)
     $nativeSystemLibraries=if($IsLinux){@('-ldl')}else{@()}
     Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/native_module_contract.c'),
@@ -329,6 +360,13 @@ try {
         Invoke-Consumer 'index-type-oracle' $referenceIndexTypeConsumer 'PASS: public integer-index and type contract'
         Invoke-Consumer 'base-closing-oracle' $referenceBaseClosingConsumer 'PASS: public host base C closing contract'
         Invoke-Consumer 'buffer-oracle' $referenceBufferConsumer 'PASS: public luaL_Buffer contract'
+        Invoke-Consumer 'allocator-oracle' $referenceAllocatorConsumer 'PASS: public allocator contract'
+        foreach($mode in @('string','number')){
+            $message=if($mode -ceq 'string'){'allocator panic witness'}else{'error object is not a string'}
+            Invoke-Consumer "allocator-panic-$mode-oracle" $referenceAllocatorConsumer '' @("--panic-$mode") `
+                ("PANIC: unprotected error in call to Lua API ($message)`n")
+        }
+        Invoke-Consumer 'substitution-oracle' $referenceSubstitutionConsumer 'PASS: public luaL_addgsub and luaL_gsub contract'
         $nativeModuleC=Invoke-NativeModuleConsumer -Name native-module-oracle -Executable $referenceNativeModuleConsumer `
             -Implementation ReferenceC -RuntimePath $referenceDirectory -Compiler $fixtureCompiler
         Invoke-Consumer 'thread-reset-oracle' $referenceThreadResetConsumer 'PASS: public thread reset/base closing contract' $resetArguments
@@ -413,6 +451,17 @@ try {
     if([IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-oracle.stdout'))){throw 'C/Ada public buffer contract output differs'}
     Write-Output 'PASS: identical public luaL_Buffer contract against C and Ada'
+    foreach($kind in @('allocator','substitution')){
+        foreach($stream in @('stdout','stderr')){
+            if((Get-FileHash (Join-Path $reportDirectory "$kind-api.$stream")).Hash -cne
+                (Get-FileHash (Join-Path $reportDirectory "$kind-oracle.$stream")).Hash){throw "C/Ada public $kind contract $stream differs"}
+        }
+        Write-Output "PASS: identical public $kind contract against C and Ada"
+    }
+    foreach($mode in @('string','number')){foreach($stream in @('stdout','stderr')){
+        if((Get-FileHash (Join-Path $reportDirectory "allocator-panic-$mode-api.$stream")).Hash -cne
+            (Get-FileHash (Join-Path $reportDirectory "allocator-panic-$mode-oracle.$stream")).Hash){throw "C/Ada installed panic $mode $stream differs"}
+    }}
     if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'thread-reset-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'thread-reset-oracle.stdout'))) {
         throw 'C/Ada public thread reset contract output differs'
@@ -488,6 +537,8 @@ try {
     $bufferContractSources=@(foreach($name in @('buffer_api_contract.c','consumer_allocator.h')){
         @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
     })
+    $allocatorContractSources=@(@{file='c_api/tests/allocator_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/allocator_api_contract.c')).Hash.ToLowerInvariant()})
+    $substitutionContractSources=@(@{file='c_api/tests/substitution_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/substitution_api_contract.c')).Hash.ToLowerInvariant()})
     $threadResetContractSources = @(foreach ($name in @('thread_reset_api_contract.c', 'consumer_allocator.h')) {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
@@ -515,8 +566,9 @@ try {
         consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources);
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources);
         configuration = $Configuration; consumers = $records.ToArray();
+        reference_compiler_defines=$referenceCompilerDefines;
         library_files = $libraries;
         gc_contract = [ordered]@{ matching_output=$true; sources=$contractSources;
             reference_library_files=$referenceLibraries };
@@ -548,6 +600,8 @@ try {
             ada_fixture_directory=$nativeModuleAda.library_directory;c_fixture_directory=$nativeModuleC.library_directory;
             ada_fixture_records=$nativeModuleAda.records;c_fixture_records=$nativeModuleC.records};
         buffer_contract=@{matching_output=$true;sources=$bufferContractSources;matched_cases=17;reference_library_files=$referenceLibraries};
+        allocator_contract=@{matching_output=$true;sources=$allocatorContractSources;matched_cases=13;panic_modes=@('string','number');reference_library_files=$referenceLibraries};
+        substitution_contract=@{matching_output=$true;sources=$substitutionContractSources;matched_cases=16;reference_library_files=$referenceLibraries};
         thread_reset_contract = [ordered]@{ matching_output=$true; sources=$threadResetContractSources;
             matched_cases=$(if ($Configuration -eq 'upstream-test') { 23 } else { 24 });
             skipped_warning_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 1 } else { 0 });

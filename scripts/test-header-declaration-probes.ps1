@@ -18,6 +18,12 @@ Case 'closed declaration schedule retains all contexts C++ DLL and distinct priv
     Assert-True ($mapping.api_anchors.Count -eq 228 -and $mapping.applicability_anchors.Count -eq 28 -and $mapping.cases.Count -eq 132) 'Declaration/applicability context inventory narrowed'
     foreach($entry in $mapping.api_anchors){Assert-True ($entry.kind -ceq 'type' -or ($entry.kind -ceq 'macro' -and
         $entry.declaration -cnotmatch '^#define\s+[A-Za-z_][A-Za-z0-9_]*\(')) 'A function or callable macro acquired declaration-only classification'}
+    foreach($case in $mapping.cases){
+        Assert-True ('scripts/TargetWitnessPolicy.psm1' -cin @($case.source_bindings.path)) 'The final declaration/runtime boundary was not source-bound'
+        Assert-True ($case.profile_assertions.LUA_EXTRASPACE -eq $(if($case.mode.StartsWith('private-t-')){16}else{8})) 'The exact header extraspace role was not asserted'
+        $includes=@($case.sides.sdk.compile_arguments|Where-Object{$_ -cmatch '^\{root\}/(?:references/lua|c_api/include/api)$'})
+        Assert-True ($includes.Count -eq 1 -and $includes[0] -ceq '{root}/c_api/include/api') 'SDK headers can fall back to the reference public tree'
+    }
     foreach($context in @($mapping.cases.contexts|ForEach-Object{$_}|Sort-Object -Unique)){
         $selected=@($mapping.cases|Where-Object{ $context -cin $_.contexts })
         Assert-True ('public-cpp' -cin $selected.mode -and 'public-c' -cin $selected.mode) 'C++ was omitted from declaration applicability'
@@ -29,6 +35,7 @@ Case 'missing C++ mode fake declaration anchors and compiler flag drift fail the
     $m=Clone $mapping;$m.cases=@($m.cases|Select-Object -Skip 1);Reject {Assert-HeaderDeclarationMapping -Root $root -Mapping $m} 'complete probe schedule'
     $m=Clone $mapping;$m.api_anchors[0].kind='function';Reject {Assert-HeaderDeclarationMapping -Root $root -Mapping $m} 'api_anchors'
     $m=Clone $mapping;$m.cases[0].sides.sdk.compile_arguments+=@('-DLUA_32BITS');Reject {Assert-HeaderDeclarationMapping -Root $root -Mapping $m} 'complete probe schedule'
+    $m=Clone $mapping;$m.candidate_category_decisions.behavioral_macro='eligible-compiled-candidate';Reject {Assert-HeaderDeclarationMapping -Root $root -Mapping $m} 'candidate_category_decisions'
 }
 Case 'synthetic preprocessing parser preserves case-sensitive macro names and original source line identities'{
     $path=Join-Path $directory 'synthetic-origin.stdout'
@@ -126,6 +133,19 @@ if($Compiler -ne ''){
             Assert-True ($value.measured_fields -eq 145 -and $value.api_anchor_states.Count -eq 256 -and -not $value.runtime_acceptance) 'Measured profile was narrowed or promoted to API acceptance'
         }
     }
+    Case 'actual SDK compiler cannot silently borrow a missing public header from the oracle tree'{
+        $case=Clone $selectedCases[0]
+        $missing=Join-Path $directory 'empty-sdk-include';[void][IO.Directory]::CreateDirectory($missing)
+        $case.sides.sdk.compile_arguments=@($case.sides.sdk.compile_arguments|ForEach-Object{if($_ -ceq '{root}/c_api/include/api'){$missing}else{$_}})
+        $case.sides.sdk.preprocessing_arguments=@($case.sides.sdk.preprocessing_arguments|ForEach-Object{if($_ -ceq '{root}/c_api/include/api'){$missing}else{$_}})
+        foreach($side in @('sdk','native')){
+            $old=$case.sides[$side].output
+            $new=($directory.Replace('\','/')+'/missing-sdk-probe/'+[IO.Path]::GetFileName($old))
+            $case.sides[$side].output=$new
+            $case.sides[$side].compile_arguments=@($case.sides[$side].compile_arguments|ForEach-Object{if($_ -ceq $old){$new}else{$_}})
+        }
+        Reject {Invoke-HeaderDeclarationPair -Root $root -Compiler $Compiler -Case $case} 'compiler failed'
+    }
     Case 'actual pair cannot lose its native counterpart or reuse the SDK executable for both sides'{
         $r=Clone $records[0];[void]$r.sides.Remove('native');Reject {Replay $r $selectedCases[0]} 'counterpart is missing'
         $r=Clone $records[0];$r.sides.native=Clone $r.sides.sdk;Reject {Replay $r $selectedCases[0]} 'executable output path'
@@ -153,6 +173,12 @@ if($Compiler -ne ''){
         foreach($side in @('sdk','native')){
             $p=$r.sides[$side].processes.execution
             Rewrite-Capture $p ([IO.File]::ReadAllText($p.stdout_path).Replace('"sizeof.lua_Integer":8','"sizeof.lua_Integer":7'))
+        }
+        Reject {Replay $r $selectedCases[0]} 'fixed public ABI/version'
+        $r=Clone $records[0]
+        foreach($side in @('sdk','native')){
+            $p=$r.sides[$side].processes.execution
+            Rewrite-Capture $p ([IO.File]::ReadAllText($p.stdout_path).Replace('"LUA_EXTRASPACE":8','"LUA_EXTRASPACE":16'))
         }
         Reject {Replay $r $selectedCases[0]} 'fixed public ABI/version'
         $r=Clone $records[0];$p=$r.sides.native.processes.execution

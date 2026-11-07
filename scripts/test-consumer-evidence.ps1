@@ -282,4 +282,71 @@ Run-Case 'buffer contract rejects an unreviewed mode argument and string summary
 Run-Case 'buffer case summary must remain the actual integer seventeen' {param($r)
     $r.buffer_contract.matched_cases='17'
 } 'seventeen actual cases' -Foreign -Format -Additional $extended
+$allocatorNames=@('null-block-ignores-old-size','zero-size-frees-and-returns-null','grow-preserves-prefix','shrink-preserves-prefix',
+    'fresh-allocation-after-free','numeric-userdata-alignment','huge-refusal-preserves-old-block','public-allocator-identity-and-use',
+    'default-state-allocator-identity','makeseed-live-state-is-inert','makeseed-accepts-null','counted-state-closes-balanced','close-with-live-stack-balances')
+$substitutionNames=@('literal-metachars','nonoverlap-matches','replacement-not-rescanned','shrinking-replacement','growing-replacement',
+    'empty-replacement','no-match','empty-subject','prefix-suffix','embedded-nul-subject','embedded-nul-pattern','buffer-append-reuse',
+    'large-growth-prefix','callback-result','callback-error-cleanup','allocator-refusal-recovery')
+$newProtocols=@{}
+foreach($kind in @('allocator','substitution')){
+    $names=if($kind -ceq 'allocator'){$allocatorNames}else{$substitutionNames}
+    $completion=if($kind -ceq 'allocator'){'PASS: public allocator contract'}else{'PASS: public luaL_addgsub and luaL_gsub contract'}
+    $newProtocols[$kind]=(@(for($i=0;$i -lt $names.Count;$i++){
+        if($kind -ceq 'allocator'){"PASS: allocator-api-$i $($names[$i])"}else{'PASS: substitution-'+$names[$i]}
+    }) -join "`n")+"`n$completion`n"
+    $baseline[$kind+'_contract']=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=$names.Count}
+    foreach($name in @("$kind-api","$kind-oracle")){
+        $record=$records[0].Clone();$record.name=$name;$out=Join-Path $directory "$name.stdout"
+        [IO.File]::WriteAllText($out,$newProtocols[$kind]);$record.arguments=@();$record.stdout=$out
+        $record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$baseline.consumers+=$record
+    }
+}
+$baseline.allocator_contract.panic_modes=@('string','number')
+$panicSource='c_api/tests/allocator_api_contract.c'
+$baseline.consumer_sources+=@{file=$panicSource;sha256=$hash}
+foreach($mode in @('string','number')){
+    $message=if($mode -ceq 'string'){'allocator panic witness'}else{'error object is not a string'}
+    $line="PANIC: unprotected error in call to Lua API ($message)"
+    $mapping.cases+=@{source=$panicSource;case_id="installed-panic-$mode";source_sha256=$hash;
+        consumer="allocator-panic-$mode-api";witness_stream='stderr';expected_count=1;exact_witnesses=@($line);pattern_witness=$null}
+    foreach($implementation in @('api','oracle')){
+        $name="allocator-panic-$mode-$implementation";$record=$records[0].Clone();$record.name=$name
+        $out=Join-Path $directory "$name.stdout";$err=Join-Path $directory "$name.stderr"
+        [IO.File]::WriteAllText($out,'');[IO.File]::WriteAllText($err,$line+"`n")
+        $record.arguments=@("--panic-$mode");$record.stdout=$out;$record.stderr=$err
+        $record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant();$record.stderr_sha256=(Get-FileHash $err).Hash.ToLowerInvariant()
+        $baseline.consumers+=$record
+    }
+}
+$extended+=@('allocator','substitution')
+Run-Case 'allocator thirteen substitution sixteen and separate installed panic children retain exact paired protocols' {} '' -Foreign -Format -Additional $extended
+Run-Case 'matching allocator output cannot replace default constructor identity' {param($r)
+    foreach($name in @('allocator-api','allocator-oracle')){Replace-Capture $r $name stdout ($newProtocols.allocator.Replace('default-state-allocator-identity','invented-identity'))}
+} 'complete ordered protocol' -Foreign -Format -Additional $extended
+Run-Case 'matching substitution output cannot omit a literal case behind its final marker' {param($r)
+    foreach($name in @('substitution-api','substitution-oracle')){Replace-Capture $r $name stdout ($newProtocols.substitution.Replace("PASS: substitution-embedded-nul-pattern`n",''))}
+} 'complete ordered protocol' -Foreign -Format -Additional $extended
+Run-Case 'installed panic requires its actual native counterpart process' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE allocator-panic-string-oracle)
+} 'panic consumer missing' -Foreign -Format -Additional $extended
+Run-Case 'installed panic actual numeric mode cannot silently reuse string mode' {param($r)
+    @($r.consumers|Where-Object name -CEQ allocator-panic-number-api)[0].arguments=@('--panic-string')
+} 'actual argument differs' -Foreign -Format -Additional $extended
+Run-Case 'both matching panic captures cannot substitute a success marker for exact diagnostic' {param($r)
+    foreach($name in @('allocator-panic-string-api','allocator-panic-string-oracle')){Replace-Capture $r $name stderr "PASS: panic observed`n"}
+} 'exact stderr' -Foreign -Format -Additional $extended
+Run-Case 'panic exception does not permit output on stdout' {param($r)
+    Replace-Capture $r allocator-panic-number-api stdout "unreviewed output`n"
+} 'empty stdout' -Foreign -Format -Additional $extended
+Run-Case 'panic stderr allowance does not weaken regular allocator empty stderr' {param($r)
+    Replace-Capture $r allocator-api stderr "PANIC: unprotected error in call to Lua API (allocator panic witness)`n"
+} 'consumer stderr' -Foreign -Format -Additional $extended
+$panicCase=@($mapping.cases|Where-Object case_id -CEQ installed-panic-string)[0]
+$panicCase.witness_stream='stdout'
+Run-Case 'panic mapping cannot treat diagnostic as a stdout success witness' {} 'witness stream' -Foreign -Format -Additional $extended
+$panicCase.witness_stream='stderr'
+$mapping.cases[0].witness_stream='stderr'
+Run-Case 'ordinary witness cannot borrow the narrowly named panic stderr protocol' {} 'witness stream' -Foreign -Format -Additional $extended
+$mapping.cases[0].Remove('witness_stream')
 Write-Output "PASS: $count named consumer evidence regressions; synthetic observations only"

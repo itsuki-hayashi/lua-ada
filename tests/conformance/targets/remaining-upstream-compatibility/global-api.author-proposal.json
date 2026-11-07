@@ -8,7 +8,7 @@
   "runtime_acceptance": false,
   "coverage_authority": false,
   "source_snapshot": {
-    "revision": "94a5518ba176f24c5630d905d23c0eedec77c9a9",
+    "revision": "60cd38470435c42036f60f969ca40f5bf1d468ba",
     "repository_dirty": true,
     "kind": "repository-source-snapshot"
   },
@@ -29212,17 +29212,796 @@
       "declaration": "LUALIB_API void *(luaL_alloc) (void *ud, void *ptr, size_t osize, size_t nsize);",
       "conditions": [],
       "classification": "pending-semantic-review",
-      "invariant": null,
-      "boundaries": null,
+      "invariant": "Actual exported allocator handles malloc/realloc/free, preserves prefixes and refuses oversized requests without losing the previous block.",
+      "boundaries": "Null block ignores old size; zero frees; growth/shrink/fresh allocation, alignment, actual refusal and balanced state cleanup; no exact allocation-count or OOM-size assumption.",
       "retained_route": false,
-      "named_c_cases": [],
-      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+        "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+        "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+        "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+        "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+        "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use",
+        "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+        "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+        "tests/src/lua-c_allocator_tests.adb#Free_Null",
+        "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+        "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+        "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup",
+        "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+        "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+        "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+        "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+        "tests/src/lua-c_allocator_tests.adb#State_Cleanup"
+      ],
       "compiled_witnesses": [],
       "applicability_review": null,
       "review_status": "pending",
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "execution_evidence": []
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "proposed_invariant": "Actual exported allocator handles malloc/realloc/free, preserves prefixes and refuses oversized requests without losing the previous block.",
+      "proposed_boundaries": "Null block ignores old size; zero frees; growth/shrink/fresh allocation, alignment, actual refusal and balanced state cleanup; no exact allocation-count or OOM-size assumption.",
+      "proposed_context_witnesses": [
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/windows/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/windows/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/windows/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/windows/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "upstream-test/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "upstream-test/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/linux/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/linux/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/linux/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/linux/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "upstream-test/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "upstream-test/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/macos/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/macos/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/macos/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/macos/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "upstream-test/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "upstream-test/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "default/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#null-block-ignores-old-size",
+            "c_api/tests/allocator_api_contract.c#zero-size-frees-and-returns-null",
+            "c_api/tests/allocator_api_contract.c#grow-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#shrink-preserves-prefix",
+            "c_api/tests/allocator_api_contract.c#fresh-allocation-after-free",
+            "c_api/tests/allocator_api_contract.c#numeric-userdata-alignment",
+            "c_api/tests/allocator_api_contract.c#huge-refusal-preserves-old-block",
+            "c_api/tests/allocator_api_contract.c#public-allocator-identity-and-use"
+          ],
+          "context": "upstream-test/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Null_Old_Size",
+            "tests/src/lua-c_allocator_tests.adb#Free_Null",
+            "tests/src/lua-c_allocator_tests.adb#Growth_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Shrink_Prefix",
+            "tests/src/lua-c_allocator_tests.adb#Fresh_After_Free",
+            "tests/src/lua-c_allocator_tests.adb#Numeric_Alignment",
+            "tests/src/lua-c_allocator_tests.adb#Refusal_Preserves",
+            "tests/src/lua-c_allocator_tests.adb#Allocator_Identity",
+            "tests/src/lua-c_allocator_tests.adb#State_Cleanup",
+            "tests/src/lua-c_allocator_tests.adb#Live_Stack_Cleanup"
+          ]
+        }
+      ]
     },
     {
       "id": "CAPI-LAUXLIB-H-MACRO-LUA_NOREF-89",
@@ -30113,16 +30892,416 @@
       "boundaries": "This invariant covers the actual selected public calls only; complete global C API acceptance remains pending.",
       "retained_route": true,
       "named_c_cases": [
+        "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+        "c_api/tests/allocator_api_contract.c#installed-panic-number",
+        "c_api/tests/allocator_api_contract.c#installed-panic-string",
         "c_api/tests/c_api_consumer.c#test_constructor_leaves_standard_libraries_closed",
         "c_api/tests/c_api_consumer.c#test_reentrant_independent_universes"
       ],
-      "named_aunit_cases": [],
+      "named_aunit_cases": [
+        "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+      ],
       "compiled_witnesses": [],
       "applicability_review": null,
       "review_status": "pending",
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "execution_evidence": []
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "proposed_invariant": "Actual default constructor installs the public auxiliary allocator and a nonnull native-matched panic callback.",
+      "proposed_boundaries": "Two separately invoked installed-panic children preserve stack height/type, return zero and emit exact paired stderr; no deliberate process abort or foreign jump.",
+      "proposed_context_witnesses": [
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/windows/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/windows/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/windows/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/windows/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "upstream-test/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "upstream-test/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/linux/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/linux/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/linux/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/linux/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "upstream-test/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "upstream-test/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/macos/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/macos/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/macos/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/macos/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "upstream-test/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "upstream-test/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "default/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#default-state-allocator-identity",
+            "c_api/tests/allocator_api_contract.c#installed-panic-string",
+            "c_api/tests/allocator_api_contract.c#installed-panic-number"
+          ],
+          "context": "upstream-test/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Default_Identity"
+          ]
+        }
+      ]
     },
     {
       "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_MAKESEED-106",
@@ -30136,17 +31315,418 @@
       "declaration": "LUALIB_API unsigned (luaL_makeseed) (lua_State *L);",
       "conditions": [],
       "classification": "pending-semantic-review",
-      "invariant": null,
-      "boundaries": null,
+      "invariant": "Actual seed helper accepts live and null state arguments without touching stack or allocation ownership.",
+      "boundaries": "Seed value and uniqueness are intentionally unspecified; live-state stack, allocator count and bytes remain inert.",
       "retained_route": false,
-      "named_c_cases": [],
-      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/allocator_api_contract.c#makeseed-accepts-null",
+        "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+        "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+      ],
       "compiled_witnesses": [],
       "applicability_review": null,
       "review_status": "pending",
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "execution_evidence": []
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "proposed_invariant": "Actual seed helper accepts live and null state arguments without touching stack or allocation ownership.",
+      "proposed_boundaries": "Seed value and uniqueness are intentionally unspecified; live-state stack, allocator count and bytes remain inert.",
+      "proposed_context_witnesses": [
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/windows/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/windows/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/windows/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/windows/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "upstream-test/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "upstream-test/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/linux/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/linux/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/linux/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/linux/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "upstream-test/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "upstream-test/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/macos/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/macos/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/macos/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/macos/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "upstream-test/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "upstream-test/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "default/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/allocator_api_contract.c#makeseed-live-state-is-inert",
+            "c_api/tests/allocator_api_contract.c#makeseed-accepts-null"
+          ],
+          "context": "upstream-test/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_allocator_tests.adb#Live_Seed",
+            "tests/src/lua-c_allocator_tests.adb#Null_Seed"
+          ]
+        }
+      ]
     },
     {
       "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_LEN-108",
@@ -30531,17 +32111,364 @@
       "declaration": "LUALIB_API void (luaL_addgsub) (luaL_Buffer *b, const char *s, const char *p, const char *r);",
       "conditions": [],
       "classification": "pending-semantic-review",
-      "invariant": null,
-      "boundaries": null,
+      "invariant": "Actual exported helper appends literal nonoverlapping substitutions into an existing buffer which is reused between operations.",
+      "boundaries": "Literal metacharacters and replacements are not pattern expansions; completed append preserves prefix/suffix and exact stack placement.",
       "retained_route": false,
-      "named_c_cases": [],
-      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+      ],
       "compiled_witnesses": [],
       "applicability_review": null,
       "review_status": "pending",
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "execution_evidence": []
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "proposed_invariant": "Actual exported helper appends literal nonoverlapping substitutions into an existing buffer which is reused between operations.",
+      "proposed_boundaries": "Literal metacharacters and replacements are not pattern expansions; completed append preserves prefix/suffix and exact stack placement.",
+      "proposed_context_witnesses": [
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/windows/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/windows/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/windows/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/windows/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "upstream-test/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "upstream-test/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/linux/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/linux/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/linux/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/linux/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "upstream-test/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "upstream-test/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/macos/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/macos/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/macos/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/macos/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "upstream-test/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "upstream-test/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "default/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#buffer-append-reuse"
+          ],
+          "context": "upstream-test/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Append_Reuse"
+          ]
+        }
+      ]
     },
     {
       "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_GSUB-112",
@@ -30555,17 +32482,1201 @@
       "declaration": "LUALIB_API const char *(luaL_gsub) (lua_State *L, const char *s, const char *p, const char *r);",
       "conditions": [],
       "classification": "pending-semantic-review",
-      "invariant": null,
-      "boundaries": null,
+      "invariant": "Actual exported string substitution pushes one exact string result with native-matched literal, nonoverlap, NUL-terminated C-string, growth and protected-error semantics.",
+      "boundaries": "Sixteen shared-source scenarios remain separately observed; empty-pattern nonprogress and comparison quota are Ada bounded-policy witnesses only, not fabricated native terminating cases.",
       "retained_route": false,
-      "named_c_cases": [],
-      "named_aunit_cases": [],
+      "named_c_cases": [
+        "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery",
+        "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+        "c_api/tests/substitution_api_contract.c#callback-result",
+        "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+        "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+        "c_api/tests/substitution_api_contract.c#empty-replacement",
+        "c_api/tests/substitution_api_contract.c#empty-subject",
+        "c_api/tests/substitution_api_contract.c#growing-replacement",
+        "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+        "c_api/tests/substitution_api_contract.c#literal-metachars",
+        "c_api/tests/substitution_api_contract.c#no-match",
+        "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+        "c_api/tests/substitution_api_contract.c#prefix-suffix",
+        "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+        "c_api/tests/substitution_api_contract.c#shrinking-replacement"
+      ],
+      "named_aunit_cases": [
+        "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+        "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+        "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+        "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+        "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+        "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+        "tests/src/lua-c_substitution_tests.adb#Grow",
+        "tests/src/lua-c_substitution_tests.adb#Heap_Disposal",
+        "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+        "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+        "tests/src/lua-c_substitution_tests.adb#No_Match",
+        "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+        "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+        "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+        "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+        "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+        "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+        "tests/src/lua-c_substitution_tests.adb#Shrink"
+      ],
       "compiled_witnesses": [],
       "applicability_review": null,
       "review_status": "pending",
       "runtime_acceptance": false,
       "coverage_authority": false,
-      "execution_evidence": []
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "proposed_invariant": "Actual exported string substitution pushes one exact string result with native-matched literal, nonoverlap, NUL-terminated C-string, growth and protected-error semantics.",
+      "proposed_boundaries": "Sixteen shared-source scenarios remain separately observed; empty-pattern nonprogress and comparison quota are Ada bounded-policy witnesses only, not fabricated native terminating cases.",
+      "proposed_context_witnesses": [
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/windows/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/windows/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/windows/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/windows/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "upstream-test/windows/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "upstream-test/windows/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/linux/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/linux/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/linux/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/linux/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "upstream-test/linux/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "upstream-test/linux/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/macos/development/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/macos/development/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/macos/release/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/macos/release/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "upstream-test/macos/validation/static",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "upstream-test/macos/validation/shared",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "default/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        },
+        {
+          "runtime_acceptance": false,
+          "compiled_witnesses": [],
+          "required_disposition": "runtime-observed",
+          "named_c_cases": [
+            "c_api/tests/substitution_api_contract.c#literal-metachars",
+            "c_api/tests/substitution_api_contract.c#nonoverlap-matches",
+            "c_api/tests/substitution_api_contract.c#replacement-not-rescanned",
+            "c_api/tests/substitution_api_contract.c#shrinking-replacement",
+            "c_api/tests/substitution_api_contract.c#growing-replacement",
+            "c_api/tests/substitution_api_contract.c#empty-replacement",
+            "c_api/tests/substitution_api_contract.c#no-match",
+            "c_api/tests/substitution_api_contract.c#empty-subject",
+            "c_api/tests/substitution_api_contract.c#prefix-suffix",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-subject",
+            "c_api/tests/substitution_api_contract.c#embedded-nul-pattern",
+            "c_api/tests/substitution_api_contract.c#large-growth-prefix",
+            "c_api/tests/substitution_api_contract.c#callback-result",
+            "c_api/tests/substitution_api_contract.c#callback-error-cleanup",
+            "c_api/tests/substitution_api_contract.c#allocator-refusal-recovery"
+          ],
+          "context": "upstream-test/windows/validation/static-pic",
+          "review_status": "pending",
+          "named_aunit_cases": [
+            "tests/src/lua-c_substitution_tests.adb#Literal_Metachars",
+            "tests/src/lua-c_substitution_tests.adb#Nonoverlap",
+            "tests/src/lua-c_substitution_tests.adb#No_Rescan",
+            "tests/src/lua-c_substitution_tests.adb#Shrink",
+            "tests/src/lua-c_substitution_tests.adb#Grow",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Replacement",
+            "tests/src/lua-c_substitution_tests.adb#No_Match",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Prefix_Suffix",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Subject",
+            "tests/src/lua-c_substitution_tests.adb#Nul_Pattern",
+            "tests/src/lua-c_substitution_tests.adb#Large_Prefix",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Result",
+            "tests/src/lua-c_substitution_tests.adb#Callback_Error",
+            "tests/src/lua-c_substitution_tests.adb#Refusal_Recovery",
+            "tests/src/lua-c_substitution_tests.adb#Empty_Pattern_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Comparison_Quota",
+            "tests/src/lua-c_substitution_tests.adb#Heap_Disposal"
+          ]
+        }
+      ]
     },
     {
       "id": "CAPI-LAUXLIB-H-FUNCTION-LUAL_SETFUNCS-115",

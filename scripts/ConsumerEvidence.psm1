@@ -8,7 +8,7 @@ function Test-NamedConsumerEvidence {
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
           [switch] $RequireFormatContract,
-          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer')]
+          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','allocator','substitution')]
           [string[]] $AdditionalContracts=@())
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
@@ -42,7 +42,8 @@ function Test-NamedConsumerEvidence {
     $additionalMarkers=@{format='PASS: public formatting contract';value='PASS: public value operation contract';auxiliary='PASS: public auxiliary contract';
         'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';external='PASS: public external string contract';
         conversion='PASS: public numeric conversion contract';operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract';
-        'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external';buffer='PASS: public luaL_Buffer contract'}
+        'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external';buffer='PASS: public luaL_Buffer contract';
+        allocator='PASS: public allocator contract';substitution='PASS: public luaL_addgsub and luaL_gsub contract'}
     foreach($kind in $additional|Sort-Object -Unique){
         $markers["$kind-api"]=$additionalMarkers[$kind];$markers["$kind-oracle"]=$additionalMarkers[$kind]
         $contractKinds+=$kind;$consumerKinds+="$kind-api"
@@ -148,6 +149,62 @@ function Test-NamedConsumerEvidence {
             }
         }
     }
+    foreach($kind in @('allocator','substitution')){if($kind -cin $additional){
+        $names=if($kind -ceq 'allocator'){
+            @('null-block-ignores-old-size','zero-size-frees-and-returns-null','grow-preserves-prefix','shrink-preserves-prefix',
+                'fresh-allocation-after-free','numeric-userdata-alignment','huge-refusal-preserves-old-block','public-allocator-identity-and-use',
+                'default-state-allocator-identity','makeseed-live-state-is-inert','makeseed-accepts-null','counted-state-closes-balanced','close-with-live-stack-balances')
+        }else{
+            @('literal-metachars','nonoverlap-matches','replacement-not-rescanned','shrinking-replacement','growing-replacement',
+                'empty-replacement','no-match','empty-subject','prefix-suffix','embedded-nul-subject','embedded-nul-pattern',
+                'buffer-append-reuse','large-growth-prefix','callback-result','callback-error-cleanup','allocator-refusal-recovery')
+        }
+        $lines=@(for($i=0;$i -lt $names.Count;$i++){
+            if($kind -ceq 'allocator'){"PASS: allocator-api-$i $($names[$i])"}else{'PASS: substitution-'+$names[$i]}
+        })
+        $expected=($lines -join "`n")+"`n"+$additionalMarkers[$kind]+"`n"
+        $contract=$Report[$kind+'_contract']
+        if(($contract.matched_cases -isnot [int] -and $contract.matched_cases -isnot [long]) -or $contract.matched_cases -ne $names.Count){
+            throw "Named $kind contract requires all $($names.Count) actual cases"
+        }
+        foreach($name in @("$kind-api","$kind-oracle")){
+            $record=@($Report.consumers|Where-Object name -CEQ $name)[0]
+            if($record.arguments -isnot [Array] -or $record.arguments.Count -ne 0 -or $outputs[$name].text.Replace("`r`n","`n") -cne $expected){
+                throw "Named $kind actual arguments or complete ordered protocol differ"
+            }
+        }
+    }}
+    if('allocator' -cin $additional){
+        # Default panic is intentionally observed through the installed public
+        # function, in separate actual children. It returns to the C driver;
+        # no deliberate host abort or foreign jump crosses an Ada frame. Only
+        # these fixed two operations may supply stderr witnesses. Their exact
+        # counterpart bytes are mandatory even though the normal allocator
+        # child and every historical consumer still require empty stderr.
+        if($Report.allocator_contract.panic_modes -isnot [Array] -or
+            ($Report.allocator_contract.panic_modes -join '|') -cne 'string|number'){throw 'Named allocator installed panic modes differ'}
+        foreach($mode in @('string','number')){
+            $message=if($mode -ceq 'string'){'allocator panic witness'}else{'error object is not a string'}
+            $expected="PANIC: unprotected error in call to Lua API ($message)`n"
+            foreach($implementation in @('api','oracle')){
+                $name="allocator-panic-$mode-$implementation"
+                $matches=@($Report.consumers|Where-Object name -CEQ $name)
+                if($matches.Count -ne 1){throw "Named installed panic consumer missing/duplicate: $name"}
+                $record=$matches[0]
+                if($record.exit_code -ne 0 -or $record.timed_out -ne $false -or $record.configuration -cne $parts[0] -or
+                    $record.profile -cne $parts[2] -or $record.library_type -cne $libraryType -or
+                    $record.executable_sha256 -cnotmatch '^[0-9a-f]{64}$' -or $record.arguments -isnot [Array] -or
+                    ($record.arguments -join '|') -cne "--panic-$mode"){throw 'Named installed panic process or actual argument differs'}
+                $outPath=& $ResolveCapture $record.stdout $record.stdout_sha256
+                $errPath=& $ResolveCapture $record.stderr $record.stderr_sha256
+                $stderr=[IO.File]::ReadAllText($errPath)
+                if((Get-Item $outPath).Length -ne 0 -or $stderr.Replace("`r`n","`n") -cne $expected){throw 'Named installed panic exact stderr or empty stdout differs'}
+                $outputs[$name]=@{text=$stderr;hash=$record.stderr_sha256;stream='stderr'}
+            }
+            if($outputs["allocator-panic-$mode-api"].hash -cne $outputs["allocator-panic-$mode-oracle"].hash){throw 'Named installed panic actual oracle bytes differ'}
+            $consumerKinds+="allocator-panic-$mode-api"
+        }
+    }
     $seen = @{}
     foreach ($case in $Mapping.cases) {
         $key = $case.source + '#' + $case.case_id
@@ -159,6 +216,10 @@ function Test-NamedConsumerEvidence {
         if ($source.Count -ne 1 -or $source[0].sha256 -cne $case.source_sha256) {
             throw "Named consumer source differs: $key"
         }
+        $stream=if($case.Contains('witness_stream')){$case.witness_stream}else{'stdout'}
+        $panic=$case.consumer -cmatch '^allocator-panic-(string|number)-api$'
+        if(($panic -and ($stream -cne 'stderr' -or $case.source -cne 'c_api/tests/allocator_api_contract.c')) -or
+            (-not $panic -and $stream -cne 'stdout')){throw 'Named consumer witness stream is not the exact installed panic operation'}
         $patterns = @($case.exact_witnesses | ForEach-Object { '(?m)^' + [regex]::Escape($_) + '\r?$' })
         if ($null -ne $case.pattern_witness) { $patterns += '(?m)' + $case.pattern_witness }
         if ($patterns.Count -eq 0) { throw "Named consumer has no witness: $key" }

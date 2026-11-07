@@ -1,6 +1,6 @@
 {
   "global_api": {
-    "sha256": "2b3c86b6629fbd92dc0e509c59c11143e094957eef93c4d875a3395475505d0f",
+    "sha256": "ab5791959fa2f1f04a31fe886e36a06c3d4185080ad5d3e3e73eb4b170456bf1",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
   },
   "retained_api_routes": 159,
@@ -38,7 +38,7 @@
     },
     "tests/src/test_runner.adb": {
       "previous": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8",
-      "current": "db3b36bb954a8a96626aae35bf76784f7bb67389f038ca5846f215693de325f3"
+      "current": "a8360e2ccbd3cc68bf8224ff7356a03d69ea8057651960c72b557dd285258c76"
     },
     "tests/src/lua-collector_tests.adb": {
       "previous": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4",
@@ -54,28 +54,28 @@
     }
   },
   "retained_consumer_cases": 100,
-  "proposed_aunit_cases": 128,
+  "proposed_aunit_cases": 160,
   "consumer": {
-    "sha256": "b9fd143c30f12b7b7540972c9a8c9b532f74b868c884188919b0846ed42236ea",
+    "sha256": "9936eddefc60328e4c1360977edfd3029a5bec687ef9346e95629a2b747df406",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/consumer-witness.author-proposal.json"
   },
   "retained_aunit_cases": 94,
-  "proposed_consumer_cases": 354,
+  "proposed_consumer_cases": 385,
   "independent_review_status": "pending",
   "runtime_acceptance": false,
   "global_api_entries": 473,
   "witness_policy": {
-    "sha256": "22bc41f818c4dbfc9b317c543fe56568560f80b249b96b7a215e6620436a76dd",
+    "sha256": "48e1235c15fd7782c65a8f76c99ed976ec9d0ca52efc9233d630e405e08fe80a",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/witness-policy.author-proposal.json"
   },
   "source_snapshot": {
-    "revision": "94a5518ba176f24c5630d905d23c0eedec77c9a9",
+    "revision": "60cd38470435c42036f60f969ca40f5bf1d468ba",
     "repository_dirty": true,
     "kind": "repository-source-snapshot"
   },
   "target": "remaining-upstream-compatibility",
   "aunit": {
-    "sha256": "9face2db41388c6b1f45f6961ec2e705bd817da0c47a41fad074f25d665f5529",
+    "sha256": "001011c7215d100e1e496edc4a4c71223c5ac16255d2cbb10ca3e849a2a724af",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/aunit-witness.author-proposal.json"
   }
 }

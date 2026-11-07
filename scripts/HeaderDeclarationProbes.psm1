@@ -29,7 +29,8 @@ function New-HeaderDeclarationMapping {
     $applicability=@($api|Where-Object{ $_.id -cnotin $ids -and $_.conditions.Count -gt 0 }|ForEach-Object{Anchor-Identity $_})
     $source='tests/conformance/header_declarations.c';$hash=(Get-FileHash (Join-Path $Root $source)).Hash.ToLowerInvariant()
     $bindings=@(@{path=$source;sha256=$hash})
-    foreach($script in @('scripts/HeaderDeclarationProbes.psm1','scripts/run-target-compiled-witnesses.ps1','scripts/TargetCompiledWitnesses.psm1')){
+    foreach($script in @('scripts/HeaderDeclarationProbes.psm1','scripts/run-target-compiled-witnesses.ps1',
+        'scripts/TargetCompiledWitnesses.psm1','scripts/TargetWitnessPolicy.psm1')){
         $bindings+=@{path=$script;sha256=(Get-FileHash (Join-Path $Root $script)).Hash.ToLowerInvariant()}
     }
     foreach($directory in @('references/lua','c_api/include/api')){foreach($header in @('lua.h','lauxlib.h','lualib.h','luaconf.h')){
@@ -43,8 +44,8 @@ function New-HeaderDeclarationMapping {
         if($parts[0] -ceq 'upstream-test'){$facadeFlags+='-DLUA_ADA_AUXILIARY_BUFFER_BYTES=23'}
         if($parts[1] -ceq 'windows'){$facadeFlags+=@('-DLUA_BUILD_AS_DLL','-DLUA_CORE','-DLUA_LIB')}
         $modes+=@{id='facade-c';language='c';extra=$facadeFlags}
-        if($parts[0] -ceq 'upstream-test'){$modes+=@(@{id='private-t-c';language='c';extra=@('-DLUA_USER_H=<ltests.h>')},
-            @{id='private-t-cpp';language='c++';extra=@('-DLUA_USER_H=<ltests.h>')})}
+        if($parts[0] -ceq 'upstream-test'){$modes+=@(@{id='private-t-c';language='c';extra=@('-DLUA_USER_H=<{root}/references/lua/ltests.h>')},
+            @{id='private-t-cpp';language='c++';extra=@('-DLUA_USER_H=<{root}/references/lua/ltests.h>')})}
         if($parts[1] -ceq 'windows'){foreach($language in @('c','c++')){foreach($role in @('import','export')){
             $extra=@('-DLUA_BUILD_AS_DLL');if($role -ceq 'export'){$extra+='-DLUA_CORE'}
             $modes+=@{id=('dll-'+$role+'-'+$(if($language -ceq 'c'){'c'}else{'cpp'}));language=$language;extra=$extra}
@@ -59,7 +60,11 @@ function New-HeaderDeclarationMapping {
             $sides=@{}
             foreach($side in @('sdk','native')){
                 $include=if($side -ceq 'sdk'){'c_api/include/api'}else{'references/lua'}
-                $arguments=$common+@('-I',('{root}/'+$include),'-I','{root}/references/lua')
+                # Only the selected public tree is searchable. An SDK header
+                # missing from that tree must fail rather than borrowing the
+                # oracle's copy. Private T selects the one exact original
+                # ltests.h by absolute include name, not a fallback directory.
+                $arguments=$common+@('-I',('{root}/'+$include))
                 $output=$directory+'/'+$side+$(if($parts[1] -ceq 'windows'){'.exe'}else{''})
                 $sides[$side]=@{compile_arguments=($arguments+@(('{root}/'+$source),'-o',$output));output=$output;
                     preprocessing_arguments=($arguments+@('-E','-dD',('{root}/'+$source)));
@@ -76,17 +81,25 @@ function New-HeaderDeclarationMapping {
             $cases+=@{id=$id;protocol='paired-header-profile-v1';contexts=@($context);mode=$mode.id;language=$mode.language;
                 source=@{path=$source;sha256=$hash};source_bindings=$sourceBindings;profile_fields=$fields;
                 profile_assertions=@{LUA_VERSION_NUM=505;LUA_VERSION_RELEASE_NUM=50501;
-                    'sizeof.lua_Integer'=8;'sizeof.lua_Unsigned'=8;'sizeof.lua_Number'=8;LUA_VERSION='Lua 5.5';LUA_RELEASE='Lua 5.5.1'};
+                    'sizeof.lua_State *'=8;'sizeof.lua_Integer'=8;'sizeof.lua_Unsigned'=8;'sizeof.lua_Number'=8;
+                    LUA_EXTRASPACE=$(if($mode.id.StartsWith('private-t-')){16}else{8});
+                    LUAL_BUFFERSIZE=$(if($mode.id.StartsWith('private-t-') -or ($mode.id -ceq 'facade-c' -and $parts[0] -ceq 'upstream-test')){23}else{1024});
+                    LUA_VERSION='Lua 5.5';LUA_RELEASE='Lua 5.5.1'};
                 required_stdout_line='HEADER-PROFILE-V1';sides=$sides;global_classification_review_status='pending';
                 runtime_acceptance=$false;coverage_authority=$false}
         }
     }
     return @{schema_version=1;kind='target-compiled-witness-mapping';target='remaining-upstream-compatibility';
         reference_revision=$suite.reference_revision;author='Codex /root/validation_delivery';
+        candidate_category_decisions=@{status='candidate-not-semantic-classification';type_layout='eligible-compiled-candidate';
+            object_macro='eligible-compiled-candidate';callable_function='runtime-required';behavioral_macro='runtime-required';
+            conditional_behavioral_applicability='not-runtime-evidence'};
         independent_review_status='pending';runtime_acceptance=$false;coverage_authority=$false;execution_evidence=@();
         api_anchors=$anchors;applicability_anchors=$applicability;cases=$cases;review=@{status='pending';author='Codex /root/validation_delivery';reviewer=$null;artifact=$null;artifact_sha256=$null};
         boundaries=@('Declaration/type/header observations only; no Lua implementation is linked and no Lua API executes.',
             'Public C/C++ consumers, DLL import/export declarations and private T callers are distinct modes.',
+            'The implementation-facade receiver is C99-only, matching the actual C implementation; it makes no C++ facade claim.',
+            'On these 64-bit contexts the exact header roles assert pointer8, ordinary/facade extraspace8 and native private-T lock declaration16; this does not assert Ada lock storage.',
             'Private T extraspace and buffer declarations do not certify ordinary SDK extraspace mutation or runtime representation.',
             'All function/data entries and behavioral macros retain independently reviewed actual runtime routes.',
             'All 473 global semantic classifications and coverage ledger entries remain pending.')}
@@ -122,7 +135,7 @@ function Invoke-HeaderDeclarationPair {
         $directory=Split-Path -Parent $artifact;[void][IO.Directory]::CreateDirectory($directory)
         $processes=@{}
         foreach($operation in @('preprocessing','final_macros','compile')){
-            $arguments=@($spec[$operation+'_arguments']|ForEach-Object{$_.Replace('{root}',$Root)})
+            $arguments=@($spec[$operation+'_arguments']|ForEach-Object{$_.Replace('{root}',$Root.Replace('\','/'))})
             $p=Invoke-ConformanceProcess -Executable $compilerPath -Arguments $arguments -Directory $Root `
                 -OutputPrefix (Join-Path $directory ($side+'-'+$operation)) -TimeoutSeconds 120 `
                 -Environment @{PATH=((Split-Path -Parent $compilerPath)+[IO.Path]::PathSeparator+$env:PATH)}
@@ -229,7 +242,7 @@ function Assert-HeaderDeclarationMapping {
     # The generated schedule is closed over every real context/language/mode.
     # A caller cannot drop the C++ or DLL observation which selects a branch
     # while retaining an easier counterpart where that branch is inactive.
-    foreach($field in @('api_anchors','applicability_anchors','cases')){
+    foreach($field in @('candidate_category_decisions','api_anchors','applicability_anchors','cases')){
         if((Get-HeaderProbePayloadHash $Mapping[$field]) -cne (Get-HeaderProbePayloadHash $actual[$field])){
             throw "Paired header source or complete probe schedule differs: $field"
         }
@@ -242,6 +255,7 @@ function Get-HeaderDeclarationReviewClaims([Collections.IDictionary] $Mapping) {
     # so that its content-addressed identity does not become circular.
     return [ordered]@{scope='header-probe-source-and-configuration';target=$Mapping.target;
         reference_revision=$Mapping.reference_revision;api_anchors=$Mapping.api_anchors;
+        candidate_category_decisions=$Mapping.candidate_category_decisions;
         applicability_anchors=$Mapping.applicability_anchors;cases=$Mapping.cases;
         global_api_classifications_accepted=$false;runtime_acceptance=$false}
 }
