@@ -308,6 +308,150 @@ int lua_error(lua_State *state) {
     abort(); /* A raise action cannot return through the C guard. */
 }
 
+static void release_buffer(lua_State *state, void *buffer) {
+    struct lua_ada_request input = request(ADA_RELEASE_BUFFER);
+    input.pointer = buffer;
+    dispatch(state, input);
+}
+
+int lua_load(lua_State *state, lua_Reader reader, void *data,
+             const char *name, const char *mode) {
+    struct lua_ada_guard guard;
+    struct lua_ada_response output;
+    void *volatile buffer = NULL;
+    volatile size_t length = 0;
+    volatile size_t capacity = 0;
+    volatile int barrier_active = 0;
+    int top = lua_gettop(state);
+    int status;
+    /* Source storage is allocated through the actual Ada universe, while
+     * reader calls run only above this C checkpoint. A reader may call back
+     * into Lua, trigger collection, or raise; no controlled Ada temporary
+     * lives across that foreign call. Volatile ownership survives longjmp. */
+    guard.previous = state->guard;
+    guard.error_handled = 0;
+    state->guard = &guard;
+    status = setjmp(guard.target);
+    if (status == 0) {
+        struct lua_ada_request enter = request(ADA_READER_BARRIER);
+        enter.index = 1;
+        dispatch(state, enter);
+        barrier_active = 1;
+        for (;;) {
+            size_t part_size = 0;
+            const char *part = reader(state, data, &part_size);
+            size_t needed;
+            if (part == NULL || part_size == 0) {
+                status = luaL_loadbufferx(state, buffer, length, name, mode);
+                break;
+            }
+            if (length == 0 && (unsigned char)part[0] == 0x1b &&
+                mode != NULL && strchr(mode, 'B') != NULL) {
+                /* B's documented reader contract supplies the entire binary
+                 * in its first stable block. Decode it synchronously without
+                 * an extra EOF read; owned canonical storage may safely copy
+                 * that block rather than exposing borrowed native words. */
+                status = luaL_loadbufferx(state, part, part_size, name, mode);
+                break;
+            }
+            if (part_size > (size_t)-1 - length) {
+                struct lua_ada_request input = request(ADA_RESIZE_LOAD_BUFFER);
+                input.index = 1; /* Report actual size overflow as ERRMEM. */
+                dispatch(state, input);
+            }
+            needed = length + part_size;
+            if (needed > capacity) {
+                struct lua_ada_request input = request(ADA_RESIZE_LOAD_BUFFER);
+                input.pointer = buffer;
+                input.length = needed;
+                output = dispatch(state, input);
+                buffer = output.pointer;
+                capacity = output.length;
+            }
+            memcpy((char *)buffer + length, part, part_size);
+            length = needed;
+            if ((unsigned char)((char *)buffer)[0] == 0x1b ||
+                (mode != NULL && strchr(mode, 't') == NULL)) {
+                struct lua_ada_request input = request(ADA_LOAD_BUFFER);
+                input.pointer = buffer;
+                input.length = length;
+                input.name = name;
+                input.mode = mode;
+                input.count = 1; /* An incomplete binary can request more. */
+                output = dispatch(state, input);
+                if (output.integer_data != -1) {
+                    status = (int)output.integer_data;
+                    break;
+                }
+            }
+        }
+    }
+    if (status == LUA_ERRRUN && !guard.error_handled) {
+        /* lua_error in the reader uses the nearest surrounding message
+         * handler even though the parser catches its final status. Re-raise
+         * through a hidden phase on the existing VM driver; ordinary pcall
+         * applies the real handler (including recursive handler failures). */
+        struct lua_ada_request input = request(ADA_PREPARE_READER_ERROR);
+        guard.error_handled = 1;
+        output = dispatch(state, input);
+        if (output.integer_data != 0)
+            status = lua_pcall(state, 1, 1, lua_gettop(state) - 2);
+    }
+    /* Release ownership before restoring the stack. The restore is a direct,
+     * allocation-free top adjustment, matching protectedparser rather than
+     * lua_settop (which can run arbitrary to-be-closed handlers). */
+    state->guard = guard.previous;
+    release_buffer(state, buffer);
+    if (barrier_active) dispatch(state, request(ADA_READER_BARRIER));
+    if (status == ADA_ACTION_ABORT) {
+        memset(&output, 0, sizeof output);
+        raise_action(state, status, &output);
+    }
+    {
+        struct lua_ada_request restore = request(ADA_RESTORE_LOAD_STACK);
+        restore.index = top;
+        restore.count = 1;
+        dispatch(state, restore);
+    }
+    return status;
+}
+
+int lua_dump(lua_State *state, lua_Writer writer, void *data, int strip) {
+    struct lua_ada_request input = request(ADA_DUMP_FUNCTION);
+    struct lua_ada_response output;
+    struct lua_ada_guard guard;
+    void *volatile buffer = NULL;
+    int top = lua_gettop(state);
+    volatile int result = 0;
+    int status;
+    /* The canonical snapshot is owned bytes, never a live Ada borrow. Writer
+     * reentry may mutate its stack and run collection between calls; only its
+     * final stack size is restored. Lua 5.5 additionally requires the terminal
+     * NULL/zero callback, and a nonzero writer result stops all further calls. */
+    guard.previous = state->guard;
+    guard.error_handled = 0;
+    state->guard = &guard;
+    status = setjmp(guard.target);
+    if (status == 0) {
+        input.index = strip;
+        output = dispatch(state, input);
+        buffer = output.pointer;
+        result = writer(state, buffer, output.length, data);
+        if (result == 0) result = writer(state, NULL, 0, data);
+    }
+    state->guard = guard.previous;
+    release_buffer(state, buffer);
+    if (status != 0) {
+        memset(&output, 0, sizeof output);
+        output.error_handled = guard.error_handled;
+        raise_action(state, status, &output);
+    }
+    input = request(ADA_RESTORE_LOAD_STACK);
+    input.index = top;
+    dispatch(state, input);
+    return result;
+}
+
 int luaL_loadbufferx(lua_State *state, const char *buffer, size_t size,
                      const char *name, const char *mode) {
     struct lua_ada_request input = request(ADA_LOAD_BUFFER);

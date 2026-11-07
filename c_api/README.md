@@ -37,8 +37,25 @@ yieldable continuations, public resume windows and C hooks; its
 [session record](../docs/sessions/2026-11-07-expanded-t-conformance.md) owns
 actual verification and remaining failures. These additions are not accepted
 full C API evidence. See [ADR 0017](../docs/decisions/0017-c-continuations-and-resume.md).
-Reader-based loading,
-dumping, full auxiliaries, debug APIs, builtin C trampolines and
+Reader-based `lua_load` and canonical `lua_dump` use real public callbacks.
+The protected reader region preserves callback stack values between reads,
+rejects yielding, returns the real error object, and restores the caller's
+stack with one closure or error. Source buffers use the selected universe
+allocator and are released on every callback/error/refusal path. Binary
+reading stops at the decoded graph without an extra EOF read; documented
+whole-buffer `B` inputs are copied into owned canonical storage. The Lua
+library's `load` continues to reject `B`, as pinned C Lua does.
+Text reader acquisition currently buffers through EOF; matching native early
+syntax-failure reader counts remains an explicit follow-up. This checkpoint
+therefore does not establish complete public reader compatibility.
+
+Dumping serializes the selected actual canonical subtree and preserves the
+writer's stack between callbacks. It sends Lua 5.5's terminal NULL/zero call,
+returns a nonzero writer status unchanged, and releases its owned snapshot
+before propagating a writer error through the caller's C guard. The shared
+reader/writer consumer has fifteen separately named, native-matched cases;
+`check-core-image.ps1` runs and compares that same source against both images.
+Full auxiliaries, debug APIs, builtin C trampolines and
 remaining exports are pending. In particular, `lua_tocfunction` currently exposes
 real foreign callbacks; Ada native-library functions need their own stable C
 trampolines before complete `luaL_openlibs`/C-function inspection parity.

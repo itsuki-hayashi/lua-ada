@@ -2470,6 +2470,13 @@ package body Lua.Engine.Machine is
             Complete (Self, Activation.Native_Results);
          end if;
          return;
+      elsif Name = "@reader.error" then
+         --  Foreign lua_load catches reader errors inside the active
+         --  protected parser. Its inherited message handler still runs
+         --  before return, through this same driver's normal error protocol.
+         --  The original object receives no invented source prefix, and
+         --  internal @ phases never become public logical stack frames.
+         Raise_Value (Self, Arg (1), Level => 0);
       elsif Name = "@message.handler" then
          if Activation.Native_Stage = 0 then
             Packet.Append (Arg (2));

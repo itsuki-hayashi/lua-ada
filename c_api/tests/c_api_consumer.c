@@ -985,6 +985,8 @@ static void test_warning_uses_no_allocator(void) {
 
 #include "gc_contract.h"
 
+#include "load_dump_contract.h"
+
 int main(void) {
     lua_State *state;
     test_state_allocator_lifetime();
@@ -1041,6 +1043,7 @@ int main(void) {
     test_close_drains_c_finalizers();
     test_close_refusal_releases_storage();
     test_gc_and_close_warning_callbacks();
+    test_load_dump_contract(state);
     lua_close(state);
     puts("PASS: real Ada C API bootstrap consumer");
     return 0;

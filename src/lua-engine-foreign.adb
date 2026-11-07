@@ -13,6 +13,7 @@ with Lua.Engine.Foreign_Hooks;
 with Lua.Engine.Library_Openers;
 with Lua.Engine.Operating_System;
 with Lua.Engine.Warnings;
+with Lua.Prototypes;
 with Lua.Runtime_Configuration;
 with Lua.Syntax;
 with Lua.Syntax_Trees;
@@ -33,6 +34,8 @@ package body Lua.Engine.Foreign is
    use type Memory.Allocation_Function;
    use type C.unsigned_long_long;
    use type System.Address;
+   use type Lua.Prototypes.Prototype_Access;
+   use type Lua.Chunks.Error_Kind;
 
    function Close_Regular (State : System.Address) return C.int
      with Import, Convention => C,
@@ -2343,6 +2346,185 @@ package body Lua.Engine.Foreign is
             end if;
             Leave_Context;
             return Action_Raise;
+         when Prepare_Reader_Error =>
+            if Main_Owner.Driver /= null and then
+              (Main_Owner.Calls /= System.Null_Address or else
+               Main_Owner.Driver_Borrowed)
+            then
+               declare
+                  Handler : constant Value :=
+                    VM.Current_Message_Handler (Main_Owner.Driver.all);
+                  Item : constant Value := Get_Value (-1);
+               begin
+                  if Handler.Kind /= Nil_Kind then
+                     --  A reader's lua_error inherits the surrounding
+                     --  errfunc even though protectedparser catches the
+                     --  resulting failure. Reuse the ordinary protected
+                     --  driver and its recursive handler rules; the hidden
+                     --  raiser contributes no invented public debug frame.
+                     Pin (Owner.Universe.all, Handler);
+                     Pin (Owner.Universe.all, Item);
+                     Push (Owner.Universe.all, Context, Handler);
+                     Push (Owner.Universe.all, Context,
+                           New_Native (Owner.Universe.all, "@reader.error"));
+                     Push (Owner.Universe.all, Context, Item);
+                     Output.Integer_Data := 1;
+                  end if;
+               end;
+            end if;
+         when Restore_Load_Stack =>
+            declare
+               Top : Natural;
+               Item : Value;
+            begin
+               if Input.Index < 0 or else Input.Count not in 0 .. 1 then
+                  raise Program_Error with "invalid loader stack restore";
+               end if;
+               Top := Context.Foreign_Base + Natural (Input.Index) +
+                 Natural (Input.Count);
+               if Top > Natural (Context.Foreign_Stack.Length) then
+                  raise Program_Error with "unreserved loader result slot";
+               end if;
+               --  Pinned protectedparser and lua_dump reset their top
+               --  directly, rather than executing lua_settop's C closing
+               --  protocol. Copy the single real load result before retiring
+               --  callback scratch roots; no allocation or callback can
+               --  interrupt publication of this reserved scalar interval.
+               if Input.Count = 1 then
+                  Item := Get_Value (-1);
+                  Stacks.Write (Owner.Universe.all, Context, Top, Item);
+               end if;
+               if Top < Context.Foreign_Top then
+                  Stacks.Clear_Range
+                    (Context, Top + 1, Context.Foreign_Top);
+               end if;
+               Publish_Top (Context, Top);
+            end;
+         when Reader_Barrier =>
+            --  lua_load's protected parser is non-yieldable even when its
+            --  caller is a resumable C activation. This scalar guard spans
+            --  foreign reads, never an Ada activation; C removes it on every
+            --  normal, reader-error and host-abort return path.
+            if Input.Index /= 0 then
+               Context.Non_Yieldable := Context.Non_Yieldable + 1;
+            elsif Context.Non_Yieldable = 0 then
+               raise Program_Error with "missing foreign reader barrier";
+            else
+               Context.Non_Yieldable := Context.Non_Yieldable - 1;
+            end if;
+         when Resize_Load_Buffer =>
+            declare
+               Block : System.Address := Input.Pointer;
+               Capacity : Memory.Byte_Count := 0;
+               Needed : Memory.Byte_Count;
+               Retried : Boolean := False;
+            begin
+               --  The C-owned reader guard holds only this byte address.
+               --  Its storage still belongs to the real universe provider,
+               --  so callback allocation limits and accounting include the
+               --  complete source while foreign callbacks run without Ada
+               --  activations on their nonlocal-transfer path.
+               if Input.Index /= 0 or else
+                 Input.Length > C.size_t (Memory.Byte_Count'Last)
+               then
+                  raise Memory.Allocation_Error;
+               elsif Input.Length >
+                 C.size_t (Owner.Universe.Bounds.Source_Bytes)
+               then
+                  Fail (Owner.Universe.all, "source byte limit exceeded",
+                        Resource => True);
+               end if;
+               if Block /= System.Null_Address and then not
+                 Memory.Owns (Owner.Universe.Memory, Block)
+               then
+                  raise Foreign_Error with "invalid loading buffer";
+               end if;
+               if Block /= System.Null_Address then
+                  Capacity := Memory.Allocation_Size (Block);
+               end if;
+               Needed := Memory.Byte_Count (Input.Length);
+               if Needed > Capacity then
+                  --  Geometric reserve avoids quadratic copying for small
+                  --  reader pieces. Clamp spare capacity to the actual
+                  --  source bound so a valid last piece never fails solely
+                  --  because of speculative growth beyond that bound.
+                  Capacity := Memory.Byte_Count'Max
+                    (Needed, Memory.Byte_Count'Min
+                       (Memory.Byte_Count
+                          (Owner.Universe.Bounds.Source_Bytes),
+                        Memory.Byte_Count'Max (4_096, Capacity * 2)));
+                  loop
+                     begin
+                        Memory.Reallocate
+                          (Owner.Universe.Memory, Block, Capacity);
+                        exit;
+                     exception
+                        when Memory.Allocation_Error =>
+                           if not Retry_Allocation
+                             (Owner.Universe.all, Retried)
+                           then
+                              raise;
+                           end if;
+                     end;
+                  end loop;
+               end if;
+               Output.Pointer := Block;
+               Output.Length := C.size_t (Capacity);
+            end;
+         when Release_Buffer =>
+            declare
+               Block : System.Address := Input.Pointer;
+            begin
+               --  Release never allocates. Both reader and writer guards
+               --  use it before returning a callback failure or forwarding
+               --  an error to their caller's live C checkpoint.
+               if Block /= System.Null_Address and then not
+                 Memory.Owns (Owner.Universe.Memory, Block)
+               then
+                  raise Foreign_Error with "invalid foreign byte buffer";
+               end if;
+               Memory.Release (Owner.Universe.Memory, Block);
+            end;
+         when Dump_Function =>
+            declare
+               Item : constant Value := Get_Value (-1);
+               Block : System.Address := System.Null_Address;
+            begin
+               if Item.Kind /= Closure_Kind or else
+                 Item.Reference.Code.Canonical_Node = null
+               then
+                  raise Foreign_Error with "Lua function expected";
+               end if;
+               declare
+                  Code : constant Prototype_Access := Item.Reference.Code;
+                  Bytes : Owned_Buffer := Lua.Chunks.Encode
+                    (Code.Canonical_Owner.Model, Strip => Input.Index /= 0,
+                     Maximum_Depth => Owner.Universe.Bounds.Syntax_Depth,
+                     Root_Node => Code.Canonical_Node);
+                  procedure Copy (Text : String);
+                  procedure Copy (Text : String) is
+                     Target : String (Text'Range)
+                       with Import, Address => Block;
+                  begin
+                     Target := Text;
+                  end Copy;
+               begin
+                  --  Encode the selected real subtree before invoking C.
+                  --  A separate managed byte snapshot survives writer API
+                  --  reentry and collection without borrowing a controlled
+                  --  Ada buffer across a possible C nonlocal transfer.
+                  Block := Memory.Allocate
+                    (Owner.Universe.Memory,
+                     Memory.Byte_Count (Bytes.Length));
+                  Bytes.Query (Copy'Access);
+                  Output.Pointer := Block;
+                  Output.Length := C.size_t (Bytes.Length);
+               end;
+            exception
+               when others =>
+                  Memory.Release (Owner.Universe.Memory, Block);
+                  raise;
+            end;
          when Load_Buffer =>
             declare
                Source : constant String := Read_Bytes
@@ -2356,8 +2538,10 @@ package body Lua.Engine.Foreign is
                --  Loading validates and owns code but never executes it.
                --  The binary decoder and text frontend both produce the real
                --  canonical graph, adopted into this session's actual heap.
-               if Ada.Strings.Fixed.Index
-                 (Mode, (if Binary then "b" else "t")) = 0
+               if (if Binary then
+                     Ada.Strings.Fixed.Index (Mode, "b") = 0 and then
+                     Ada.Strings.Fixed.Index (Mode, "B") = 0
+                   else Ada.Strings.Fixed.Index (Mode, "t") = 0)
                then
                   Error_Result ("attempt to load a " &
                     (if Binary then "binary" else "text") &
@@ -2378,9 +2562,20 @@ package body Lua.Engine.Foreign is
                               Global_Environment (Owner.Universe.all));
                            Push (Owner.Universe.all, Context, Callee);
                         when Lua.Chunks.Bad_Format =>
-                           Error_Result (Name & ": " &
-                             Lua.Chunks.Message (Decoded.Error));
-                           Output.Integer_Data := 3;
+                           if Input.Count /= 0 and then
+                             Decoded.Error = Lua.Chunks.Truncated
+                           then
+                              --  A foreign reader can provide another piece.
+                              --  Do not publish an error or a partial closure;
+                              --  the caller retries the owned decoder when
+                              --  more bytes arrive. A complete binary ends
+                              --  reading without an extra EOF callback.
+                              Output.Integer_Data := -1;
+                           else
+                              Error_Result (Name & ": bad binary format (" &
+                                Lua.Chunks.Message (Decoded.Error) & ")");
+                              Output.Integer_Data := 3;
+                           end if;
                         when Lua.Chunks.Resource_Limit =>
                            Fail (Owner.Universe.all,
                              "binary loading resource limit", True);

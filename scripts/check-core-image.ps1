@@ -155,6 +155,7 @@ try {
     Invoke-Consumer 'gc-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/gc_api_contract$suffix") 'PASS: public GC contract'
     Invoke-Consumer 'io-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/io_api_contract$suffix") 'PASS: public IO/OS contract'
     Invoke-Consumer 'foreign-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/foreign_api_contract$suffix") 'PASS: public foreign contract'
+    Invoke-Consumer 'load-dump-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/load_dump_api_contract$suffix") 'PASS: public reader/writer contract'
     # Compile the identical public-header contract against the isolated pinned
     # C library. No reference object is linked into either Ada consumer.
     Invoke-Build @('exec', '--', 'gprbuild', '-P', 'experiments/conformance/reference.gpr', '-p', "-XLUA_CONFORMANCE_CONFIGURATION=$Configuration")
@@ -179,6 +180,11 @@ try {
         (Join-Path $projectRoot 'tests/c/math_reopen_contract.c'),
         (Join-Path $projectRoot 'tests/c/library_opener_contract.c'),
         '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceForeignConsumer)
+    $referenceLoadDumpConsumer = Join-Path $reportDirectory "load-dump-oracle$suffix"
+    Invoke-Build @('exec', '--', 'gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-pedantic',
+        '-I', (Join-Path $projectRoot 'c_api/include/api'),
+        (Join-Path $projectRoot 'c_api/tests/load_dump_api_contract.c'),
+        '-L', $referenceDirectory, '-lconformance_lua', '-lm', '-o', $referenceLoadDumpConsumer)
     $adaExecutionLdPath = $env:LD_LIBRARY_PATH
     $adaExecutionDyldPath = $env:DYLD_LIBRARY_PATH
     try {
@@ -188,6 +194,7 @@ try {
         Invoke-Consumer 'gc-oracle' $referenceConsumer 'PASS: public GC contract'
         Invoke-Consumer 'io-oracle' $referenceIOConsumer 'PASS: public IO/OS contract'
         Invoke-Consumer 'foreign-oracle' $referenceForeignConsumer 'PASS: public foreign contract'
+        Invoke-Consumer 'load-dump-oracle' $referenceLoadDumpConsumer 'PASS: public reader/writer contract'
     } finally {
         $env:PATH = $adaExecutionPath
         $env:LD_LIBRARY_PATH = $adaExecutionLdPath
@@ -208,6 +215,11 @@ try {
         throw 'C/Ada public foreign contract output differs'
     }
     Write-Output 'PASS: identical public foreign contract against C and Ada'
+    if ([IO.File]::ReadAllText((Join-Path $reportDirectory 'load-dump-api.stdout')) -cne
+        [IO.File]::ReadAllText((Join-Path $reportDirectory 'load-dump-oracle.stdout'))) {
+        throw 'C/Ada public reader/writer contract output differs'
+    }
+    Write-Output 'PASS: identical public reader/writer contract against C and Ada'
     $referenceLibraries = @(Get-ChildItem -LiteralPath $referenceDirectory -File |
         Where-Object { $_.Name -match '^libconformance_lua\.(dll|so(\.[0-9.]+)?|dylib)$' } |
         ForEach-Object { [ordered]@{ file=$_.Name;
@@ -227,6 +239,11 @@ try {
         [ordered]@{ file=$name;
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot $name) -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
+    $loadDumpContractSources = @(foreach ($name in @('load_dump_api_contract.c',
+        'load_dump_contract.h', 'consumer_allocator.h')) {
+        [ordered]@{ file="c_api/tests/$name";
+            sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
+    })
     Invoke-Consumer 'mixed' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/lua-core_image_check$suffix") 'CORE IMAGE ADA+C OK'
     Invoke-Consumer 'c-startup' (Join-Path $projectRoot "build/c-api/image/bin/$configurationPart$Profile/$LibraryType/c_image_client$suffix") 'CORE IMAGE C STARTUP OK'
     # Old ignored products can remain after the library rename. Hash only the
@@ -245,7 +262,7 @@ try {
         repository_dirty = ($repositoryChanges.Count -ne 0);
         platform = $(if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' });
         reference_revision = $referenceRevision;
-        consumer_sources = @(@(foreach ($name in @('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'consumer_allocator.h')) {
+        consumer_sources = @(@(foreach ($name in @('c_api_consumer.c', 'gc_contract.h', 'io_contract.h', 'load_dump_contract.h', 'consumer_allocator.h')) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
         }) + $foreignContractSources);
@@ -256,6 +273,8 @@ try {
         io_contract = [ordered]@{ matching_output=$true; sources=$ioContractSources;
             reference_library_files=$referenceLibraries };
         foreign_contract = [ordered]@{ matching_output=$true; sources=$foreignContractSources;
+            reference_library_files=$referenceLibraries };
+        load_dump_contract = [ordered]@{ matching_output=$true; sources=$loadDumpContractSources;
             reference_library_files=$referenceLibraries } } | ConvertTo-Json -Depth 6 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8
     Write-Output 'PASS: one production interpreter image; Ada/C state, pool, allocator and startup checks'
