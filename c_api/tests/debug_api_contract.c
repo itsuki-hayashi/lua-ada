@@ -697,6 +697,34 @@ static void invalid_finalizer_call_error(lua_State *L) {
                   "number value (metamethod '__gc'))") == 0);
 }
 
+static int stripped_line_events;
+
+static void inspect_stripped_line(lua_State *L, lua_Debug *ar) {
+    int target;
+    assert(lua_getinfo(L, "f", ar));
+    lua_getglobal(L, "stripped_line_target");
+    target = lua_rawequal(L, -1, -2);
+    lua_pop(L, 2);
+    if (target) {
+        ++stripped_line_events;
+        assert(ar->event == LUA_HOOKLINE && ar->currentline == -1);
+        assert(lua_getinfo(L, "l", ar) && ar->currentline == -1);
+    }
+}
+
+static void stripped_first_c_line(lua_State *L) {
+    /* Unknown source data still causes the actual entry line event. The
+     * public C record reports -1 while the Lua callback receives nil. */
+    run(L, "return assert(load(string.dump(function()return 7 end,true)))");
+    lua_setglobal(L, "stripped_line_target");
+    stripped_line_events = 0;
+    lua_sethook(L, inspect_stripped_line, LUA_MASKLINE, 0);
+    run(L, "assert(stripped_line_target()==7)");
+    lua_sethook(L, NULL, 0, 0);
+    assert(stripped_line_events == 1);
+    lua_pushnil(L); lua_setglobal(L, "stripped_line_target");
+}
+
 static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     assert(lua_gettop(L) == 0);
     body(L);
@@ -738,6 +766,7 @@ int main(void) {
     check("protected-nil-call-error", protected_nil_call_error, L);
     check("removed-c-slot-call-error", removed_c_slot_call_error, L);
     check("invalid-finalizer-call-error", invalid_finalizer_call_error, L);
+    check("stripped-first-c-line", stripped_first_c_line, L);
     lua_close(L); assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public debug contract");
     return 0;

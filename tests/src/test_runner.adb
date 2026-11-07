@@ -26,6 +26,7 @@ with Loop_Close_Tests;
 with Call_Error_Tests;
 with Comparison_Branch_Tests;
 with String_Constant_Tests;
+with Stripped_Line_Tests;
 with Lua.Constant_Pool_Tests;
 with Runtime_Inspection_Tests;
 with Lua.Opcode_Tests;
@@ -114,6 +115,7 @@ procedure Test_Runner is
       Call_Error_Tests.Register (Result);
       Comparison_Branch_Tests.Register (Result);
       String_Constant_Tests.Register (Result);
+      Stripped_Line_Tests.Register (Result);
       Lua.Constant_Pool_Tests.Register (Result);
       Runtime_Inspection_Tests.Register (Result);
       Lua.Opcode_Tests.Register (Result);

@@ -50,7 +50,10 @@ static int hook_dispatch(lua_State *L) {
     else if (strcmp(event, "line") == 0) ar.event = LUA_HOOKLINE;
     else if (strcmp(event, "count") == 0) ar.event = LUA_HOOKCOUNT;
     else ar.event = LUA_HOOKTAILCALL;
-    ar.currentline = ar.event == LUA_HOOKLINE ? (int)lua_tointeger(L, 2) : -1;
+    /* Lua hooks receive nil when line data is absent; C records use -1.
+     * Converting that nil through lua_tointeger would invent line zero. */
+    ar.currentline = ar.event == LUA_HOOKLINE && lua_isinteger(L, 2)
+        ? (int)lua_tointeger(L, 2) : -1;
     memset(&input, 0, sizeof input);
     input.operation = ADA_GET_DEBUG_FRAME;
     input.index = -1;

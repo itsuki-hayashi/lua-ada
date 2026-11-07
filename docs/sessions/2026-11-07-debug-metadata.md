@@ -654,3 +654,47 @@ The next mismatch is the initial line event for a stripped function: unknown
 line zero currently aliases the frame's unseen-line sentinel, and line-event
 arguments must be nil when source information is absent. Full db.lua, final
 instrumented Ada and full-upstream acceptance remain open.
+
+## 2026-11-08 stripped line events and completed db.lua diagnostic
+
+The frame's cached hook line now distinguishes an unseen word (-1) from a
+checked word with absent source information (the model's zero). Reuse resets
+that sentinel. The first stripped instruction therefore produces its actual
+entry line event; subsequent events follow real backward control transfers.
+VARARGPREP keeps its existing setup/call-event phase. Lua receives nil as the
+line argument when data is absent. No opcode or callback is selectively hidden.
+
+Four named Lua/AUnit regressions cover first entry, backward loops, vararg
+setup and frame reuse. The same fixture passes native default and T. A fifth
+public C case checks both the line event and a subsequent getinfo('l') query
+for the same actual stripped target. Its first run exposed lua_tointeger(nil)
+in hook_dispatch inventing line zero; the corrected transport maps absent
+payload to -1. Its next assertion exposed the C getinfo selector returning the
+model's zero sentinel. That selector now normalizes absent line data to -1,
+matching the existing Lua query path. The native assertions were preserved.
+
+Strict root/test/consumer builds pass, with all 1,664 AUnit cases succeeding
+after the Lua/frame changes. The two narrow C corrections were then validated
+by strict root/consumer rebuilds, all 32 public debug C cases and the eight
+other available C consumers. The test executables were not relinked merely to
+repeat AUnit for those C-only/selector corrections; final-head integrated
+verification remains the parent delivery's responsibility. The identical
+32-case debug source passes both native configurations with zero counted
+blocks/bytes remaining at close.
+
+The complete four-case fixture passes both producers on both default runtimes
+with empty stderr and stdout SHA256
+AD3EE22618137A99B1047E3220171B7E251331A0AA1CB965FF1DC9C3516B0D67.
+All thirty-six retained four-way cases pass. The unchanged db.lua copied bytes
+now reach OK: default Ada source execution and both producers' entire chunks
+on both default runtimes all have empty stderr and stdout SHA256
+61D58565C89CD99626C0A10641E6E8A14303A560258EF302FC6B9915E7724897.
+Full native default and instrumented source runs match that hash too. Source
+was loaded with @db.lua from the disposable tree, preserving original line
+positions and bytes. db.lua contains no T-conditional obligations.
+
+This is complete local unchanged-source and default four-way diagnostic
+evidence for db.lua, not the final conformance certificate or instrumented Ada
+matrix. Reference files/pins are unchanged; git diff --check is clean. The
+next lifecycle work remains locals.lua error-close yieldability through real
+continuation-capable protection, preserving explicit-close and C barriers.

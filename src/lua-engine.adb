@@ -1295,7 +1295,7 @@ package body Lua.Engine is
       Item.Return_Hook_Done := False;
       Item.External_Return_Pending := False;
       Item.External_Return_Independent := False;
-      Item.Hook_Line := 0;
+      Item.Hook_Line := -1;
       Item.Hook_PC := 0;
       Item.Last_Executed_PC := 0;
       Item.Line_Hook_Checked := False;

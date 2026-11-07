@@ -617,7 +617,9 @@ private package Lua.Engine is
       External_Return_Independent : Boolean := False;
       --  Unwind_Results owns a completed raw packet while external release
       --  callbacks borrow this still-live actual departing activation.
-      Hook_Line : Natural := 0;
+      Hook_Line : Integer range -1 .. Integer'Last := -1;
+      --  Minus one means unseen; zero is a checked word without line data.
+      --  Keeping them distinct preserves a stripped frame's first event.
       Hook_PC : Natural := 0;
       Last_Executed_PC : Natural := 0;
       Line_Hook_Checked : Boolean := False;

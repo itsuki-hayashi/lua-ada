@@ -168,8 +168,14 @@ is
       if Wants ('l') and then Selected /= null and then
         not Selected.Is_Native
       then
-         Info.Current_Line := C.int
-           (Canonical.Source_Line (Selected, Current_PC (Selected)));
+         declare
+            Line : constant Natural :=
+              Canonical.Source_Line (Selected, Current_PC (Selected));
+         begin
+            --  Zero is the model's missing-line sentinel, never a public
+            --  source line. C getinfo uses -1 just like the Lua query path.
+            Info.Current_Line := (if Line = 0 then -1 else C.int (Line));
+         end;
       end if;
       if Wants ('u') then
          if Code /= null then

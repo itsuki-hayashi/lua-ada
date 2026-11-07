@@ -1123,7 +1123,8 @@ package body Lua.Engine.Machine is
       --  returns. Its owned arguments and function remain collector roots.
       Args.Append (New_String (State, Event));
       Args.Append
-        ((if Event = "line" then (Integer_Kind, Integer_Value (Line))
+        ((if Event = "line" and then Line > 0 then
+             (Integer_Kind, Integer_Value (Line))
           else Nil_Value));
       --  A return continuation is already above its departing owner. The
       --  event still identifies that real owner, never the helper carrying
