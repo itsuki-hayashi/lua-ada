@@ -31,6 +31,7 @@ its runtime changes are planned, not implemented by the foundation gate.
 | 0020 | [Callable builtin identities](0020-callable-builtin-identities.md)             | scoped implementation |
 | 0021 | [External strings and weak identities](0021-external-string-ownership.md)      | scoped implementation |
 | 0022 | [Owned C varargs formatting](0022-c-varargs-formatting.md)                     | scoped implementation |
+| 0024 | [Fixed numeric scratch](0024-fixed-numeric-scratch.md)                         | scoped implementation |
 
 ADR 0009 records the approved combined delivery order, iterative scheduler,
 stable cells, explicit cleanup, weak thread ownership and execution policies.

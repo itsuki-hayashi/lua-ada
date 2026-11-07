@@ -139,6 +139,7 @@ library project Lua_Ada is
       "lua-sessions.ads",
       "lua-sources.ads",
       "lua-storage-buffers.ads",
+      "lua-storage-fixed_arenas.ads",
       "lua-storage-vectors.ads",
       "lua-storage.ads",
       "lua-syntax_trees.ads",

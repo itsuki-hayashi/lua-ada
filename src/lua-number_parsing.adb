@@ -2,6 +2,7 @@ with Ada.Characters.Latin_1;
 with Ada.Unchecked_Conversion;
 with Interfaces;
 with Lua.Big_Naturals;
+with Lua.Storage.Fixed_Arenas;
 
 package body Lua.Number_Parsing is
    use Lua.Numbers;
@@ -10,6 +11,21 @@ package body Lua.Number_Parsing is
    use type Integer_Value;
    package Big renames Lua.Big_Naturals;
    use type Big.Ordering;
+
+   function Read_Without_Allocation
+     (Text : String; Base : Natural := 0; Decimal_Point : Character := '.')
+      return Number
+   is
+      Arena : Lua.Storage.Fixed_Arenas.Arena;
+      Memory : Lua.Storage.Owner;
+   begin
+      --  All growing rational vectors use the ordinary owner-aware exact
+      --  arithmetic. Only its backing provider changes: a fixed local arena
+      --  outlives both the scoped owner and every internal numeric borrower.
+      --  Read returns a scalar after those controlled borrowers finalized.
+      Lua.Storage.Fixed_Arenas.Bind (Arena, Memory);
+      return Read (Text, Lua.Storage.Reference (Memory), Base, Decimal_Point);
+   end Read_Without_Allocation;
 
    function From_Bits is new Ada.Unchecked_Conversion
      (Interfaces.Unsigned_64, Real_Value);

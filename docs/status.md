@@ -2,6 +2,11 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [fixed numeric scratch checkpoint](sessions/2026-11-08-fixed-numeric-scratch.md)
+reuses the exact parser with a bounded local provider. Strict local default
+builds and 1,640 AUnit cases pass. Public C conversion wiring, integrated T,
+shared/platform and complete-suite acceptance remain separate obligations.
+
 The [C varargs formatting checkpoint](sessions/2026-11-08-c-varargs-formatting.md)
 passes strict Windows validation/static builds and all 1,551 current AUnit
 cases. Its four public C contracts also pass unchanged against default and

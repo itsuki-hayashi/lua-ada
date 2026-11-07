@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+The [fixed numeric scratch primitive](sessions/2026-11-08-fixed-numeric-scratch.md)
+passes strict local builds and 1,640 AUnit cases. Its shared exact parser has
+bounded local backing; the public C conversions still require wiring and
+actual allocator-refusal C consumer evidence.
+
 External payload ownership, guarded deallocator reentry and weak short-string
 identities have a scoped local checkpoint: 1,557 passing AUnit cases, eighteen
 native-default paired C cases, and thirteen native-T ownership cases with five
