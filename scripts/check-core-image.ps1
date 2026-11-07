@@ -27,6 +27,7 @@ $scenarios = @("-XLUA_ADA_LIBRARY_TYPE=$LibraryType",
 Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'PEUnwind.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
+Import-Module (Join-Path $PSScriptRoot 'FileConsumerIO.psm1')
 $referenceCompilerDefines=if($IsWindows){@('-DLUA_BUILD_AS_DLL')}else{@()}
 
 function Invoke-NativeModuleConsumer {
@@ -224,6 +225,8 @@ try {
             ("PANIC: unprotected error in call to Lua API ($message)`n")
     }
     Invoke-Consumer 'substitution-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/substitution_api_contract$suffix") 'PASS: public luaL_addgsub and luaL_gsub contract'
+    $loadfileConsumer=Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/loadfile_api_contract$suffix"
+    Invoke-Consumer 'loadfile-api' $loadfileConsumer 'PASS: public luaL_loadfilex contract'
     $compilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
     if($LASTEXITCODE -ne 0){throw 'Cannot identify selected native module fixture compiler'}
     $fixtureCompiler=($compilerOutput -join '').Trim()
@@ -335,6 +338,10 @@ try {
     Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/substitution_api_contract.c'),
         '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceSubstitutionConsumer)
+    $referenceLoadfileConsumer=Join-Path $reportDirectory "loadfile-oracle$suffix"
+    Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
+        '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/loadfile_api_contract.c'),
+        '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceLoadfileConsumer)
     $nativeSystemLibraries=if($IsLinux){@('-ldl')}else{@()}
     Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/native_module_contract.c'),
@@ -367,6 +374,17 @@ try {
                 ("PANIC: unprotected error in call to Lua API ($message)`n")
         }
         Invoke-Consumer 'substitution-oracle' $referenceSubstitutionConsumer 'PASS: public luaL_addgsub and luaL_gsub contract'
+        Invoke-Consumer 'loadfile-oracle' $referenceLoadfileConsumer 'PASS: public luaL_loadfilex contract'
+        $fileContext=$Configuration+'/'+$(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'})+'/'+$Profile+'/'+$(if($LibraryType -ceq 'relocatable'){'shared'}else{$LibraryType})
+        $fileIO=Invoke-FileConsumerIO -Root $projectRoot -Context $fileContext -AdaExecutable $loadfileConsumer `
+            -ReferenceExecutable $referenceLoadfileConsumer -RecordDirectory (Join-Path $reportDirectory 'file-stdin')
+        $fileCaptureResolver={param($path,$sha)
+            if((Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant() -cne $sha){throw 'Actual file stdin capture bytes differ'}
+            return $path
+        }
+        $null=Test-FileConsumerIO -Observation $fileIO -Context $fileContext -ResolveCapture $fileCaptureResolver `
+            -DriverHashes @{Ada=(Get-FileHash $loadfileConsumer).Hash.ToLowerInvariant();ReferenceC=(Get-FileHash $referenceLoadfileConsumer).Hash.ToLowerInvariant()}
+        Write-Output 'PASS: exact text stdin and both binary producers across all four C/Ada input paths'
         $nativeModuleC=Invoke-NativeModuleConsumer -Name native-module-oracle -Executable $referenceNativeModuleConsumer `
             -Implementation ReferenceC -RuntimePath $referenceDirectory -Compiler $fixtureCompiler
         Invoke-Consumer 'thread-reset-oracle' $referenceThreadResetConsumer 'PASS: public thread reset/base closing contract' $resetArguments
@@ -451,7 +469,7 @@ try {
     if([IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-oracle.stdout'))){throw 'C/Ada public buffer contract output differs'}
     Write-Output 'PASS: identical public luaL_Buffer contract against C and Ada'
-    foreach($kind in @('allocator','substitution')){
+    foreach($kind in @('allocator','substitution','loadfile')){
         foreach($stream in @('stdout','stderr')){
             if((Get-FileHash (Join-Path $reportDirectory "$kind-api.$stream")).Hash -cne
                 (Get-FileHash (Join-Path $reportDirectory "$kind-oracle.$stream")).Hash){throw "C/Ada public $kind contract $stream differs"}
@@ -539,6 +557,9 @@ try {
     })
     $allocatorContractSources=@(@{file='c_api/tests/allocator_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/allocator_api_contract.c')).Hash.ToLowerInvariant()})
     $substitutionContractSources=@(@{file='c_api/tests/substitution_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/substitution_api_contract.c')).Hash.ToLowerInvariant()})
+    $loadfileContractSources=@(foreach($name in @('loadfile_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
     $threadResetContractSources = @(foreach ($name in @('thread_reset_api_contract.c', 'consumer_allocator.h')) {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
@@ -566,7 +587,7 @@ try {
         consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources);
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources);
         configuration = $Configuration; consumers = $records.ToArray();
         reference_compiler_defines=$referenceCompilerDefines;
         library_files = $libraries;
@@ -602,12 +623,13 @@ try {
         buffer_contract=@{matching_output=$true;sources=$bufferContractSources;matched_cases=17;reference_library_files=$referenceLibraries};
         allocator_contract=@{matching_output=$true;sources=$allocatorContractSources;matched_cases=13;panic_modes=@('string','number');reference_library_files=$referenceLibraries};
         substitution_contract=@{matching_output=$true;sources=$substitutionContractSources;matched_cases=16;reference_library_files=$referenceLibraries};
+        loadfile_contract=@{matching_output=$true;sources=$loadfileContractSources;matched_cases=21;stdin_io=$fileIO;reference_library_files=$referenceLibraries};
         thread_reset_contract = [ordered]@{ matching_output=$true; sources=$threadResetContractSources;
             matched_cases=$(if ($Configuration -eq 'upstream-test') { 23 } else { 24 });
             skipped_warning_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 1 } else { 0 });
             reference_library_files=$referenceLibraries };
         value_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$valueSources;reference_library_files=$referenceLibraries}}else{$null});
-        auxiliary_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$auxiliarySources;platform_defines=$platformDefines;reference_library_files=$referenceLibraries}}else{$null}) } | ConvertTo-Json -Depth 6 |
+        auxiliary_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$auxiliarySources;platform_defines=$platformDefines;reference_library_files=$referenceLibraries}}else{$null}) } | ConvertTo-Json -Depth 32 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8
     Write-Output 'PASS: one production interpreter image; Ada/C state, pool, allocator and startup checks'
 }

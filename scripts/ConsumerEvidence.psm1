@@ -1,5 +1,6 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path $PSScriptRoot 'FileConsumerIO.psm1')
 
 function Test-NamedConsumerEvidence {
     param([Collections.IDictionary] $Report,
@@ -8,7 +9,7 @@ function Test-NamedConsumerEvidence {
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
           [switch] $RequireFormatContract,
-          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','allocator','substitution')]
+          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','allocator','substitution','loadfile')]
           [string[]] $AdditionalContracts=@())
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
@@ -43,7 +44,7 @@ function Test-NamedConsumerEvidence {
         'load-dump'='PASS: public reader/writer contract';debug='PASS: public debug contract';external='PASS: public external string contract';
         conversion='PASS: public numeric conversion contract';operator='PASS: public C operator contract';'index-type'='PASS: public integer-index and type contract';
         'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external';buffer='PASS: public luaL_Buffer contract';
-        allocator='PASS: public allocator contract';substitution='PASS: public luaL_addgsub and luaL_gsub contract'}
+        allocator='PASS: public allocator contract';substitution='PASS: public luaL_addgsub and luaL_gsub contract';loadfile='PASS: public luaL_loadfilex contract'}
     foreach($kind in $additional|Sort-Object -Unique){
         $markers["$kind-api"]=$additionalMarkers[$kind];$markers["$kind-oracle"]=$additionalMarkers[$kind]
         $contractKinds+=$kind;$consumerKinds+="$kind-api"
@@ -149,18 +150,23 @@ function Test-NamedConsumerEvidence {
             }
         }
     }
-    foreach($kind in @('allocator','substitution')){if($kind -cin $additional){
+    foreach($kind in @('allocator','substitution','loadfile')){if($kind -cin $additional){
         $names=if($kind -ceq 'allocator'){
             @('null-block-ignores-old-size','zero-size-frees-and-returns-null','grow-preserves-prefix','shrink-preserves-prefix',
                 'fresh-allocation-after-free','numeric-userdata-alignment','huge-refusal-preserves-old-block','public-allocator-identity-and-use',
                 'default-state-allocator-identity','makeseed-live-state-is-inert','makeseed-accepts-null','counted-state-closes-balanced','close-with-live-stack-balances')
-        }else{
+        }elseif($kind -ceq 'substitution'){
             @('literal-metachars','nonoverlap-matches','replacement-not-rescanned','shrinking-replacement','growing-replacement',
                 'empty-replacement','no-match','empty-subject','prefix-suffix','embedded-nul-subject','embedded-nul-pattern',
                 'buffer-append-reuse','large-growth-prefix','callback-result','callback-error-cleanup','allocator-refusal-recovery')
+        }else{
+            @('empty-file-no-results','bom-skipped','shebang-line-numbers','crlf-line-numbers','incomplete-bom-syntax','syntax-error-class',
+                'text-mode-rejects-binary','binary-mode-rejects-text','dump-file-loads-runs','stripped-dump-no-source','source-info-matches-file',
+                'missing-file-errno','filename-nul-suffix','success-keeps-stack','missing-keeps-stack','syntax-failure-keeps-stack','protected-callback',
+                'persistent-refusal-recovers','prefixed-binary-alignment','actual-file-growth-sweep','shebang-lone-CR')
         }
         $lines=@(for($i=0;$i -lt $names.Count;$i++){
-            if($kind -ceq 'allocator'){"PASS: allocator-api-$i $($names[$i])"}else{'PASS: substitution-'+$names[$i]}
+            if($kind -ceq 'allocator'){"PASS: allocator-api-$i $($names[$i])"}else{"PASS: $kind-$($names[$i])"}
         })
         $expected=($lines -join "`n")+"`n"+$additionalMarkers[$kind]+"`n"
         $contract=$Report[$kind+'_contract']
@@ -174,6 +180,13 @@ function Test-NamedConsumerEvidence {
             }
         }
     }}
+    if('loadfile' -cin $additional){
+        if(-not $Report.loadfile_contract.Contains('stdin_io')){throw 'Named loadfile contract lacks mandatory actual stdin producer/consumer operations'}
+        $hashes=@{Ada=@($Report.consumers|Where-Object name -CEQ loadfile-api)[0].executable_sha256;
+            ReferenceC=@($Report.consumers|Where-Object name -CEQ loadfile-oracle)[0].executable_sha256}
+        $stdin=Test-FileConsumerIO -Observation $Report.loadfile_contract.stdin_io -Context $Context -DriverHashes $hashes -ResolveCapture $ResolveCapture
+        foreach($name in $stdin.named_outputs.Keys){$outputs[$name]=$stdin.named_outputs[$name];$consumerKinds+=$name}
+    }
     if('allocator' -cin $additional){
         # Default panic is intentionally observed through the installed public
         # function, in separate actual children. It returns to the C driver;

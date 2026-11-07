@@ -717,6 +717,26 @@ simultaneous pipe pressure, blocked readers, early exit and invalid input.
 They establish transport behavior only; source-bound Lua file/stdin consumer
 protocols and complete runtime/context evidence remain separate obligations.
 
+The file-loading successor adds 21 separately named C cases, two named stdin
+witnesses and 25 AUnit registrations. The author generator assembles 408 C and
+185 AUnit identities, retaining all original protocols. The convenience macro
+has an actual empty-file call; the extended function retains text/binary mode,
+BOM/shebang/CRLF, source/error/stack, native errno and ownership/refusal cases.
+`FileConsumerIO.psm1` snapshots the two actual driver executables, captures both
+real dump producers as bytes, and requires both text readers plus all four
+same-context binary producer-to-reader paths. A two-row stdin mapping cannot
+omit the other actual children. Each consumed `.stdin` snapshot must bind its
+selected producer's exact raw output and a completed write/EOF. The final
+consumer rejects synthetic observations, and immutable-image replay binds
+both drivers and every input/output artifact. Nine non-execution fixtures
+exercise the failure paths without claiming compiler or Lua execution.
+
+The previously recorded header source review remains evidence for its exact
+bound source bytes. Subsequent production GPR and harness changes stale that
+binding intentionally; fresh generated header mappings remain pending until
+the stable candidate receives its final source review. No prior approval is
+silently carried forward by regenerating proposal hashes.
+
 Final image replay also binds the actual selected C/C++ frontend identities,
 the compiler/query processes, both executables and every capture. Declaration
 and applicability reconciliation checks every required language/configuration

@@ -594,6 +594,9 @@ Case 'full-target smoke and mixed acceptance flags reject before setup' {
 Case 'exact binary stdin and bounded simultaneous pipe transport' {
     & (Join-Path $PSScriptRoot 'test-conformance-stdin.ps1')
 }
+Case 'file binary producer and stdin replay rejects synthetic incomplete or altered paths' {
+    & (Join-Path $PSScriptRoot 'test-file-consumer-io.ps1')
+}
 Write-Output "RUNNER TESTS: $script:cases cases; $($failures.Count) failed"
 if ($failures.Count -gt 0) { exit 1 }
 if ($ReferenceInterpreter -ne '') {

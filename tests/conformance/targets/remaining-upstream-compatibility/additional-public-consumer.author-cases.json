@@ -4009,6 +4009,328 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "empty-file-no-results",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-empty-file-no-results"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "bom-skipped",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-bom-skipped"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "shebang-line-numbers",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-shebang-line-numbers"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "crlf-line-numbers",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-crlf-line-numbers"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "incomplete-bom-syntax",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-incomplete-bom-syntax"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "syntax-error-class",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-syntax-error-class"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "text-mode-rejects-binary",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-text-mode-rejects-binary"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "binary-mode-rejects-text",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-binary-mode-rejects-text"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "dump-file-loads-runs",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-dump-file-loads-runs"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "stripped-dump-no-source",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-stripped-dump-no-source"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "source-info-matches-file",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-source-info-matches-file"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "missing-file-errno",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-missing-file-errno"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "filename-nul-suffix",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-filename-nul-suffix"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "success-keeps-stack",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-success-keeps-stack"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "missing-keeps-stack",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-missing-keeps-stack"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "syntax-failure-keeps-stack",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-syntax-failure-keeps-stack"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "protected-callback",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-protected-callback"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "persistent-refusal-recovers",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-persistent-refusal-recovers"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "prefixed-binary-alignment",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-prefixed-binary-alignment"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "actual-file-growth-sweep",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-actual-file-growth-sweep"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "shebang-lone-CR",
+      "consumer": "loadfile-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: loadfile-shebang-lone-CR"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "stdin-text",
+      "consumer": "loadfile-stdin-text-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: public loadfile stdin"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "source": "c_api/tests/loadfile_api_contract.c",
+      "case_id": "stdin-binary-cross-runtime",
+      "consumer": "loadfile-stdin-binary-c-api",
+      "expected_count": 1,
+      "exact_witnesses": [
+        "PASS: public loadfile stdin"
+      ],
+      "pattern_witness": null,
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
     }
   ],
   "source_measurements": {

@@ -299,7 +299,7 @@ function Test-TargetNamedContextEvidence {
         'load-dump'='load_dump_api_contract.c';debug='debug_api_contract.c';external='external_string_contract.c';
         conversion='conversion_api_contract.c';operator='operator_api_contract.c';'index-type'='index_type_api_contract.c';
         'base-closing'='base_closing_api_contract.c';'native-module'='native_module_contract.c';buffer='buffer_api_contract.c';
-        allocator='allocator_api_contract.c';substitution='substitution_api_contract.c'}
+        allocator='allocator_api_contract.c';substitution='substitution_api_contract.c';loadfile='loadfile_api_contract.c'}
     foreach($kind in $driverNames.Keys){if($kind -ceq 'native-module' -or @($Policy.consumer.cases|Where-Object consumer -CEQ "$kind-api").Count -gt 0){
         if($kind -cnotin $additional){$additional+=$kind}
         $names=@(('c_api/tests/'+$driverNames[$kind]))

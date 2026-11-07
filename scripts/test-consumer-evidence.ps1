@@ -349,4 +349,27 @@ $panicCase.witness_stream='stderr'
 $mapping.cases[0].witness_stream='stderr'
 Run-Case 'ordinary witness cannot borrow the narrowly named panic stderr protocol' {} 'witness stream' -Foreign -Format -Additional $extended
 $mapping.cases[0].Remove('witness_stream')
+$loadfileNames=@('empty-file-no-results','bom-skipped','shebang-line-numbers','crlf-line-numbers','incomplete-bom-syntax','syntax-error-class',
+    'text-mode-rejects-binary','binary-mode-rejects-text','dump-file-loads-runs','stripped-dump-no-source','source-info-matches-file',
+    'missing-file-errno','filename-nul-suffix','success-keeps-stack','missing-keeps-stack','syntax-failure-keeps-stack','protected-callback',
+    'persistent-refusal-recovers','prefixed-binary-alignment','actual-file-growth-sweep','shebang-lone-CR')
+$fileFull=(@($loadfileNames|ForEach-Object{'PASS: loadfile-'+$_}) -join "`n")+"`nPASS: public luaL_loadfilex contract`n"
+$baseline.loadfile_contract=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=21}
+foreach($name in @('loadfile-api','loadfile-oracle')){
+    $record=$records[0].Clone();$record.name=$name;$record.arguments=@();$out=Join-Path $directory "$name.stdout"
+    [IO.File]::WriteAllText($out,$fileFull);$record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant()
+    $baseline.consumers+=$record
+}
+$extended+='loadfile'
+Run-Case 'twenty-one file markers cannot replace the mandatory actual stdin matrix' {} 'mandatory actual stdin' -Foreign -Format -Additional $extended
+Run-Case 'file loading cannot lose its actual native process' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE loadfile-oracle)
+} 'missing/duplicate' -Foreign -Format -Additional $extended
+Run-Case 'matching file completion cannot omit the actual lone CR case' {param($r)
+    foreach($name in @('loadfile-api','loadfile-oracle')){Replace-Capture $r $name stdout ($fileFull.Replace("PASS: loadfile-shebang-lone-CR`n",''))}
+} 'complete ordered protocol' -Foreign -Format -Additional $extended
+Run-Case 'file stdin synthetic fixture cannot pass through the final consumer as actual evidence' {param($r)
+    $r.loadfile_contract.stdin_io=@{schema_version=1;kind='public-file-stdin-observations';context=$context;source_root=$root;synthetic_fixture=$true;
+        drivers=@{Ada=@{};ReferenceC=@{}};runtime_acceptance=$false;coverage_authority=$false}
+} 'actual matching context' -Foreign -Format -Additional $extended
 Write-Output "PASS: $count named consumer evidence regressions; synthetic observations only"

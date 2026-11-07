@@ -579,6 +579,231 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Empty_File",
+      "registered_label": "C file loading: empty file",
+      "required_stdout_line": "OK C file loading: empty file",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Bom",
+      "registered_label": "C file loading: BOM skipped",
+      "required_stdout_line": "OK C file loading: BOM skipped",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Shebang",
+      "registered_label": "C file loading: shebang lines",
+      "required_stdout_line": "OK C file loading: shebang lines",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#CrLf",
+      "registered_label": "C file loading: CRLF lines",
+      "required_stdout_line": "OK C file loading: CRLF lines",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Incomplete_Bom",
+      "registered_label": "C file loading: incomplete BOM",
+      "required_stdout_line": "OK C file loading: incomplete BOM",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Syntax_Class",
+      "registered_label": "C file loading: syntax error class",
+      "required_stdout_line": "OK C file loading: syntax error class",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Text_Mode",
+      "registered_label": "C file loading: text mode rejects binary",
+      "required_stdout_line": "OK C file loading: text mode rejects binary",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Binary_Mode",
+      "registered_label": "C file loading: binary mode rejects text",
+      "required_stdout_line": "OK C file loading: binary mode rejects text",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Dump_Load",
+      "registered_label": "C file loading: dump file loads",
+      "required_stdout_line": "OK C file loading: dump file loads",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Stripped_Dump",
+      "registered_label": "C file loading: stripped dump metadata",
+      "required_stdout_line": "OK C file loading: stripped dump metadata",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Source_Info",
+      "registered_label": "C file loading: source metadata",
+      "required_stdout_line": "OK C file loading: source metadata",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Missing_Errno",
+      "registered_label": "C file loading: native missing errno",
+      "required_stdout_line": "OK C file loading: native missing errno",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Nul_Filename",
+      "registered_label": "C file loading: NUL filename",
+      "required_stdout_line": "OK C file loading: NUL filename",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Success_Stack",
+      "registered_label": "C file loading: success preserves stack",
+      "required_stdout_line": "OK C file loading: success preserves stack",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Missing_Stack",
+      "registered_label": "C file loading: missing preserves stack",
+      "required_stdout_line": "OK C file loading: missing preserves stack",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Syntax_Stack",
+      "registered_label": "C file loading: syntax preserves stack",
+      "required_stdout_line": "OK C file loading: syntax preserves stack",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Protected_Call",
+      "registered_label": "C file loading: protected callback",
+      "required_stdout_line": "OK C file loading: protected callback",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Refusal_Recovery",
+      "registered_label": "C file loading: refusal and recovery",
+      "required_stdout_line": "OK C file loading: refusal and recovery",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Prefixed_Binary",
+      "registered_label": "C file loading: prefixed binary alignment",
+      "required_stdout_line": "OK C file loading: prefixed binary alignment",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Growth_Sweep",
+      "registered_label": "C file loading: actual growth refusal sweep",
+      "required_stdout_line": "OK C file loading: actual growth refusal sweep",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Shebang_CR",
+      "registered_label": "C file loading: shebang lone CR",
+      "required_stdout_line": "OK C file loading: shebang lone CR",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Source_Quota",
+      "registered_label": "C file loading: source host quota cleanup",
+      "required_stdout_line": "OK C file loading: source host quota cleanup",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/lua-c_loadfile_tests.adb#Work_Quota",
+      "registered_label": "C file loading: work host quota cleanup",
+      "required_stdout_line": "OK C file loading: work host quota cleanup",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/source_tests.adb#Lone_CR_Ignored",
+      "registered_label": "source interpreter lone CR ignored",
+      "required_stdout_line": "OK source interpreter lone CR ignored",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
+    },
+    {
+      "case": "tests/src/source_tests.adb#Interior_CR_With_CRLF",
+      "registered_label": "source interior CR and terminal CRLF",
+      "required_stdout_line": "OK source interior CR and terminal CRLF",
+      "independent_review_status": "pending",
+      "execution_evidence": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false
     }
   ]
 }

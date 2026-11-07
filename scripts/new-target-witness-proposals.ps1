@@ -101,7 +101,8 @@ if ($AdditionalConsumerCases -ne '') {
         if (@($consumer.cases | Where-Object { ($_.source + '#' + $_.case_id) -ceq $key }).Count -ne 0 -or
             $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api','value-api','auxiliary-api',
                 'load-dump-api','debug-api','external-api','conversion-api','operator-api','index-type-api','base-closing-api','native-module-api','buffer-api',
-                'allocator-api','allocator-panic-string-api','allocator-panic-number-api','substitution-api') -or
+                'allocator-api','allocator-panic-string-api','allocator-panic-number-api','substitution-api',
+                'loadfile-api','loadfile-stdin-text-api','loadfile-stdin-binary-c-api') -or
             $case.source -cnotmatch '^(?:c_api/tests/[a-zA-Z0-9_-]+\.(?:c|h)|tests/c/[a-zA-Z0-9_-]+\.c)$' -or
             (@($case.exact_witnesses).Count -eq 0 -and ($null -eq $case.pattern_witness -or
                 -not $case.pattern_witness.StartsWith('^') -or -not $case.pattern_witness.EndsWith('$'))) -or

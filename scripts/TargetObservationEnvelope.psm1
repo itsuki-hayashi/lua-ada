@@ -3,6 +3,7 @@ $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetContext.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
+Import-Module (Join-Path $PSScriptRoot 'FileConsumerIO.psm1')
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtureEvidence.psm1')
 
 function Get-TargetObservationClaims {
@@ -148,6 +149,9 @@ function Test-TargetImageBuildWitnesses {
         -Context $Context -Revision $Revision -ConsumerArtifactRoot $payload -AUnitArtifactRoot $payload
     $consumer=Get-Content -LiteralPath $consumerPath -Raw|ConvertFrom-Json -AsHashtable -Depth 48
     Assert-TargetBuildRuntimeBindings -Image $image -ConsumerReport $consumer
+    if($consumer.Contains('loadfile_contract') -and $null -ne $consumer.loadfile_contract){
+        Assert-FileConsumerIOImageBinding -Image $image -Observation $consumer.loadfile_contract.stdin_io
+    }
     foreach($implementation in @('ada','c')){
         $name=if($implementation -ceq 'ada'){'native-module-api'}else{'native-module-oracle'}
         $process=@($consumer.consumers|Where-Object name -CEQ $name)
@@ -173,7 +177,7 @@ function Assert-TargetBuildRuntimeBindings {
         }
     }
     $kinds=@('gc','io','foreign')
-    foreach($kind in @('format','value','auxiliary','load_dump','debug','builtin','external','conversion','operator','index_type','base_closing','native_module','buffer','allocator','substitution','thread_reset')){
+    foreach($kind in @('format','value','auxiliary','load_dump','debug','builtin','external','conversion','operator','index_type','base_closing','native_module','buffer','allocator','substitution','thread_reset','loadfile')){
         if($ConsumerReport.Contains("${kind}_contract") -and $null -ne $ConsumerReport["${kind}_contract"]){$kinds+=$kind}
     }
     foreach($kind in $kinds){
