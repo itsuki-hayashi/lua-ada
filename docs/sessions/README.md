@@ -2,6 +2,8 @@
 
 Component: [public value identities](2026-11-08-public-value-identities.md).
 
+Component: [public C concat windows](2026-11-08-c-concat-windows.md).
+
 Component: [public file loading](2026-11-08-public-file-loading.md).
 
 Component: [literal auxiliary substitution](2026-11-08-auxiliary-substitution.md).

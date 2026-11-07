@@ -92,6 +92,7 @@ with Lua.C_Conversion_Tests;
 with Lua.C_Operator_Tests;
 with Lua.C_Base_Closing_Tests;
 with Lua.C_Buffer_Tests;
+with Lua.C_Concat_Tests;
 with Lua.C_Allocator_Tests;
 with Lua.C_Substitution_Tests;
 with Lua.C_Loadfile_Tests;
@@ -203,6 +204,7 @@ procedure Test_Runner is
       Lua.C_Operator_Tests.Register (Result);
       Lua.C_Base_Closing_Tests.Register (Result);
       Lua.C_Buffer_Tests.Register (Result);
+      Lua.C_Concat_Tests.Register (Result);
       Lua.C_Allocator_Tests.Register (Result);
       Lua.C_Substitution_Tests.Register (Result);
       Lua.C_Loadfile_Tests.Register (Result);

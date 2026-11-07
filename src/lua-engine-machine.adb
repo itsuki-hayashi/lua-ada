@@ -402,6 +402,22 @@ package body Lua.Engine.Machine is
                Operand_Error (State, Left, "concatenate", 1);
             end if;
          end if;
+         --  luaV_concat reuses a string adjoining the ordinary short empty
+         --  string. External empty strings intentionally take the ordinary
+         --  copy path; the upstream isemptystr shortcut excludes them.
+         if Right.Kind = String_Kind and then
+           Right.Reference.Bytes.Size = 0 and then
+           not Right.Reference.External_String
+         then
+            return (if Left.Kind = String_Kind then Left else
+                      New_String (State, Image (State.Current.Memory, Left)));
+         elsif Left.Kind = String_Kind and then
+           Left.Reference.Bytes.Size = 0 and then
+           not Left.Reference.External_String
+         then
+            return (if Right.Kind = String_Kind then Right else
+                      New_String (State, Image (State.Current.Memory, Right)));
+         end if;
          if Image (State.Current.Memory, Left)'Length >
            State.Bounds.String_Bytes - Natural'Min
              (Image (State.Current.Memory, Right)'Length,
@@ -502,6 +518,37 @@ package body Lua.Engine.Machine is
                  "attempt to perform 'n%0'"));
          return Nil_Value;
    end Binary_Value;
+
+   procedure Concatenate_Primitives
+     (State : in out World; First : Positive; Last : in out Natural)
+   is
+      Context : constant Context_Access := State.Current;
+      Left, Right, Result : Value;
+   begin
+      if First > Last or else Last > Context.Foreign_Top then
+         raise Program_Error with "invalid C concatenation interval";
+      end if;
+      while Last > First loop
+         Left := Stacks.Read (Context, Last - 1);
+         Right := Stacks.Read (Context, Last);
+         exit when
+           Left.Kind not in String_Kind | Integer_Kind | Real_Kind or else
+           Right.Kind not in String_Kind | Integer_Kind | Real_Kind;
+         if State.Policy = Bounded then
+            if State.Steps >= State.Bounds.Instructions then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + 1;
+         end if;
+         Result := Binary_Value (State, Concatenate, Left, Right);
+         --  Publish the result before removing the consumed right edge.
+         --  Any later handler reads the remaining original slots afresh;
+         --  debug.setlocal mutations cannot be hidden by an old snapshot.
+         Stacks.Write (State, Context, Last - 1, Result);
+         Foreign.Set_Concatenation_Top (State, Last - 1);
+         Last := Last - 1;
+      end loop;
+   end Concatenate_Primitives;
 
    function Unary_Value
      (State : in out World; Operator : Token_Kind; Item : Value) return Value
@@ -3828,26 +3875,43 @@ package body Lua.Engine.Machine is
          end if;
       elsif Name = "@api.concat" then
          if Activation.Native_Stage = 0 then
-            Activation.Native_Index :=
-              Natural (Activation.Native_Arguments.Length);
-            Append_Root (State, Activation.Native_Captures,
-                         Arg (Activation.Native_Index));
+            Activation.Native_Aux := Natural
+              (Activation.Native_Captures (1).Integer_Data);
+            Activation.Native_Index := Natural
+              (Activation.Native_Captures (2).Integer_Data);
+            --  This C-dispatched private callable initially owns its real
+            --  function slot. Its continuation needs metadata only; remove
+            --  that window before any handler observes the original caller.
+            Retire_Stack_Window (Activation);
          else
-            Activation.Native_Captures.Clear;
-            Append_Root (State, Activation.Native_Captures,
-                         First (Activation.Native_Results));
+            Handler := First (Activation.Native_Results);
+            Stacks.Write
+              (State, State.Current, Activation.Native_Aux +
+               Activation.Native_Index - 2, Handler);
+            Foreign.Set_Concatenation_Top
+              (State, Activation.Native_Aux + Activation.Native_Index - 2);
+            Activation.Native_Results.Clear;
             Activation.Native_Index := Activation.Native_Index - 1;
          end if;
+         declare
+            Last : Natural :=
+              Activation.Native_Aux + Activation.Native_Index - 1;
+         begin
+            Concatenate_Primitives (State, Activation.Native_Aux, Last);
+            Activation.Native_Index := Last - Activation.Native_Aux + 1;
+         end;
          if Activation.Native_Index = 1 then
-            --  Copy the scalar out of its vector before completion retires
-            --  that vector's frame; no indexing borrow may span retirement.
-            Return_Native (Activation.Native_Captures.First_Element);
+            Append_Root
+              (State, Activation.Native_Results,
+               Stacks.Read (State.Current, Activation.Native_Aux));
+            Complete (Self, Activation.Native_Results, Independent => True);
          else
-            --  C concat is a right fold, including handler order and
-            --  non-string intermediate handler results. Reuse the actual
-            --  binary primitive/metamethod continuation and its roots.
-            Packet.Append (Arg (Activation.Native_Index - 1));
-            Packet.Append (Activation.Native_Captures (1));
+            Packet.Append (Stacks.Read
+              (State.Current, Activation.Native_Aux +
+               Activation.Native_Index - 2));
+            Packet.Append (Stacks.Read
+              (State.Current, Activation.Native_Aux +
+               Activation.Native_Index - 1));
             Activation.Native_Stage := 1;
             Schedule (Self, "@binary", Packet, 0, Concatenate);
          end if;

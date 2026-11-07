@@ -22,6 +22,13 @@ package Lua.Engine.Machine is
    --  Conversion failures use Item's table/userdata diagnostic type; zero
    --  step has no offending type and ignores the default nil Item.
 
+   procedure Concatenate_Primitives
+     (State : in out World; First : Positive; Last : in out Natural);
+   --  Fold the convertible suffix of an actual C operand interval. Publish
+   --  each result in its left slot and consume the right slot. Stop at the
+   --  first handler-requiring pair; First=Last means a complete result.
+   --  The current addressed C/borrowed window owns all input/result roots.
+
    function Ensure_Stack
      (State : in out World; Context : not null Context_Access;
       Last : Natural; Raise_Error : Boolean := True) return Boolean;

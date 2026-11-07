@@ -223,6 +223,11 @@ package Lua.Engine.Foreign is
    procedure Initialize_Bridge;
    --  Verify the C/Ada surface contract during library elaboration.
 
+   procedure Set_Concatenation_Top (State : in out World; Top : Natural);
+   --  Shrink the actual current C/borrowed API view after a completed fold.
+   --  Top is absolute and stays above its retained prefix. This invokes no
+   --  closer; lua_concat's free-operand precondition excludes closing slots.
+
    procedure Prepare_Thread_Surface
      (State : in out World; Context : Context_Id);
    --  Reserve the addressed thread's C surface while thread construction

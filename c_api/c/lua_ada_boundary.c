@@ -955,8 +955,17 @@ void lua_len(lua_State *state, int index) {
 
 void lua_concat(lua_State *state, int count) {
     struct lua_ada_request input = request(ADA_PREPARE_CONCATENATION);
+    int top = lua_gettop(state);
     input.count = count;
-    if (dispatch(state, input).length != 0) lua_call(state, count, 1);
+    if (dispatch(state, input).length != 0) {
+        int first = top - count + 1;
+        /* The Ada continuation operates on the original C slots. This
+           boundary only drives its zero-argument call and publishes the
+           returned value over the consumed interval after it completes. */
+        lua_call(state, 0, 1);
+        lua_copy(state, -1, first);
+        lua_settop(state, first);
+    }
 }
 
 unsigned lua_numbertocstring(lua_State *state, int index, char *buffer) {

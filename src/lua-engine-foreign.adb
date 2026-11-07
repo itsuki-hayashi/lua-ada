@@ -1083,6 +1083,18 @@ package body Lua.Engine.Foreign is
       Publish_Top (Context, Top);
    end Set_C_Top;
 
+   procedure Set_Concatenation_Top (State : in out World; Top : Natural) is
+      Context : constant Context_Access := State.Current;
+   begin
+      if Top < Context.Foreign_Base or else Top > Context.Foreign_Top then
+         raise Program_Error with "invalid concatenation stack shrink";
+      end if;
+      --  Reuse the real C view, including a warning/release borrow of a Lua
+      --  window. A native-only setter or shadow argument vector would lose
+      --  those public slots and keep consumed values alive during callbacks.
+      Set_C_Top (State, Context, Top);
+   end Set_Concatenation_Top;
+
    procedure Pop (Context : not null Context_Access; Count : Natural := 1) is
       Old : constant Natural := Context.Foreign_Top;
    begin
@@ -2030,25 +2042,27 @@ package body Lua.Engine.Foreign is
                      New_String (Owner.Universe.all, ""));
             elsif Input.Count > 1 then
                declare
-                  Arguments : Values.Vector := Owned_Values
+                  Last : Natural := Context.Foreign_Top;
+                  First : constant Positive :=
+                    Last - Natural (Input.Count) + 1;
+                  Captures : Values.Vector := Owned_Values
                     (Owner.Universe.all);
                begin
-                  --  Root every operand before retiring its public stack
-                  --  edge. The hidden continuation folds from the right via
-                  --  the same binary operation used by canonical code;
-                  --  arbitrary Lua/C handlers never run in this activation.
-                  for Index in reverse 1 .. Natural (Input.Count) loop
-                     Append_Root (Owner.Universe.all, Arguments,
-                                  Get_Value (-C.int (Index)));
-                  end loop;
-                  Pin (Owner.Universe.all, Arguments);
-                  Pop (Context, Natural (Input.Count));
-                  Push (Owner.Universe.all, Context,
-                        New_Native (Owner.Universe.all, "@api.concat"));
-                  for Item of Arguments loop
-                     Push (Owner.Universe.all, Context, Item);
-                  end loop;
-                  Output.Length := 1;
+                  --  Convertible pairs finish directly in their actual C
+                  --  slots. A handler continuation captures only stable
+                  --  indices/counts, never a second set of operand roots.
+                  VM.Concatenate_Primitives (Owner.Universe.all, First, Last);
+                  if First /= Last then
+                     Captures.Append
+                       (Value'(Integer_Kind, Integer_Value (First)));
+                     Captures.Append
+                       (Value'(Integer_Kind,
+                               Integer_Value (Last - First + 1)));
+                     Push (Owner.Universe.all, Context,
+                       New_Native
+                         (Owner.Universe.all, "@api.concat", Captures));
+                     Output.Length := 1;
+                  end if;
                end;
             end if;
          when Number_To_C_String =>
