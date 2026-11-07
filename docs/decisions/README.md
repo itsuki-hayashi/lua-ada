@@ -26,6 +26,7 @@ its runtime changes are planned, not implemented by the foundation gate.
 | 0015 | [Managed exact numeric scratch](0015-managed-numeric-scratch.md)               | accepted              |
 | 0016 | [Collector inspection and storage equivalents](0016-gc-adapter-equivalents.md) | scoped acceptance     |
 | 0017 | [C continuations and resume](0017-c-continuations-and-resume.md)               | scoped implementation |
+| 0018 | [Compatibility-relevant T coverage](0018-relevant-t-compatibility.md)          | accepted policy       |
 
 ADR 0009 records the approved combined delivery order, iterative scheduler,
 stable cells, explicit cleanup, weak thread ownership and execution policies.
