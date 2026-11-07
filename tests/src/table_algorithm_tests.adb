@@ -280,6 +280,56 @@ package body Table_Algorithm_Tests is
       Assert (Result.Status = Succeeded, "create abort poisoned the session");
    end Create_Budget_Recovery;
 
+   procedure Invalid_Length_Result;
+   procedure Invalid_Length_Result is
+   begin
+      --  An arbitrary __len value is legal for #t, but table functions need
+      --  luaL_len's integer conversion and its distinct diagnostic.
+      Check
+        ("local t=setmetatable({}, {__len=function() return 'abc' end}); " &
+         "assert(#t=='abc'); for _,f in ipairs{table.insert,table.remove," &
+         "table.concat,table.unpack} do local ok,e=pcall(f,t,1); " &
+         "assert(not ok and e:find('object length is not an integer'," &
+         "1,true)) end");
+   end Invalid_Length_Result;
+
+   procedure Fractional_Length_Result;
+   procedure Fractional_Length_Result is
+   begin
+      --  Fractional/out-of-range results fail integer conversion, with the
+      --  same length diagnostic rather than the ordinary argument error.
+      Check
+        ("for _,v in ipairs{1.5,math.huge} do local t=setmetatable({}," &
+         "{__len=function() return v end}); local ok,e=" &
+         "pcall(table.insert,t,1); assert(not ok and " &
+         "e:find('object length is not an integer',1,true)) end");
+   end Fractional_Length_Result;
+
+   procedure Numeric_String_Length_Result;
+   procedure Numeric_String_Length_Result is
+   begin
+      --  lua_tointegerx accepts a numeric string returned by __len. Preserve
+      --  that coercion through both table operations.
+      Check
+        ("local t=setmetatable({7,8},{__len=function() return '2.0' end});" &
+         "assert(table.concat(t,',')=='7,8'); local a,b=table.unpack(t);" &
+         "assert(a==7 and b==8)");
+   end Numeric_String_Length_Result;
+
+   procedure Unpack_Length_Before_Bounds;
+   procedure Unpack_Length_Before_Bounds is
+   begin
+      --  The pinned tunpack calls aux_getn before optional argument checks,
+      --  even when explicit bounds describe an empty result range.
+      Check
+        ("local n=0; local t=setmetatable({9},{__len=function() " &
+         "n=n+1; return 1 end}); assert(table.unpack(t,1,1)==9 and n==1);" &
+         "assert(select('#',table.unpack(t,2,1))==0 and n==2); " &
+         "getmetatable(t).__len=function() error('length first',0) end;" &
+         "local ok,e=pcall(table.unpack,t,'bad',1); " &
+         "assert(not ok and e=='length first')");
+   end Unpack_Length_Before_Bounds;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -342,5 +392,13 @@ package body Table_Algorithm_Tests is
       Test_Support.Add
         (Suite, "table algorithms: create budget recovery",
          Create_Budget_Recovery'Access);
+      Test_Support.Add (Suite, "table algorithms: invalid length result",
+                        Invalid_Length_Result'Access);
+      Test_Support.Add (Suite, "table algorithms: fractional length result",
+                        Fractional_Length_Result'Access);
+      Test_Support.Add (Suite, "table algorithms: numeric string length",
+                        Numeric_String_Length_Result'Access);
+      Test_Support.Add (Suite, "table algorithms: unpack length before bounds",
+                        Unpack_Length_Before_Bounds'Access);
    end Register;
 end Table_Algorithm_Tests;

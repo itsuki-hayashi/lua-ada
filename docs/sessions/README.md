@@ -8,6 +8,8 @@ Component: [runtime numeric locale](2026-11-08-runtime-numeric-locale.md).
 
 Component: [CLI process controls](2026-11-08-cli-process-controls.md).
 
+Component: [table length results](2026-11-08-table-length-results.md).
+
 Previous: [four-file GC/IO conformance](2026-11-07-gc-io-conformance.md).
 
 Previous checkpoint: [complete M3 upstream conformance](2026-11-06-m3-upstream-conformance.md).

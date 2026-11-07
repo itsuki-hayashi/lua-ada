@@ -35,7 +35,8 @@ package body Lua.Engine.Table_Drivers is
       function Key (Item : Integer_Value) return Value is
         ((Integer_Kind, Item));
       procedure Save (Index : Positive; Item : Value);
-      function Integral (Item : Value) return Integer_Value;
+      function Integral
+        (Item : Value; Length_Result : Boolean := False) return Integer_Value;
       function Text (Item : Value) return String;
       procedure Check_Table
         (Item : Value; Readable, Writable, Sized : Boolean);
@@ -56,9 +57,20 @@ package body Lua.Engine.Table_Drivers is
             Index, Item);
       end Save;
 
-      function Integral (Item : Value) return Integer_Value is
+      function Integral
+        (Item : Value; Length_Result : Boolean := False) return Integer_Value
+      is
          Parsed : Lua.Numbers.Number;
          Real_Item : Real_Value := 0.0;
+         procedure Reject (Message : String);
+         procedure Reject (Message : String) is
+         begin
+            --  luaL_len distinguishes an invalid __len result from an
+            --  invalid caller argument. Reuse the exact conversion, including
+            --  numeric strings, without hiding allocator or callback errors.
+            Fail (State, (if Length_Result then
+              "object length is not an integer" else Message));
+         end Reject;
       begin
          if Item.Kind = Integer_Kind then
             return Item.Integer_Data;
@@ -71,17 +83,17 @@ package body Lua.Engine.Table_Drivers is
             elsif Parsed.Kind = Lua.Numbers.Real_Number then
                Real_Item := Parsed.Real_Item;
             else
-               Fail (State, "integer expected in " & Name);
+               Reject ("integer expected in " & Name);
             end if;
          else
-            Fail (State, "integer expected in " & Name);
+            Reject ("integer expected in " & Name);
          end if;
          if Real_Item >= -2.0 ** 63 and then Real_Item < 2.0 ** 63 and then
            Real_Value'Truncation (Real_Item) = Real_Item
          then
             return Integer_Value (Real_Item);
          end if;
-         Fail (State, "number has no integer representation");
+         Reject ("number has no integer representation");
          return 0;
       end Integral;
 
@@ -236,29 +248,17 @@ package body Lua.Engine.Table_Drivers is
             end if;
          else
             Activation.Native_Stage := 1;
-            if Name = "table.unpack" then
-               --  Unpack obtains length lazily, after validating its start
-               --  index, and only if the end is absent. Explicit empty ranges
-               --  do not even index their receiver, which need not be a table.
-               First := (if Arg (2).Kind = Nil_Kind then 1
-                         else Integral (Arg (2)));
-               if Arg (3).Kind /= Nil_Kind then
-                  Copy_Roots
-                    (State, Activation.Native_Results,
-                     One_Value (State, Arg (3), 1));
-               else
-                  return Request ("@length", One_Value (State, Item, 1));
-               end if;
-            else
-               Check_Table (Item, True,
-                            Name in "table.insert" | "table.remove", True);
-               return Request ("@length", One_Value (State, Item, 1));
-            end if;
+            --  Every aux_getn operation obtains and validates length before
+            --  checking its optional bounds. In particular, pinned tunpack
+            --  still invokes __len with an explicit end or an empty range.
+            Check_Table (Item, True,
+                         Name in "table.insert" | "table.remove", True);
+            return Request ("@length", One_Value (State, Item, 1));
          end if;
       end if;
 
       if Activation.Native_Stage = 1 then
-         Size := Integral (Returned);
+         Size := Integral (Returned, Length_Result => True);
          if Name in "table.concat" | "table.unpack" then
             First := (if Arg (2).Kind = Nil_Kind or else Name = "table.concat"
                       then 1 else Integral (Arg (2)));

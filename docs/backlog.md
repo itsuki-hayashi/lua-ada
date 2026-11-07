@@ -13,6 +13,12 @@ component progress. The binary Lua searcher now accepts native chunks and its
 focused caching/loader-data regression passes within 1,391 local AUnit cases.
 Full target and all original unfinished M3 gates remain open.
 
+Table library length conversion/order now has focused native/Ada evidence;
+unreduced sort.lua completes locally and literals.lua has a fresh matching
+default runner pair. The dated
+[record](sessions/2026-11-08-table-length-results.md) preserves their revision
+limits and unfinished instrumented/matrix obligations.
+
 Runtime numeric-string locale conversion now has eight focused regressions
 within a passing 1,418-case component run. See its dated
 [checkpoint](sessions/2026-11-08-runtime-numeric-locale.md); this does not close

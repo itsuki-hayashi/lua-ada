@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [table length checkpoint](sessions/2026-11-08-table-length-results.md)
+matches pinned conversion diagnostics and unpack ordering, with 1,507 passing
+local AUnit cases. Unchanged unreduced sort.lua reaches OK locally; literals.lua
+has a matching default C/Ada runner observation. Both require final-head matrix
+and relevant instrumented evidence before target acceptance.
+
 The [runtime numeric locale checkpoint](sessions/2026-11-08-runtime-numeric-locale.md)
 adds native-point string conversion while retaining source grammar and exact
 rounding. Its strict Windows validation/static component build passes 1,418

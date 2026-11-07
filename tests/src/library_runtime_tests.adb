@@ -590,18 +590,18 @@ package body Library_Runtime_Tests is
    end Table_Callback_Failure;
 
    procedure Table_Unpack_Explicit_End is
-      --  An explicit end bypasses __len even on a nonempty traversal. Empty
-      --  ranges must additionally bypass receiver indexing/type checks; an
-      --  invalid start is rejected before requesting a default length.
+      --  Pinned Lua 5.5 checks the table and obtains length before optional
+      --  bounds, even with an explicit end or an empty traversal. The older
+      --  regression incorrectly expected a bypass and disagreed with C Lua.
    begin
       Check
         ("local calls=0; local t=setmetatable({1,2},{__len=function() " &
-         "calls=calls+1; error('unexpected length') end}); " &
+         "calls=calls+1; return 2 end}); " &
          "local a,b=table.unpack(t,1,2); assert(a==1 and b==2); " &
          "assert(select('#',table.unpack(t,3,2))==0); " &
-         "assert(select('#',table.unpack(nil,3,2))==0); " &
-         "assert(not pcall(table.unpack,t,{})); assert(calls==0); " &
-         "assert(not pcall(table.unpack,t)); assert(calls==1)");
+         "assert(not pcall(table.unpack,nil,3,2)); " &
+         "assert(not pcall(table.unpack,t,{})); assert(calls==3); " &
+         "local x,y=table.unpack(t); assert(x==1 and y==2 and calls==4)");
    end Table_Unpack_Explicit_End;
 
    procedure Table_Move_Maximum_Destination is
@@ -720,7 +720,7 @@ package body Library_Runtime_Tests is
                         Table_Move_Equality_Order'Access);
       Test_Support.Add (Suite, "table metamethod callback failure",
                         Table_Callback_Failure'Access);
-      Test_Support.Add (Suite, "table unpack explicit end bypass",
+      Test_Support.Add (Suite, "table unpack explicit end length order",
                         Table_Unpack_Explicit_End'Access);
       Test_Support.Add (Suite, "table move maximum destination",
                         Table_Move_Maximum_Destination'Access);
