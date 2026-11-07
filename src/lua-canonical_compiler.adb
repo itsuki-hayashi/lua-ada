@@ -13,6 +13,7 @@ package body Lua.Canonical_Compiler is
    use type Ada.Containers.Count_Type;
    use type Interfaces.Integer_8;
    use type Interfaces.Unsigned_8;
+   use type Interfaces.Unsigned_64;
    use type Lua.Syntax.Check_Status;
    use type Lua.Numbers.Real_Value;
    use type Lua.Numbers.Integer_Value;
@@ -35,6 +36,13 @@ package body Lua.Canonical_Compiler is
    end record;
    package Places is new Lua.Storage.Vectors (Binding_Place);
    package Indices is new Lua.Storage.Vectors (Natural);
+   type String_Constant_Entry is record
+      Text : String_Id := No_String;
+      Long_String : Boolean := False;
+      Constant_Index, Next : Natural := 0;
+   end record;
+   package String_Constants is new
+     Lua.Storage.Vectors (String_Constant_Entry);
    type Label_Point is record
       Id : Node_Id := No_Node;
       PC : Natural := 0;
@@ -53,6 +61,11 @@ package body Lua.Canonical_Compiler is
    type Function_State is tagged limited record
       Code : Prototype_Access;
       Active, Captures : Places.Vector;
+      String_Keys : String_Constants.Vector;
+      String_Buckets : Indices.Vector;
+      --  Per-function constant indexes keyed by immutable model string IDs.
+      --  Dense entry/bucket storage grows with retained keys, never with the
+      --  largest global string ID or the number of repeated source uses.
       Targets : Labels.Vector;
       Pending : Jumps.Vector;
       Loop_Stack : Loops.Vector;
@@ -260,6 +273,52 @@ package body Lua.Canonical_Compiler is
                   Put (Fn, ABC (Op_MOVE, Destination, Source));
                end if;
             end Move;
+            function String_Bucket
+              (Text : String_Id; Long_String : Boolean; Count : Positive)
+               return Positive;
+            function String_Bucket
+              (Text : String_Id; Long_String : Boolean; Count : Positive)
+               return Positive is
+              (Natural (((Interfaces.Unsigned_64 (Text) *
+                16#9E37_79B9_7F4A_7C15#) xor
+                Interfaces.Unsigned_64 (Boolean'Pos (Long_String))) mod
+                Interfaces.Unsigned_64 (Count)) + 1);
+            procedure Grow_String_Keys (Fn : in out Function_State);
+            procedure Grow_String_Keys (Fn : in out Function_State) is
+               Size : constant Natural :=
+                 Natural (Fn.String_Buckets.Length);
+               Bucket : Positive;
+               Key_Record : String_Constant_Entry;
+            begin
+               if Size /= 0 and then
+                 Natural (Fn.String_Keys.Length) < Size / 2
+               then
+                  return;
+               elsif Size > Natural'Last / 2 then
+                  raise Lua.Storage.Allocation_Error;
+               end if;
+               --  Allocate through the compilation owner before relinking.
+               --  Entries contain only scalar IDs/links, so rehash performs
+               --  no hidden text copies or allocations after bucket growth.
+               Fn.String_Buckets.Set_Length
+                 (Ada.Containers.Count_Type (Natural'Max (8, Size * 2)));
+               for Index in Fn.String_Buckets.First_Index ..
+                 Fn.String_Buckets.Last_Index
+               loop
+                  Fn.String_Buckets.Replace_Element (Index, 0);
+               end loop;
+               for Index in Fn.String_Keys.First_Index ..
+                 Fn.String_Keys.Last_Index
+               loop
+                  Key_Record := Fn.String_Keys (Index);
+                  Bucket := String_Bucket
+                    (Key_Record.Text, Key_Record.Long_String,
+                     Natural (Fn.String_Buckets.Length));
+                  Key_Record.Next := Fn.String_Buckets (Bucket);
+                  Fn.String_Keys.Replace_Element (Index, Key_Record);
+                  Fn.String_Buckets.Replace_Element (Bucket, Index);
+               end loop;
+            end Grow_String_Keys;
             function Constant_Index
               (Fn : in out Function_State; Data : Constant_Value)
                return Natural;
@@ -268,11 +327,53 @@ package body Lua.Canonical_Compiler is
                return Natural
             is
                Index : constant Natural := Natural (Fn.Code.Constants.Length);
+               Bucket, Cursor : Natural := 0;
+               Key_Record : String_Constant_Entry;
             begin
+               --  The model already interns exact string bytes. Reuse only
+               --  the same typed string constant within this function; integer
+               --  and floating constants keep their existing representation.
+               --  Look up before growth so a hit needs no new allocation.
+               if Data.Kind = String_Constant and then
+                 not Fn.String_Buckets.Is_Empty
+               then
+                  Bucket := String_Bucket
+                    (Data.String_Data, Data.Long_String,
+                     Natural (Fn.String_Buckets.Length));
+                  Cursor := Fn.String_Buckets (Bucket);
+                  while Cursor /= 0 loop
+                     Key_Record := Fn.String_Keys (Cursor);
+                     if Key_Record.Text = Data.String_Data and then
+                       Key_Record.Long_String = Data.Long_String
+                     then
+                        return Key_Record.Constant_Index;
+                     end if;
+                     Cursor := Key_Record.Next;
+                  end loop;
+               end if;
                if Constant_Count = Bounds.Constants then
                   Fail (Constant_Budget, Host => True);
                elsif Index >= 2 ** 25 then
                   Fail (Constant_Encoding_Limit);
+               end if;
+               if Data.Kind = String_Constant then
+                  Grow_String_Keys (Fn);
+                  Bucket := String_Bucket
+                    (Data.String_Data, Data.Long_String,
+                     Natural (Fn.String_Buckets.Length));
+                  --  Reserve both publications before changing either live
+                  --  sequence. Refusal abandons the owned compilation; no
+                  --  half-published constant or borrowed frontend byte span
+                  --  escapes. First occurrence still fixes the pool order.
+                  Fn.Code.Constants.Reserve_Capacity
+                    (Fn.Code.Constants.Length + 1);
+                  Fn.String_Keys.Reserve_Capacity
+                    (Fn.String_Keys.Length + 1);
+                  Fn.String_Keys.Append
+                    (String_Constant_Entry'(Data.String_Data,
+                     Data.Long_String, Index, Fn.String_Buckets (Bucket)));
+                  Fn.String_Buckets.Replace_Element
+                    (Bucket, Natural (Fn.String_Keys.Length));
                end if;
                Constant_Count := Constant_Count + 1;
                Fn.Code.Constants.Append (Data);
@@ -1640,6 +1741,8 @@ package body Lua.Canonical_Compiler is
                Node_Count := Node_Count + 1;
                Fn.Code := New_Prototype (Result.Code);
                Fn.Active.Set_Owner (Memory);
+               Fn.String_Keys.Set_Owner (Memory);
+               Fn.String_Buckets.Set_Owner (Memory);
                Fn.Captures.Set_Owner (Memory);
                Fn.Targets.Set_Owner (Memory);
                Fn.Pending.Set_Owner (Memory);

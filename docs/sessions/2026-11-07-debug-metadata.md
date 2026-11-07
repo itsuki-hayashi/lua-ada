@@ -605,3 +605,52 @@ string-constant reuse is approved next; no whole-pool linear scan or sparse
 vector indexed by global string IDs is justified. This measured observation
 is separate from the earlier withdrawn big.lua complexity attribution.
 Neither private pool ordering nor full db.lua acceptance is claimed here.
+
+## 2026-11-08 owned string-constant reuse
+
+After synchronizing to integrated 6e166ea and the comparison checkpoint,
+canonical lowering adds a managed per-function hash from immutable program
+String_Id plus the serialized string tag to that function's constant index.
+This is an Ada-owned compiler index, not a copied C table layout. Entries and
+buckets are dense and grow with retained keys, never with global ID magnitude.
+Hits precede growth and allocate nothing. Insertions reserve both publications
+before changing either sequence; scalar-link rehashing cannot copy frontend
+bytes. Both vectors bind to the compiler owner and die with Function_State.
+The constant pool remains append-only in first-occurrence order. Numeric
+representations and distinct string tags are preserved. Pinned
+lcode.c:k2proto/stringK supply the semantic reference for string reuse; private
+pool minimality/order is not itself claimed as a conformance requirement.
+
+Seven named public regressions cover a 300-call prefix before the live count
+bound, exact case/NUL values and indexed keys, long bytes, independent child
+indexes, typed constants and source anchors retained after parent/cache
+retirement. Four separately named compiler tests cover retained-constant
+quotas, exact byte distinctions, per-function aggregate quotas and refusal at
+every actual allocation boundary through multiple 64-key table growths. Each
+attempt's result finalizes before asserting zero live owner blocks and retry;
+the sweep reaches verified success within its explicit 1,200-bound ceiling.
+
+Strict default Windows root/test builds pass under GNAT 16.1.0. All 1,660
+AUnit cases pass with zero failed assertions/errors. The seven-case complete
+fixture passes native default/T source execution, and both producers' chunks
+pass on both default runtimes with empty stderr and stdout SHA256
+E3F934492F149C865C07D1FA5DA7DA579ABA25DC32423400E4C8CADC1710C07A.
+All thirty-six retained four-way cases pass. Reference files/pins remain
+unchanged and whitespace is clean. C consumers were not relinked for this
+compiler-only checkpoint; their previous results are not newly attributed.
+
+A bounded read-only Claude Haiku review found no high-confidence defects in
+the supplied diff, vector contract, focused tests and pinned cache reference.
+It did not run tests or inspect the whole repository. Its initial tool-driven
+attempt exhausted three turns and is not counted as a completed review; the
+second supplied-text/no-tools review completed. Owner initialization and the
+absence of constant rollback were separately checked in the actual compiler.
+The reviewer notes predictable ID strides can cluster hash buckets; storage
+remains bounded and this is not a worst-case-time proof or final PR review.
+
+The unchanged copied db.lua diagnostic now advances from line 603 to 1030,
+passing the live count bounds, later debug work and traceback-size checks.
+The next mismatch is the initial line event for a stripped function: unknown
+line zero currently aliases the frame's unseen-line sentinel, and line-event
+arguments must be nil when source information is absent. Full db.lua, final
+instrumented Ada and full-upstream acceptance remain open.
