@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [native module checkpoint](sessions/2026-11-08-native-module-loading.md)
+builds the owned loader and CLI environment control locally, with 1,691
+passing AUnit cases and fourteen passing C consumers. Unchanged native
+fixtures load into the static host. A disposable Windows-corrected attrib.lua
+matches C output; its adaptation is not yet reviewed acceptance evidence.
+Native image receipts, lifetime/fault campaigns and final matrix remain open.
+
 The [C operator checkpoint](sessions/2026-11-08-c-operator-windows.md) adds
 arithmetic/comparison with actual caller slots and unary duplicate operands.
 Seventeen C cases match both native configurations; strict local default

@@ -46,9 +46,11 @@ project Consumer is
             for Default_Switches ("C") use
               ("-lm", "-Wl,-u,___gnat_tasking_runtime_initialize",
                external ("LUA_ADA_TASKING_RUNTIME_ARCHIVE", ""),
-               external ("LUA_ADA_ABI_RUNTIME_ARCHIVE", ""));
+               external ("LUA_ADA_ABI_RUNTIME_ARCHIVE", "")) &
+              Lua_Ada.Module_Link_Options;
          when others =>
-            for Default_Switches ("C") use ("-lm");
+            for Default_Switches ("C") use
+              ("-lm") & Lua_Ada.Module_Link_Options;
       end case;
    end Linker;
 end Consumer;

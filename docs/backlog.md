@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+Native loading now has [local component observations](sessions/2026-11-08-native-module-loading.md).
+Complete immutable same-image fixtures, reviewed platform counterparts,
+explicit unload/provider fault witnesses and instrumented/shared/POSIX gates.
+The diagnostic attrib.lua pair does not close its source or runtime ledger.
+
 Public C arithmetic/comparison have [caller-window evidence](sessions/2026-11-08-c-operator-windows.md):
 seventeen native-default/T matched cases and 1,678 passing local AUnit cases.
 Thread reset, host-base C closing slots and integrated full acceptance remain.

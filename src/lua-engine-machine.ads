@@ -190,6 +190,11 @@ package Lua.Engine.Machine is
    --  independently of replaceable Lua globals. Custom C callbacks use the
    --  ordinary borrowed portal and complete before this host call returns.
 
+   procedure Run_Package_Environment
+     (State : in out World; Ignore_Environment : Boolean);
+   --  Configure native package paths and the real LUA_NOENV registry marker
+   --  through an idle borrowed driver, including deferred release callbacks.
+
    procedure Close_Lua_State (State : in out World);
    --  Drive an idle main thread's TBC/finalizer close protocol, leaving
    --  physical ownership with the caller. Never call from an active drive.

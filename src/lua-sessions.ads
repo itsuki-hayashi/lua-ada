@@ -136,6 +136,16 @@ package Lua.Sessions is
    --  same guarded scheduler as execution. Serialize this host operation
    --  with all other calls on Self; it starts its own bounded work epoch.
 
+   function Configure_Package_Environment
+     (Self : in out Session; Ignore_Environment : Boolean := False)
+      return Execution_Result;
+   --  Select pinned native package defaults and optional environment paths
+   --  for the current package table, recording LUA_NOENV in the real registry.
+   --  Intended for a CLI/host before initialization code; ordinary bounded
+   --  session construction retains its existing local Lua search path.
+   --  Serialize with Self's other operations. Failures use the same typed
+   --  work/allocation policy as execution; no runtime values escape.
+
    procedure Set_Limits (Self : in out Session; Bounds : Execution_Limits);
    --  Select bounded policy and change limits for later calls. This
    --  does not discard existing globals.

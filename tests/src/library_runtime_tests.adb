@@ -35,6 +35,15 @@ package body Library_Runtime_Tests is
    procedure Custom_Searcher_Data;
    procedure Package_Not_Found;
    procedure Searchpath_Failure;
+   procedure Searchpath_Empty_Templates;
+   procedure Package_Path_Type;
+   procedure Native_Loader_Missing;
+   procedure Require_Searcher_Diagnostics;
+   procedure Package_C_String_Boundaries;
+   procedure Require_C_String_Name;
+   procedure Loadlib_Argument_Name;
+   procedure Loadlib_Method_Self;
+   procedure Loadlib_Custom_Type;
    procedure Loadfile_Failure;
    procedure Resource_Recovery;
    procedure Compilation_Work_Budget;
@@ -381,6 +390,102 @@ package body Library_Runtime_Tests is
              "assert(f==nil and type(e)=='string')");
    end Searchpath_Failure;
 
+   procedure Searchpath_Empty_Templates is
+      --  Failed searches reproduce all path separators in their error text,
+      --  even though empty templates are never opened as candidate files.
+   begin
+      Check ("local n=string.char(10,9); " &
+             "local f,e=package.searchpath('absent',';?.none;;'); " &
+             "assert(f==nil and e==" &
+             "[[no file '']]..n..[[no file 'absent.none']]..n.." &
+             "[[no file '']]..n..[[no file '']]); " &
+             "f,e=package.searchpath('absent',''); " &
+             "assert(f==nil and e==[[no file '']])");
+   end Searchpath_Empty_Templates;
+
+   procedure Package_Path_Type is
+      --  Both file searchers identify the invalid public package field;
+      --  ordinary protected failures leave the next search usable.
+   begin
+      Check ("package.path={}; local ok,e=pcall(require,'absent'); " &
+             "assert(not ok and e:find('package.path',1,true)); " &
+             "package.path=''; package.cpath={}; " &
+             "ok,e=pcall(require,'absent'); " &
+             "assert(not ok and e:find('package.cpath',1,true))");
+   end Package_Path_Type;
+
+   procedure Native_Loader_Missing is
+      --  An OS-open failure is a three-value result, not a catchable Lua
+      --  exception or a claim that the platform has no dynamic loader.
+   begin
+      Check ("assert(#package.searchers==4); " &
+             "local f,e,s=package.loadlib('absent-lua-ada-fixture','x'); " &
+             "assert(f==nil and type(e)=='string' and s=='open')");
+   end Native_Loader_Missing;
+
+   procedure Require_Searcher_Diagnostics is
+      --  Searcher messages have no prefix themselves; require adds one
+      --  newline/tab per message, including each candidate file.
+   begin
+      Check ("package.path='?.lua;?/?'; package.cpath='?.so;?/init'; " &
+             "local ok,e=pcall(require,'XXX'); " &
+             "local n=string.char(10,9); assert(not ok and e==" &
+             "[[module 'XXX' not found:]]..n.." &
+             """no field package.preload['XXX']""..n.." &
+             "[[no file 'XXX.lua']]..n..[[no file 'XXX/XXX']]..n.." &
+             "[[no file 'XXX.so']]..n..[[no file 'XXX/init']])");
+   end Require_Searcher_Diagnostics;
+
+   procedure Package_C_String_Boundaries is
+      --  Each public path parameter is a C string independently. Embedded
+      --  zero tails must affect neither substitution nor missing-file text.
+   begin
+      Check ("local z=string.char(0); local f,e=package.searchpath(" &
+             "'absent'..z..'tail','?.none'..z..'discard'," &
+             "'.'..z..'tail','/'..z..'tail'); " &
+             "assert(f==nil and e==[[no file 'absent.none']])");
+   end Package_C_String_Boundaries;
+
+   procedure Require_C_String_Name is
+      --  Registry and searchers use a truncated key, but the chosen loader
+      --  receives the original counted name. Neither cache entry aliases it.
+   begin
+      Check ("local name='nul'..string.char(0)..'tail'; " &
+             "package.loaded[name]=17; package.preload.nul=function(n,d) " &
+             "assert(n==name and d==':preload:'); return 9 end; " &
+             "assert(require(name)==9 and package.loaded.nul==9 and " &
+             "package.loaded[name]==17)");
+   end Require_C_String_Name;
+
+   procedure Loadlib_Argument_Name is
+      --  Report an actual lexical alias rather than a fixed builtin label.
+   begin
+      Check ("local ok,e=pcall(function() local alias=package.loadlib; " &
+             "alias(nil,'x') end); assert(not ok and " &
+             "e:find([[bad argument #1 to 'alias' " &
+             "(string expected, got nil)]],1,true))");
+   end Loadlib_Argument_Name;
+
+   procedure Loadlib_Method_Self is
+      --  Colon syntax shifts the argument number and identifies bad self.
+   begin
+      Check ("local t={open=package.loadlib}; " &
+             "local ok,e=pcall(function() t:open('x') end); " &
+             "assert(not ok and e:find([[calling 'open' on bad self " &
+             "(string expected, got table)]],1,true))");
+   end Loadlib_Method_Self;
+
+   procedure Loadlib_Custom_Type is
+      --  A raw metatable name labels the value even when __metatable hides
+      --  that table. This is the public auxiliary type-error convention.
+   begin
+      Check ("local alias=package.loadlib; local value=setmetatable({}," &
+             "{__name='fixture',__metatable=false}); " &
+             "local ok,e=pcall(function() alias('missing',value) end); " &
+             "assert(not ok and e:find([[bad argument #2 to 'alias' " &
+             "(string expected, got fixture)]],1,true))");
+   end Loadlib_Custom_Type;
+
    procedure Loadfile_Failure is
       --  File I/O failures are ordinary loadfile nil/message results, while
       --  dofile raises the same class of failure through protected calls.
@@ -678,6 +783,24 @@ package body Library_Runtime_Tests is
                         Package_Not_Found'Access);
       Test_Support.Add (Suite, "package searchpath failure",
                         Searchpath_Failure'Access);
+      Test_Support.Add (Suite, "package searchpath empty templates",
+                        Searchpath_Empty_Templates'Access);
+      Test_Support.Add (Suite, "package path field type errors",
+                        Package_Path_Type'Access);
+      Test_Support.Add (Suite, "native loader missing image status",
+                        Native_Loader_Missing'Access);
+      Test_Support.Add (Suite, "require ordered searcher diagnostics",
+                        Require_Searcher_Diagnostics'Access);
+      Test_Support.Add (Suite, "package C string boundaries",
+                        Package_C_String_Boundaries'Access);
+      Test_Support.Add (Suite, "require C string registry name",
+                        Require_C_String_Name'Access);
+      Test_Support.Add (Suite, "loadlib argument alias diagnostic",
+                        Loadlib_Argument_Name'Access);
+      Test_Support.Add (Suite, "loadlib bad method self diagnostic",
+                        Loadlib_Method_Self'Access);
+      Test_Support.Add (Suite, "loadlib custom metatable type diagnostic",
+                        Loadlib_Custom_Type'Access);
       Test_Support.Add (Suite, "loadfile I/O failure",
                         Loadfile_Failure'Access);
       Test_Support.Add (Suite, "load reader budget recovery",

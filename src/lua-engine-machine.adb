@@ -21,6 +21,7 @@ with Lua.Engine.Unicode;
 with Lua.Engine.Core_Libraries;
 with Lua.Engine.Pattern_Drivers;
 with Lua.Engine.Loaders;
+with Lua.Engine.Native_Modules;
 with Lua.Engine.Format_Drivers;
 with Lua.Engine.Table_Drivers;
 with Lua.Engine.Sorting;
@@ -1047,7 +1048,9 @@ package body Lua.Engine.Machine is
            "math.min" | "math.max" | "table.concat" | "table.insert" |
            "table.remove" | "table.move" | "table.unpack" | "table.sort" |
            "base.load" | "base.loadfile" | "base.require" |
-           "package.preload_searcher" | "package.lua_searcher" or else
+           "package.preload_searcher" | "package.lua_searcher" |
+           "package.c_searcher" | "package.croot_searcher" |
+           "package.loadlib" or else
            (Name'Length > 6 and then
             Name (Name'First .. Name'First + 5) = "arith.");
          if Activation.Blocks_Yield then
@@ -3183,6 +3186,20 @@ package body Lua.Engine.Machine is
             Complete (Self, Values.Empty_Vector);
          end if;
          return;
+      elsif Name in "@host.package.env" | "@host.package.noenv" then
+         Set (State, (Table_Kind, State.Foreign_Registry),
+              New_String (State, "LUA_NOENV"),
+              (if Name = "@host.package.noenv" then (Boolean_Kind, True)
+               else Nil_Value));
+         Handler := Get (Global_Environment (State),
+                         New_String (State, "package"));
+         if Handler.Kind /= Table_Kind then
+            Fail (State, "'package' must be a table");
+         end if;
+         Native_Modules.Configure_Paths
+           (State, Handler, Native_Defaults => True);
+         Complete (Self, Values.Empty_Vector);
+         return;
       elsif Name in "@host.warning.on" | "@host.warning.off" then
          --  CLI/host controls call the warning mechanism, not the global
          --  warn function which user code can replace. Static message bytes
@@ -3220,7 +3237,8 @@ package body Lua.Engine.Machine is
          Action := Table_Drivers.Advance (State, Activation);
       elsif Name in "base.load" | "base.loadfile" | "base.dofile" |
         "base.require" | "package.searchpath" |
-        "package.preload_searcher" | "package.lua_searcher"
+        "package.preload_searcher" | "package.lua_searcher" |
+        "package.c_searcher" | "package.croot_searcher" | "package.loadlib"
       then
          Action := Loaders.Advance (State, Activation);
       else
@@ -5196,6 +5214,25 @@ package body Lua.Engine.Machine is
          Finish (Self);
          raise;
    end Run_Warning_Control;
+
+   procedure Run_Package_Environment
+     (State : in out World; Ignore_Environment : Boolean)
+   is
+      Self : Driver;
+   begin
+      Prepare
+        (Self, World_View (World_Addresses.To_Pointer (State'Address)));
+      Schedule
+        (Self, (if Ignore_Environment then "@host.package.noenv"
+                else "@host.package.env"), Values.Empty_Vector, 0);
+      Drive_To_Completion (State, Self);
+      Finish (Self);
+   exception
+      when others =>
+         Self.Failed := True;
+         Finish (Self);
+         raise;
+   end Run_Package_Environment;
    procedure Close_Lua_State (State : in out World) is
       Self : Driver;
    begin

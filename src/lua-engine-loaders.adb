@@ -6,7 +6,9 @@ with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Lua.Engine.Compiler;
+with Lua.Engine.Call_Names;
 with Lua.Engine.Inspection;
+with Lua.Engine.Native_Modules;
 with Lua.Sources;
 with Lua.Storage.Buffers;
 with Lua_Ada_Config;
@@ -18,6 +20,7 @@ package body Lua.Engine.Loaders is
    use type Ada.Directories.File_Kind;
    use type Ada.Streams.Stream_Element_Offset;
    use type Ada.Streams.Stream_IO.Count;
+   use type Native_Modules.Failure_Stage;
 
    function Advance
      (State : in out World; Activation : Frame_Access) return Native_Action
@@ -34,6 +37,8 @@ package body Lua.Engine.Loaders is
         (Item.Kind in Closure_Kind | Native_Closure_Kind | Native_Kind_Value |
            Foreign_Function_Kind);
       function Bytes (Item : Value) return String;
+      function C_Bytes (Item : Value) return String;
+      procedure Check_String_Argument (Index : Positive);
       function Field (Table : Value; Key : String) return Value;
       function Package_Table return Value;
       procedure Work;
@@ -60,6 +65,9 @@ package body Lua.Engine.Loaders is
          return Values.Vector;
       function Call (Function_Value : Value; Args : Values.Vector)
                      return Native_Action;
+      procedure Load_C_Module
+        (Path, Module_Name : String; Handler : out Value;
+         Stage : out Native_Modules.Failure_Stage);
       Package_Value, Item, Function_Value, Data, Environment : Value;
       Buffer, Errors, Chunk_Name, Mode : Managed.Buffer;
       procedure Validate_Mode;
@@ -89,6 +97,47 @@ package body Lua.Engine.Loaders is
          end if;
       end Work;
 
+      procedure Load_C_Module
+        (Path, Module_Name : String; Handler : out Value;
+         Stage : out Native_Modules.Failure_Stage)
+      is
+         Converted, Symbol : Managed.Buffer;
+         Mark : Natural := 0;
+
+         procedure Lookup (Text : String);
+         procedure Lookup (Text : String) is
+         begin
+            Native_Modules.Resolve (State, Path, Text, Handler, Errors, Stage);
+         end Lookup;
+      begin
+         Converted.Set_Owner (Lua.Storage.Reference (State.Memory));
+         Symbol.Set_Owner (Lua.Storage.Reference (State.Memory));
+         for Byte of Module_Name loop
+            Work;
+            exit when Byte = Character'Val (0);
+            Converted.Append ((if Byte = '.' then '_' else Byte));
+            if Byte = '-' and then Mark = 0 then
+               Mark := Converted.Length;
+            end if;
+         end loop;
+         --  Resolve the prefix before an ignore mark first. Only a missing
+         --  entry symbol tries the historical suffix spelling; a failed
+         --  library open is an actual loader error and must not be retried.
+         if Mark /= 0 then
+            Symbol.Set_Value ("luaopen_");
+            for Index in 1 .. Mark - 1 loop
+               Symbol.Append (Converted.Element (Index));
+            end loop;
+            Symbol.Query (Lookup'Access);
+            if Stage /= Native_Modules.Symbol_Failed then return; end if;
+         end if;
+         Symbol.Set_Value ("luaopen_");
+         for Index in Mark + 1 .. Converted.Length loop
+            Symbol.Append (Converted.Element (Index));
+         end loop;
+         Symbol.Query (Lookup'Access);
+      end Load_C_Module;
+
       function Bytes (Item : Value) return String is
       begin
          if Item.Kind = String_Kind then
@@ -99,6 +148,77 @@ package body Lua.Engine.Loaders is
          Fail (State, "string expected in " & Name);
          return "";
       end Bytes;
+
+      function C_Bytes (Item : Value) return String is
+         Size : Natural := 0;
+      begin
+         if Item.Kind /= String_Kind then return Bytes (Item); end if;
+         declare
+            Text : constant String (1 .. Length (Item.Reference.Bytes))
+              with Import, Address => Item.Reference.Bytes.Address;
+         begin
+            --  Package names, paths and symbols use the pinned C-string
+            --  interfaces. Counted load source and reader results still use
+            --  Copy_Bytes and must retain embedded zero bytes.
+            for Byte of Text loop
+               Work;
+               exit when Byte = Character'Val (0);
+               Size := Size + 1;
+            end loop;
+            return Text (1 .. Size);
+         end;
+      end C_Bytes;
+
+      procedure Check_String_Argument (Index : Positive) is
+         use type Call_Names.Name_Kind;
+         Identity : Call_Names.Borrowed_Identity;
+         Position : Natural := Index;
+         Extra : Boolean;
+         Label, Detail : Owned_Buffer;
+         Meta : Object_Access;
+         Type_Label : Value := Nil_Value;
+      begin
+         if Arg (Index).Kind in String_Kind | Integer_Kind | Real_Kind then
+            return;
+         end if;
+         Label.Set_Owner (Lua.Storage.Reference (State.Memory));
+         Detail.Set_Owner (Lua.Storage.Reference (State.Memory));
+         Identity := Call_Names.View_From_Caller
+           (State, Inspection.Caller_Frame
+              (State, State.Current, Activation));
+         Label.Set_Value
+           ((if Identity.Kind = Call_Names.Unknown then Name
+             else To_String (Identity.Item)));
+         Meta := Raw_Metatable (State, Arg (Index));
+         if Meta /= null then
+            Type_Label := Get
+              ((Table_Kind, Meta), New_String (State, "__name"));
+         end if;
+         Detail.Set_Value ("string expected, got ");
+         Detail.Append
+           ((if Type_Label.Kind = String_Kind then C_Bytes (Type_Label)
+             elsif Index > Natural (Activation.Native_Arguments.Length)
+             then "no value"
+             elsif Arg (Index).Kind = Light_Identity_Kind
+             then "light userdata" else Type_Name (Arg (Index))));
+         --  Match auxiliary diagnostics using the actual call origin,
+         --  including __call's prepended values and colon-call self.
+         Extra := Index <= Activation.Call_Metamethod_Count;
+         if not Extra then
+            Position := Index - Activation.Call_Metamethod_Count;
+            if Identity.Kind = Call_Names.Method_Call then
+               Position := Position - 1;
+               if Position = 0 then
+                  Fail (State, "calling '" & To_String (Label) &
+                    "' on bad self (" & To_String (Detail) & ")");
+               end if;
+            end if;
+         end if;
+         Fail (State, "bad " &
+           (if Extra then "extra argument #" else "argument #") &
+           Ada.Strings.Fixed.Trim (Position'Image, Ada.Strings.Both) &
+           " to '" & To_String (Label) & "' (" & To_String (Detail) & ")");
+      end Check_String_Argument;
 
       function Field (Table : Value; Key : String) return Value is
       begin
@@ -265,51 +385,56 @@ package body Lua.Engine.Loaders is
          Last : Natural;
       begin
          Errors.Clear;
-         while First <= Path'Last loop
+         --  Empty templates are skipped for opening, but remain in the
+         --  original path used by Lua's diagnostic. This includes a final
+         --  separator and the completely empty path (loadlib.c searchpath).
+         loop
             Work;
             Last := First;
             while Last <= Path'Last and then Path (Last) /= ';' loop
                Last := Last + 1;
             end loop;
-            if Last > First then
-               declare
-                  File : constant String := Replace_All
-                    (Path (First .. Last - 1), "?", Converted);
-                  Readable : Boolean := False;
-                  Handle : Ada.Streams.Stream_IO.File_Type;
+            declare
+               File : constant String := Replace_All
+                 (Path (First .. Last - 1), "?", Converted);
+               Readable : Boolean := False;
+               Handle : Ada.Streams.Stream_IO.File_Type;
+            begin
+               --  Opening is the test: existence alone does not establish
+               --  readability, and directories are not Lua source files.
                begin
-                  --  Opening is the test: existence alone does not establish
-                  --  readability, and directories are not Lua source files.
-                  begin
-                     if Ada.Directories.Exists (File) and then
-                       Ada.Directories.Kind (File) =
-                         Ada.Directories.Ordinary_File
-                     then
-                        Ada.Streams.Stream_IO.Open
-                          (Handle, Ada.Streams.Stream_IO.In_File, File);
-                        Ada.Streams.Stream_IO.Close (Handle);
-                        Readable := True;
-                     end if;
-                  exception
-                     when Ada.Text_IO.Name_Error | Ada.Text_IO.Use_Error =>
-                        null;
-                  end;
-                  if Readable then
-                     return File;
-                  end if;
-                  --  Each template may expand to a large module name. Bound
-                  --  the accumulated error text as well as each individual
-                  --  filename so a long failing path cannot multiply memory.
-                  if File'Length + 12 > State.Bounds.String_Bytes -
-                    Length (Errors)
+                  if File'Length /= 0 and then
+                    Ada.Directories.Exists (File) and then
+                    Ada.Directories.Kind (File) =
+                      Ada.Directories.Ordinary_File
                   then
-                     Fail (State, "module diagnostic limit exceeded",
-                           Resource => True);
+                     Ada.Streams.Stream_IO.Open
+                       (Handle, Ada.Streams.Stream_IO.In_File, File);
+                     Ada.Streams.Stream_IO.Close (Handle);
+                     Readable := True;
                   end if;
-                  Append (Errors, Character'Val (10) & Character'Val (9) &
-                          "no file '" & File & "'");
+               exception
+                  when Ada.Text_IO.Name_Error | Ada.Text_IO.Use_Error =>
+                     null;
                end;
-            end if;
+               if Readable then
+                  return File;
+               end if;
+               --  Each template may expand to a large module name. Bound
+               --  the accumulated error text as well as each individual
+               --  filename so a long failing path cannot multiply memory.
+               if File'Length + 12 > State.Bounds.String_Bytes -
+                 Length (Errors)
+               then
+                  Fail (State, "module diagnostic limit exceeded",
+                        Resource => True);
+               end if;
+               if not Errors.Is_Empty then
+                  Append (Errors, Character'Val (10) & Character'Val (9));
+               end if;
+               Append (Errors, "no file '" & File & "'");
+            end;
+            exit when Last > Path'Last;
             First := Last + 1;
          end loop;
          return "";
@@ -603,12 +728,16 @@ package body Lua.Engine.Loaders is
             return Call (Result.Results.First_Element, Values.Empty_Vector);
          end if;
       elsif Name = "package.searchpath" then
+         Check_String_Argument (1);
+         Check_String_Argument (2);
+         if Arg (3).Kind /= Nil_Kind then Check_String_Argument (3); end if;
+         if Arg (4).Kind /= Nil_Kind then Check_String_Argument (4); end if;
          declare
             Path : constant String := Search_Path
-              (Bytes (Arg (1)), Bytes (Arg (2)),
-               (if Arg (3).Kind = Nil_Kind then "." else Bytes (Arg (3))),
+              (C_Bytes (Arg (1)), C_Bytes (Arg (2)),
+               (if Arg (3).Kind = Nil_Kind then "." else C_Bytes (Arg (3))),
                (if Arg (4).Kind = Nil_Kind then Directory_Separator
-                else Bytes (Arg (4))), Errors);
+                else C_Bytes (Arg (4))), Errors);
          begin
             if Path'Length = 0 then
                Result.Results.Append (Nil_Value);
@@ -619,20 +748,27 @@ package body Lua.Engine.Loaders is
          end;
       elsif Name in "package.preload_searcher" | "package.searcher_preload"
       then
-         Item := Get ((Table_Kind, State.Preload_Modules), Arg (1));
+         Check_String_Argument (1);
+         Item := Get ((Table_Kind, State.Preload_Modules),
+                      New_String (State, C_Bytes (Arg (1))));
          if Item.Kind = Nil_Kind then
             Result.Results.Append (New_String (State,
-              Character'Val (10) & Character'Val (9) &
-              "no field package.preload['" & Bytes (Arg (1)) & "']"));
+              "no field package.preload['" & C_Bytes (Arg (1)) & "']"));
          else
             Result.Results.Append (Item);
             Result.Results.Append (New_String (State, ":preload:"));
          end if;
       elsif Name in "package.lua_searcher" | "package.searcher_lua" then
+         Check_String_Argument (1);
          Package_Value := Package_Table;
+         if Field (Package_Value, "path").Kind not in String_Kind |
+           Integer_Kind | Real_Kind
+         then
+            Fail (State, "'package.path' must be a string");
+         end if;
          declare
             Path : constant String := Search_Path
-              (Bytes (Arg (1)), Bytes (Field (Package_Value, "path")), ".",
+              (C_Bytes (Arg (1)), C_Bytes (Field (Package_Value, "path")), ".",
                Directory_Separator, Errors);
          begin
             if Path'Length = 0 then
@@ -663,10 +799,89 @@ package body Lua.Engine.Loaders is
                Result.Results.Append (New_String (State, Path));
             end if;
          end;
+      elsif Name = "package.loadlib" then
+         Check_String_Argument (1);
+         Check_String_Argument (2);
+         declare
+            Stage : Native_Modules.Failure_Stage;
+         begin
+            Native_Modules.Resolve
+              (State, Bytes (Arg (1)), Bytes (Arg (2)),
+               Function_Value, Errors, Stage);
+            if Stage = Native_Modules.Loaded then
+               Result.Results.Append (Function_Value);
+            else
+               Result.Results.Append (Nil_Value);
+               Result.Results.Append
+                 ((if Errors.Is_Empty then Nil_Value
+                   else New_String (State, Errors)));
+               Result.Results.Append (New_String
+                 (State, (if Stage = Native_Modules.Open_Failed
+                          then "open" else "init")));
+            end if;
+         end;
+      elsif Name in "package.c_searcher" | "package.croot_searcher" then
+         Check_String_Argument (1);
+         Package_Value := Package_Table;
+         declare
+            Module_Name : constant String := C_Bytes (Arg (1));
+            Root_End : Natural := Module_Name'Last;
+            Root_Found : Boolean := False;
+            Root_Search : constant Boolean := Name = "package.croot_searcher";
+            Stage : Native_Modules.Failure_Stage;
+            Search_Path_Value : constant Value := Field
+              (Package_Value, "cpath");
+         begin
+            if Root_Search then
+               Root_End := 0;
+               for Index in Module_Name'Range loop
+                  Work;
+                  exit when Module_Name (Index) = Character'Val (0);
+                  if Module_Name (Index) = '.' then
+                     Root_Found := True;
+                     Root_End := Index - 1;
+                     exit;
+                  end if;
+               end loop;
+               if not Root_Found then return Result; end if;
+            end if;
+            if Search_Path_Value.Kind not in String_Kind | Integer_Kind |
+              Real_Kind
+            then
+               Fail (State, "'package.cpath' must be a string");
+            end if;
+            declare
+               Path : constant String := Search_Path
+                 (Module_Name (Module_Name'First .. Root_End),
+                  C_Bytes (Search_Path_Value), ".", Directory_Separator,
+                  Errors);
+            begin
+               if Path'Length = 0 then
+                  Result.Results.Append (New_String (State, Errors));
+               else
+                  Load_C_Module (Path, Module_Name, Function_Value, Stage);
+                  if Stage = Native_Modules.Loaded then
+                     Result.Results.Append (Function_Value);
+                     Result.Results.Append (New_String (State, Path));
+                  elsif Root_Search and then
+                    Stage = Native_Modules.Symbol_Failed
+                  then
+                     Result.Results.Append (New_String
+                       (State, "no module '" & Module_Name & "' in file '" &
+                        Path & "'"));
+                  else
+                     Fail (State, "error loading module '" & Module_Name &
+                       "' from file '" & Path & "':" & Character'Val (10) &
+                       Character'Val (9) & To_String (Errors));
+                  end if;
+               end if;
+            end;
+         end;
       elsif Name in "base.require" | "require" then
          if Activation.Native_Stage = 0 then
             Package_Value := Package_Table;
-            Item := New_String (State, Bytes (Arg (1)));
+            Check_String_Argument (1);
+            Item := New_String (State, C_Bytes (Arg (1)));
             Data := Get ((Table_Kind, State.Loaded_Modules), Item);
             if Truth (Data) then
                Result.Results.Append (Data);
@@ -679,6 +894,17 @@ package body Lua.Engine.Loaders is
             Append_Root
               (State, Activation.Native_Captures,
                Item);
+            Data := Field (Package_Value, "searchers");
+            if Data.Kind /= Table_Kind then
+               Fail (State, "'package.searchers' must be a table");
+            end if;
+            Append_Root (State, Activation.Native_Captures, Data);
+            --  findloader passes the C-string spelling to each searcher,
+            --  while ll_require later passes its original counted name to
+            --  the selected loader. Keep those distinct for embedded zeroes.
+            Append_Root (State, Activation.Native_Captures,
+              (if Arg (1).Kind = String_Kind then Arg (1)
+               else New_String (State, Bytes (Arg (1)))));
             Activation.Native_Buffer.Set_Value
               ("module '" & Bytes (Item) & "' not found:");
             if Length (Activation.Native_Buffer) > State.Bounds.String_Bytes
@@ -691,9 +917,8 @@ package body Lua.Engine.Loaders is
          end if;
          Item := Activation.Native_Captures (2);
          if Activation.Native_Stage = 1 then
-            Package_Value := Activation.Native_Captures (1);
             Function_Value := Get
-              (Field (Package_Value, "searchers"),
+              (Activation.Native_Captures (3),
                (Integer_Kind, Integer_Value (Activation.Native_Index)));
             if Function_Value.Kind = Nil_Kind then
                Fail (State, To_String (Activation.Native_Buffer));
@@ -711,7 +936,7 @@ package body Lua.Engine.Loaders is
                declare
                   Args : Values.Vector := Owned_Values (State);
                begin
-                  Args.Append (Item);
+                  Args.Append (Activation.Native_Captures (4));
                   Args.Append (Data);
                   return Call (Function_Value, Args);
                end;
@@ -723,6 +948,8 @@ package body Lua.Engine.Loaders is
                   Fail (State, "module diagnostic limit exceeded",
                         Resource => True);
                end if;
+               Append (Activation.Native_Buffer,
+                       Character'Val (10) & Character'Val (9));
                Append (Activation.Native_Buffer, Bytes (Function_Value));
             end if;
             Activation.Native_Index := Activation.Native_Index + 1;
@@ -739,7 +966,7 @@ package body Lua.Engine.Loaders is
                Set (State, (Table_Kind, State.Loaded_Modules), Item, Data);
             end if;
             Result.Results.Append (Data);
-            Result.Results.Append (Activation.Native_Captures (3));
+            Result.Results.Append (Activation.Native_Captures (5));
          end if;
       else
          Fail (State, "unknown loader: " & Name);

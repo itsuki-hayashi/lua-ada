@@ -386,6 +386,68 @@ package body Lua.Sessions is
          return Result;
    end Set_Warnings_Enabled;
 
+   function Configure_Package_Environment
+     (Self : in out Session; Ignore_Environment : Boolean := False)
+      return Execution_Result
+   is
+      Result : Execution_Result;
+      procedure Recover;
+      procedure Recover is
+         State : Lua.Engine.World renames Self.State.all;
+      begin
+         Lua.Engine.End_Operation (State);
+         Lua.Engine.Machine.Clear_Frames (State);
+         State.Current.Arguments.Clear;
+         State.Current.Status := Lua.Engine.Suspended_Context;
+      end Recover;
+   begin
+      if Self.State = null then return Failure (Self, "(package)"); end if;
+      declare
+         State : Lua.Engine.World renames Self.State.all;
+      begin
+         --  Like warning control, this is a serialized idle-host operation.
+         --  Run it through the ordinary driver so a collection-triggered
+         --  external-string release uses its real guarded C callback portal.
+         State.Current.Failure := Lua.Engine.Nil_Value;
+         State.Current.Has_Failure_Value := False;
+         State.Current.Failure_Text := Null_Unbounded_String;
+         State.Current.Failure_Class := Lua.Engine.No_Failure;
+         State.Current.Failure_Handled := False;
+         State.Current.Protected_Failure_Class := Lua.Engine.No_Failure;
+         State.Current.Protected_Handler_Called := False;
+         State.Current.Failure_At := (others => 1);
+         State.Current.Arguments.Clear;
+         State.Output := Null_Unbounded_String;
+         State.Output_Used := 0;
+         State.Steps := 0;
+         Lua.Engine.Begin_Operation (State);
+         Lua.Engine.Machine.Run_Package_Environment
+           (State, Ignore_Environment);
+         Lua.Engine.End_Operation (State);
+         State.Current.Status := Lua.Engine.Suspended_Context;
+         Result.Output := State.Output;
+         if State.Exit_Phase = Lua.Engine.Exit_Complete then
+            Apply_Exit (Self, Result);
+         end if;
+      end;
+      return Result;
+   exception
+      when Lua.Engine.Language_Error =>
+         Recover;
+         return Failure (Self, "(package)");
+      when Lua.Storage.Allocation_Error =>
+         Lua.Engine.Record_Memory_Error (Self.State.all);
+         Recover;
+         return Failure (Self, "(package)");
+      when Storage_Error =>
+         Recover;
+         Result.Status := Resource_Error;
+         Result.Error.Source := To_Unbounded_String ("(package)");
+         Result.Error.Message :=
+           To_Unbounded_String ("host storage exhausted");
+         return Result;
+   end Configure_Package_Environment;
+
    function Set_Arguments
      (Self : in out Session; Arguments : Argument_Array)
       return Execution_Result

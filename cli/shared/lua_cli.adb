@@ -547,43 +547,6 @@ begin
             function Environment_Value (Name : String) return String is
               (Ada.Environment_Variables.Value (Name));
 
-            function Set_Search_Path
-              (Variable, Field : String) return Boolean;
-            function Set_Search_Path
-              (Variable, Field : String) return Boolean
-            is
-               Versioned : constant String := Variable & "_5_5";
-               Chosen : constant String :=
-                 (if Ada.Environment_Variables.Exists (Versioned)
-                  then Versioned else Variable);
-            begin
-               --  loadlib.c setpath: the versioned variable wins; ";;" in
-               --  the value expands, once, to the default. The library
-               --  keeps only its default; this host step applies the
-               --  environment before any user code, so the observable
-               --  package field matches. The value travels as a vararg
-               --  string, never spliced into source text.
-               if not Ada.Environment_Variables.Exists (Chosen) then
-                  return True;
-               end if;
-               return Run
-                 ("local field, value = ..." & LF &
-                  "local mark = string.find(value, ';;', 1, true)" & LF &
-                  "if mark then" & LF &
-                  "  local out = ''" & LF &
-                  "  if mark > 1 then out = string.sub(value, 1, mark - 1)" &
-                  " .. ';' end" & LF &
-                  "  out = out .. package[field]" & LF &
-                  "  if mark < #value - 1 then out = out .. ';' .. " &
-                  "string.sub(value, mark + 2) end" & LF &
-                  "  value = out" & LF &
-                  "end" & LF &
-                  "package[field] = value" & LF,
-                  "=" & Chosen,
-                  [1 => To_Unbounded_String (Field),
-                   2 => To_Unbounded_String (Environment_Value (Chosen))]);
-            end Set_Search_Path;
-
             function Run_Init return Boolean;
             function Run_Init return Boolean is
                Versioned : constant String := "LUA_INIT_5_5";
@@ -736,6 +699,13 @@ begin
                   else Argument (Index + Script_Index));
             end loop;
             Universe.Set_Execution_Policy (Lua_Compatible);
+            Result := Universe.Configure_Package_Environment
+              (Ignore_Environment);
+            if Result.Status /= Succeeded then
+               Report (Result);
+               Universe.Close;
+               return;
+            end if;
             --  Flush earlier Ada help/version text before C stdio starts
             --  writing. Runtime bytes are published immediately, in Lua
             --  program order, and are not printed again from result packets.
@@ -752,12 +722,7 @@ begin
             --  off before the ordered -e/-l/-W actions and the script; a
             --  warning emitted during initialization uses the initial mode.
             if not Ignore_Environment then
-               if not Set_Search_Path ("LUA_PATH", "path")
-                 or else not Set_Search_Path ("LUA_CPATH", "cpath")
-                 or else not Run_Init
-               then
-                  return;
-               end if;
+               if not Run_Init then return; end if;
             end if;
             if not Control_Warnings (False) then
                return;

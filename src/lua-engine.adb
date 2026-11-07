@@ -4,6 +4,7 @@ with Lua.Engine.Finalizers;
 with Lua.Engine.Warnings;
 with Lua.Engine.External_Releases;
 with Lua.Engine.Formats;
+with Lua.Engine.Native_Modules;
 with Lua.Storage.Fixed_Arenas;
 with Lua.Platform_Streams;
 with Lua.Engine.Stacks;
@@ -2431,6 +2432,10 @@ package body Lua.Engine is
       State.Operation_Roots.Release;
       State.Operation_Programs.Release;
       State.Memory_Ready := False;
+      --  Foreign finalizers, external-string releasers and all heap/context
+      --  payload cleanup have finished. Native code remains loaded through
+      --  those phases and through its own provider-owned cache metadata.
+      Native_Modules.Close_All (State);
    end Finalize;
 
    function Execute

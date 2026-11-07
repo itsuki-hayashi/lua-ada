@@ -116,7 +116,7 @@ private string metatable, and loaded/preload registries. Reset removes previous
 module caches and metatable mutations; separate sessions never share these
 mutable objects.
 
-Lua code may load text through `load`, `loadfile`, `dofile`, and Lua-only
+Lua code may load text through `load`, `loadfile`, `dofile`, and
 `require`. Loaded closures retain their initial `_ENV`, including an explicitly
 nil environment. Compilation errors from `load` return nil/message; resource
 failures retain the execution-abort policy. Native Lua 5.5.1 binary chunks are
@@ -124,9 +124,14 @@ validated and executed through the canonical backend; string.dump serializes a
 real selected function subtree. The codec checks native widths/byte order.
 File preambles are handled as file input; bytes passed to Execute or load are
 raw text or native chunks. See [binary chunks](binary-chunks.md) for current
-verification and explicit limits. Default package lookup is local (`./?.lua;./?/init.lua`), without
-native modules or environment-driven path initialization. The library does not
-promise a filesystem sandbox.
+verification and explicit limits. Bounded-session package lookup defaults to
+local Lua and native-module templates and ignores ambient path initialization.
+Native modules use the actual public C boundary and remain loaded through
+state cleanup; see [ADR 0025](decisions/0025-native-module-lifetimes.md).
+Execution limits govern managed Ada work and storage; arbitrary native code
+has the host process's capabilities and must be trusted by its embedding
+application. The library does not promise a filesystem sandbox. The CLI and
+C-compatible states use the pinned SDK environment path behavior.
 
 Ada host callback registration, exposed object handles and thread synchronization
 remain deferred. The separate C facade has a partial real exported surface;

@@ -4,6 +4,7 @@ with Lua.Builtin_Registry;
 with Lua.Lexers;
 with Lua.Prototypes;
 with Lua.Numbers;
+with Lua.Platform_Modules;
 with Interfaces;
 with Interfaces.C;
 with Lua.Storage;
@@ -108,6 +109,18 @@ private package Lua.Engine is
      renames Lua.Storage.Buffers.Append;
    procedure Append (Item : in out Owned_Buffer; Text : Character)
      renames Lua.Storage.Buffers.Append;
+
+   type Native_Library_Node;
+   type Native_Library_Access is access Native_Library_Node;
+   for Native_Library_Access'Storage_Pool use Lua.Storage.Pool;
+   type Native_Library_Node is record
+      Previous : Native_Library_Access;
+      Path : Owned_Buffer;
+      Handle : System.Address := System.Null_Address;
+   end record;
+   --  Loader references belong to the world, outside the tracing heap.
+   --  Their selected-provider paths/records survive every finalizer and
+   --  external-string release; shutdown unloads them in reverse open order.
 
    type Heap_Kind is
      (String_Object, Table_Object, Environment, Closure, Native_Closure,
@@ -766,9 +779,12 @@ private package Lua.Engine is
    type Random_State is array (0 .. 3) of Interfaces.Unsigned_64;
 
    type World is limited record
+      Module_Code : Lua.Platform_Modules.Code_Lease;
+      --  This lease finalizes after Memory, including its residual raw frees.
       Memory : Lua.Storage.Owner;
       --  The allocator owner outlives every typed object and buffer in this
       --  universe. Explicit subpool allocators never borrow a global owner.
+      Native_Libraries : Native_Library_Access;
       Bounds       : Limits;
       Saved_Bounds : Limits;
       Policy : Execution_Policy := Bounded;
