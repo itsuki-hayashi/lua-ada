@@ -2,6 +2,13 @@
 
 ## Active remaining-suite delivery
 
+Concatenation has [local evaluation/diagnostic evidence](sessions/2026-11-08-concat-operation-diagnostics.md):
+twenty named cases within 1,766 passing AUnit cases, two complete default
+four-way fixtures and a matching unchanged db.lua replay. Finish arithmetic
+operand diagnostics, actual public C concat windows, the locals.lua progress
+output policy, T paths and final-head matrices; component results do not
+complete these obligations.
+
 Eight public buffer exports have [local ownership evidence](sessions/2026-11-08-auxiliary-buffer-ownership.md),
 including seventeen native-default/T matched C cases and 1,738 passing
 AUnit cases. Finish file/trace/substitution/default-allocator helpers,

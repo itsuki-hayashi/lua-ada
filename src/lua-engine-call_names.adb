@@ -370,6 +370,17 @@ package body Lua.Engine.Call_Names is
                end if;
             when Op_BNOT | Op_UNM =>
                return Resolve (Part (Instruction, B), PC, True);
+            when Op_CONCAT =>
+               if Caller.Canonical_Pending = Concat_Canonical_Result and then
+                 Caller.Canonical_Concat_Last > 0
+               then
+                  --  A handler can complete several earlier folds before
+                  --  this pair fails. Use its actual remaining register pair,
+                  --  not the original instruction's rightmost operands.
+                  return Resolve
+                    (Caller.Canonical_Concat_Last -
+                       (if Operand_Index = 1 then 1 else 0), PC, True);
+               end if;
             when others => null;
          end case;
          return (others => <>);
@@ -423,5 +434,10 @@ package body Lua.Engine.Call_Names is
    function From_Operand
      (State : in out World; Caller : Frame_Access; Index : Arithmetic_Operand)
       return Identity is
-     (Materialize (State, Resolve_Name (State, Caller, Index)));
+     (Materialize (State, View_From_Operand (State, Caller, Index)));
+
+   function View_From_Operand
+     (State : in out World; Caller : Frame_Access; Index : Arithmetic_Operand)
+      return Borrowed_Identity is
+     (Resolve_Name (State, Caller, Index));
 end Lua.Engine.Call_Names;

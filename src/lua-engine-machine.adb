@@ -202,10 +202,79 @@ package body Lua.Engine.Machine is
    begin
       --  type() remains the language's primitive category. Error wording
       --  alone honors a raw string __name supplied by the object's owner.
-      return (if Name.Kind = String_Kind
-              then Image (State.Current.Memory, Name)
-              else Type_Name (Item));
+      if Name.Kind = String_Kind then
+         declare
+            Text : constant String := Image (State.Current.Memory, Name);
+         begin
+            --  luaT_objtypename returns a C string. Its diagnostic use ends
+            --  at an embedded NUL even though the underlying Lua __name is a
+            --  counted byte string; the type() result remains primitive.
+            for Index in Text'Range loop
+               if Text (Index) = Character'Val (0) then
+                  return Text (Text'First .. Index - 1);
+               end if;
+            end loop;
+            return Text;
+         end;
+      end if;
+      return Type_Name (Item);
    end Diagnostic_Type;
+
+   procedure Operand_Error
+     (State : in out World; Item : Value; Operation : String;
+      Operand_Index : Call_Names.Arithmetic_Operand);
+   procedure Operand_Error
+     (State : in out World; Item : Value; Operation : String;
+      Operand_Index : Call_Names.Arithmetic_Operand)
+   is
+      Description : Unbounded_String := To_Unbounded_String
+        ("attempt to " & Operation & " a " &
+         Diagnostic_Type (State, Item) & " value");
+      Caller : Frame_Access;
+      use type Call_Names.Name_Kind;
+   begin
+      if State.Current.Stack.Length >= 2 then
+         declare
+            Helper : constant Frame_Access := State.Current.Stack.Last_Element;
+         begin
+            Caller := State.Current.Stack (State.Current.Stack.Last_Index - 1);
+            if not Helper.Is_Native or else Caller.Is_Native or else
+              To_String (Helper.Native_Name) not in "@binary" | "@unary"
+            then
+               Caller := null;
+            end if;
+         end;
+      end if;
+      if Caller /= null then
+         if Caller.Code.Canonical_Node /= null then
+            declare
+               Name : constant Call_Names.Borrowed_Identity :=
+                 Call_Names.View_From_Operand (State, Caller, Operand_Index);
+            begin
+               if Name.Kind /= Call_Names.Unknown then
+                  Append (Description, " (" &
+                    Call_Names.Kind_Image (Name.Kind) & " '" &
+                    To_String (Name.Item) & "')");
+               end if;
+            end;
+         end if;
+         declare
+            Line : constant Natural := Line_At
+              (Caller, Positive'Max (1, Caller.PC - 1));
+            Prefix : constant String := Inspection.Short_Source
+              ((if Caller.Code.Canonical_Node /= null then
+                  To_String (Canonical.Source_Bytes (Caller.Code))
+                else To_String (Caller.Code.Name))) & ":" &
+              (if Line = 0 then "?" else Ada.Strings.Fixed.Trim
+                 (Line'Image, Ada.Strings.Both)) & ": ";
+         begin
+            Fail (State, Prefix & To_String (Description));
+         end;
+      end if;
+      --  A native caller must not borrow a binding or location from an older
+      --  Lua frame. luaG_runerror adds source only to its actual Lua CI.
+      Fail (State, To_String (Description));
+   end Operand_Error;
 
    function Numeric (State : in out World; Item : Value)
                      return Lua.Numbers.Number
@@ -335,7 +404,11 @@ package body Lua.Engine.Machine is
          if Left.Kind not in String_Kind | Integer_Kind | Real_Kind or else
            Right.Kind not in String_Kind | Integer_Kind | Real_Kind
          then
-            Fail (State, "attempt to concatenate a non-string value");
+            if Left.Kind in String_Kind | Integer_Kind | Real_Kind then
+               Operand_Error (State, Right, "concatenate", 2);
+            else
+               Operand_Error (State, Left, "concatenate", 1);
+            end if;
          end if;
          if Image (State.Current.Memory, Left)'Length >
            State.Bounds.String_Bytes - Natural'Min

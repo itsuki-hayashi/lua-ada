@@ -851,6 +851,51 @@ package body Lua.Canonical_Compiler is
                Immediate : Constant_Value;
                Op : Opcode;
                Where : Lvalue;
+               procedure Concatenate_Run;
+
+               procedure Concatenate_Run is
+                  First : constant Natural := Temporary (Fn);
+                  Current : Node_Id := Id;
+                  Right_Node, Next : Node_Id;
+                  Length : Natural := 0;
+                  function Right_Concat (Node : Node_Id) return Node_Id;
+                  function Right_Concat (Node : Node_Id) return Node_Id is
+                     Inner : Node_Id := Node;
+                  begin
+                     while Fetch (Inner).Kind = Parenthesized loop
+                        Inner := Fetch (Inner).Children (1);
+                     end loop;
+                     return (if Fetch (Inner).Kind = Binary_Expression and then
+                       Fetch (Inner).Operator = Concatenate then Inner
+                       else No_Node);
+                  end Right_Concat;
+               begin
+                  --  luaK_infix places each left operand in its next real
+                  --  register before evaluating the RHS. luaK_posfix merges
+                  --  a right-associated run into one CONCAT; a parenthesized
+                  --  left expression still executes separately. Reuse only
+                  --  a genuinely empty result span, never active bindings.
+                  loop
+                     Reserve (Fn, First + Length + 1);
+                     Expression
+                       (Fn, Fetch (Current).Children (1), First + Length,
+                        At_Line => Fetch (Current).Site.Line);
+                     Length := Length + 1;
+                     Right_Node := Fetch (Current).Children (2);
+                     Next := Right_Concat (Right_Node);
+                     exit when Next = No_Node;
+                     Current := Next;
+                  end loop;
+                  Reserve (Fn, First + Length + 1);
+                  Expression (Fn, Right_Node, First + Length,
+                              At_Line => End_Line (Right_Node));
+                  Site := Fetch (Current).Site;
+                  Put (Fn, ABC (Op_CONCAT, First, Length + 1));
+                  --  Moving operands down before CONCAT both overwrites
+                  --  earlier values and destroys their real reaching names.
+                  --  Publish only the completed result into its destination.
+                  Move (Fn, Destination, First);
+               end Concatenate_Run;
             begin
                Site := Item.Site;
                if Item.Kind in Literal | Name_Reference | Index_Expression
@@ -955,21 +1000,11 @@ package body Lua.Canonical_Compiler is
                         Put (Fn, ABC (Op_LFALSESKIP, Destination));
                         Patch (Fn, Branch, PC (Fn));
                         Put (Fn, ABC (Op_LOADTRUE, Destination));
+                     elsif Item.Operator = Concatenate then
+                        Concatenate_Run;
                      else
-                        if Item.Operator = Concatenate then
-                           Reserve (Fn, Destination + 2);
-                        end if;
-                        if Item.Operator = Concatenate then
-                           --  Concatenation requires a contiguous result
-                           --  range and discharges its left value before
-                           --  parsing/evaluating the RHS (luaK_infix).
-                           Left := Temporary (Fn);
-                           Expression (Fn, Item.Children (1), Left,
-                                       At_Line => Item.Site.Line);
-                        else
-                           Left := Register_Operand
-                             (Fn, Item.Children (1), Item.Site.Line);
-                        end if;
+                        Left := Register_Operand
+                          (Fn, Item.Children (1), Item.Site.Line);
                         --  A literal/constant integer RHS fits ADDI's real
                         --  signed byte operand. Preserve the matching MMBINI
                         --  event and original operand for fallback; no LOADK
@@ -989,10 +1024,6 @@ package body Lua.Canonical_Compiler is
                         if Immediate_Add then
                            Put (Fn, ABC (Op_ADDI, Destination, Left, Right));
                            Put (Fn, ABC (Op_MMBINI, Left, Right, 6));
-                        elsif Item.Operator = Concatenate then
-                           Move (Fn, Destination, Left);
-                           Move (Fn, Destination + 1, Right);
-                           Put (Fn, ABC (Op_CONCAT, Destination, 2));
                         else
                            Op := (case Item.Operator is
                              when Plus => Op_ADD, when Minus => Op_SUB,

@@ -2,6 +2,14 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [concatenation operation checkpoint](sessions/2026-11-08-concat-operation-diagnostics.md)
+preserves actual operand capture, merged source events and diagnostic names.
+Twenty new cases pass within 1,766 local AUnit cases, with two complete
+four-way fixtures. Unchanged db.lua still matches native output; locals.lua
+assertions and stdout pass with an explicit collection-progress stderr
+difference. Arithmetic diagnostics, actual C concat windows and full target
+acceptance remain open.
+
 The [auxiliary buffer checkpoint](sessions/2026-11-08-auxiliary-buffer-ownership.md)
 completes eight exports locally: seventeen identical-source C cases match
 both native configurations, and strict local builds pass 1,738 AUnit cases
