@@ -491,3 +491,44 @@ T-enabled Ada execution nor full-upstream acceptance is established. A separate
 T.listcode inspection of a default-produced chunk hits the native test build's
 MAXIWTHABS=3 assumption versus the default compiler interval128; configuration
 line-anchor validation remains separate from these default cross-checks.
+
+## 2026-11-08 iteration cells and suppressed count periods
+
+A measured empty numeric loop reported 2,006 count callbacks against native
+1,005: the compiler emitted CLOSE on every iteration even when no child
+captured its visible control. Binding descriptors now record real stack
+upvalue captures while compiling the child. Matching both symbol and slot
+avoids marking hidden loop state that shares a debug lifetime symbol. The
+loop emits its actual iteration CLOSE only for captured visible controls;
+body-owned closers and generic iterator exit closing keep their existing
+operations. Shadowing, transitive captures, slot reuse and collection preserve
+separate iteration cells, following pinned lparser.c:forbody/leaveblock.
+
+The first strict attempt passed its eight AUnit cases, but the new cross-check
+correctly failed on C executing Ada's period-four fixture. Investigation found
+a separate execution bug: luaG_traceexec decrements/resets the real counter
+while luaD_hook prevents callback reentry. Before_Step had skipped both.
+Suppressed hook/finalizer bodies now consume their real executed words while
+call/line/count callback entry remains disabled. Dedicated five/eight-word Lua
+hook bodies protect the resulting period shifts without recursive callbacks.
+Canonical addition also uses the real ADDI/MMBINI pair for a side-effect-free
+integer RHS in -127..128, preserving fallback operands/event and removing the
+unexecuted constant load that changed the hook body's word count. Named tests
+cover both signed endpoints, a value outside that range, fallback operands,
+integer wrapping, float results and numeric-string conversion.
+
+Final default validation/static builds pass under the unchanged strict GNAT
+16.1.0 flags. All 1,591 AUnit cases pass with zero failed assertions/errors.
+The fourteen-case loop_close_phases.lua fixture passes native default and T
+source execution. Both producers' complete chunks pass on both default
+runtimes, with empty stderr and shared stdout SHA256
+4A53F3B4CF8BE86026CBE373B5AD5B178F3B9A6145B5E904C4BE05F59BF513BD.
+All thirty-six retained four-way cases also pass after the final changes.
+The C consumer was not relinked/re-executed for this compiler/hook followup;
+its earlier checkpoint result is not newly attributed to this source head.
+
+The unchanged db.lua diagnostic still stops at line603: the second comparison
+in its live-hook assertion executes additional boolean materialization words
+before reading the counter. Conditional lowering remains a separate measured
+followup. No assertion was relaxed, no hook was selectively suppressed, no
+reference was changed, and no full db.lua or upstream pass is claimed here.

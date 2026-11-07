@@ -1161,12 +1161,11 @@ package body Lua.Engine.Machine is
                    when 'l' => 4, when others => 8)) mod 2 /= 0
           else Ada.Strings.Fixed.Index
             (To_String (State.Current.Hook_Mask), "" & Mask) /= 0));
+      Suppressed : constant Boolean := State.Current.Hook_Active or else
+        State.Current.Finalizer_Hook_Suppression /= 0;
       Line : Natural;
    begin
-      if Item.Is_C_Collector_Transport or else
-        State.Current.Hook_Active or else
-        State.Current.Finalizer_Hook_Suppression /= 0
-      then
+      if Item.Is_C_Collector_Transport then
          return False;
       end if;
       if not Item.Entry_Hook_Done and then not Item.Is_Native and then
@@ -1178,7 +1177,8 @@ package body Lua.Engine.Machine is
       if not Item.Entry_Hook_Done then
          Item.Entry_Hook_Done := True;
          if (not Item.Is_Native or else
-              Element (Item.Native_Name, 1) /= '@') and then Wants ('c')
+              Element (Item.Native_Name, 1) /= '@') and then
+           not Suppressed and then Wants ('c')
          then
             Hook_Event
               (Self, (if Item.Is_Tail_Call then "tail call" else "call"));
@@ -1197,8 +1197,14 @@ package body Lua.Engine.Machine is
                     State.Current.Hook_Remaining - 1;
                else
                   State.Current.Hook_Remaining := State.Current.Hook_Count;
-                  Hook_Event (Self, "count");
-                  return True;
+                  --  luaG_traceexec still decrements/resets the real count
+                  --  while luaD_hook disallows callback reentry. Lua code in
+                  --  a hook/finalizer therefore changes the remaining period
+                  --  even though it cannot recursively invoke another hook.
+                  if not Suppressed then
+                     Hook_Event (Self, "count");
+                     return True;
+                  end if;
                end if;
             end if;
          end if;
@@ -1208,7 +1214,7 @@ package body Lua.Engine.Machine is
          then
             Item.Line_Hook_Checked := True;
             Item.Hook_Line := Line;
-            if Wants ('l') then
+            if not Suppressed and then Wants ('l') then
                Hook_Event (Self, "line", Line);
                return True;
             end if;

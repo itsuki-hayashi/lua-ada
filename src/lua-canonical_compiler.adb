@@ -29,6 +29,9 @@ package body Lua.Canonical_Compiler is
       Symbol : Symbol_Id := No_Symbol;
       Value : Place;
       Debug_Index : Natural := 0;
+      Captured : Boolean := False;
+      --  A child prototype actually closes over this active stack binding.
+      --  Iteration control needs CLOSE only when such a cell must detach.
    end record;
    package Places is new Lua.Storage.Vectors (Binding_Place);
    package Indices is new Lua.Storage.Vectors (Natural);
@@ -344,7 +347,7 @@ package body Lua.Canonical_Compiler is
                   PC (Fn) - 1, 0));
                Fn.Active.Append (Binding_Place'
                  (Id, (Stack_Place, Register_Id, (Kind => Nil_Constant)),
-                  Natural (Fn.Code.Locals.Length)));
+                  Natural (Fn.Code.Locals.Length), False));
                Fn.Base := Natural'Max (Fn.Base, Register_Id + 1);
                Reserve (Fn, Fn.Base);
             end Bind;
@@ -714,6 +717,8 @@ package body Lua.Canonical_Compiler is
                Mark, Left, Right, Branch, Finish, Index : Natural;
                Count : Natural;
                Open_Last : Boolean;
+               Immediate_Add : Boolean := False;
+               Immediate : Constant_Value;
                Op : Opcode;
                Where : Lvalue;
             begin
@@ -811,9 +816,21 @@ package body Lua.Canonical_Compiler is
                            Left := Register_Operand
                              (Fn, Item.Children (1), Item.Site.Line);
                         end if;
-                        Right := Register_Operand
-                          (Fn, Item.Children (2),
-                           End_Line (Item.Children (2)));
+                        --  A literal/constant integer RHS fits ADDI's real
+                        --  signed byte operand. Preserve the matching MMBINI
+                        --  event and original operand for fallback; no LOADK
+                        --  is executed for an immediate in the pinned code.
+                        Immediate_Add := Item.Operator = Plus and then
+                          Fold (Fn, Item.Children (2), Immediate) and then
+                          Immediate.Kind = Integer_Constant and then
+                          Immediate.Integer_Data in -127 .. 128;
+                        if Immediate_Add then
+                           Right := Natural (Immediate.Integer_Data + 127);
+                        else
+                           Right := Register_Operand
+                             (Fn, Item.Children (2),
+                              End_Line (Item.Children (2)));
+                        end if;
                         Site := Item.Site;
                         if Item.Operator in Equal | Not_Equal | Less |
                           Less_Equal | Greater | Greater_Equal
@@ -834,6 +851,9 @@ package body Lua.Canonical_Compiler is
                            Patch (Fn, Branch, PC (Fn));
                            Put (Fn, ABC (Op_LOADTRUE, Destination));
                            Patch (Fn, Finish, PC (Fn));
+                        elsif Immediate_Add then
+                           Put (Fn, ABC (Op_ADDI, Destination, Left, Right));
+                           Put (Fn, ABC (Op_MMBINI, Left, Right, 6));
                         elsif Item.Operator = Concatenate then
                            Move (Fn, Destination, Left);
                            Move (Fn, Destination + 1, Right);
@@ -1001,7 +1021,7 @@ package body Lua.Canonical_Compiler is
                Fn.Active.Append (Binding_Place'
                  (Lifetime, (Stack_Place, Register_Id,
                               (Kind => Nil_Constant)),
-                  Natural (Fn.Code.Locals.Length)));
+                  Natural (Fn.Code.Locals.Length), False));
                Fn.Base := Natural'Max (Fn.Base, Register_Id + 1);
                Reserve (Fn, Fn.Base);
             end Bind_Hidden;
@@ -1303,7 +1323,7 @@ package body Lua.Canonical_Compiler is
                         end loop;
                         Fn.Active.Append (Binding_Place'
                           (Item.Symbols.Last_Element,
-                           (Constant_Place, 0, Folded), 0));
+                           (Constant_Place, 0, Folded), 0, False));
                      else
                         Left := Fn.Base;
                         Values (Fn,
@@ -1473,11 +1493,26 @@ package body Lua.Canonical_Compiler is
                      Begin_Loop (Fn, Base);
                      Fn.Next := Fn.Base;
                      Block (Fn, Item.Children.Last_Element);
-                     --  Close visible iteration cells before the control
-                     --  opcode mutates their register. The next closure then
-                     --  acquires a fresh cell for the next iteration value.
-                     Put (Fn, ABC (Op_CLOSE, Base +
-                       (if Item.Kind = Numeric_For then 2 else 3)));
+                     --  Pinned forbody leaves the visible-variable block
+                     --  before FORLOOP/TFORCALL, but emits CLOSE only when a
+                     --  child captured one of those cells. Body-owned locals
+                     --  and closers have already left through Block above.
+                     --  An uncaptured control has no cell to detach; adding
+                     --  a no-op CLOSE would still add a real count-hook event.
+                     declare
+                        First_Control : constant Natural := Base +
+                          (if Item.Kind = Numeric_For then 2 else 3);
+                     begin
+                        for Binding of Fn.Active loop
+                           if Binding.Captured and then
+                             Binding.Value.Kind = Stack_Place and then
+                             Binding.Value.Index >= First_Control
+                           then
+                              Put (Fn, ABC (Op_CLOSE, First_Control));
+                              exit;
+                           end if;
+                        end loop;
+                     end;
                      --  Pinned forbody fixes both iterator-call and loop
                      --  words to the loop control site, independently of the
                      --  last body statement. Numeric loops revisit 'for';
@@ -1524,9 +1559,32 @@ package body Lua.Canonical_Compiler is
                   Index : Natural;
                begin
                   Value := Locate (Parent.all, Symbol);
+                  if Value.Kind = Stack_Place then
+                     --  Match the same live binding used by Locate, not an
+                     --  unrelated earlier occupant of the reused register.
+                     --  Hidden loop state shares the visible symbol solely
+                     --  for debug lifetime, so its slot must match as well.
+                     for Position in reverse Parent.Active.First_Index ..
+                       Parent.Active.Last_Index
+                     loop
+                        if Parent.Active (Position).Symbol = Symbol and then
+                          Parent.Active (Position).Value.Index = Value.Index
+                        then
+                           declare
+                              Binding : Binding_Place :=
+                                Parent.Active (Position);
+                           begin
+                              Binding.Captured := True;
+                              Parent.Active.Replace_Element
+                                (Position, Binding);
+                           end;
+                           exit;
+                        end if;
+                     end loop;
+                  end if;
                   if Value.Kind = Constant_Place then
                      Fn.Captures.Append
-                       (Binding_Place'(Symbol, Value, 0));
+                       (Binding_Place'(Symbol, Value, 0, False));
                   else
                      Index := Natural (Fn.Code.Upvalues.Length);
                      if Index = 255 then Fail (Upvalue_Limit); end if;
@@ -1536,7 +1594,7 @@ package body Lua.Canonical_Compiler is
                           (Unit.Names (Positive (Symbol)).Name)));
                      Fn.Captures.Append (Binding_Place'
                        (Symbol, (Upvalue_Place, Index,
-                                 (Kind => Nil_Constant)), 0));
+                                 (Kind => Nil_Constant)), 0, False));
                   end if;
                end Capture;
             begin
@@ -1559,7 +1617,7 @@ package body Lua.Canonical_Compiler is
                     (True, 0, 0, Intern (Result.Code, "_ENV")));
                   Fn.Captures.Append (Binding_Place'
                     (Unit.Environment,
-                     (Upvalue_Place, 0, (Kind => Nil_Constant)), 0));
+                     (Upvalue_Place, 0, (Kind => Nil_Constant)), 0, False));
                else
                   Fn.Code.First_Line := Item.Site.Line;
                   Fn.Code.Last_Line := Item.End_Line;

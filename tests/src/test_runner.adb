@@ -22,6 +22,7 @@ with Hook_Registry_Tests;
 with Debug_Temporary_Tests;
 with Native_Return_Window_Tests;
 with Metamethod_Name_Tests;
+with Loop_Close_Tests;
 with Runtime_Inspection_Tests;
 with Lua.Opcode_Tests;
 with Lua.Context_Tests;
@@ -100,6 +101,7 @@ procedure Test_Runner is
       Debug_Temporary_Tests.Register (Result);
       Native_Return_Window_Tests.Register (Result);
       Metamethod_Name_Tests.Register (Result);
+      Loop_Close_Tests.Register (Result);
       Runtime_Inspection_Tests.Register (Result);
       Lua.Opcode_Tests.Register (Result);
       Lua.Context_Tests.Register (Result);
