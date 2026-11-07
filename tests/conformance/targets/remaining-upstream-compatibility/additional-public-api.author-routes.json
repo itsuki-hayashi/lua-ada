@@ -1808,6 +1808,570 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#register-cfunction"
+      ],
+      "name": "lua_register",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_REGISTER-400",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_register with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#islightuserdata"
+      ],
+      "name": "lua_islightuserdata",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_ISLIGHTUSERDATA-406",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_islightuserdata with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#isboolean"
+      ],
+      "name": "lua_isboolean",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_ISBOOLEAN-408",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_isboolean with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#isnone"
+      ],
+      "name": "lua_isnone",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_ISNONE-410",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_isnone with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#insert-suffix"
+      ],
+      "name": "lua_insert",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_INSERT-421",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_insert with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#replace-pop"
+      ],
+      "name": "lua_replace",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_REPLACE-425",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_replace with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#newuserdata-one-uservalue"
+      ],
+      "name": "lua_newuserdata",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_NEWUSERDATA-436",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_newuserdata with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#getuservalue-alias"
+      ],
+      "name": "lua_getuservalue",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_GETUSERVALUE-437",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_getuservalue with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#setuservalue-alias"
+      ],
+      "name": "lua_setuservalue",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUA-H-MACRO-LUA_SETUSERVALUE-438",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_setuservalue with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#newlibtable-empty"
+      ],
+      "name": "luaL_newlibtable",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_NEWLIBTABLE-132",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_newlibtable with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#newlib-calls"
+      ],
+      "name": "luaL_newlib",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_NEWLIB-135",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_newlib with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#argcheck-short-circuit",
+        "c_api/tests/macro_api_contract.c#argcheck-protected-error"
+      ],
+      "name": "luaL_argcheck",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_ARGCHECK-138",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_argcheck with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#argexpected-short-circuit",
+        "c_api/tests/macro_api_contract.c#argexpected-protected-error"
+      ],
+      "name": "luaL_argexpected",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_ARGEXPECTED-141",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_argexpected with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#checkstring-binary",
+        "c_api/tests/macro_api_contract.c#checkstring-number",
+        "c_api/tests/macro_api_contract.c#checkstring-protected-error"
+      ],
+      "name": "luaL_checkstring",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKSTRING-144",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_checkstring with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#optstring-default",
+        "c_api/tests/macro_api_contract.c#optstring-present"
+      ],
+      "name": "luaL_optstring",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPTSTRING-145",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_optstring with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#typename-alias"
+      ],
+      "name": "luaL_typename",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_TYPENAME-147",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_typename with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#dofile-results",
+        "c_api/tests/macro_api_contract.c#dofile-syntax",
+        "c_api/tests/macro_api_contract.c#dofile-runtime"
+      ],
+      "name": "luaL_dofile",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_DOFILE-149",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_dofile with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#dostring-results",
+        "c_api/tests/macro_api_contract.c#dostring-syntax",
+        "c_api/tests/macro_api_contract.c#dostring-runtime"
+      ],
+      "name": "luaL_dostring",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_DOSTRING-152",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_dostring with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#getmetatable-registry"
+      ],
+      "name": "luaL_getmetatable",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_GETMETATABLE-155",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_getmetatable with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#opt-short-circuit"
+      ],
+      "name": "luaL_opt",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPT-157",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_opt with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#loadbuffer-extent"
+      ],
+      "name": "luaL_loadbuffer",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_LOADBUFFER-159",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_loadbuffer with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#intop-wrap"
+      ],
+      "name": "luaL_intop",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_INTOP-166",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_intop with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original false branch selected only by the separately compiled LUA_FAILISFALSE client. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#pushfail-selected"
+      ],
+      "name": "luaL_pushfail",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_PUSHFAIL-172",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_pushfail with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original nil branch selected by the ordinary SDK receiver, including the ordinary caller of a T runtime. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#pushfail-selected"
+      ],
+      "name": "luaL_pushfail",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_PUSHFAIL-174",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_pushfail with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-checkunsigned"
+      ],
+      "name": "luaL_checkunsigned",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKUNSIGNED-254",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_checkunsigned with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-optunsigned"
+      ],
+      "name": "luaL_optunsigned",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPTUNSIGNED-255",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_optunsigned with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-checkint"
+      ],
+      "name": "luaL_checkint",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKINT-258",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_checkint with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-optint"
+      ],
+      "name": "luaL_optint",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPTINT-259",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_optint with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-checklong"
+      ],
+      "name": "luaL_checklong",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_CHECKLONG-261",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_checklong with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Original alias is absent in an ordinary receiver; a separate actual client defines LUA_COMPAT_APIINTCASTS before including the unchanged SDK. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_compat_api_contract.c#compat-optlong"
+      ],
+      "name": "luaL_optlong",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LAUXLIB-H-MACRO-LUAL_OPTLONG-262",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes luaL_optlong with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#legacy-strlen"
+      ],
+      "name": "lua_strlen",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_STRLEN-365",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_strlen with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#legacy-objlen"
+      ],
+      "name": "lua_objlen",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_OBJLEN-367",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_objlen with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#legacy-equal-metamethod"
+      ],
+      "name": "lua_equal",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_EQUAL-369",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_equal with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#legacy-lessthan-metamethod"
+      ],
+      "name": "lua_lessthan",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_LESSTHAN-370",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_lessthan with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#floor-helper"
+      ],
+      "name": "l_floor",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-L_FLOOR-405",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes l_floor with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#integer-format"
+      ],
+      "name": "lua_integer2str",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_INTEGER2STR-486",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_integer2str with the pinned public expansion and checks the separately named results/errors/side effects."
+    },
+    {
+      "boundaries": "Unconditional original function-like macro; actual caller operations require independent source-semantic review. The same C source is required against Ada and native C; named markers alone or this author proposal grant no coverage.",
+      "review_status": "pending",
+      "named_c_cases": [
+        "c_api/tests/macro_api_contract.c#pointer-format"
+      ],
+      "name": "lua_pointer2str",
+      "named_aunit_cases": [],
+      "runtime_acceptance": false,
+      "coverage_authority": false,
+      "id": "CAPI-LUACONF-H-MACRO-LUA_POINTER2STR-591",
+      "execution_evidence": [],
+      "proposed_classification": "runtime-behavior",
+      "invariant": "Actual compiled SDK receiver invokes lua_pointer2str with the pinned public expansion and checks the separately named results/errors/side effects."
     }
   ],
   "kind": "additional-target-api-author-routes",

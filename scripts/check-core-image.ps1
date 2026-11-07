@@ -28,6 +28,7 @@ Import-Module (Join-Path $PSScriptRoot 'RuntimeSupport.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'PEUnwind.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
 Import-Module (Join-Path $PSScriptRoot 'FileConsumerIO.psm1')
+Import-Module (Join-Path $PSScriptRoot 'SdkMacroEvidence.psm1')
 $referenceCompilerDefines=if($IsWindows){@('-DLUA_BUILD_AS_DLL')}else{@()}
 
 function Invoke-NativeModuleConsumer {
@@ -229,6 +230,8 @@ try {
     Invoke-Consumer 'loadfile-api' $loadfileConsumer 'PASS: public luaL_loadfilex contract'
     Invoke-Consumer 'pointer-identity-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/pointer_identity_contract$suffix") 'PASS: public pointer identity contract'
     Invoke-Consumer 'concat-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/concat_api_contract$suffix") 'PASS: public lua_concat contract'
+    Invoke-Consumer 'macro-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/macro_api_contract$suffix") 'PASS: public SDK macro contract'
+    Invoke-Consumer 'macro-compat-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/macro_compat_api_contract$suffix") 'PASS: public SDK macro contract'
     $compilerOutput=& alr exec -- pwsh -NoProfile -Command '(Get-Command gcc -ErrorAction Stop).Source'
     if($LASTEXITCODE -ne 0){throw 'Cannot identify selected native module fixture compiler'}
     $fixtureCompiler=($compilerOutput -join '').Trim()
@@ -352,6 +355,15 @@ try {
     Invoke-Build @('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/concat_api_contract.c'),
         '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$referenceConcatConsumer)
+    $macroPlatformDefines=if($IsLinux){@('-DLUA_USE_LINUX')}elseif($IsMacOS){@('-DLUA_USE_MACOSX')}else{@()}
+    $referenceMacroConsumer=Join-Path $reportDirectory "macro-oracle$suffix"
+    $referenceMacroCompatConsumer=Join-Path $reportDirectory "macro-compat-oracle$suffix"
+    foreach($selection in @(@{source='macro_api_contract.c';output=$referenceMacroConsumer},
+        @{source='macro_compat_api_contract.c';output=$referenceMacroCompatConsumer})){
+        Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic')+$macroPlatformDefines+@(
+            '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot ('c_api/tests/'+$selection.source)),
+            '-L',$referenceDirectory,'-lconformance_lua','-lm','-o',$selection.output))
+    }
     $nativeSystemLibraries=if($IsLinux){@('-ldl')}else{@()}
     Invoke-Build (@('exec','--','gcc','-std=c99','-Wall','-Wextra','-Werror','-pedantic',
         '-I',(Join-Path $projectRoot 'c_api/include/api'),(Join-Path $projectRoot 'c_api/tests/native_module_contract.c'),
@@ -387,6 +399,8 @@ try {
         Invoke-Consumer 'loadfile-oracle' $referenceLoadfileConsumer 'PASS: public luaL_loadfilex contract'
         Invoke-Consumer 'pointer-identity-oracle' $referencePointerConsumer 'PASS: public pointer identity contract'
         Invoke-Consumer 'concat-oracle' $referenceConcatConsumer 'PASS: public lua_concat contract'
+        Invoke-Consumer 'macro-oracle' $referenceMacroConsumer 'PASS: public SDK macro contract'
+        Invoke-Consumer 'macro-compat-oracle' $referenceMacroCompatConsumer 'PASS: public SDK macro contract'
         $fileContext=$Configuration+'/'+$(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'})+'/'+$Profile+'/'+$(if($LibraryType -ceq 'relocatable'){'shared'}else{$LibraryType})
         $fileIO=Invoke-FileConsumerIO -Root $projectRoot -Context $fileContext -AdaExecutable $loadfileConsumer `
             -ReferenceExecutable $referenceLoadfileConsumer -RecordDirectory (Join-Path $reportDirectory 'file-stdin')
@@ -481,12 +495,19 @@ try {
     if([IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-api.stdout')) -cne
         [IO.File]::ReadAllText((Join-Path $reportDirectory 'buffer-oracle.stdout'))){throw 'C/Ada public buffer contract output differs'}
     Write-Output 'PASS: identical public luaL_Buffer contract against C and Ada'
-    foreach($kind in @('allocator','substitution','loadfile','pointer-identity','concat')){
+    foreach($kind in @('allocator','substitution','loadfile','pointer-identity','concat','macro','macro-compat')){
         foreach($stream in @('stdout','stderr')){
             if((Get-FileHash (Join-Path $reportDirectory "$kind-api.$stream")).Hash -cne
                 (Get-FileHash (Join-Path $reportDirectory "$kind-oracle.$stream")).Hash){throw "C/Ada public $kind contract $stream differs"}
         }
         Write-Output "PASS: identical public $kind contract against C and Ada"
+    }
+    $macroCounts=@{}
+    foreach($kind in @('macro','macro-compat')){
+        $role=if($kind -ceq 'macro'){'ordinary'}else{'client-opt-ins'}
+        $text=[IO.File]::ReadAllText((Join-Path $reportDirectory "$kind-api.stdout"))
+        $macroCounts[$kind]=[regex]::Matches($text,'(?m)^PASS: macro-').Count
+        $null=Test-SdkMacroProtocol -Text $text -Role $role -Platform $(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'}) -ReportedCases $macroCounts[$kind]
     }
     foreach($mode in @('string','number')){foreach($stream in @('stdout','stderr')){
         if((Get-FileHash (Join-Path $reportDirectory "allocator-panic-$mode-api.$stream")).Hash -cne
@@ -578,6 +599,10 @@ try {
     $concatContractSources=@(foreach($name in @('concat_api_contract.c','consumer_allocator.h')){
         @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
     })
+    $macroContractSources=@(foreach($name in @('macro_api_contract.c','consumer_allocator.h')){
+        @{file="c_api/tests/$name";sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name")).Hash.ToLowerInvariant()}
+    })
+    $macroCompatSource=@{file='c_api/tests/macro_compat_api_contract.c';sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot 'c_api/tests/macro_compat_api_contract.c')).Hash.ToLowerInvariant()}
     $threadResetContractSources = @(foreach ($name in @('thread_reset_api_contract.c', 'consumer_allocator.h')) {
         [ordered]@{ file="c_api/tests/$name";
             sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
@@ -605,7 +630,7 @@ try {
         consumer_sources = @(@(foreach ($name in $consumerSourceNames) {
             [ordered]@{ file="c_api/tests/$name";
                 sha256=(Get-FileHash -LiteralPath (Join-Path $projectRoot "c_api/tests/$name") -Algorithm SHA256).Hash.ToLowerInvariant() }
-        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources + $pointerContractSources + $concatContractSources);
+        }) + $foreignContractSources + $debugContractSources + $builtinContractSources + $externalContractSources + $conversionContractSources + $operatorContractSources + $indexTypeContractSources + $baseClosingContractSources + $nativeModuleContractSources + $bufferContractSources + $threadResetContractSources + $allocatorContractSources + $substitutionContractSources + $loadfileContractSources + $pointerContractSources + $concatContractSources + $macroContractSources + @($macroCompatSource));
         configuration = $Configuration; consumers = $records.ToArray();
         reference_compiler_defines=$referenceCompilerDefines;
         library_files = $libraries;
@@ -644,6 +669,8 @@ try {
         loadfile_contract=@{matching_output=$true;sources=$loadfileContractSources;matched_cases=21;stdin_io=$fileIO;reference_library_files=$referenceLibraries};
         pointer_identity_contract=@{matching_output=$true;sources=$pointerContractSources;matched_cases=8;reference_library_files=$referenceLibraries};
         concat_contract=@{matching_output=$true;sources=$concatContractSources;matched_cases=21;reference_library_files=$referenceLibraries};
+        macro_contract=@{matching_output=$true;sources=$macroContractSources;matched_cases=$macroCounts.macro;platform_defines=$macroPlatformDefines;reference_library_files=$referenceLibraries};
+        macro_compat_contract=@{matching_output=$true;sources=(@($macroContractSources)+@($macroCompatSource));matched_cases=$macroCounts['macro-compat'];platform_defines=$macroPlatformDefines;reference_library_files=$referenceLibraries};
         thread_reset_contract = [ordered]@{ matching_output=$true; sources=$threadResetContractSources;
             matched_cases=$(if ($Configuration -eq 'upstream-test') { 23 } else { 24 });
             skipped_warning_reentry_cases=$(if ($Configuration -eq 'upstream-test') { 1 } else { 0 });

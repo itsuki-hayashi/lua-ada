@@ -5094,6 +5094,826 @@
       "execution_evidence": [],
       "runtime_acceptance": false,
       "coverage_authority": false
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-register-cfunction"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "register-cfunction"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-islightuserdata"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "islightuserdata"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-isboolean"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "isboolean"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-isnone"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "isnone"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-insert-suffix"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "insert-suffix"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-replace-pop"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "replace-pop"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-newuserdata-one-uservalue"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "newuserdata-one-uservalue"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-getuservalue-alias"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "getuservalue-alias"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-setuservalue-alias"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "setuservalue-alias"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-newlibtable-empty"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "newlibtable-empty"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-newlib-calls"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "newlib-calls"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-argcheck-short-circuit"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "argcheck-short-circuit"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-argcheck-protected-error"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "argcheck-protected-error"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-argexpected-short-circuit"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "argexpected-short-circuit"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-argexpected-protected-error"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "argexpected-protected-error"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-checkstring-binary"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "checkstring-binary"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-checkstring-number"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "checkstring-number"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-checkstring-protected-error"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "checkstring-protected-error"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-optstring-default"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "optstring-default"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-optstring-present"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "optstring-present"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-typename-alias"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "typename-alias"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dofile-results"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dofile-results"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dofile-syntax"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dofile-syntax"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dofile-runtime"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dofile-runtime"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dostring-results"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dostring-results"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dostring-syntax"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dostring-syntax"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dostring-runtime"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dostring-runtime"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-getmetatable-registry"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "getmetatable-registry"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-opt-short-circuit"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "opt-short-circuit"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-loadbuffer-extent"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "loadbuffer-extent"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-intop-wrap"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "intop-wrap"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-pushfail-selected"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "pushfail-selected"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-legacy-strlen"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "legacy-strlen"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-legacy-objlen"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "legacy-objlen"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-legacy-equal-metamethod"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "legacy-equal-metamethod"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-legacy-lessthan-metamethod"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "legacy-lessthan-metamethod"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-floor-helper"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "floor-helper"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-float-attribute"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "float-attribute"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-math-helper"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "math-helper"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-decimal-helper"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "decimal-helper"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-integer-format"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "integer-format"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-sprintf-helper"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "sprintf-helper"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-hex-parse"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "contexts": [
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared"
+      ],
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "hex-parse"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-hex-format"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "contexts": [
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared"
+      ],
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "hex-format"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-pointer-format"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "pointer-format"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-locale-decimal"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "locale-decimal"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-branch-hints"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "branch-hints"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-stringify-raw-bytes"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "stringify-raw-bytes"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-stringify-expanded-bytes"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "stringify-expanded-bytes"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-pushfail-selected"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "pushfail-selected"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-checkunsigned"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-checkunsigned"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-optunsigned"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-optunsigned"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-checkint"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-checkint"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-optint"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-optint"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-checklong"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-checklong"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-optlong"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-optlong"
     }
   ],
   "source_measurements": {

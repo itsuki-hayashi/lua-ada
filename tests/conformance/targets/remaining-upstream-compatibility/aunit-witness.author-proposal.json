@@ -154,7 +154,7 @@
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "a85d4158a2f16ca3227deb435b979d919daeac0d88aed9264a8df32335d89965"
+      "sha256": "5a6867b3bc1f74a81d590b277aa0e890f49b896aca61fe8567bbf902f460cbad"
     },
     {
       "path": "tests/src/test_runner.adb",

@@ -103,7 +103,7 @@ if ($AdditionalConsumerCases -ne '') {
             $case.consumer -cnotin @('c-api','gc-api','io-api','foreign-api','format-api','value-api','auxiliary-api',
                 'load-dump-api','debug-api','external-api','conversion-api','operator-api','index-type-api','base-closing-api','native-module-api','buffer-api',
                 'allocator-api','allocator-panic-string-api','allocator-panic-number-api','substitution-api',
-                'loadfile-api','loadfile-stdin-text-api','loadfile-stdin-binary-c-api','pointer-identity-api','concat-api','thread-reset-api') -or
+                'loadfile-api','loadfile-stdin-text-api','loadfile-stdin-binary-c-api','pointer-identity-api','concat-api','thread-reset-api','macro-api','macro-compat-api') -or
             $case.source -cnotmatch '^(?:c_api/tests/[a-zA-Z0-9_-]+\.(?:c|h)|tests/c/[a-zA-Z0-9_-]+\.c)$' -or
             (@($case.exact_witnesses).Count -eq 0 -and ($null -eq $case.pattern_witness -or
                 -not $case.pattern_witness.StartsWith('^') -or -not $case.pattern_witness.EndsWith('$'))) -or

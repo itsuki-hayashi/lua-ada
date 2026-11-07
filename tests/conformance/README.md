@@ -51,6 +51,24 @@ and luaconf.h: 156 exported function declarations, 298 macro definitions,
 conditional definitions remain separate entries. The raw inventory is not an
 export-symbol pass or proof that a conditional branch is active on every host.
 
+The target-owned
+[public SDK macro audit](targets/remaining-upstream-compatibility/public-sdk-macros.author-audit.json)
+keeps the original spans for 59 remaining function-like macro anchors and
+proposes separately named operations in the installed C consumer source.
+The ordinary SDK program and the client opt-in program are separate mains;
+the latter selects `LUA_COMPAT_APIINTCASTS` and `LUA_FAILISFALSE` before header
+inclusion. Both retain an ordinary public header role when calling a T runtime.
+The protocol records the real C89 selection, ordered operations and actual
+stringification bytes. On Windows the pinned SDK selects `LUA_USE_C89` even
+when the client compiler uses `-std=c99`.
+
+Conditional alternatives retain separate source anchors. Inactive float,
+long-double and non-GNU alternatives, later replacement definitions, and pure
+stringification eligibility still require independent semantic/applicability
+decisions. The audit does not classify them as declaration-only or grant pass
+evidence. Its C rows and all 473 global classifications remain pending until
+review and fresh paired observations in the required immutable contexts.
+
 ## Candidate anchors and manual coverage
 
 The 34 `coverage/*.jsonl` partitions currently contain 4,490 pending anchors.

@@ -1,6 +1,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'FileConsumerIO.psm1')
+Import-Module (Join-Path $PSScriptRoot 'SdkMacroEvidence.psm1')
 
 function Test-NamedConsumerEvidence {
     param([Collections.IDictionary] $Report,
@@ -9,7 +10,7 @@ function Test-NamedConsumerEvidence {
           [scriptblock] $ResolveCapture,
           [switch] $RequireForeignContract,
           [switch] $RequireFormatContract,
-          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','allocator','substitution','loadfile','pointer-identity','concat','thread-reset')]
+          [ValidateSet('format','value','auxiliary','load-dump','debug','external','conversion','operator','index-type','base-closing','native-module','buffer','allocator','substitution','loadfile','pointer-identity','concat','thread-reset','macro','macro-compat')]
           [string[]] $AdditionalContracts=@(),
           [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy='')
     # This replay checks actual observations, not review authority. Its caller
@@ -47,7 +48,7 @@ function Test-NamedConsumerEvidence {
         'base-closing'='PASS: public host base C closing contract';'native-module'='PASS: native-module-explicit-lib2-newstr-external';buffer='PASS: public luaL_Buffer contract';
         allocator='PASS: public allocator contract';substitution='PASS: public luaL_addgsub and luaL_gsub contract';loadfile='PASS: public luaL_loadfilex contract';
         'pointer-identity'='PASS: public pointer identity contract';concat='PASS: public lua_concat contract';
-        'thread-reset'='PASS: public thread reset/base closing contract'}
+        'thread-reset'='PASS: public thread reset/base closing contract';macro='PASS: public SDK macro contract';'macro-compat'='PASS: public SDK macro contract'}
     foreach($kind in $additional|Sort-Object -Unique){
         $markers["$kind-api"]=$additionalMarkers[$kind];$markers["$kind-oracle"]=$additionalMarkers[$kind]
         $contractKinds+=$kind;$consumerKinds+="$kind-api"
@@ -217,6 +218,15 @@ function Test-NamedConsumerEvidence {
                 $outputs[$name].text.Replace("`r`n","`n") -cne $expected){throw 'Named thread reset actual native-lock mode or complete ordered protocol differs'}
         }
     }
+    foreach($kind in @('macro','macro-compat')){if($kind -cin $additional){
+        $role=if($kind -ceq 'macro'){'ordinary'}else{'client-opt-ins'}
+        foreach($name in @("$kind-api","$kind-oracle")){
+            $record=@($Report.consumers|Where-Object name -CEQ $name)[0]
+            if($record.arguments -isnot [Array] -or $record.arguments.Count -ne 0){throw 'SDK macro consumer acquired an unreviewed receiver argument'}
+            $null=Test-SdkMacroProtocol -Text $outputs[$name].text -Role $role -Platform $parts[1] `
+                -ReportedCases $Report[$kind.Replace('-','_')+'_contract'].matched_cases
+        }
+    }}
     if('allocator' -cin $additional){
         # Default panic is intentionally observed through the installed public
         # function, in separate actual children. It returns to the C driver;

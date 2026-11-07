@@ -34,6 +34,9 @@
 #ifdef NDEBUG
 #error "macro_api_contract.c requires its actual assertions"
 #endif
+#ifdef LUA_USER_H
+#error "macro_api_contract.c models an ordinary SDK caller, not a private T header receiver"
+#endif
 
 static struct allocation_counts counts;
 static unsigned file_serial;

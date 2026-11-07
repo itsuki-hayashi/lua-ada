@@ -311,12 +311,14 @@ function Test-TargetNamedContextEvidence {
         conversion='conversion_api_contract.c';operator='operator_api_contract.c';'index-type'='index_type_api_contract.c';
         'base-closing'='base_closing_api_contract.c';'native-module'='native_module_contract.c';buffer='buffer_api_contract.c';
         allocator='allocator_api_contract.c';substitution='substitution_api_contract.c';loadfile='loadfile_api_contract.c';
-        'pointer-identity'='pointer_identity_contract.c';concat='concat_api_contract.c';'thread-reset'='thread_reset_api_contract.c'}
+        'pointer-identity'='pointer_identity_contract.c';concat='concat_api_contract.c';'thread-reset'='thread_reset_api_contract.c';
+        macro='macro_api_contract.c';'macro-compat'='macro_compat_api_contract.c'}
     foreach($kind in $driverNames.Keys){if($kind -ceq 'native-module' -or @($Policy.consumer.cases|Where-Object consumer -CEQ "$kind-api").Count -gt 0){
         if($kind -cnotin $additional){$additional+=$kind}
         $names=@(('c_api/tests/'+$driverNames[$kind]))
         if($kind -cne 'allocator'){$names+='c_api/tests/consumer_allocator.h'}
         if($kind -ceq 'load-dump'){$names+='c_api/tests/load_dump_contract.h'}
+        if($kind -ceq 'macro-compat'){$names+='c_api/tests/macro_api_contract.c'}
         foreach($name in $names){
             $source=@($consumer[$kind.Replace('-','_')+'_contract'].sources|Where-Object file -CEQ $name)
             if($source.Count -ne 1){throw 'Target additional oracle source binding is missing or duplicated'}

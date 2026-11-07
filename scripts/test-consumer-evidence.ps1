@@ -1,6 +1,7 @@
 param()
 $ErrorActionPreference = 'Stop'
 Import-Module "$PSScriptRoot/ConsumerEvidence.psm1" -Force
+Import-Module "$PSScriptRoot/SdkMacroEvidence.psm1"
 $root = Split-Path -Parent $PSScriptRoot
 $directory = Join-Path $root ('reports/consumer-evidence-selftest/' + [guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($directory)
@@ -420,6 +421,44 @@ Run-Case 'T reset count cannot promote the skipped warning to actual execution' 
 } 'native-lock mode' -Foreign -Additional thread-reset
 $context='default/windows/validation/static'
 $mapping.cases=$defaultMappedCases
+function New-SyntheticMacroProtocol([string]$Role){
+    # Deliberately fabricated protocol bytes exercise the final consumer's
+    # rejection rules; they are not compiler or Lua execution observations.
+    $opt=[int]($Role -ceq 'client-opt-ins')
+    $lines=@("MACRO-CONFIG: APIINTCASTS=$opt FAILISFALSE=$opt C89=1")
+    foreach($case in Get-SdkMacroCaseNames -Role $Role -C89 $true){
+        if($case -ceq 'stringify-raw-bytes'){$lines+='MACRO-TOKEN-RAW: MACRO_CONTRACT_TOKEN'}
+        if($case -ceq 'stringify-expanded-bytes'){$lines+='MACRO-TOKEN-EXPANDED: 41'}
+        $lines+='PASS: macro-'+$case
+    }
+    return ($lines -join "`n")+"`nPASS: public SDK macro contract`n"
+}
+$macroProtocols=@{macro=(New-SyntheticMacroProtocol ordinary);'macro-compat'=(New-SyntheticMacroProtocol client-opt-ins)}
+foreach($kind in @('macro','macro-compat')){
+    $baseline[$kind.Replace('-','_')+'_contract']=@{matching_output=$true;reference_library_files=@(@{sha256=$hash});matched_cases=$(if($kind -ceq 'macro'){47}else{53})}
+    foreach($name in @("$kind-api","$kind-oracle")){
+        $record=$records[0].Clone();$record.name=$name;$record.arguments=@();$out=Join-Path $directory "$name.stdout"
+        [IO.File]::WriteAllText($out,$macroProtocols[$kind]);$record.stdout=$out;$record.stdout_sha256=(Get-FileHash $out).Hash.ToLowerInvariant()
+        $baseline.consumers+=$record
+    }
+}
+Run-Case 'ordinary47and opt-in53 macros require both complete ordered counterpart protocols' {} '' -Foreign -Format -Additional ($extended+@('macro','macro-compat'))
+Run-Case 'macro counterpart cannot be replaced by another matching consumer' {param($r)
+    $r.consumers=@($r.consumers|Where-Object name -CNE macro-oracle)
+} 'missing/duplicate' -Foreign -Format -Additional ($extended+@('macro'))
+Run-Case 'matching paired macro output cannot conflate opt-in and ordinary receiver flags' {param($r)
+    foreach($name in @('macro-api','macro-oracle')){Replace-Capture $r $name stdout $macroProtocols['macro-compat']}
+} 'receiver configuration' -Foreign -Format -Additional ($extended+@('macro'))
+Run-Case 'macro aliases cannot hide one omitted actual public operation' {param($r)
+    foreach($name in @('macro-api','macro-oracle')){Replace-Capture $r $name stdout ($macroProtocols.macro.Replace("PASS: macro-replace-pop`n",''))}
+} 'receiver configuration' -Foreign -Format -Additional ($extended+@('macro'))
+Run-Case 'pure stringification requires the actual emitted expansion bytes' {param($r)
+    foreach($name in @('macro-api','macro-oracle')){Replace-Capture $r $name stdout ($macroProtocols.macro.Replace('MACRO-TOKEN-EXPANDED: 41','MACRO-TOKEN-EXPANDED: MACRO_CONTRACT_TOKEN'))}
+} 'receiver configuration' -Foreign -Format -Additional ($extended+@('macro'))
+Run-Case 'macro receiver arguments cannot silently select a different header role' {param($r)
+    @($r.consumers|Where-Object name -CEQ macro-compat-api)[0].arguments=@('--private-T')
+} 'receiver argument' -Foreign -Format -Additional ($extended+@('macro-compat'))
+Run-Case 'macro operation count must be a measured integer' {param($r) $r.macro_contract.matched_cases='47'} 'receiver configuration' -Foreign -Format -Additional ($extended+@('macro'))
 $loadfileNames=@('empty-file-no-results','bom-skipped','shebang-line-numbers','crlf-line-numbers','incomplete-bom-syntax','syntax-error-class',
     'text-mode-rejects-binary','binary-mode-rejects-text','dump-file-loads-runs','stripped-dump-no-source','source-info-matches-file',
     'missing-file-errno','filename-nul-suffix','success-keeps-stack','missing-keeps-stack','syntax-failure-keeps-stack','protected-callback',

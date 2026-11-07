@@ -157,7 +157,7 @@
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "a85d4158a2f16ca3227deb435b979d919daeac0d88aed9264a8df32335d89965"
+      "sha256": "5a6867b3bc1f74a81d590b277aa0e890f49b896aca61fe8567bbf902f460cbad"
     },
     {
       "path": "tests/src/test_runner.adb",
@@ -238,6 +238,14 @@
     {
       "sha256": "cbdda7b7f115df21e09bf0d3820966487a0ff9408145b2dd282fe8e92fd910af",
       "path": "c_api/tests/thread_reset_api_contract.c"
+    },
+    {
+      "sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4",
+      "path": "c_api/tests/macro_api_contract.c"
+    },
+    {
+      "sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806",
+      "path": "c_api/tests/macro_compat_api_contract.c"
     }
   ],
   "cases": [
@@ -7600,6 +7608,882 @@
       "runtime_acceptance": false,
       "coverage_authority": false,
       "source_sha256": "cbdda7b7f115df21e09bf0d3820966487a0ff9408145b2dd282fe8e92fd910af"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-register-cfunction"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "register-cfunction",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-islightuserdata"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "islightuserdata",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-isboolean"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "isboolean",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-isnone"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "isnone",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-insert-suffix"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "insert-suffix",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-replace-pop"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "replace-pop",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-newuserdata-one-uservalue"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "newuserdata-one-uservalue",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-getuservalue-alias"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "getuservalue-alias",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-setuservalue-alias"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "setuservalue-alias",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-newlibtable-empty"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "newlibtable-empty",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-newlib-calls"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "newlib-calls",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-argcheck-short-circuit"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "argcheck-short-circuit",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-argcheck-protected-error"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "argcheck-protected-error",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-argexpected-short-circuit"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "argexpected-short-circuit",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-argexpected-protected-error"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "argexpected-protected-error",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-checkstring-binary"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "checkstring-binary",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-checkstring-number"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "checkstring-number",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-checkstring-protected-error"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "checkstring-protected-error",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-optstring-default"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "optstring-default",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-optstring-present"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "optstring-present",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-typename-alias"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "typename-alias",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dofile-results"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dofile-results",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dofile-syntax"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dofile-syntax",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dofile-runtime"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dofile-runtime",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dostring-results"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dostring-results",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dostring-syntax"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dostring-syntax",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-dostring-runtime"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "dostring-runtime",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-getmetatable-registry"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "getmetatable-registry",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-opt-short-circuit"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "opt-short-circuit",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-loadbuffer-extent"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "loadbuffer-extent",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-intop-wrap"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "intop-wrap",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-pushfail-selected"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "pushfail-selected",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-legacy-strlen"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "legacy-strlen",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-legacy-objlen"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "legacy-objlen",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-legacy-equal-metamethod"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "legacy-equal-metamethod",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-legacy-lessthan-metamethod"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "legacy-lessthan-metamethod",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-floor-helper"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "floor-helper",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-float-attribute"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "float-attribute",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-math-helper"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "math-helper",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-decimal-helper"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "decimal-helper",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-integer-format"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "integer-format",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-sprintf-helper"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "sprintf-helper",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-hex-parse"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "contexts": [
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared"
+      ],
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "hex-parse",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-hex-format"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "contexts": [
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared"
+      ],
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "hex-format",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-pointer-format"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "pointer-format",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-locale-decimal"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "locale-decimal",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-branch-hints"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "branch-hints",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-stringify-raw-bytes"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "stringify-raw-bytes",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-stringify-expanded-bytes"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "stringify-expanded-bytes",
+      "source_sha256": "4da6e7844c3583a0685bd7bcecb56462701730e150b96fef8bc12cc4e12520b4"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-pushfail-selected"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "pushfail-selected",
+      "source_sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-checkunsigned"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-checkunsigned",
+      "source_sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-optunsigned"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-optunsigned",
+      "source_sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-checkint"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-checkint",
+      "source_sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-optint"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-optint",
+      "source_sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-checklong"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-checklong",
+      "source_sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806"
+    },
+    {
+      "consumer": "macro-compat-api",
+      "pattern_witness": null,
+      "source": "c_api/tests/macro_compat_api_contract.c",
+      "exact_witnesses": [
+        "PASS: macro-compat-optlong"
+      ],
+      "expected_count": 1,
+      "runtime_acceptance": false,
+      "execution_evidence": [],
+      "independent_review_status": "pending",
+      "coverage_authority": false,
+      "case_id": "compat-optlong",
+      "source_sha256": "19eb596fc152f29d8b0d19073589762bc419985216db54dba18a7a6862558806"
     }
   ],
   "entries": [

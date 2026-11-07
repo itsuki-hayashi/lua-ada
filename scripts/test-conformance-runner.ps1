@@ -597,6 +597,9 @@ Case 'exact binary stdin and bounded simultaneous pipe transport' {
 Case 'file binary producer and stdin replay rejects synthetic incomplete or altered paths' {
     & (Join-Path $PSScriptRoot 'test-file-consumer-io.ps1')
 }
+Case 'public SDK macro protocols preserve actual configuration and expanded bytes' {
+    & (Join-Path $PSScriptRoot 'test-sdk-macro-evidence.ps1')
+}
 Write-Output "RUNNER TESTS: $script:cases cases; $($failures.Count) failed"
 if ($failures.Count -gt 0) { exit 1 }
 if ($ReferenceInterpreter -ne '') {
