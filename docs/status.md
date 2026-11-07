@@ -2,33 +2,40 @@
 
 ## Expanded T conformance (2026-11-07)
 
-The approved delivery on codex/m3-expanded-t-conformance retains the nine
-previously exercised primary files and adds constructs.lua, closure.lua,
-pm.lua and math.lua. It must resolve every selected T obligation and the
-bwcoercion.lua helper across all 26 contexts. Implementation and acceptance
-are in progress; no additional file or complete T coverage is claimed.
-The [current session](sessions/2026-11-07-expanded-t-conformance.md) records
-the failed initial draft build and the remaining verification work.
+The delivery on codex/m3-expanded-t-conformance retains the nine previously
+exercised primary files and adds constructs.lua, closure.lua, pm.lua and
+math.lua, including selected T paths and the bwcoercion.lua helper. The
+installed scope resolves 850 runtime/audit obligations and 159 selected API
+entries. Its 1,643 non-runtime classifications remain separately reviewed
+source inventory, not executed test cases. The historical gc-io-events scope
+and unrelated global obligations remain distinct.
 
-Current local Windows/upstream-test/validation/static evidence passes 1,380
-AUnit cases, the seven-phase C-driver regression and unchanged coroutine.lua
-with both T API sections enabled. Separate native default/instrumented runs
-pass 48 new public C contract cases. These dirty local observations do not
-complete the 13-file or 26-context gate; scoped source/API/runtime evidence
-and final-revision acceptance remain pending.
-The full local default/validation/static pipeline also passes all 13 primary
-files, both constructs templates and retained consumer/CLI/binary checks.
+Clean candidate 3107dd6e43e028ae7cd107222802fcf852ded62a passed all 24 jobs
+and 26 contexts in [workflow 42348074001](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42348074001).
+The single checkout-only failure passed when retried on the same revision.
+The verified bundle contains 338 primary C/Ada pairs and 26 additional
+constructs pairs: 676 primary reports and 52 supplemental reports. It also
+contains all 26 warning indices and 170 warning processes. All seven
+upstream-test contexts reach their applicable guarded tests without omissions;
+default T-absence messages retain explicit instrumented coverage links.
 
-The clean first cross-platform candidate exposed a macOS closure.lua timeout
-caused by a dead condition temporary remaining a GC root. The reviewed compiler
-repair and five native-matched regressions pass all 1,385 Windows AUnit cases
-in both configurations, unchanged closure.lua, and coroutine.lua with T.
-Corrected cross-platform execution and final scope adjudication remain pending.
-The next macOS run exposed additional eager marking of transient scalar writes
-during multi-slice propagation. The narrow atomic-rescan repair passes all
-1,390 Windows AUnit cases in both configurations, including new retained and
-transient main/suspended-stack tests and a native-matched Lua reproducer.
-Fresh cross-platform acceptance is still required.
+The complete pipelines pass 1,390 applicable AUnit cases on Windows, 1,385 on
+Linux and 1,388 on macOS, with zero assertion failures or unexpected errors.
+The scoped named catalog selects 100 C cases and 94 AUnit cases with explicit
+semantic and platform bounds. The retained ABI, frontend/opcode, native layout,
+CLI, binary, consumer and seeded differential campaigns also pass. All hosts
+select Alire 2.1.1, stable native GNAT 16.1.0 and GPRbuild package 26.0.1;
+the GPRBUILD executable banner is 26.0.0. Required flags and checks stay enabled.
+
+Independent decisions bind all 1,009 exact source/API projections, fresh
+collector/platform applicability and the final bytes of all 338 execution
+contracts. Candidate adjudication and installation do not establish final-head
+acceptance. The fresh matrix, independent reconciliation and immutable
+certificate in refs/notes/expanded-t-conformance on the tested PR head own
+that exact revision's acceptance. The [conformance catalog](../tests/conformance/README.md)
+documents retrieval; the [session](sessions/2026-11-07-expanded-t-conformance.md)
+preserves failed candidates, repairs and review evidence. Other files, all.lua,
+heavy.lua, full M3 and complete public ABI acceptance remain outside this scope.
 
 ## Four-file conformance follow-up (2026-11-07)
 

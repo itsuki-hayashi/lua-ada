@@ -291,8 +291,10 @@ launcher, C oracle and its library directory. It independently links the same
 public-API native driver to the oracle and executes the same buffered-write,
 failed-flush and close assertions against both implementations. Both pipelines
 run this counterpart and retain hashes/output in reports/windows-buffered-failure.
-This evidence supports a pending platform mapping; it is not an unchanged
-files.lua execution or an independent approval of that mapping. The command
+The platform mapping was independently accepted for the four-file PR #9
+scope. Each changed runtime still requires fresh counterpart observations;
+these runs remain labelled equivalents rather than unchanged files.lua
+execution. The command
 also executes named native file-contract and partial-write counterparts plus
 the ten-span files-windows-platform candidate, requiring the final date/version
 witness and the failed-write block in upstream-test configuration. Its
@@ -342,10 +344,12 @@ isolated C oracle and the actual Ada conformance launcher in both configurations
 Default and instrumented matrices invoke it, alongside their platform files.lua
 runner. Each process gets immutable source copies, the same launcher named lua,
 parent/bare-child/arg-child configuration checks, and balanced allocator evidence.
-GC uses the explicitly labelled, pending-review Ada equivalent; C uses the
-unchanged original. Default T omissions must match exact pinned messages and
-remain unresolved coverage links. No successful diagnostic batch sets scoped
-or full-M3 acceptance. See the [scope contract](../tests/conformance/README.md).
+GC uses the explicitly labelled Ada equivalent independently accepted for
+the four-file PR #9 scope; C uses the unchanged original. Default T omissions
+must match exact pinned messages and remain provenance for the omitted body.
+Its coverage requires independently reviewed instrumented observations. A
+successful diagnostic batch alone sets neither scoped nor full-M3 acceptance.
+See the [scope contract](../tests/conformance/README.md).
 
 scripts/check-files-scoped.ps1 adds files.lua to that same scoped execution
 path, including the required Windows native fixtures and explicit equivalent
@@ -377,6 +381,48 @@ Executable and source hashes, output, and unwind checks follow the GC contract's
 reporting path. Synthetic matrix regressions separately check review-status
 vocabulary and reject pending, self-authored or artifact-less review records;
 they confer no independent-review or executed-coverage authority.
+
+## Expanded T conformance protocol
+
+scripts/check-expanded-conformance.ps1 runs the selected 13 primary files and
+bwcoercion.lua helper in each default/instrumented context, reusing the complete
+GC/IO protocols. Its source-preserving constructs wrapper executes both random
+templates with fixed seeds in separate processes. The bitwise wrapper verifies
+the actual helper handlers and error attribution after upstream execution.
+The source-profile wrapper records actual numeric and byte-order facts for
+guard applicability; an inactive source body is never reported as executed.
+math.lua's printed seed pair is retained for reproduction. Reduction flags
+remain disabled and the primary 900-second/2 GiB policy is unchanged.
+
+The core-image pipeline additionally runs the shared foreign C contract against
+the actual Ada library and separate native oracle: 25 continuation/stack cases,
+14 portable hook/closing/refusal cases, five math reopen cases and four direct
+library opener cases. Ada-specific safety extensions and the compiler/scalar
+root regressions are separately named AUnit evidence. The approved mapping
+selects 100 named C cases and 94 named AUnit cases, retaining their actual
+source hashes and semantic limits. Process totals do not substitute for those
+individual witness results.
+
+scripts/new-expanded-matrix.ps1 collects a clean candidate's extracted CI
+artifacts into a diagnostic manifest. It requires all 26 contexts, 338 primary
+C/Ada pairs, 26 supplemental constructs pairs and 728 process reports. It also
+retains 26 warning indices containing 170 named probes: six per default context
+and eight per instrumented context. Exact payload, termination, source phase,
+raw captures, native/Ada runtime identities and shutdown behavior are replayed.
+Linux signal conversion and macOS signal transport have explicit bounded
+forms; arbitrary diagnostics are rejected.
+
+Independent reviews bind immutable source/API projections, actual observations
+and the final bytes of all 338 execution contracts. Installation preserves the
+accepted gc-io-events scope. Final expanded acceptance additionally requires a
+fresh clean publication revision, the complete matrix and independent final
+reconciliation. The immutable certificate in refs/notes/expanded-t-conformance
+on the tested PR head is the authority for that exact revision. Until that
+certificate exists, final-head acceptance is unestablished. Candidate collection,
+static source review and installation do not establish it or full M3 completion.
+Current status
+and the [delivery session](sessions/2026-11-07-expanded-t-conformance.md) own
+the actual evidence state.
 
 ## Output delivery regression consumer
 

@@ -119,23 +119,36 @@ substitute for tracing cycles.
 independent logical size, traced uservalues and an object metatable. C borrows
 the actual stable payload address. A reasoned first-party host cleanup
 attachment is separate from Lua finalizer scheduling; generic userdata has no
-implicit native destructor. Finalization and IO lifecycle integration remain
-independent acceptance requirements.
+implicit native destructor. Finalizer scheduling and IO lifecycle integration
+are implemented; the accepted GC/IO scope owns their bounded coverage while
+complete public ABI acceptance remains separate.
 
-An iterative stop-the-world mark/sweep collector traces globals, live frames,
-register packets, environments/captures, arguments, named vararg tables, error
-objects, table/type metatables, native-closure captures, native activation
-arguments/results, module registries, and reachable compiled prototypes. It runs
-at instruction safe points,
-after temporaries have entered traced storage. Allocation itself does not
-collect unrooted instruction temporaries. Dead table-key tombstones are cleared
-before object reclamation. Repeated chunks can reclaim compiled code.
+The collector implements incremental marking/sweeping and generational minor
+and major collection over actual managed objects and prototype graphs. Roots
+include the live scalar-stack union, authoritative capture cells, native
+argument/result packets, errors, registries, metatables and pending finalizers.
+Incremental work runs at scheduler safe points; atomic reconciliation is
+indivisible. Allocation refusal can restart a full emergency collection from
+the published roots before retrying, so construction values must already have
+an owning root. Dead weak entries and table-key tombstones are cleared before
+object reclamation. Repeated chunks can reclaim compiled code.
 
-Tables currently use linear entries and insertion traversal. Sequence length
-uses a valid contiguous-prefix border. Neither order nor C hash layout is a
-compatibility promise. Weak tables/ephemerons and reachability-owned coroutine
-contexts are implemented. Collector modes, barriers and finalization remain
-later work. Coroutines share one universe through the iterative scheduler.
+Uncaptured scalar writes do not eagerly shade a transient weak read during
+propagation. Their live intervals are published without an intervening
+allocation and rescanned at atomic. Already traversed reachable suspended
+threads remain on the gray-again list until that rescan. Captured-cell and
+heap writes retain their barriers, including old-to-young edges. Consumed
+condition temporaries are retired before allocating branch/loop bodies; lexical
+bindings and short-circuit result operands retain their normal lifetimes.
+The focused repairs have independent source reviews. Selected scope and final
+publication evidence are recorded separately in [status](docs/status.md).
+
+Tables use indexed lookup over owned entry storage and retain the applicable
+Lua sequence-border rules. Neither iteration order nor C hash layout is a
+compatibility promise. Weak tables use ephemeron fixed points. Finalizers are
+queued and run through the ordinary continuation driver, including state-close
+draining; physical disposal still completes when optional close storage is
+refused. Coroutines share one universe through the iterative scheduler.
 
 ## Safety and platform constraints
 
@@ -151,9 +164,10 @@ host-math adapter extends ADR 0005's pow boundary to the pinned transcendental,
 decomposition and scaling primitives. [ADR 0011](docs/decisions/0011-host-mathematics.md)
 records their names, IEEE/domain/rounding rationale and verification limits.
 Argument handling and both xoshiro256** arithmetic paths remain Ada, with owned
-per-universe random state and explicit native-work charging. Full C-facade
-construction of independent reopened math libraries remains a later integration
-requirement. No downloaded production dependency is introduced.
+per-module random state and explicit native-work charging. The real C math
+opener creates independently captured RNG state when reopened; native-matched
+contract cases cover isolation and refusal cleanup. Selected runtime acceptance
+is tracked separately. No downloaded production dependency is introduced.
 Packing and UTF-8 helpers use standard Ada types and explicit
 byte/bit operations. Native pack widths and maximum alignment come from C
 interface types, including long double; an isolated C99 probe verifies the host
@@ -172,7 +186,7 @@ Selective SPARK may protect suitable bounded algorithms; no whole-runtime
 proof is claimed. Fuzz/proof tools are optional. AUnit and differential tests
 provide current behavioral evidence.
 
-## Future interoperability
+## C interoperability and remaining acceptance
 
 The root Lua_Ada project owns one mixed Ada/C standalone library named lua.
 Ada sessions, CLI clients and the C facade import its same world/storage units;
@@ -181,57 +195,45 @@ interfaces preserve child AUnit inspection while Ada privacy remains unchanged.
 See [ADR 0014](docs/decisions/0014-one-core-library.md) for initialization, exports
 and the real mixed-consumer identity checks.
 
-The C facade shares the core without contaminating it with ABI layouts.
-Early experiments investigate C allocation, varargs, callbacks, extra space,
-startup/shutdown, and nonlocal transfer. No foreign longjmp may cross active
-Ada frames. Status returns and C-only guarded checkpoints are feasibility
-mechanisms, not a public Lua API.
+The C facade shares the same world, contexts, allocator and scheduler. Real
+public calls, protected calls, resume/yield continuations and hooks return
+through the Ada dispatcher before a C-owned guard invokes a callback or makes
+a nonlocal transfer. No foreign longjmp crosses active Ada frames. Nested
+drivers restore their previous caller and boundary ownership without resetting
+the execution budget. See [ADR 0013](docs/decisions/0013-c-owned-call-boundary.md)
+and [ADR 0017](docs/decisions/0017-c-continuations-and-resume.md).
 
-Ada containers currently allocate outside a `lua_Alloc` callback. Full C
-allocator parity needs replaceable storage and an allocation audit. Private
-representations and absence of exposed handles preserve room for that work.
-Binary chunks, C layouts/addresses, native modules, and LuaRocks have independent
-future acceptance gates.
+Managed runtime vectors, byte buffers, scalar stacks and heap blocks use the
+owning world's selected allocator. Allocation-refusal and balanced shutdown
+cases exercise the actual public C boundary. Complete allocation-path auditing,
+all public header obligations and drop-in ABI compatibility remain independent
+acceptance gates. A selected source/API scope does not certify those wider
+requirements. Reference Lua is built separately as an oracle and is never
+linked into the Ada implementation.
 
-## Accepted M3 direction: not yet implemented
+## Implementation and remaining M3 gates
 
-M3-02A now implements the ownership split: World registers private contexts,
-each owning frames, arguments and diagnostic/error roots. The current-context
-selector borrows a registered context and cannot switch while its driver runs.
-Collection visits inactive contexts too; finalization releases every context.
-Globals, heap, module registries, output and budgets remain shared. Contexts
-live until world finalization. Suspension/closing transfers, hooks and coroutine
-values remain planned; the direction below is not a claim those features exist.
+World registers private contexts, each owning frames, arguments, errors, hooks,
+suspension and closing state. Main/host contexts and active resumers are roots;
+Lua-owned suspended contexts follow reachable thread objects and can be
+reclaimed before world finalization. Globals, heap, registries, output and work
+accounting remain shared. Transfers use explicit scheduler state.
 
-The [M3 contract](docs/milestones/m3.md) expands the next milestone to complete
-covered upstream behavior. Its first gate adds inventory/baseline infrastructure
-only. The runtime described above remains implemented M2b behavior; the following
-changes are intent until their numbered gates provide acceptance evidence.
+Normal text compilation and execution use canonical Lua 5.5.1 words, real
+prototypes, scalar registers and source/upvalue metadata. Checked binary
+load/dump uses the same representation. The owned frontend remains the only
+grammar/resolver. The retained packet backend is a migration comparison path;
+its removal requires the separately recorded expanded acceptance gates.
 
-Execution will move to canonical Lua 5.5.1 instructions and prototypes. The shared
-owned frontend remains the only grammar/resolver. Canonical code generation,
-upvalue/debug metadata and chunk import/export must pass before removing the
-private packet backend; the opcode definition table alone is insufficient.
-
-A shared universe will own allocator-controlled storage and objects, while
-coroutine contexts own activation stacks, errors, hooks, suspension and closing
-state. Stable cells and indexed tables precede full weak/finalized object support
-and real incremental/generational collectors. Centralized writes supply barriers.
-Catchable Lua allocation/stack errors remain distinct from explicit host aborts.
-
-The C facade needs a reviewed foreign-API reentry portal for synchronous C calls.
-It shares roots, contexts, allocator and counters, and never starts a new public
-session execution or resets budgets. Ordinary Ada/native libraries continue to
-request callbacks through explicit continuations. This future portal is not an
-exception available to M3-01 production code. No foreign jump may cross active
-internal Ada frames; nested errors, yields and panic need proven C-owned guards.
-
-The planned public execution policy preserves bounded Ada session defaults and
-offers deliberate Lua-compatible execution. The normal CLI and C-created states
-will adopt compatible defaults at their later gates. A test configuration/ceiling
-is not a hidden product default. Public C layouts, extra space, stable addresses,
-external strings and allocator callbacks need actual runtime evidence, not an
-adapter that fabricates reference results.
+Ada sessions retain bounded defaults and offer deliberate Lua-compatible
+execution. The normal CLI and C-created states select compatible defaults.
+Catchable Lua errors remain distinct from explicit host aborts. Public layouts,
+extra space, stable addresses and allocator callbacks need their own real
+runtime evidence; a test adapter never substitutes fabricated reference values.
+The [M3 contract](docs/milestones/m3.md) and [status](docs/status.md) own the
+remaining aggregate, heavy, unrelated source/API, CLI and module requirements.
+Exact final-head acceptance is recorded separately from implementation and
+candidate adjudication; see the [conformance catalog](tests/conformance/README.md).
 
 All changes keep strict compiler/style flags, runtime checks, readable comments,
 focused AUnit cases and the standard-Ada dependency policy. Necessary C ABI,
@@ -242,9 +244,10 @@ M3; the pinned ecosystem module fixtures remain future consumers only.
 ## Language lifecycle delivery
 
 [ADR 0009](docs/decisions/0009-language-lifecycle.md) records the implemented
-private-backend lifecycle design. Explicit scheduler transfers replace running
-flags; context lifecycle and closing phase are separate. Each declaration owns a
-stable cell, closures retain exact ordered captures, and jumps use resolver
+lifecycle design first delivered on the private backend. Normal execution now
+uses canonical words. Explicit scheduler transfers replace running flags;
+context lifecycle and closing phase are separate. Captured declarations own
+stable cells, closures retain exact ordered captures, and jumps use resolver
 frontiers to clean up scopes and create fresh declaration instances on reentry.
 Closing and hook callbacks use owned native continuations; outgoing packets,
 errors and temporary values stay traced across every callback.
@@ -252,11 +255,13 @@ errors and temporary values stay traced across every callback.
 The context registry uses stable reusable slots. Main/host contexts and active
 resumers are roots; Lua-owned suspended contexts follow reachable thread objects.
 Weak tables use ephemeron fixed points and dead-entry cleanup before sweeping.
-Abandoned threads are reclaimed without executing close handlers. The collector
-remains stop-the-world, without finalizers or incremental/generational modes.
+Abandoned threads are reclaimed without executing coroutine close handlers.
+Collector atomic tracing and generational minors are indivisible; incremental
+marking/sweeping yields between work slices. Object finalizers and state-close
+draining are implemented and separately exercised by the GC/IO scope.
 
 Inspection uses prototype source ranges/names, actual local and upvalue cells,
 logical native frames and per-thread hook state. The CLI selects compatible
 execution quotas while Ada sessions remain bounded by default. Semantic stack
 checks and physical-storage aborts retain separate failure policies. None of
-these changes replaces the private instruction backend or fixes C ABI layouts.
+these component results completes full C ABI or upstream-suite acceptance.

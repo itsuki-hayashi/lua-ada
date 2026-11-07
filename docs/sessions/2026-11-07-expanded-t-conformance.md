@@ -255,3 +255,77 @@ zero failed assertions or unexpected errors. The new Lua program, unchanged
 closure.lua, unchanged coroutine.lua with T and all seven project T API phases
 pass on the repaired local runtime. New cross-platform execution, the entire
 26-context gate and final independent adjudication remain pending.
+
+## Complete candidate and independent adjudication
+
+Clean 3107dd6e43e028ae7cd107222802fcf852ded62a passes both complete local
+pipelines in default-full-check-6.log and instrumented-full-check-4.log. The
+retained-campaigns-3.log passes the isolated ABI experiments, 85 opcodes and
+4,096 words, 10,000 lexer cases, 2,000 grammar programs and 2,000 mutations,
+native C99/Ada layout, 1,120 library cases and 1,024 lifecycle cases. Lexing and
+parsing the other upstream files remains syntax-only evidence.
+
+Workflow 42348074001 passes all 24 jobs and 26 contexts on that same revision.
+Its first attempt has 23 passing jobs and one macOS shared-validation checkout
+failure while fetching the pinned submodule from GitHub. Only that job is
+retried; attempt 2 job 128338436583 passes. GitHub rekeys the 23 reused jobs,
+whose actual logs are independently verified byte-identical to their originals.
+Those jobs are not counted as fresh executions. Earlier failing campaigns stay
+rejected. All eight macOS contexts now pass unchanged closure.lua.
+
+The actual AUnit totals are Windows 1,390, Linux 1,385 and macOS 1,388, with
+zero failures/errors; differences are applicable platform registrations. Both
+Windows static-PIC configurations pass. Every host selects Alire 2.1.1, native
+GNAT 16.1.0 and GPRbuild package 26.0.1. The GPRBUILD banner is 26.0.0, targeting
+x86_64-w64-mingw32, x86_64-pc-linux-gnu or aarch64-apple-darwin24.6.0. macOS setup
+initially prints bootstrap GNAT 16.2.0, then repository stable selection chooses
+16.1.0 for the actual build. No machine-specific pin is committed.
+
+Digest-verified artifacts collect all 338 primary C/Ada pairs and 26 additional
+constructs pairs into 728 reports, with helper witnesses and all 26 warning
+indices/170 warning processes. Official diagnostic replay passes, explicitly
+without final acceptance. Independent actual-observation authoring freezes the
+39,041,021-byte proposal at e2534c2745d888f474d19f00a206c8cb4f9cd934af4fe1357d1ad1f5b4619acd.
+Lossless canonical compaction preserves every one of its 1,009 projection hashes.
+
+Separate reviewers accept the exact 142 new runtime obligations with 3,488
+context associations, 708 retained obligations with 16,824 associations and
+159 API entries with 4,134 associations. Ten T-only blocks require their actual
+seven instrumented contexts; 26 false lower-precision body links remain reviewed
+applicability references and never claim that inactive body executed. Every
+instrumented applicable case runs without omission. Default messages retain
+only their exact absence provenance and source-linked instrumented coverage.
+
+Root independently checks all 338 contract semantics against all 728 captures
+and reviews their 22 distinct protocols, including fresh current math/helper
+source applicability. All 104 retained contracts preserve their prior semantics
+plus measured source-profile evidence. A separate decision checks all 338 final
+LF byte hashes, canonical paths and original-C/default-omission pointers.
+Historical whole-file source reviews remain dated; later scalar, condition and
+current math/helper decisions own their changed-source applicability.
+
+The guarded installer reconstructs all approved outputs, replays named witnesses
+and shared Ada/native-oracle identities, and verifies all 24,446 evidence
+fragments. Its dry run authorizes 360 constrained writes. Apply completes 361
+writes including its certificate, validates both scopes as complete and preserves
+the historical gc-io-events scope. This installs 850 source runtime/audit records,
+159 scoped API records and 338 contracts; full M3 and final matrix acceptance
+remain false at installation.
+
+## Final revision and handoff protocol
+
+Owning architecture, capability, embedding, testing, backlog and decision guides
+are reconciled with merged PR #9 and the implemented continuations/openers/root
+repairs. Dated partial observations above remain historical evidence.
+
+The publication revision must be clean and freshly execute all 26 contexts with
+the installed contracts enabled. Independent final reconciliation must bind its
+338 primary pairs, 52 supplemental reports, named C/AUnit and warning identities,
+source/report hashes, actual phases/returns/shutdown and shared runtime images.
+The tested head's immutable refs/notes/expanded-t-conformance certificate owns
+that exact final result without inserting its own SHA into the tested tree.
+The PR records automatic review findings and fixes. Merge verification and final
+workflow results are recorded separately against the merge revision, preserving
+the accepted head certificate. No candidate or installation receipt replaces
+these final gates. Other upstream files, all.lua, heavy.lua, full M3 and global
+public ABI completion remain outside this delivery.

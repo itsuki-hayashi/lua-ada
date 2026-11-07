@@ -1,8 +1,9 @@
 # M3 Conformance Inventory
 
-This directory owns the machine-readable source inventory and pending coverage
-ledger for [M3](../../docs/milestones/m3.md). It does not contain a second Lua
-implementation, altered upstream tests, or passing M3 conformance results.
+This directory owns the machine-readable source inventory and coverage ledger
+for [M3](../../docs/milestones/m3.md), including accepted bounded scopes and
+unresolved obligations. It contains no second Lua implementation or altered
+upstream source. A completed scope does not establish full M3 acceptance.
 
 The baseline is Lua 5.5.1 commit
 `7579fc9d7ed90240487251dfb69168f8e64e9294`. The unchanged reference source is
@@ -181,7 +182,7 @@ reviewed block in those partitions, plus 77 directly exercised public API
 entries. Their separate scoped API ledger preserves the original header anchors
 while requiring reviewed behavioral invariants; it does not promote the global
 C API records or certify unrelated continuation paths. Its selection review
-remains pending. Scope validation first runs
+is independently approved for that exact selection. Scope validation first runs
 the full structural inventory check; unrelated missing or corrupt entries
 cannot be hidden by choosing this scope. The scope requires subprocess, stdio,
 temporary-file and platform-counterpart facilities. Unrelated interactive CLI
@@ -194,8 +195,9 @@ pwsh -NoProfile -File scripts/check-conformance-scope.ps1 -RequireScopedComplete
 ```
 
 The last command requires independent selection review and resolved coverage
-through all applicable contexts. It currently rejects incomplete coverage.
-It never sets full M3 completion. The 35 scoped inventory/process regressions
+through all applicable contexts. The gc-io-events scope completed acceptance
+in merged PR #9; incomplete scopes still fail this command. It never sets full
+M3 completion. The 35 scoped inventory/process regressions
 also check out-of-scope corruption, missing files/APIs, self-review, unresolved
 runtime obligations, early returns, GC closure ordering, final files output,
 physical shutdown, leaked blocks and wrong configurations.
@@ -236,7 +238,8 @@ part of the evidence reviewed for provenance.
 
 `scripts/test-conformance-matrix.ps1` uses explicitly synthetic bundles to test
 reconciliation and rejection. Those fixtures confer no execution or acceptance
-authority. No complete accepted real matrix has yet been recorded.
+authority. The accepted four-file matrix and final certificates are linked
+from [status](../../docs/status.md); new runtime revisions need fresh evidence.
 
 scripts/check-files-scoped.ps1 runs files.lua through this same operation/report
 path in both configurations. POSIX selects the original source; Windows selects
@@ -246,7 +249,8 @@ records are validated separately. Independent native-counterpart runners remain
 in the pipeline. macOS uses a separate native-platform candidate for its unavailable
 `/dev/full`. Its named buffered-failure counterpart runs before the equivalent
 in the same measured C/Ada state; the original POSIX nonblocking-write block
-still executes when T is present. This candidate is not reviewed acceptance.
+still executes when T is present. Its source-linked mapping is accepted for
+gc-io-events; fresh expanded observations and final acceptance are separate.
 
 Both runners measure parent, bare-lua and arg-child settings;
 scripts/test-conformance-launcher.ps1 rejects a wrong requested configuration
@@ -259,6 +263,62 @@ it cannot be combined with acceptance. Accepted equivalent executions must
 identify their exact manifest and executed-source hashes in the review contract.
 Default T omissions remain explicit and require resolved instrumented coverage
 links before acceptance; matching observed omissions alone do not close them.
+
+## Expanded T scope
+
+[expanded-t-conformance](scopes/expanded-t-conformance.json) retains the nine
+previously exercised files and adds constructs.lua, closure.lua, pm.lua and
+math.lua. bwcoercion.lua remains a helper, not a fourteenth primary. The scope
+selects all 2,493 source anchors in those partitions and 159 selected header
+identities with reviewed behavioral witnesses. Other source/API, aggregate and
+heavy obligations remain pending. Immutable selection and semantic approvals
+bind both source-condition descriptors and API invariants/witness mappings;
+changing those claims requires a new independent decision.
+
+```text
+pwsh -NoProfile -File scripts/check-conformance-scope.ps1 -Scope expanded-t-conformance
+pwsh -NoProfile -File scripts/test-expanded-conformance.ps1
+pwsh -NoProfile -File scripts/new-expanded-matrix.ps1 -ArtifactsDirectory <extracted-artifacts> -Revision <40-character-candidate-sha> -Replay
+pwsh -NoProfile -File scripts/check-conformance-matrix.ps1 -Manifest <matrix.json> -RequireScopedAcceptance
+```
+
+The expanded matrix contains 338 primary file/context pairs plus one additional
+constructs template pair per context, for 728 C/Ada process reports. The unchanged
+constructs source executes both generated branches through a seeded wrapper.
+The bitwise wrapper observes the helper's six installed handlers, fallback,
+error paths and caller attribution. Actual source-profile facts determine
+numeric/endianness branch applicability; review of an inactive body does not
+claim that body ran. The original math random-seed pair remains captured.
+
+The manifest additionally binds 26 warning indices and 170 actual named warning
+processes. Its 100 named C and 94 named AUnit witnesses are replayed individually
+against approved source-hashed mappings, with the same Ada library and separate
+native oracle as the file processes. Raw streams, telemetry, child identities,
+equivalent sources, shutdown and configuration facts remain mandatory.
+
+An author observation proposal binds the exact clean matrix and per-obligation
+ledger projections. Independent reviewers approve all 142 new runtime entries,
+708 retained entries with fresh applicability and 159 scoped API entries by
+their exact projection hashes. Historical source semantics and classifications
+remain immutable. Contracts receive semantic approval before their final 338
+file hashes receive independent index approval; these are separate artifacts
+to avoid self-referential hashes. The installer reconstructs approved outputs,
+replays actual named/runtime evidence and preserves the old scope before
+publishing any approved projection.
+
+Diagnostic collection and successful installation do not establish final
+expanded acceptance. The clean publication revision must pass the complete
+matrix and independent reconciliation. Its immutable certificate is published
+in refs/notes/expanded-t-conformance on the exact tested PR head, avoiding a
+self-referential commit SHA in these guides. Until that certificate exists,
+final-head acceptance is unestablished. To inspect a published certificate:
+
+```text
+git fetch origin refs/notes/expanded-t-conformance:refs/notes/expanded-t-conformance
+git notes --ref=expanded-t-conformance show <tested-pr-head>
+```
+
+Full M3 completion remains false even after this bounded scope is accepted.
 
 Run from the repository root in PowerShell 7:
 

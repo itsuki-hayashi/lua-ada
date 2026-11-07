@@ -1,7 +1,7 @@
 # ADR 0017: C Continuations and Public Resume Windows
 
 - Date: 2026-11-07, Asia/Tokyo
-- State: implementation contract; runtime acceptance pending
+- State: accepted implementation and scoped contracts; final revision separately certified
 - Scope: expanded-t-conformance, extending ADR 0013
 
 ## Context
@@ -66,5 +66,15 @@ full-width contexts, captured roots, forbidden yields, resume reuse/errors,
 nested driver restoration, hooks, C closing slots and module reopening.
 Run matching native-C baselines before interpreting a test expectation.
 Whole-file coroutine execution must reach its instrumented tail without
-omissions. Complete all scoped source/API reviews and all 26 contexts before
-promoting this implementation contract to accepted runtime evidence.
+omissions. The clean 3107dd6 candidate reaches both API phases and the hook-yield
+phase in all seven instrumented contexts. Separately reviewed source/API
+projections cover all 26 contexts, including real native/Ada continuation,
+closing, hook, opener and refusal witnesses. Independent compiler/scalar-root
+repairs address the macOS weak-table progress failures exposed by this campaign.
+
+These candidate results establish implementation and contract evidence. Exact
+final-head runtime acceptance additionally requires the fresh complete matrix
+and independent reconciliation, published in the tested head's conformance
+Git note. [Status](../status.md) and the
+[session](../sessions/2026-11-07-expanded-t-conformance.md) own those boundaries;
+unrelated C debug selectors, full public ABI and complete M3 remain separate.
