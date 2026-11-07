@@ -380,7 +380,13 @@ package body Lua.Engine.Loaders is
                   return Results;
                end if;
                declare
-                  Message : constant String := Chunk_Name & ":" &
+                  Display_Name : constant String :=
+                    (if Chunk_Name'Length > 0 and then
+                        Chunk_Name (Chunk_Name'First) in '@' | '='
+                     then Chunk_Name
+                       (Chunk_Name'First + 1 .. Chunk_Name'Last)
+                     else Chunk_Name);
+                  Message : constant String := Display_Name & ":" &
                     Ada.Strings.Fixed.Trim
                       (State.Current.Failure_At.Line'Image, Ada.Strings.Both) &
                     ": " & To_String (State.Current.Failure_Text);
@@ -569,9 +575,13 @@ package body Lua.Engine.Loaders is
                return Result;
          end;
          if Arg (1).Kind = Nil_Kind then
-            Chunk_Name.Set_Value ("stdin");
+            Chunk_Name.Set_Value ("=stdin");
          else
-            Copy_Bytes (Arg (1), Chunk_Name, False);
+            --  A filename is debug source identity, not a source snippet.
+            --  Keep Lua's marker in the prototype; only display formatting
+            --  removes it when constructing a diagnostic prefix.
+            Chunk_Name.Append ('@');
+            Copy_Bytes (Arg (1), Chunk_Name, True);
          end if;
          Environment := (if Name not in "base.dofile" | "dofile" and then
                             Activation.Native_Arguments.Length >= 3
@@ -628,7 +638,7 @@ package body Lua.Engine.Loaders is
                   --  as loadfile. The path's suffix is not a format filter;
                   --  package.path may deliberately select dumped modules.
                   Result.Results := Compile_Buffer
-                    (Buffer, Path, "bt",
+                    (Buffer, "@" & Path, "bt",
                      Global_Environment (State));
                exception
                   when Error : Ada.Text_IO.Name_Error | Ada.Text_IO.Use_Error |

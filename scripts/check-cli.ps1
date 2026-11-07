@@ -17,6 +17,8 @@ $newline = [Environment]::NewLine
     'print(arg[1],arg[2]); print(...)', $utf8)
 [IO.File]::WriteAllText((Join-Path $fixtureRoot '-script.lua'), 'print(42)', $utf8)
 [IO.File]::WriteAllText((Join-Path $fixtureRoot 'empty.lua'), '', $utf8)
+[IO.File]::WriteAllText((Join-Path $fixtureRoot 'source-name.lua'),
+    'local d=debug.getinfo(1,"S"); print(d.source,d.short_src)', $utf8)
 [IO.File]::WriteAllText((Join-Path $fixtureRoot 'shebang.lua'),
     "#!/usr/bin/env lua`nprint(42)", $utf8)
 [IO.File]::WriteAllText((Join-Path $fixtureRoot 'bom.lua'),
@@ -123,6 +125,19 @@ $cases = @(
        Output = "first`tsecond${newline}first`tsecond$newline" },
     @{ Title = 'option terminator'; Args = @('--', '-script.lua'); Output = "42$newline" },
     @{ Title = 'empty file'; Args = @('empty.lua'); Output = '' },
+    # Prototype source markers distinguish files/named chunks from snippets.
+    # The human-facing short name omits the marker in both file loaders.
+    @{ Title = 'file debug source identity'; Args = @('source-name.lua');
+       Output = "@source-name.lua`tsource-name.lua$newline" },
+    @{ Title = 'dofile debug source identity';
+       Args = @('-e', 'dofile("source-name.lua")');
+       Output = "@source-name.lua`tsource-name.lua$newline" },
+    @{ Title = 'loadfile debug source identity';
+       Args = @('-e', 'assert(loadfile("source-name.lua"))()');
+       Output = "@source-name.lua`tsource-name.lua$newline" },
+    @{ Title = 'command-line debug source identity';
+       Args = @('-e', 'local d=debug.getinfo(1,"S"); print(d.source,d.short_src)');
+       Output = "=(command line)`t(command line)$newline" },
     @{ Title = 'file shebang'; Args = @('shebang.lua'); Output = "42$newline" },
     @{ Title = 'BOM and shebang'; Args = @('bom.lua'); Output = "42$newline" },
     # Error classes have process-level contracts as well as Ada API tests.

@@ -80,7 +80,12 @@ procedure Lua_CLI is
       elsif Result.Status /= Succeeded then
          declare
             Message : constant String := To_String (Result.Error.Message);
-            Prefix : constant String := To_String (Result.Error.Source) & ":";
+            Source : constant String := To_String (Result.Error.Source);
+            Prefix : constant String :=
+              (if Source'Length > 0 and then
+                  Source (Source'First) in '@' | '='
+               then Source (Source'First + 1 .. Source'Last)
+               else Source) & ":";
          begin
             if Message'Length >= Prefix'Length and then
               Message (Message'First .. Message'First + Prefix'Length - 1) =
@@ -285,7 +290,8 @@ begin
             return;
          end if;
          for Source of Snippets loop
-            Result := Universe.Execute (To_String (Source), "(command line)");
+            Result := Universe.Execute
+              (To_String (Source), "=(command line)");
             Report (Result);
             if Result.Status /= Succeeded then
                if not Process_Exit_Requested then Universe.Close; end if;
@@ -299,7 +305,7 @@ begin
                  (if Path = "-" then Read_Stdin else Read_Source (Path));
             begin
                Result := Universe.Execute
-                 (Source, (if Path = "-" then "stdin" else Path),
+                 (Source, (if Path = "-" then "=stdin" else "@" & Path),
                   Arguments => Arguments_After (Script_Index));
                Report (Result);
             end;
