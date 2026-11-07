@@ -1,0 +1,2031 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "pm.lua",
+  "role": "primary",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/pm.lua",
+    "sha256": "f1413157b8dc0979f9cda8b2551cc9a953a719e5b14d2b84f375462e56355dc5",
+    "byte_length": 14163,
+    "line_count": 452
+  },
+  "original_anchor_count": 184,
+  "original_pending_ledger_sha256": "9ca71110f0b7e086c38aa448668881903a131bcf86c32a58c0b7d42b78918241",
+  "appended_runtime_blocks": 13,
+  "proposal": {
+    "path": "tests/conformance/reviews/pm.expanded-classification-proposal.jsonl",
+    "sha256": "2ad6a9970e449b4b637a2ad39463cf7a3331225ad159a5e737ceed4b14b16f79"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/pm.jsonl",
+    "sha256": "64e20bca81f2dd886661421295be3e8d45d4a83de647adacb7ab68385be658fc"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "error-helper-basic-and-empty-patterns",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 58,
+      "span_end_line": 59,
+      "byte_offset": 0,
+      "byte_length": 1695,
+      "span_sha256": "0ef007ec2d9e61a7331f319836c3908e64d0121978a3b4c7734e01700d3b8c30",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The invoked error helper verifies real protected failures. Empty subjects/patterns, embedded zeros, anchoring, greedy and optional suffix matching return the expected inclusive endpoints and byte substrings.",
+      "dynamic_invocation": "Execute the actual source calls print@7, pcall@12, string.find@13, string.find@18, string.sub@19, string.find@22, string.find@24, string.find@26, string.find@28, string.find@30, string.find@32, string.find@34, string.find@36, string.find@37, string.find@38, string.find@39, string.match@41, string.match@42, string.match@43, string.match@45, string.match@46, string.match@47, string.match@49, string.match@50, string.match@51, f@53, f@54, f@56 in section error-helper-basic-and-empty-patterns. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section error-helper-basic-and-empty-patterns; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 7,
+          "source_statement": "print('testing pattern matching')"
+        },
+        {
+          "name": "pcall",
+          "line": 12,
+          "source_statement": "  local s, err = pcall(f, ...)"
+        },
+        {
+          "name": "string.find",
+          "line": 13,
+          "source_statement": "  assert(not s and string.find(err, msg))"
+        },
+        {
+          "name": "string.find",
+          "line": 18,
+          "source_statement": "  local i,e = string.find(s, p)"
+        },
+        {
+          "name": "string.sub",
+          "line": 19,
+          "source_statement": "  if i then return string.sub(s, i, e) end"
+        },
+        {
+          "name": "string.find",
+          "line": 22,
+          "source_statement": "local a,b = string.find('', '')    -- empty patterns are tricky"
+        },
+        {
+          "name": "string.find",
+          "line": 24,
+          "source_statement": "a,b = string.find('alo', '')"
+        },
+        {
+          "name": "string.find",
+          "line": 26,
+          "source_statement": "a,b = string.find('a\\0o a\\0o a\\0o', 'a', 1)   -- first position"
+        },
+        {
+          "name": "string.find",
+          "line": 28,
+          "source_statement": "a,b = string.find('a\\0o a\\0o a\\0o', 'a\\0o', 2)   -- starts in the middle"
+        },
+        {
+          "name": "string.find",
+          "line": 30,
+          "source_statement": "a,b = string.find('a\\0o a\\0o a\\0o', 'a\\0o', 9)   -- starts in the middle"
+        },
+        {
+          "name": "string.find",
+          "line": 32,
+          "source_statement": "a,b = string.find('a\\0a\\0a\\0a\\0\\0ab', '\\0ab', 2);  -- finds at the end"
+        },
+        {
+          "name": "string.find",
+          "line": 34,
+          "source_statement": "a,b = string.find('a\\0a\\0a\\0a\\0\\0ab', 'b')    -- last position"
+        },
+        {
+          "name": "string.find",
+          "line": 36,
+          "source_statement": "assert(not string.find('a\\0a\\0a\\0a\\0\\0ab', 'b\\0'))   -- check ending"
+        },
+        {
+          "name": "string.find",
+          "line": 37,
+          "source_statement": "assert(not string.find('', '\\0'))"
+        },
+        {
+          "name": "string.find",
+          "line": 38,
+          "source_statement": "assert(string.find('alo123alo', '12') == 4)"
+        },
+        {
+          "name": "string.find",
+          "line": 39,
+          "source_statement": "assert(not string.find('alo123alo', '^12'))"
+        },
+        {
+          "name": "string.match",
+          "line": 41,
+          "source_statement": "assert(string.match(\"aaab\", \".*b\") == \"aaab\")"
+        },
+        {
+          "name": "string.match",
+          "line": 42,
+          "source_statement": "assert(string.match(\"aaa\", \".*a\") == \"aaa\")"
+        },
+        {
+          "name": "string.match",
+          "line": 43,
+          "source_statement": "assert(string.match(\"b\", \".*b\") == \"b\")"
+        },
+        {
+          "name": "string.match",
+          "line": 45,
+          "source_statement": "assert(string.match(\"aaab\", \".+b\") == \"aaab\")"
+        },
+        {
+          "name": "string.match",
+          "line": 46,
+          "source_statement": "assert(string.match(\"aaa\", \".+a\") == \"aaa\")"
+        },
+        {
+          "name": "string.match",
+          "line": 47,
+          "source_statement": "assert(not string.match(\"b\", \".+b\"))"
+        },
+        {
+          "name": "string.match",
+          "line": 49,
+          "source_statement": "assert(string.match(\"aaab\", \".?b\") == \"ab\")"
+        },
+        {
+          "name": "string.match",
+          "line": 50,
+          "source_statement": "assert(string.match(\"aaa\", \".?a\") == \"aa\")"
+        },
+        {
+          "name": "string.match",
+          "line": 51,
+          "source_statement": "assert(string.match(\"b\", \".?b\") == \"b\")"
+        },
+        {
+          "name": "f",
+          "line": 53,
+          "source_statement": "assert(f('aloALO', '%l*') == 'alo')"
+        },
+        {
+          "name": "f",
+          "line": 54,
+          "source_statement": "assert(f('aLo_ALO', '%a*') == 'aLo')"
+        },
+        {
+          "name": "f",
+          "line": 56,
+          "source_statement": "assert(f(\"  \\n\\r*&\\n\\r   xuxu  \\n\\n\", \"%g%g%g+\") == \"xuxu\")"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 19,
+          "source_statement": "  if i then return string.sub(s, i, e) end"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 7,
+          "kind": "source-phase-output",
+          "source_statement": "print('testing pattern matching')"
+        }
+      ]
+    },
+    {
+      "id": "utf8-pattern-adapter-and-quantifiers",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0002",
+      "first_line": 59,
+      "last_line": 109,
+      "span_end_line": 110,
+      "byte_offset": 1695,
+      "byte_length": 1647,
+      "span_sha256": "4e481620fed8bbf03ad1324513058e7c2a2893729894e65f0f5c9d021a2e381a",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The invoked PU adapter distributes optional markers over UTF8 bytes and rewrites dot to the actual charpattern; greedy/non-greedy/optional/classes/anchors match every supplied multilingual and escaped pattern case.",
+      "dynamic_invocation": "Execute the actual source calls string.gsub@63, string.gsub@64, string.gsub@67, f@72, f@73, f@74, f@75, f@76, f@77, f@78, f@79, f@80, f@81, f@82, f@83, f@84, f@85, f@86, f@87, f@88, f@89, f@90, f@91, f@92, f@93, f@94, f@95, f@96, f@97, f@98, f@99, f@100, PU@100, f@101, PU@101, f@102, PU@102, f@103, f@104, f@105, f@106, print@107 in section utf8-pattern-adapter-and-quantifiers. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section utf8-pattern-adapter-and-quantifiers; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gsub",
+          "line": 63,
+          "source_statement": "  p = string.gsub(p, \"(\" .. utf8.charpattern .. \")%?\", function (c)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 64,
+          "source_statement": "    return string.gsub(c, \".\", \"%0?\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 67,
+          "source_statement": "  p = string.gsub(p, \"%.\", utf8.charpattern)"
+        },
+        {
+          "name": "f",
+          "line": 72,
+          "source_statement": "assert(f('aaab', 'a*') == 'aaa');"
+        },
+        {
+          "name": "f",
+          "line": 73,
+          "source_statement": "assert(f('aaa', '^.*$') == 'aaa');"
+        },
+        {
+          "name": "f",
+          "line": 74,
+          "source_statement": "assert(f('aaa', 'b*') == '');"
+        },
+        {
+          "name": "f",
+          "line": 75,
+          "source_statement": "assert(f('aaa', 'ab*a') == 'aa')"
+        },
+        {
+          "name": "f",
+          "line": 76,
+          "source_statement": "assert(f('aba', 'ab*a') == 'aba')"
+        },
+        {
+          "name": "f",
+          "line": 77,
+          "source_statement": "assert(f('aaab', 'a+') == 'aaa')"
+        },
+        {
+          "name": "f",
+          "line": 78,
+          "source_statement": "assert(f('aaa', '^.+$') == 'aaa')"
+        },
+        {
+          "name": "f",
+          "line": 79,
+          "source_statement": "assert(not f('aaa', 'b+'))"
+        },
+        {
+          "name": "f",
+          "line": 80,
+          "source_statement": "assert(not f('aaa', 'ab+a'))"
+        },
+        {
+          "name": "f",
+          "line": 81,
+          "source_statement": "assert(f('aba', 'ab+a') == 'aba')"
+        },
+        {
+          "name": "f",
+          "line": 82,
+          "source_statement": "assert(f('a$a', '.$') == 'a')"
+        },
+        {
+          "name": "f",
+          "line": 83,
+          "source_statement": "assert(f('a$a', '.%$') == 'a$')"
+        },
+        {
+          "name": "f",
+          "line": 84,
+          "source_statement": "assert(f('a$a', '.$.') == 'a$a')"
+        },
+        {
+          "name": "f",
+          "line": 85,
+          "source_statement": "assert(not f('a$a', '$$'))"
+        },
+        {
+          "name": "f",
+          "line": 86,
+          "source_statement": "assert(not f('a$b', 'a$'))"
+        },
+        {
+          "name": "f",
+          "line": 87,
+          "source_statement": "assert(f('a$a', '$') == '')"
+        },
+        {
+          "name": "f",
+          "line": 88,
+          "source_statement": "assert(f('', 'b*') == '')"
+        },
+        {
+          "name": "f",
+          "line": 89,
+          "source_statement": "assert(not f('aaa', 'bb*'))"
+        },
+        {
+          "name": "f",
+          "line": 90,
+          "source_statement": "assert(f('aaab', 'a-') == '')"
+        },
+        {
+          "name": "f",
+          "line": 91,
+          "source_statement": "assert(f('aaa', '^.-$') == 'aaa')"
+        },
+        {
+          "name": "f",
+          "line": 92,
+          "source_statement": "assert(f('aabaaabaaabaaaba', 'b.*b') == 'baaabaaabaaab')"
+        },
+        {
+          "name": "f",
+          "line": 93,
+          "source_statement": "assert(f('aabaaabaaabaaaba', 'b.-b') == 'baaab')"
+        },
+        {
+          "name": "f",
+          "line": 94,
+          "source_statement": "assert(f('alo xo', '.o$') == 'xo')"
+        },
+        {
+          "name": "f",
+          "line": 95,
+          "source_statement": "assert(f(' \\n isto é assim', '%S%S*') == 'isto')"
+        },
+        {
+          "name": "f",
+          "line": 96,
+          "source_statement": "assert(f(' \\n isto é assim', '%S*$') == 'assim')"
+        },
+        {
+          "name": "f",
+          "line": 97,
+          "source_statement": "assert(f(' \\n isto é assim', '[a-z]*$') == 'assim')"
+        },
+        {
+          "name": "f",
+          "line": 98,
+          "source_statement": "assert(f('um caracter ? extra', '[^%sa-z]') == '?')"
+        },
+        {
+          "name": "f",
+          "line": 99,
+          "source_statement": "assert(f('', 'a?') == '')"
+        },
+        {
+          "name": "f",
+          "line": 100,
+          "source_statement": "assert(f('á', PU'á?') == 'á')"
+        },
+        {
+          "name": "PU",
+          "line": 100,
+          "source_statement": "assert(f('á', PU'á?') == 'á')"
+        },
+        {
+          "name": "f",
+          "line": 101,
+          "source_statement": "assert(f('ábl', PU'á?b?l?') == 'ábl')"
+        },
+        {
+          "name": "PU",
+          "line": 101,
+          "source_statement": "assert(f('ábl', PU'á?b?l?') == 'ábl')"
+        },
+        {
+          "name": "f",
+          "line": 102,
+          "source_statement": "assert(f('  ábl', PU'á?b?l?') == '')"
+        },
+        {
+          "name": "PU",
+          "line": 102,
+          "source_statement": "assert(f('  ábl', PU'á?b?l?') == '')"
+        },
+        {
+          "name": "f",
+          "line": 103,
+          "source_statement": "assert(f('aa', '^aa?a?a') == 'aa')"
+        },
+        {
+          "name": "f",
+          "line": 104,
+          "source_statement": "assert(f(']]]áb', '[^]]+') == 'áb')"
+        },
+        {
+          "name": "f",
+          "line": 105,
+          "source_statement": "assert(f(\"0alo alo\", \"%x*\") == \"0a\")"
+        },
+        {
+          "name": "f",
+          "line": 106,
+          "source_statement": "assert(f(\"alo alo\", \"%C+\") == \"alo alo\")"
+        },
+        {
+          "name": "print",
+          "line": 107,
+          "source_statement": "print('+')"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 107,
+          "kind": "source-phase-output",
+          "source_statement": "print('+')"
+        }
+      ]
+    },
+    {
+      "id": "capture-rewrite-and-all-byte-classes",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0003",
+      "first_line": 110,
+      "last_line": 153,
+      "span_end_line": 154,
+      "byte_offset": 3342,
+      "byte_length": 1269,
+      "span_sha256": "1fc53048e5ebb293259807b2b3e9c11e5ad51096458f16d9099e40312db0dafd",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "f1 rewrites backreferences around inserted position captures and preserves returned substrings. A recursively produced256-byte string exercises set/class/range/escape complements through real replacement callbacks.",
+      "dynamic_invocation": "Execute the actual source calls string.gsub@111, tonumber@112, string.gsub@114, string.gsub@115, string.match@116, string.sub@117, f1@120, f1@121, f1@122, string.match@123, range@127, string.char@131, range@131, string.len@133, string.gsub@137, string.len@141, strset@141, strset@143, strset@144, strset@145, strset@146, strset@147, strset@148, strset@149, strset@150, strset@151, print@152 in section capture-rewrite-and-all-byte-classes. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section capture-rewrite-and-all-byte-classes; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gsub",
+          "line": 111,
+          "source_statement": "  p = string.gsub(p, \"%%([0-9])\", function (s)"
+        },
+        {
+          "name": "tonumber",
+          "line": 112,
+          "source_statement": "        return \"%\" .. (tonumber(s)+1)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 114,
+          "source_statement": "  p = string.gsub(p, \"^(^?)\", \"%1()\", 1)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 115,
+          "source_statement": "  p = string.gsub(p, \"($?)$\", \"()%1\", 1)"
+        },
+        {
+          "name": "string.match",
+          "line": 116,
+          "source_statement": "  local t = {string.match(s, p)}"
+        },
+        {
+          "name": "string.sub",
+          "line": 117,
+          "source_statement": "  return string.sub(s, t[1], t[#t] - 1)"
+        },
+        {
+          "name": "f1",
+          "line": 120,
+          "source_statement": "assert(f1('alo alx 123 b\\0o b\\0o', '(..*) %1') == \"b\\0o b\\0o\")"
+        },
+        {
+          "name": "f1",
+          "line": 121,
+          "source_statement": "assert(f1('axz123= 4= 4 34', '(.+)=(.*)=%2 %1') == '3= 4= 4 3')"
+        },
+        {
+          "name": "f1",
+          "line": 122,
+          "source_statement": "assert(f1('=======', '^(=*)=%1$') == '=======')"
+        },
+        {
+          "name": "string.match",
+          "line": 123,
+          "source_statement": "assert(not string.match('==========', '^([=]*)=%1$'))"
+        },
+        {
+          "name": "range",
+          "line": 127,
+          "source_statement": "    return i, range(i+1, j)"
+        },
+        {
+          "name": "string.char",
+          "line": 131,
+          "source_statement": "local abc = string.char(range(0, 127)) .. string.char(range(128, 255));"
+        },
+        {
+          "name": "range",
+          "line": 131,
+          "source_statement": "local abc = string.char(range(0, 127)) .. string.char(range(128, 255));"
+        },
+        {
+          "name": "string.char",
+          "line": 131,
+          "source_statement": "local abc = string.char(range(0, 127)) .. string.char(range(128, 255));"
+        },
+        {
+          "name": "range",
+          "line": 131,
+          "source_statement": "local abc = string.char(range(0, 127)) .. string.char(range(128, 255));"
+        },
+        {
+          "name": "string.len",
+          "line": 133,
+          "source_statement": "assert(string.len(abc) == 256)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 137,
+          "source_statement": "  string.gsub(abc, p, function (c) res.s = res.s .. c end)"
+        },
+        {
+          "name": "string.len",
+          "line": 141,
+          "source_statement": "assert(string.len(strset('[\\200-\\210]')) == 11)"
+        },
+        {
+          "name": "strset",
+          "line": 141,
+          "source_statement": "assert(string.len(strset('[\\200-\\210]')) == 11)"
+        },
+        {
+          "name": "strset",
+          "line": 143,
+          "source_statement": "assert(strset('[a-z]') == \"abcdefghijklmnopqrstuvwxyz\")"
+        },
+        {
+          "name": "strset",
+          "line": 144,
+          "source_statement": "assert(strset('[a-z%d]') == strset('[%da-uu-z]'))"
+        },
+        {
+          "name": "strset",
+          "line": 144,
+          "source_statement": "assert(strset('[a-z%d]') == strset('[%da-uu-z]'))"
+        },
+        {
+          "name": "strset",
+          "line": 145,
+          "source_statement": "assert(strset('[a-]') == \"-a\")"
+        },
+        {
+          "name": "strset",
+          "line": 146,
+          "source_statement": "assert(strset('[^%W]') == strset('[%w]'))"
+        },
+        {
+          "name": "strset",
+          "line": 146,
+          "source_statement": "assert(strset('[^%W]') == strset('[%w]'))"
+        },
+        {
+          "name": "strset",
+          "line": 147,
+          "source_statement": "assert(strset('[]%%]') == '%]')"
+        },
+        {
+          "name": "strset",
+          "line": 148,
+          "source_statement": "assert(strset('[a%-z]') == '-az')"
+        },
+        {
+          "name": "strset",
+          "line": 149,
+          "source_statement": "assert(strset('[%^%[%-a%]%-b]') == '-[]^ab')"
+        },
+        {
+          "name": "strset",
+          "line": 150,
+          "source_statement": "assert(strset('%Z') == strset('[\\1-\\255]'))"
+        },
+        {
+          "name": "strset",
+          "line": 150,
+          "source_statement": "assert(strset('%Z') == strset('[\\1-\\255]'))"
+        },
+        {
+          "name": "strset",
+          "line": 151,
+          "source_statement": "assert(strset('.') == strset('[\\1-\\255%z]'))"
+        },
+        {
+          "name": "strset",
+          "line": 151,
+          "source_statement": "assert(strset('.') == strset('[\\1-\\255%z]'))"
+        },
+        {
+          "name": "print",
+          "line": 152,
+          "source_statement": "print('+');"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 126,
+          "source_statement": "  if i <= j then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 152,
+          "kind": "source-phase-output",
+          "source_statement": "print('+');"
+        }
+      ]
+    },
+    {
+      "id": "capture-endpoints-and-string-replacements",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0004",
+      "first_line": 154,
+      "last_line": 184,
+      "span_end_line": 185,
+      "byte_offset": 4611,
+      "byte_length": 1392,
+      "span_sha256": "e28fa6a8e3e5acaf2f199f934d636ca5d71c911708b07e9d0b21720aea20f28b",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Nested and position captures preserve result count and endpoints; string replacement handles whole-match/numbered references, zero bytes, limits, trim forms and empty subject anchors.",
+      "dynamic_invocation": "Execute the actual source calls string.match@154, string.match@155, string.match@156, string.match@157, string.find@158, string.match@159, PU@159, string.match@161, print@163, string.gsub@165, string.gsub@166, string.gsub@167, string.gsub@168, string.gsub@170, PU@170, string.gsub@172, PU@172, string.gsub@174, string.gsub@175, string.gsub@177, string.gsub@178, string.gsub@179, string.gsub@180, string.gsub@181, print@182 in section capture-endpoints-and-string-replacements. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section capture-endpoints-and-string-replacements; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.match",
+          "line": 154,
+          "source_statement": "assert(string.match(\"alo xyzK\", \"(%w+)K\") == \"xyz\")"
+        },
+        {
+          "name": "string.match",
+          "line": 155,
+          "source_statement": "assert(string.match(\"254 K\", \"(%d*)K\") == \"\")"
+        },
+        {
+          "name": "string.match",
+          "line": 156,
+          "source_statement": "assert(string.match(\"alo \", \"(%w*)$\") == \"\")"
+        },
+        {
+          "name": "string.match",
+          "line": 157,
+          "source_statement": "assert(not string.match(\"alo \", \"(%w+)$\"))"
+        },
+        {
+          "name": "string.find",
+          "line": 158,
+          "source_statement": "assert(string.find(\"(álo)\", \"%(á\") == 1)"
+        },
+        {
+          "name": "string.match",
+          "line": 159,
+          "source_statement": "local a, b, c, d, e = string.match(\"âlo alo\", PU\"^(((.).). (%w*))$\")"
+        },
+        {
+          "name": "PU",
+          "line": 159,
+          "source_statement": "local a, b, c, d, e = string.match(\"âlo alo\", PU\"^(((.).). (%w*))$\")"
+        },
+        {
+          "name": "string.match",
+          "line": 161,
+          "source_statement": "a, b, c, d  = string.match('0123456789', '(.+(.?)())')"
+        },
+        {
+          "name": "print",
+          "line": 163,
+          "source_statement": "print('+')"
+        },
+        {
+          "name": "string.gsub",
+          "line": 165,
+          "source_statement": "assert(string.gsub('ülo ülo', 'ü', 'x') == 'xlo xlo')"
+        },
+        {
+          "name": "string.gsub",
+          "line": 166,
+          "source_statement": "assert(string.gsub('alo úlo  ', ' +$', '') == 'alo úlo')  -- trim"
+        },
+        {
+          "name": "string.gsub",
+          "line": 167,
+          "source_statement": "assert(string.gsub('  alo alo  ', '^%s*(.-)%s*$', '%1') == 'alo alo')  -- double trim"
+        },
+        {
+          "name": "string.gsub",
+          "line": 168,
+          "source_statement": "assert(string.gsub('alo  alo  \\n 123\\n ', '%s+', ' ') == 'alo alo 123 ')"
+        },
+        {
+          "name": "string.gsub",
+          "line": 170,
+          "source_statement": "a, b = string.gsub(t, PU'(.)', '%1@')"
+        },
+        {
+          "name": "PU",
+          "line": 170,
+          "source_statement": "a, b = string.gsub(t, PU'(.)', '%1@')"
+        },
+        {
+          "name": "string.gsub",
+          "line": 172,
+          "source_statement": "a, b = string.gsub('abçd', PU'(.)', '%0@', 2)"
+        },
+        {
+          "name": "PU",
+          "line": 172,
+          "source_statement": "a, b = string.gsub('abçd', PU'(.)', '%0@', 2)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 174,
+          "source_statement": "assert(string.gsub('alo alo', '()[al]', '%1') == '12o 56o')"
+        },
+        {
+          "name": "string.gsub",
+          "line": 175,
+          "source_statement": "assert(string.gsub(\"abc=xyz\", \"(%w*)(%p)(%w+)\", \"%3%2%1-%0\") =="
+        },
+        {
+          "name": "string.gsub",
+          "line": 177,
+          "source_statement": "assert(string.gsub(\"abc\", \"%w\", \"%1%0\") == \"aabbcc\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 178,
+          "source_statement": "assert(string.gsub(\"abc\", \"%w+\", \"%0%1\") == \"abcabc\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 179,
+          "source_statement": "assert(string.gsub('áéí', '$', '\\0óú') == 'áéí\\0óú')"
+        },
+        {
+          "name": "string.gsub",
+          "line": 180,
+          "source_statement": "assert(string.gsub('', '^', 'r') == 'r')"
+        },
+        {
+          "name": "string.gsub",
+          "line": 181,
+          "source_statement": "assert(string.gsub('', '$', 'r') == 'r')"
+        },
+        {
+          "name": "print",
+          "line": 182,
+          "source_statement": "print('+')"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 163,
+          "kind": "source-phase-output",
+          "source_statement": "print('+')"
+        },
+        {
+          "line": 182,
+          "kind": "source-phase-output",
+          "source_statement": "print('+')"
+        }
+      ]
+    },
+    {
+      "id": "empty-match-advance-and-callback-reentry",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0005",
+      "first_line": 185,
+      "last_line": 222,
+      "span_end_line": 223,
+      "byte_offset": 6003,
+      "byte_length": 1204,
+      "span_sha256": "45cdf1646830ec3f64c7b3aeaeced44a9a40fcf951392f49ea1dc64d92768874",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Empty pattern matches advance without repeating positions. Native/Lua replacement callbacks can mutate globals, recurse into gsub or execute dynamically loaded source; expected returned content and side effects remain observable.",
+      "dynamic_invocation": "Execute the actual source calls string.gsub@186, string.gmatch@191, string.sub@192, string.gsub@199, rawset@203, string.gsub@204, string.gsub@209, string.gsub@210, load@213, string.gsub@214, string.gsub@218 in section empty-match-advance-and-callback-reentry. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section empty-match-advance-and-callback-reentry; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gsub",
+          "line": 186,
+          "source_statement": "  assert(string.gsub(\"a b cd\", \" *\", \"-\") == \"-a-b-c-d-\")"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 191,
+          "source_statement": "  for p, e in string.gmatch(sub, \"()%s*()\") do"
+        },
+        {
+          "name": "string.sub",
+          "line": 192,
+          "source_statement": "    res = res .. string.sub(sub, i, p - 1) .. \"-\""
+        },
+        {
+          "name": "string.gsub",
+          "line": 199,
+          "source_statement": "assert(string.gsub(\"um (dois) tres (quatro)\", \"(%(%w+%))\", string.upper) =="
+        },
+        {
+          "name": "rawset",
+          "line": 203,
+          "source_statement": "  local function setglobal (n,v) rawset(_G, n, v) end"
+        },
+        {
+          "name": "string.gsub",
+          "line": 204,
+          "source_statement": "  string.gsub(\"a=roberto,roberto=a\", \"(%w+)=(%w%w*)\", setglobal)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 209,
+          "source_statement": "function f(a,b) return string.gsub(a,'.',b) end"
+        },
+        {
+          "name": "string.gsub",
+          "line": 210,
+          "source_statement": "assert(string.gsub(\"trocar tudo em |teste|b| é |beleza|al|\", \"|([^|]*)|([^|]*)|\", f) =="
+        },
+        {
+          "name": "load",
+          "line": 213,
+          "source_statement": "local function dostring (s) return load(s, \"\")() or \"\" end"
+        },
+        {
+          "name": "string.gsub",
+          "line": 214,
+          "source_statement": "assert(string.gsub(\"alo $a='x'$ novamente $return a$\","
+        },
+        {
+          "name": "string.gsub",
+          "line": 218,
+          "source_statement": "local x = string.gsub(\"$x=string.gsub('alo', '.', string.upper)$ assim vai para $return x$\","
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 191,
+          "source_statement": "  for p, e in string.gmatch(sub, \"()%s*()\") do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "callback-position-captures-and-balancing",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0006",
+      "first_line": 223,
+      "last_line": 240,
+      "span_end_line": 241,
+      "byte_offset": 7207,
+      "byte_length": 524,
+      "span_sha256": "e201780908ca300d32f39944848bd644e0bdd57d1a4577400cbd653f4df55783",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Replacement callbacks receive exact position/string captures while nil retains original text. Balanced matching removes only properly nested delimiters including embedded zeros.",
+      "dynamic_invocation": "Execute the actual source calls string.gsub@225, string.len@226, string.find@233, string.gsub@233, isbalanced@236, isbalanced@237, string.gsub@238 in section callback-position-captures-and-balancing. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section callback-position-captures-and-balancing; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gsub",
+          "line": 225,
+          "source_statement": "local r = string.gsub(s, '()(%w+)()', function (a,w,b)"
+        },
+        {
+          "name": "string.len",
+          "line": 226,
+          "source_statement": "             assert(string.len(w) == b-a);"
+        },
+        {
+          "name": "string.find",
+          "line": 233,
+          "source_statement": "  return not string.find(string.gsub(s, \"%b()\", \"\"), \"[()]\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 233,
+          "source_statement": "  return not string.find(string.gsub(s, \"%b()\", \"\"), \"[()]\")"
+        },
+        {
+          "name": "isbalanced",
+          "line": 236,
+          "source_statement": "assert(isbalanced(\"(9 ((8))(\\0) 7) \\0\\0 a b ()(c)() a\"))"
+        },
+        {
+          "name": "isbalanced",
+          "line": 237,
+          "source_statement": "assert(not isbalanced(\"(9 ((8) 7) a b (\\0 c) a\"))"
+        },
+        {
+          "name": "string.gsub",
+          "line": 238,
+          "source_statement": "assert(string.gsub(\"alo 'oi' alo\", \"%b''\", '\"') == 'alo \" alo')"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "replacement-iteration-and-error-diagnostics",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0007",
+      "first_line": 241,
+      "last_line": 261,
+      "span_end_line": 262,
+      "byte_offset": 7731,
+      "byte_length": 917,
+      "span_sha256": "0d90028ad4cf48397c714f7fbafa4d25f53be2d1d689aadf6324378efc26671f",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Replacement callbacks respect maximum replacement counts and store only visited words. Invalid table replacement values, absent/unfinished capture indices and replacement-percent syntax raise the specified messages.",
+      "dynamic_invocation": "Execute the actual source calls string.gsub@242, string.gsub@246, string.gsub@250, checkerror@254, checkerror@256, checkerror@257, checkerror@258, checkerror@259 in section replacement-iteration-and-error-diagnostics. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section replacement-iteration-and-error-diagnostics; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gsub",
+          "line": 242,
+          "source_statement": "assert(string.gsub(\"x and x and x\", \"x\", function () t.n=t.n+1; return t[t.n] end)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 246,
+          "source_statement": "string.gsub(\"first second word\", \"%w%w*\", function (w) t.n=t.n+1; t[t.n] = w end)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 250,
+          "source_statement": "assert(string.gsub(\"first second word\", \"%w+\","
+        },
+        {
+          "name": "checkerror",
+          "line": 254,
+          "source_statement": "checkerror(\"invalid replacement value %(a table%)\","
+        },
+        {
+          "name": "checkerror",
+          "line": 256,
+          "source_statement": "checkerror(\"invalid capture index %%2\", string.gsub, \"alo\", \".\", \"%2\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 257,
+          "source_statement": "checkerror(\"invalid capture index %%0\", string.gsub, \"alo\", \"(%0)\", \"a\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 258,
+          "source_statement": "checkerror(\"invalid capture index %%1\", string.gsub, \"alo\", \"(%1)\", \"a\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 259,
+          "source_statement": "checkerror(\"invalid use of '%%'\", string.gsub, \"alo\", \".\", \"%x\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "non-soft-big-string-and-recursive-substitution",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0008",
+      "first_line": 262,
+      "last_line": 282,
+      "span_end_line": 283,
+      "byte_offset": 8648,
+      "byte_length": 482,
+      "span_sha256": "8d8f7eca17ce270ff65dfe11504d6996883c2228d7942ad95fe924fb238a7d0c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The300000-byte greedy/non-greedy cases execute with _soft unset; missing replacement arguments fail on large inputs. A nested gsub callback reversal round-trips the original word.",
+      "dynamic_invocation": "With _soft nil, execute source264-267 on300000 bytes and source270-271 on10000a plus10000b bytes, checking the missing replacement argument. Then invoke recursive replacement rev twice at280 to restoreabcdef.",
+      "execution_condition": "Selected pm.lua section non-soft-big-string-and-recursive-substitution; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 263,
+          "source_statement": "  print(\"big strings\")"
+        },
+        {
+          "name": "string.rep",
+          "line": 264,
+          "source_statement": "  local a = string.rep('a', 300000)"
+        },
+        {
+          "name": "string.find",
+          "line": 265,
+          "source_statement": "  assert(string.find(a, '^a*.?$'))"
+        },
+        {
+          "name": "string.find",
+          "line": 266,
+          "source_statement": "  assert(not string.find(a, '^a*.?b$'))"
+        },
+        {
+          "name": "string.find",
+          "line": 267,
+          "source_statement": "  assert(string.find(a, '^a-.?$'))"
+        },
+        {
+          "name": "string.rep",
+          "line": 270,
+          "source_statement": "  a = string.rep('a', 10000) .. string.rep('b', 10000)"
+        },
+        {
+          "name": "string.rep",
+          "line": 270,
+          "source_statement": "  a = string.rep('a', 10000) .. string.rep('b', 10000)"
+        },
+        {
+          "name": "pcall",
+          "line": 271,
+          "source_statement": "  assert(not pcall(string.gsub, a, 'b'))"
+        },
+        {
+          "name": "string.gsub",
+          "line": 276,
+          "source_statement": "  return string.gsub(s, \"(.)(.+)\", function (c,s1) return rev(s1)..c end)"
+        },
+        {
+          "name": "rev",
+          "line": 276,
+          "source_statement": "  return string.gsub(s, \"(.)(.+)\", function (c,s1) return rev(s1)..c end)"
+        },
+        {
+          "name": "rev",
+          "line": 280,
+          "source_statement": "assert(rev(rev(x)) == x)"
+        },
+        {
+          "name": "rev",
+          "line": 280,
+          "source_statement": "assert(rev(rev(x)) == x)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 262,
+          "source_statement": "if not _soft then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 263,
+          "kind": "non-soft-phase",
+          "value": "big strings",
+          "require_flags_unset": [
+            "_soft"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "table-replacement-and-metamethod-index",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0009",
+      "first_line": 283,
+      "last_line": 294,
+      "span_end_line": 295,
+      "byte_offset": 9130,
+      "byte_length": 503,
+      "span_sha256": "b1975ffcb09bec3a2351dc0ab87ac13ef87de7800b0d9c1e49f51363ce7ce96b",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Replacement tables retain missing/false entries, choose first captures/positions correctly and use their real __index metamethod for missing word keys.",
+      "dynamic_invocation": "Execute the actual source calls string.gsub@284, string.gsub@285, string.gsub@286, string.gsub@287, string.gsub@289, setmetatable@291, string.upper@291, string.gsub@292 in section table-replacement-and-metamethod-index. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section table-replacement-and-metamethod-index; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gsub",
+          "line": 284,
+          "source_statement": "assert(string.gsub(\"alo alo\", \".\", {}) == \"alo alo\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 285,
+          "source_statement": "assert(string.gsub(\"alo alo\", \"(.)\", {a=\"AA\", l=\"\"}) == \"AAo AAo\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 286,
+          "source_statement": "assert(string.gsub(\"alo alo\", \"(.).\", {a=\"AA\", l=\"K\"}) == \"AAo AAo\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 287,
+          "source_statement": "assert(string.gsub(\"alo alo\", \"((.)(.?))\", {al=\"AA\", o=false}) == \"AAo AAo\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 289,
+          "source_statement": "assert(string.gsub(\"alo alo\", \"().\", {'x','yy','zzz'}) == \"xyyzzz alo\")"
+        },
+        {
+          "name": "setmetatable",
+          "line": 291,
+          "source_statement": "t = {}; setmetatable(t, {__index = function (t,s) return string.upper(s) end})"
+        },
+        {
+          "name": "string.upper",
+          "line": 291,
+          "source_statement": "t = {}; setmetatable(t, {__index = function (t,s) return string.upper(s) end})"
+        },
+        {
+          "name": "string.gsub",
+          "line": 292,
+          "source_statement": "assert(string.gsub(\"a alo b hi\", \"%w%w+\", t) == \"a ALO b HI\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "gmatch-captures-and-initial-position",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0010",
+      "first_line": 295,
+      "last_line": 349,
+      "span_end_line": 350,
+      "byte_offset": 9633,
+      "byte_length": 1167,
+      "span_sha256": "7e56d5bd9ee3d162ae140bb28529a78cbad5d767ee283512b55f20ae927b64a1",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Empty-position, repeated-character and numeric-pair iterators produce actual expected sequences; positive/negative initial positions and exactly-end/past-end starts terminate correctly.",
+      "dynamic_invocation": "Execute the actual source calls string.gmatch@297, string.gmatch@301, string.gmatch@307, table.remove@308, string.gmatch@313, tonumber@314, pairs@317, string.gmatch@323, tonumber@324, string.gmatch@329, tonumber@330, string.gmatch@336, string.gmatch@343 in section gmatch-captures-and-initial-position. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section gmatch-captures-and-initial-position; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gmatch",
+          "line": 297,
+          "source_statement": "for i in string.gmatch('abcde', '()') do assert(i == a+1); a=i end"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 301,
+          "source_statement": "for w in string.gmatch(\"first second word\", \"%w+\") do"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 307,
+          "source_statement": "for i in string.gmatch (\"xuxx uu ppar r\", \"()(.)%2\") do"
+        },
+        {
+          "name": "table.remove",
+          "line": 308,
+          "source_statement": "  assert(i == table.remove(t, 1))"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 313,
+          "source_statement": "for i,j in string.gmatch(\"13 14 10 = 11, 15= 16, 22=23\", \"(%d+)%s*=%s*(%d+)\") do"
+        },
+        {
+          "name": "tonumber",
+          "line": 314,
+          "source_statement": "  t[tonumber(i)] = tonumber(j)"
+        },
+        {
+          "name": "tonumber",
+          "line": 314,
+          "source_statement": "  t[tonumber(i)] = tonumber(j)"
+        },
+        {
+          "name": "pairs",
+          "line": 317,
+          "source_statement": "for k,v in pairs(t) do assert(k+1 == v+0); a=a+1 end"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 323,
+          "source_statement": "  for k in string.gmatch(\"10 20 30\", \"%d+\", 3) do"
+        },
+        {
+          "name": "tonumber",
+          "line": 324,
+          "source_statement": "    s = s + tonumber(k)"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 329,
+          "source_statement": "  for k in string.gmatch(\"11 21 31\", \"%d+\", -4) do"
+        },
+        {
+          "name": "tonumber",
+          "line": 330,
+          "source_statement": "    s = s + tonumber(k)"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 336,
+          "source_statement": "  for k in string.gmatch(\"11 21 31\", \"%w*\", 9) do"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 343,
+          "source_statement": "  for k in string.gmatch(\"11 21 31\", \"%w*\", 10) do"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 297,
+          "source_statement": "for i in string.gmatch('abcde', '()') do assert(i == a+1); a=i end"
+        },
+        {
+          "line": 301,
+          "source_statement": "for w in string.gmatch(\"first second word\", \"%w+\") do"
+        },
+        {
+          "line": 307,
+          "source_statement": "for i in string.gmatch (\"xuxx uu ppar r\", \"()(.)%2\") do"
+        },
+        {
+          "line": 313,
+          "source_statement": "for i,j in string.gmatch(\"13 14 10 = 11, 15= 16, 22=23\", \"(%d+)%s*=%s*(%d+)\") do"
+        },
+        {
+          "line": 317,
+          "source_statement": "for k,v in pairs(t) do assert(k+1 == v+0); a=a+1 end"
+        },
+        {
+          "line": 323,
+          "source_statement": "  for k in string.gmatch(\"10 20 30\", \"%d+\", 3) do"
+        },
+        {
+          "line": 329,
+          "source_statement": "  for k in string.gmatch(\"11 21 31\", \"%d+\", -4) do"
+        },
+        {
+          "line": 336,
+          "source_statement": "  for k in string.gmatch(\"11 21 31\", \"%w*\", 9) do"
+        },
+        {
+          "line": 343,
+          "source_statement": "  for k in string.gmatch(\"11 21 31\", \"%w*\", 10) do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "pattern-complexity-recovery-and-frontiers",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0011",
+      "first_line": 350,
+      "last_line": 388,
+      "span_end_line": 389,
+      "byte_offset": 10800,
+      "byte_length": 1388,
+      "span_sha256": "10b3ed1209a257378c3b2b609270c7c7fdfd2a91030aeb343cba8045af8079d8",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "A too-complex iterator can be called again without corrupting recursion-depth state. Frontier patterns distinguish start/end classes, zero sentinels and exact positions across all supplied cases.",
+      "dynamic_invocation": "Execute the actual source calls string.gmatch@352, string.rep@352, pcall@353, pcall@356, string.gsub@362, string.gsub@363, string.gsub@364, string.gsub@365, string.gsub@366, string.gsub@367, string.find@369, string.find@370, string.find@371, string.find@372, string.find@373, string.find@374, string.find@375, string.find@377, string.match@379, string.gmatch@383, table.remove@384 in section pattern-complexity-recovery-and-frontiers. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section pattern-complexity-recovery-and-frontiers; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.gmatch",
+          "line": 352,
+          "source_statement": "  local iter = string.gmatch(string.rep(\"a\", N), string.rep(\"a?\", N))"
+        },
+        {
+          "name": "string.rep",
+          "line": 352,
+          "source_statement": "  local iter = string.gmatch(string.rep(\"a\", N), string.rep(\"a?\", N))"
+        },
+        {
+          "name": "string.rep",
+          "line": 352,
+          "source_statement": "  local iter = string.gmatch(string.rep(\"a\", N), string.rep(\"a?\", N))"
+        },
+        {
+          "name": "pcall",
+          "line": 353,
+          "source_statement": "  pcall(iter)   -- error for pattern too complex"
+        },
+        {
+          "name": "pcall",
+          "line": 356,
+          "source_statement": "  pcall(iter)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 362,
+          "source_statement": "assert(string.gsub(\"aaa aa a aaa a\", \"%f[%w]a\", \"x\") == \"xaa xa x xaa x\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 363,
+          "source_statement": "assert(string.gsub(\"[[]] [][] [[[[\", \"%f[[].\", \"x\") == \"x[]] x]x] x[[[\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 364,
+          "source_statement": "assert(string.gsub(\"01abc45de3\", \"%f[%d]\", \".\") == \".01abc.45de.3\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 365,
+          "source_statement": "assert(string.gsub(\"01abc45 de3x\", \"%f[%D]%w\", \".\") == \"01.bc45 de3.\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 366,
+          "source_statement": "assert(string.gsub(\"function\", \"%f[\\1-\\255]%w\", \".\") == \".unction\")"
+        },
+        {
+          "name": "string.gsub",
+          "line": 367,
+          "source_statement": "assert(string.gsub(\"function\", \"%f[^\\1-\\255]\", \".\") == \"function.\")"
+        },
+        {
+          "name": "string.find",
+          "line": 369,
+          "source_statement": "assert(string.find(\"a\", \"%f[a]\") == 1)"
+        },
+        {
+          "name": "string.find",
+          "line": 370,
+          "source_statement": "assert(string.find(\"a\", \"%f[^%z]\") == 1)"
+        },
+        {
+          "name": "string.find",
+          "line": 371,
+          "source_statement": "assert(string.find(\"a\", \"%f[^%l]\") == 2)"
+        },
+        {
+          "name": "string.find",
+          "line": 372,
+          "source_statement": "assert(string.find(\"aba\", \"%f[a%z]\") == 3)"
+        },
+        {
+          "name": "string.find",
+          "line": 373,
+          "source_statement": "assert(string.find(\"aba\", \"%f[%z]\") == 4)"
+        },
+        {
+          "name": "string.find",
+          "line": 374,
+          "source_statement": "assert(not string.find(\"aba\", \"%f[%l%z]\"))"
+        },
+        {
+          "name": "string.find",
+          "line": 375,
+          "source_statement": "assert(not string.find(\"aba\", \"%f[^%l%z]\"))"
+        },
+        {
+          "name": "string.find",
+          "line": 377,
+          "source_statement": "local i, e = string.find(\" alo aalo allo\", \"%f[%S].-%f[%s].-%f[%S]\")"
+        },
+        {
+          "name": "string.match",
+          "line": 379,
+          "source_statement": "local k = string.match(\" alo aalo allo\", \"%f[%S](.-%f[%s].-%f[%S])\")"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 383,
+          "source_statement": "for k in string.gmatch(\"alo alo th02 is 1hat\", \"()%f[%w%d]\") do"
+        },
+        {
+          "name": "table.remove",
+          "line": 384,
+          "source_statement": "  assert(table.remove(a, 1) == k)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 383,
+          "source_statement": "for k in string.gmatch(\"alo alo th02 is 1hat\", \"()%f[%w%d]\") do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "malformed-and-zero-containing-patterns",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0012",
+      "first_line": 389,
+      "last_line": 421,
+      "span_end_line": 422,
+      "byte_offset": 12188,
+      "byte_length": 903,
+      "span_sha256": "3cc350dd6b44e8448c89cf5ac54c3866271fea10c9dc42a9877beb282da2bc3a",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The invoked malformed-pattern helper validates incomplete captures/classes/escapes/frontiers. Literal/escaped zeros, zero ranges, balanced zero delimiters and magic bytes after zeros match correct byte spans.",
+      "dynamic_invocation": "Execute the actual source calls pcall@392, string.find@393, malform@396, malform@397, malform@398, malform@399, malform@400, malform@401, malform@402, malform@403, malform@404, malform@405, malform@406, string.match@409, string.match@410, string.find@411, string.find@412, string.match@413, string.match@414, string.match@415, string.find@418, string.find@419 in section malformed-and-zero-containing-patterns. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section malformed-and-zero-containing-patterns; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "pcall",
+          "line": 392,
+          "source_statement": "  local r, msg = pcall(string.find, \"a\", p)"
+        },
+        {
+          "name": "string.find",
+          "line": 393,
+          "source_statement": "  assert(not r and string.find(msg, m))"
+        },
+        {
+          "name": "malform",
+          "line": 396,
+          "source_statement": "malform(\"(.\", \"unfinished capture\")"
+        },
+        {
+          "name": "malform",
+          "line": 397,
+          "source_statement": "malform(\".)\", \"invalid pattern capture\")"
+        },
+        {
+          "name": "malform",
+          "line": 398,
+          "source_statement": "malform(\"[a\")"
+        },
+        {
+          "name": "malform",
+          "line": 399,
+          "source_statement": "malform(\"[]\")"
+        },
+        {
+          "name": "malform",
+          "line": 400,
+          "source_statement": "malform(\"[^]\")"
+        },
+        {
+          "name": "malform",
+          "line": 401,
+          "source_statement": "malform(\"[a%]\")"
+        },
+        {
+          "name": "malform",
+          "line": 402,
+          "source_statement": "malform(\"[a%\")"
+        },
+        {
+          "name": "malform",
+          "line": 403,
+          "source_statement": "malform(\"%b\")"
+        },
+        {
+          "name": "malform",
+          "line": 404,
+          "source_statement": "malform(\"%ba\")"
+        },
+        {
+          "name": "malform",
+          "line": 405,
+          "source_statement": "malform(\"%\")"
+        },
+        {
+          "name": "malform",
+          "line": 406,
+          "source_statement": "malform(\"%f\", \"missing\")"
+        },
+        {
+          "name": "string.match",
+          "line": 409,
+          "source_statement": "assert(string.match(\"ab\\0\\1\\2c\", \"[\\0-\\2]+\") == \"\\0\\1\\2\")"
+        },
+        {
+          "name": "string.match",
+          "line": 410,
+          "source_statement": "assert(string.match(\"ab\\0\\1\\2c\", \"[\\0-\\0]+\") == \"\\0\")"
+        },
+        {
+          "name": "string.find",
+          "line": 411,
+          "source_statement": "assert(string.find(\"b$a\", \"$\\0?\") == 2)"
+        },
+        {
+          "name": "string.find",
+          "line": 412,
+          "source_statement": "assert(string.find(\"abc\\0efg\", \"%\\0\") == 4)"
+        },
+        {
+          "name": "string.match",
+          "line": 413,
+          "source_statement": "assert(string.match(\"abc\\0efg\\0\\1e\\1g\", \"%b\\0\\1\") == \"\\0efg\\0\\1e\\1\")"
+        },
+        {
+          "name": "string.match",
+          "line": 414,
+          "source_statement": "assert(string.match(\"abc\\0\\0\\0\", \"%\\0+\") == \"\\0\\0\\0\")"
+        },
+        {
+          "name": "string.match",
+          "line": 415,
+          "source_statement": "assert(string.match(\"abc\\0\\0\\0\", \"%\\0%\\0?\") == \"\\0\\0\")"
+        },
+        {
+          "name": "string.find",
+          "line": 418,
+          "source_statement": "assert(string.find(\"abc\\0\\0\",\"\\0.\") == 4)"
+        },
+        {
+          "name": "string.find",
+          "line": 419,
+          "source_statement": "assert(string.find(\"abcx\\0\\0abc\\0abc\",\"x\\0\\0abc\\0a.\") == 4)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "unchanged-gsub-identity-and-explicit-copy",
+      "runtime_id": "LUA-PM-REVIEWED-BLOCK-0013",
+      "first_line": 422,
+      "last_line": 452,
+      "span_end_line": 453,
+      "byte_offset": 13091,
+      "byte_length": 1072,
+      "span_sha256": "e1ea0c45c62689a4db6c4729715970277f4b706823bd7aa93c6a678333d8f33b",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "No-match and table/callback nil replacements reuse the actual original long string identity; every callback is counted and receives a. Returning the same byte character explicitly performs replacements and creates a distinct long string despite equal content. Terminal OK follows all identity assertions.",
+      "dynamic_invocation": "Execute the actual source calls string.rep@423, string.gsub@424, string.format@425, string.gsub@427, string.format@428, string.gsub@431, string.gsub@436, string.format@438, string.gsub@441, string.format@448, print@451 in section unchanged-gsub-identity-and-explicit-copy. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected pm.lua section unchanged-gsub-identity-and-explicit-copy; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.rep",
+          "line": 423,
+          "source_statement": "  local s = string.rep(\"a\", 100)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 424,
+          "source_statement": "  local r = string.gsub(s, \"b\", \"c\")   -- no match"
+        },
+        {
+          "name": "string.format",
+          "line": 425,
+          "source_statement": "  assert(string.format(\"%p\", s) == string.format(\"%p\", r))"
+        },
+        {
+          "name": "string.format",
+          "line": 425,
+          "source_statement": "  assert(string.format(\"%p\", s) == string.format(\"%p\", r))"
+        },
+        {
+          "name": "string.gsub",
+          "line": 427,
+          "source_statement": "  r = string.gsub(s, \".\", {x = \"y\"})   -- no substitutions"
+        },
+        {
+          "name": "string.format",
+          "line": 428,
+          "source_statement": "  assert(string.format(\"%p\", s) == string.format(\"%p\", r))"
+        },
+        {
+          "name": "string.format",
+          "line": 428,
+          "source_statement": "  assert(string.format(\"%p\", s) == string.format(\"%p\", r))"
+        },
+        {
+          "name": "string.gsub",
+          "line": 431,
+          "source_statement": "  r = string.gsub(s, \".\", function (x)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 436,
+          "source_statement": "  r = string.gsub(r, \".\", {b = 'x'})   -- \"a\" is not a key; no subst."
+        },
+        {
+          "name": "string.format",
+          "line": 438,
+          "source_statement": "  assert(string.format(\"%p\", s) == string.format(\"%p\", r))"
+        },
+        {
+          "name": "string.format",
+          "line": 438,
+          "source_statement": "  assert(string.format(\"%p\", s) == string.format(\"%p\", r))"
+        },
+        {
+          "name": "string.gsub",
+          "line": 441,
+          "source_statement": "  r = string.gsub(s, \".\", function (x)"
+        },
+        {
+          "name": "string.format",
+          "line": 448,
+          "source_statement": "  assert(r == s and string.format(\"%p\", s) ~= string.format(\"%p\", r))"
+        },
+        {
+          "name": "string.format",
+          "line": 448,
+          "source_statement": "  assert(r == s and string.format(\"%p\", s) ~= string.format(\"%p\", r))"
+        },
+        {
+          "name": "print",
+          "line": 451,
+          "source_statement": "print('OK')"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 451,
+          "kind": "source-phase-output",
+          "source_statement": "print('OK')"
+        }
+      ]
+    }
+  ],
+  "supplemental_obligations": [],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": []
+}

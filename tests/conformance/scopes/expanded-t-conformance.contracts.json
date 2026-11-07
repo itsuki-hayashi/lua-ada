@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "scope": "expanded-t-conformance",
+  "contracts": [],
+  "review": {
+    "status": "pending",
+    "author": "Codex",
+    "reviewer": null,
+    "artifact": null,
+    "artifact_sha256": null
+  }
+}

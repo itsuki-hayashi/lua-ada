@@ -1,0 +1,1348 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "bitwise.lua",
+  "role": "primary",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/bitwise.lua",
+    "sha256": "ea36f2c261483e85a65dffe41b0674fb92869a6372ac744ed7fea8304e6a8a19",
+    "byte_length": 10141,
+    "line_count": 363
+  },
+  "original_anchor_count": 155,
+  "original_pending_ledger_sha256": "82b8d25e6f617c2e19d63f77d11ec35fb884645b12ae2442ded21892d048bb5f",
+  "appended_runtime_blocks": 10,
+  "proposal": {
+    "path": "tests/conformance/reviews/bitwise.expanded-classification-proposal.jsonl",
+    "sha256": "1ca8eab2fee10217e525d077ba36ff60df0346ed2f6ed45383d1a77dd831ee58"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/bitwise.jsonl",
+    "sha256": "e668830d947778cdcf97ee7a97905bf3dffe0c718ca59aa0b093fc980dc10132"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "operator-basics-and-helper-loading",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 40,
+      "span_end_line": 41,
+      "byte_offset": 0,
+      "byte_length": 967,
+      "span_sha256": "3378821a8396b68e55857240bad34d25fc21f115b388cce2c5206d0148beab9a",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The unchanged bwcoercion helper is actually required before testing integer/float/numeric-string bitwise operands, precedence, shifts across 32-bit halves and complement identities.",
+      "dynamic_invocation": "Execute the actual source calls print@4, require@6, string.packsize@8 in section operator-basics-and-helper-loading. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected bitwise.lua section operator-basics-and-helper-loading; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 4,
+          "source_statement": "print(\"testing bitwise operations\")"
+        },
+        {
+          "name": "require",
+          "line": 6,
+          "source_statement": "require \"bwcoercion\""
+        },
+        {
+          "name": "string.packsize",
+          "line": 8,
+          "source_statement": "local numbits = string.packsize('j') * 8"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 4,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"testing bitwise operations\")"
+        }
+      ]
+    },
+    {
+      "id": "constant-folded-and-extreme-shifts",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0002",
+      "first_line": 41,
+      "last_line": 74,
+      "span_end_line": 75,
+      "byte_offset": 967,
+      "byte_length": 1051,
+      "span_sha256": "1ac74ba0ff634f755fd193b8bb6d88f52aab6478a82fbc9b10937dd67898f7b5",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Dynamically loaded constant shifts and runtime shifts handle min/max counts, negative directions and full-width saturation consistently without signed overflow.",
+      "dynamic_invocation": "Execute the actual source calls string.format@43, load@44, string.format@45, load@46, string.format@47, load@48, string.format@49, load@50 in section constant-folded-and-extreme-shifts. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected bitwise.lua section constant-folded-and-extreme-shifts; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.format",
+          "line": 43,
+          "source_statement": "  local code = string.format(\"return -1 >> %d\", math.maxinteger)"
+        },
+        {
+          "name": "load",
+          "line": 44,
+          "source_statement": "  assert(load(code)() == 0)"
+        },
+        {
+          "name": "string.format",
+          "line": 45,
+          "source_statement": "  local code = string.format(\"return -1 >> %d\", math.mininteger)"
+        },
+        {
+          "name": "load",
+          "line": 46,
+          "source_statement": "  assert(load(code)() == 0)"
+        },
+        {
+          "name": "string.format",
+          "line": 47,
+          "source_statement": "  local code = string.format(\"return -1 << %d\", math.maxinteger)"
+        },
+        {
+          "name": "load",
+          "line": 48,
+          "source_statement": "  assert(load(code)() == 0)"
+        },
+        {
+          "name": "string.format",
+          "line": 49,
+          "source_statement": "  local code = string.format(\"return -1 << %d\", math.mininteger)"
+        },
+        {
+          "name": "load",
+          "line": 50,
+          "source_statement": "  assert(load(code)() == 0)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "string-coercion-and-error-fallback",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0003",
+      "first_line": 75,
+      "last_line": 100,
+      "span_end_line": 101,
+      "byte_offset": 2018,
+      "byte_length": 645,
+      "span_sha256": "207d737989209b154639b877a88f9f3cab05526b791877f3990324bb3456597b",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Numeric byte strings coerce through the installed handlers, concatenated operands remain observable, invalid/out-of-range/embedded-zero inputs fail and band/bnot error names identify the selected fallback.",
+      "dynamic_invocation": "Execute the actual source calls pcall@85, string.find@86, pcall@88, string.find@89, pcall@94, pcall@97, print@99 in section string-coercion-and-error-fallback. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected bitwise.lua section string-coercion-and-error-fallback; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "pcall",
+          "line": 85,
+          "source_statement": "  local st, msg = pcall(function () return 4 & \"a\" end)"
+        },
+        {
+          "name": "string.find",
+          "line": 86,
+          "source_statement": "  assert(string.find(msg, \"'band'\"))"
+        },
+        {
+          "name": "pcall",
+          "line": 88,
+          "source_statement": "  local st, msg = pcall(function () return ~\"a\" end)"
+        },
+        {
+          "name": "string.find",
+          "line": 89,
+          "source_statement": "  assert(string.find(msg, \"'bnot'\"))"
+        },
+        {
+          "name": "pcall",
+          "line": 94,
+          "source_statement": "assert(not pcall(function () return \"0xffffffffffffffff.0\" | 0 end))"
+        },
+        {
+          "name": "pcall",
+          "line": 97,
+          "source_statement": "assert(not pcall(function () return \"0xffffffffffffffff\\0\" | 0 end))"
+        },
+        {
+          "name": "print",
+          "line": 99,
+          "source_statement": "print'+'"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 99,
+          "kind": "source-phase-output",
+          "source_statement": "print'+'"
+        }
+      ]
+    },
+    {
+      "id": "lua-bit32-core-operations",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0004",
+      "first_line": 101,
+      "last_line": 151,
+      "span_end_line": 152,
+      "byte_offset": 2663,
+      "byte_length": 1060,
+      "span_sha256": "5c8c91d0df8e200e189f352c50a5fc5c55f0917e2d6bba0ebf6ba3baf4b8c234",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "A real Lua preload module builds 32-bit masked not/and/or/xor, vararg accumulation, btest and logical/arithmetic shifts using the implementation bitwise operators.",
+      "dynamic_invocation": "The constructors are definitions here; all operations are called by the subsequent assertions and loops.",
+      "execution_condition": "Selected bitwise.lua section lua-bit32-core-operations; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [],
+      "guard_sites": [
+        {
+          "line": 119,
+          "source_statement": "  if not z then"
+        },
+        {
+          "line": 130,
+          "source_statement": "  if not z then"
+        },
+        {
+          "line": 141,
+          "source_statement": "  if not z then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 124,
+          "source_statement": "    for i = 1, #arg do res = res & arg[i] end"
+        },
+        {
+          "line": 135,
+          "source_statement": "    for i = 1, #arg do res = res | arg[i] end"
+        },
+        {
+          "line": 146,
+          "source_statement": "    for i = 1, #arg do res = res ~ arg[i] end"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "lua-bit32-rotation-and-fields",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0005",
+      "first_line": 152,
+      "last_line": 206,
+      "span_end_line": 207,
+      "byte_offset": 3723,
+      "byte_length": 1060,
+      "span_sha256": "3b0f0eafa5b39a51a6579eccf826aa217d365dabaac49cc389db9fbacb051736",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The preload module masks rotations modulo32 and implements extract/replace from checked nonnegative field and positive width bounds; the constructor returns the real function table.",
+      "dynamic_invocation": "Every helper and field-bound check is invoked by later positive/negative tests.",
+      "execution_condition": "Selected bitwise.lua section lua-bit32-rotation-and-fields; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "bit.band",
+          "line": 152,
+          "source_statement": "  return bit.band(...) ~= 0"
+        },
+        {
+          "name": "bit.lrotate",
+          "line": 180,
+          "source_statement": "  return bit.lrotate(a, -b)"
+        },
+        {
+          "name": "checkfield",
+          "line": 192,
+          "source_statement": "  local f, mask = checkfield(f, w)"
+        },
+        {
+          "name": "checkfield",
+          "line": 197,
+          "source_statement": "  local f, mask = checkfield(f, w)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 165,
+          "source_statement": "  if b <= 0 or (a & 0x80000000) == 0 then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "bit32-empty-and-range-behavior",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0006",
+      "first_line": 207,
+      "last_line": 245,
+      "span_end_line": 246,
+      "byte_offset": 4783,
+      "byte_length": 1244,
+      "span_sha256": "7a7f31a9b88a442706155136f6ed71dda0e1b8392c7b309bbf2d5eaf664086a3",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The loaded module handles empty and unary variadic operations, wraps values outside32 bits, rotates in either direction and preserves masked logical/arithmetic shift behavior including negative counts.",
+      "dynamic_invocation": "Execute the actual source calls print@208, require@210, bit32.band@212, bit32.bnot@212, bit32.btest@213, bit32.bor@214, bit32.bxor@215, bit32.band@217, bit32.band@218, bit32.band@222, bit32.band@223, bit32.band@224, bit32.band@225, bit32.band@226, bit32.band@227, bit32.band@228, bit32.band@229, bit32.band@230, bit32.lrotate@232, bit32.lrotate@233, bit32.lrotate@234, bit32.lrotate@235, bit32.lrotate@236, bit32.rrotate@237, bit32.lrotate@238, bit32.rrotate@239, bit32.lrotate@240, bit32.lrotate@241, bit32.lrotate@243 in section bit32-empty-and-range-behavior. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected bitwise.lua section bit32-empty-and-range-behavior; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 208,
+          "source_statement": "print(\"testing bitwise library\")"
+        },
+        {
+          "name": "require",
+          "line": 210,
+          "source_statement": "local bit32 = require'bit32'"
+        },
+        {
+          "name": "bit32.band",
+          "line": 212,
+          "source_statement": "assert(bit32.band() == bit32.bnot(0))"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 212,
+          "source_statement": "assert(bit32.band() == bit32.bnot(0))"
+        },
+        {
+          "name": "bit32.btest",
+          "line": 213,
+          "source_statement": "assert(bit32.btest() == true)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 214,
+          "source_statement": "assert(bit32.bor() == 0)"
+        },
+        {
+          "name": "bit32.bxor",
+          "line": 215,
+          "source_statement": "assert(bit32.bxor() == 0)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 217,
+          "source_statement": "assert(bit32.band() == bit32.band(0xffffffff))"
+        },
+        {
+          "name": "bit32.band",
+          "line": 217,
+          "source_statement": "assert(bit32.band() == bit32.band(0xffffffff))"
+        },
+        {
+          "name": "bit32.band",
+          "line": 218,
+          "source_statement": "assert(bit32.band(1,2) == 0)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 222,
+          "source_statement": "assert(bit32.band(-1) == 0xffffffff)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 223,
+          "source_statement": "assert(bit32.band((1 << 33) - 1) == 0xffffffff)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 224,
+          "source_statement": "assert(bit32.band(-(1 << 33) - 1) == 0xffffffff)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 225,
+          "source_statement": "assert(bit32.band((1 << 33) + 1) == 1)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 226,
+          "source_statement": "assert(bit32.band(-(1 << 33) + 1) == 1)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 227,
+          "source_statement": "assert(bit32.band(-(1 << 40)) == 0)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 228,
+          "source_statement": "assert(bit32.band(1 << 40) == 0)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 229,
+          "source_statement": "assert(bit32.band(-(1 << 40) - 2) == 0xfffffffe)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 230,
+          "source_statement": "assert(bit32.band((1 << 40) - 4) == 0xfffffffc)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 232,
+          "source_statement": "assert(bit32.lrotate(0, -1) == 0)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 233,
+          "source_statement": "assert(bit32.lrotate(0, 7) == 0)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 234,
+          "source_statement": "assert(bit32.lrotate(0x12345678, 0) == 0x12345678)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 235,
+          "source_statement": "assert(bit32.lrotate(0x12345678, 32) == 0x12345678)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 236,
+          "source_statement": "assert(bit32.lrotate(0x12345678, 4) == 0x23456781)"
+        },
+        {
+          "name": "bit32.rrotate",
+          "line": 237,
+          "source_statement": "assert(bit32.rrotate(0x12345678, -4) == 0x23456781)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 238,
+          "source_statement": "assert(bit32.lrotate(0x12345678, -8) == 0x78123456)"
+        },
+        {
+          "name": "bit32.rrotate",
+          "line": 239,
+          "source_statement": "assert(bit32.rrotate(0x12345678, 8) == 0x78123456)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 240,
+          "source_statement": "assert(bit32.lrotate(0xaaaaaaaa, 2) == 0xaaaaaaaa)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 241,
+          "source_statement": "assert(bit32.lrotate(0xaaaaaaaa, -2) == 0xaaaaaaaa)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 243,
+          "source_statement": "  assert(bit32.lrotate(0x89abcdef, i) == bit32.lrotate(0x89abcdef, i%32))"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 243,
+          "source_statement": "  assert(bit32.lrotate(0x89abcdef, i) == bit32.lrotate(0x89abcdef, i%32))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 242,
+          "source_statement": "for i = -50, 50 do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 208,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"testing bitwise library\")"
+        }
+      ]
+    },
+    {
+      "id": "native-shifts-and-dynamic-algebra",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0007",
+      "first_line": 246,
+      "last_line": 305,
+      "span_end_line": 306,
+      "byte_offset": 6027,
+      "byte_length": 2387,
+      "span_sha256": "c802f38b7ad4d658886901698d7e63e5323411a6161897ddf545e9412ff7f15b",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Native-width shifts are distinct from masked bit32 results. A ten-value matrix exercises bitwise identities, btest, rotations and masked chained shifts for all supplied inputs.",
+      "dynamic_invocation": "Execute the actual source calls bit32.lshift@246, bit32.lshift@247, bit32.lshift@248, bit32.lshift@249, bit32.lshift@250, bit32.lshift@251, bit32.rshift@252, bit32.rshift@253, bit32.rshift@254, bit32.rshift@255, bit32.arshift@256, bit32.arshift@257, bit32.arshift@258, bit32.arshift@259, bit32.arshift@260, bit32.arshift@261, bit32.arshift@262, bit32.band@262, print@275, pairs@280, bit32.band@281, bit32.band@282, bit32.band@283, bit32.btest@284, bit32.band@285, bit32.band@286, bit32.btest@287, bit32.band@288, bit32.bnot@288, bit32.bor@289, bit32.bnot@289, bit32.bor@290, bit32.bor@291, bit32.bor@292, bit32.bor@293, bit32.bxor@294, bit32.bxor@295, bit32.bxor@296, bit32.bxor@297, bit32.bxor@298, bit32.bnot@299, bit32.bnot@300, bit32.bnot@301, bit32.lrotate@302, bit32.rrotate@303, bit32.lshift@304, bit32.band@304, bit32.bnot@304, bit32.rshift@305, bit32.band@305, bit32.bnot@305 in section native-shifts-and-dynamic-algebra. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected bitwise.lua section native-shifts-and-dynamic-algebra; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "bit32.lshift",
+          "line": 246,
+          "source_statement": "assert(bit32.lshift(0x12345678, 4) == 0x23456780)"
+        },
+        {
+          "name": "bit32.lshift",
+          "line": 247,
+          "source_statement": "assert(bit32.lshift(0x12345678, 8) == 0x34567800)"
+        },
+        {
+          "name": "bit32.lshift",
+          "line": 248,
+          "source_statement": "assert(bit32.lshift(0x12345678, -4) == 0x01234567)"
+        },
+        {
+          "name": "bit32.lshift",
+          "line": 249,
+          "source_statement": "assert(bit32.lshift(0x12345678, -8) == 0x00123456)"
+        },
+        {
+          "name": "bit32.lshift",
+          "line": 250,
+          "source_statement": "assert(bit32.lshift(0x12345678, 32) == 0)"
+        },
+        {
+          "name": "bit32.lshift",
+          "line": 251,
+          "source_statement": "assert(bit32.lshift(0x12345678, -32) == 0)"
+        },
+        {
+          "name": "bit32.rshift",
+          "line": 252,
+          "source_statement": "assert(bit32.rshift(0x12345678, 4) == 0x01234567)"
+        },
+        {
+          "name": "bit32.rshift",
+          "line": 253,
+          "source_statement": "assert(bit32.rshift(0x12345678, 8) == 0x00123456)"
+        },
+        {
+          "name": "bit32.rshift",
+          "line": 254,
+          "source_statement": "assert(bit32.rshift(0x12345678, 32) == 0)"
+        },
+        {
+          "name": "bit32.rshift",
+          "line": 255,
+          "source_statement": "assert(bit32.rshift(0x12345678, -32) == 0)"
+        },
+        {
+          "name": "bit32.arshift",
+          "line": 256,
+          "source_statement": "assert(bit32.arshift(0x12345678, 0) == 0x12345678)"
+        },
+        {
+          "name": "bit32.arshift",
+          "line": 257,
+          "source_statement": "assert(bit32.arshift(0x12345678, 1) == 0x12345678 // 2)"
+        },
+        {
+          "name": "bit32.arshift",
+          "line": 258,
+          "source_statement": "assert(bit32.arshift(0x12345678, -1) == 0x12345678 * 2)"
+        },
+        {
+          "name": "bit32.arshift",
+          "line": 259,
+          "source_statement": "assert(bit32.arshift(-1, 1) == 0xffffffff)"
+        },
+        {
+          "name": "bit32.arshift",
+          "line": 260,
+          "source_statement": "assert(bit32.arshift(-1, 24) == 0xffffffff)"
+        },
+        {
+          "name": "bit32.arshift",
+          "line": 261,
+          "source_statement": "assert(bit32.arshift(-1, 32) == 0xffffffff)"
+        },
+        {
+          "name": "bit32.arshift",
+          "line": 262,
+          "source_statement": "assert(bit32.arshift(-1, -1) == bit32.band(-1 * 2, 0xffffffff))"
+        },
+        {
+          "name": "bit32.band",
+          "line": 262,
+          "source_statement": "assert(bit32.arshift(-1, -1) == bit32.band(-1 * 2, 0xffffffff))"
+        },
+        {
+          "name": "print",
+          "line": 275,
+          "source_statement": "print(\"+\")"
+        },
+        {
+          "name": "pairs",
+          "line": 280,
+          "source_statement": "for _, b in pairs(c) do"
+        },
+        {
+          "name": "bit32.band",
+          "line": 281,
+          "source_statement": "  assert(bit32.band(b) == b)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 282,
+          "source_statement": "  assert(bit32.band(b, b) == b)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 283,
+          "source_statement": "  assert(bit32.band(b, b, b, b) == b)"
+        },
+        {
+          "name": "bit32.btest",
+          "line": 284,
+          "source_statement": "  assert(bit32.btest(b, b) == (b ~= 0))"
+        },
+        {
+          "name": "bit32.band",
+          "line": 285,
+          "source_statement": "  assert(bit32.band(b, b, b) == b)"
+        },
+        {
+          "name": "bit32.band",
+          "line": 286,
+          "source_statement": "  assert(bit32.band(b, b, b, ~b) == 0)"
+        },
+        {
+          "name": "bit32.btest",
+          "line": 287,
+          "source_statement": "  assert(bit32.btest(b, b, b) == (b ~= 0))"
+        },
+        {
+          "name": "bit32.band",
+          "line": 288,
+          "source_statement": "  assert(bit32.band(b, bit32.bnot(b)) == 0)"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 288,
+          "source_statement": "  assert(bit32.band(b, bit32.bnot(b)) == 0)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 289,
+          "source_statement": "  assert(bit32.bor(b, bit32.bnot(b)) == bit32.bnot(0))"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 289,
+          "source_statement": "  assert(bit32.bor(b, bit32.bnot(b)) == bit32.bnot(0))"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 289,
+          "source_statement": "  assert(bit32.bor(b, bit32.bnot(b)) == bit32.bnot(0))"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 290,
+          "source_statement": "  assert(bit32.bor(b) == b)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 291,
+          "source_statement": "  assert(bit32.bor(b, b) == b)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 292,
+          "source_statement": "  assert(bit32.bor(b, b, b) == b)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 293,
+          "source_statement": "  assert(bit32.bor(b, b, 0, ~b) == 0xffffffff)"
+        },
+        {
+          "name": "bit32.bxor",
+          "line": 294,
+          "source_statement": "  assert(bit32.bxor(b) == b)"
+        },
+        {
+          "name": "bit32.bxor",
+          "line": 295,
+          "source_statement": "  assert(bit32.bxor(b, b) == 0)"
+        },
+        {
+          "name": "bit32.bxor",
+          "line": 296,
+          "source_statement": "  assert(bit32.bxor(b, b, b) == b)"
+        },
+        {
+          "name": "bit32.bxor",
+          "line": 297,
+          "source_statement": "  assert(bit32.bxor(b, b, b, b) == 0)"
+        },
+        {
+          "name": "bit32.bxor",
+          "line": 298,
+          "source_statement": "  assert(bit32.bxor(b, 0) == b)"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 299,
+          "source_statement": "  assert(bit32.bnot(b) ~= b)"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 300,
+          "source_statement": "  assert(bit32.bnot(bit32.bnot(b)) == b)"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 300,
+          "source_statement": "  assert(bit32.bnot(bit32.bnot(b)) == b)"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 301,
+          "source_statement": "  assert(bit32.bnot(b) == (1 << 32) - 1 - b)"
+        },
+        {
+          "name": "bit32.lrotate",
+          "line": 302,
+          "source_statement": "  assert(bit32.lrotate(b, 32) == b)"
+        },
+        {
+          "name": "bit32.rrotate",
+          "line": 303,
+          "source_statement": "  assert(bit32.rrotate(b, 32) == b)"
+        },
+        {
+          "name": "bit32.lshift",
+          "line": 304,
+          "source_statement": "  assert(bit32.lshift(bit32.lshift(b, -4), 4) == bit32.band(b, bit32.bnot(0xf)))"
+        },
+        {
+          "name": "bit32.lshift",
+          "line": 304,
+          "source_statement": "  assert(bit32.lshift(bit32.lshift(b, -4), 4) == bit32.band(b, bit32.bnot(0xf)))"
+        },
+        {
+          "name": "bit32.band",
+          "line": 304,
+          "source_statement": "  assert(bit32.lshift(bit32.lshift(b, -4), 4) == bit32.band(b, bit32.bnot(0xf)))"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 304,
+          "source_statement": "  assert(bit32.lshift(bit32.lshift(b, -4), 4) == bit32.band(b, bit32.bnot(0xf)))"
+        },
+        {
+          "name": "bit32.rshift",
+          "line": 305,
+          "source_statement": "  assert(bit32.rshift(bit32.rshift(b, 4), -4) == bit32.band(b, bit32.bnot(0xf)))"
+        },
+        {
+          "name": "bit32.rshift",
+          "line": 305,
+          "source_statement": "  assert(bit32.rshift(bit32.rshift(b, 4), -4) == bit32.band(b, bit32.bnot(0xf)))"
+        },
+        {
+          "name": "bit32.band",
+          "line": 305,
+          "source_statement": "  assert(bit32.rshift(bit32.rshift(b, 4), -4) == bit32.band(b, bit32.bnot(0xf)))"
+        },
+        {
+          "name": "bit32.bnot",
+          "line": 305,
+          "source_statement": "  assert(bit32.rshift(bit32.rshift(b, 4), -4) == bit32.band(b, bit32.bnot(0xf)))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 280,
+          "source_statement": "for _, b in pairs(c) do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 275,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"+\")"
+        }
+      ]
+    },
+    {
+      "id": "float-comparison-and-invalid-arguments",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0008",
+      "first_line": 306,
+      "last_line": 325,
+      "span_end_line": 326,
+      "byte_offset": 8414,
+      "byte_length": 533,
+      "span_sha256": "c11522e2558e641e4bb1ad44f2f28f01752713bb75442cace28dde0ffb897f8a",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The 24-bit value/count matrix matches a floating fmod/floor oracle for shifts; invalid table/string/missing/function arguments to bitwise helpers fail.",
+      "dynamic_invocation": "Execute the actual source calls pairs@310, bit32.lshift@312, math.floor@313, math.fmod@313, math.fmod@314, pcall@318, pcall@319, pcall@320, pcall@321, pcall@322, print@324 in section float-comparison-and-invalid-arguments. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected bitwise.lua section float-comparison-and-invalid-arguments; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "pairs",
+          "line": 310,
+          "source_statement": "for _, b in pairs(c) do"
+        },
+        {
+          "name": "bit32.lshift",
+          "line": 312,
+          "source_statement": "    local x = bit32.lshift(b, i)"
+        },
+        {
+          "name": "math.floor",
+          "line": 313,
+          "source_statement": "    local y = math.floor(math.fmod(b * 2.0^i, 2.0^32))"
+        },
+        {
+          "name": "math.fmod",
+          "line": 313,
+          "source_statement": "    local y = math.floor(math.fmod(b * 2.0^i, 2.0^32))"
+        },
+        {
+          "name": "math.fmod",
+          "line": 314,
+          "source_statement": "    assert(math.fmod(x - y, 2.0^32) == 0)"
+        },
+        {
+          "name": "pcall",
+          "line": 318,
+          "source_statement": "assert(not pcall(bit32.band, {}))"
+        },
+        {
+          "name": "pcall",
+          "line": 319,
+          "source_statement": "assert(not pcall(bit32.bnot, \"a\"))"
+        },
+        {
+          "name": "pcall",
+          "line": 320,
+          "source_statement": "assert(not pcall(bit32.lshift, 45))"
+        },
+        {
+          "name": "pcall",
+          "line": 321,
+          "source_statement": "assert(not pcall(bit32.lshift, 45, print))"
+        },
+        {
+          "name": "pcall",
+          "line": 322,
+          "source_statement": "assert(not pcall(bit32.rshift, 45, print))"
+        },
+        {
+          "name": "print",
+          "line": 324,
+          "source_statement": "print(\"+\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 310,
+          "source_statement": "for _, b in pairs(c) do"
+        },
+        {
+          "line": 311,
+          "source_statement": "  for i = -40, 40 do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 324,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"+\")"
+        }
+      ]
+    },
+    {
+      "id": "field-extract-replace-and-float-conversion",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0009",
+      "first_line": 326,
+      "last_line": 363,
+      "span_end_line": 364,
+      "byte_offset": 8947,
+      "byte_length": 1194,
+      "span_sha256": "47ab44cf9c492182d44d961808c5a88de480ff0dc73bb1aca20f82d1b61c9756",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Field extraction/replacement preserves masks and native sign behavior while rejecting out-of-range spans; exact float operands convert and the measured sufficiently precise float/integer branch exercises large integral float inputs. Terminal OK follows all module tests.",
+      "dynamic_invocation": "Execute the actual source calls bit32.extract@329, bit32.extract@330, bit32.extract@331, bit32.extract@332, bit32.extract@333, bit32.extract@334, pcall@336, pcall@337, pcall@338, pcall@339, bit32.replace@341, bit32.replace@342, bit32.replace@343, bit32.replace@344, bit32.replace@345, bit32.replace@346, bit32.bor@351, bit32.bor@352, bit32.bor@356, bit32.bor@357, bit32.bor@358, bit32.bor@359, print@362 in section field-extract-replace-and-float-conversion. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected bitwise.lua section field-extract-replace-and-float-conversion; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "bit32.extract",
+          "line": 329,
+          "source_statement": "assert(bit32.extract(0x12345678, 0, 4) == 8)"
+        },
+        {
+          "name": "bit32.extract",
+          "line": 330,
+          "source_statement": "assert(bit32.extract(0x12345678, 4, 4) == 7)"
+        },
+        {
+          "name": "bit32.extract",
+          "line": 331,
+          "source_statement": "assert(bit32.extract(0xa0001111, 28, 4) == 0xa)"
+        },
+        {
+          "name": "bit32.extract",
+          "line": 332,
+          "source_statement": "assert(bit32.extract(0xa0001111, 31, 1) == 1)"
+        },
+        {
+          "name": "bit32.extract",
+          "line": 333,
+          "source_statement": "assert(bit32.extract(0x50000111, 31, 1) == 0)"
+        },
+        {
+          "name": "bit32.extract",
+          "line": 334,
+          "source_statement": "assert(bit32.extract(0xf2345679, 0, 32) == 0xf2345679)"
+        },
+        {
+          "name": "pcall",
+          "line": 336,
+          "source_statement": "assert(not pcall(bit32.extract, 0, -1))"
+        },
+        {
+          "name": "pcall",
+          "line": 337,
+          "source_statement": "assert(not pcall(bit32.extract, 0, 32))"
+        },
+        {
+          "name": "pcall",
+          "line": 338,
+          "source_statement": "assert(not pcall(bit32.extract, 0, 0, 33))"
+        },
+        {
+          "name": "pcall",
+          "line": 339,
+          "source_statement": "assert(not pcall(bit32.extract, 0, 31, 2))"
+        },
+        {
+          "name": "bit32.replace",
+          "line": 341,
+          "source_statement": "assert(bit32.replace(0x12345678, 5, 28, 4) == 0x52345678)"
+        },
+        {
+          "name": "bit32.replace",
+          "line": 342,
+          "source_statement": "assert(bit32.replace(0x12345678, 0x87654321, 0, 32) == 0x87654321)"
+        },
+        {
+          "name": "bit32.replace",
+          "line": 343,
+          "source_statement": "assert(bit32.replace(0, 1, 2) == 2^2)"
+        },
+        {
+          "name": "bit32.replace",
+          "line": 344,
+          "source_statement": "assert(bit32.replace(0, -1, 4) == 2^4)"
+        },
+        {
+          "name": "bit32.replace",
+          "line": 345,
+          "source_statement": "assert(bit32.replace(-1, 0, 31) == (1 << 31) - 1)"
+        },
+        {
+          "name": "bit32.replace",
+          "line": 346,
+          "source_statement": "assert(bit32.replace(-1, 0, 1, 2) == (1 << 32) - 7)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 351,
+          "source_statement": "assert(bit32.bor(3.0) == 3)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 352,
+          "source_statement": "assert(bit32.bor(-4.0) == 0xfffffffc)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 356,
+          "source_statement": "  assert(bit32.bor(2.0^32 - 5.0) == 0xfffffffb)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 357,
+          "source_statement": "  assert(bit32.bor(-2.0^32 - 6.0) == 0xfffffffa)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 358,
+          "source_statement": "  assert(bit32.bor(2.0^48 - 5.0) == 0xfffffffb)"
+        },
+        {
+          "name": "bit32.bor",
+          "line": 359,
+          "source_statement": "  assert(bit32.bor(-2.0^48 - 6.0) == 0xfffffffa)"
+        },
+        {
+          "name": "print",
+          "line": 362,
+          "source_statement": "print'OK'"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 355,
+          "source_statement": "if 2.0^50 < 2.0^50 + 1.0 and 2.0^50 < (-1 >> 1) then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 362,
+          "kind": "source-phase-output",
+          "source_statement": "print'OK'"
+        }
+      ]
+    }
+  ],
+  "supplemental_obligations": [
+    {
+      "id": "measured-large-integral-float-guard",
+      "runtime_id": "LUA-BITWISE-REVIEWED-BLOCK-0010",
+      "first_line": 355,
+      "last_line": 360,
+      "span_end_line": 361,
+      "byte_offset": 9878,
+      "byte_length": 251,
+      "span_sha256": "e4890ccb899e0667ea4ec699652fcab41086aca758d448dca601ee6e0698c763",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The exact predicate2.0^50<2.0^50+1.0 and2.0^50<(-1>>1) is measured by the source-profile witness. Its four original large-float assertions execute only when true; false cannot be certified by terminalOK.",
+      "measured_condition": {
+        "fact": "bitwise_precision",
+        "operator": "eq",
+        "value": true
+      },
+      "dynamic_invocation": "Run the unchanged source with a hash-bound source-profile-witness.lua measurement in this same C/Ada process. Compare actual facts with this condition and independently adjudicate which original body is active; do not record the inactive body as executed.",
+      "execution_condition": "The guard measurement applies in every selected configuration; its body applicability is determined by actual per-context facts.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ]
+    }
+  ],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": [],
+  "helper_execution_witness": {
+    "path": "tests/conformance/bitwise-helper-witness.lua",
+    "sha256": "1a858b2c5592f2945bbe7b17d7cfa4269774908069c125de1d1f1a87ea086f55",
+    "protocol": "Execute the unchanged bitwise.lua, whose real require executes unchanged bwcoercion.lua, then six-handler/coercion/raw-secondary-fallback/error assertions; upstream OK precedes terminal BWCOERCION HELPER OK.",
+    "runtime_acceptance": false,
+    "independent_review_status": "pending"
+  }
+}

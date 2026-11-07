@@ -27,9 +27,9 @@ function Assert-MatrixReview {
 function Assert-ScopedMatrixIndex {
     param([Parameter(Mandatory)][Collections.IDictionary] $Manifest,
           [Parameter(Mandatory)][string[]] $Contexts)
-    if ($Manifest.schema_version -ne 1 -or $Manifest.scope -cne 'gc-io-events' -or
+    if ($Manifest.schema_version -ne 1 -or $Manifest.scope -cnotin @('gc-io-events','expanded-t-conformance') -or
         $Manifest.revision -cnotmatch '^[0-9a-f]{40}$') { throw 'Invalid scoped matrix identity' }
-    $files = @('events.lua','gc.lua','gengc.lua','files.lua')
+    $files = (Get-ConformanceScopePolicy -Scope $Manifest.scope).Files
     $seen = @{}
     foreach ($entry in $Manifest.operations) {
         if ($entry.file -cnotin $files -or $entry.context -cnotin $Contexts) {
@@ -38,6 +38,22 @@ function Assert-ScopedMatrixIndex {
         $key = $entry.context + '/' + $entry.file
         if ($seen.ContainsKey($key)) { throw "Duplicate scoped matrix operation: $key" }
         $seen[$key] = $true
+        if ($Manifest.scope -ceq 'expanded-t-conformance' -and $entry.file -ceq 'constructs.lua') {
+            if (-not $entry.Contains('supplemental') -or @($entry.supplemental).Count -ne 1 -or
+                $entry.supplemental[0].variant -cne 'constructs-branch-1') {
+                throw 'Constructs requires its second seeded template execution'
+            }
+            foreach ($target in @('ada','c')) {
+                $identity=$entry.supplemental[0][$target]
+                if ($null -eq $identity -or [string]::IsNullOrWhiteSpace([string]$identity.report) -or
+                    [string]::IsNullOrWhiteSpace([string]$identity.artifact_root) -or
+                    $identity.sha256 -cnotmatch '^[0-9a-f]{64}$') {
+                    throw 'Constructs supplemental report identity missing'
+                }
+            }
+        } elseif ($entry.Contains('supplemental') -and @($entry.supplemental).Count -gt 0) {
+            throw 'Unexpected supplemental matrix execution'
+        }
         foreach ($target in @('ada','c')) {
             if ($null -eq $entry[$target] -or
                 [string]::IsNullOrWhiteSpace([string]$entry[$target].report) -or
@@ -119,18 +135,31 @@ function Test-MatrixNamedEvidence {
             $_.path -ceq $case.source -and $_.sha256 -ceq $case.source_sha256
         }).Count -ne 1) { throw 'Reviewed consumer source binding incomplete' }
     }
-    $api = @(Read-ConformanceJsonLines -Path (Join-Path $Root 'tests/conformance/scopes/gc-io-events.api.jsonl'))
+    $api = @(Read-ConformanceJsonLines -Path (Join-Path $Root "tests/conformance/scopes/$($manifest.scope).api.jsonl"))
     if (@($mapping.entries).Count -ne $api.Count) { throw 'Consumer mapping API inventory differs' }
+    $aunitApiCases = @{}
     foreach ($obligation in $api) {
         $matched = @($mapping.entries | Where-Object { $_.id -ceq $obligation.id })
         if ($matched.Count -ne 1) { throw 'Consumer mapping API obligation missing/duplicate' }
-        $expected = @($obligation.named_cases | ForEach-Object { $_.source + '#' + $_.id } | Sort-Object -Unique)
+        $expected = @(if ($obligation.Contains('named_cases')) {
+            $obligation.named_cases | ForEach-Object { $_.source + '#' + $_.id } | Sort-Object -Unique
+        })
         $actual = @($matched[0].cases | Sort-Object -Unique)
         if (($expected -join "`n") -cne ($actual -join "`n")) { throw 'Consumer mapping API cases differ' }
         foreach ($case in $expected) {
             if (@($mapping.cases | Where-Object { ($_.source + '#' + $_.case_id) -ceq $case }).Count -ne 1) {
                 throw 'Consumer mapping case missing/duplicate'
             }
+        }
+        if ($manifest.scope -ceq 'expanded-t-conformance') {
+            $unitCases = @(if ($obligation.Contains('named_aunit_cases')) {
+                $obligation.named_aunit_cases | ForEach-Object { $_.source + '#' + $_.id }
+            })
+            if (($expected.Count + $unitCases.Count) -eq 0) { throw 'Scoped API has no named runtime witness' }
+            if ($unitCases.Count -ne @($unitCases | Sort-Object -Unique).Count) {
+                throw 'Scoped API has duplicate named AUnit witnesses'
+            }
+            $aunitApiCases[$obligation.id] = $unitCases
         }
     }
     $contexts = @{}
@@ -148,12 +177,27 @@ function Test-MatrixNamedEvidence {
                 [void](Resolve-ReviewedFile -Root $Root -Path $source[0].file -Sha256 $source[0].sha256)
             }
         }
+        if ($manifest.scope -ceq 'expanded-t-conformance') {
+            if (-not $consumerReport.Contains('foreign_contract')) { throw 'Expanded foreign contract missing' }
+            $foreignSources=@('c_api/tests/foreign_api_contract.c',
+                'tests/c/foreign_continuation_contract.c','tests/c/foreign_hook_contract.c',
+                'tests/c/math_reopen_contract.c','tests/c/library_opener_contract.c')
+            if (@($consumerReport.foreign_contract.sources).Count -ne $foreignSources.Count) {
+                throw 'Expanded foreign contract source set differs'
+            }
+            foreach ($name in $foreignSources) {
+                $source=@($consumerReport.foreign_contract.sources | Where-Object file -CEQ $name)
+                if ($source.Count -ne 1) { throw 'Expanded foreign contract source missing/duplicate' }
+                [void](Resolve-ReviewedFile -Root $Root -Path $source[0].file -Sha256 $source[0].sha256)
+            }
+        }
         $consumerRoot = [IO.Path]::GetFullPath((Join-Path $bundle $consumer.artifact_root))
         $resolve = { param($path,$hash)
             Resolve-MatrixCapture -Original $path -ArtifactRoot $consumerRoot -Hash $hash
         }
         $contexts[$consumer.context] = Test-NamedConsumerEvidence -Report $consumerReport -Mapping $mapping `
-            -Revision $manifest.revision -Context $consumer.context -ResolveCapture $resolve
+            -Revision $manifest.revision -Context $consumer.context -ResolveCapture $resolve `
+            -RequireForeignContract:($manifest.scope -ceq 'expanded-t-conformance')
         $consumerReports[$consumer.context] = $consumerReport
     }
     foreach ($context in $suite.acceptance_contexts) {
@@ -164,6 +208,11 @@ function Test-MatrixNamedEvidence {
     $reviewPath = Resolve-ReviewedFile -Root $Root -Path $identity.review -Sha256 $identity.review_sha256
     $aunitMapping = Get-Content -LiteralPath $mappingPath -Raw | ConvertFrom-Json -AsHashtable -Depth 64
     $aunitReview = Get-Content -LiteralPath $reviewPath -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    if ($manifest.scope -ceq 'expanded-t-conformance' -and
+        (-not $aunitMapping.Contains('expected_stderr') -or
+         $aunitMapping.expected_stderr -cne "Lua warning: error in __gc ([string `"file-abort-test`"]:1: ordinary failure)`n")) {
+        throw 'Expanded AUnit warning mapping differs from its source regression'
+    }
     if ($aunitReview.decision -cne 'accepted-semantic-witness-mapping' -or
         [string]::IsNullOrWhiteSpace($aunitReview.author) -or
         [string]::IsNullOrWhiteSpace($aunitReview.reviewer) -or
@@ -178,6 +227,13 @@ function Test-MatrixNamedEvidence {
         if (@($aunitMapping.bindings | Where-Object {
             $_.path -ceq $entry.case.Split('#')[0] -and $_.sha256 -ceq $entry.source_sha256
         }).Count -ne 1) { throw 'Reviewed AUnit source binding incomplete' }
+    }
+    foreach ($apiId in $aunitApiCases.Keys) {
+        foreach ($case in $aunitApiCases[$apiId]) {
+            if (@($aunitMapping.entries | Where-Object { $_.case -ceq $case }).Count -ne 1) {
+                throw "Scoped API named AUnit witness missing/duplicate: $apiId/$case"
+            }
+        }
     }
     $aunitContexts = @{}
     foreach ($unit in $manifest.named_aunit) {
@@ -211,7 +267,7 @@ function Test-ScopedMatrix {
     $suite = Get-Content -LiteralPath (Join-Path $Root 'tests/conformance/suite.json') -Raw |
         ConvertFrom-Json -AsHashtable -Depth 32
     Assert-ScopedMatrixIndex -Manifest $manifest -Contexts $suite.acceptance_contexts
-    $scope = Test-ConformanceScope -Root $Root -RequireScopedComplete:$RequireScopedAcceptance
+    $scope = Test-ConformanceScope -Root $Root -Scope $manifest.scope -RequireScopedComplete:$RequireScopedAcceptance
     if ($RequireScopedAcceptance) {
         foreach ($field in @('author','reviewer','artifact','rationale')) {
             if ($null -eq $manifest.review -or [string]::IsNullOrWhiteSpace([string]$manifest.review[$field])) {
@@ -227,16 +283,31 @@ function Test-ScopedMatrix {
         $consumerReports = Test-MatrixNamedEvidence -Root $Root -Manifest $manifest -Bundle $bundle -Suite $suite
     }
     $coverage = @{}
-    foreach ($file in $scope.Definition.files) {
+    $coverageByFile = @{}
+    $scopeHelpers = @(if ($scope.Definition.Contains('helpers')) { $scope.Definition.helpers })
+    foreach ($file in (@($scope.Definition.files) + $scopeHelpers)) {
         $source = @($suite.files | Where-Object { $_.path -ceq $file.path })[0]
-        foreach ($record in Read-ConformanceJsonLines -Path (Join-Path $Root "tests/conformance/$($source.coverage_file)")) {
+        $fileRecords=@(Read-ConformanceJsonLines -Path (Join-Path $Root "tests/conformance/$($source.coverage_file)"))
+        $coverageByFile[$file.path]=$fileRecords
+        foreach ($record in $fileRecords) {
             $coverage[$record.id] = $record
         }
     }
     $records = @()
-    foreach ($entry in $manifest.operations) {
+    $executionEntries = @($manifest.operations)
+    if ($manifest.scope -ceq 'expanded-t-conformance') {
+        foreach ($primary in $manifest.operations | Where-Object file -CEQ 'constructs.lua') {
+            $extra=$primary.supplemental[0]
+            $expanded=@{file=$primary.file; context=$primary.context; c=$extra.c; ada=$extra.ada;
+                variant=$extra.variant}
+            if ($RequireScopedAcceptance) { $expanded.contract=$primary.contract }
+            $executionEntries += $expanded
+        }
+    }
+    foreach ($entry in $executionEntries) {
         $configuration = $entry.context.Split('/')[0]
         $referenceNativeFacts = $null
+        $referenceSourceFacts = $null
         $contract = $null
         if ($RequireScopedAcceptance) {
             $contract = Read-MatrixHashedJson -Path (Join-Path $bundle $entry.contract.path) -Hash $entry.contract.sha256
@@ -256,7 +327,9 @@ function Test-ScopedMatrix {
                 }
             }
             if ($RequireScopedAcceptance -and $target -eq 'c') {
-                foreach ($kind in @('gc','io')) {
+                $contractKinds=@('gc','io')
+                if ($manifest.scope -ceq 'expanded-t-conformance') { $contractKinds += 'foreign' }
+                foreach ($kind in $contractKinds) {
                     foreach ($library in $consumerReports[$entry.context]["${kind}_contract"].reference_library_files) {
                         $same = @($report.reference_library_records | Where-Object {
                             [IO.Path]::GetFileName($_.path.Replace('\','/')) -ceq $library.file -and
@@ -332,6 +405,64 @@ function Test-ScopedMatrix {
             $telemetry = Get-Content -LiteralPath $telemetryPath -Raw | ConvertFrom-Json -AsHashtable
             Assert-ScopedProcessCompletion -File $entry.file -Process $report.process -Telemetry $telemetry `
                 -RunId $report.run_id -Configuration $configuration -Platform $report.host.platform -NativeOracle:($target -eq 'c')
+            if ($manifest.scope -ceq 'expanded-t-conformance') {
+                $facts = Get-ScopedSourceProfileFacts -Output ([IO.File]::ReadAllText($report.process.stdout_path)) `
+                    -Observed $report.observed_configuration
+                if (-not $report.Contains('source_profile_facts') -or $null -eq $report.source_profile_facts -or
+                    $report.source_profile_facts.Count -ne $facts.Count) {
+                    throw 'Matrix source profile fact record missing'
+                }
+                foreach ($name in $facts.Keys) {
+                    if ($report.source_profile_facts[$name] -cne $facts[$name]) {
+                        throw 'Matrix captured source profile facts differ'
+                    }
+                    if ($target -eq 'ada' -and $facts[$name] -cne $referenceSourceFacts[$name]) {
+                        throw 'Matrix C/Ada source profile applicability differs'
+                    }
+                }
+                if ($target -eq 'c') { $referenceSourceFacts=$facts }
+                $conditions=Get-ScopedMeasuredConditionResults -Records $coverageByFile[$entry.file] -Facts $facts
+                if (-not $report.Contains('source_condition_results') -or $null -eq $report.source_condition_results -or
+                    (@($conditions.Keys | Sort-Object) -join '|') -cne
+                    (@($report.source_condition_results.Keys | Sort-Object) -join '|')) {
+                    throw 'Matrix measured source condition set differs'
+                }
+                foreach ($id in $conditions.Keys) {
+                    if ($report.source_condition_results[$id] -isnot [bool] -or
+                        $report.source_condition_results[$id] -ne $conditions[$id]) {
+                        throw 'Matrix measured source condition result differs'
+                    }
+                }
+                $wrapperPath='tests/conformance/source-profile-witness.lua'
+                $wrapper=@($report.native_fixture_records | Where-Object source -CEQ $wrapperPath)
+                $hash=(Get-FileHash (Join-Path $Root $wrapperPath)).Hash.ToLowerInvariant()
+                if ($wrapper.Count -ne 1 -or $wrapper[0].source_sha256 -cne $hash -or
+                    $wrapper[0].artifact_sha256 -cne $hash) { throw 'Matrix source profile witness differs' }
+                [void](Resolve-MatrixCapture -Original $wrapper[0].artifact -ArtifactRoot $artifacts -Hash $hash)
+            }
+            if ($manifest.scope -ceq 'expanded-t-conformance' -and $entry.file -ceq 'bitwise.lua') {
+                $wrapperPath='tests/conformance/bitwise-helper-witness.lua'
+                $wrapper=@($report.native_fixture_records | Where-Object source -CEQ $wrapperPath)
+                $hash=(Get-FileHash (Join-Path $Root $wrapperPath)).Hash.ToLowerInvariant()
+                if ($wrapper.Count -ne 1 -or $wrapper[0].source_sha256 -cne $hash -or
+                    $wrapper[0].artifact_sha256 -cne $hash) { throw 'Matrix bitwise helper wrapper differs' }
+                [void](Resolve-MatrixCapture -Original $wrapper[0].artifact -ArtifactRoot $artifacts -Hash $hash)
+            }
+            if ($manifest.scope -ceq 'expanded-t-conformance' -and $entry.file -ceq 'constructs.lua') {
+                $branch=if($entry.Contains('variant')){1}else{0}
+                $stdout=[IO.File]::ReadAllText($report.process.stdout_path)
+                $pattern='(?m)^testing short-circuit optimizations \('+$branch+'\)\r?$'
+                if (-not $report.Contains('constructs_branch') -or $report.constructs_branch -ne $branch -or
+                    [regex]::Matches($stdout,$pattern).Count -ne 1) {
+                    throw 'Matrix constructs template branch differs'
+                }
+                $wrapperPath='tests/conformance/constructs-seeded.lua'
+                $wrapper=@($report.native_fixture_records | Where-Object source -CEQ $wrapperPath)
+                $hash=(Get-FileHash (Join-Path $Root $wrapperPath)).Hash.ToLowerInvariant()
+                if ($wrapper.Count -ne 1 -or $wrapper[0].source_sha256 -cne $hash -or
+                    $wrapper[0].artifact_sha256 -cne $hash) { throw 'Matrix constructs wrapper differs' }
+                [void](Resolve-MatrixCapture -Original $wrapper[0].artifact -ArtifactRoot $artifacts -Hash $hash)
+            }
             if ($entry.file -eq 'events.lua') {
                 $wrapperPath = 'tests/conformance/events-return-witness.lua'
                 $wrapper = @($report.native_fixture_records | Where-Object { $_.source -ceq $wrapperPath })
@@ -416,7 +547,7 @@ function Test-ScopedMatrix {
                         throw 'Matrix contract does not identify its equivalent execution'
                     }
                 }
-                $marker = if ($entry.file -eq 'files.lua') { '' } else { 'OK' }
+                $marker = if ($entry.file -eq 'files.lua') { '' } elseif ($entry.file -ceq 'utf8.lua') { 'ok' } else { 'OK' }
                 $outcome = Get-ConformanceOutcome -Process $report.process -Marker $marker
                 [void](Test-ConformanceAcceptance -Process $report.process -Outcome $outcome -Contract $contract `
                     -Operation "file:$($entry.file)" -Context $entry.context -SourceRecords $report.fixture_records `
@@ -424,6 +555,7 @@ function Test-ScopedMatrix {
                     -CoverageComplete $scope.ScopeComplete -CoverageRecords $coverage -Telemetry $telemetry)
             }
             $records += [ordered]@{file=$entry.file; context=$entry.context; target=$expectedTarget;
+                variant=$(if($entry.Contains('variant')){$entry.variant}else{'primary'});
                 disposition=$report.execution_disposition; report_sha256=$identity.sha256;
                 supplemental_native_equivalents=$(if($entry.file -eq 'files.lua'){@($nativeMapping.branches.id)}else{@()})}
         }

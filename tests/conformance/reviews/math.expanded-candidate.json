@@ -1,0 +1,4216 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "math.lua",
+  "role": "primary",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/math.lua",
+    "sha256": "24b1e2a94ab2e5f70d1fca0820e0c2746deca27d7e1a6152499b033de1b463b1",
+    "byte_length": 33144,
+    "line_count": 1145
+  },
+  "original_anchor_count": 468,
+  "original_pending_ledger_sha256": "c14315d9eb9a040f67b08c042ec4cf482ca6dbaddb6ebadae84678d0100b6f7f",
+  "appended_runtime_blocks": 26,
+  "proposal": {
+    "path": "tests/conformance/reviews/math.expanded-classification-proposal.jsonl",
+    "sha256": "3b9c4f92b4fe6e64aa847ccf5db2b3ffca74e8d0c4cd8e14c7f9c95bcb43007b"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/math.jsonl",
+    "sha256": "bc38010be4fe9eec429801fcfb17047c11ead884e72b521a952d7334da5416b0"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "numeric-profile-and-helper-contracts",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 88,
+      "span_end_line": 89,
+      "byte_offset": 0,
+      "byte_length": 1729,
+      "span_sha256": "e8a3891e8fdbd19880180c6a0b08272522e1d32d51ed3e55e0c8617738e7d5f0",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Integer width, floating mantissa width and exponent range are measured from real operations; min/max bounds, NaN classification and numeric types agree. Invoked checkerror, eq and eqT helpers enforce diagnostic, tolerance and type-sensitive expectations.",
+      "dynamic_invocation": "Execute the actual source calls print@4, require@6, require@7, math.floor@16, math.log@16, isNaN@48, isNaN@49, print@57, string.format@57, math.type@60, math.type@61, pcall@65, string.find@66, math.abs@79, math.type@85 in section numeric-profile-and-helper-contracts. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section numeric-profile-and-helper-contracts; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 4,
+          "source_statement": "print(\"testing numbers and math lib\")"
+        },
+        {
+          "name": "require",
+          "line": 6,
+          "source_statement": "local math = require \"math\""
+        },
+        {
+          "name": "require",
+          "line": 7,
+          "source_statement": "local string = require \"string\""
+        },
+        {
+          "name": "math.floor",
+          "line": 16,
+          "source_statement": "local intbits <const> = math.floor(math.log(maxint, 2) + 0.5) + 1"
+        },
+        {
+          "name": "math.log",
+          "line": 16,
+          "source_statement": "local intbits <const> = math.floor(math.log(maxint, 2) + 0.5) + 1"
+        },
+        {
+          "name": "isNaN",
+          "line": 48,
+          "source_statement": "assert(isNaN(0/0))"
+        },
+        {
+          "name": "isNaN",
+          "line": 49,
+          "source_statement": "assert(not isNaN(1/0))"
+        },
+        {
+          "name": "print",
+          "line": 57,
+          "source_statement": "  print(string.format(msg, intbits, floatbits, maxexp))"
+        },
+        {
+          "name": "string.format",
+          "line": 57,
+          "source_statement": "  print(string.format(msg, intbits, floatbits, maxexp))"
+        },
+        {
+          "name": "math.type",
+          "line": 60,
+          "source_statement": "assert(math.type(0) == \"integer\" and math.type(0.0) == \"float\""
+        },
+        {
+          "name": "math.type",
+          "line": 60,
+          "source_statement": "assert(math.type(0) == \"integer\" and math.type(0.0) == \"float\""
+        },
+        {
+          "name": "math.type",
+          "line": 61,
+          "source_statement": "       and not math.type(\"10\"))"
+        },
+        {
+          "name": "pcall",
+          "line": 65,
+          "source_statement": "  local s, err = pcall(f, ...)"
+        },
+        {
+          "name": "string.find",
+          "line": 66,
+          "source_statement": "  assert(not s and string.find(err, msg))"
+        },
+        {
+          "name": "math.abs",
+          "line": 79,
+          "source_statement": "  return a == b or math.abs(a-b) <= limit"
+        },
+        {
+          "name": "math.type",
+          "line": 85,
+          "source_statement": "  return a == b and math.type(a) == math.type(b)"
+        },
+        {
+          "name": "math.type",
+          "line": 85,
+          "source_statement": "  return a == b and math.type(a) == math.type(b)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 73,
+          "source_statement": "  if not limit then"
+        },
+        {
+          "line": 74,
+          "source_statement": "    if floatbits >= 50 then limit = 1E-11"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 26,
+          "source_statement": "  while p < p + 1.0 do"
+        },
+        {
+          "line": 37,
+          "source_statement": "  while p < math.huge do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 4,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"testing numbers and math lib\")"
+        },
+        {
+          "line": 57,
+          "kind": "source-phase-output",
+          "source_statement": "  print(string.format(msg, intbits, floatbits, maxexp))"
+        }
+      ]
+    },
+    {
+      "id": "notation-coercion-signed-zero-and-modf",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0002",
+      "first_line": 89,
+      "last_line": 133,
+      "span_end_line": 134,
+      "byte_offset": 1729,
+      "byte_length": 1227,
+      "span_sha256": "1a55c89b57cc3f2129e6371d0f6b2fef63ab68f9958c0f54dc15314c6cce2a90",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Decimal literal forms and arithmetic numeric-string coercion preserve input strings; negative zero shares table key0. modf returns correctly typed integral/fractional pieces for integers, finite floats, infinities and NaN.",
+      "dynamic_invocation": "Execute the actual source calls type@95, math.modf@110, math.modf@112, math.modf@114, math.modf@116, math.modf@118, math.modf@120, math.modf@122, isNaN@123, math.modf@124, eqT@125, math.modf@126, eqT@127 in section notation-coercion-signed-zero-and-modf. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section notation-coercion-signed-zero-and-modf; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "type",
+          "line": 95,
+          "source_statement": "  assert(type(a) == 'string' and type(b) == 'string' and type(c) == 'string')"
+        },
+        {
+          "name": "type",
+          "line": 95,
+          "source_statement": "  assert(type(a) == 'string' and type(b) == 'string' and type(c) == 'string')"
+        },
+        {
+          "name": "type",
+          "line": 95,
+          "source_statement": "  assert(type(a) == 'string' and type(b) == 'string' and type(c) == 'string')"
+        },
+        {
+          "name": "math.modf",
+          "line": 110,
+          "source_statement": "  local a,b = math.modf(3.5)"
+        },
+        {
+          "name": "math.modf",
+          "line": 112,
+          "source_statement": "  a,b = math.modf(-2.5)"
+        },
+        {
+          "name": "math.modf",
+          "line": 114,
+          "source_statement": "  a,b = math.modf(-3e23)"
+        },
+        {
+          "name": "math.modf",
+          "line": 116,
+          "source_statement": "  a,b = math.modf(3e35)"
+        },
+        {
+          "name": "math.modf",
+          "line": 118,
+          "source_statement": "  a,b = math.modf(-1/0)   -- -inf"
+        },
+        {
+          "name": "math.modf",
+          "line": 120,
+          "source_statement": "  a,b = math.modf(1/0)   -- inf"
+        },
+        {
+          "name": "math.modf",
+          "line": 122,
+          "source_statement": "  a,b = math.modf(0/0)   -- NaN"
+        },
+        {
+          "name": "isNaN",
+          "line": 123,
+          "source_statement": "  assert(isNaN(a) and isNaN(b))"
+        },
+        {
+          "name": "isNaN",
+          "line": 123,
+          "source_statement": "  assert(isNaN(a) and isNaN(b))"
+        },
+        {
+          "name": "math.modf",
+          "line": 124,
+          "source_statement": "  a,b = math.modf(3)  -- integer argument"
+        },
+        {
+          "name": "eqT",
+          "line": 125,
+          "source_statement": "  assert(eqT(a, 3) and eqT(b, 0.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 125,
+          "source_statement": "  assert(eqT(a, 3) and eqT(b, 0.0))"
+        },
+        {
+          "name": "math.modf",
+          "line": 126,
+          "source_statement": "  a,b = math.modf(minint)"
+        },
+        {
+          "name": "eqT",
+          "line": 127,
+          "source_statement": "  assert(eqT(a, minint) and eqT(b, 0.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 127,
+          "source_statement": "  assert(eqT(a, minint) and eqT(b, 0.0))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "integer-wrap-and-floor-division",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0003",
+      "first_line": 134,
+      "last_line": 186,
+      "span_end_line": 187,
+      "byte_offset": 2956,
+      "byte_length": 1406,
+      "span_sha256": "3cd171f62369612debf3d3b34ca471cedc2b0fd53a5bf4ad838859a435c3c0a8",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Min/max integer arithmetic wraps exactly. The signed integer i/j matrix repeats its integer assertions inside the ti/tj loops; the computed floating x/y locals are not asserted there. Separate explicit float/immediate/register cases check floor semantics and result type, including floating division by zero and minint/-1.",
+      "dynamic_invocation": "Execute the actual source calls math.floor@150, eqT@158, eqT@159, eqT@165, eqT@166, eqT@168, eqT@169 in section integer-wrap-and-floor-division. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section integer-wrap-and-floor-division; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "math.floor",
+          "line": 150,
+          "source_statement": "          assert(i//j == math.floor(i/j))"
+        },
+        {
+          "name": "eqT",
+          "line": 158,
+          "source_statement": "assert(eqT(3.5 // 1.5, 2.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 159,
+          "source_statement": "assert(eqT(3.5 // -1.5, -3.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 165,
+          "source_statement": "  x = 3.5; assert(eqT(x // 1, 3.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 166,
+          "source_statement": "  assert(eqT(x // -1, -4.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 168,
+          "source_statement": "  x = 3.5; y = 1.5; assert(eqT(x // y, 2.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 169,
+          "source_statement": "  x = 3.5; y = -1.5; assert(eqT(x // y, -3.0))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 144,
+          "source_statement": "for _, i in pairs{-16, -15, -3, -2, -1, 0, 1, 2, 3, 15} do"
+        },
+        {
+          "line": 145,
+          "source_statement": "  for _, j in pairs{-16, -15, -3, -2, -1, 1, 2, 3, 15} do"
+        },
+        {
+          "line": 146,
+          "source_statement": "    for _, ti in pairs{0, 0.0} do     -- try 'i' as integer and as float"
+        },
+        {
+          "line": 147,
+          "source_statement": "      for _, tj in pairs{0, 0.0} do   -- try 'j' as integer and as float"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "power-domains-and-width-conditioned-equality",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0004",
+      "first_line": 187,
+      "last_line": 218,
+      "span_end_line": 219,
+      "byte_offset": 4362,
+      "byte_length": 987,
+      "span_sha256": "13dfb8f9ead1cfa879061cb2a969a63b250a291aa0028812acf4aba26c809f6a",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Negative exponents and all nonportable domain cases run with _port unset. Integer/float equality at mantissa boundaries follows the measured width branch and conversions preserve representable endpoints.",
+      "dynamic_invocation": "Execute the actual source calls eq@190, eq@195 in section power-domains-and-width-conditioned-equality. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section power-domains-and-width-conditioned-equality; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "eq",
+          "line": 190,
+          "source_statement": "  assert(eq((-3)^-3, 1 / (-3)^3))"
+        },
+        {
+          "name": "eq",
+          "line": 195,
+          "source_statement": "          assert(eq(i^j, 1 / i^(-j)))"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 194,
+          "source_statement": "        if not _ENV._port or i ~= 0 or j > 0 then"
+        },
+        {
+          "line": 202,
+          "source_statement": "if floatbits < intbits then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 191,
+          "source_statement": "  for i = -3, 3 do    -- variables avoid constant folding"
+        },
+        {
+          "line": 192,
+          "source_statement": "      for j = -3, 3 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "mixed-order-boundaries-and-NaN",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0005",
+      "first_line": 219,
+      "last_line": 304,
+      "span_end_line": 305,
+      "byte_offset": 5349,
+      "byte_length": 2487,
+      "span_sha256": "46d49979e53bb609f4d538bb7757f843f8e7a03609daf62cf4842c2d2bbf2878",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Ordering distinguishes adjacent integers that round to the same float, selects the measured-width branch and treats all NaN comparisons as unordered; all min/max boundary relations are checked.",
+      "dynamic_invocation": "Execute the actual source calls print@243, print@261 in section mixed-order-boundaries-and-NaN. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section mixed-order-boundaries-and-NaN; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 243,
+          "source_statement": "  print(\"testing order (floats cannot represent all integers)\")"
+        },
+        {
+          "name": "print",
+          "line": 261,
+          "source_statement": "  print(\"testing order (floats can represent all integers)\")"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 242,
+          "source_statement": "if floatbits < intbits then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 243,
+          "kind": "source-phase-output",
+          "source_statement": "  print(\"testing order (floats cannot represent all integers)\")"
+        },
+        {
+          "line": 261,
+          "kind": "source-phase-output",
+          "source_statement": "  print(\"testing order (floats can represent all integers)\")"
+        }
+      ]
+    },
+    {
+      "id": "runtime-errors-and-integer-conversion",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0006",
+      "first_line": 305,
+      "last_line": 348,
+      "span_end_line": 349,
+      "byte_offset": 7836,
+      "byte_length": 1669,
+      "span_sha256": "63b0f5623e7c94c6974b8cf9a2942201905edd65de00385f6e100e77b37d993c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Loaded constant-invalid operations fail only at execution with divide/integer-representation/field-huge diagnostics. Runtime conversion rejects infinities/NaN and rounded out-of-range values while preserving the largest exact integral float and minint.",
+      "dynamic_invocation": "Execute the actual source calls checkerror@307, load@307, checkcompt@309, checkcompt@310, checkcompt@311, ):format@311, checkcompt@312, checkcompt@313, ):format@313, checkcompt@314, checkerror@319, checkerror@320, checkerror@321, checkerror@327, f2i@328, f2i@329, f2i@333, f2i@335, f2i@340, checkerror@341, checkerror@342, f2i@346 in section runtime-errors-and-integer-conversion. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section runtime-errors-and-integer-conversion; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "checkerror",
+          "line": 307,
+          "source_statement": "  checkerror(msg, assert(load(code)))"
+        },
+        {
+          "name": "load",
+          "line": 307,
+          "source_statement": "  checkerror(msg, assert(load(code)))"
+        },
+        {
+          "name": "checkcompt",
+          "line": 309,
+          "source_statement": "checkcompt(\"divide by zero\", \"return 2 // 0\")"
+        },
+        {
+          "name": "checkcompt",
+          "line": 310,
+          "source_statement": "checkcompt(msgf2i, \"return 2.3 >> 0\")"
+        },
+        {
+          "name": "checkcompt",
+          "line": 311,
+          "source_statement": "checkcompt(msgf2i, (\"return 2.0^%d & 1\"):format(intbits - 1))"
+        },
+        {
+          "name": "):format",
+          "line": 311,
+          "source_statement": "checkcompt(msgf2i, (\"return 2.0^%d & 1\"):format(intbits - 1))"
+        },
+        {
+          "name": "checkcompt",
+          "line": 312,
+          "source_statement": "checkcompt(\"field 'huge'\", \"return math.huge << 1\")"
+        },
+        {
+          "name": "checkcompt",
+          "line": 313,
+          "source_statement": "checkcompt(msgf2i, (\"return 1 | 2.0^%d\"):format(intbits - 1))"
+        },
+        {
+          "name": "):format",
+          "line": 313,
+          "source_statement": "checkcompt(msgf2i, (\"return 1 | 2.0^%d\"):format(intbits - 1))"
+        },
+        {
+          "name": "checkcompt",
+          "line": 314,
+          "source_statement": "checkcompt(msgf2i, \"return 2.3 ~ 0.0\")"
+        },
+        {
+          "name": "checkerror",
+          "line": 319,
+          "source_statement": "checkerror(msgf2i, f2i, math.huge)     -- +inf"
+        },
+        {
+          "name": "checkerror",
+          "line": 320,
+          "source_statement": "checkerror(msgf2i, f2i, -math.huge)    -- -inf"
+        },
+        {
+          "name": "checkerror",
+          "line": 321,
+          "source_statement": "checkerror(msgf2i, f2i, 0/0)           -- NaN"
+        },
+        {
+          "name": "checkerror",
+          "line": 327,
+          "source_statement": "  checkerror(msgf2i, f2i, maxint + 0.0)"
+        },
+        {
+          "name": "f2i",
+          "line": 328,
+          "source_statement": "  assert(f2i(2.0^(intbits - 2)) == 1 << (intbits - 2))"
+        },
+        {
+          "name": "f2i",
+          "line": 329,
+          "source_statement": "  assert(f2i(-2.0^(intbits - 2)) == -(1 << (intbits - 2)))"
+        },
+        {
+          "name": "f2i",
+          "line": 333,
+          "source_statement": "  assert(f2i(mf + 0.0) == mf)  -- OK up to here"
+        },
+        {
+          "name": "f2i",
+          "line": 335,
+          "source_statement": "  assert(f2i(mf + 0.0) ~= mf)   -- no more representable"
+        },
+        {
+          "name": "f2i",
+          "line": 340,
+          "source_statement": "  assert(f2i(maxint + 0.0) == maxint)"
+        },
+        {
+          "name": "checkerror",
+          "line": 341,
+          "source_statement": "  checkerror(\"no integer rep\", f2i, maxint + 1.0)"
+        },
+        {
+          "name": "checkerror",
+          "line": 342,
+          "source_statement": "  checkerror(\"no integer rep\", f2i, minint - 1.0)"
+        },
+        {
+          "name": "f2i",
+          "line": 346,
+          "source_statement": "assert(f2i(minint + 0.0) == minint)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 323,
+          "source_statement": "if floatbits < intbits then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "numeric-strings-and-literal-overflow",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0007",
+      "first_line": 349,
+      "last_line": 392,
+      "span_end_line": 393,
+      "byte_offset": 9505,
+      "byte_length": 1203,
+      "span_sha256": "b8a419f7604f7d368a55799567c547ea57b667b68e9acb71a5cabfb2051e4ec9",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Arithmetic strings coerce correctly; decimal overflows become floats while hexadecimal overflow wraps. Generated boundary lexer sources preserve min/max integer types and large numerals remain floats.",
+      "dynamic_invocation": "Execute the actual source calls eqT@360, tonumber@360, tostring@360, eqT@361, tonumber@361, tostring@361, string.format@365, string.gsub@366, string.char@368, string.byte@368, eqT@374, tonumber@374, incd@374, eqT@375, tonumber@375, incd@375, eqT@378, tonumber@378, string.rep@378, eqT@379, tonumber@379, string.rep@379, eqT@382, tonumber@382, string.rep@382, load@385, eqT@386, load@386, eqT@388, eqT@389 in section numeric-strings-and-literal-overflow. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section numeric-strings-and-literal-overflow; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "eqT",
+          "line": 360,
+          "source_statement": "  assert(eqT(tonumber(tostring(maxint)), maxint))"
+        },
+        {
+          "name": "tonumber",
+          "line": 360,
+          "source_statement": "  assert(eqT(tonumber(tostring(maxint)), maxint))"
+        },
+        {
+          "name": "tostring",
+          "line": 360,
+          "source_statement": "  assert(eqT(tonumber(tostring(maxint)), maxint))"
+        },
+        {
+          "name": "eqT",
+          "line": 361,
+          "source_statement": "  assert(eqT(tonumber(tostring(minint)), minint))"
+        },
+        {
+          "name": "tonumber",
+          "line": 361,
+          "source_statement": "  assert(eqT(tonumber(tostring(minint)), minint))"
+        },
+        {
+          "name": "tostring",
+          "line": 361,
+          "source_statement": "  assert(eqT(tonumber(tostring(minint)), minint))"
+        },
+        {
+          "name": "string.format",
+          "line": 365,
+          "source_statement": "    local s = string.format(\"%d\", n)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 366,
+          "source_statement": "    s = string.gsub(s, \"%d$\", function (d)"
+        },
+        {
+          "name": "string.char",
+          "line": 368,
+          "source_statement": "          return string.char(string.byte(d) + 1)"
+        },
+        {
+          "name": "string.byte",
+          "line": 368,
+          "source_statement": "          return string.char(string.byte(d) + 1)"
+        },
+        {
+          "name": "eqT",
+          "line": 374,
+          "source_statement": "  assert(eqT(tonumber(incd(maxint)), maxint + 1.0))"
+        },
+        {
+          "name": "tonumber",
+          "line": 374,
+          "source_statement": "  assert(eqT(tonumber(incd(maxint)), maxint + 1.0))"
+        },
+        {
+          "name": "incd",
+          "line": 374,
+          "source_statement": "  assert(eqT(tonumber(incd(maxint)), maxint + 1.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 375,
+          "source_statement": "  assert(eqT(tonumber(incd(minint)), minint - 1.0))"
+        },
+        {
+          "name": "tonumber",
+          "line": 375,
+          "source_statement": "  assert(eqT(tonumber(incd(minint)), minint - 1.0))"
+        },
+        {
+          "name": "incd",
+          "line": 375,
+          "source_statement": "  assert(eqT(tonumber(incd(minint)), minint - 1.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 378,
+          "source_statement": "  assert(eqT(tonumber(\"1\"..string.rep(\"0\", 30)), 1e30))"
+        },
+        {
+          "name": "tonumber",
+          "line": 378,
+          "source_statement": "  assert(eqT(tonumber(\"1\"..string.rep(\"0\", 30)), 1e30))"
+        },
+        {
+          "name": "string.rep",
+          "line": 378,
+          "source_statement": "  assert(eqT(tonumber(\"1\"..string.rep(\"0\", 30)), 1e30))"
+        },
+        {
+          "name": "eqT",
+          "line": 379,
+          "source_statement": "  assert(eqT(tonumber(\"-1\"..string.rep(\"0\", 30)), -1e30))"
+        },
+        {
+          "name": "tonumber",
+          "line": 379,
+          "source_statement": "  assert(eqT(tonumber(\"-1\"..string.rep(\"0\", 30)), -1e30))"
+        },
+        {
+          "name": "string.rep",
+          "line": 379,
+          "source_statement": "  assert(eqT(tonumber(\"-1\"..string.rep(\"0\", 30)), -1e30))"
+        },
+        {
+          "name": "eqT",
+          "line": 382,
+          "source_statement": "  assert(eqT(tonumber(\"0x1\"..string.rep(\"0\", 30)), 0))"
+        },
+        {
+          "name": "tonumber",
+          "line": 382,
+          "source_statement": "  assert(eqT(tonumber(\"0x1\"..string.rep(\"0\", 30)), 0))"
+        },
+        {
+          "name": "string.rep",
+          "line": 382,
+          "source_statement": "  assert(eqT(tonumber(\"0x1\"..string.rep(\"0\", 30)), 0))"
+        },
+        {
+          "name": "load",
+          "line": 385,
+          "source_statement": "  assert(minint == load(\"return \" .. minint)())"
+        },
+        {
+          "name": "eqT",
+          "line": 386,
+          "source_statement": "  assert(eqT(maxint, load(\"return \" .. maxint)()))"
+        },
+        {
+          "name": "load",
+          "line": 386,
+          "source_statement": "  assert(eqT(maxint, load(\"return \" .. maxint)()))"
+        },
+        {
+          "name": "eqT",
+          "line": 388,
+          "source_statement": "  assert(eqT(10000000000000000000000.0, 10000000000000000000000))"
+        },
+        {
+          "name": "eqT",
+          "line": 389,
+          "source_statement": "  assert(eqT(-10000000000000000000000.0, -10000000000000000000000))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "tonumber-valid-and-long-inputs",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0008",
+      "first_line": 393,
+      "last_line": 456,
+      "span_end_line": 457,
+      "byte_offset": 10708,
+      "byte_length": 2585,
+      "span_sha256": "a5f629147a38d70dcf6073d931243753ca6d20061c9d56830226b42c59c2c88c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Decimal/base2-through36/hex conversion consumes complete strings, preserves signed values and wraps base-specific integers. All thousand-digit/exponent boundary numerals execute with _soft unset.",
+      "dynamic_invocation": "Execute the actual source calls tonumber@396, eqT@397, tonumber@397, eqT@398, tonumber@398, tonumber@399, tonumber@402, tonumber@403, tonumber@404, tonumber@405, tonumber@406, tonumber@408, tonumber@409, tonumber@410, tonumber@411, tonumber@412, tonumber@413, tonumber@414, tonumber@415, tonumber@417, tonumber@418, string.rep@418, tonumber@419, string.rep@419, tonumber@422, tonumber@423, tonumber@424, tonumber@425, tonumber@426, tonumber@427, tonumber@428, tonumber@429, tonumber@430, string.rep@430, tonumber@431, tonumber@432, tonumber@433, tonumber@437, tonumber@442, string.rep@442, tonumber@443, string.rep@443, tonumber@444, string.rep@444, tonumber@445, string.rep@445, tonumber@446, string.rep@446, tonumber@447, string.rep@447, tonumber@448, string.rep@448, tonumber@449, string.rep@449, tonumber@450, string.rep@450, tonumber@451, string.rep@451, tonumber@453, string.rep@453, tonumber@454, string.rep@454 in section tonumber-valid-and-long-inputs. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section tonumber-valid-and-long-inputs; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "tonumber",
+          "line": 396,
+          "source_statement": "assert(tonumber(3.4) == 3.4)"
+        },
+        {
+          "name": "eqT",
+          "line": 397,
+          "source_statement": "assert(eqT(tonumber(3), 3))"
+        },
+        {
+          "name": "tonumber",
+          "line": 397,
+          "source_statement": "assert(eqT(tonumber(3), 3))"
+        },
+        {
+          "name": "eqT",
+          "line": 398,
+          "source_statement": "assert(eqT(tonumber(maxint), maxint) and eqT(tonumber(minint), minint))"
+        },
+        {
+          "name": "tonumber",
+          "line": 398,
+          "source_statement": "assert(eqT(tonumber(maxint), maxint) and eqT(tonumber(minint), minint))"
+        },
+        {
+          "name": "eqT",
+          "line": 398,
+          "source_statement": "assert(eqT(tonumber(maxint), maxint) and eqT(tonumber(minint), minint))"
+        },
+        {
+          "name": "tonumber",
+          "line": 398,
+          "source_statement": "assert(eqT(tonumber(maxint), maxint) and eqT(tonumber(minint), minint))"
+        },
+        {
+          "name": "tonumber",
+          "line": 399,
+          "source_statement": "assert(tonumber(1/0) == 1/0)"
+        },
+        {
+          "name": "tonumber",
+          "line": 402,
+          "source_statement": "assert(tonumber(\"0\") == 0)"
+        },
+        {
+          "name": "tonumber",
+          "line": 403,
+          "source_statement": "assert(not tonumber(\"\"))"
+        },
+        {
+          "name": "tonumber",
+          "line": 404,
+          "source_statement": "assert(not tonumber(\"  \"))"
+        },
+        {
+          "name": "tonumber",
+          "line": 405,
+          "source_statement": "assert(not tonumber(\"-\"))"
+        },
+        {
+          "name": "tonumber",
+          "line": 406,
+          "source_statement": "assert(not tonumber(\"  -0x \"))"
+        },
+        {
+          "name": "tonumber",
+          "line": 408,
+          "source_statement": "assert(tonumber'+0.01' == 1/100 and tonumber'+.01' == 0.01 and"
+        },
+        {
+          "name": "tonumber",
+          "line": 408,
+          "source_statement": "assert(tonumber'+0.01' == 1/100 and tonumber'+.01' == 0.01 and"
+        },
+        {
+          "name": "tonumber",
+          "line": 409,
+          "source_statement": "       tonumber'.01' == 0.01    and tonumber'-1.' == -1 and"
+        },
+        {
+          "name": "tonumber",
+          "line": 409,
+          "source_statement": "       tonumber'.01' == 0.01    and tonumber'-1.' == -1 and"
+        },
+        {
+          "name": "tonumber",
+          "line": 410,
+          "source_statement": "       tonumber'+1.' == 1)"
+        },
+        {
+          "name": "tonumber",
+          "line": 411,
+          "source_statement": "assert(not tonumber'+ 0.01' and not tonumber'+.e1' and"
+        },
+        {
+          "name": "tonumber",
+          "line": 411,
+          "source_statement": "assert(not tonumber'+ 0.01' and not tonumber'+.e1' and"
+        },
+        {
+          "name": "tonumber",
+          "line": 412,
+          "source_statement": "       not tonumber'1e'     and not tonumber'1.0e+' and"
+        },
+        {
+          "name": "tonumber",
+          "line": 412,
+          "source_statement": "       not tonumber'1e'     and not tonumber'1.0e+' and"
+        },
+        {
+          "name": "tonumber",
+          "line": 413,
+          "source_statement": "       not tonumber'.')"
+        },
+        {
+          "name": "tonumber",
+          "line": 414,
+          "source_statement": "assert(tonumber('-012') == -010-2)"
+        },
+        {
+          "name": "tonumber",
+          "line": 415,
+          "source_statement": "assert(tonumber('-1.2e2') == - - -120)"
+        },
+        {
+          "name": "tonumber",
+          "line": 417,
+          "source_statement": "assert(tonumber(\"0xffffffffffff\") == (1 << (4*12)) - 1)"
+        },
+        {
+          "name": "tonumber",
+          "line": 418,
+          "source_statement": "assert(tonumber(\"0x\"..string.rep(\"f\", (intbits//4))) == -1)"
+        },
+        {
+          "name": "string.rep",
+          "line": 418,
+          "source_statement": "assert(tonumber(\"0x\"..string.rep(\"f\", (intbits//4))) == -1)"
+        },
+        {
+          "name": "tonumber",
+          "line": 419,
+          "source_statement": "assert(tonumber(\"-0x\"..string.rep(\"f\", (intbits//4))) == 1)"
+        },
+        {
+          "name": "string.rep",
+          "line": 419,
+          "source_statement": "assert(tonumber(\"-0x\"..string.rep(\"f\", (intbits//4))) == 1)"
+        },
+        {
+          "name": "tonumber",
+          "line": 422,
+          "source_statement": "assert(tonumber('  001010  ', 2) == 10)"
+        },
+        {
+          "name": "tonumber",
+          "line": 423,
+          "source_statement": "assert(tonumber('  001010  ', 10) == 001010)"
+        },
+        {
+          "name": "tonumber",
+          "line": 424,
+          "source_statement": "assert(tonumber('  -1010  ', 2) == -10)"
+        },
+        {
+          "name": "tonumber",
+          "line": 425,
+          "source_statement": "assert(tonumber('10', 36) == 36)"
+        },
+        {
+          "name": "tonumber",
+          "line": 426,
+          "source_statement": "assert(tonumber('  -10  ', 36) == -36)"
+        },
+        {
+          "name": "tonumber",
+          "line": 427,
+          "source_statement": "assert(tonumber('  +1Z  ', 36) == 36 + 35)"
+        },
+        {
+          "name": "tonumber",
+          "line": 428,
+          "source_statement": "assert(tonumber('  -1z  ', 36) == -36 + -35)"
+        },
+        {
+          "name": "tonumber",
+          "line": 429,
+          "source_statement": "assert(tonumber('-fFfa', 16) == -(10+(16*(15+(16*(15+(16*15)))))))"
+        },
+        {
+          "name": "tonumber",
+          "line": 430,
+          "source_statement": "assert(tonumber(string.rep('1', (intbits - 2)), 2) + 1 == 2^(intbits - 2))"
+        },
+        {
+          "name": "string.rep",
+          "line": 430,
+          "source_statement": "assert(tonumber(string.rep('1', (intbits - 2)), 2) + 1 == 2^(intbits - 2))"
+        },
+        {
+          "name": "tonumber",
+          "line": 431,
+          "source_statement": "assert(tonumber('ffffFFFF', 16)+1 == (1 << 32))"
+        },
+        {
+          "name": "tonumber",
+          "line": 432,
+          "source_statement": "assert(tonumber('0ffffFFFF', 16)+1 == (1 << 32))"
+        },
+        {
+          "name": "tonumber",
+          "line": 433,
+          "source_statement": "assert(tonumber('-0ffffffFFFF', 16) - 1 == -(1 << 40))"
+        },
+        {
+          "name": "tonumber",
+          "line": 437,
+          "source_statement": "  assert(tonumber('\\t10000000000\\t', i) == i10)"
+        },
+        {
+          "name": "tonumber",
+          "line": 442,
+          "source_statement": "  assert(tonumber(\"0x\"..string.rep(\"f\", 13)..\".0\") == 2.0^(4*13) - 1)"
+        },
+        {
+          "name": "string.rep",
+          "line": 442,
+          "source_statement": "  assert(tonumber(\"0x\"..string.rep(\"f\", 13)..\".0\") == 2.0^(4*13) - 1)"
+        },
+        {
+          "name": "tonumber",
+          "line": 443,
+          "source_statement": "  assert(tonumber(\"0x\"..string.rep(\"f\", 150)..\".0\") == 2.0^(4*150) - 1)"
+        },
+        {
+          "name": "string.rep",
+          "line": 443,
+          "source_statement": "  assert(tonumber(\"0x\"..string.rep(\"f\", 150)..\".0\") == 2.0^(4*150) - 1)"
+        },
+        {
+          "name": "tonumber",
+          "line": 444,
+          "source_statement": "  assert(tonumber(\"0x\"..string.rep(\"f\", 300)..\".0\") == 2.0^(4*300) - 1)"
+        },
+        {
+          "name": "string.rep",
+          "line": 444,
+          "source_statement": "  assert(tonumber(\"0x\"..string.rep(\"f\", 300)..\".0\") == 2.0^(4*300) - 1)"
+        },
+        {
+          "name": "tonumber",
+          "line": 445,
+          "source_statement": "  assert(tonumber(\"0x\"..string.rep(\"f\", 500)..\".0\") == 2.0^(4*500) - 1)"
+        },
+        {
+          "name": "string.rep",
+          "line": 445,
+          "source_statement": "  assert(tonumber(\"0x\"..string.rep(\"f\", 500)..\".0\") == 2.0^(4*500) - 1)"
+        },
+        {
+          "name": "tonumber",
+          "line": 446,
+          "source_statement": "  assert(tonumber('0x3.' .. string.rep('0', 1000)) == 3)"
+        },
+        {
+          "name": "string.rep",
+          "line": 446,
+          "source_statement": "  assert(tonumber('0x3.' .. string.rep('0', 1000)) == 3)"
+        },
+        {
+          "name": "tonumber",
+          "line": 447,
+          "source_statement": "  assert(tonumber('0x' .. string.rep('0', 1000) .. 'a') == 10)"
+        },
+        {
+          "name": "string.rep",
+          "line": 447,
+          "source_statement": "  assert(tonumber('0x' .. string.rep('0', 1000) .. 'a') == 10)"
+        },
+        {
+          "name": "tonumber",
+          "line": 448,
+          "source_statement": "  assert(tonumber('0x0.' .. string.rep('0', 13)..\"1\") == 2.0^(-4*14))"
+        },
+        {
+          "name": "string.rep",
+          "line": 448,
+          "source_statement": "  assert(tonumber('0x0.' .. string.rep('0', 13)..\"1\") == 2.0^(-4*14))"
+        },
+        {
+          "name": "tonumber",
+          "line": 449,
+          "source_statement": "  assert(tonumber('0x0.' .. string.rep('0', 150)..\"1\") == 2.0^(-4*151))"
+        },
+        {
+          "name": "string.rep",
+          "line": 449,
+          "source_statement": "  assert(tonumber('0x0.' .. string.rep('0', 150)..\"1\") == 2.0^(-4*151))"
+        },
+        {
+          "name": "tonumber",
+          "line": 450,
+          "source_statement": "  assert(tonumber('0x0.' .. string.rep('0', 300)..\"1\") == 2.0^(-4*301))"
+        },
+        {
+          "name": "string.rep",
+          "line": 450,
+          "source_statement": "  assert(tonumber('0x0.' .. string.rep('0', 300)..\"1\") == 2.0^(-4*301))"
+        },
+        {
+          "name": "tonumber",
+          "line": 451,
+          "source_statement": "  assert(tonumber('0x0.' .. string.rep('0', 500)..\"1\") == 2.0^(-4*501))"
+        },
+        {
+          "name": "string.rep",
+          "line": 451,
+          "source_statement": "  assert(tonumber('0x0.' .. string.rep('0', 500)..\"1\") == 2.0^(-4*501))"
+        },
+        {
+          "name": "tonumber",
+          "line": 453,
+          "source_statement": "  assert(tonumber('0xe03' .. string.rep('0', 1000) .. 'p-4000') == 3587.0)"
+        },
+        {
+          "name": "string.rep",
+          "line": 453,
+          "source_statement": "  assert(tonumber('0xe03' .. string.rep('0', 1000) .. 'p-4000') == 3587.0)"
+        },
+        {
+          "name": "tonumber",
+          "line": 454,
+          "source_statement": "  assert(tonumber('0x.' .. string.rep('0', 1000) .. '74p4004') == 0x7.4)"
+        },
+        {
+          "name": "string.rep",
+          "line": 454,
+          "source_statement": "  assert(tonumber('0x.' .. string.rep('0', 1000) .. '74p4004') == 0x7.4)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 440,
+          "source_statement": "if not _ENV._soft then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 434,
+          "source_statement": "for i = 2,36 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "tonumber-invalid-and-literal-hex-floats",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0009",
+      "first_line": 457,
+      "last_line": 546,
+      "span_end_line": 547,
+      "byte_offset": 13293,
+      "byte_length": 2338,
+      "span_sha256": "2f9fb18f6c7496a2102a32fc31e04c8001b26e2771dd95032ddb2318a88d0a4c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Invalid decimal/base/hex forms, embedded zeros, inf/NaN text and trailing garbage return exactly one nil result. Decimal/hex literal exponents and arithmetic string conversions retain expected numeric values.",
+      "dynamic_invocation": "Execute the actual source calls select@460, f@467, tonumber@467, f@468, tonumber@468, f@469, tonumber@469, f@470, tonumber@470, f@471, tonumber@471, f@472, tonumber@472, f@473, tonumber@473, f@475, tonumber@475, f@476, tonumber@476, f@477, tonumber@477, f@478, tonumber@478, f@480, tonumber@480, f@481, tonumber@481, f@482, tonumber@482, f@483, tonumber@483, f@484, tonumber@484, f@485, tonumber@485, f@486, tonumber@486, f@487, tonumber@487, f@488, tonumber@488, f@489, tonumber@489, tonumber@494, tonumber@495, tonumber@496, tonumber@497, tonumber@498, tonumber@499, tonumber@500, tonumber@501, tonumber@502, tonumber@503, tonumber@504, tonumber@505, tonumber@513, tonumber@514, tonumber@515, tonumber@523, tonumber@524, tonumber@525, tonumber@538, tonumber@539, tonumber@545 in section tonumber-invalid-and-literal-hex-floats. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section tonumber-invalid-and-literal-hex-floats; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "select",
+          "line": 460,
+          "source_statement": "  if select('#', ...) == 1 then"
+        },
+        {
+          "name": "f",
+          "line": 467,
+          "source_statement": "assert(not f(tonumber('fFfa', 15)))"
+        },
+        {
+          "name": "tonumber",
+          "line": 467,
+          "source_statement": "assert(not f(tonumber('fFfa', 15)))"
+        },
+        {
+          "name": "f",
+          "line": 468,
+          "source_statement": "assert(not f(tonumber('099', 8)))"
+        },
+        {
+          "name": "tonumber",
+          "line": 468,
+          "source_statement": "assert(not f(tonumber('099', 8)))"
+        },
+        {
+          "name": "f",
+          "line": 469,
+          "source_statement": "assert(not f(tonumber('1\\0', 2)))"
+        },
+        {
+          "name": "tonumber",
+          "line": 469,
+          "source_statement": "assert(not f(tonumber('1\\0', 2)))"
+        },
+        {
+          "name": "f",
+          "line": 470,
+          "source_statement": "assert(not f(tonumber('', 8)))"
+        },
+        {
+          "name": "tonumber",
+          "line": 470,
+          "source_statement": "assert(not f(tonumber('', 8)))"
+        },
+        {
+          "name": "f",
+          "line": 471,
+          "source_statement": "assert(not f(tonumber('  ', 9)))"
+        },
+        {
+          "name": "tonumber",
+          "line": 471,
+          "source_statement": "assert(not f(tonumber('  ', 9)))"
+        },
+        {
+          "name": "f",
+          "line": 472,
+          "source_statement": "assert(not f(tonumber('  ', 9)))"
+        },
+        {
+          "name": "tonumber",
+          "line": 472,
+          "source_statement": "assert(not f(tonumber('  ', 9)))"
+        },
+        {
+          "name": "f",
+          "line": 473,
+          "source_statement": "assert(not f(tonumber('0xf', 10)))"
+        },
+        {
+          "name": "tonumber",
+          "line": 473,
+          "source_statement": "assert(not f(tonumber('0xf', 10)))"
+        },
+        {
+          "name": "f",
+          "line": 475,
+          "source_statement": "assert(not f(tonumber('inf')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 475,
+          "source_statement": "assert(not f(tonumber('inf')))"
+        },
+        {
+          "name": "f",
+          "line": 476,
+          "source_statement": "assert(not f(tonumber(' INF ')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 476,
+          "source_statement": "assert(not f(tonumber(' INF ')))"
+        },
+        {
+          "name": "f",
+          "line": 477,
+          "source_statement": "assert(not f(tonumber('Nan')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 477,
+          "source_statement": "assert(not f(tonumber('Nan')))"
+        },
+        {
+          "name": "f",
+          "line": 478,
+          "source_statement": "assert(not f(tonumber('nan')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 478,
+          "source_statement": "assert(not f(tonumber('nan')))"
+        },
+        {
+          "name": "f",
+          "line": 480,
+          "source_statement": "assert(not f(tonumber('  ')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 480,
+          "source_statement": "assert(not f(tonumber('  ')))"
+        },
+        {
+          "name": "f",
+          "line": 481,
+          "source_statement": "assert(not f(tonumber('')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 481,
+          "source_statement": "assert(not f(tonumber('')))"
+        },
+        {
+          "name": "f",
+          "line": 482,
+          "source_statement": "assert(not f(tonumber('1  a')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 482,
+          "source_statement": "assert(not f(tonumber('1  a')))"
+        },
+        {
+          "name": "f",
+          "line": 483,
+          "source_statement": "assert(not f(tonumber('1  a', 2)))"
+        },
+        {
+          "name": "tonumber",
+          "line": 483,
+          "source_statement": "assert(not f(tonumber('1  a', 2)))"
+        },
+        {
+          "name": "f",
+          "line": 484,
+          "source_statement": "assert(not f(tonumber('1\\0')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 484,
+          "source_statement": "assert(not f(tonumber('1\\0')))"
+        },
+        {
+          "name": "f",
+          "line": 485,
+          "source_statement": "assert(not f(tonumber('1 \\0')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 485,
+          "source_statement": "assert(not f(tonumber('1 \\0')))"
+        },
+        {
+          "name": "f",
+          "line": 486,
+          "source_statement": "assert(not f(tonumber('1\\0 ')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 486,
+          "source_statement": "assert(not f(tonumber('1\\0 ')))"
+        },
+        {
+          "name": "f",
+          "line": 487,
+          "source_statement": "assert(not f(tonumber('e1')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 487,
+          "source_statement": "assert(not f(tonumber('e1')))"
+        },
+        {
+          "name": "f",
+          "line": 488,
+          "source_statement": "assert(not f(tonumber('e  1')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 488,
+          "source_statement": "assert(not f(tonumber('e  1')))"
+        },
+        {
+          "name": "f",
+          "line": 489,
+          "source_statement": "assert(not f(tonumber(' 3.4.5 ')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 489,
+          "source_statement": "assert(not f(tonumber(' 3.4.5 ')))"
+        },
+        {
+          "name": "tonumber",
+          "line": 494,
+          "source_statement": "assert(not tonumber('0x'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 495,
+          "source_statement": "assert(not tonumber('x'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 496,
+          "source_statement": "assert(not tonumber('x3'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 497,
+          "source_statement": "assert(not tonumber('0x3.3.3'))   -- two decimal points"
+        },
+        {
+          "name": "tonumber",
+          "line": 498,
+          "source_statement": "assert(not tonumber('00x2'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 499,
+          "source_statement": "assert(not tonumber('0x 2'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 500,
+          "source_statement": "assert(not tonumber('0 x2'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 501,
+          "source_statement": "assert(not tonumber('23x'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 502,
+          "source_statement": "assert(not tonumber('- 0xaa'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 503,
+          "source_statement": "assert(not tonumber('-0xaaP '))   -- no exponent"
+        },
+        {
+          "name": "tonumber",
+          "line": 504,
+          "source_statement": "assert(not tonumber('0x0.51p'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 505,
+          "source_statement": "assert(not tonumber('0x5p+-2'))"
+        },
+        {
+          "name": "tonumber",
+          "line": 513,
+          "source_statement": "assert(tonumber('+0x2') == 2)"
+        },
+        {
+          "name": "tonumber",
+          "line": 514,
+          "source_statement": "assert(tonumber('-0xaA') == -170)"
+        },
+        {
+          "name": "tonumber",
+          "line": 515,
+          "source_statement": "assert(tonumber('-0xffFFFfff') == -(1 << 32) + 1)"
+        },
+        {
+          "name": "tonumber",
+          "line": 523,
+          "source_statement": "assert(tonumber('  0x2.5  ') == 0x25/16)"
+        },
+        {
+          "name": "tonumber",
+          "line": 524,
+          "source_statement": "assert(tonumber('  -0x2.5  ') == -0x25/16)"
+        },
+        {
+          "name": "tonumber",
+          "line": 525,
+          "source_statement": "assert(tonumber('  +0x0.51p+8  ') == 0x51)"
+        },
+        {
+          "name": "tonumber",
+          "line": 538,
+          "source_statement": "assert(tonumber'1111111111' - tonumber'1111111110' =="
+        },
+        {
+          "name": "tonumber",
+          "line": 538,
+          "source_statement": "assert(tonumber'1111111111' - tonumber'1111111110' =="
+        },
+        {
+          "name": "tonumber",
+          "line": 539,
+          "source_statement": "       tonumber\"  +0.001e+3 \\n\\t\")"
+        },
+        {
+          "name": "tonumber",
+          "line": 545,
+          "source_statement": "assert(tonumber('+1.23E18') == 1.23*10.0^18)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 460,
+          "source_statement": "  if select('#', ...) == 1 then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "orders-modulo-and-subnormal-values",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0010",
+      "first_line": 547,
+      "last_line": 598,
+      "span_end_line": 599,
+      "byte_offset": 15631,
+      "byte_length": 1552,
+      "span_sha256": "93ef5461a2a7e92168628e0fa1e64049b1560cdeba3ffae9457fcc682f3ccbff",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Number and byte-string order operators agree with their relations. Integer/float modulo signs, result types and tiny underflow-sensitive remainders match the supplied exact/tolerance checks.",
+      "dynamic_invocation": "Execute the actual source calls eqT@559, eqT@560, eqT@561, eqT@562, eqT@563, eqT@564, eqT@565, eqT@566, eqT@567, eqT@568, eqT@569, eqT@570, eqT@571, eqT@572, eqT@573, eqT@574, eq@592, eq@593, eq@594, eq@595 in section orders-modulo-and-subnormal-values. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section orders-modulo-and-subnormal-values; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "eqT",
+          "line": 559,
+          "source_statement": "assert(eqT(-4 % 3, 2))"
+        },
+        {
+          "name": "eqT",
+          "line": 560,
+          "source_statement": "assert(eqT(4 % -3, -2))"
+        },
+        {
+          "name": "eqT",
+          "line": 561,
+          "source_statement": "assert(eqT(-4.0 % 3, 2.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 562,
+          "source_statement": "assert(eqT(4 % -3.0, -2.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 563,
+          "source_statement": "assert(eqT(4 % -5, -1))"
+        },
+        {
+          "name": "eqT",
+          "line": 564,
+          "source_statement": "assert(eqT(4 % -5.0, -1.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 565,
+          "source_statement": "assert(eqT(4 % 5, 4))"
+        },
+        {
+          "name": "eqT",
+          "line": 566,
+          "source_statement": "assert(eqT(4 % 5.0, 4.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 567,
+          "source_statement": "assert(eqT(-4 % -5, -4))"
+        },
+        {
+          "name": "eqT",
+          "line": 568,
+          "source_statement": "assert(eqT(-4 % -5.0, -4.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 569,
+          "source_statement": "assert(eqT(-4 % 5, 1))"
+        },
+        {
+          "name": "eqT",
+          "line": 570,
+          "source_statement": "assert(eqT(-4 % 5.0, 1.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 571,
+          "source_statement": "assert(eqT(4.25 % 4, 0.25))"
+        },
+        {
+          "name": "eqT",
+          "line": 572,
+          "source_statement": "assert(eqT(10.0 % 2, 0.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 573,
+          "source_statement": "assert(eqT(-10.0 % 2, 0.0))"
+        },
+        {
+          "name": "eqT",
+          "line": 574,
+          "source_statement": "assert(eqT(-10.0 % -2, 0.0))"
+        },
+        {
+          "name": "eq",
+          "line": 592,
+          "source_statement": "  assert(eq((2.1 * b) % (2 * b), (0.1 * b), delta))"
+        },
+        {
+          "name": "eq",
+          "line": 593,
+          "source_statement": "  assert(eq((-2.1 * b) % (2 * b), (2 * b) - (0.1 * b), delta))"
+        },
+        {
+          "name": "eq",
+          "line": 594,
+          "source_statement": "  assert(eq((2.1 * b) % (-2 * b), (0.1 * b) - (2 * b), delta))"
+        },
+        {
+          "name": "eq",
+          "line": 595,
+          "source_statement": "  assert(eq((-2.1 * b) % (-2 * b), (-0.1 * b), delta))"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 582,
+          "source_statement": "    if 10^-m > 0 then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 580,
+          "source_statement": "  while i < j do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "modulo-consistency-and-nonportable-domain",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0011",
+      "first_line": 599,
+      "last_line": 657,
+      "span_end_line": 658,
+      "byte_offset": 17183,
+      "byte_length": 1299,
+      "span_sha256": "a8f80dbfd3e73eaf23afb214779956bb7546786d57042ba9cbd26544cdafb2d7",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Integer/float modulo agrees over the full signed matrices and powers, including integer extrema and minint%-1. Nonportable zero/infinite-domain cases execute with _port unset; native mismatches require demonstrated counterparts rather than omissions.",
+      "dynamic_invocation": "Execute the actual source calls eqT@630, eqT@631, isNaN@643, anan@644, anan@645, anan@646, anan@647, anan@648, anan@649 in section modulo-consistency-and-nonportable-domain. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section modulo-consistency-and-nonportable-domain; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "eqT",
+          "line": 630,
+          "source_statement": "assert(eqT(minint % minint, 0))"
+        },
+        {
+          "name": "eqT",
+          "line": 631,
+          "source_statement": "assert(eqT(maxint % maxint, 0))"
+        },
+        {
+          "name": "isNaN",
+          "line": 643,
+          "source_statement": "  local function anan (x) assert(isNaN(x)) end   -- assert Not a Number"
+        },
+        {
+          "name": "anan",
+          "line": 644,
+          "source_statement": "  anan(0.0 % 0)"
+        },
+        {
+          "name": "anan",
+          "line": 645,
+          "source_statement": "  anan(1.3 % 0)"
+        },
+        {
+          "name": "anan",
+          "line": 646,
+          "source_statement": "  anan(math.huge % 1)"
+        },
+        {
+          "name": "anan",
+          "line": 647,
+          "source_statement": "  anan(math.huge % 1e30)"
+        },
+        {
+          "name": "anan",
+          "line": 648,
+          "source_statement": "  anan(-math.huge % 1e30)"
+        },
+        {
+          "name": "anan",
+          "line": 649,
+          "source_statement": "  anan(-math.huge % -1e30)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 602,
+          "source_statement": "    if j ~= 0 then"
+        },
+        {
+          "line": 610,
+          "source_statement": "    if j ~= 0 then"
+        },
+        {
+          "line": 642,
+          "source_statement": "if not _ENV._port then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 600,
+          "source_statement": "for i = -10, 10 do"
+        },
+        {
+          "line": 601,
+          "source_statement": "  for j = -10, 10 do"
+        },
+        {
+          "line": 608,
+          "source_statement": "for i = 0, 10 do"
+        },
+        {
+          "line": 609,
+          "source_statement": "  for j = -10, 10 do"
+        },
+        {
+          "line": 618,
+          "source_statement": "  while (1 << i) > 0 do"
+        },
+        {
+          "line": 624,
+          "source_statement": "  while 2^i < math.huge do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "unsigned-order-transcendentals-and-decomposition",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0012",
+      "first_line": 658,
+      "last_line": 710,
+      "span_end_line": 711,
+      "byte_offset": 18482,
+      "byte_length": 1526,
+      "span_sha256": "7154c8bdec238cf4e80f14a5f15f7660a407f3766c1a72e762265f4b097659c9",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Unsigned comparison reinterprets actual integer bits; trigonometric/angle/log/sqrt/abs primitives match supplied tolerances and endpoint types. frexp/ldexp reconstruct each finite/infinite value, and decimal conversion preserves fine differences.",
+      "dynamic_invocation": "Execute the actual source calls math.ult@659, math.ult@660, math.ult@661, math.ult@662, math.ult@663, math.ult@664, math.ult@665, eq@668, math.sin@668, math.cos@668, eq@669, math.tan@669, eq@670, math.sin@670, math.cos@670, eq@671, math.atan@671, math.acos@671, eq@672, math.asin@672, eq@673, math.deg@673, math.rad@673, math.abs@674, eqT@675, math.abs@675, eqT@676, math.abs@676, eqT@677, math.abs@677, eq@678, math.atan@678, math.fmod@679, eq@680, math.sqrt@680, eq@681, math.log@681, eq@682, math.log@682, eq@683, math.log@683, eq@684, math.exp@684, eq@685, math.sin@685, print@688, math.frexp@691, math.ldexp@692, math.abs@693, tonumber@700, tonumber@701 in section unsigned-order-transcendentals-and-decomposition. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section unsigned-order-transcendentals-and-decomposition; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "math.ult",
+          "line": 659,
+          "source_statement": "assert(math.ult(3, 4))"
+        },
+        {
+          "name": "math.ult",
+          "line": 660,
+          "source_statement": "assert(not math.ult(4, 4))"
+        },
+        {
+          "name": "math.ult",
+          "line": 661,
+          "source_statement": "assert(math.ult(-2, -1))"
+        },
+        {
+          "name": "math.ult",
+          "line": 662,
+          "source_statement": "assert(math.ult(2, -1))"
+        },
+        {
+          "name": "math.ult",
+          "line": 663,
+          "source_statement": "assert(not math.ult(-2, -2))"
+        },
+        {
+          "name": "math.ult",
+          "line": 664,
+          "source_statement": "assert(math.ult(maxint, minint))"
+        },
+        {
+          "name": "math.ult",
+          "line": 665,
+          "source_statement": "assert(not math.ult(minint, maxint))"
+        },
+        {
+          "name": "eq",
+          "line": 668,
+          "source_statement": "assert(eq(math.sin(-9.8)^2 + math.cos(-9.8)^2, 1))"
+        },
+        {
+          "name": "math.sin",
+          "line": 668,
+          "source_statement": "assert(eq(math.sin(-9.8)^2 + math.cos(-9.8)^2, 1))"
+        },
+        {
+          "name": "math.cos",
+          "line": 668,
+          "source_statement": "assert(eq(math.sin(-9.8)^2 + math.cos(-9.8)^2, 1))"
+        },
+        {
+          "name": "eq",
+          "line": 669,
+          "source_statement": "assert(eq(math.tan(math.pi/4), 1))"
+        },
+        {
+          "name": "math.tan",
+          "line": 669,
+          "source_statement": "assert(eq(math.tan(math.pi/4), 1))"
+        },
+        {
+          "name": "eq",
+          "line": 670,
+          "source_statement": "assert(eq(math.sin(math.pi/2), 1) and eq(math.cos(math.pi/2), 0))"
+        },
+        {
+          "name": "math.sin",
+          "line": 670,
+          "source_statement": "assert(eq(math.sin(math.pi/2), 1) and eq(math.cos(math.pi/2), 0))"
+        },
+        {
+          "name": "eq",
+          "line": 670,
+          "source_statement": "assert(eq(math.sin(math.pi/2), 1) and eq(math.cos(math.pi/2), 0))"
+        },
+        {
+          "name": "math.cos",
+          "line": 670,
+          "source_statement": "assert(eq(math.sin(math.pi/2), 1) and eq(math.cos(math.pi/2), 0))"
+        },
+        {
+          "name": "eq",
+          "line": 671,
+          "source_statement": "assert(eq(math.atan(1), math.pi/4) and eq(math.acos(0), math.pi/2) and"
+        },
+        {
+          "name": "math.atan",
+          "line": 671,
+          "source_statement": "assert(eq(math.atan(1), math.pi/4) and eq(math.acos(0), math.pi/2) and"
+        },
+        {
+          "name": "eq",
+          "line": 671,
+          "source_statement": "assert(eq(math.atan(1), math.pi/4) and eq(math.acos(0), math.pi/2) and"
+        },
+        {
+          "name": "math.acos",
+          "line": 671,
+          "source_statement": "assert(eq(math.atan(1), math.pi/4) and eq(math.acos(0), math.pi/2) and"
+        },
+        {
+          "name": "eq",
+          "line": 672,
+          "source_statement": "       eq(math.asin(1), math.pi/2))"
+        },
+        {
+          "name": "math.asin",
+          "line": 672,
+          "source_statement": "       eq(math.asin(1), math.pi/2))"
+        },
+        {
+          "name": "eq",
+          "line": 673,
+          "source_statement": "assert(eq(math.deg(math.pi/2), 90) and eq(math.rad(90), math.pi/2))"
+        },
+        {
+          "name": "math.deg",
+          "line": 673,
+          "source_statement": "assert(eq(math.deg(math.pi/2), 90) and eq(math.rad(90), math.pi/2))"
+        },
+        {
+          "name": "eq",
+          "line": 673,
+          "source_statement": "assert(eq(math.deg(math.pi/2), 90) and eq(math.rad(90), math.pi/2))"
+        },
+        {
+          "name": "math.rad",
+          "line": 673,
+          "source_statement": "assert(eq(math.deg(math.pi/2), 90) and eq(math.rad(90), math.pi/2))"
+        },
+        {
+          "name": "math.abs",
+          "line": 674,
+          "source_statement": "assert(math.abs(-10.43) == 10.43)"
+        },
+        {
+          "name": "eqT",
+          "line": 675,
+          "source_statement": "assert(eqT(math.abs(minint), minint))"
+        },
+        {
+          "name": "math.abs",
+          "line": 675,
+          "source_statement": "assert(eqT(math.abs(minint), minint))"
+        },
+        {
+          "name": "eqT",
+          "line": 676,
+          "source_statement": "assert(eqT(math.abs(maxint), maxint))"
+        },
+        {
+          "name": "math.abs",
+          "line": 676,
+          "source_statement": "assert(eqT(math.abs(maxint), maxint))"
+        },
+        {
+          "name": "eqT",
+          "line": 677,
+          "source_statement": "assert(eqT(math.abs(-maxint), maxint))"
+        },
+        {
+          "name": "math.abs",
+          "line": 677,
+          "source_statement": "assert(eqT(math.abs(-maxint), maxint))"
+        },
+        {
+          "name": "eq",
+          "line": 678,
+          "source_statement": "assert(eq(math.atan(1,0), math.pi/2))"
+        },
+        {
+          "name": "math.atan",
+          "line": 678,
+          "source_statement": "assert(eq(math.atan(1,0), math.pi/2))"
+        },
+        {
+          "name": "math.fmod",
+          "line": 679,
+          "source_statement": "assert(math.fmod(10,3) == 1)"
+        },
+        {
+          "name": "eq",
+          "line": 680,
+          "source_statement": "assert(eq(math.sqrt(10)^2, 10))"
+        },
+        {
+          "name": "math.sqrt",
+          "line": 680,
+          "source_statement": "assert(eq(math.sqrt(10)^2, 10))"
+        },
+        {
+          "name": "eq",
+          "line": 681,
+          "source_statement": "assert(eq(math.log(2, 10), math.log(2)/math.log(10)))"
+        },
+        {
+          "name": "math.log",
+          "line": 681,
+          "source_statement": "assert(eq(math.log(2, 10), math.log(2)/math.log(10)))"
+        },
+        {
+          "name": "math.log",
+          "line": 681,
+          "source_statement": "assert(eq(math.log(2, 10), math.log(2)/math.log(10)))"
+        },
+        {
+          "name": "math.log",
+          "line": 681,
+          "source_statement": "assert(eq(math.log(2, 10), math.log(2)/math.log(10)))"
+        },
+        {
+          "name": "eq",
+          "line": 682,
+          "source_statement": "assert(eq(math.log(2, 2), 1))"
+        },
+        {
+          "name": "math.log",
+          "line": 682,
+          "source_statement": "assert(eq(math.log(2, 2), 1))"
+        },
+        {
+          "name": "eq",
+          "line": 683,
+          "source_statement": "assert(eq(math.log(9, 3), 2))"
+        },
+        {
+          "name": "math.log",
+          "line": 683,
+          "source_statement": "assert(eq(math.log(9, 3), 2))"
+        },
+        {
+          "name": "eq",
+          "line": 684,
+          "source_statement": "assert(eq(math.exp(0), 1))"
+        },
+        {
+          "name": "math.exp",
+          "line": 684,
+          "source_statement": "assert(eq(math.exp(0), 1))"
+        },
+        {
+          "name": "eq",
+          "line": 685,
+          "source_statement": "assert(eq(math.sin(10), math.sin(10%(2*math.pi))))"
+        },
+        {
+          "name": "math.sin",
+          "line": 685,
+          "source_statement": "assert(eq(math.sin(10), math.sin(10%(2*math.pi))))"
+        },
+        {
+          "name": "math.sin",
+          "line": 685,
+          "source_statement": "assert(eq(math.sin(10), math.sin(10%(2*math.pi))))"
+        },
+        {
+          "name": "print",
+          "line": 688,
+          "source_statement": "do  print(\"testing ldexp/frexp\")"
+        },
+        {
+          "name": "math.frexp",
+          "line": 691,
+          "source_statement": "    local m, p = math.frexp(x)"
+        },
+        {
+          "name": "math.ldexp",
+          "line": 692,
+          "source_statement": "    assert(math.ldexp(m, p) == x)"
+        },
+        {
+          "name": "math.abs",
+          "line": 693,
+          "source_statement": "    local am = math.abs(m)"
+        },
+        {
+          "name": "tonumber",
+          "line": 700,
+          "source_statement": "assert(tonumber(' 1.3e-2 ') == 1.3e-2)"
+        },
+        {
+          "name": "tonumber",
+          "line": 701,
+          "source_statement": "assert(tonumber(' -1.00000000000001 ') == -1.00000000000001)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 690,
+          "source_statement": "  for _, x in ipairs{0, 10, 32, -math.pi, 1e10, 1e-10, math.huge, -math.huge} do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 688,
+          "kind": "source-phase-output",
+          "source_statement": "do  print(\"testing ldexp/frexp\")"
+        }
+      ]
+    },
+    {
+      "id": "floor-ceil-tointeger-contracts",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0013",
+      "first_line": 711,
+      "last_line": 754,
+      "span_end_line": 755,
+      "byte_offset": 20008,
+      "byte_length": 1650,
+      "span_sha256": "951aff47aef7a03b1dea10c6d53b70317b87c6e7f828196c2b7541aaf033a5ff",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "floor/ceil preserve integer versus floating return rules, infinities and large exact values; tointeger returns exact in-range integers and nil for fractions/NaN/uncoercible inputs. Bad arguments report expected type errors.",
+      "dynamic_invocation": "Execute the actual source calls eqT@712, math.floor@712, eqT@713, math.ceil@713, eqT@714, math.floor@714, eqT@715, math.ceil@715, eqT@716, math.floor@716, eqT@717, math.ceil@717, eqT@718, math.floor@718, eqT@719, math.floor@719, eqT@720, math.ceil@720, eqT@721, math.ceil@721, math.floor@722, math.ceil@723, math.floor@724, math.ceil@725, math.floor@727, math.floor@728, math.ceil@729, math.ceil@730, checkerror@732, checkerror@733, eqT@734, math.tointeger@734, eqT@735, math.tointeger@735, eqT@736, math.tointeger@736, eqT@737, math.tointeger@737, eqT@738, math.tointeger@738, math.tointeger@739, math.tointeger@740, math.tointeger@741, math.floor@742, math.ceil@743, math.tointeger@744, math.floor@745, math.ceil@746, math.tointeger@747, math.tointeger@748, math.tointeger@749, math.tointeger@750, math.tointeger@751 in section floor-ceil-tointeger-contracts. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section floor-ceil-tointeger-contracts; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "eqT",
+          "line": 712,
+          "source_statement": "  assert(eqT(math.floor(3.4), 3))"
+        },
+        {
+          "name": "math.floor",
+          "line": 712,
+          "source_statement": "  assert(eqT(math.floor(3.4), 3))"
+        },
+        {
+          "name": "eqT",
+          "line": 713,
+          "source_statement": "  assert(eqT(math.ceil(3.4), 4))"
+        },
+        {
+          "name": "math.ceil",
+          "line": 713,
+          "source_statement": "  assert(eqT(math.ceil(3.4), 4))"
+        },
+        {
+          "name": "eqT",
+          "line": 714,
+          "source_statement": "  assert(eqT(math.floor(-3.4), -4))"
+        },
+        {
+          "name": "math.floor",
+          "line": 714,
+          "source_statement": "  assert(eqT(math.floor(-3.4), -4))"
+        },
+        {
+          "name": "eqT",
+          "line": 715,
+          "source_statement": "  assert(eqT(math.ceil(-3.4), -3))"
+        },
+        {
+          "name": "math.ceil",
+          "line": 715,
+          "source_statement": "  assert(eqT(math.ceil(-3.4), -3))"
+        },
+        {
+          "name": "eqT",
+          "line": 716,
+          "source_statement": "  assert(eqT(math.floor(maxint), maxint))"
+        },
+        {
+          "name": "math.floor",
+          "line": 716,
+          "source_statement": "  assert(eqT(math.floor(maxint), maxint))"
+        },
+        {
+          "name": "eqT",
+          "line": 717,
+          "source_statement": "  assert(eqT(math.ceil(maxint), maxint))"
+        },
+        {
+          "name": "math.ceil",
+          "line": 717,
+          "source_statement": "  assert(eqT(math.ceil(maxint), maxint))"
+        },
+        {
+          "name": "eqT",
+          "line": 718,
+          "source_statement": "  assert(eqT(math.floor(minint), minint))"
+        },
+        {
+          "name": "math.floor",
+          "line": 718,
+          "source_statement": "  assert(eqT(math.floor(minint), minint))"
+        },
+        {
+          "name": "eqT",
+          "line": 719,
+          "source_statement": "  assert(eqT(math.floor(minint + 0.0), minint))"
+        },
+        {
+          "name": "math.floor",
+          "line": 719,
+          "source_statement": "  assert(eqT(math.floor(minint + 0.0), minint))"
+        },
+        {
+          "name": "eqT",
+          "line": 720,
+          "source_statement": "  assert(eqT(math.ceil(minint), minint))"
+        },
+        {
+          "name": "math.ceil",
+          "line": 720,
+          "source_statement": "  assert(eqT(math.ceil(minint), minint))"
+        },
+        {
+          "name": "eqT",
+          "line": 721,
+          "source_statement": "  assert(eqT(math.ceil(minint + 0.0), minint))"
+        },
+        {
+          "name": "math.ceil",
+          "line": 721,
+          "source_statement": "  assert(eqT(math.ceil(minint + 0.0), minint))"
+        },
+        {
+          "name": "math.floor",
+          "line": 722,
+          "source_statement": "  assert(math.floor(1e50) == 1e50)"
+        },
+        {
+          "name": "math.ceil",
+          "line": 723,
+          "source_statement": "  assert(math.ceil(1e50) == 1e50)"
+        },
+        {
+          "name": "math.floor",
+          "line": 724,
+          "source_statement": "  assert(math.floor(-1e50) == -1e50)"
+        },
+        {
+          "name": "math.ceil",
+          "line": 725,
+          "source_statement": "  assert(math.ceil(-1e50) == -1e50)"
+        },
+        {
+          "name": "math.floor",
+          "line": 727,
+          "source_statement": "    assert(math.floor(2^p) == 2^p)"
+        },
+        {
+          "name": "math.floor",
+          "line": 728,
+          "source_statement": "    assert(math.floor(2^p + 0.5) == 2^p)"
+        },
+        {
+          "name": "math.ceil",
+          "line": 729,
+          "source_statement": "    assert(math.ceil(2^p) == 2^p)"
+        },
+        {
+          "name": "math.ceil",
+          "line": 730,
+          "source_statement": "    assert(math.ceil(2^p - 0.5) == 2^p)"
+        },
+        {
+          "name": "checkerror",
+          "line": 732,
+          "source_statement": "  checkerror(\"number expected\", math.floor, {})"
+        },
+        {
+          "name": "checkerror",
+          "line": 733,
+          "source_statement": "  checkerror(\"number expected\", math.ceil, print)"
+        },
+        {
+          "name": "eqT",
+          "line": 734,
+          "source_statement": "  assert(eqT(math.tointeger(minint), minint))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 734,
+          "source_statement": "  assert(eqT(math.tointeger(minint), minint))"
+        },
+        {
+          "name": "eqT",
+          "line": 735,
+          "source_statement": "  assert(eqT(math.tointeger(minint .. \"\"), minint))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 735,
+          "source_statement": "  assert(eqT(math.tointeger(minint .. \"\"), minint))"
+        },
+        {
+          "name": "eqT",
+          "line": 736,
+          "source_statement": "  assert(eqT(math.tointeger(maxint), maxint))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 736,
+          "source_statement": "  assert(eqT(math.tointeger(maxint), maxint))"
+        },
+        {
+          "name": "eqT",
+          "line": 737,
+          "source_statement": "  assert(eqT(math.tointeger(maxint .. \"\"), maxint))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 737,
+          "source_statement": "  assert(eqT(math.tointeger(maxint .. \"\"), maxint))"
+        },
+        {
+          "name": "eqT",
+          "line": 738,
+          "source_statement": "  assert(eqT(math.tointeger(minint + 0.0), minint))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 738,
+          "source_statement": "  assert(eqT(math.tointeger(minint + 0.0), minint))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 739,
+          "source_statement": "  assert(not math.tointeger(0.0 - minint))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 740,
+          "source_statement": "  assert(not math.tointeger(math.pi))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 741,
+          "source_statement": "  assert(not math.tointeger(-math.pi))"
+        },
+        {
+          "name": "math.floor",
+          "line": 742,
+          "source_statement": "  assert(math.floor(math.huge) == math.huge)"
+        },
+        {
+          "name": "math.ceil",
+          "line": 743,
+          "source_statement": "  assert(math.ceil(math.huge) == math.huge)"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 744,
+          "source_statement": "  assert(not math.tointeger(math.huge))"
+        },
+        {
+          "name": "math.floor",
+          "line": 745,
+          "source_statement": "  assert(math.floor(-math.huge) == -math.huge)"
+        },
+        {
+          "name": "math.ceil",
+          "line": 746,
+          "source_statement": "  assert(math.ceil(-math.huge) == -math.huge)"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 747,
+          "source_statement": "  assert(not math.tointeger(-math.huge))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 748,
+          "source_statement": "  assert(math.tointeger(\"34.0\") == 34)"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 749,
+          "source_statement": "  assert(not math.tointeger(\"34.3\"))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 750,
+          "source_statement": "  assert(not math.tointeger({}))"
+        },
+        {
+          "name": "math.tointeger",
+          "line": 751,
+          "source_statement": "  assert(not math.tointeger(0/0))    -- NaN"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 726,
+          "source_statement": "  for _, p in pairs{31,32,63,64} do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "fmod-max-min-and-coercion",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0014",
+      "first_line": 755,
+      "last_line": 798,
+      "span_end_line": 799,
+      "byte_offset": 21658,
+      "byte_length": 1383,
+      "span_sha256": "5d1431f149ade5d8129f1b346594f302bd581ca92566fc82729fe8a181717fd3",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Every signed fmod pair has truncating remainder and correct integer/float type; zero raises. min/max preserve argument-selected types and extrema, reject no arguments, and numeric-string arithmetic leaves its source strings unchanged.",
+      "dynamic_invocation": "Execute the actual source calls math.fmod@759, math.fmod@760, math.type@762, eqT@764, eqT@769, math.fmod@769, eqT@770, math.fmod@770, eqT@771, math.fmod@771, eqT@772, math.fmod@772, checkerror@774, checkerror@778, checkerror@779, eqT@780, math.max@780, eqT@781, math.max@781, math.max@782, eqT@783, math.max@783, eqT@784, math.min@784, eqT@785, math.min@785, math.min@786, math.min@787, math.min@788, eqT@789, math.min@789, eqT@790, math.min@790 in section fmod-max-min-and-coercion. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section fmod-max-min-and-coercion; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "math.fmod",
+          "line": 759,
+          "source_statement": "      local mi = math.fmod(i, j)"
+        },
+        {
+          "name": "math.fmod",
+          "line": 760,
+          "source_statement": "      local mf = math.fmod(i + 0.0, j)"
+        },
+        {
+          "name": "math.type",
+          "line": 762,
+          "source_statement": "      assert(math.type(mi) == 'integer' and math.type(mf) == 'float')"
+        },
+        {
+          "name": "math.type",
+          "line": 762,
+          "source_statement": "      assert(math.type(mi) == 'integer' and math.type(mf) == 'float')"
+        },
+        {
+          "name": "eqT",
+          "line": 764,
+          "source_statement": "        assert(eqT(mi, i % j))"
+        },
+        {
+          "name": "eqT",
+          "line": 769,
+          "source_statement": "assert(eqT(math.fmod(minint, minint), 0))"
+        },
+        {
+          "name": "math.fmod",
+          "line": 769,
+          "source_statement": "assert(eqT(math.fmod(minint, minint), 0))"
+        },
+        {
+          "name": "eqT",
+          "line": 770,
+          "source_statement": "assert(eqT(math.fmod(maxint, maxint), 0))"
+        },
+        {
+          "name": "math.fmod",
+          "line": 770,
+          "source_statement": "assert(eqT(math.fmod(maxint, maxint), 0))"
+        },
+        {
+          "name": "eqT",
+          "line": 771,
+          "source_statement": "assert(eqT(math.fmod(minint + 1, minint), minint + 1))"
+        },
+        {
+          "name": "math.fmod",
+          "line": 771,
+          "source_statement": "assert(eqT(math.fmod(minint + 1, minint), minint + 1))"
+        },
+        {
+          "name": "eqT",
+          "line": 772,
+          "source_statement": "assert(eqT(math.fmod(maxint - 1, maxint), maxint - 1))"
+        },
+        {
+          "name": "math.fmod",
+          "line": 772,
+          "source_statement": "assert(eqT(math.fmod(maxint - 1, maxint), maxint - 1))"
+        },
+        {
+          "name": "checkerror",
+          "line": 774,
+          "source_statement": "checkerror(\"zero\", math.fmod, 3, 0)"
+        },
+        {
+          "name": "checkerror",
+          "line": 778,
+          "source_statement": "  checkerror(\"value expected\", math.max)"
+        },
+        {
+          "name": "checkerror",
+          "line": 779,
+          "source_statement": "  checkerror(\"value expected\", math.min)"
+        },
+        {
+          "name": "eqT",
+          "line": 780,
+          "source_statement": "  assert(eqT(math.max(3), 3))"
+        },
+        {
+          "name": "math.max",
+          "line": 780,
+          "source_statement": "  assert(eqT(math.max(3), 3))"
+        },
+        {
+          "name": "eqT",
+          "line": 781,
+          "source_statement": "  assert(eqT(math.max(3, 5, 9, 1), 9))"
+        },
+        {
+          "name": "math.max",
+          "line": 781,
+          "source_statement": "  assert(eqT(math.max(3, 5, 9, 1), 9))"
+        },
+        {
+          "name": "math.max",
+          "line": 782,
+          "source_statement": "  assert(math.max(maxint, 10e60) == 10e60)"
+        },
+        {
+          "name": "eqT",
+          "line": 783,
+          "source_statement": "  assert(eqT(math.max(minint, minint + 1), minint + 1))"
+        },
+        {
+          "name": "math.max",
+          "line": 783,
+          "source_statement": "  assert(eqT(math.max(minint, minint + 1), minint + 1))"
+        },
+        {
+          "name": "eqT",
+          "line": 784,
+          "source_statement": "  assert(eqT(math.min(3), 3))"
+        },
+        {
+          "name": "math.min",
+          "line": 784,
+          "source_statement": "  assert(eqT(math.min(3), 3))"
+        },
+        {
+          "name": "eqT",
+          "line": 785,
+          "source_statement": "  assert(eqT(math.min(3, 5, 9, 1), 1))"
+        },
+        {
+          "name": "math.min",
+          "line": 785,
+          "source_statement": "  assert(eqT(math.min(3, 5, 9, 1), 1))"
+        },
+        {
+          "name": "math.min",
+          "line": 786,
+          "source_statement": "  assert(math.min(3.2, 5.9, -9.2, 1.1) == -9.2)"
+        },
+        {
+          "name": "math.min",
+          "line": 787,
+          "source_statement": "  assert(math.min(1.9, 1.7, 1.72) == 1.7)"
+        },
+        {
+          "name": "math.min",
+          "line": 788,
+          "source_statement": "  assert(math.min(-10e60, minint) == -10e60)"
+        },
+        {
+          "name": "eqT",
+          "line": 789,
+          "source_statement": "  assert(eqT(math.min(maxint, maxint - 1), maxint - 1))"
+        },
+        {
+          "name": "math.min",
+          "line": 789,
+          "source_statement": "  assert(eqT(math.min(maxint, maxint - 1), maxint - 1))"
+        },
+        {
+          "name": "eqT",
+          "line": 790,
+          "source_statement": "  assert(eqT(math.min(maxint - 2, maxint, maxint - 1), maxint - 2))"
+        },
+        {
+          "name": "math.min",
+          "line": 790,
+          "source_statement": "  assert(eqT(math.min(maxint - 2, maxint, maxint - 1), maxint - 2))"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 758,
+          "source_statement": "    if j ~= 0 then"
+        },
+        {
+          "line": 763,
+          "source_statement": "      if (i >= 0 and j >= 0) or (i <= 0 and j <= 0) or mi == 0 then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 756,
+          "source_statement": "for i = -6, 6 do"
+        },
+        {
+          "line": 757,
+          "source_statement": "  for j = -6, 6 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "negative-zero-NaN-and-constant-kinds",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0015",
+      "first_line": 799,
+      "last_line": 837,
+      "span_end_line": 838,
+      "byte_offset": 23041,
+      "byte_length": 1118,
+      "span_sha256": "b1d53caa90e33cc1a06fd2303fe1759687b1d587cf30b7356308faf9df1d925c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Positive/negative zero compare as one table key while reciprocals retain sign; NaNs remain unordered and are rejected as table keys. Binary-zero byte-string constants remain distinct from numeric zero.",
+      "dynamic_invocation": "Execute the actual source calls print@800, pcall@825, pcall@828 in section negative-zero-NaN-and-constant-kinds. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section negative-zero-NaN-and-constant-kinds; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 800,
+          "source_statement": "  print(\"testing -0 and NaN\")"
+        },
+        {
+          "name": "pcall",
+          "line": 825,
+          "source_statement": "  assert(not pcall(rawset, a, NaN, 1))"
+        },
+        {
+          "name": "pcall",
+          "line": 828,
+          "source_statement": "  assert(not pcall(rawset, a, NaN, 1))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 800,
+          "kind": "source-phase-output",
+          "source_statement": "  print(\"testing -0 and NaN\")"
+        }
+      ]
+    },
+    {
+      "id": "known-RNG-stream-and-seed-replay",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0016",
+      "first_line": 838,
+      "last_line": 890,
+      "span_end_line": 891,
+      "byte_offset": 24159,
+      "byte_length": 1713,
+      "span_sha256": "0069c0669ec327a462321e1cd611792a01b6b1015fbb5e8499c04d155b64470c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Seed1007 produces the exact pinned64-bit integer and mantissa-derived float on both RNG arithmetic implementations. No-argument randomseed returns its actual two seeds; replay repeats the next integer and prints the seeds for reproduction.",
+      "dynamic_invocation": "Source858/863 seed1007 and call both integer/float RNG forms against pinned known bits. Source881 obtains both automatic seeds;883-886 replay them twice, and888 prints their actual signed pair for every context.",
+      "execution_condition": "Selected math.lua section known-RNG-stream-and-seed-replay; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 840,
+          "source_statement": "      print(\"testing 'math.random'\")"
+        },
+        {
+          "name": "math.abs",
+          "line": 847,
+          "source_statement": "  return (math.abs(val - ref) < ref * tol)"
+        },
+        {
+          "name": "math.randomseed",
+          "line": 858,
+          "source_statement": "  math.randomseed(1007)"
+        },
+        {
+          "name": "random",
+          "line": 861,
+          "source_statement": "  assert(random(0) == res)"
+        },
+        {
+          "name": "math.randomseed",
+          "line": 863,
+          "source_statement": "  math.randomseed(1007, 0)"
+        },
+        {
+          "name": "random",
+          "line": 874,
+          "source_statement": "  local rand = random()"
+        },
+        {
+          "name": "eq",
+          "line": 875,
+          "source_statement": "  assert(eq(rand, 0x0.7a7040a5a323c9d6, 2^-floatbits))"
+        },
+        {
+          "name": "math.randomseed",
+          "line": 881,
+          "source_statement": "  local x, y = math.randomseed()"
+        },
+        {
+          "name": "math.random",
+          "line": 882,
+          "source_statement": "  local res = math.random(0)"
+        },
+        {
+          "name": "math.randomseed",
+          "line": 883,
+          "source_statement": "  x, y = math.randomseed(x, y)    -- should repeat the state"
+        },
+        {
+          "name": "math.random",
+          "line": 884,
+          "source_statement": "  assert(math.random(0) == res)"
+        },
+        {
+          "name": "math.randomseed",
+          "line": 885,
+          "source_statement": "  math.randomseed(x, y)    -- again should repeat the state"
+        },
+        {
+          "name": "math.random",
+          "line": 886,
+          "source_statement": "  assert(math.random(0) == res)"
+        },
+        {
+          "name": "print",
+          "line": 888,
+          "source_statement": "  print(string.format(\"random seeds: %d, %d\", x, y))"
+        },
+        {
+          "name": "string.format",
+          "line": 888,
+          "source_statement": "  print(string.format(\"random seeds: %d, %d\", x, y))"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 867,
+          "source_statement": "  if floatbits <= 32 then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 888,
+          "kind": "actual-seed-pair",
+          "pattern": "^random seeds: -?[0-9]+, -?[0-9]+$",
+          "retain": "Keep both signed integer seeds and raw capture for deterministic replay."
+        }
+      ]
+    },
+    {
+      "id": "float-RNG-bit-distribution",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0017",
+      "first_line": 891,
+      "last_line": 927,
+      "span_end_line": 928,
+      "byte_offset": 25872,
+      "byte_length": 1241,
+      "span_sha256": "edcc9350387dee1eb35c68dc36adab1d5941a881a3c99917d9d811f35c3b8fd3",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Full floating random values remain in[0,1), contain no extra precision bits and eventually cover both range ends with every tested mantissa bit near50percent. Actual rounds/range output identifies completion, with retries charged to ordinary work.",
+      "dynamic_invocation": "Initialize one count per actual mantissa bit and execute the inclusive i=0..rounds loop at901-911, where rounds=100*randbits (thus rounds+1 actual draws per iteration). Retry through goto900 when913 or919 rejects range/bit balance. Preserve the original nominal totalrounds accumulation, low/up and all thresholds; printed calls are not an exact draw counter. No retry cap or _soft reduction.",
+      "execution_condition": "Selected math.lua section float-RNG-bit-distribution; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "math.min",
+          "line": 892,
+          "source_statement": "  local randbits = math.min(floatbits, 64)   -- at most 64 random bits"
+        },
+        {
+          "name": "random",
+          "line": 902,
+          "source_statement": "    local t = random()"
+        },
+        {
+          "name": "max",
+          "line": 904,
+          "source_statement": "    up = max(up, t)"
+        },
+        {
+          "name": "min",
+          "line": 905,
+          "source_statement": "    low = min(low, t)"
+        },
+        {
+          "name": "eq",
+          "line": 913,
+          "source_statement": "  if not (eq(up, 1, 0.001) and eq(low, 0, 0.001)) then"
+        },
+        {
+          "name": "eq",
+          "line": 913,
+          "source_statement": "  if not (eq(up, 1, 0.001) and eq(low, 0, 0.001)) then"
+        },
+        {
+          "name": "testnear",
+          "line": 919,
+          "source_statement": "    if not testnear(counts[i], expected, 0.10) then"
+        },
+        {
+          "name": "print",
+          "line": 923,
+          "source_statement": "  print(string.format(\"float random range in %d calls: [%f, %f]\","
+        },
+        {
+          "name": "string.format",
+          "line": 923,
+          "source_statement": "  print(string.format(\"float random range in %d calls: [%f, %f]\","
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 908,
+          "source_statement": "    if (t * 2^bit) % 1 >= 0.5 then    -- is bit set?"
+        },
+        {
+          "line": 913,
+          "source_statement": "  if not (eq(up, 1, 0.001) and eq(low, 0, 0.001)) then"
+        },
+        {
+          "line": 919,
+          "source_statement": "    if not testnear(counts[i], expected, 0.10) then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 895,
+          "source_statement": "  for i = 1, randbits do counts[i] = 0 end"
+        },
+        {
+          "line": 901,
+          "source_statement": "  for i = 0, rounds do"
+        },
+        {
+          "line": 918,
+          "source_statement": "  for i = 1, randbits do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 923,
+          "kind": "actual-retry-total-and-range",
+          "pattern": "^float random range in [0-9]+ calls: \\[",
+          "retain": "Printed cumulative rounds and actual measured range; retries use the shared work budget."
+        }
+      ]
+    },
+    {
+      "id": "integer-RNG-bit-distribution",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0018",
+      "first_line": 928,
+      "last_line": 961,
+      "span_end_line": 962,
+      "byte_offset": 27113,
+      "byte_length": 1091,
+      "span_sha256": "96e6c2bb87b76da89c89053cc27d771562fbbd5fb172f73d32bbe72dbd2edf31",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Full-width random integers eventually cover both extrema and show near50percent counts for each integer bit; actual rounds and measured range are printed.",
+      "dynamic_invocation": "Count each native integer bit in the inclusive i=0..rounds loop at936-943, with rounds=100*intbits (rounds+1 actual draws per iteration). Goto935 retries when946 or952 rejects endpoint reach/bit balance. Source956-959 retains the original nominal totalrounds accumulation and measured endpoint distances; printed calls are not an exact draw counter.",
+      "execution_condition": "Selected math.lua section integer-RNG-bit-distribution; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "random",
+          "line": 937,
+          "source_statement": "    local t = random(0)"
+        },
+        {
+          "name": "max",
+          "line": 938,
+          "source_statement": "    up = max(up, t)"
+        },
+        {
+          "name": "min",
+          "line": 939,
+          "source_statement": "    low = min(low, t)"
+        },
+        {
+          "name": "testnear",
+          "line": 952,
+          "source_statement": "    if not testnear(counts[i], expected, 0.10) then"
+        },
+        {
+          "name": "print",
+          "line": 956,
+          "source_statement": "  print(string.format("
+        },
+        {
+          "name": "string.format",
+          "line": 956,
+          "source_statement": "  print(string.format("
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 946,
+          "source_statement": "  if not (maxint - up < lim and low - minint < lim) then"
+        },
+        {
+          "line": 952,
+          "source_statement": "    if not testnear(counts[i], expected, 0.10) then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 932,
+          "source_statement": "  for i = 1, intbits do counts[i] = 0 end"
+        },
+        {
+          "line": 936,
+          "source_statement": "  for i = 0, rounds do"
+        },
+        {
+          "line": 951,
+          "source_statement": "  for i = 1, intbits do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 956,
+          "kind": "actual-retry-total-and-range",
+          "pattern": "^integer random range in [0-9]+ calls: \\[minint",
+          "retain": "Preserve actual rounds and both ppm distances; no fabricated C memory or numeric profile facts."
+        }
+      ]
+    },
+    {
+      "id": "dice-and-small-interval-exhaustion",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0019",
+      "first_line": 962,
+      "last_line": 1011,
+      "span_end_line": 1012,
+      "byte_offset": 28204,
+      "byte_length": 1055,
+      "span_sha256": "d3ad6c68d642b827c85cb2fdf458f9e5026565fabb5059b2cf5eefb488880c9b",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Dice counts converge under the original threshold. Each small signed/boundary/singleton interval produces only in-range values and visits every value, including min/max integer neighborhoods.",
+      "dynamic_invocation": "Execute the actual source calls random@969, testnear@974, random@984, aux@997, aux@998, aux@999, aux@1000, aux@1001, aux@1002, aux@1003, aux@1004, aux@1005, aux@1006, aux@1007, aux@1008, aux@1009 in section dice-and-small-interval-exhaustion. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section dice-and-small-interval-exhaustion; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "random",
+          "line": 969,
+          "source_statement": "    local r = random(6)"
+        },
+        {
+          "name": "testnear",
+          "line": 974,
+          "source_statement": "    if not testnear(count[i], totalrep, 0.05) then"
+        },
+        {
+          "name": "random",
+          "line": 984,
+          "source_statement": "      local t = random(x1, x2)"
+        },
+        {
+          "name": "aux",
+          "line": 997,
+          "source_statement": "  aux(-10,0)"
+        },
+        {
+          "name": "aux",
+          "line": 998,
+          "source_statement": "  aux(1, 6)"
+        },
+        {
+          "name": "aux",
+          "line": 999,
+          "source_statement": "  aux(1, 2)"
+        },
+        {
+          "name": "aux",
+          "line": 1000,
+          "source_statement": "  aux(1, 13)"
+        },
+        {
+          "name": "aux",
+          "line": 1001,
+          "source_statement": "  aux(1, 31)"
+        },
+        {
+          "name": "aux",
+          "line": 1002,
+          "source_statement": "  aux(1, 32)"
+        },
+        {
+          "name": "aux",
+          "line": 1003,
+          "source_statement": "  aux(1, 33)"
+        },
+        {
+          "name": "aux",
+          "line": 1004,
+          "source_statement": "  aux(-10, 10)"
+        },
+        {
+          "name": "aux",
+          "line": 1005,
+          "source_statement": "  aux(-10,-10)   -- unit set"
+        },
+        {
+          "name": "aux",
+          "line": 1006,
+          "source_statement": "  aux(minint, minint)   -- unit set"
+        },
+        {
+          "name": "aux",
+          "line": 1007,
+          "source_statement": "  aux(maxint, maxint)   -- unit set"
+        },
+        {
+          "name": "aux",
+          "line": 1008,
+          "source_statement": "  aux(minint, minint + 9)"
+        },
+        {
+          "name": "aux",
+          "line": 1009,
+          "source_statement": "  aux(maxint - 3, maxint)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 974,
+          "source_statement": "    if not testnear(count[i], totalrep, 0.05) then"
+        },
+        {
+          "line": 986,
+          "source_statement": "      if not mark[t] then  -- new value"
+        },
+        {
+          "line": 989,
+          "source_statement": "        if count == x2 - x1 + 1 then   -- all values appeared; OK"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 968,
+          "source_statement": "  for i = 1, rep * 6 do"
+        },
+        {
+          "line": 973,
+          "source_statement": "  for i = 1, 6 do"
+        },
+        {
+          "line": 983,
+          "source_statement": "    while true do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "large-interval-distribution-and-errors",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0020",
+      "first_line": 1012,
+      "last_line": 1060,
+      "span_end_line": 1061,
+      "byte_offset": 29259,
+      "byte_length": 1269,
+      "span_sha256": "86f50f15f51732de77e9e82f08e090ac9c685671cb66adb7040301ed358b44fd",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Each supplied large signed interval yields at least80percent distinct observations and values near both endpoints; random rejects excess arguments and reversed/empty intervals.",
+      "dynamic_invocation": "Execute the actual source calls random@1020, math.max@1023, math.min@1024, aux@1039, aux@1040, aux@1041, aux@1042, aux@1043, aux@1044, aux@1045, aux@1046, aux@1047, pcall@1051, pcall@1054, pcall@1055, pcall@1056 in section large-interval-distribution-and-errors. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected math.lua section large-interval-distribution-and-errors; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "random",
+          "line": 1020,
+          "source_statement": "      local t = random(p1, p2)"
+        },
+        {
+          "name": "math.max",
+          "line": 1023,
+          "source_statement": "        max = math.max(max, t)"
+        },
+        {
+          "name": "math.min",
+          "line": 1024,
+          "source_statement": "        min = math.min(min, t)"
+        },
+        {
+          "name": "aux",
+          "line": 1039,
+          "source_statement": "  aux(0, maxint)"
+        },
+        {
+          "name": "aux",
+          "line": 1040,
+          "source_statement": "  aux(1, maxint)"
+        },
+        {
+          "name": "aux",
+          "line": 1041,
+          "source_statement": "  aux(3, maxint // 3)"
+        },
+        {
+          "name": "aux",
+          "line": 1042,
+          "source_statement": "  aux(minint, -1)"
+        },
+        {
+          "name": "aux",
+          "line": 1043,
+          "source_statement": "  aux(minint // 2, maxint // 2)"
+        },
+        {
+          "name": "aux",
+          "line": 1044,
+          "source_statement": "  aux(minint, maxint)"
+        },
+        {
+          "name": "aux",
+          "line": 1045,
+          "source_statement": "  aux(minint + 1, maxint)"
+        },
+        {
+          "name": "aux",
+          "line": 1046,
+          "source_statement": "  aux(minint, maxint - 1)"
+        },
+        {
+          "name": "aux",
+          "line": 1047,
+          "source_statement": "  aux(0, 1 << (intbits - 5))"
+        },
+        {
+          "name": "pcall",
+          "line": 1051,
+          "source_statement": "assert(not pcall(random, 1, 2, 3))    -- too many arguments"
+        },
+        {
+          "name": "pcall",
+          "line": 1054,
+          "source_statement": "assert(not pcall(random, minint + 1, minint))"
+        },
+        {
+          "name": "pcall",
+          "line": 1055,
+          "source_statement": "assert(not pcall(random, maxint, maxint - 1))"
+        },
+        {
+          "name": "pcall",
+          "line": 1056,
+          "source_statement": "assert(not pcall(random, maxint, minint))"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 1021,
+          "source_statement": "      if not mark[t] then  -- new value"
+        },
+        {
+          "line": 1030,
+          "source_statement": "    if not (count >= n * 0.8) then"
+        },
+        {
+          "line": 1035,
+          "source_statement": "    if not (min < p1 + diff and max > p2 - diff) then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 1019,
+          "source_statement": "    for _ = 1, n do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "tostring-precision-and-completion",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0021",
+      "first_line": 1061,
+      "last_line": 1145,
+      "span_end_line": 1146,
+      "byte_offset": 30528,
+      "byte_length": 2616,
+      "span_sha256": "3c092a54fdb0ffcbaa056e46cd2643c51ad366f1cdcc42502aa13fb7c9407240",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Mersenne fractions, random fractions, adjacent representable float pairs, generated five-digit decimal spellings and random binary float bit patterns round-trip through tostring/tonumber without merging distinct finite values. Printed precision phases and terminal OK follow the whole campaign.",
+      "dynamic_invocation": "Print measured decimal precisions1069/1073; check all maxexp Mersenne fractions,100 random fractions, adjacent floats for both exponent signs,1000 five-digit numerals at every decimal insertion and400 binary RNG float patterns. Source1136 limits only the final roundtrip assertion to finite numeral spellings.",
+      "execution_condition": "Selected math.lua section tostring-precision-and-completion; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 1063,
+          "source_statement": "    print(\"testing precision of 'tostring'\")"
+        },
+        {
+          "name": "math.floor",
+          "line": 1068,
+          "source_statement": "local decdig = math.floor(floatbits * math.log(2, 10))"
+        },
+        {
+          "name": "math.log",
+          "line": 1068,
+          "source_statement": "local decdig = math.floor(floatbits * math.log(2, 10))"
+        },
+        {
+          "name": "print",
+          "line": 1069,
+          "source_statement": "print(string.format(\"  %d-digit float numbers with full precision\","
+        },
+        {
+          "name": "string.format",
+          "line": 1069,
+          "source_statement": "print(string.format(\"  %d-digit float numbers with full precision\","
+        },
+        {
+          "name": "math.floor",
+          "line": 1072,
+          "source_statement": "local Idecdig = math.floor(math.log(maxint, 10))"
+        },
+        {
+          "name": "math.log",
+          "line": 1072,
+          "source_statement": "local Idecdig = math.floor(math.log(maxint, 10))"
+        },
+        {
+          "name": "print",
+          "line": 1073,
+          "source_statement": "print(string.format(\"  %d-digit integer numbers with full precision\","
+        },
+        {
+          "name": "string.format",
+          "line": 1073,
+          "source_statement": "print(string.format(\"  %d-digit integer numbers with full precision\","
+        },
+        {
+          "name": "tonumber",
+          "line": 1085,
+          "source_statement": "    assert(x == tonumber(tostring(x)))"
+        },
+        {
+          "name": "tostring",
+          "line": 1085,
+          "source_statement": "    assert(x == tonumber(tostring(x)))"
+        },
+        {
+          "name": "math.random",
+          "line": 1090,
+          "source_statement": "    local x = math.random()"
+        },
+        {
+          "name": "tonumber",
+          "line": 1091,
+          "source_statement": "    assert(x == tonumber(tostring(x)))"
+        },
+        {
+          "name": "tostring",
+          "line": 1091,
+          "source_statement": "    assert(x == tonumber(tostring(x)))"
+        },
+        {
+          "name": "tostring",
+          "line": 1103,
+          "source_statement": "      local fy = tostring(y)"
+        },
+        {
+          "name": "tostring",
+          "line": 1104,
+          "source_statement": "      assert(x ~= y and tostring(x) ~= fy)"
+        },
+        {
+          "name": "tonumber",
+          "line": 1105,
+          "source_statement": "      assert(tonumber(fy) == y)"
+        },
+        {
+          "name": "string.format",
+          "line": 1117,
+          "source_statement": "    local x = string.format(\"%.5d\", math.random(0, 99999))"
+        },
+        {
+          "name": "math.random",
+          "line": 1117,
+          "source_statement": "    local x = string.format(\"%.5d\", math.random(0, 99999))"
+        },
+        {
+          "name": "string.sub",
+          "line": 1120,
+          "source_statement": "      local y = string.sub(x, 1, i - 1) .. \".\" .. string.sub(x, i, -1)"
+        },
+        {
+          "name": "string.sub",
+          "line": 1120,
+          "source_statement": "      local y = string.sub(x, 1, i - 1) .. \".\" .. string.sub(x, i, -1)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 1121,
+          "source_statement": "      y = string.gsub(y, \"^0*(%d.-%d)0*$\", \"%1\")   -- trim extra zeros"
+        },
+        {
+          "name": "tostring",
+          "line": 1122,
+          "source_statement": "      assert(y == tostring(tonumber(y)))"
+        },
+        {
+          "name": "tonumber",
+          "line": 1122,
+          "source_statement": "      assert(y == tostring(tonumber(y)))"
+        },
+        {
+          "name": "string.packsize",
+          "line": 1127,
+          "source_statement": "  local Fsz = string.packsize(\"n\")   -- size of floats in bytes"
+        },
+        {
+          "name": "string.pack",
+          "line": 1130,
+          "source_statement": "    local s = string.pack(\"j\", math.random(0))   -- a random string of bits"
+        },
+        {
+          "name": "math.random",
+          "line": 1130,
+          "source_statement": "    local s = string.pack(\"j\", math.random(0))   -- a random string of bits"
+        },
+        {
+          "name": "string.pack",
+          "line": 1132,
+          "source_statement": "      s = s .. string.pack(\"j\", math.random(0))"
+        },
+        {
+          "name": "math.random",
+          "line": 1132,
+          "source_statement": "      s = s .. string.pack(\"j\", math.random(0))"
+        },
+        {
+          "name": "string.unpack",
+          "line": 1134,
+          "source_statement": "    local n = string.unpack(\"n\", s)   -- read 's' as a float"
+        },
+        {
+          "name": "tostring",
+          "line": 1135,
+          "source_statement": "    s = tostring(n)"
+        },
+        {
+          "name": "string.find",
+          "line": 1136,
+          "source_statement": "    if string.find(s, \"^%-?%d\") then   -- avoid NaN, inf, -inf"
+        },
+        {
+          "name": "tonumber",
+          "line": 1137,
+          "source_statement": "      assert(tonumber(s) == n)"
+        },
+        {
+          "name": "print",
+          "line": 1145,
+          "source_statement": "print('OK')"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 1136,
+          "source_statement": "    if string.find(s, \"^%-?%d\") then   -- avoid NaN, inf, -inf"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 1082,
+          "source_statement": "  for i = 1, maxexp do"
+        },
+        {
+          "line": 1089,
+          "source_statement": "  for i = 1, 100 do"
+        },
+        {
+          "line": 1098,
+          "source_statement": "  for i = 1, maxexp - 1 do"
+        },
+        {
+          "line": 1099,
+          "source_statement": "    for _, i in ipairs{-i, i} do"
+        },
+        {
+          "line": 1115,
+          "source_statement": "  for i = 1, 1000 do"
+        },
+        {
+          "line": 1118,
+          "source_statement": "    for i = 2, #x do"
+        },
+        {
+          "line": 1129,
+          "source_statement": "  for i = 1, 400 do"
+        },
+        {
+          "line": 1131,
+          "source_statement": "    while #s < Fsz do   -- make 's' long enough"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 1069,
+          "kind": "measured-float-decimal-precision",
+          "pattern": "^  [0-9]+-digit float numbers with full precision$"
+        },
+        {
+          "line": 1073,
+          "kind": "measured-integer-decimal-precision",
+          "pattern": "^  [0-9]+-digit integer numbers with full precision$"
+        },
+        {
+          "line": 1145,
+          "kind": "terminal",
+          "value": "OK"
+        }
+      ]
+    }
+  ],
+  "supplemental_obligations": [
+    {
+      "id": "measured-default-tolerance-guard",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0022",
+      "first_line": 73,
+      "last_line": 76,
+      "span_end_line": 77,
+      "byte_offset": 1447,
+      "byte_length": 92,
+      "span_sha256": "259a587b129abef7bfee6b83a78844854704817604d25d0de4662a83a9b9e5d2",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "When eq is called without an explicit tolerance, actual mantissa_bits selects1E-11 or1E-5. Per-context source-profile facts certify the selected branch; the other assignment is measured inactive and never receives a body-execution pass.",
+      "measured_condition": {
+        "fact": "mantissa_bits",
+        "operator": "ge",
+        "value": 50
+      },
+      "dynamic_invocation": "Run the unchanged source with a hash-bound source-profile-witness.lua measurement in this same C/Ada process. Compare actual facts with this condition and independently adjudicate which original body is active; do not record the inactive body as executed.",
+      "execution_condition": "The guard measurement applies in every selected configuration; its body applicability is determined by actual per-context facts.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ]
+    },
+    {
+      "id": "measured-width-equality-guard",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0023",
+      "first_line": 202,
+      "last_line": 213,
+      "span_end_line": 214,
+      "byte_offset": 4754,
+      "byte_length": 471,
+      "span_sha256": "72e42ac4f6b5416dd7146cb8c8a61518ccee2ac1a8c0a7a9222a6c10dcc621de",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Actual integer_bits/mantissa_bits select the original mixed-width equality branch. Only source203-207 or209-212 executes; inactive lexical assertions remain reviewed references to this measured guard, never passed calls.",
+      "measured_condition": {
+        "fact": "mantissa_bits",
+        "operator": "lt",
+        "value_fact": "integer_bits"
+      },
+      "dynamic_invocation": "Run the unchanged source with a hash-bound source-profile-witness.lua measurement in this same C/Ada process. Compare actual facts with this condition and independently adjudicate which original body is active; do not record the inactive body as executed.",
+      "execution_condition": "The guard measurement applies in every selected configuration; its body applicability is determined by actual per-context facts.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ]
+    },
+    {
+      "id": "measured-width-order-guard",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0024",
+      "first_line": 242,
+      "last_line": 289,
+      "span_end_line": 290,
+      "byte_offset": 6039,
+      "byte_length": 1515,
+      "span_sha256": "a859fc6184939961ce283bcd2493394747e3c90c21f1dcd190d5b7398fc512f3",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The measured numeric profile selects the original mixed integer/float order branch. Passing source evidence covers only243-259 when true or261-288 when false; hardware-inapplicable body assertions are not claimed executed.",
+      "measured_condition": {
+        "fact": "mantissa_bits",
+        "operator": "lt",
+        "value_fact": "integer_bits"
+      },
+      "dynamic_invocation": "Run the unchanged source with a hash-bound source-profile-witness.lua measurement in this same C/Ada process. Compare actual facts with this condition and independently adjudicate which original body is active; do not record the inactive body as executed.",
+      "execution_condition": "The guard measurement applies in every selected configuration; its body applicability is determined by actual per-context facts.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ]
+    },
+    {
+      "id": "measured-width-conversion-guard",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0025",
+      "first_line": 323,
+      "last_line": 343,
+      "span_end_line": 344,
+      "byte_offset": 8508,
+      "byte_length": 887,
+      "span_sha256": "18211d62db24710ac540e7b464914658e96b9a1d5a620758b53869bbfeb910af",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The measured numeric profile selects the exact/rounded integer-conversion branch. Only324-335 or337-342 is executed; the opposite source alternative stays an explicitly reviewed inactive-body reference.",
+      "measured_condition": {
+        "fact": "mantissa_bits",
+        "operator": "lt",
+        "value_fact": "integer_bits"
+      },
+      "dynamic_invocation": "Run the unchanged source with a hash-bound source-profile-witness.lua measurement in this same C/Ada process. Compare actual facts with this condition and independently adjudicate which original body is active; do not record the inactive body as executed.",
+      "execution_condition": "The guard measurement applies in every selected configuration; its body applicability is determined by actual per-context facts.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ]
+    },
+    {
+      "id": "measured-RNG-mantissa-half-guard",
+      "runtime_id": "LUA-MATH-REVIEWED-BLOCK-0026",
+      "first_line": 867,
+      "last_line": 873,
+      "span_end_line": 874,
+      "byte_offset": 25091,
+      "byte_length": 271,
+      "span_sha256": "df4b6d8a53a3d0f7a9a2dc4b0906c0a7e534bee4c6cab789f27bd2975f9679d7",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The actual floating mantissa determines whether pinned seed1007 uses only the high32-bit half or also low bits. The source-profile witness decides the branch; an inactive calculation is not represented as executed.",
+      "measured_condition": {
+        "fact": "mantissa_bits",
+        "operator": "le",
+        "value": 32
+      },
+      "dynamic_invocation": "Run the unchanged source with a hash-bound source-profile-witness.lua measurement in this same C/Ada process. Compare actual facts with this condition and independently adjudicate which original body is active; do not record the inactive body as executed.",
+      "execution_condition": "The guard measurement applies in every selected configuration; its body applicability is determined by actual per-context facts.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ]
+    }
+  ],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": []
+}

@@ -139,5 +139,31 @@ Reject 'matrix AUnit review differs' {param($f) $f.Matrix.aunit_mapping.review_s
 Reject 'matrix consumer report differs' {param($f) $f.Matrix.named_consumers[0].sha256='4'*64} 'named report review' -Matrix
 Reject 'matrix AUnit report differs' {param($f) $f.Matrix.named_aunit[0].sha256='4'*64} 'named report review' -Matrix
 Reject 'matrix named report missing' {param($f) $f.Matrix.named_consumers=@()} 'named report set' -Matrix
+function Expand-MatrixFixture($Fixture) {
+    $Fixture.Matrix.scope='expanded-t-conformance'
+    $Fixture.Matrix.operations[0].file='constructs.lua'
+    $Fixture.Matrix.operations[0].supplemental=@(@{variant='constructs-branch-1';
+        c=$Fixture.Matrix.operations[0].c.Clone(); ada=$Fixture.Matrix.operations[0].ada.Clone()})
+    $Fixture.MatrixApproval.scope='expanded-t-conformance'
+    $Fixture.MatrixApproval.operations[0].file='constructs.lua'
+    $Fixture.MatrixApproval.operations[0].supplemental=@(@{variant='constructs-branch-1'; decision='accepted';
+        c_report_sha256=$Fixture.Matrix.operations[0].c.sha256;
+        ada_report_sha256=$Fixture.Matrix.operations[0].ada.sha256})
+    $Fixture.Matrix.review.artifact_sha256=Write-Json (Join-Path $Fixture.Root 'matrix-approval.json') $Fixture.MatrixApproval
+}
+$expanded=New-Fixture
+Expand-MatrixFixture $expanded
+Assert-MatrixReviewBinding -Root $expanded.Root -Manifest $expanded.Matrix
+$script:cases++
+Write-Output 'REVIEW TEST PASS: both constructs templates have content-bound review'
+Reject 'matrix missing supplemental decision' {param($f)
+    Expand-MatrixFixture $f
+    $f.MatrixApproval.operations[0].Remove('supplemental')
+    $f.Matrix.review.artifact_sha256=Write-Json (Join-Path $f.Root 'matrix-approval.json') $f.MatrixApproval
+} 'supplemental report review' -Matrix
+Reject 'matrix altered supplemental report' {param($f)
+    Expand-MatrixFixture $f
+    $f.Matrix.operations[0].supplemental[0].ada.sha256='4'*64
+} 'supplemental report review' -Matrix
 Write-Output "PASS: $script:cases review-artifact binding regressions; synthetic authority only"
 & (Join-Path $PSScriptRoot 'test-native-branch-review.ps1')

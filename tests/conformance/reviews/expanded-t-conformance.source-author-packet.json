@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-audit-author-packet",
+  "scope": "expanded-t-conformance",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_file_count": 10,
+  "original_anchor_count": 1462,
+  "appended_runtime_block_count": 132,
+  "required_contexts": [
+    "default/windows/development/static",
+    "default/windows/development/shared",
+    "default/windows/validation/static",
+    "default/windows/validation/shared",
+    "default/windows/release/static",
+    "default/windows/release/shared",
+    "upstream-test/windows/validation/static",
+    "upstream-test/windows/validation/shared",
+    "default/linux/development/static",
+    "default/linux/development/shared",
+    "default/linux/validation/static",
+    "default/linux/validation/shared",
+    "default/linux/release/static",
+    "default/linux/release/shared",
+    "upstream-test/linux/validation/static",
+    "upstream-test/linux/validation/shared",
+    "default/macos/development/static",
+    "default/macos/development/shared",
+    "default/macos/validation/static",
+    "default/macos/validation/shared",
+    "default/macos/release/static",
+    "default/macos/release/shared",
+    "upstream-test/macos/validation/static",
+    "upstream-test/macos/validation/shared",
+    "default/windows/validation/static-pic",
+    "upstream-test/windows/validation/static-pic"
+  ],
+  "files": [
+    {
+      "file": "tpack.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/tpack.expanded-candidate.json",
+        "sha256": "d3728d5332a000bbe9ac49878819c5e0b426dd349b85a1eddd18cca8961eb461"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/tpack.expanded-classification-proposal.jsonl",
+        "sha256": "680972d8cbc1eef6b5e6a1c0539f508a4f579528a6d16f45e77beb40efbe5a1c"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/tpack.jsonl",
+        "sha256": "8edf4c5f58780945849e5dd2f4709c13cb63bcac14ab99bedc4382f406ac6bf3"
+      },
+      "original_anchor_count": 96,
+      "new_runtime_block_count": 11
+    },
+    {
+      "file": "utf8.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/utf8.expanded-candidate.json",
+        "sha256": "6e285dad6cbe88db9bab63a956879882718f9848b361b35958775eb0082f13c1"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/utf8.expanded-classification-proposal.jsonl",
+        "sha256": "1da9cf40599df03ffb9a3ee8a159521edd45574eb323513e2dd7f03f57c12a4b"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/utf8.jsonl",
+        "sha256": "e379874b50880aa2c6356fc4ac8a97c0ee9df65fc0dd7019ef6fbd555ffe6698"
+      },
+      "original_anchor_count": 59,
+      "new_runtime_block_count": 9
+    },
+    {
+      "file": "bitwise.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/bitwise.expanded-candidate.json",
+        "sha256": "7fa60c7121507278450d01b207846c609bb13388ac872a36e64c88622f35c36d"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/bitwise.expanded-classification-proposal.jsonl",
+        "sha256": "1ca8eab2fee10217e525d077ba36ff60df0346ed2f6ed45383d1a77dd831ee58"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/bitwise.jsonl",
+        "sha256": "e668830d947778cdcf97ee7a97905bf3dffe0c718ca59aa0b093fc980dc10132"
+      },
+      "original_anchor_count": 155,
+      "new_runtime_block_count": 10
+    },
+    {
+      "file": "bwcoercion.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/bwcoercion.expanded-candidate.json",
+        "sha256": "bd61b2443c7cbc47f7bf63f0c82be6fd410a873e30682d89a031a6267711f13d"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/bwcoercion.expanded-classification-proposal.jsonl",
+        "sha256": "d9d486b59b2f773b39c7e698d412b8ab10b4c49aeadbfc55283e870bec123d6d"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/bwcoercion.jsonl",
+        "sha256": "4d80d54c1763677d2e5293c4e7bdce811e304ccf79af694f27db132edd8fddd6"
+      },
+      "original_anchor_count": 5,
+      "new_runtime_block_count": 3
+    },
+    {
+      "file": "goto.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/goto.expanded-candidate.json",
+        "sha256": "c2c0d014d21ae1fa2e807acfb9f5184a1fdbce25a2b71f1c56648938c7b1c899"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/goto.expanded-classification-proposal.jsonl",
+        "sha256": "2f5b5c27e22b8dcf809ace1f40b1eaacdfcbfb159bbe3c1f685543b868a59edc"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/goto.jsonl",
+        "sha256": "0d9344de782a450311faa99408e5a9c15d2d62fa10350adaf916ca07bd3e2914"
+      },
+      "original_anchor_count": 62,
+      "new_runtime_block_count": 12
+    },
+    {
+      "file": "constructs.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/constructs.expanded-candidate.json",
+        "sha256": "f569ac32c295c2440f102f1d38bd55478d49bbfa40e3a113167c5e0225cb128c"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/constructs.expanded-classification-proposal.jsonl",
+        "sha256": "c1a6e5de25531075de78dddbb7e14a4860505d4f85ce92da23e5b7e06fd39702"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/constructs.jsonl",
+        "sha256": "bbc8a596fa96583d666617d386c25e681b79ada349d5685301b6b2ba4834ee54"
+      },
+      "original_anchor_count": 83,
+      "new_runtime_block_count": 12
+    },
+    {
+      "file": "closure.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/closure.expanded-candidate.json",
+        "sha256": "d76f426041f169b1eb01c23e2c7dc6dbd1d5d9c5eff8a33c39c2e4be880cc8b5"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/closure.expanded-classification-proposal.jsonl",
+        "sha256": "e4dc85eeae7f1a811689f731aa6ff6fb852605efaba4eaa65fd939b8b4797630"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/closure.jsonl",
+        "sha256": "378314fc66c2e6af9df740a030a1aea975bf582e7ffc345e022fe18fe8e86874"
+      },
+      "original_anchor_count": 63,
+      "new_runtime_block_count": 8
+    },
+    {
+      "file": "pm.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/pm.expanded-candidate.json",
+        "sha256": "d13cd93cec29943cf55819eb9023af255323d85f2947c340e81b92457d387001"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/pm.expanded-classification-proposal.jsonl",
+        "sha256": "2ad6a9970e449b4b637a2ad39463cf7a3331225ad159a5e737ceed4b14b16f79"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/pm.jsonl",
+        "sha256": "64e20bca81f2dd886661421295be3e8d45d4a83de647adacb7ab68385be658fc"
+      },
+      "original_anchor_count": 184,
+      "new_runtime_block_count": 13
+    },
+    {
+      "file": "math.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/math.expanded-candidate.json",
+        "sha256": "1f04ad9d19a6f95e86a888c4a8c572da0ae49460b19fafd9599546e44b924784"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/math.expanded-classification-proposal.jsonl",
+        "sha256": "3b9c4f92b4fe6e64aa847ccf5db2b3ffca74e8d0c4cd8e14c7f9c95bcb43007b"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/math.jsonl",
+        "sha256": "bc38010be4fe9eec429801fcfb17047c11ead884e72b521a952d7334da5416b0"
+      },
+      "original_anchor_count": 468,
+      "new_runtime_block_count": 26
+    },
+    {
+      "file": "coroutine.lua",
+      "candidate": {
+        "path": "tests/conformance/reviews/coroutine.expanded-candidate.json",
+        "sha256": "c1fd8c4cd91148edaf170cf92ec76c8a212d640f88d55edfc3a196bac9751bc0"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/coroutine.expanded-classification-proposal.jsonl",
+        "sha256": "2c13009473c30b28d1855f3c945b72800b0cf7a7575b35c611968cb38175f9f0"
+      },
+      "coverage": {
+        "path": "tests/conformance/coverage/coroutine.jsonl",
+        "sha256": "34219d9e1184bf1f0d5f837b1f63be20cb36c332cb8413e95c502949447e41d9"
+      },
+      "original_anchor_count": 287,
+      "new_runtime_block_count": 28
+    }
+  ],
+  "preserved_prior_scope": "events.lua, gc.lua, gengc.lua and files.lua retain their prior source adjudication; changed-runtime evidence must still be refreshed.",
+  "completion_rules": [
+    "338 paired primary operations/676 process reports are the base matrix, with separately retained helper and seeded-scenario evidence.",
+    "Default T omissions link to real instrumented bodies; T-enabled runs contain no omitted applicable test case.",
+    "Both constructs constant-template branches require unchanged seeded executions for every context.",
+    "bwcoercion has no standalone terminal marker; require bitwise invocation plus explicit six-handler/fallback witness evidence.",
+    "math prints its actual no-argument randomseed pair; retain that pair and all retry/range/precision phase witnesses.",
+    "No final OK, source inventory count, independent structural review or default early return alone establishes semantic acceptance."
+  ],
+  "execution_evidence": []
+}

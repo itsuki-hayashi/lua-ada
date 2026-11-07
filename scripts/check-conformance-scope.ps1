@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('gc-io-events')][string] $Scope = 'gc-io-events',
+    [ValidateSet('gc-io-events','expanded-t-conformance')][string] $Scope = 'gc-io-events',
     [string] $InventoryDirectory = '',
     [switch] $RequireScopedComplete,
     [string] $Report = ''

@@ -3,6 +3,22 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
+
+function Get-ConformanceScopePolicy {
+    param([ValidateSet('gc-io-events','expanded-t-conformance')][string] $Scope = 'gc-io-events')
+    # A definition cannot shrink its own mandatory coverage. Keep the reviewed
+    # delivery boundaries explicit while sharing all validation mechanisms.
+    $files = @('events.lua','files.lua','gc.lua','gengc.lua')
+    $helpers = @()
+    if ($Scope -ceq 'expanded-t-conformance') {
+        $files += @('bitwise.lua','closure.lua','constructs.lua','coroutine.lua',
+            'goto.lua','math.lua','pm.lua','tpack.lua','utf8.lua')
+        $helpers = @('bwcoercion.lua')
+    }
+    return @{ Files=@($files | Sort-Object); Helpers=$helpers;
+        Prerequisites=@('native-platform-counterparts','stdio','subprocess','temporary-files') }
+}
 
 function Assert-ScopedBuildIdentity {
     param([Parameter(Mandatory)][Collections.IDictionary] $Observed,
@@ -137,8 +153,253 @@ function Get-ScopedNativeBranchFacts {
     return $facts
 }
 
+function Get-ScopedSourceProfileFacts {
+    param([Parameter(Mandatory)][string] $Output,
+          [Parameter(Mandatory)][Collections.IDictionary] $Observed)
+    # Branch applicability is measured in the same process that executes the
+    # unchanged source. A process-wide OK cannot certify an inactive endian or
+    # numeric-width alternative. Preserve these facts as distinct evidence.
+    $matches = [regex]::Matches($Output, '(?m)^source profile facts: (\{[^\r\n]+\})\r?$')
+    if ($matches.Count -ne 1) { throw 'Source profile facts missing or duplicated' }
+    $facts = $matches[0].Groups[1].Value | ConvertFrom-Json -AsHashtable
+    $fields=@('byte_order','bitwise_precision','integer_bits','mantissa_bits','max_exponent')
+    if ((@($facts.Keys | Sort-Object) -join '|') -cne (@($fields | Sort-Object) -join '|')) {
+        throw 'Source profile field set differs'
+    }
+    foreach ($name in @('integer_bits','mantissa_bits','max_exponent')) {
+        if ($facts[$name] -isnot [int] -and $facts[$name] -isnot [long]) {
+            throw 'Source profile numeric measurement is not an integer'
+        }
+    }
+    if ($Observed.integer_bytes -ne 8 -or $Observed.number_bytes -ne 8 -or
+        $facts.integer_bits -ne 64 -or $facts.mantissa_bits -ne 53 -or
+        $facts.max_exponent -ne 1023 -or $facts.byte_order -cnotin @('little','big') -or
+        $facts.bitwise_precision -isnot [bool] -or -not $facts.bitwise_precision) {
+        throw 'Source profile differs from supported int64/binary64 configuration'
+    }
+    return $facts
+}
+
+function Get-ScopedMeasuredConditionResults {
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]] $Records,
+          [Parameter(Mandatory)][Collections.IDictionary] $Facts)
+    # Only this small declarative vocabulary can describe source conditions.
+    # Never evaluate author-provided code. A false result records that the
+    # corresponding body did not execute; it is not a passing body assertion.
+    $results = [ordered]@{}
+    foreach ($record in $Records) {
+        if (-not $record.Contains('measured_condition')) { continue }
+        if ([string]::IsNullOrWhiteSpace([string]$record.id) -or $results.Contains($record.id)) {
+            throw 'Measured source condition duplicate or missing identity'
+        }
+        $condition = $record.measured_condition
+        if ($null -eq $condition -or $condition.operator -cnotin @('eq','lt','le','ge') -or
+            -not $Facts.Contains($condition.fact) -or
+            $condition.Contains('value') -eq $condition.Contains('value_fact') -or
+            $condition.Count -ne 3) {
+            throw 'Invalid measured source condition'
+        }
+        $left = $Facts[$condition.fact]
+        $right = if ($condition.Contains('value_fact')) {
+            if (-not $Facts.Contains($condition.value_fact)) { throw 'Measured condition fact missing' }
+            $Facts[$condition.value_fact]
+        } else { $condition.value }
+        $integers = ($left -is [int] -or $left -is [long]) -and
+            ($right -is [int] -or $right -is [long])
+        if (($condition.operator -cne 'eq' -and -not $integers) -or
+            ($condition.operator -ceq 'eq' -and -not $integers -and
+             ($null -eq $right -or $left.GetType() -ne $right.GetType()))) {
+            throw 'Measured source condition types differ'
+        }
+        $results[$record.id] = switch ($condition.operator) {
+            'eq' { $left -ceq $right }
+            'lt' { $left -lt $right }
+            'le' { $left -le $right }
+            'ge' { $left -ge $right }
+        }
+    }
+    return $results
+}
+
+function Assert-ScopedConditionalReferences {
+    param([Parameter(Mandatory)][object[]] $Records)
+    foreach ($record in $Records) {
+        if (-not $record.Contains('conditional_applicability')) { continue }
+        $applicability = $record.conditional_applicability
+        if ($record.status -eq 'passed' -or
+            $applicability.inactive_body -cne 'reviewed-reference-only' -or
+            $applicability.Contains('when') -eq $applicability.Contains('guard_evaluation') -or
+            ($applicability.Contains('when') -and $applicability.when -isnot [bool]) -or
+            ($applicability.Contains('guard_evaluation') -and
+             ($applicability.guard_evaluation -isnot [bool] -or -not $applicability.guard_evaluation))) {
+            throw 'Conditional lexical anchors cannot claim inactive body execution'
+        }
+        $target = @($Records | Where-Object id -CEQ $applicability.measured_guard_obligation)
+        if ($target.Count -ne 1 -or -not $target[0].Contains('measured_condition') -or
+            ($record.status -eq 'reviewed' -and
+             $applicability.measured_guard_obligation -cnotin $record.obligations)) {
+            throw 'Conditional lexical anchor lacks its measured guard obligation'
+        }
+        # Canonical key order preserves scalar types when comparing the author
+        # applicability predicate with the actual runtime guard descriptor.
+        $descriptors = @($applicability.condition, $target[0].measured_condition)
+        $encoded = @(foreach ($descriptor in $descriptors) {
+            $ordered = [ordered]@{}
+            foreach ($key in $descriptor.Keys | Sort-Object) { $ordered[$key]=$descriptor[$key] }
+            $ordered | ConvertTo-Json -Compress
+        })
+        if ($encoded[0] -cne $encoded[1]) { throw 'Conditional lexical predicate differs from measured guard' }
+    }
+}
+
+function ConvertTo-ScopedSemanticJson {
+    param([AllowNull()] $Value)
+    # JSON object ordering is irrelevant to an approved semantic descriptor.
+    # Sort object keys recursively while preserving array order and scalar
+    # types, so a string "false" cannot replace a measured Boolean false.
+    function Normalize-ScopedValue($Item) {
+        if ($Item -is [Collections.IDictionary]) {
+            $result=[ordered]@{}
+            foreach ($key in $Item.Keys | Sort-Object) { $result[$key]=Normalize-ScopedValue $Item[$key] }
+            return $result
+        }
+        if ($Item -is [array]) {
+            $result=@(foreach ($entry in $Item) { Normalize-ScopedValue $entry })
+            return ,$result
+        }
+        return $Item
+    }
+    return ConvertTo-Json -InputObject (Normalize-ScopedValue $Value) -Depth 32 -Compress
+}
+
+function Get-ScopedApprovedSourceClassifications {
+    param([string] $Root, [Collections.IDictionary] $Definition,
+          [Collections.IDictionary] $Suite)
+    if (-not $Definition.Contains('source_classification_review')) {
+        throw 'Expanded source classification review identity missing'
+    }
+    $binding=$Definition.source_classification_review
+    $path=Resolve-ReviewedFile -Root $Root -Path $binding.path -Sha256 $binding.sha256
+    $review=Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    if ($review.kind -cne 'independent-expanded-source-semantic-review' -or
+        $review.scope -cne $Definition.id -or $review.reference_revision -cne $Suite.reference_revision -or
+        $review.decision -cne 'accepted-source-classification-with-runtime-obligations-pending' -or
+        [string]::IsNullOrWhiteSpace($review.author) -or [string]::IsNullOrWhiteSpace($review.reviewer) -or
+        $review.author -ceq $review.reviewer) { throw 'Expanded source classification approval differs' }
+    $required=@('bitwise.lua','bwcoercion.lua','closure.lua','constructs.lua','coroutine.lua',
+        'goto.lua','math.lua','pm.lua','tpack.lua','utf8.lua')
+    if ((@($review.files.file | Sort-Object) -join '|') -cne ($required -join '|')) {
+        throw 'Expanded reviewed source classification set differs'
+    }
+    $result=@{}
+    foreach ($file in $review.files) {
+        $source=@($Suite.files | Where-Object path -CEQ $file.file)
+        if ($source.Count -ne 1 -or $file.source.path -cne "references/lua/testes/$($file.file)" -or
+            $file.source.sha256 -cne $source[0].sha256) { throw 'Reviewed classification source differs' }
+        $path=Resolve-ReviewedFile -Root $Root -Path $file.proposal.path -Sha256 $file.proposal.sha256
+        $result[$file.file]=@(Read-ConformanceJsonLines -Path $path)
+    }
+    return $result
+}
+
+function Assert-ScopedSourceClassificationBinding {
+    param([object[]] $Records, [object[]] $Approved)
+    if ($Records.Count -ne $Approved.Count) { throw 'Reviewed source classification record set differs' }
+    $byId=@{}
+    foreach ($proposal in $Approved) {
+        if ($byId.ContainsKey($proposal.id)) { throw 'Reviewed source classification identity missing/duplicate' }
+        $byId[$proposal.id]=$proposal
+    }
+    foreach ($record in $Records) {
+        if (-not $byId.ContainsKey($record.id)) { throw 'Reviewed source classification identity missing/duplicate' }
+        $proposal=$byId[$record.id]
+        if ($record.kind -cne $proposal.original_kind) { throw 'Reviewed source classification kind differs' }
+        foreach ($field in @('byte_offset','byte_length','line','end_line','anchor_sha256')) {
+            if ($record[$field] -cne $proposal[$field]) { throw 'Reviewed source classification anchor differs' }
+        }
+        foreach ($field in @('measured_condition','conditional_applicability')) {
+            if ($record.Contains($field) -ne $proposal.Contains($field) -or
+                ($record.Contains($field) -and
+                 (ConvertTo-ScopedSemanticJson $record[$field]) -cne (ConvertTo-ScopedSemanticJson $proposal[$field]))) {
+                throw 'Reviewed source applicability descriptor differs'
+            }
+        }
+        if ($record.status -eq 'reviewed' -and
+            ($record.classification -cne $proposal.proposed_classification -or
+             (@($record.obligations) -join '|') -cne (@($proposal.obligation_links) -join '|'))) {
+            throw 'Reviewed source classification or obligation linkage differs'
+        }
+        if ($record.status -ne 'pending' -and
+            ($record.invariant -cne $proposal.invariant -or
+             (@($record.configurations) -join '|') -cne (@($proposal.configurations) -join '|'))) {
+            throw 'Reviewed source invariant or applicability configuration differs'
+        }
+    }
+}
+
+function Get-ScopedApprovedApiSemantics {
+    param([string] $Root, [Collections.IDictionary] $Definition)
+    if (-not $Definition.Contains('api_semantic_review')) {
+        throw 'Expanded API semantic review identity missing'
+    }
+    $binding=$Definition.api_semantic_review
+    $path=Resolve-ReviewedFile -Root $Root -Path $binding.path -Sha256 $binding.sha256
+    $review=Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    if ($review.schema_version -ne 1 -or
+        $review.kind -cne 'independent-expanded-api-semantic-witness-review' -or
+        $review.scope -cne $Definition.id -or
+        $review.decision -cne 'accepted-semantic-witness-mapping' -or
+        [string]::IsNullOrWhiteSpace($review.author) -or
+        [string]::IsNullOrWhiteSpace($review.reviewer) -or
+        $review.author -ceq $review.reviewer) { throw 'Expanded API semantic approval differs' }
+    $path=Resolve-ReviewedFile -Root $Root -Path $review.proposal.path -Sha256 $review.proposal.sha256
+    $proposal=Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+    if ($proposal.schema_version -ne 1 -or
+        $proposal.kind -cne 'expanded-api-semantic-witness-author-proposal' -or
+        $proposal.scope -cne $Definition.id -or $proposal.author -cne $review.author -or
+        $proposal.reference_revision -cne $Definition.reference_revision -or
+        $proposal.entry_count -ne @($proposal.entries).Count -or
+        (@($proposal.entries.id | Sort-Object) -join '|') -cne
+        (@($Definition.api_ids | Sort-Object) -join '|') -or
+        (@($review.verified_api_ids | Sort-Object) -join '|') -cne
+        (@($Definition.api_ids | Sort-Object) -join '|')) {
+        throw 'Expanded approved API selection differs'
+    }
+    # The semantic decision covers these exact consumer, test and T-driver
+    # sources. Runtime evidence may later change status/evidence fields, but
+    # cannot silently broaden the accepted claims or their source witnesses.
+    foreach ($source in $review.source_bindings) {
+        [void](Resolve-ReviewedFile -Root $Root -Path $source.path -Sha256 $source.sha256)
+    }
+    return @($proposal.entries)
+}
+
+function Assert-ScopedApiSemanticBinding {
+    param([object[]] $Records, [object[]] $Approved)
+    if ($Records.Count -ne $Approved.Count) { throw 'Reviewed API semantic record set differs' }
+    $byId=@{}
+    foreach ($entry in $Approved) {
+        if ($byId.ContainsKey($entry.id)) { throw 'Reviewed API semantic identity duplicate' }
+        $byId[$entry.id]=$entry
+    }
+    foreach ($record in $Records) {
+        if (-not $byId.ContainsKey($record.id)) { throw 'Reviewed API semantic identity missing' }
+        $proposal=$byId[$record.id]
+        foreach ($field in @('invariant','scoped_boundaries','named_cases',
+                'named_aunit_cases','selected_lua_runtime_obligations')) {
+            if (-not $record.Contains($field) -or -not $proposal.Contains($field) -or
+                (ConvertTo-ScopedSemanticJson $record[$field]) -cne
+                (ConvertTo-ScopedSemanticJson $proposal[$field])) {
+                throw "Reviewed API semantic descriptor differs: $($record.id)/$field"
+            }
+        }
+    }
+}
+
 function Assert-ScopedProcessCompletion {
-    param([ValidateSet('events.lua','files.lua','gc.lua','gengc.lua')][string] $File,
+    param([ValidateSet('events.lua','files.lua','gc.lua','gengc.lua','bitwise.lua',
+        'closure.lua','constructs.lua','coroutine.lua','goto.lua','math.lua',
+        'pm.lua','tpack.lua','utf8.lua')][string] $File,
           [Parameter(Mandatory)][Collections.IDictionary] $Process,
           [Parameter(Mandatory)][Collections.IDictionary] $Telemetry,
           [Parameter(Mandatory)][string] $RunId,
@@ -191,8 +452,56 @@ function Assert-ScopedProcessCompletion {
             }
         }
         [void](Get-ScopedNativeBranchFacts -Output $stdout)
+    } elseif ($File -eq 'utf8.lua') {
+        if ($stdout -cnotmatch '(?m)^ok\r?\n?\z') { throw 'UTF-8 final ok witness missing' }
     } elseif ($stdout -notmatch '(?m)^OK\r?$') {
         throw 'Scoped final OK witness missing'
+    }
+    # Phase witnesses protect nonterminal output and configuration-selected
+    # paths. Exact templates/aliases still require their reviewed ledger links.
+    $phases = switch ($File) {
+        'bitwise.lua' { @('testing bitwise operations','testing bitwise library') }
+        'closure.lua' { @('testing closures') }
+        'constructs.lua' { @('testing syntax') }
+        'coroutine.lua' { @('testing coroutines','testing yields inside metamethods',
+            "testing yields inside 'for' iterators") }
+        'goto.lua' { @('testing goto and global declarations',
+            'testing initialization in global declarations') }
+        'math.lua' { @('testing numbers and math lib',"testing 'math.random'",
+            "testing precision of 'tostring'") }
+        'pm.lua' { @('testing pattern matching','big strings') }
+        'tpack.lua' { @('testing pack/unpack','testing invalid formats','testing alignment') }
+        'utf8.lua' { @('testing UTF-8 library') }
+        default { @() }
+    }
+    foreach ($phase in $phases) {
+        if ($stdout -notmatch ('(?m)^' + [regex]::Escape($phase) + '\r?$')) {
+            throw "Scoped phase witness missing: $File/$phase"
+        }
+    }
+    if ($File -ceq 'bitwise.lua' -and $stdout -notmatch '(?m)^OK\r?\nBWCOERCION HELPER OK\r?\n?\z') {
+        throw 'Bitwise unchanged helper completion witness missing'
+    }
+    if ($File -ceq 'math.lua' -and
+        [regex]::Matches($stdout, '(?m)^random seeds: -?\d+, -?\d+\r?$').Count -ne 1) {
+        throw 'Math actual random seed witness missing or duplicated'
+    }
+    if ($File -ceq 'goto.lua') {
+        $message = "  ('global' is not a reserved word)"
+        $count = [regex]::Matches($stdout, '(?m)^' + [regex]::Escape($message) + '\r?$').Count
+        if (($Configuration -ceq 'default' -and $count -ne 1) -or
+            ($Configuration -ceq 'upstream-test' -and $count -ne 0)) {
+            throw 'Goto configuration-specific global declaration witness differs'
+        }
+    }
+    if ($File -cin @('closure.lua','constructs.lua','coroutine.lua','goto.lua','math.lua','pm.lua','tpack.lua') -and
+        $stdout -notmatch '(?m)^OK\r?\n?\z') {
+        throw 'Scoped terminal OK witness missing'
+    }
+    if ($File -eq 'coroutine.lua' -and $Configuration -eq 'upstream-test' -and
+        ($stdout -notmatch '(?m)^testing yields inside hooks\r?$' -or
+         [regex]::Matches($stdout, '(?m)^testing coroutine API\r?$').Count -ne 2)) {
+        throw 'Coroutine instrumented hook/API tail witnesses missing'
     }
     if ($File -eq 'gc.lua' -and $stdout -notmatch '(?ms)^OK\r?\n.*^>>> closing state <<<\r?$') {
         throw 'GC state-close completion witness missing'
@@ -213,7 +522,7 @@ function Assert-ScopedProcessCompletion {
 function Test-ConformanceScope {
     [CmdletBinding()]
     param([Parameter(Mandatory)][string] $Root,
-          [ValidateSet('gc-io-events')][string] $Scope = 'gc-io-events',
+          [ValidateSet('gc-io-events','expanded-t-conformance')][string] $Scope = 'gc-io-events',
           [string] $InventoryDirectory = '',
           [switch] $RequireScopedComplete)
     if ($InventoryDirectory -eq '') { $InventoryDirectory = Join-Path $Root 'tests/conformance' }
@@ -226,11 +535,19 @@ function Test-ConformanceScope {
         ConvertFrom-Json -AsHashtable -Depth 32
     if ($definition.schema_version -ne 1 -or $definition.id -cne $Scope -or
         $definition.reference_revision -cne $suite.reference_revision) { throw 'Invalid coverage scope identity' }
-    $requiredFiles = @('events.lua','files.lua','gc.lua','gengc.lua')
+    $approvedClassifications=if($Scope -ceq 'expanded-t-conformance') {
+        Get-ScopedApprovedSourceClassifications -Root $Root -Definition $definition -Suite $suite
+    } else { @{} }
+    $policy = Get-ConformanceScopePolicy -Scope $Scope
+    $requiredFiles = $policy.Files
     if ((@($definition.files.path | Sort-Object) -join '|') -cne ($requiredFiles -join '|')) {
-        throw 'Scope must retain all four selected files exactly once'
+        throw 'Scope must retain all four original and selected delivery files exactly once'
     }
-    $prerequisites = @('native-platform-counterparts','stdio','subprocess','temporary-files')
+    $helpers = @(if ($definition.Contains('helpers')) { $definition.helpers })
+    if ((@($helpers | ForEach-Object { $_.path } | Sort-Object) -join '|') -cne ($policy.Helpers -join '|')) {
+        throw 'Scope must retain all selected helpers exactly once'
+    }
+    $prerequisites = $policy.Prerequisites
     if ((@($definition.prerequisites | Sort-Object) -join '|') -cne ($prerequisites -join '|')) {
         throw 'Scope prerequisites changed'
     }
@@ -248,6 +565,19 @@ function Test-ConformanceScope {
         'lua_pushcclosure','lua_rawgeti','lua_pcall','lua_pcallk','lua_call','lua_callk',
         'lua_absindex','lua_tonumber','lua_tonumberx','LUA_REGISTRYINDEX',
         'LUA_TUSERDATA','LUA_TNIL','LUA_MULTRET','LUA_OK')
+    if ($Scope -ceq 'expanded-t-conformance') {
+        $requiredNames += @('lua_resume','lua_yieldk','lua_xmove','lua_newthread',
+            'lua_status','lua_closeslot','lua_rawseti','LUA_TNUMBER','lua_sethook','lua_gethook','lua_gethookmask','lua_gethookcount',
+            'lua_getstack','lua_getinfo','lua_Debug','lua_Hook',
+            'lua_KFunction','lua_KContext','luaL_openselectedlibs','luaL_requiref',
+            'luaL_getsubtable','luaopen_base','luaopen_package','luaopen_coroutine',
+            'luaopen_debug','luaopen_math','luaopen_string','luaopen_table','luaopen_utf8',
+            'luaL_openlibs','luaL_newstate','lua_rotate','LUA_ERRERR',
+            'LUA_RIDX_MAINTHREAD','LUA_RIDX_GLOBALS','LUA_TBOOLEAN','LUA_TTABLE',
+            'LUA_YIELD','LUA_HOOKCALL','LUA_HOOKTAILCALL','LUA_HOOKRET',
+            'LUA_HOOKLINE','LUA_HOOKCOUNT','LUA_MASKCALL','LUA_MASKRET',
+            'LUA_MASKLINE','LUA_MASKCOUNT','LUA_LOADED_TABLE','LUA_PRELOAD_TABLE')
+    }
     $requiredApi = @($api | Where-Object { $_.name -cin $requiredNames -or $_.name -cmatch '^LUA_GC' })
     $selectedIds = @($definition.api_ids)
     if ($selectedIds.Count -ne @($selectedIds | Select-Object -Unique).Count) {
@@ -266,6 +596,10 @@ function Test-ConformanceScope {
     }
     $selectedApi = @(Read-ConformanceJsonLines -Path (Join-Path $InventoryDirectory $definition.api_coverage_file))
     if ($selectedApi.Count -ne $originalApi.Count) { throw 'Scoped API coverage set changed' }
+    if ($Scope -ceq 'expanded-t-conformance') {
+        $approvedApi=@(Get-ScopedApprovedApiSemantics -Root $Root -Definition $definition)
+        Assert-ScopedApiSemanticBinding -Records $selectedApi -Approved $approvedApi
+    }
     $seenApi = @{}
     foreach ($entry in $selectedApi) {
         if ($seenApi.ContainsKey($entry.id)) { throw 'Duplicate scoped API coverage record' }
@@ -301,9 +635,42 @@ function Test-ConformanceScope {
         if ($review.status -ne 'reviewed' -or $review.author -ceq $review.reviewer) {
             throw 'Scope requires independent review'
         }
+        if ($Scope -ceq 'expanded-t-conformance') {
+            # Bind the selection itself, not only a reviewer name. Otherwise a
+            # later edit could drop an API or helper while retaining accepted
+            # metadata from a narrower selection. The approval excludes review
+            # metadata from its identity to avoid a circular content hash.
+            if (-not $review.Contains('artifact_sha256')) { throw 'Scope selection review hash missing' }
+            $path = Resolve-ReviewedFile -Root $Root -Path $review.artifact -Sha256 $review.artifact_sha256
+            $approval = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 64
+            if ($approval.schema_version -ne 1 -or $approval.kind -cne 'scope-definition-semantic-approval' -or
+                $approval.decision -cne 'accepted' -or $approval.scope -cne $Scope -or
+                $approval.author -cne $review.author -or $approval.reviewer -cne $review.reviewer) {
+                throw 'Scope selection review identity differs'
+            }
+            $identity = $approval.approved_identity
+            foreach ($field in @('reference_revision','api_coverage_file')) {
+                if ($identity[$field] -cne $definition[$field]) { throw 'Scope selection review differs' }
+            }
+            foreach ($field in @('source_classification_review','api_semantic_review')) {
+                if ((ConvertTo-ScopedSemanticJson $identity[$field]) -cne
+                    (ConvertTo-ScopedSemanticJson $definition[$field])) {
+                    throw 'Scope selected semantic approval differs'
+                }
+            }
+            foreach ($field in @('files','helpers')) {
+                $expected = @($definition[$field] | ForEach-Object { $_.path + '#' + $_.sha256 } | Sort-Object)
+                $actual = @($identity[$field] | ForEach-Object { $_.path + '#' + $_.sha256 } | Sort-Object)
+                if (($expected -join '|') -cne ($actual -join '|')) { throw 'Scope selected source review differs' }
+            }
+            foreach ($field in @('api_ids','prerequisites')) {
+                if ((@($identity[$field] | Sort-Object) -join '|') -cne
+                    (@($definition[$field] | Sort-Object) -join '|')) { throw 'Scope selected obligation review differs' }
+            }
+        }
     }
     $sourceRecords = [Collections.Generic.List[object]]::new()
-    foreach ($file in $definition.files) {
+    foreach ($file in (@($definition.files) + $helpers)) {
         $original = @($suite.files | Where-Object { $_.path -ceq $file.path })
         if ($original.Count -ne 1 -or $original[0].sha256 -cne $file.sha256) {
             throw "Scoped source hash drift: $($file.path)"
@@ -315,12 +682,16 @@ function Test-ConformanceScope {
             $sourceRecords.Add($record)
         }
         Test-ConformanceSourceLinks -Records $records -RequireComplete:$RequireScopedComplete
+        if ($Scope -ceq 'expanded-t-conformance') { Assert-ScopedConditionalReferences -Records $records }
+        if ($approvedClassifications.Contains($file.path)) {
+            Assert-ScopedSourceClassificationBinding -Records $records -Approved $approvedClassifications[$file.path]
+        }
     }
     foreach ($entry in $selectedApi) {
         Test-ConformanceResolvedRecord -Record $entry -Contexts $suite.acceptance_contexts `
             -Api -RequireComplete:$RequireScopedComplete
     }
-    [pscustomobject]@{ Scope=$Scope; Files=4; SourceAnchors=$sourceRecords.Count;
+    [pscustomobject]@{ Scope=$Scope; Files=@($definition.files).Count; Helpers=$helpers.Count; SourceAnchors=$sourceRecords.Count;
         UnresolvedSourceAnchors=@($sourceRecords | Where-Object { $_.status -eq 'pending' }).Count;
         ApiEntries=$selectedApi.Count;
         UnresolvedApiEntries=@($selectedApi | Where-Object { $_.status -ne 'passed' }).Count;
@@ -328,4 +699,4 @@ function Test-ConformanceScope {
         StructuralInventory=$inventory; Definition=$definition }
 }
 
-Export-ModuleMember -Function Test-ConformanceScope, Assert-ScopedProcessCompletion, Test-ScopedLauncher, Assert-ScopedBuildIdentity, Assert-ScopedProbeTelemetry, Get-ScopedNativeBranchFacts
+Export-ModuleMember -Function Get-ConformanceScopePolicy, Test-ConformanceScope, Assert-ScopedProcessCompletion, Test-ScopedLauncher, Assert-ScopedBuildIdentity, Assert-ScopedProbeTelemetry, Get-ScopedNativeBranchFacts, Get-ScopedSourceProfileFacts, Get-ScopedMeasuredConditionResults

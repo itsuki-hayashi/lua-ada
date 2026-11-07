@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "kind": "reviewed-expanded-api-mapping-installation",
+  "scope": "expanded-t-conformance",
+  "author": "Codex /root/expanded_source_audit",
+  "independent_approval": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
+    "sha256": "4e68af414df9eda74c36d551f6ef2674891c7f052355d45588e8289bac7d77b6"
+  },
+  "proposal": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-author-proposal.json",
+    "sha256": "4934edebb0d20b7d3a66b20f5412092dab62c05bf225d8baed4e2717103c7fba"
+  },
+  "ledger": {
+    "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
+    "before_sha256": "c85827e4f7446f7a31b368b9131d9688e66d481ee13d0f84c83cce88b98d1258",
+    "after_sha256": "327d24a7dbf6c547f4d12448cbb75fd77aeff862b597830fc4b5ce9fdb8a867c"
+  },
+  "api_entries": 159,
+  "pending_entries": 159,
+  "passing_entries": 0,
+  "added_execution_evidence": 0,
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "action": "Copied only the independently approved invariants, scoped boundaries, named C/AUnit witness relations and selected Lua obligation links. Preserved all public header anchors, pending status and empty evidence."
+}

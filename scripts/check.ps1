@@ -137,17 +137,12 @@ try {
         '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
         '-ReferenceLibraryDirectory', (Join-Path $projectRoot 'build/conformance/default/lib'))
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
-        (Join-Path $PSScriptRoot 'check-gc-events.ps1'),
+        (Join-Path $PSScriptRoot 'check-expanded-conformance.ps1'),
         '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
         '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
         '-RuntimeDirectory', $runtimePath, '-Configuration', 'default',
         '-Profile', $Profile, '-LibraryType', $LibraryType)
-    Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
-        (Join-Path $PSScriptRoot 'check-files-scoped.ps1'),
-        '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
-        '-ReferenceInterpreter', (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
-        '-RuntimeDirectory', $runtimePath, '-Configuration', 'default',
-        '-Profile', $Profile, '-LibraryType', $LibraryType)
+
     Write-Output "PASS: $Profile / $LibraryType (AUnit and CLI contracts)"
 }
 finally {

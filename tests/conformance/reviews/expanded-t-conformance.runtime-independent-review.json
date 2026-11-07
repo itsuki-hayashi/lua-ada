@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "kind": "independent-foreign-runtime-integration-review",
+  "scope": "expanded-t-conformance",
+  "author": "Codex /root/draft_assessment",
+  "reviewer": "Codex /root/expanded_source_audit",
+  "decision": "accepted-local-runtime-invariants-with-final-matrix-pending",
+  "date": "2026-11-07",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_bindings": [
+    {
+      "path": "c_api/c/lua_ada_boundary.c",
+      "sha256": "cfa9cc9acc6cc7f9112539e0650a56704ecc3d917ffc7740f617893af906a3df"
+    },
+    {
+      "path": "c_api/include/lua_ada_boundary.h",
+      "sha256": "1ec6f34da60297f8aee18672e5ee82ab32523a292850111e9ccf997648d3d659"
+    },
+    {
+      "path": "c_api/c/lua_ada_debug.c",
+      "sha256": "35943173582e58788c79957d1a253a0796a89cc53c6c23fac3f78b1336a92370"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "sha256": "31590d9a9a56aaa6e50e1dbbcd4834c722af8433bc8f8d1e3ceba86415f3f829"
+    },
+    {
+      "path": "src/lua-engine-foreign.ads",
+      "sha256": "6e3d6a4f576d128472f6f1b84892ca57251fd759cb2abff29eb9bb95f31ce928"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "sha256": "1a444907c253e9cec17aca2a5b5c85a6b8a4b97c28ab9390f59213018e04ec93"
+    },
+    {
+      "path": "src/lua-engine-machine.ads",
+      "sha256": "ac2588bfeacdfdcf361f9d31f34a3c78fa059443fd48464abd1e5b97349fba04"
+    },
+    {
+      "path": "src/lua-engine-foreign_hooks.adb",
+      "sha256": "2f5a6ffc8e1c9e08113a9514029a99dc30f97c4e119b1a9ee9c6ddb583c43cee"
+    },
+    {
+      "path": "src/lua-engine-foreign_hooks.ads",
+      "sha256": "265039c9d1a51131e22a131440019c3b815a234d6ce24ff3283d90bffbcd22e6"
+    },
+    {
+      "path": "src/lua-engine-inspection.adb",
+      "sha256": "66027d5e82e43202079ae0cf859cbc0a8198ec80abcb87f58a2286264afb0a9c"
+    },
+    {
+      "path": "src/lua-engine.ads",
+      "sha256": "5195bea52ce308e6df621b2f99051ee3e4a94da32a4a56afaeec600c53e02038"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "1c15ba0c7b50ec7c138750ab865f3408edf56d5b3ab670f71afa2a66cfe21197"
+    },
+    {
+      "path": "src/lua-engine-stacks.adb",
+      "sha256": "0adfa273a64c37b5b4849cb547f9a63ff977bccb61ead31c541b3aebb4bf2acd"
+    },
+    {
+      "path": "src/lua-engine-inspection.ads",
+      "sha256": "94df27825ab7b109893e583d70686a7a6628f48c6f8e4f323ca312cdf657b8a2"
+    },
+    {
+      "path": "c_api/c/lua_ada_libraries.c",
+      "sha256": "86b76f6d3536b45903dce8a119b2c5bb57a5a17dc6eda049f3f1ae2240cfd4da"
+    },
+    {
+      "path": "src/lua-engine-library_openers.adb",
+      "sha256": "d2b906f55ffad70f897eeb55fc2246d02970f6cb46177863438b7049fdaddcf7"
+    }
+  ],
+  "inspected_evidence": [
+    {
+      "path": "reports/expanded-t-conformance/runtime-instrumented-build-12.log",
+      "sha256": "ac8ea7ac7aed58a72585de90169f168b9c3842b0a74477f81edda859e2f199f3"
+    },
+    {
+      "path": "reports/expanded-t-conformance/runtime-instrumented-tests-7.log",
+      "sha256": "a63b10695f577aea98f1c40c7aa53e53236775d6ef00df9c278ae5c55bec5df8"
+    },
+    {
+      "path": "reports/expanded-t-conformance/t-api-smoke-review.log",
+      "sha256": "772956dd0f8ddcc22497bda0172db0631bb1689042a3058932f85f5be61fe6f1"
+    },
+    {
+      "path": "reports/expanded-t-conformance/coroutine-t-review.json",
+      "sha256": "5e2d850c0e89fd125d6312a06aae4461b0f5ab74549e9a82a1268eb8789993bf"
+    },
+    {
+      "path": "reports/expanded-t-conformance/coroutine-t-review.stdout",
+      "sha256": "67684281e453d226eff6c1aa9e9dcffdec4f631b170e6716d1ca1cd8896df204"
+    },
+    {
+      "path": "reports/expanded-t-conformance/coroutine-t-review.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/expanded-native48-default.log",
+      "sha256": "96d1a78d8f1b8ca3aeb9063bd970ddef05d41d5b32109373541c1e5139b1341e"
+    },
+    {
+      "path": "reports/expanded-native48-upstream.log",
+      "sha256": "96d1a78d8f1b8ca3aeb9063bd970ddef05d41d5b32109373541c1e5139b1341e"
+    }
+  ],
+  "accepted_invariants": [
+    "The C callback pump installs its guard only after ada_lua_dispatch returns; actual K callbacks are invoked by the C pump with saved status/context and do not nonlocally jump across active Ada scheduler frames.",
+    "Each pending C call now records its owning activation. Suspension selects the foreign boundary belonging to that activation rather than repeatedly marking the nearest sentinel; three nested K boundaries are covered by named case20 and the unchanged coroutine tail.",
+    "Resume preserves its live scalar execution window and places host-facing results outside suspended registers; a later resume roots supplied arguments before restoring the saved execution view.",
+    "Completed child resume driver/call/context/native-depth ownership is restored before fallible host-result publication, so a refused result-window growth cannot strand the parent under the completed driver.",
+    "A successfully completed thread with an actual new callable can be reused through public C resume; missing-body/error-dead/running states remain distinguished. Independent from-state identity supplies depth without replacing the resumed universe.",
+    "Synchronous success returns to the original C body even when yieldable. A protected error in a yieldable K-aware frame reaches K even before a yield; resumed error versus YIELD status and full-width context are real frame data.",
+    "C hook line/count yields preserve the interrupted instruction and live registers. Public valid getstack/getinfo line inspection skips the synthetic transport callback; suspended debug locals use the retained hook PC.",
+    "The public C debug selector scope is explicitly l only. Expired-frame rejection is an Ada safety invariant and is not claimed as valid native C behavior.",
+    "Retiring C activations run their actual to-be-closed slots on return/error/resumed continuation, with retained outgoing result/error roots through collection.",
+    "Protectedness survives suspension on the actual foreign boundary: a later unprotected callk error sets the caller failure stage and does not invoke K; only pcallk may resume K with an error status.",
+    "Discard_Pending restores owned/borrowed driver identity, saved call stack, current context and native depth on exceptional resume exits before freeing scalar metadata. Boundary result packets are reserved before driver ownership changes; completed results move without a new uncontrolled packet allocation. Create_Surface rolls back both blocks and publishes only after initialization.",
+    "A root public call above suspended frames records its retained entry depth. Completion, temporary frame cleanup and failure cancellation stop at that depth, preserve the suspended lifecycle status and restore the original public prefix before publishing results.",
+    "C settop/closeslot schedule a private owner-bound close helper only after the Ada dispatcher returns. The ordinary iterative unwind driver closes and retires crossed slots, permitting depth reuse; explicit closeslot detaches the old cell and writes nil before its C body continues.",
+    "Yield permission and hook result/K constraints are validated before publishing any transfer or continuation fields. Public yield refusal chooses the pinned main-thread versus C-boundary wording. Invalid/dead/non-suspended resume errors pop supplied arguments; setup allocation refusal consistently leaves the failed target error-dead while restoring the healthy caller.",
+    "Lua-side suspension records a detached empty public window and the previous execution view. Both Lua/C takeover restore that view before actual argument delivery. An interrupted Lua instruction discards hook resume arguments instead of retaining them in an unrelated native-result packet.",
+    "Stacks.Trace marks the saved true host prefix and merges the detached public interval in order with real activation windows; neither dead register gaps nor a high public result address become implicit roots.",
+    "A pending count-hook yield is published only after the due line event for that same instruction, before execution. Error retirement clears the pending request. The suspended PC remains the actual interrupted instruction.",
+    "Short_Source matches pinned lobject.c chunk identifiers: at most59 bytes, literal truncation, file-tail truncation, first-line snippet truncation at45 bytes and the same bracketed identifier in debug metadata and error prefixes.",
+    "Public library opening/cache selection follows the pinned stack algorithms. Direct debug/string/table/utf8 witnesses require real export calls and no implicit module-global publication; requiref preserves truthy module identity and reopens a false entry. The reviewed constructor regions exclude my authored Math_Module generator change."
+  ],
+  "resolved_findings": [
+    {
+      "id": "R-RESUME-REUSE",
+      "finding": "Earlier Begin_Resume rejected all completed contexts.",
+      "resolution": "Fresh now includes empty successfully completed contexts without a failure value, and the unchanged T thread-reuse scenario completes."
+    },
+    {
+      "id": "R-RESUME-RESTORE",
+      "finding": "Earlier result Push could allocate before parent driver restoration.",
+      "resolution": "Driver/context/depth restoration now precedes result Push; actual packet remains rooted in the caller boundary result owner."
+    },
+    {
+      "id": "R-NESTED-BOUNDARY",
+      "finding": "Earlier unwinding selected the nearest foreign sentinel for every pending call.",
+      "resolution": "Pending.Activation identifies the matching Foreign_Previous_Frame, with focused three-level K regression and unchanged full T coroutine success."
+    },
+    {
+      "id": "R-HOOK-FRAME",
+      "finding": "Earlier valid getstack inside a C hook could expose synthetic callback frame.",
+      "resolution": "Foreign_Hooks excludes the active foreign hook trampoline; callback case2 queries valid getstack/getinfo and checks actual interrupted line."
+    },
+    {
+      "id": "R-CALLK-UNPROTECTED",
+      "finding": "A suspended callk holder previously lost whether it was protected and could incorrectly invoke K on a later child error.",
+      "resolution": "Foreign_Protected is retained on the boundary; a false packet from an unprotected child reinstates real failure metadata and enters the original C frame error-unwind stage. Native/Ada named case21 passes."
+    },
+    {
+      "id": "R-REFUSAL-OWNERSHIP",
+      "finding": "Exceptional C resume publication/setup could strand the child driver or pending metadata.",
+      "resolution": "Explicit Discard_Pending/Cancel and pre-reserved owned result packets restore the saved owner fields. Counted refusal sweep case13 exercises healthy caller reuse, failed child ordinary stack access, and balanced physical release."
+    },
+    {
+      "id": "R-SUSPENDED-INDEXING",
+      "finding": "A root public metamethod call on a suspended thread rejected retained frames or could clear them.",
+      "resolution": "Retained_Depth/Entry_Depth delimit the temporary root entry. Case15 executes real index/newindex and collection above suspension, then completes the original thread with its retained table result."
+    },
+    {
+      "id": "R-C-TOP-CLOSERS",
+      "finding": "C settop removed marked values without immediately invoking/retiring their closers; public closeslot was missing.",
+      "resolution": "A private close helper and C_Slot_Exit use the ordinary scheduler after dispatch returns. Cases11/12 verify immediate effects, depth reuse, nil replacement and collection during real closing."
+    },
+    {
+      "id": "R-HOOK-PREVALIDATION",
+      "finding": "Invalid hook yield could leave an already published Yielded transfer.",
+      "resolution": "Validation precedes transfer mutation; fresh T smoke has a separately named invalid-hook-yield/recovery phase."
+    },
+    {
+      "id": "R-LUA-C-TAKEOVER",
+      "finding": "C takeover of Lua-suspended execution lacked initialized return/public view metadata.",
+      "resolution": "Lua suspension saves Resume_* and exposes an empty detached window; case23 checks retained locals and actual C resume arguments."
+    },
+    {
+      "id": "R-COMBINED-HOOK-YIELD",
+      "finding": "Count-hook yield could suspend before a line hook due on the same instruction.",
+      "resolution": "Hook_Yield_Pending defers publication until both callbacks have run; case14 verifies same host-resume generation and final program result."
+    },
+    {
+      "id": "R-SUSPENDED-ROOTS",
+      "finding": "Detached public top and Lua hook resume packets could retain dead objects.",
+      "resolution": "Trace uses separate ordered intervals and Lua-top resume discards unrelated packet arguments. Cases24/25 verify weak collection. Case25 first retires only the checkstack-created public tail, preserving all original native Lua registers."
+    }
+  ],
+  "local_observations": [
+    "Inspected strict instrumented build12 success and fresh AUnit tests7:1380run,1380successful,0assertion failures,0unexpected errors. The earlier tests8 log failed and is not passing evidence.",
+    "Inspected fresh T API smoke: seven distinct PASS phases, including invalid C hook yield recovery, and terminal T COROUTINE API OK.",
+    "Inspected coroutine-t-review process report: exit0, no timeout/capture/pipe failure,274stdoutbytes,0stderrbytes. The unchanged instrumented file reaches both coroutine API phases and terminal OK.",
+    "Independently compiled all five actual public C contract translation units with -std=c99 -Wall -Wextra -Werror against the separate pinned C oracle in both configurations. Both processes exit0 and produce the same48 named PASS witnesses plus terminal public foreign contract:25continuation,14valid-hook,5math-reopen,4direct-library-opener. Invalid-lifetime hook6 remains Ada-only.",
+    "Native baseline caught and repaired test-premise defects before freezing: hook-suspended pushes require checkstack; its enlarged public tail must be retired before weak collection; an ERRMEM-dead coroutine cannot execute pcall without reset. Final tests preserve these valid public API preconditions and use healthy caller reuse plus failed-child ordinary stack access."
+  ],
+  "exclusions": [
+    "I authored the per-module math RNG implementation and math/library-opener regression sources. Their current hashes and local native results are recorded as context, not independent approval of my own production/test changes; root or another reviewer must approve those changes.",
+    "No final clean-revision26context scope or global M3 acceptance is claimed. The inspected local Ada/native artifacts are implementation diagnostics and must be refreshed through the final matrix.",
+    "This review does not establish omitted public C debug selectors, complete foreign API semantics, all.lua, heavy.lua or unrelated upstream file coverage."
+  ],
+  "execution_evidence": [],
+  "previous_review": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.runtime-independent-review.initial.json",
+    "sha256": "16799e10b1be63b759a7d196f10cb28dd6b8075aa8984bfca5d7155b79952ca4",
+    "boundary": "Earlier source-bound local review is retained unchanged. This delta reviews later F2–F11 repairs and inspected fresh local observations; neither grants final scope acceptance."
+  },
+  "additional_authors": [
+    "Codex /root"
+  ],
+  "reviewed_delta": "F2–F11 source and local-observation review only. No new production code was edited by this reviewer; final clean-head26context acceptance, semantic observation adjudication and PR review remain required."
+}

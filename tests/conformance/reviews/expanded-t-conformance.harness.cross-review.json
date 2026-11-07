@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "kind": "independent-expanded-harness-semantic-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "author": "Codex /root/conformance_scope",
+  "reviewer": "Codex /root/draft_assessment",
+  "decision": "accepted-harness-mechanisms-with-runtime-obligations-pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "review_scope": "Independent source review of the expanded 13-file selection, process protocol, source/API immutable semantic projections, named consumer/AUnit replay, candidate bundle collector and final matrix gates. This excludes production runtime implementation and grants no source/API runtime pass, context acceptance or final matrix approval.",
+  "source_bindings": [
+    {
+      "path": "scripts/ConformanceScope.psm1",
+      "sha256": "05c8dcfd73d1b2239af8ff1f4ee9f47e6838712e7bdf9eca79262e7c00631300"
+    },
+    {
+      "path": "scripts/ConformanceMatrix.psm1",
+      "sha256": "cd8cc1c48bba34b883de358474c8e3e6a43dfd047e76cfa87bd554f9c04a1d84"
+    },
+    {
+      "path": "scripts/ConformanceReview.psm1",
+      "sha256": "26b6bb7d7c62cf0abb05d80cf0f28883ade0e31b9df6e4add21ec701275e281f"
+    },
+    {
+      "path": "scripts/ScopedAcceptancePolicy.psm1",
+      "sha256": "52ad841444f3ee7498f4c51d61d6c96891ca8dbb6a782b06186f9c99841fd653"
+    },
+    {
+      "path": "scripts/ConformanceRunner.psm1",
+      "sha256": "14c5528004b9b574954b653ccb9492e8bd6292e88ebe97d22113562829febf2f"
+    },
+    {
+      "path": "scripts/ConsumerEvidence.psm1",
+      "sha256": "c8bcc969814278889cf1cd0ca5649d39be11a7bd40bcf934eeb0fefcd2d584f2"
+    },
+    {
+      "path": "scripts/AUnitEvidence.psm1",
+      "sha256": "88b6e2497952cffa0072ce5345616d8f97d1a674b9f1cdce10ca6d540fac658c"
+    },
+    {
+      "path": "scripts/run-conformance.ps1",
+      "sha256": "c9db96176c66216fd2874fcb955e8f1549db16dfdea10652f95de11e4f80af4d"
+    },
+    {
+      "path": "scripts/check-conformance-scope.ps1",
+      "sha256": "ae1fd426e2fce0ab542323864b12529ace26280f2072a95cb14f3cb625828bfc"
+    },
+    {
+      "path": "scripts/check-expanded-conformance.ps1",
+      "sha256": "beec8192f1185b30ad0e02fb940ef7baa776be2c65b29c418211c9b12d1cb164"
+    },
+    {
+      "path": "scripts/check-gc-events.ps1",
+      "sha256": "07998adbf91636d939b3e8b4dffd4da30fa7ab7b3f0c0aeca6423a9fc268c3c9"
+    },
+    {
+      "path": "scripts/check-files-scoped.ps1",
+      "sha256": "100e3f6a6cdd4b5ecdfa821963a4c33997690956f4af20c84564d003f9573934"
+    },
+    {
+      "path": "scripts/check-aunit-evidence.ps1",
+      "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "ae2e8b732e37f09edd0477c862d99950f3c00293aeff39405958dea804fb0ec2"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "8071c9872cc2244d59cc8de256b530262820e453cd802c5edbf6cee7db16c9e5"
+    },
+    {
+      "path": "scripts/test-expanded-conformance.ps1",
+      "sha256": "a9cbf720179373307ee068dff63608742fcb93d60c9dd8e952561a3aa81fa534"
+    },
+    {
+      "path": "scripts/test-consumer-evidence.ps1",
+      "sha256": "3e72e5869f2f4c05a84c02118bcbfa50f8d5aa60d8ca942e9d6f85b5182be54f"
+    },
+    {
+      "path": "scripts/test-aunit-evidence.ps1",
+      "sha256": "871743e8fdfb4be11799cff06ac70562986093146ccf186114dc742fe429ff06"
+    },
+    {
+      "path": "scripts/test-conformance-review.ps1",
+      "sha256": "eb24dfaab468450d63ee8cf9f0aa6216eb2c4ba533ef5898af0175d92e055bf9"
+    },
+    {
+      "path": "scripts/test-matrix-named-evidence.ps1",
+      "sha256": "1ae97293708bc5476f8758f35e1598a6b611f9fd09640a7fe8fcf2e99251661c"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "sha256": "27a3cc6d88be6ff74c8e266cf3f0c2878bf6177035b6af6b9131431d0e93a4b6"
+    },
+    {
+      "path": "tests/conformance/constructs-seeded.lua",
+      "sha256": "55f6e2cb2c542dfcd2267dff56a0fae28027cd1730839e79c88e89c8f0ebd7c7"
+    },
+    {
+      "path": "tests/conformance/source-profile-witness.lua",
+      "sha256": "e9170727df20072001968fccdc551ef827d3b2937eee997921c224b5ef2ba752"
+    },
+    {
+      "path": "tests/conformance/bitwise-helper-witness.lua",
+      "sha256": "1a858b2c5592f2945bbe7b17d7cfa4269774908069c125de1d1f1a87ea086f55"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.json",
+      "sha256": "edd4a6733654bc0d29f911163fd85d31f5061f4020afd62ddf432d21b4e443f2"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.api.jsonl",
+      "sha256": "327d24a7dbf6c547f4d12448cbb75fd77aeff862b597830fc4b5ce9fdb8a867c"
+    },
+    {
+      "path": "tests/conformance/scopes/expanded-t-conformance.contracts.json",
+      "sha256": "033ba398d337e0a57eab8b77032431297268b6482850256377e9177cd3439ea8"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection-author-proposal.json",
+      "sha256": "a896d7cac17c784203f15a6fac4c79031e2ee56bad9e432b2023fd1826b44c0a"
+    },
+    {
+      "path": "scripts/ExpandedMatrixBundle.psm1",
+      "sha256": "78da99ce7e006a6ba8f9e4edc8cde903bcc7e50a57caea7717673a06dc7ffc1f"
+    },
+    {
+      "path": "scripts/new-expanded-matrix.ps1",
+      "sha256": "35e2f43e2cc60831f6c070c2ce4f7bda25d5d0c385cd60ff454949419ab99ac3"
+    },
+    {
+      "path": "scripts/test-expanded-matrix-bundle.ps1",
+      "sha256": "49bc0cb5e9c3750cf6071c93d87f2a3c5a331468afebde5b8d1b3f73dc09e6a1"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness-author-proposal.json",
+      "sha256": "4934edebb0d20b7d3a66b20f5412092dab62c05bf225d8baed4e2717103c7fba"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.api-witness.cross-review.json",
+      "sha256": "4e68af414df9eda74c36d551f6ef2674891c7f052355d45588e8289bac7d77b6"
+    },
+    {
+      "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json",
+      "sha256": "f9bc35a5860b7df04c4e713d77035c10e664a45eadb444dab1973a27be1bb143"
+    }
+  ],
+  "input_manifest": {
+    "sha256": "f8456217f5cceca6cc1a04c1103cc4d933515ef027c12b07995f99f0be7549e1",
+    "path": "reports/expanded-harness-review-inputs.json"
+  },
+  "scope_selection": {
+    "result": "Installed selection metadata validates 13 actual primary files, 2493 source anchors, one helper and 159 APIs; 142 source and 159 API obligations remain pending.",
+    "sha256": "f9bc35a5860b7df04c4e713d77035c10e664a45eadb444dab1973a27be1bb143",
+    "path": "tests/conformance/reviews/expanded-t-conformance.scope-selection.cross-review.json"
+  },
+  "resolved_findings": [
+    {
+      "regression": "Editing both the guard threshold and lexical condition is rejected by the source applicability binding.",
+      "problem": "A coordinated edit to both a measured guard and its linked lexical applicability descriptor could otherwise retain earlier source review.",
+      "id": "H1",
+      "resolution": "The definition now binds immutable source cross-review/proposal bytes. Current anchor,classifications,obligation links,invariants,configuration and measured descriptors must match the approved source projection."
+    },
+    {
+      "regression": "Corrupted approval hash and five independent semantic descriptor drift mutations are rejected.",
+      "problem": "API invariant/scoped boundary text could otherwise broaden while approved named-case IDs remained unchanged.",
+      "id": "H2",
+      "resolution": "The scope and its selection approval now bind the independently reviewed API proposal. All159 current invariant,boundary,C/AUnit references and selected Lua obligation projections must match immutable approved bytes; status/evidence remain independently adjudicated."
+    }
+  ],
+  "reviewed_guarantees": [
+    "The required scope cannot shrink its own 13 original-source identities or bwcoercion helper; exact 159 selected public header IDs and both semantic review identities are immutable selection inputs.",
+    "Per-process source-profile witness measures integer/mantissa/exponent/endian/precision facts without consuming the RNG. Declarative typed guard evaluation records false native alternatives as reviewed references without passing inactive assertion bodies.",
+    "Instrumented coroutine execution requires hook tail and both actual public C API sections. Default omission reports require genuine linked instrumented runtime obligations. Unexpected omissions or diagnostics fail.",
+    "Both separately seeded unchanged constructs templates are mandatory in every context,  with actual branch output and source/copy hashes. No RNG replacement or fabricated branch coverage is accepted.",
+    "Expanded public foreign consumers execute the identical 48 public-header contracts against Ada and separately built pinned C. Named source hashes,  unique completion/case witnesses, empty stderr and exact C/Ada captured bytes are replayed.",
+    "AUnit replay binds exact registered names/current sources, complete actual suite count, zero failures/errors and exact expected warning bytes. Generic source text, wrong chunk names and appended stderr are rejected.",
+    "Final matrix acceptance requires 26 distinct contexts, clean final checkout revision, reviewed source/contract/equivalent identities, actual measured launcher configurations, 900 second / 2 GiB policy, balanced allocator shutdown and matching runtime/oracle libraries across files, C consumers and AUnit.",
+    "Independent reconciliation binds all primary/supplemental process reports, contracts and named consumer/AUnit identities. A successful observation or pending author mapping alone carries no acceptance authority.",
+    "The artifact collector requires every context and named report, verifies original reports paths/hashes/revisions, refuses duplicates/partial indices and cannot overwrite a matrix with review metadata. Its output remains diagnostic until separately reviewed.",
+    "CI jobs select one PR head revision and preserve raw reports, captures, equivalents and process evidence for later independent replay."
+  ],
+  "independent_checks": {
+    "final_scope_selection_check": "passed after installed reviewed metadata",
+    "aunit_evidence_regressions": 24,
+    "consumer_evidence_regressions": 29,
+    "contract_policy_regressions": 11,
+    "legacy_matrix_regressions": 35,
+    "expanded_harness_regressions": 56,
+    "native_mapping_regressions": 18,
+    "notes": "Synthetic protocol regressions and source/hash checks only. Production runtime/context acceptance is not inferred.",
+    "source_input_hashes": 34,
+    "review_binding_regressions": 40,
+    "git_diff_check": "passed",
+    "bundle_collector_regressions": 9,
+    "macos_output_regressions": 10,
+    "named_matrix_regressions": 12
+  },
+  "independent_check_logs": [
+    "reports/expanded-t-conformance/independent-expanded-harness-review-2.log",
+    "reports/expanded-t-conformance/independent-consumer-harness-review.log",
+    "reports/expanded-t-conformance/independent-aunit-harness-review-2.log",
+    "reports/expanded-t-conformance/independent-full-matrix-harness.log",
+    "reports/expanded-t-conformance/independent-bundle-collector.log",
+    "reports/expanded-t-conformance/independent-final-scope-selection.log"
+  ],
+  "findings": [],
+  "remaining_gates": [
+    "All 142 source obligations and 159 selected API obligations still need actual clean-revision evidence in their required contexts.",
+    "Execution-contract review, source/API runtime adjudication, all 26 contexts and final independent matrix acceptance remain separate obligations.",
+    "Full M3, unselected primary files, aggregate/heavy and unrelated global ABI/ecosystem claims remain outside this bounded decision."
+  ]
+}

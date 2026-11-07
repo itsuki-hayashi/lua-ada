@@ -1,0 +1,4111 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "coroutine.lua",
+  "role": "primary",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/coroutine.lua",
+    "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9",
+    "byte_length": 34752,
+    "line_count": 1263
+  },
+  "original_anchor_count": 287,
+  "original_pending_ledger_sha256": "caf1f5ea3025b948d2faacee35b5d23eecdf58285e48e37ddcfdc041d04168a0",
+  "appended_runtime_blocks": 28,
+  "proposal": {
+    "path": "tests/conformance/reviews/coroutine.expanded-classification-proposal.jsonl",
+    "sha256": "2c13009473c30b28d1855f3c945b72800b0cf7a7575b35c611968cb38175f9f0"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/coroutine.jsonl",
+    "sha256": "34219d9e1184bf1f0d5f837b1f63be20cb36c332cb8413e95c502949447e41d9"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "main-thread-and-multiresume-protocol",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 72,
+      "span_end_line": 73,
+      "byte_offset": 0,
+      "byte_length": 2002,
+      "span_sha256": "cbdafb1f6f30da12622d12d75caaa89d9f9d2522a45aa467ec20f1fae133b3a9",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Main-thread identity/yieldability and invalid arguments are correct. Repeated resumes preserve empty/multiple arguments/results, running/suspended/dead states and failed self-resume without corrupting the active coroutine.",
+      "dynamic_invocation": "Execute the actual source calls print@4, require@6, coroutine.running@10, type@11, coroutine.resume@12, coroutine.isyieldable@13, pcall@14, pcall@18, pcall@19, coroutine.running@35, coroutine.resume@39, coroutine.status@40, coroutine.isyieldable@42, coroutine.yield@44, table.unpack@44, table.unpack@46, coroutine.create@49, coroutine.isyieldable@50, type@51, coroutine.status@51, string.find@52, tostring@52, coroutine.resume@54, coroutine.isyieldable@55, coroutine.status@56, coroutine.resume@57, eqtab@58, coroutine.isyieldable@60, coroutine.resume@61, eqtab@62, coroutine.resume@64, eqtab@65, coroutine.status@67, coroutine.resume@68, string.find@69, coroutine.status@69 in section main-thread-and-multiresume-protocol. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section main-thread-and-multiresume-protocol; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 4,
+          "source_statement": "print \"testing coroutines\""
+        },
+        {
+          "name": "require",
+          "line": 6,
+          "source_statement": "local debug = require'debug'"
+        },
+        {
+          "name": "coroutine.running",
+          "line": 10,
+          "source_statement": "local main, ismain = coroutine.running()"
+        },
+        {
+          "name": "type",
+          "line": 11,
+          "source_statement": "assert(type(main) == \"thread\" and ismain)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 12,
+          "source_statement": "assert(not coroutine.resume(main))"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 13,
+          "source_statement": "assert(not coroutine.isyieldable(main) and not coroutine.isyieldable())"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 13,
+          "source_statement": "assert(not coroutine.isyieldable(main) and not coroutine.isyieldable())"
+        },
+        {
+          "name": "pcall",
+          "line": 14,
+          "source_statement": "assert(not pcall(coroutine.yield))"
+        },
+        {
+          "name": "pcall",
+          "line": 18,
+          "source_statement": "assert(not pcall(coroutine.resume, 0))"
+        },
+        {
+          "name": "pcall",
+          "line": 19,
+          "source_statement": "assert(not pcall(coroutine.status, 0))"
+        },
+        {
+          "name": "coroutine.running",
+          "line": 35,
+          "source_statement": "  local x, y = coroutine.running()"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 39,
+          "source_statement": "  assert(coroutine.resume(f) == false)"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 40,
+          "source_statement": "  assert(coroutine.status(f) == \"running\")"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 42,
+          "source_statement": "  assert(coroutine.isyieldable(x))"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 44,
+          "source_statement": "    _G.x = {coroutine.yield(table.unpack(arg[i]))}"
+        },
+        {
+          "name": "table.unpack",
+          "line": 44,
+          "source_statement": "    _G.x = {coroutine.yield(table.unpack(arg[i]))}"
+        },
+        {
+          "name": "table.unpack",
+          "line": 46,
+          "source_statement": "  return table.unpack(a)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 49,
+          "source_statement": "f = coroutine.create(foo)"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 50,
+          "source_statement": "assert(coroutine.isyieldable(f))"
+        },
+        {
+          "name": "type",
+          "line": 51,
+          "source_statement": "assert(type(f) == \"thread\" and coroutine.status(f) == \"suspended\")"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 51,
+          "source_statement": "assert(type(f) == \"thread\" and coroutine.status(f) == \"suspended\")"
+        },
+        {
+          "name": "string.find",
+          "line": 52,
+          "source_statement": "assert(string.find(tostring(f), \"thread\"))"
+        },
+        {
+          "name": "tostring",
+          "line": 52,
+          "source_statement": "assert(string.find(tostring(f), \"thread\"))"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 54,
+          "source_statement": "s,a,b,c,d = coroutine.resume(f, {1,2,3}, {}, {1}, {'a', 'b', 'c'})"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 55,
+          "source_statement": "assert(coroutine.isyieldable(f))"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 56,
+          "source_statement": "assert(s and a == nil and coroutine.status(f) == \"suspended\")"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 57,
+          "source_statement": "s,a,b,c,d = coroutine.resume(f)"
+        },
+        {
+          "name": "eqtab",
+          "line": 58,
+          "source_statement": "eqtab(_G.x, {})"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 60,
+          "source_statement": "assert(coroutine.isyieldable(f))"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 61,
+          "source_statement": "s,a,b,c,d = coroutine.resume(f, 1, 2, 3)"
+        },
+        {
+          "name": "eqtab",
+          "line": 62,
+          "source_statement": "eqtab(_G.x, {1, 2, 3})"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 64,
+          "source_statement": "s,a,b,c,d = coroutine.resume(f, \"xuxu\")"
+        },
+        {
+          "name": "eqtab",
+          "line": 65,
+          "source_statement": "eqtab(_G.x, {\"xuxu\"})"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 67,
+          "source_statement": "assert(coroutine.status(f) == \"dead\")"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 68,
+          "source_statement": "s, a = coroutine.resume(f, \"xuxu\")"
+        },
+        {
+          "name": "string.find",
+          "line": 69,
+          "source_statement": "assert(not s and string.find(a, \"dead\") and coroutine.status(f) == \"dead\")"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 69,
+          "source_statement": "assert(not s and string.find(a, \"dead\") and coroutine.status(f) == \"dead\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 26,
+          "source_statement": "  for i = 1, #t1 do"
+        },
+        {
+          "line": 43,
+          "source_statement": "  for i=1,#arg do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 4,
+          "kind": "source-phase-output",
+          "source_statement": "print \"testing coroutines\""
+        }
+      ]
+    },
+    {
+      "id": "tail-recursion-and-sieve-transfers",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0002",
+      "first_line": 73,
+      "last_line": 129,
+      "span_end_line": 130,
+      "byte_offset": 2002,
+      "byte_length": 955,
+      "span_sha256": "c59f6b5c88100ac7ba43c13df43adb4066058b2cdd157f47a31fc75c21c86177",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Tail-call yields, recursive yields and nested generator/filter coroutines preserve results and independent execution contexts; the prime sieve produces22 values ending79.",
+      "dynamic_invocation": "Execute the actual source calls coroutine.yield@74, coroutine.wrap@75, foo@77, f@81, f@82, coroutine.yield@88, pf@89, coroutine.wrap@92, f@95, coroutine.wrap@101, coroutine.yield@102, coroutine.wrap@108, g@110, math.fmod@112, coroutine.yield@112, gen@117, x@120, table.insert@122, filter@123 in section tail-recursion-and-sieve-transfers. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section tail-recursion-and-sieve-transfers; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "coroutine.yield",
+          "line": 74,
+          "source_statement": "local function foo (i) return coroutine.yield(i) end"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 75,
+          "source_statement": "local f = coroutine.wrap(function ()"
+        },
+        {
+          "name": "foo",
+          "line": 77,
+          "source_statement": "    assert(foo(i) == _G.x)"
+        },
+        {
+          "name": "f",
+          "line": 81,
+          "source_statement": "for i=1,10 do _G.x = i; assert(f(i) == i) end"
+        },
+        {
+          "name": "f",
+          "line": 82,
+          "source_statement": "_G.x = 'xuxu'; assert(f('xuxu') == 'a')"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 88,
+          "source_statement": "  coroutine.yield(n)"
+        },
+        {
+          "name": "pf",
+          "line": 89,
+          "source_statement": "  pf(n*i, i+1)"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 92,
+          "source_statement": "f = coroutine.wrap(pf)"
+        },
+        {
+          "name": "f",
+          "line": 95,
+          "source_statement": "  assert(f(1, 1) == s)"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 101,
+          "source_statement": "  return coroutine.wrap(function ()"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 102,
+          "source_statement": "    for i=2,n do coroutine.yield(i) end"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 108,
+          "source_statement": "  return coroutine.wrap(function ()"
+        },
+        {
+          "name": "g",
+          "line": 110,
+          "source_statement": "      local n = g()"
+        },
+        {
+          "name": "math.fmod",
+          "line": 112,
+          "source_statement": "      if math.fmod(n, p) ~= 0 then coroutine.yield(n) end"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 112,
+          "source_statement": "      if math.fmod(n, p) ~= 0 then coroutine.yield(n) end"
+        },
+        {
+          "name": "gen",
+          "line": 117,
+          "source_statement": "local x = gen(80)"
+        },
+        {
+          "name": "x",
+          "line": 120,
+          "source_statement": "  local n = x()"
+        },
+        {
+          "name": "table.insert",
+          "line": 122,
+          "source_statement": "  table.insert(a, n)"
+        },
+        {
+          "name": "filter",
+          "line": 123,
+          "source_statement": "  x = filter(n, x)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 111,
+          "source_statement": "      if n == nil then return end"
+        },
+        {
+          "line": 112,
+          "source_statement": "      if math.fmod(n, p) ~= 0 then coroutine.yield(n) end"
+        },
+        {
+          "line": 121,
+          "source_statement": "  if n == nil then break end"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 76,
+          "source_statement": "  for i=1,10 do"
+        },
+        {
+          "line": 81,
+          "source_statement": "for i=1,10 do _G.x = i; assert(f(i) == i) end"
+        },
+        {
+          "line": 94,
+          "source_statement": "for i=1,10 do"
+        },
+        {
+          "line": 102,
+          "source_statement": "    for i=2,n do coroutine.yield(i) end"
+        },
+        {
+          "line": 109,
+          "source_statement": "    while 1 do"
+        },
+        {
+          "line": 119,
+          "source_statement": "while 1 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "semantic-stack-overflow",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0003",
+      "first_line": 130,
+      "last_line": 141,
+      "span_end_line": 142,
+      "byte_offset": 2957,
+      "byte_length": 441,
+      "span_sha256": "08d51c5c1b9b63b7e8eb94c5d650a4109c7df9ba14b4af6902c8bcb5b5fcb0b2",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Unbounded ordinary Lua recursion produces a catchable stack overflow and a dead coroutine rather than host recursion/crash.",
+      "dynamic_invocation": "Execute the actual source calls foo@131, coroutine.create@132, coroutine.resume@136, string.find@137, coroutine.status@138 in section semantic-stack-overflow. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section semantic-stack-overflow; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "foo",
+          "line": 131,
+          "source_statement": "  local function foo () foo () end    -- just create a stack overflow"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 132,
+          "source_statement": "  local co = coroutine.create(foo)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 136,
+          "source_statement": "  local st, msg = coroutine.resume(co)"
+        },
+        {
+          "name": "string.find",
+          "line": 137,
+          "source_statement": "  assert(string.find(msg, \"stack overflow\"))"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 138,
+          "source_statement": "  assert(coroutine.status(co) == \"dead\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "close-state-and-reentrant-close",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0004",
+      "first_line": 142,
+      "last_line": 234,
+      "span_end_line": 235,
+      "byte_offset": 3398,
+      "byte_length": 2445,
+      "span_sha256": "54f42a53e428fc8da23c3d3a9bee386ddec65d7cd433300dc8af631400840891",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Closing fresh/dead/failed/suspended coroutines follows status rules, transports actual error objects, runs close handlers once in reverse order and permits reentrant self-close while rejecting main/normal closure.",
+      "dynamic_invocation": "Execute the actual source calls print@142, setmetatable@145, coroutine.create@150, coroutine.resume@151, coroutine.status@152, coroutine.close@153, coroutine.close@156, coroutine.running@159, pcall@162, string.find@163, coroutine.wrap@167, pcall@168, string.find@169, coroutine.create@174, func2close@176, coroutine.close@177, coroutine.yield@179, coroutine.resume@181, coroutine.close@183, coroutine.create@191, coroutine.resume@192, coroutine.close@194, coroutine.close@197, coroutine.create@200, func2close@201, coroutine.yield@205, coroutine.resume@207, coroutine.close@209, coroutine.status@210, coroutine.create@214, func2close@215, error@218, func2close@220, error@221, coroutine.yield@223, coroutine.resume@225, coroutine.close@227, coroutine.status@228, coroutine.close@231 in section close-state-and-reentrant-close. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section close-state-and-reentrant-close; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 142,
+          "source_statement": "print(\"to-be-closed variables in coroutines\")"
+        },
+        {
+          "name": "setmetatable",
+          "line": 145,
+          "source_statement": "  return setmetatable({}, {__close = f})"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 150,
+          "source_statement": "  local co = coroutine.create(print)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 151,
+          "source_statement": "  assert(coroutine.resume(co, \"testing 'coroutine.close'\"))"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 152,
+          "source_statement": "  assert(coroutine.status(co) == \"dead\")"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 153,
+          "source_statement": "  local st, msg = coroutine.close(co)"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 156,
+          "source_statement": "  st, msg = coroutine.close(co)"
+        },
+        {
+          "name": "coroutine.running",
+          "line": 159,
+          "source_statement": "  local main = coroutine.running()"
+        },
+        {
+          "name": "pcall",
+          "line": 162,
+          "source_statement": "  local st, msg = pcall(coroutine.close, main);"
+        },
+        {
+          "name": "string.find",
+          "line": 163,
+          "source_statement": "  assert(not st and string.find(msg, \"main\"))"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 167,
+          "source_statement": "  ;(coroutine.wrap(function ()"
+        },
+        {
+          "name": "pcall",
+          "line": 168,
+          "source_statement": "    local st, msg = pcall(coroutine.close, main)"
+        },
+        {
+          "name": "string.find",
+          "line": 169,
+          "source_statement": "    assert(not st and string.find(msg, \"normal\"))"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 174,
+          "source_statement": "    co = coroutine.create("
+        },
+        {
+          "name": "func2close",
+          "line": 176,
+          "source_statement": "        local x <close> = func2close(function()"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 177,
+          "source_statement": "            coroutine.close(co)   -- close it again"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 179,
+          "source_statement": "        coroutine.yield(20)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 181,
+          "source_statement": "    local st, msg = coroutine.resume(co)"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 183,
+          "source_statement": "    st, msg = coroutine.close(co)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 191,
+          "source_statement": "  local co = coroutine.create(error)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 192,
+          "source_statement": "  local st, msg = coroutine.resume(co, 100)"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 194,
+          "source_statement": "  st, msg = coroutine.close(co)"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 197,
+          "source_statement": "  st, msg = coroutine.close(co)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 200,
+          "source_statement": "  co = coroutine.create(function ()"
+        },
+        {
+          "name": "func2close",
+          "line": 201,
+          "source_statement": "    local x <close> = func2close(function (self, err)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 205,
+          "source_statement": "    coroutine.yield()"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 207,
+          "source_statement": "  coroutine.resume(co)"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 209,
+          "source_statement": "  assert(coroutine.close(co))"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 210,
+          "source_statement": "  assert(not X and coroutine.status(co) == \"dead\")"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 214,
+          "source_statement": "  co = coroutine.create(function()"
+        },
+        {
+          "name": "func2close",
+          "line": 215,
+          "source_statement": "    local y <close> = func2close(function (self,err)"
+        },
+        {
+          "name": "error",
+          "line": 218,
+          "source_statement": "      error(200)"
+        },
+        {
+          "name": "func2close",
+          "line": 220,
+          "source_statement": "    local x <close> = func2close(function (self, err)"
+        },
+        {
+          "name": "error",
+          "line": 221,
+          "source_statement": "      assert(err == nil); error(111)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 223,
+          "source_statement": "    coroutine.yield()"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 225,
+          "source_statement": "  coroutine.resume(co)"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 227,
+          "source_statement": "  local st, msg = coroutine.close(co)"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 228,
+          "source_statement": "  assert(st == false and coroutine.status(co) == \"dead\" and msg == 200)"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 231,
+          "source_statement": "  st, msg = coroutine.close(co)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 142,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"to-be-closed variables in coroutines\")"
+        }
+      ]
+    },
+    {
+      "id": "protected-close-error-recovery",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0005",
+      "first_line": 235,
+      "last_line": 290,
+      "span_end_line": 291,
+      "byte_offset": 5843,
+      "byte_length": 1461,
+      "span_sha256": "1e82fd8ee0a9dc29225022a644cf1d8686cef155676742cca8bc4d242cebfff7",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Close handlers see the actual protected-error boundary/debug C frame, and errors raised during multi-handler cleanup replace the pending error in the specified order.",
+      "dynamic_invocation": "Execute the actual source calls func2close@240, debug.getinfo@241, error@244, coroutine.create@246, pcall@246, coroutine.resume@247, func2close@260, error@262, func2close@264, func2close@268, error@270, coroutine.yield@272, h@273, func2close@273, error@275, coroutine.create@279, coroutine.resume@281, coroutine.resume@283, coroutine.status@284 in section protected-close-error-recovery. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section protected-close-error-recovery; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "func2close",
+          "line": 240,
+          "source_statement": "    local x <close> = func2close(function (self, err)"
+        },
+        {
+          "name": "debug.getinfo",
+          "line": 241,
+          "source_statement": "      Y = debug.getinfo(2)"
+        },
+        {
+          "name": "error",
+          "line": 244,
+          "source_statement": "    error(43)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 246,
+          "source_statement": "  local co = coroutine.create(function () return pcall(foo) end)"
+        },
+        {
+          "name": "pcall",
+          "line": 246,
+          "source_statement": "  local co = coroutine.create(function () return pcall(foo) end)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 247,
+          "source_statement": "  local st1, st2, err = coroutine.resume(co)"
+        },
+        {
+          "name": "func2close",
+          "line": 260,
+          "source_statement": "    local x <close> = func2close(function(_,msg)"
+        },
+        {
+          "name": "error",
+          "line": 262,
+          "source_statement": "      error(20)"
+        },
+        {
+          "name": "func2close",
+          "line": 264,
+          "source_statement": "    local y <close> = func2close(function(_,msg)"
+        },
+        {
+          "name": "func2close",
+          "line": 268,
+          "source_statement": "    local z <close> = func2close(function(_,msg)"
+        },
+        {
+          "name": "error",
+          "line": 270,
+          "source_statement": "      error(10)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 272,
+          "source_statement": "    coroutine.yield(1)"
+        },
+        {
+          "name": "h",
+          "line": 273,
+          "source_statement": "    h(func2close(function(_,msg)"
+        },
+        {
+          "name": "func2close",
+          "line": 273,
+          "source_statement": "    h(func2close(function(_,msg)"
+        },
+        {
+          "name": "error",
+          "line": 275,
+          "source_statement": "        error(2)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 279,
+          "source_statement": "  local co = coroutine.create(pcall)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 281,
+          "source_statement": "  local st, res = coroutine.resume(co, foo)    -- call 'foo' protected"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 283,
+          "source_statement": "  local st, res1, res2 = coroutine.resume(co)   -- continue"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 284,
+          "source_statement": "  assert(coroutine.status(co) == \"dead\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "self-close-through-nonyieldable-callback",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0006",
+      "first_line": 291,
+      "last_line": 340,
+      "span_end_line": 341,
+      "byte_offset": 7304,
+      "byte_length": 1282,
+      "span_sha256": "f03a47a5c23501fe0933944d1085a7c89fb4b118fdfca48c61fd27d720d75e17",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "A coroutine can close itself through a nonyieldable string callback and nested protected calls; normal return, replacement error and forbidden-yield close handlers produce the tested outcomes.",
+      "dynamic_invocation": "Execute the actual source calls print@291, coroutine.create@298, func2close@300, coroutine.yield@302, error@304, string.gsub@312, coroutine.isyieldable@313, pcall@316, coroutine.close@318, os.exit@319, new@325, coroutine.resume@326, new@330, coroutine.resume@331, new@334, coroutine.resume@335, string.find@336 in section self-close-through-nonyieldable-callback. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section self-close-through-nonyieldable-callback; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 291,
+          "source_statement": "do print(\"coroutines closing itself\")"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 298,
+          "source_statement": "    return coroutine.create(function (what)"
+        },
+        {
+          "name": "func2close",
+          "line": 300,
+          "source_statement": "      local <close>var = func2close(function (t, err)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 302,
+          "source_statement": "          coroutine.yield()"
+        },
+        {
+          "name": "error",
+          "line": 304,
+          "source_statement": "          error(200)"
+        },
+        {
+          "name": "string.gsub",
+          "line": 312,
+          "source_statement": "      string.gsub(\"a\", \"a\", function ()"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 313,
+          "source_statement": "        assert(not coroutine.isyieldable())"
+        },
+        {
+          "name": "pcall",
+          "line": 316,
+          "source_statement": "        assert(pcall(pcall, function ()"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 318,
+          "source_statement": "          coroutine.close()   -- close itself"
+        },
+        {
+          "name": "os.exit",
+          "line": 319,
+          "source_statement": "          os.exit(false)   -- not reacheable"
+        },
+        {
+          "name": "new",
+          "line": 325,
+          "source_statement": "  local co = new()"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 326,
+          "source_statement": "  local st, msg = coroutine.resume(co, \"ret\")"
+        },
+        {
+          "name": "new",
+          "line": 330,
+          "source_statement": "  local co = new()"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 331,
+          "source_statement": "  local st, msg = coroutine.resume(co, \"error\")"
+        },
+        {
+          "name": "new",
+          "line": 334,
+          "source_statement": "  local co = new()"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 335,
+          "source_statement": "  local st, msg = coroutine.resume(co, \"yield\")"
+        },
+        {
+          "name": "string.find",
+          "line": 336,
+          "source_statement": "  assert(not st and string.find(msg, \"attempt to yield\"))"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 301,
+          "source_statement": "        if what == \"yield\" then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 291,
+          "kind": "source-phase-output",
+          "source_statement": "do print(\"coroutines closing itself\")"
+        }
+      ]
+    },
+    {
+      "id": "protected-yields-and-error-handler-results",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0007",
+      "first_line": 341,
+      "last_line": 398,
+      "span_end_line": 399,
+      "byte_offset": 8586,
+      "byte_length": 1351,
+      "span_sha256": "bcf53dbf10e1324bc8739d211d6c6651c4a98f041e5728938623f4751375c4e2",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Forbidden sort/callback yields fail without disabling later legitimate yields. Nested pcall/xpcall and generic iterators preserve recovery state, actual yielded arguments and transformed errors.",
+      "dynamic_invocation": "Execute the actual source calls coroutine.wrap@343, pcall@344, coroutine.isyieldable@345, coroutine.yield@346, co@350, co@351, coroutine.yield@354, coroutine.wrap@356, xpcall@357, pcall@360, error@361, f1@365, f1@366, f1@367, coroutine.yield@371, coroutine.wrap@374, coroutine.yield@375, xpcall@375, co@378, co@379, coroutine.isyieldable@386, coroutine.wrap@390, coroutine.isyieldable@391, string.gsub@392, co@395 in section protected-yields-and-error-handler-results. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section protected-yields-and-error-handler-results; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "coroutine.wrap",
+          "line": 343,
+          "source_statement": "local co = coroutine.wrap(function()"
+        },
+        {
+          "name": "pcall",
+          "line": 344,
+          "source_statement": "       assert(not pcall(table.sort,{1,2,3}, coroutine.yield))"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 345,
+          "source_statement": "       assert(coroutine.isyieldable())"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 346,
+          "source_statement": "       coroutine.yield(20)"
+        },
+        {
+          "name": "co",
+          "line": 350,
+          "source_statement": "assert(co() == 20)"
+        },
+        {
+          "name": "co",
+          "line": 351,
+          "source_statement": "assert(co() == 30)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 354,
+          "source_statement": "local f = function (s, i) return coroutine.yield(i) end"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 356,
+          "source_statement": "local f1 = coroutine.wrap(function ()"
+        },
+        {
+          "name": "xpcall",
+          "line": 357,
+          "source_statement": "             return xpcall(pcall, function (...) return ... end,"
+        },
+        {
+          "name": "pcall",
+          "line": 360,
+          "source_statement": "                 for i in f, nil, 1 do pcall(function () s = s + i end) end"
+        },
+        {
+          "name": "error",
+          "line": 361,
+          "source_statement": "                 error({s})"
+        },
+        {
+          "name": "f1",
+          "line": 365,
+          "source_statement": "f1()"
+        },
+        {
+          "name": "f1",
+          "line": 366,
+          "source_statement": "for i = 1, 10 do assert(f1(i) == i) end"
+        },
+        {
+          "name": "f1",
+          "line": 367,
+          "source_statement": "local r1, r2, v = f1(nil)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 371,
+          "source_statement": "local function f (a, b) a = coroutine.yield(a);  error{a + b} end"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 374,
+          "source_statement": "co = coroutine.wrap(function ()"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 375,
+          "source_statement": "       coroutine.yield(xpcall(f, g, 10, 20))"
+        },
+        {
+          "name": "xpcall",
+          "line": 375,
+          "source_statement": "       coroutine.yield(xpcall(f, g, 10, 20))"
+        },
+        {
+          "name": "co",
+          "line": 378,
+          "source_statement": "assert(co() == 10)"
+        },
+        {
+          "name": "co",
+          "line": 379,
+          "source_statement": "local r, msg = co(100)"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 386,
+          "source_statement": "          assert(not coroutine.isyieldable())"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 390,
+          "source_statement": "  local co = coroutine.wrap(function (c)"
+        },
+        {
+          "name": "coroutine.isyieldable",
+          "line": 391,
+          "source_statement": "               assert(coroutine.isyieldable())"
+        },
+        {
+          "name": "string.gsub",
+          "line": 392,
+          "source_statement": "               local s = string.gsub(\"a\", \".\", f)"
+        },
+        {
+          "name": "co",
+          "line": 395,
+          "source_statement": "  assert(co() == \"aa\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 360,
+          "source_statement": "                 for i in f, nil, 1 do pcall(function () s = s + i end) end"
+        },
+        {
+          "line": 366,
+          "source_statement": "for i = 1, 10 do assert(f1(i) == i) end"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "debug-trace-and-coroutine-errors",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0008",
+      "first_line": 399,
+      "last_line": 442,
+      "span_end_line": 443,
+      "byte_offset": 9937,
+      "byte_length": 1107,
+      "span_sha256": "2880eb64eccf9a2a6bae0515d5a5bafb477816ed689d224ced83cc6ed033fc23",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The exact hook event trace and logical source lines survive yield/resume. Function-valued errors propagate unchanged through wrap/resume; resuming the dead coroutine reports its state.",
+      "dynamic_invocation": "Execute the actual source calls coroutine.create@402, coroutine.yield@403, debug.sethook@410, coroutine.resume@411, pairs@414, debug.getinfo@421, debug.getinfo@422, coroutine.yield@423, error@424, foo@427, coroutine.wrap@428, x@429, pcall@430, coroutine.create@433, coroutine.resume@434, coroutine.resume@436, coroutine.status@437, coroutine.resume@438, string.find@439, coroutine.status@439 in section debug-trace-and-coroutine-errors. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section debug-trace-and-coroutine-errors; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "coroutine.create",
+          "line": 402,
+          "source_statement": "  local co = coroutine.create(function ()"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 403,
+          "source_statement": "    coroutine.yield(10)"
+        },
+        {
+          "name": "debug.sethook",
+          "line": 410,
+          "source_statement": "  debug.sethook(co, dotrace, \"clr\")"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 411,
+          "source_statement": "  repeat until not coroutine.resume(co)"
+        },
+        {
+          "name": "pairs",
+          "line": 414,
+          "source_statement": "  for k, v in pairs(trace) do"
+        },
+        {
+          "name": "debug.getinfo",
+          "line": 421,
+          "source_statement": "  assert(debug.getinfo(1).currentline == debug.getinfo(foo).linedefined + 1)"
+        },
+        {
+          "name": "debug.getinfo",
+          "line": 421,
+          "source_statement": "  assert(debug.getinfo(1).currentline == debug.getinfo(foo).linedefined + 1)"
+        },
+        {
+          "name": "debug.getinfo",
+          "line": 422,
+          "source_statement": "  assert(debug.getinfo(2).currentline == debug.getinfo(goo).linedefined)"
+        },
+        {
+          "name": "debug.getinfo",
+          "line": 422,
+          "source_statement": "  assert(debug.getinfo(2).currentline == debug.getinfo(goo).linedefined)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 423,
+          "source_statement": "  coroutine.yield(3)"
+        },
+        {
+          "name": "error",
+          "line": 424,
+          "source_statement": "  error(foo)"
+        },
+        {
+          "name": "foo",
+          "line": 427,
+          "source_statement": "function goo() foo() end"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 428,
+          "source_statement": "x = coroutine.wrap(goo)"
+        },
+        {
+          "name": "x",
+          "line": 429,
+          "source_statement": "assert(x() == 3)"
+        },
+        {
+          "name": "pcall",
+          "line": 430,
+          "source_statement": "local a,b = pcall(x)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 433,
+          "source_statement": "x = coroutine.create(goo)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 434,
+          "source_statement": "a,b = coroutine.resume(x)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 436,
+          "source_statement": "a,b = coroutine.resume(x)"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 437,
+          "source_statement": "assert(not a and b == foo and coroutine.status(x) == \"dead\")"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 438,
+          "source_statement": "a,b = coroutine.resume(x)"
+        },
+        {
+          "name": "string.find",
+          "line": 439,
+          "source_statement": "assert(not a and string.find(b, \"dead\") and coroutine.status(x) == \"dead\")"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 439,
+          "source_statement": "assert(not a and string.find(b, \"dead\") and coroutine.status(x) == \"dead\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 411,
+          "source_statement": "  repeat until not coroutine.resume(co)"
+        },
+        {
+          "line": 414,
+          "source_statement": "  for k, v in pairs(trace) do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "loop-yields-and-collected-captures",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0009",
+      "first_line": 443,
+      "last_line": 481,
+      "span_end_line": 482,
+      "byte_offset": 11044,
+      "byte_length": 749,
+      "span_sha256": "ef79505568c64a001620e070b54b11c1961dbfac6798bdc542ef7ec8c768c7ae",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "A5^4 recursive enumeration yields all combinations; weakly retained wrapped coroutines can collect while externally retained open captures preserve their actual mutable cell.",
+      "dynamic_invocation": "Execute the actual source calls coroutine.yield@445, all@449, coroutine.wrap@455, all@455, setmetatable@462, coroutine.wrap@463, coroutine.yield@468, x@474, f@475, x@475, collectgarbage@477, f@479 in section loop-yields-and-collected-captures. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section loop-yields-and-collected-captures; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "coroutine.yield",
+          "line": 445,
+          "source_statement": "  if k == 0 then coroutine.yield(a)"
+        },
+        {
+          "name": "all",
+          "line": 449,
+          "source_statement": "      all(a, n, k-1)"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 455,
+          "source_statement": "for t in coroutine.wrap(function () all({}, 5, 4) end) do"
+        },
+        {
+          "name": "all",
+          "line": 455,
+          "source_statement": "for t in coroutine.wrap(function () all({}, 5, 4) end) do"
+        },
+        {
+          "name": "setmetatable",
+          "line": 462,
+          "source_statement": "local C = {}; setmetatable(C, {__mode = \"kv\"})"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 463,
+          "source_statement": "local x = coroutine.wrap (function ()"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 468,
+          "source_statement": "              coroutine.yield(f)"
+        },
+        {
+          "name": "x",
+          "line": 474,
+          "source_statement": "local f = x()"
+        },
+        {
+          "name": "f",
+          "line": 475,
+          "source_statement": "assert(f() == 21 and x()() == 32 and x() == f)"
+        },
+        {
+          "name": "x",
+          "line": 475,
+          "source_statement": "assert(f() == 21 and x()() == 32 and x() == f)"
+        },
+        {
+          "name": "x",
+          "line": 475,
+          "source_statement": "assert(f() == 21 and x()() == 32 and x() == f)"
+        },
+        {
+          "name": "collectgarbage",
+          "line": 477,
+          "source_statement": "collectgarbage()"
+        },
+        {
+          "name": "f",
+          "line": 479,
+          "source_statement": "assert(f() == 43 and f() == 53)"
+        },
+        {
+          "name": "f",
+          "line": 479,
+          "source_statement": "assert(f() == 43 and f() == 53)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 445,
+          "source_statement": "  if k == 0 then coroutine.yield(a)"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 447,
+          "source_statement": "    for i=1,n do"
+        },
+        {
+          "line": 455,
+          "source_statement": "for t in coroutine.wrap(function () all({}, 5, 4) end) do"
+        },
+        {
+          "line": 466,
+          "source_statement": "            while true do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "self-normal-and-close-error-regressions",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0010",
+      "first_line": 482,
+      "last_line": 555,
+      "span_end_line": 556,
+      "byte_offset": 11793,
+      "byte_length": 1958,
+      "span_sha256": "fc7e941d53c27e561ecf0651bb38aad32cdeae8b6fce6031c82c93b22767c143",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Self/normal resume failures preserve yieldability and close state; wrap resets failed-coroutine close errors correctly, and infinite coroutine nesting fails semantically.",
+      "dynamic_invocation": "Execute the actual source calls coroutine.running@485, coroutine.resume@486, coroutine.yield@487, coroutine.resume@488, coroutine.yield@489, coroutine.create@493, coroutine.resume@494, coroutine.resume@496, coroutine.resume@498, coroutine.resume@500, coroutine.resume@501, coroutine.running@507, coroutine.create@508, coroutine.resume@508, coroutine.resume@509, coroutine.wrap@513, func2close@514, pcall@515, A@517, string.find@518, coroutine.wrap@527, func2close@528, pcall@528, error@529, pcall@531, pcall@533, string.find@534, coroutine.create@540, co2@540, coroutine.wrap@541, coroutine.status@542, coroutine.resume@543, coroutine.yield@544, coroutine.resume@547, coroutine.status@549, coroutine.wrap@552, pcall@553 in section self-normal-and-close-error-regressions. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section self-normal-and-close-error-regressions; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "coroutine.running",
+          "line": 485,
+          "source_statement": "  assert(coroutine.running() == current_co)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 486,
+          "source_statement": "  assert(coroutine.resume(current_co) == false)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 487,
+          "source_statement": "  coroutine.yield(10, 20)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 488,
+          "source_statement": "  assert(coroutine.resume(current_co) == false)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 489,
+          "source_statement": "  coroutine.yield(23)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 493,
+          "source_statement": "local co = coroutine.create(co_func)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 494,
+          "source_statement": "local a,b,c = coroutine.resume(co, co)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 496,
+          "source_statement": "a,b = coroutine.resume(co, co)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 498,
+          "source_statement": "a,b = coroutine.resume(co, co)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 500,
+          "source_statement": "assert(coroutine.resume(co, co) == false)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 501,
+          "source_statement": "assert(coroutine.resume(co, co) == false)"
+        },
+        {
+          "name": "coroutine.running",
+          "line": 507,
+          "source_statement": "  local A = coroutine.running()"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 508,
+          "source_statement": "  local B = coroutine.create(function() return coroutine.resume(A) end)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 508,
+          "source_statement": "  local B = coroutine.create(function() return coroutine.resume(A) end)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 509,
+          "source_statement": "  local st, res = coroutine.resume(B)"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 513,
+          "source_statement": "  A = coroutine.wrap(function()"
+        },
+        {
+          "name": "func2close",
+          "line": 514,
+          "source_statement": "    local _ <close> = func2close(function () X = true end)"
+        },
+        {
+          "name": "pcall",
+          "line": 515,
+          "source_statement": "    return pcall(A, 1)"
+        },
+        {
+          "name": "A",
+          "line": 517,
+          "source_statement": "  st, res = A()"
+        },
+        {
+          "name": "string.find",
+          "line": 518,
+          "source_statement": "  assert(not st and string.find(res, \"non%-suspended\") and X == true)"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 527,
+          "source_statement": "  co = coroutine.wrap(function()"
+        },
+        {
+          "name": "func2close",
+          "line": 528,
+          "source_statement": "    local x <close> = func2close(function() return pcall(co) end)"
+        },
+        {
+          "name": "pcall",
+          "line": 528,
+          "source_statement": "    local x <close> = func2close(function() return pcall(co) end)"
+        },
+        {
+          "name": "error",
+          "line": 529,
+          "source_statement": "    error(111)"
+        },
+        {
+          "name": "pcall",
+          "line": 531,
+          "source_statement": "  local st, errobj = pcall(co)"
+        },
+        {
+          "name": "pcall",
+          "line": 533,
+          "source_statement": "  st, errobj = pcall(co)"
+        },
+        {
+          "name": "string.find",
+          "line": 534,
+          "source_statement": "  assert(not st and string.find(errobj, \"dead coroutine\"))"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 540,
+          "source_statement": "co1 = coroutine.create(function () return co2() end)"
+        },
+        {
+          "name": "co2",
+          "line": 540,
+          "source_statement": "co1 = coroutine.create(function () return co2() end)"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 541,
+          "source_statement": "co2 = coroutine.wrap(function ()"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 542,
+          "source_statement": "        assert(coroutine.status(co1) == 'normal')"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 543,
+          "source_statement": "        assert(not coroutine.resume(co1))"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 544,
+          "source_statement": "        coroutine.yield(3)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 547,
+          "source_statement": "a,b = coroutine.resume(co1)"
+        },
+        {
+          "name": "coroutine.status",
+          "line": 549,
+          "source_statement": "assert(coroutine.status(co1) == 'dead')"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 552,
+          "source_statement": "a = function(a) coroutine.wrap(a)(a) end"
+        },
+        {
+          "name": "pcall",
+          "line": 553,
+          "source_statement": "assert(not pcall(a, a))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "closing-message-handlers-and-error-captures",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0011",
+      "first_line": 556,
+      "last_line": 590,
+      "span_end_line": 591,
+      "byte_offset": 13751,
+      "byte_length": 1025,
+      "span_sha256": "4258aac0b5ca4a280b7e04fb49bdd19648999ebef0c4966e332ae6decb9fde52",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Closing ignores a stale message handler overwritten by a live close local, returns the actual134 error, and failed resumes cannot overwrite a retained capture from an erroneous coroutine.",
+      "dynamic_invocation": "Execute the actual source calls coroutine.create@560, setmetatable@561, error@563, xpcall@568, coroutine.resume@571, coroutine.close@572, coroutine.create@577, error@580, coroutine.resume@583, coroutine.resume@585, _G.F@586, _G.F@587 in section closing-message-handlers-and-error-captures. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section closing-message-handlers-and-error-captures; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "coroutine.create",
+          "line": 560,
+          "source_statement": "  local c = coroutine.create(function()"
+        },
+        {
+          "name": "setmetatable",
+          "line": 561,
+          "source_statement": "    local clo <close> = setmetatable({}, {__close=function()"
+        },
+        {
+          "name": "error",
+          "line": 563,
+          "source_statement": "      error(x)"
+        },
+        {
+          "name": "xpcall",
+          "line": 568,
+          "source_statement": "    xpcall(coroutine.yield, function() return \"XXX\" end)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 571,
+          "source_statement": "  assert(coroutine.resume(c))   -- start coroutine"
+        },
+        {
+          "name": "coroutine.close",
+          "line": 572,
+          "source_statement": "  local st, msg = coroutine.close(c)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 577,
+          "source_statement": "local x = coroutine.create (function ()"
+        },
+        {
+          "name": "error",
+          "line": 580,
+          "source_statement": "            error('x')"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 583,
+          "source_statement": "assert(not coroutine.resume(x))"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 585,
+          "source_statement": "assert(not coroutine.resume(x, 1, 1, 1, 1, 1, 1, 1))"
+        },
+        {
+          "name": "_G.F",
+          "line": 586,
+          "source_statement": "assert(_G.F() == 11)"
+        },
+        {
+          "name": "_G.F",
+          "line": 587,
+          "source_statement": "assert(_G.F() == 12)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "T-hook-omission-boundary",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0012",
+      "first_line": 591,
+      "last_line": 594,
+      "span_end_line": 595,
+      "byte_offset": 14776,
+      "byte_length": 110,
+      "span_sha256": "6b4e4784bc2768b10b4299b6982342ad663145dcec5c68254fbe958b12302734",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The default branch emits the exact omission provenance; its successful continuation never certifies T-only hook/API bodies. The instrumented configuration must enter the following real C-driver obligations.",
+      "dynamic_invocation": "Section T-hook-omission-boundary defines/executes the source-local control and capture operations listed in its invariant; its invoked callback/closure bodies are checked by the unchanged callers in the same whole-file run, not by a declaration-only pass.",
+      "execution_condition": "Selected coroutine.lua section T-hook-omission-boundary; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [],
+      "guard_sites": [
+        {
+          "line": 591,
+          "source_statement": "if not T then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "T-count-hook-interleaving-and-live-top",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0013",
+      "first_line": 595,
+      "last_line": 650,
+      "span_end_line": 651,
+      "byte_offset": 14886,
+      "byte_length": 1518,
+      "span_sha256": "46b70d92d299070b19730ae4ee611eddf17f259d6536b8dbbbfd334e268b7281",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "C count hooks repeatedly yield alternating factorial coroutines through real lua_resume and preserve traceback/live multires top. Sizes0,1,3,100 survive hooks that push stack noise and yield at each operation.",
+      "dynamic_invocation": "Execute the actual source calls print@595, fact@602, coroutine.create@608, T.sethook@609, fact@610, coroutine.create@613, T.sethook@614, fact@615, T.resume@619, T.resume@620, debug.traceback@623, debug.traceback@624, coroutine.wrap@633, T.sethook@637, table.unpack@638, test@645, co@645, test@646, co@646, test@647, co@647, test@648, co@648 in section T-count-hook-interleaving-and-live-top. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-count-hook-interleaving-and-live-top; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 595,
+          "source_statement": "  print \"testing yields inside hooks\""
+        },
+        {
+          "name": "fact",
+          "line": 602,
+          "source_statement": "    else return x*fact(t, x-1)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 608,
+          "source_statement": "  local x = coroutine.create(function ()"
+        },
+        {
+          "name": "T.sethook",
+          "line": 609,
+          "source_statement": "    T.sethook(\"yield 0\", \"\", 2)"
+        },
+        {
+          "name": "fact",
+          "line": 610,
+          "source_statement": "    A = fact(\"A\", 6)"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 613,
+          "source_statement": "  local y = coroutine.create(function ()"
+        },
+        {
+          "name": "T.sethook",
+          "line": 614,
+          "source_statement": "    T.sethook(\"yield 0\", \"\", 3)"
+        },
+        {
+          "name": "fact",
+          "line": 615,
+          "source_statement": "    B = fact(\"B\", 7)"
+        },
+        {
+          "name": "T.resume",
+          "line": 619,
+          "source_statement": "    if A==0 then turn = \"A\"; assert(T.resume(x)) end"
+        },
+        {
+          "name": "T.resume",
+          "line": 620,
+          "source_statement": "    if B==0 then turn = \"B\"; assert(T.resume(y)) end"
+        },
+        {
+          "name": "debug.traceback",
+          "line": 623,
+          "source_statement": "    debug.traceback(x)"
+        },
+        {
+          "name": "debug.traceback",
+          "line": 624,
+          "source_statement": "    debug.traceback(y)"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 633,
+          "source_statement": "      return coroutine.wrap(function ()"
+        },
+        {
+          "name": "T.sethook",
+          "line": 637,
+          "source_statement": "        T.sethook(\"pushint 10; yield 0\", \"\", 1)   -- yield at each op."
+        },
+        {
+          "name": "table.unpack",
+          "line": 638,
+          "source_statement": "        local a1 = {table.unpack(a)}   -- must keep top between ops."
+        },
+        {
+          "name": "test",
+          "line": 645,
+          "source_statement": "    local co = test(0); while not done do co(30) end"
+        },
+        {
+          "name": "co",
+          "line": 645,
+          "source_statement": "    local co = test(0); while not done do co(30) end"
+        },
+        {
+          "name": "test",
+          "line": 646,
+          "source_statement": "    co = test(1); while not done do co(20, 10) end"
+        },
+        {
+          "name": "co",
+          "line": 646,
+          "source_statement": "    co = test(1); while not done do co(20, 10) end"
+        },
+        {
+          "name": "test",
+          "line": 647,
+          "source_statement": "    co = test(3); while not done do co() end"
+        },
+        {
+          "name": "co",
+          "line": 647,
+          "source_statement": "    co = test(3); while not done do co() end"
+        },
+        {
+          "name": "test",
+          "line": 648,
+          "source_statement": "    co = test(100); while not done do co() end"
+        },
+        {
+          "name": "co",
+          "line": 648,
+          "source_statement": "    co = test(100); while not done do co() end"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 601,
+          "source_statement": "    if x == 0 then return 1"
+        },
+        {
+          "line": 619,
+          "source_statement": "    if A==0 then turn = \"A\"; assert(T.resume(x)) end"
+        },
+        {
+          "line": 620,
+          "source_statement": "    if B==0 then turn = \"B\"; assert(T.resume(y)) end"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 618,
+          "source_statement": "  while A==0 or B==0 do    -- A ~= 0 when 'x' finishes (similar for 'B','y')"
+        },
+        {
+          "line": 635,
+          "source_statement": "        for i = 1, n do a[i] = i end"
+        },
+        {
+          "line": 640,
+          "source_statement": "        for i = 1, n do assert(a[i] == i) end"
+        },
+        {
+          "line": 645,
+          "source_statement": "    local co = test(0); while not done do co(30) end"
+        },
+        {
+          "line": 646,
+          "source_statement": "    co = test(1); while not done do co(20, 10) end"
+        },
+        {
+          "line": 647,
+          "source_statement": "    co = test(3); while not done do co() end"
+        },
+        {
+          "line": 648,
+          "source_statement": "    co = test(100); while not done do co() end"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 595,
+          "kind": "source-phase-output",
+          "source_statement": "  print \"testing yields inside hooks\""
+        }
+      ]
+    },
+    {
+      "id": "T-line-count-yield-and-debug-suspension",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0014",
+      "first_line": 651,
+      "last_line": 725,
+      "span_end_line": 726,
+      "byte_offset": 16404,
+      "byte_length": 2505,
+      "span_sha256": "6196fbfa92e1de0bfed4417d7ab36c8efc75b264bbbc5a89272c7c3390515b2c",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "Line and count C hooks yield only at the proper instruction boundary. Current line, live register values, suspended locals/vararg-table metadata, setlocal and last-C-frame inspection remain real and intact.",
+      "dynamic_invocation": "Execute the actual source calls debug.getinfo@651, coroutine.wrap@659, T.sethook@660, foo@660, co@663, co@664, co@665, co@666, co@667, coroutine.wrap@671, T.sethook@672, foo@672, co@676, coroutine.wrap@679, T.sethook@680, foo@680, co@684, coroutine.create@691, T.sethook@692, coroutine.resume@697, debug.getlocal@698, debug.getlocal@699, debug.setlocal@700, debug.getinfo@701, debug.getinfo@703, coroutine.resume@704, debug.getlocal@705, debug.getlocal@707, coroutine.resume@709, coroutine.resume@711, coroutine.create@717, T.testC@717, coroutine.resume@718, debug.getinfo@720, debug.getlocal@721 in section T-line-count-yield-and-debug-suspension. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-line-count-yield-and-debug-suspension; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "debug.getinfo",
+          "line": 651,
+          "source_statement": "  local line = debug.getinfo(1, \"l\").currentline + 2    -- get line number"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 659,
+          "source_statement": "  local co = coroutine.wrap(function ()"
+        },
+        {
+          "name": "T.sethook",
+          "line": 660,
+          "source_statement": "    T.sethook(\"setglobal X; yield 0\", \"l\", 0); foo(); return 10 end)"
+        },
+        {
+          "name": "foo",
+          "line": 660,
+          "source_statement": "    T.sethook(\"setglobal X; yield 0\", \"l\", 0); foo(); return 10 end)"
+        },
+        {
+          "name": "co",
+          "line": 663,
+          "source_statement": "  _G.X = nil; co(); assert(_G.X == line)"
+        },
+        {
+          "name": "co",
+          "line": 664,
+          "source_statement": "  _G.X = nil; co(); assert(_G.X == line + 1)"
+        },
+        {
+          "name": "co",
+          "line": 665,
+          "source_statement": "  _G.X = nil; co(); assert(_G.X == line + 2 and _G.XX == nil)"
+        },
+        {
+          "name": "co",
+          "line": 666,
+          "source_statement": "  _G.X = nil; co(); assert(_G.X == line + 3 and _G.XX == 20)"
+        },
+        {
+          "name": "co",
+          "line": 667,
+          "source_statement": "  assert(co() == 10)"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 671,
+          "source_statement": "  co = coroutine.wrap(function ()"
+        },
+        {
+          "name": "T.sethook",
+          "line": 672,
+          "source_statement": "    T.sethook(\"yield 0\", \"\", 1); foo(); return 10 end)"
+        },
+        {
+          "name": "foo",
+          "line": 672,
+          "source_statement": "    T.sethook(\"yield 0\", \"\", 1); foo(); return 10 end)"
+        },
+        {
+          "name": "co",
+          "line": 676,
+          "source_statement": "  repeat c = c + 1; local a = co() until a == 10"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 679,
+          "source_statement": "  co = coroutine.wrap(function ()"
+        },
+        {
+          "name": "T.sethook",
+          "line": 680,
+          "source_statement": "    T.sethook(\"yield 0\", \"\", 2); foo(); return 10 end)"
+        },
+        {
+          "name": "foo",
+          "line": 680,
+          "source_statement": "    T.sethook(\"yield 0\", \"\", 2); foo(); return 10 end)"
+        },
+        {
+          "name": "co",
+          "line": 684,
+          "source_statement": "  repeat c = c + 1; local a = co() until a == 10"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 691,
+          "source_statement": "    c = coroutine.create(function (a, ...)"
+        },
+        {
+          "name": "T.sethook",
+          "line": 692,
+          "source_statement": "      T.sethook(\"yield 0\", \"l\")   -- will yield on next two lines"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 697,
+          "source_statement": "    assert(coroutine.resume(c, 1, 2, 3))   -- start coroutine"
+        },
+        {
+          "name": "debug.getlocal",
+          "line": 698,
+          "source_statement": "    local n,v = debug.getlocal(c, 0, 1)    -- check its local"
+        },
+        {
+          "name": "debug.getlocal",
+          "line": 699,
+          "source_statement": "    assert(n == \"a\" and v == 1 and debug.getlocal(c, 0, 2) ~= \"b\")"
+        },
+        {
+          "name": "debug.setlocal",
+          "line": 700,
+          "source_statement": "    assert(debug.setlocal(c, 0, 1, 10))     -- test 'setlocal'"
+        },
+        {
+          "name": "debug.getinfo",
+          "line": 701,
+          "source_statement": "    local t = debug.getinfo(c, 0)        -- test 'getinfo'"
+        },
+        {
+          "name": "debug.getinfo",
+          "line": 703,
+          "source_statement": "    assert(not debug.getinfo(c, 1))      -- no other level"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 704,
+          "source_statement": "    assert(coroutine.resume(c))          -- run next line"
+        },
+        {
+          "name": "debug.getlocal",
+          "line": 705,
+          "source_statement": "    local n,v = debug.getlocal(c, 0, 2)    -- check vararg table"
+        },
+        {
+          "name": "debug.getlocal",
+          "line": 707,
+          "source_statement": "    local n,v = debug.getlocal(c, 0, 3)    -- check next local"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 709,
+          "source_statement": "    v = {coroutine.resume(c)}         -- finish coroutine"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 711,
+          "source_statement": "    assert(not coroutine.resume(c))"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 717,
+          "source_statement": "    local c = coroutine.create(function () T.testC(\"yield 1\", 10, 20) end)"
+        },
+        {
+          "name": "T.testC",
+          "line": 717,
+          "source_statement": "    local c = coroutine.create(function () T.testC(\"yield 1\", 10, 20) end)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 718,
+          "source_statement": "    local a, b = coroutine.resume(c)"
+        },
+        {
+          "name": "debug.getinfo",
+          "line": 720,
+          "source_statement": "    assert(debug.getinfo(c, 0).linedefined == -1)"
+        },
+        {
+          "name": "debug.getlocal",
+          "line": 721,
+          "source_statement": "    a, b = debug.getlocal(c, 0, 2)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 676,
+          "source_statement": "  repeat c = c + 1; local a = co() until a == 10"
+        },
+        {
+          "line": 684,
+          "source_statement": "  repeat c = c + 1; local a = co() until a == 10"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "T-C-resume-thread-reuse-and-running-errors",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0015",
+      "first_line": 726,
+      "last_line": 778,
+      "span_end_line": 779,
+      "byte_offset": 18909,
+      "byte_length": 1364,
+      "span_sha256": "5df6b698d52916d3d62acc3cbb1fb2cecb21eebc1fbced360f2b2c77e24ea181",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "The command driver creates/moves/resumes a real thread twice, transports statuses/results and reports running-main/coroutine resume errors with the actual unchanged stack shape.",
+      "dynamic_invocation": "Execute the actual source calls print@726, T.testC@729, coroutine.create@754, T.testC@755, coroutine.resume@763, string.find@764, T.testC@767, coroutine.running@775, string.find@775 in section T-C-resume-thread-reuse-and-running-errors. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-C-resume-thread-reuse-and-running-errors; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 726,
+          "source_statement": "  print \"testing coroutine API\""
+        },
+        {
+          "name": "T.testC",
+          "line": 729,
+          "source_statement": "  assert(T.testC([["
+        },
+        {
+          "name": "coroutine.create",
+          "line": 754,
+          "source_statement": "  C = coroutine.create(function ()"
+        },
+        {
+          "name": "T.testC",
+          "line": 755,
+          "source_statement": "        return T.testC([["
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 763,
+          "source_statement": "  local a, b, c, d = coroutine.resume(C)"
+        },
+        {
+          "name": "string.find",
+          "line": 764,
+          "source_statement": "  assert(a == true and string.find(b, \"non%-suspended\") and"
+        },
+        {
+          "name": "T.testC",
+          "line": 767,
+          "source_statement": "  a, b, c, d = T.testC([["
+        },
+        {
+          "name": "coroutine.running",
+          "line": 775,
+          "source_statement": "  assert(a == coroutine.running() and string.find(b, \"non%-suspended\") and"
+        },
+        {
+          "name": "string.find",
+          "line": 775,
+          "source_statement": "  assert(a == coroutine.running() and string.find(b, \"non%-suspended\") and"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 726,
+          "kind": "source-phase-output",
+          "source_statement": "  print \"testing coroutine API\""
+        }
+      ]
+    },
+    {
+      "id": "T-independent-main-thread-and-library-state",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0016",
+      "first_line": 779,
+      "last_line": 823,
+      "span_end_line": 824,
+      "byte_offset": 20273,
+      "byte_length": 1358,
+      "span_sha256": "7afe921ccf853ddc42d07e8503f56f387b19b39e674316bdb760338aabbe1cc0",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "A separately allocated real state distinguishes main/thread yieldability, opens only base/package while preloading coroutine, executes remote code, resumes the main thread with stack shadowing, preserves previous stack after completion and closes its owned state.",
+      "dynamic_invocation": "Execute the actual source calls T.newstate@780, T.testC@783, T.testC@786, T.testC@788, T.loadlib@790, T.doremote@792, table.pack@797, T.testC@797, T.doremote@814, T.doremote@815, T.doremote@816, T.closestate@818, print@820 in section T-independent-main-thread-and-library-state. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-independent-main-thread-and-library-state; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "T.newstate",
+          "line": 780,
+          "source_statement": "  local state = T.newstate()"
+        },
+        {
+          "name": "T.testC",
+          "line": 783,
+          "source_statement": "  assert(T.testC(state, \"newthread; isyieldable -1; remove 1; return 1\"))"
+        },
+        {
+          "name": "T.testC",
+          "line": 786,
+          "source_statement": "  assert(not T.testC(state, \"rawgeti R !M; isyieldable -1; remove 1; return 1\"))"
+        },
+        {
+          "name": "T.testC",
+          "line": 788,
+          "source_statement": "  T.testC(state, \"settop 0\")"
+        },
+        {
+          "name": "T.loadlib",
+          "line": 790,
+          "source_statement": "  T.loadlib(state, 1 | 2, 4)   -- load _G and 'package', preload 'coroutine'"
+        },
+        {
+          "name": "T.doremote",
+          "line": 792,
+          "source_statement": "  assert(T.doremote(state, [["
+        },
+        {
+          "name": "table.pack",
+          "line": 797,
+          "source_statement": "  local t = table.pack(T.testC(state, [["
+        },
+        {
+          "name": "T.testC",
+          "line": 797,
+          "source_statement": "  local t = table.pack(T.testC(state, [["
+        },
+        {
+          "name": "T.doremote",
+          "line": 814,
+          "source_statement": "  assert(T.doremote(state, \"return T\") == '2')"
+        },
+        {
+          "name": "T.doremote",
+          "line": 815,
+          "source_statement": "  assert(T.doremote(state, \"return A\") == 'AA')"
+        },
+        {
+          "name": "T.doremote",
+          "line": 816,
+          "source_statement": "  assert(T.doremote(state, \"return B\") == 'BB')"
+        },
+        {
+          "name": "T.closestate",
+          "line": 818,
+          "source_statement": "  T.closestate(state)"
+        },
+        {
+          "name": "print",
+          "line": 820,
+          "source_statement": "  print'+'"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 820,
+          "kind": "source-phase-output",
+          "source_statement": "  print'+'"
+        }
+      ]
+    },
+    {
+      "id": "pending-thread-and-full-stack-limit",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0017",
+      "first_line": 824,
+      "last_line": 855,
+      "span_end_line": 856,
+      "byte_offset": 21631,
+      "byte_length": 682,
+      "span_sha256": "db5f28f90639b66209adb7f9515362ef6590ec0cb87fb7e3039fd68d68bb6117",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "A pending wrapped coroutine remains owned until shutdown. The full non-soft million-slot unpack boundary cases fail when required and preserve the actual main-thread identity.",
+      "dynamic_invocation": "Execute the actual source calls coroutine.wrap@826, coroutine.yield@829, _G.TO_SURVIVE@832, coroutine.create@841, table.unpack@842, coroutine.resume@844, coroutine.running@851, print@853 in section pending-thread-and-full-stack-limit. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section pending-thread-and-full-stack-limit; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "coroutine.wrap",
+          "line": 826,
+          "source_statement": "_G.TO_SURVIVE = coroutine.wrap(function ()"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 829,
+          "source_statement": "      coroutine.yield()"
+        },
+        {
+          "name": "_G.TO_SURVIVE",
+          "line": 832,
+          "source_statement": "_G.TO_SURVIVE()"
+        },
+        {
+          "name": "coroutine.create",
+          "line": 841,
+          "source_statement": "    local co = coroutine.create(function()"
+        },
+        {
+          "name": "table.unpack",
+          "line": 842,
+          "source_statement": "           return table.unpack({}, 1, j)"
+        },
+        {
+          "name": "coroutine.resume",
+          "line": 844,
+          "source_statement": "    local r, msg = coroutine.resume(co)"
+        },
+        {
+          "name": "coroutine.running",
+          "line": 851,
+          "source_statement": "assert(coroutine.running() == main)"
+        },
+        {
+          "name": "print",
+          "line": 853,
+          "source_statement": "print\"+\""
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 835,
+          "source_statement": "if not _soft then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 839,
+          "source_statement": "  for i = 1, #t do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 853,
+          "kind": "source-phase-output",
+          "source_statement": "print\"+\""
+        }
+      ]
+    },
+    {
+      "id": "yielding-metamethod-definitions-and-model",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0018",
+      "first_line": 856,
+      "last_line": 919,
+      "span_end_line": 920,
+      "byte_offset": 22313,
+      "byte_length": 2323,
+      "span_sha256": "7cea08b5426693845ed3975f97f4c55d0925956f87f4b38e817a24eb0b387b9c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Actual metamethod bodies yield event tokens before returning values; the invoked run helper resumes until completion and checks every event token and exhaustion against the supplied model.",
+      "dynamic_invocation": "Execute the actual source calls print@856, type@859, coroutine.yield@863, val@863, coroutine.yield@864, val@864, coroutine.yield@865, coroutine.yield@866, val@867, coroutine.yield@868, val@868, coroutine.yield@869, val@869, coroutine.yield@870, val@870, coroutine.yield@871, val@872, coroutine.yield@873, val@873, coroutine.yield@874, val@874, coroutine.yield@875, val@875, coroutine.yield@876, val@876, coroutine.yield@877, val@878, coroutine.yield@879, val@880, coroutine.yield@882, val@883, coroutine.yield@885, val@886, coroutine.yield@887, val@888, coroutine.yield@891, val@892, ..val@892, coroutine.yield@894, coroutine.yield@895, setmetatable@900, new@904, new@905, new@906, coroutine.wrap@910, c@912 in section yielding-metamethod-definitions-and-model. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section yielding-metamethod-definitions-and-model; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 856,
+          "source_statement": "print\"testing yields inside metamethods\""
+        },
+        {
+          "name": "type",
+          "line": 859,
+          "source_statement": "  if type(x) == \"table\" then return x.x else return x end"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 863,
+          "source_statement": "  __eq = function(a,b) coroutine.yield(nil, \"eq\"); return val(a) == val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 863,
+          "source_statement": "  __eq = function(a,b) coroutine.yield(nil, \"eq\"); return val(a) == val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 863,
+          "source_statement": "  __eq = function(a,b) coroutine.yield(nil, \"eq\"); return val(a) == val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 864,
+          "source_statement": "  __lt = function(a,b) coroutine.yield(nil, \"lt\"); return val(a) < val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 864,
+          "source_statement": "  __lt = function(a,b) coroutine.yield(nil, \"lt\"); return val(a) < val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 864,
+          "source_statement": "  __lt = function(a,b) coroutine.yield(nil, \"lt\"); return val(a) < val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 865,
+          "source_statement": "  __le = function(a,b) coroutine.yield(nil, \"le\"); return a - b <= 0 end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 866,
+          "source_statement": "  __add = function(a,b) coroutine.yield(nil, \"add\");"
+        },
+        {
+          "name": "val",
+          "line": 867,
+          "source_statement": "                        return val(a) + val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 867,
+          "source_statement": "                        return val(a) + val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 868,
+          "source_statement": "  __sub = function(a,b) coroutine.yield(nil, \"sub\"); return val(a) - val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 868,
+          "source_statement": "  __sub = function(a,b) coroutine.yield(nil, \"sub\"); return val(a) - val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 868,
+          "source_statement": "  __sub = function(a,b) coroutine.yield(nil, \"sub\"); return val(a) - val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 869,
+          "source_statement": "  __mul = function(a,b) coroutine.yield(nil, \"mul\"); return val(a) * val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 869,
+          "source_statement": "  __mul = function(a,b) coroutine.yield(nil, \"mul\"); return val(a) * val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 869,
+          "source_statement": "  __mul = function(a,b) coroutine.yield(nil, \"mul\"); return val(a) * val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 870,
+          "source_statement": "  __div = function(a,b) coroutine.yield(nil, \"div\"); return val(a) / val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 870,
+          "source_statement": "  __div = function(a,b) coroutine.yield(nil, \"div\"); return val(a) / val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 870,
+          "source_statement": "  __div = function(a,b) coroutine.yield(nil, \"div\"); return val(a) / val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 871,
+          "source_statement": "  __idiv = function(a,b) coroutine.yield(nil, \"idiv\");"
+        },
+        {
+          "name": "val",
+          "line": 872,
+          "source_statement": "                         return val(a) // val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 872,
+          "source_statement": "                         return val(a) // val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 873,
+          "source_statement": "  __pow = function(a,b) coroutine.yield(nil, \"pow\"); return val(a) ^ val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 873,
+          "source_statement": "  __pow = function(a,b) coroutine.yield(nil, \"pow\"); return val(a) ^ val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 873,
+          "source_statement": "  __pow = function(a,b) coroutine.yield(nil, \"pow\"); return val(a) ^ val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 874,
+          "source_statement": "  __mod = function(a,b) coroutine.yield(nil, \"mod\"); return val(a) % val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 874,
+          "source_statement": "  __mod = function(a,b) coroutine.yield(nil, \"mod\"); return val(a) % val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 874,
+          "source_statement": "  __mod = function(a,b) coroutine.yield(nil, \"mod\"); return val(a) % val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 875,
+          "source_statement": "  __unm = function(a,b) coroutine.yield(nil, \"unm\"); return -val(a) end,"
+        },
+        {
+          "name": "val",
+          "line": 875,
+          "source_statement": "  __unm = function(a,b) coroutine.yield(nil, \"unm\"); return -val(a) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 876,
+          "source_statement": "  __bnot = function(a,b) coroutine.yield(nil, \"bnot\"); return ~val(a) end,"
+        },
+        {
+          "name": "val",
+          "line": 876,
+          "source_statement": "  __bnot = function(a,b) coroutine.yield(nil, \"bnot\"); return ~val(a) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 877,
+          "source_statement": "  __shl = function(a,b) coroutine.yield(nil, \"shl\");"
+        },
+        {
+          "name": "val",
+          "line": 878,
+          "source_statement": "                        return val(a) << val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 878,
+          "source_statement": "                        return val(a) << val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 879,
+          "source_statement": "  __shr = function(a,b) coroutine.yield(nil, \"shr\");"
+        },
+        {
+          "name": "val",
+          "line": 880,
+          "source_statement": "                        return val(a) >> val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 880,
+          "source_statement": "                        return val(a) >> val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 882,
+          "source_statement": "             coroutine.yield(nil, \"band\")"
+        },
+        {
+          "name": "val",
+          "line": 883,
+          "source_statement": "             return val(a) & val(b)"
+        },
+        {
+          "name": "val",
+          "line": 883,
+          "source_statement": "             return val(a) & val(b)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 885,
+          "source_statement": "  __bor = function(a,b) coroutine.yield(nil, \"bor\");"
+        },
+        {
+          "name": "val",
+          "line": 886,
+          "source_statement": "                        return val(a) | val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 886,
+          "source_statement": "                        return val(a) | val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 887,
+          "source_statement": "  __bxor = function(a,b) coroutine.yield(nil, \"bxor\");"
+        },
+        {
+          "name": "val",
+          "line": 888,
+          "source_statement": "                         return val(a) ~ val(b) end,"
+        },
+        {
+          "name": "val",
+          "line": 888,
+          "source_statement": "                         return val(a) ~ val(b) end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 891,
+          "source_statement": "               coroutine.yield(nil, \"concat\");"
+        },
+        {
+          "name": "val",
+          "line": 892,
+          "source_statement": "               return val(a) .. val(b)"
+        },
+        {
+          "name": "..val",
+          "line": 892,
+          "source_statement": "               return val(a) .. val(b)"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 894,
+          "source_statement": "  __index = function (t,k) coroutine.yield(nil, \"idx\"); return t.k[k] end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 895,
+          "source_statement": "  __newindex = function (t,k,v) coroutine.yield(nil, \"nidx\"); t.k[k] = v end,"
+        },
+        {
+          "name": "setmetatable",
+          "line": 900,
+          "source_statement": "  return setmetatable({x = x, k = {}}, mt)"
+        },
+        {
+          "name": "new",
+          "line": 904,
+          "source_statement": "local a = new(10)"
+        },
+        {
+          "name": "new",
+          "line": 905,
+          "source_statement": "local b = new(12)"
+        },
+        {
+          "name": "new",
+          "line": 906,
+          "source_statement": "local c = new\"hello\""
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 910,
+          "source_statement": "  local c = coroutine.wrap(f)"
+        },
+        {
+          "name": "c",
+          "line": 912,
+          "source_statement": "    local res, stat = c()"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 859,
+          "source_statement": "  if type(x) == \"table\" then return x.x else return x end"
+        },
+        {
+          "line": 913,
+          "source_statement": "    if res then assert(t[i] == undef); return res, t end"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 911,
+          "source_statement": "  while true do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 856,
+          "kind": "source-phase-output",
+          "source_statement": "print\"testing yields inside metamethods\""
+        }
+      ]
+    },
+    {
+      "id": "yielding-comparison-arithmetic-and-bitwise",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0019",
+      "first_line": 920,
+      "last_line": 974,
+      "span_end_line": 975,
+      "byte_offset": 24636,
+      "byte_length": 2555,
+      "span_sha256": "23f09b35582974dde7c9d6b398c86057b30392e3938596a5889260a678211579",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Every immediate/register/large-constant arithmetic, comparison and bitwise expression preserves result and exact metamethod-yield order, including nested le/sub handlers.",
+      "dynamic_invocation": "Execute the actual source calls run@920, run@922, run@924, run@927, run@929, run@930, run@931, run@932, run@933, run@934, run@935, run@937, run@938, run@939, run@940, run@941, run@942, run@943, new@946, run@948, run@949, run@950, run@951, run@952, run@953, run@957, run@959, run@960, run@961, run@962, run@963, run@965, run@966, run@967, run@968, run@969, run@970, run@971, run@972 in section yielding-comparison-arithmetic-and-bitwise. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section yielding-comparison-arithmetic-and-bitwise; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "run",
+          "line": 920,
+          "source_statement": "assert(run(function () if (a>=b) then return '>=' else return '<' end end,"
+        },
+        {
+          "name": "run",
+          "line": 922,
+          "source_statement": "assert(run(function () if (a<=b) then return '<=' else return '>' end end,"
+        },
+        {
+          "name": "run",
+          "line": 924,
+          "source_statement": "assert(run(function () if (a==b) then return '==' else return '~=' end end,"
+        },
+        {
+          "name": "run",
+          "line": 927,
+          "source_statement": "assert(run(function () return a & b + a end, {\"add\", \"band\"}) == 2)"
+        },
+        {
+          "name": "run",
+          "line": 929,
+          "source_statement": "assert(run(function () return 1 + a end, {\"add\"}) == 11)"
+        },
+        {
+          "name": "run",
+          "line": 930,
+          "source_statement": "assert(run(function () return a - 25 end, {\"sub\"}) == -15)"
+        },
+        {
+          "name": "run",
+          "line": 931,
+          "source_statement": "assert(run(function () return 2 * a end, {\"mul\"}) == 20)"
+        },
+        {
+          "name": "run",
+          "line": 932,
+          "source_statement": "assert(run(function () return a ^ 2 end, {\"pow\"}) == 100)"
+        },
+        {
+          "name": "run",
+          "line": 933,
+          "source_statement": "assert(run(function () return a / 2 end, {\"div\"}) == 5)"
+        },
+        {
+          "name": "run",
+          "line": 934,
+          "source_statement": "assert(run(function () return a % 6 end, {\"mod\"}) == 4)"
+        },
+        {
+          "name": "run",
+          "line": 935,
+          "source_statement": "assert(run(function () return a // 3 end, {\"idiv\"}) == 3)"
+        },
+        {
+          "name": "run",
+          "line": 937,
+          "source_statement": "assert(run(function () return a + b end, {\"add\"}) == 22)"
+        },
+        {
+          "name": "run",
+          "line": 938,
+          "source_statement": "assert(run(function () return a - b end, {\"sub\"}) == -2)"
+        },
+        {
+          "name": "run",
+          "line": 939,
+          "source_statement": "assert(run(function () return a * b end, {\"mul\"}) == 120)"
+        },
+        {
+          "name": "run",
+          "line": 940,
+          "source_statement": "assert(run(function () return a ^ b end, {\"pow\"}) == 10^12)"
+        },
+        {
+          "name": "run",
+          "line": 941,
+          "source_statement": "assert(run(function () return a / b end, {\"div\"}) == 10/12)"
+        },
+        {
+          "name": "run",
+          "line": 942,
+          "source_statement": "assert(run(function () return a % b end, {\"mod\"}) == 10)"
+        },
+        {
+          "name": "run",
+          "line": 943,
+          "source_statement": "assert(run(function () return a // b end, {\"idiv\"}) == 0)"
+        },
+        {
+          "name": "new",
+          "line": 946,
+          "source_statement": "local a1000 = new(1000)"
+        },
+        {
+          "name": "run",
+          "line": 948,
+          "source_statement": "assert(run(function () return a1000 + 1000 end, {\"add\"}) == 2000)"
+        },
+        {
+          "name": "run",
+          "line": 949,
+          "source_statement": "assert(run(function () return a1000 - 25000 end, {\"sub\"}) == -24000)"
+        },
+        {
+          "name": "run",
+          "line": 950,
+          "source_statement": "assert(run(function () return 2000 * a end, {\"mul\"}) == 20000)"
+        },
+        {
+          "name": "run",
+          "line": 951,
+          "source_statement": "assert(run(function () return a1000 / 1000 end, {\"div\"}) == 1)"
+        },
+        {
+          "name": "run",
+          "line": 952,
+          "source_statement": "assert(run(function () return a1000 % 600 end, {\"mod\"}) == 400)"
+        },
+        {
+          "name": "run",
+          "line": 953,
+          "source_statement": "assert(run(function () return a1000 // 500 end, {\"idiv\"}) == 2)"
+        },
+        {
+          "name": "run",
+          "line": 957,
+          "source_statement": "assert(run(function () return a % b end, {\"mod\"}) == 10)"
+        },
+        {
+          "name": "run",
+          "line": 959,
+          "source_statement": "assert(run(function () return ~a & b end, {\"bnot\", \"band\"}) == ~10 & 12)"
+        },
+        {
+          "name": "run",
+          "line": 960,
+          "source_statement": "assert(run(function () return a | b end, {\"bor\"}) == 10 | 12)"
+        },
+        {
+          "name": "run",
+          "line": 961,
+          "source_statement": "assert(run(function () return a ~ b end, {\"bxor\"}) == 10 ~ 12)"
+        },
+        {
+          "name": "run",
+          "line": 962,
+          "source_statement": "assert(run(function () return a << b end, {\"shl\"}) == 10 << 12)"
+        },
+        {
+          "name": "run",
+          "line": 963,
+          "source_statement": "assert(run(function () return a >> b end, {\"shr\"}) == 10 >> 12)"
+        },
+        {
+          "name": "run",
+          "line": 965,
+          "source_statement": "assert(run(function () return 10 & b end, {\"band\"}) == 10 & 12)"
+        },
+        {
+          "name": "run",
+          "line": 966,
+          "source_statement": "assert(run(function () return a | 2 end, {\"bor\"}) == 10 | 2)"
+        },
+        {
+          "name": "run",
+          "line": 967,
+          "source_statement": "assert(run(function () return a ~ 2 end, {\"bxor\"}) == 10 ~ 2)"
+        },
+        {
+          "name": "run",
+          "line": 968,
+          "source_statement": "assert(run(function () return a >> 2 end, {\"shr\"}) == 10 >> 2)"
+        },
+        {
+          "name": "run",
+          "line": 969,
+          "source_statement": "assert(run(function () return 1 >> a end, {\"shr\"}) == 1 >> 10)"
+        },
+        {
+          "name": "run",
+          "line": 970,
+          "source_statement": "assert(run(function () return a << 2 end, {\"shl\"}) == 10 << 2)"
+        },
+        {
+          "name": "run",
+          "line": 971,
+          "source_statement": "assert(run(function () return 1 << a end, {\"shl\"}) == 1 << 10)"
+        },
+        {
+          "name": "run",
+          "line": 972,
+          "source_statement": "assert(run(function () return 2 ~ a end, {\"bxor\"}) == 2 ~ 10)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 920,
+          "source_statement": "assert(run(function () if (a>=b) then return '>=' else return '<' end end,"
+        },
+        {
+          "line": 922,
+          "source_statement": "assert(run(function () if (a<=b) then return '<=' else return '>' end end,"
+        },
+        {
+          "line": 924,
+          "source_statement": "assert(run(function () if (a==b) then return '==' else return '~=' end end,"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "yielding-concat-and-comparison-chains",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0020",
+      "first_line": 975,
+      "last_line": 1021,
+      "span_end_line": 1022,
+      "byte_offset": 27191,
+      "byte_length": 1020,
+      "span_sha256": "5cab06244092cd2108f0139a6ffe6c3c8cb7c75530b3c29c25ad92fcc6387d6c",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Right-associated concatenation and distinct metatable ordering handlers can suspend repeatedly without losing operands or comparison continuation state.",
+      "dynamic_invocation": "Execute the actual source calls run@975, run@977, run@980, coroutine.yield@987, val@988, coroutine.yield@991, val@992, coroutine.wrap@998, co@1001, setmetatable@1007, setmetatable@1008, run@1018 in section yielding-concat-and-comparison-chains. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section yielding-concat-and-comparison-chains; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "run",
+          "line": 975,
+          "source_statement": "assert(run(function () return a..b end, {\"concat\"}) == \"1012\")"
+        },
+        {
+          "name": "run",
+          "line": 977,
+          "source_statement": "assert(run(function() return a .. b .. c .. a end,"
+        },
+        {
+          "name": "run",
+          "line": 980,
+          "source_statement": "assert(run(function() return \"a\" .. \"b\" .. a .. \"c\" .. c .. b .. \"x\" end,"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 987,
+          "source_statement": "      coroutine.yield(10)"
+        },
+        {
+          "name": "val",
+          "line": 988,
+          "source_statement": "      return (val(a) <= val(b))"
+        },
+        {
+          "name": "val",
+          "line": 988,
+          "source_statement": "      return (val(a) <= val(b))"
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 991,
+          "source_statement": "      coroutine.yield(10)"
+        },
+        {
+          "name": "val",
+          "line": 992,
+          "source_statement": "      return val(a) < val(b)"
+        },
+        {
+          "name": "val",
+          "line": 992,
+          "source_statement": "      return val(a) < val(b)"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 998,
+          "source_statement": "    local co = coroutine.wrap(f)"
+        },
+        {
+          "name": "co",
+          "line": 1001,
+          "source_statement": "      res = co()"
+        },
+        {
+          "name": "setmetatable",
+          "line": 1007,
+          "source_statement": "    local a1 = setmetatable({x=1}, mt1)"
+        },
+        {
+          "name": "setmetatable",
+          "line": 1008,
+          "source_statement": "    local a2 = setmetatable({x=2}, mt2)"
+        },
+        {
+          "name": "run",
+          "line": 1018,
+          "source_statement": "  run(test)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 1000,
+          "source_statement": "    repeat"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "yielding-index-environment-and-for-iterator",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0021",
+      "first_line": 1022,
+      "last_line": 1052,
+      "span_end_line": 1053,
+      "byte_offset": 28211,
+      "byte_length": 694,
+      "span_sha256": "af136baaf28bed8066926942ddce149143cc4be90a001ddf10000ded528501d6",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Index/newindex and replaced environment upvalue operations preserve write/read order through yields. Generic-for iteration resumes its iterator and accumulates the expected sum with exact yield token sequence.",
+      "dynamic_invocation": "Execute the actual source calls run@1022, new@1031, debug.setupvalue@1032, run@1033, print@1036, print@1038, coroutine.yield@1041, run@1045 in section yielding-index-environment-and-for-iterator. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section yielding-index-environment-and-for-iterator; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "run",
+          "line": 1022,
+          "source_statement": "assert(run(function ()"
+        },
+        {
+          "name": "new",
+          "line": 1031,
+          "source_statement": "local g = new(10); g.k.BBB = 10;"
+        },
+        {
+          "name": "debug.setupvalue",
+          "line": 1032,
+          "source_statement": "debug.setupvalue(f, 1, g)"
+        },
+        {
+          "name": "run",
+          "line": 1033,
+          "source_statement": "assert(run(f, {\"idx\", \"nidx\", \"idx\"}) == 11)"
+        },
+        {
+          "name": "print",
+          "line": 1036,
+          "source_statement": "print\"+\""
+        },
+        {
+          "name": "print",
+          "line": 1038,
+          "source_statement": "print\"testing yields inside 'for' iterators\""
+        },
+        {
+          "name": "coroutine.yield",
+          "line": 1041,
+          "source_statement": "      if i%2 == 0 then coroutine.yield(nil, \"for\") end"
+        },
+        {
+          "name": "run",
+          "line": 1045,
+          "source_statement": "assert(run(function ()"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 1041,
+          "source_statement": "      if i%2 == 0 then coroutine.yield(nil, \"for\") end"
+        },
+        {
+          "line": 1042,
+          "source_statement": "      if i < s then return i + 1 end"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 1047,
+          "source_statement": "             for i in f, 4, 0 do s = s + i end"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 1036,
+          "kind": "source-phase-output",
+          "source_statement": "print\"+\""
+        },
+        {
+          "line": 1038,
+          "kind": "source-phase-output",
+          "source_statement": "print\"testing yields inside 'for' iterators\""
+        }
+      ]
+    },
+    {
+      "id": "T-tail-omission-and-early-return",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0022",
+      "first_line": 1053,
+      "last_line": 1058,
+      "span_end_line": 1059,
+      "byte_offset": 28905,
+      "byte_length": 152,
+      "span_sha256": "cd1c51bffaa2801331f11404d2fc86f1bc721db7e153b8c0fd4dff616986348f",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Default emits the second exact coroutine API omission and returns after its early OK. Instrumented execution must pass this boundary and run every later continuation and nested-C-call assertion.",
+      "dynamic_invocation": "Execute the actual source calls print@1056 in section T-tail-omission-and-early-return. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-tail-omission-and-early-return; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 1056,
+          "source_statement": "  print \"OK\"; return"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 1054,
+          "source_statement": "if T==nil then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 1056,
+          "kind": "source-phase-output",
+          "source_statement": "  print \"OK\"; return"
+        }
+      ]
+    },
+    {
+      "id": "T-protected-K-error-and-repeated-yields",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0023",
+      "first_line": 1059,
+      "last_line": 1100,
+      "span_end_line": 1101,
+      "byte_offset": 29057,
+      "byte_length": 986,
+      "span_sha256": "4c69039bff801b1a36f2546d8be3d0d2f2eaf7322919a37415628fd48f365c21",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "Protected C continuations receive actual ERRRUN/YIELD statuses and context indices, retain preceding stack markers and adjust fixed/multiple results across repeated yields; completed wrapped C functions reject another resume.",
+      "dynamic_invocation": "Execute the actual source calls print@1059, coroutine.wrap@1063, T.testC@1064, table.unpack@1064, apico@1068, apico@1084, co@1090, co@1091, co@1092, pcall@1098 in section T-protected-K-error-and-repeated-yields. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-protected-K-error-and-repeated-yields; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 1059,
+          "source_statement": "print('testing coroutine API')"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 1063,
+          "source_statement": "  return coroutine.wrap(function ()"
+        },
+        {
+          "name": "T.testC",
+          "line": 1064,
+          "source_statement": "    return T.testC(table.unpack(x))"
+        },
+        {
+          "name": "table.unpack",
+          "line": 1064,
+          "source_statement": "    return T.testC(table.unpack(x))"
+        },
+        {
+          "name": "apico",
+          "line": 1068,
+          "source_statement": "local a = {apico("
+        },
+        {
+          "name": "apico",
+          "line": 1084,
+          "source_statement": "local co = apico("
+        },
+        {
+          "name": "co",
+          "line": 1090,
+          "source_statement": "assert(co() == 10)"
+        },
+        {
+          "name": "co",
+          "line": 1091,
+          "source_statement": "assert(co(20, 30) == 'a')"
+        },
+        {
+          "name": "co",
+          "line": 1092,
+          "source_statement": "a = {co()}"
+        },
+        {
+          "name": "pcall",
+          "line": 1098,
+          "source_statement": "assert(not pcall(co))   -- coroutine is dead now"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 1059,
+          "kind": "source-phase-output",
+          "source_statement": "print('testing coroutine API')"
+        }
+      ]
+    },
+    {
+      "id": "T-C-body-yield-and-closed-stack-slot",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0024",
+      "first_line": 1101,
+      "last_line": 1151,
+      "span_end_line": 1152,
+      "byte_offset": 30043,
+      "byte_length": 1518,
+      "span_sha256": "e30d3b54d6fe67cb67af58d1930a95bde9ae7d05638f3c1e1e39799122136878",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "Plain C yields resume to callers with supplied results; K continuation retains real C closure upvalues. A to-be-closed slot remains live while pcallk suspends and closes only when its continuation completes.",
+      "dynamic_invocation": "Execute the actual source calls T.makeCfunc@1101, coroutine.wrap@1102, f@1103, co@1105, co@1106, co@1107, T.makeCfunc@1111, coroutine.wrap@1125, coro@1128, func2close@1138, coro@1143, coroutine.wrap@1147, x@1148, eqtab@1149, x@1149 in section T-C-body-yield-and-closed-stack-slot. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-C-body-yield-and-closed-stack-slot; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "T.makeCfunc",
+          "line": 1101,
+          "source_statement": "f = T.makeCfunc(\"pushnum 3; pushnum 5; yield 1;\")"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 1102,
+          "source_statement": "co = coroutine.wrap(function ()"
+        },
+        {
+          "name": "f",
+          "line": 1103,
+          "source_statement": "  assert(f() == 23); assert(f() == 23); return 10"
+        },
+        {
+          "name": "f",
+          "line": 1103,
+          "source_statement": "  assert(f() == 23); assert(f() == 23); return 10"
+        },
+        {
+          "name": "co",
+          "line": 1105,
+          "source_statement": "assert(co(23,16) == 5)"
+        },
+        {
+          "name": "co",
+          "line": 1106,
+          "source_statement": "assert(co(23,16) == 5)"
+        },
+        {
+          "name": "co",
+          "line": 1107,
+          "source_statement": "assert(co(23,16) == 10)"
+        },
+        {
+          "name": "T.makeCfunc",
+          "line": 1111,
+          "source_statement": "f = T.makeCfunc([["
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 1125,
+          "source_statement": "  local coro = coroutine.wrap(T.testC)"
+        },
+        {
+          "name": "coro",
+          "line": 1128,
+          "source_statement": "  local res1, res2 = coro("
+        },
+        {
+          "name": "func2close",
+          "line": 1138,
+          "source_statement": "    func2close(function () X = true end),   -- (index 3): TBC slot"
+        },
+        {
+          "name": "coro",
+          "line": 1143,
+          "source_statement": "  local res1, res2, res3 = coro(34, \"hi\")  -- runs continuation function"
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 1147,
+          "source_statement": "x = coroutine.wrap(f)"
+        },
+        {
+          "name": "x",
+          "line": 1148,
+          "source_statement": "assert(x() == 102)"
+        },
+        {
+          "name": "eqtab",
+          "line": 1149,
+          "source_statement": "eqtab({x()}, {23, \"huu\"})"
+        },
+        {
+          "name": "x",
+          "line": 1149,
+          "source_statement": "eqtab({x()}, {23, \"huu\"})"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "T-C-thread-results-and-suspendable-chain",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0025",
+      "first_line": 1152,
+      "last_line": 1193,
+      "span_end_line": 1194,
+      "byte_offset": 31561,
+      "byte_length": 1218,
+      "span_sha256": "9f3628464d3d6ed85451b32bd1d26ab4a1ccd9ff40919ac414f5fe2495cc00d7",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "C commands transport a two-value yield through xmove/resume/status and resume to completion. A three-level K-aware C call chain yields at its leaf and runs exactly one saved continuation per level.",
+      "dynamic_invocation": "Execute the actual source calls T.makeCfunc@1152, T.testC@1154, T.makeCfunc@1165, coroutine.wrap@1187, f@1187, co@1188, co@1189 in section T-C-thread-results-and-suspendable-chain. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-C-thread-results-and-suspendable-chain; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "T.makeCfunc",
+          "line": 1152,
+          "source_statement": "f = T.makeCfunc[[pushstring 'a'; pushnum 102; yield 2; ]]"
+        },
+        {
+          "name": "T.testC",
+          "line": 1154,
+          "source_statement": "a, b, c, d = T.testC([[newthread; pushvalue 2; xmove 0 3 1; resume 3 0;"
+        },
+        {
+          "name": "T.makeCfunc",
+          "line": 1165,
+          "source_statement": "f = T.makeCfunc([["
+        },
+        {
+          "name": "coroutine.wrap",
+          "line": 1187,
+          "source_statement": "co = coroutine.wrap(function () return f(nil) end)"
+        },
+        {
+          "name": "f",
+          "line": 1187,
+          "source_statement": "co = coroutine.wrap(function () return f(nil) end)"
+        },
+        {
+          "name": "co",
+          "line": 1188,
+          "source_statement": "assert(co() == \"hello\")   -- argument to 'yield'"
+        },
+        {
+          "name": "co",
+          "line": 1189,
+          "source_statement": "a = {co()}"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 1181,
+          "source_statement": "  if count == 0 then return coroutine.yield"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "T-multistage-K-yield-and-protected-error",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0026",
+      "first_line": 1194,
+      "last_line": 1253,
+      "span_end_line": 1254,
+      "byte_offset": 32779,
+      "byte_length": 1747,
+      "span_sha256": "9e7f9cfbc189a4b4b89da99401e7673650eead1cf74f6269300d8094d0fdee3e",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "Four retained continuation scripts preserve original/resume arguments and full stack shape through zero/one-result yields, ordinary protected error return and pcallk error transfer; status/context/actual error text and final dead state are asserted.",
+      "dynamic_invocation": "Execute the actual source calls coroutine.wrap@1198, T.testC@1199, error@1225, co@1230, co@1232, co@1233, co@1234, type@1236, type@1237, type@1238, ]:find@1244, pcall@1248 in section T-multistage-K-yield-and-protected-error. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-multistage-K-yield-and-protected-error; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "coroutine.wrap",
+          "line": 1198,
+          "source_statement": "co = coroutine.wrap(function (...) return"
+        },
+        {
+          "name": "T.testC",
+          "line": 1199,
+          "source_statement": "       T.testC([[ # initial function"
+        },
+        {
+          "name": "error",
+          "line": 1225,
+          "source_statement": "       function (a,b) x=a; y=b; error(\"errmsg\") end,"
+        },
+        {
+          "name": "co",
+          "line": 1230,
+          "source_statement": "local a = {co(3,4,6)}"
+        },
+        {
+          "name": "co",
+          "line": 1232,
+          "source_statement": "a = {co()}; assert(a[1] == undef and _G.status == \"YIELD\" and _G.ctx == 2)"
+        },
+        {
+          "name": "co",
+          "line": 1233,
+          "source_statement": "a = {co()}; assert(a[1] == undef and _G.status == \"YIELD\" and _G.ctx == 3)"
+        },
+        {
+          "name": "co",
+          "line": 1234,
+          "source_statement": "a = {co(7,8)};"
+        },
+        {
+          "name": "type",
+          "line": 1236,
+          "source_statement": "assert(type(a[1]) == 'string' and type(a[2]) == 'string' and"
+        },
+        {
+          "name": "type",
+          "line": 1236,
+          "source_statement": "assert(type(a[1]) == 'string' and type(a[2]) == 'string' and"
+        },
+        {
+          "name": "type",
+          "line": 1237,
+          "source_statement": "     type(a[3]) == 'string' and type(a[4]) == 'string' and"
+        },
+        {
+          "name": "type",
+          "line": 1237,
+          "source_statement": "     type(a[3]) == 'string' and type(a[4]) == 'string' and"
+        },
+        {
+          "name": "type",
+          "line": 1238,
+          "source_statement": "     type(a[5]) == 'string' and type(a[6]) == 'function')"
+        },
+        {
+          "name": "type",
+          "line": 1238,
+          "source_statement": "     type(a[5]) == 'string' and type(a[6]) == 'function')"
+        },
+        {
+          "name": "]:find",
+          "line": 1244,
+          "source_statement": "assert(a[11]:find(\"errmsg\") and #a == 11)"
+        },
+        {
+          "name": "pcall",
+          "line": 1248,
+          "source_statement": "assert(not pcall(co))   -- coroutine should be dead"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "T-nested-protected-C-depth-tail-and-completion",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0027",
+      "first_line": 1254,
+      "last_line": 1263,
+      "span_end_line": 1264,
+      "byte_offset": 34526,
+      "byte_length": 226,
+      "span_sha256": "7a8269b2163ec8ad66e107c703ba9a4966840e6f38c50211947a2aaa730d21a3",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "The final nested protected-C call regression preserves the tenth hi value and reaches terminal OK only after the full instrumented tail; default early OK cannot serve as its evidence.",
+      "dynamic_invocation": "Execute the actual source calls coroutine.wrap@1255, pcall@1256, pcall@1257, table.unpack@1257, co@1260, print@1263 in section T-nested-protected-C-depth-tail-and-completion. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected coroutine.lua section T-nested-protected-C-depth-tail-and-completion; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "coroutine.wrap",
+          "line": 1255,
+          "source_statement": "local co = coroutine.wrap(function ()"
+        },
+        {
+          "name": "pcall",
+          "line": 1256,
+          "source_statement": "  local a = {pcall(pcall,pcall,pcall,pcall,pcall,pcall,pcall,error,\"hi\")}"
+        },
+        {
+          "name": "pcall",
+          "line": 1257,
+          "source_statement": "  return pcall(assert, table.unpack(a))"
+        },
+        {
+          "name": "table.unpack",
+          "line": 1257,
+          "source_statement": "  return pcall(assert, table.unpack(a))"
+        },
+        {
+          "name": "co",
+          "line": 1260,
+          "source_statement": "local a = {co()}"
+        },
+        {
+          "name": "print",
+          "line": 1263,
+          "source_statement": "print'OK'"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 1263,
+          "kind": "source-phase-output",
+          "source_statement": "print'OK'"
+        }
+      ]
+    }
+  ],
+  "supplemental_obligations": [
+    {
+      "id": "default-API-early-OK-and-return",
+      "runtime_id": "LUA-COROUTINE-REVIEWED-BLOCK-0028",
+      "first_line": 1056,
+      "last_line": 1056,
+      "span_end_line": 1057,
+      "byte_offset": 29031,
+      "byte_length": 21,
+      "span_sha256": "169bd6e8959d47ae76e9fde492058396f6f1a99e4f1574a773e37500de5fb534",
+      "configurations": [
+        "default"
+      ],
+      "invariant": "Default alone prints its one earlyOK and returns at source1056 after both exact omission reports. This is completion of the default path, never evidence of the instrumented K-continuation tail.",
+      "measured_condition": null,
+      "dynamic_invocation": "Observe the exact two default omission messages, then the earlyOK at1056 and immediate return, with balanced physical shutdown; instrumented tail execution is separately mandatory.",
+      "execution_condition": "T absent in the default configuration only.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "default/windows/validation/static-pic"
+      ]
+    }
+  ],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": [],
+  "default_omissions": [
+    {
+      "guard_line": 591,
+      "report_line": 592,
+      "message": ">>> testC not active: skipping coroutine API tests <<<",
+      "controlled_runtime_ids": [
+        "LUA-COROUTINE-REVIEWED-BLOCK-0013",
+        "LUA-COROUTINE-REVIEWED-BLOCK-0014",
+        "LUA-COROUTINE-REVIEWED-BLOCK-0015",
+        "LUA-COROUTINE-REVIEWED-BLOCK-0016"
+      ]
+    },
+    {
+      "guard_line": 1054,
+      "report_line": 1055,
+      "early_OK_line": 1056,
+      "message": ">>> testC not active: skipping coroutine API tests <<<",
+      "controlled_runtime_ids": [
+        "LUA-COROUTINE-REVIEWED-BLOCK-0023",
+        "LUA-COROUTINE-REVIEWED-BLOCK-0024",
+        "LUA-COROUTINE-REVIEWED-BLOCK-0025",
+        "LUA-COROUTINE-REVIEWED-BLOCK-0026",
+        "LUA-COROUTINE-REVIEWED-BLOCK-0027"
+      ]
+    }
+  ]
+}

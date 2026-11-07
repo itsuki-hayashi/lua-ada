@@ -70,7 +70,7 @@ try {
     # for later named-case replay. The expected warning belongs to one explicit
     # finalizer regression; any additional diagnostic fails this campaign.
     Write-Output $stdout
-    $expectedError = "Lua warning: error in __gc ((native):1: ordinary failure)`n"
+    $expectedError = "Lua warning: error in __gc ([string `"file-abort-test`"]:1: ordinary failure)`n"
     if (-not $completed -or $process.ExitCode -ne 0 -or $libraries.Count -eq 0 -or
         $stderr.Replace("`r`n","`n") -cne $expectedError -or
         $stdout -notmatch 'Total Tests Run:\s+([1-9][0-9]*)' -or

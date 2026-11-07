@@ -113,6 +113,9 @@ try {
         -Directory $root -Witness '"configuration":"upstream-test"'
     $runner = "$bin/conformance_runner$suffix"
     & "$PSScriptRoot/check-conformance-adapter.ps1" -Interpreter $runner
+    $null = Invoke-ObservedProcess -Name continuation-api -Executable $runner `
+        -Arguments @((Join-Path $root 'tests/instrumented/t_coroutine_api.lua')) `
+        -Directory $root -Witness 'T COROUTINE API OK' -Telemetry
     & "$PSScriptRoot/check-conformance-telemetry.ps1" -Interpreter $runner -Configuration upstream-test
     & "$PSScriptRoot/check-conformance-equivalents.ps1"
     & "$PSScriptRoot/check-conformance-scope.ps1"
@@ -121,9 +124,6 @@ try {
 
     Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')
-    & "$PSScriptRoot/check-gc-events.ps1" -Interpreter $runner `
-        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
-        -RuntimeDirectory $library -Configuration upstream-test -LibraryType $LibraryType
     if ($IsWindows) {
         & "$PSScriptRoot/check-windows-buffered-failure.ps1" -Interpreter $runner `
             -Configuration upstream-test -LibraryType $LibraryType `
@@ -137,7 +137,7 @@ try {
             -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua" `
             -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib"
     }
-    & "$PSScriptRoot/check-files-scoped.ps1" -Interpreter $runner `
+    & "$PSScriptRoot/check-expanded-conformance.ps1" -Interpreter $runner `
         -Configuration upstream-test -LibraryType $LibraryType -RuntimeDirectory $library `
         -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix"
     & "$PSScriptRoot/test-conformance-launcher.ps1" -Interpreter $runner `

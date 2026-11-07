@@ -1,0 +1,1146 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "goto.lua",
+  "role": "primary",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/goto.lua",
+    "sha256": "2e5168bba512878d4874398ba43d411741db0a68400a49818ec7b52ba62dc7cf",
+    "byte_length": 10668,
+    "line_count": 477
+  },
+  "original_anchor_count": 62,
+  "original_pending_ledger_sha256": "dcd546eceeeab734f071a6f8d960a8257a06c5ac34aae9d56015e8e15c71d3c3",
+  "appended_runtime_blocks": 12,
+  "proposal": {
+    "path": "tests/conformance/reviews/goto.expanded-classification-proposal.jsonl",
+    "sha256": "2f5b5c27e22b8dcf809ace1f40b1eaacdfcbfb159bbe3c1f685543b868a59edc"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/goto.jsonl",
+    "sha256": "0d9344de782a450311faa99408e5a9c15d2d62fa10350adaf916ca07bd3e2914"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "label-visibility-and-scope-errors",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 52,
+      "span_end_line": 53,
+      "byte_offset": 0,
+      "byte_length": 1181,
+      "span_sha256": "84a7b722fdb57da2ef20157abc980a83580b5ab1d580ef897fcb337977ace414",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The invoked errmsg helper requires compilation errors for missing/repeated labels, jumps into blocks and jumps over local/global declarations including repeat-until locals.",
+      "dynamic_invocation": "Execute the actual source calls print@8, collectgarbage@10, load@13, string.find@14, errmsg@18, errmsg@19, errmsg@22, errmsg@23, errmsg@28, errmsg@30, errmsg@32, errmsg@40, errmsg@41, errmsg@44 in section label-visibility-and-scope-errors. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section label-visibility-and-scope-errors; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 8,
+          "source_statement": "print(\"testing goto and global declarations\")"
+        },
+        {
+          "name": "collectgarbage",
+          "line": 10,
+          "source_statement": "collectgarbage()"
+        },
+        {
+          "name": "load",
+          "line": 13,
+          "source_statement": "  local st, msg = load(code)"
+        },
+        {
+          "name": "string.find",
+          "line": 14,
+          "source_statement": "  assert(not st and string.find(msg, m))"
+        },
+        {
+          "name": "errmsg",
+          "line": 18,
+          "source_statement": "errmsg([[ goto l1; do ::l1:: end ]], \"label 'l1'\")"
+        },
+        {
+          "name": "errmsg",
+          "line": 19,
+          "source_statement": "errmsg([[ do ::l1:: end goto l1; ]], \"label 'l1'\")"
+        },
+        {
+          "name": "errmsg",
+          "line": 22,
+          "source_statement": "errmsg([[ ::l1:: ::l1:: ]], \"label 'l1'\")"
+        },
+        {
+          "name": "errmsg",
+          "line": 23,
+          "source_statement": "errmsg([[ ::l1:: do ::l1:: end]], \"label 'l1'\")"
+        },
+        {
+          "name": "errmsg",
+          "line": 28,
+          "source_statement": "errmsg([[ goto l1; local aa ::l1:: ::l2:: print(3) ]], \"scope of 'aa'\")"
+        },
+        {
+          "name": "errmsg",
+          "line": 30,
+          "source_statement": "errmsg([[ goto l2; global *; ::l1:: ::l2:: print(3) ]], \"scope of '*'\")"
+        },
+        {
+          "name": "errmsg",
+          "line": 32,
+          "source_statement": "errmsg([["
+        },
+        {
+          "name": "errmsg",
+          "line": 40,
+          "source_statement": "errmsg([[ do ::l1:: end goto l1 ]], \"label 'l1'\")"
+        },
+        {
+          "name": "errmsg",
+          "line": 41,
+          "source_statement": "errmsg([[ goto l1 do ::l1:: end ]], \"label 'l1'\")"
+        },
+        {
+          "name": "errmsg",
+          "line": 44,
+          "source_statement": "errmsg([["
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 8,
+          "kind": "source-phase-output",
+          "source_statement": "print(\"testing goto and global declarations\")"
+        }
+      ]
+    },
+    {
+      "id": "label-execution-and-long-generated-labels",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0002",
+      "first_line": 53,
+      "last_line": 143,
+      "span_end_line": 144,
+      "byte_offset": 1181,
+      "byte_length": 1696,
+      "span_sha256": "612bc9bbd526ff4698b7f0d51478da1de483cd60f4bed16cc6db675735276594",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Forward/backward labels, multiple labels, end-of-block declaration jumps and a generated400-byte label program execute with their expected control flow; intentionally unreachable error calls remain unreachable.",
+      "dynamic_invocation": "Execute the actual source calls string.rep@75, string.format@76, load@77, error@100, ::foo@121 in section label-execution-and-long-generated-labels. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section label-execution-and-long-generated-labels; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "string.rep",
+          "line": 75,
+          "source_statement": "  local label = string.rep(\"0123456789\", 40)"
+        },
+        {
+          "name": "string.format",
+          "line": 76,
+          "source_statement": "  prog = string.format(prog, label, label, label, label)"
+        },
+        {
+          "name": "load",
+          "line": 77,
+          "source_statement": "  assert(assert(load(prog))() == 31)"
+        },
+        {
+          "name": "error",
+          "line": 100,
+          "source_statement": "  error(\"should not be here\")"
+        },
+        {
+          "name": "::foo",
+          "line": 121,
+          "source_statement": "::l6:: foo()"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 98,
+          "source_statement": "if print then"
+        },
+        {
+          "line": 118,
+          "source_statement": "  if not a[6] then a[6] = true; goto l3a end   -- do it twice"
+        },
+        {
+          "line": 130,
+          "source_statement": "  if x == nil then"
+        },
+        {
+          "line": 143,
+          "source_statement": "  if true then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 89,
+          "source_statement": "while true do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "backward-jump-local-lifetimes",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0003",
+      "first_line": 144,
+      "last_line": 181,
+      "span_end_line": 182,
+      "byte_offset": 2877,
+      "byte_length": 700,
+      "span_sha256": "9ce431a4813f6b08452fe92f1325f653a238f8c50e51743a9d4c58ad50c13f97",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Backward jumps reinitialize local registers and retain live values correctly; compile-only infinite-loop bodies remain unreachable through the outer escape.",
+      "dynamic_invocation": "Execute the actual source calls require@166 in section backward-jump-local-lifetimes. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section backward-jump-local-lifetimes; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "require",
+          "line": 166,
+          "source_statement": "local debug = require 'debug'"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 148,
+          "source_statement": "    if first then"
+        },
+        {
+          "line": 179,
+          "source_statement": "    if i > 2 then goto l2 end"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "closed-upvalue-identity-across-goto",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0004",
+      "first_line": 182,
+      "last_line": 229,
+      "span_end_line": 230,
+      "byte_offset": 3577,
+      "byte_length": 1274,
+      "span_sha256": "e86e6953cc0cf8563d62c9e9200115f5f89e1ccfefb93ff4e2ed502d44fd4e2a",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The six retained closures share or detach each a/b/c/d capture according to the actual crossed lexical scopes; debug.upvalueid distinguishes every required sharing relation.",
+      "dynamic_invocation": "Execute the actual source calls foo@192, debug.upvalueid@197, debug.upvalueid@203, debug.upvalueid@204, debug.upvalueid@209, debug.upvalueid@210, debug.upvalueid@212, debug.upvalueid@213, debug.upvalueid@218, debug.upvalueid@224 in section closed-upvalue-identity-across-goto. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section closed-upvalue-identity-across-goto; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "foo",
+          "line": 192,
+          "source_statement": "local a = foo()"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 197,
+          "source_statement": "  assert(debug.upvalueid(a[1], 1) == debug.upvalueid(a[i], 1))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 197,
+          "source_statement": "  assert(debug.upvalueid(a[1], 1) == debug.upvalueid(a[i], 1))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 203,
+          "source_statement": "  assert(debug.upvalueid(a[1], 2) ~= debug.upvalueid(a[i], 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 203,
+          "source_statement": "  assert(debug.upvalueid(a[1], 2) ~= debug.upvalueid(a[i], 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 204,
+          "source_statement": "  assert(debug.upvalueid(a[1], 3) ~= debug.upvalueid(a[i], 3))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 204,
+          "source_statement": "  assert(debug.upvalueid(a[1], 3) ~= debug.upvalueid(a[i], 3))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 209,
+          "source_statement": "  assert(debug.upvalueid(a[i], 2) == debug.upvalueid(a[i - 1], 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 209,
+          "source_statement": "  assert(debug.upvalueid(a[i], 2) == debug.upvalueid(a[i - 1], 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 210,
+          "source_statement": "  assert(debug.upvalueid(a[i], 3) == debug.upvalueid(a[i - 1], 3))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 210,
+          "source_statement": "  assert(debug.upvalueid(a[i], 3) == debug.upvalueid(a[i - 1], 3))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 212,
+          "source_statement": "  assert(debug.upvalueid(a[i], 2) ~= debug.upvalueid(a[i + 1], 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 212,
+          "source_statement": "  assert(debug.upvalueid(a[i], 2) ~= debug.upvalueid(a[i + 1], 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 213,
+          "source_statement": "  assert(debug.upvalueid(a[i], 3) ~= debug.upvalueid(a[i + 1], 3))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 213,
+          "source_statement": "  assert(debug.upvalueid(a[i], 3) ~= debug.upvalueid(a[i + 1], 3))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 218,
+          "source_statement": "  assert(debug.upvalueid(a[1], 4) == debug.upvalueid(a[i], 4))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 218,
+          "source_statement": "  assert(debug.upvalueid(a[1], 4) == debug.upvalueid(a[i], 4))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 224,
+          "source_statement": "    assert((debug.upvalueid(a[i], 4) == debug.upvalueid(a[j], 4))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 224,
+          "source_statement": "    assert((debug.upvalueid(a[i], 4) == debug.upvalueid(a[j], 4))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 196,
+          "source_statement": "for i = 2, 6 do"
+        },
+        {
+          "line": 201,
+          "source_statement": "for i = 2, 6 do"
+        },
+        {
+          "line": 207,
+          "source_statement": "for i = 3, 5, 2 do"
+        },
+        {
+          "line": 217,
+          "source_statement": "for i = 2, 6, 2 do"
+        },
+        {
+          "line": 222,
+          "source_statement": "for i = 3, 5, 2 do"
+        },
+        {
+          "line": 223,
+          "source_statement": "  for j = 1, 6 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "conditional-goto-and-close-transfers",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0005",
+      "first_line": 230,
+      "last_line": 294,
+      "span_end_line": 295,
+      "byte_offset": 4851,
+      "byte_length": 1363,
+      "span_sha256": "c25caaec987c0f38418b1aa63b5d55da95be6b8493256ac8e260118def44abf4",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "All five testG branches select their expected return. Gotos around a to-be-closed local preserve its truthy value on in-scope jumps and make that local name unavailable after scope exit. The supplied close callback resets its named global; the later not-varX assertion itself checks name visibility, not that global side effect.",
+      "dynamic_invocation": "Execute the actual source calls error@235, error@240, error@245, error@247, testG@256, testG@257, testG@258, testG@259, testG@260, setmetatable@270, newobj@280, foo@293 in section conditional-goto-and-close-transfers. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section conditional-goto-and-close-transfers; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "error",
+          "line": 235,
+          "source_statement": "    error(\"should never be here!\")"
+        },
+        {
+          "name": "error",
+          "line": 240,
+          "source_statement": "    error(\"should never be here!\")"
+        },
+        {
+          "name": "error",
+          "line": 245,
+          "source_statement": "    error(\"should never be here!\")"
+        },
+        {
+          "name": "error",
+          "line": 247,
+          "source_statement": "    error(\"should never be here!\")"
+        },
+        {
+          "name": "testG",
+          "line": 256,
+          "source_statement": "assert(testG(1) == \"1\")"
+        },
+        {
+          "name": "testG",
+          "line": 257,
+          "source_statement": "assert(testG(2) == \"2\")"
+        },
+        {
+          "name": "testG",
+          "line": 258,
+          "source_statement": "assert(testG(3) == \"3\")"
+        },
+        {
+          "name": "testG",
+          "line": 259,
+          "source_statement": "assert(testG(4) == 5)"
+        },
+        {
+          "name": "testG",
+          "line": 260,
+          "source_statement": "assert(testG(5) == 10)"
+        },
+        {
+          "name": "setmetatable",
+          "line": 270,
+          "source_statement": "    return setmetatable({}, {__close = function ()"
+        },
+        {
+          "name": "newobj",
+          "line": 280,
+          "source_statement": "  local varX <close> = newobj(\"X\")"
+        },
+        {
+          "name": "foo",
+          "line": 293,
+          "source_statement": "foo()"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 233,
+          "source_statement": "  if a == 1 then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "global-declaration-errors-and-shadowing",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0006",
+      "first_line": 295,
+      "last_line": 327,
+      "span_end_line": 328,
+      "byte_offset": 6214,
+      "byte_length": 824,
+      "span_sha256": "da7df36837c4feba5ff2785cb8f1c017b5ba6f9025fb7d7ba2d83785a2b7a999",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "The invoked checkerr helper rejects undeclared/global-close/_ENV errors with source names, while declared globals can shadow locals only in their intended scope.",
+      "dynamic_invocation": "Execute the actual source calls load@298, string.find@299, checkerr@306, checkerr@307, checkerr@310, checkerr@311, checkerr@321, checkerr@324 in section global-declaration-errors-and-shadowing. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section global-declaration-errors-and-shadowing; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "load",
+          "line": 298,
+          "source_statement": "  local st, msg = load(code)"
+        },
+        {
+          "name": "string.find",
+          "line": 299,
+          "source_statement": "  assert(not st and string.find(msg, err))"
+        },
+        {
+          "name": "checkerr",
+          "line": 306,
+          "source_statement": "  checkerr(\"global none; X = 1\", \"variable 'X'\")"
+        },
+        {
+          "name": "checkerr",
+          "line": 307,
+          "source_statement": "  checkerr(\"global none; function XX() end\", \"variable 'XX'\")"
+        },
+        {
+          "name": "checkerr",
+          "line": 310,
+          "source_statement": "  checkerr(\"global X<close>\", \"cannot be\")"
+        },
+        {
+          "name": "checkerr",
+          "line": 311,
+          "source_statement": "  checkerr(\"global <close> *\", \"cannot be\")"
+        },
+        {
+          "name": "checkerr",
+          "line": 321,
+          "source_statement": "  checkerr(\"global _ENV, a; a = 10\", \"variable 'a'\")"
+        },
+        {
+          "name": "checkerr",
+          "line": 324,
+          "source_statement": "  checkerr([["
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "default-global-identifier",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0007",
+      "first_line": 328,
+      "last_line": 331,
+      "span_end_line": 332,
+      "byte_offset": 7038,
+      "byte_length": 177,
+      "span_sha256": "2bb149a9a32213cf8325a2549c72a0e9205bf049b52ef56793b3b9d0fa7bef2c",
+      "configurations": [
+        "default"
+      ],
+      "invariant": "Default LUA_COMPAT_GLOBAL=1 permits global as an ordinary identifier in the loaded program and emits its reserved-word diagnostic witness.",
+      "dynamic_invocation": "Execute the actual source calls load@329, print@330 in section default-global-identifier. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section default-global-identifier; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "default/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "load",
+          "line": 329,
+          "source_statement": "    assert(load(\"global = 1; return global\")() == 1)"
+        },
+        {
+          "name": "print",
+          "line": 330,
+          "source_statement": "    print \"  ('global' is not a reserved word)\""
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 328,
+          "source_statement": "  if not T then  -- when not in \"test mode\", \"global\" isn't reserved"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 330,
+          "kind": "source-phase-output",
+          "source_statement": "    print \"  ('global' is not a reserved word)\""
+        }
+      ]
+    },
+    {
+      "id": "instrumented-global-reservation",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0008",
+      "first_line": 332,
+      "last_line": 335,
+      "span_end_line": 336,
+      "byte_offset": 7215,
+      "byte_length": 112,
+      "span_sha256": "cce62c6357d1ef9208c9000b1f5ab363f90dfc7ddefc5566c2059e3ebdee8ca2",
+      "configurations": [
+        "upstream-test"
+      ],
+      "invariant": "The upstream-test lexer reserves global; compilation of the same ordinary identifier program fails without executing it.",
+      "dynamic_invocation": "Execute the actual source calls load@333 in section instrumented-global-reservation. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section instrumented-global-reservation; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "load",
+          "line": 333,
+          "source_statement": "    assert(not load(\"global = 1; return global\"))"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "global-constant-and-redeclaration-scopes",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0009",
+      "first_line": 336,
+      "last_line": 386,
+      "span_end_line": 387,
+      "byte_offset": 7327,
+      "byte_length": 1034,
+      "span_sha256": "c07b89e7d9d3a7d7faf2309480de3a44c6a8719b27e181afcb7fa1d0c37cf908",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Global functions recurse through their declared global binding; local shadowing survives; const globals reject assignment/function syntax at correct source lines; wildcard const/read-write transitions preserve actual globals.",
+      "dynamic_invocation": "Execute the actual source calls foo@339, foo@341, _ENV.foo@343, checkerr@351, checkerr@356, checkerr@363, checkerr@369 in section global-constant-and-redeclaration-scopes. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section global-constant-and-redeclaration-scopes; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "foo",
+          "line": 339,
+          "source_statement": "      if x == 0 then return 1 else return 2 * foo(x - 1) end"
+        },
+        {
+          "name": "foo",
+          "line": 341,
+          "source_statement": "    assert(foo == _ENV.foo and foo(4) == 16)"
+        },
+        {
+          "name": "_ENV.foo",
+          "line": 343,
+          "source_statement": "  assert(_ENV.foo(4) == 16)"
+        },
+        {
+          "name": "checkerr",
+          "line": 351,
+          "source_statement": "  checkerr([["
+        },
+        {
+          "name": "checkerr",
+          "line": 356,
+          "source_statement": "  checkerr([["
+        },
+        {
+          "name": "checkerr",
+          "line": 363,
+          "source_statement": "  checkerr([["
+        },
+        {
+          "name": "checkerr",
+          "line": 369,
+          "source_statement": "  checkerr([["
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 339,
+          "source_statement": "      if x == 0 then return 1 else return 2 * foo(x - 1) end"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "large-generated-declaration-tables",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0010",
+      "first_line": 387,
+      "last_line": 414,
+      "span_end_line": 415,
+      "byte_offset": 8361,
+      "byte_length": 632,
+      "span_sha256": "23fc601f7ece4d18a435af4f6ad392e8ab197fc78975435f9bc45d2ba8ccec2a",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Programs generated with1000 global declarations or200 alternating global/local declarations compile and return the actual final values, including names beyond constant/register shortcut ranges.",
+      "dynamic_invocation": "Execute the actual source calls table.concat@395, load@397, table.concat@409, load@411 in section large-generated-declaration-tables. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section large-generated-declaration-tables; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "table.concat",
+          "line": 395,
+          "source_statement": "  code = table.concat(code)"
+        },
+        {
+          "name": "load",
+          "line": 397,
+          "source_statement": "  assert(load(code)() == 11)"
+        },
+        {
+          "name": "table.concat",
+          "line": 409,
+          "source_statement": "  code = table.concat(code)"
+        },
+        {
+          "name": "load",
+          "line": 411,
+          "source_statement": "  assert(assert(load(code))() == 2*200 + 11)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 391,
+          "source_statement": "  for i = 1, 1000 do"
+        },
+        {
+          "line": 404,
+          "source_statement": "  for i = 1, 200 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "global-initializer-adjustment-and-environments",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0011",
+      "first_line": 415,
+      "last_line": 461,
+      "span_end_line": 462,
+      "byte_offset": 8993,
+      "byte_length": 1258,
+      "span_sha256": "2585c8b17265bdd005709416f856d54ab90bfb41a4ed55390f0114477df82197",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Global initializers preserve multires adjustment, nil fill, visibility of outer locals and cleanup. A generated300-constant function initializes the explicitly supplied _ENV with actual named values.",
+      "dynamic_invocation": "Execute the actual source calls print@415, table.concat@447, string.format@448, load@455, fun@458 in section global-initializer-adjustment-and-environments. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section global-initializer-adjustment-and-environments; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 415,
+          "source_statement": "do  print \"testing initialization in global declarations\""
+        },
+        {
+          "name": "table.concat",
+          "line": 447,
+          "source_statement": "  code = table.concat(code, \",\")"
+        },
+        {
+          "name": "string.format",
+          "line": 448,
+          "source_statement": "  code = string.format([["
+        },
+        {
+          "name": "load",
+          "line": 455,
+          "source_statement": "  local fun = assert(load(code))()"
+        },
+        {
+          "name": "fun",
+          "line": 458,
+          "source_statement": "  fun(env)"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 446,
+          "source_statement": "  for i = 1, 300 do code[i] = \"'\" .. i .. \"'\" end"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 415,
+          "kind": "source-phase-output",
+          "source_statement": "do  print \"testing initialization in global declarations\""
+        }
+      ]
+    },
+    {
+      "id": "runtime-global-redefinition-errors-and-completion",
+      "runtime_id": "LUA-GOTO-REVIEWED-BLOCK-0012",
+      "first_line": 462,
+      "last_line": 477,
+      "span_end_line": 478,
+      "byte_offset": 10251,
+      "byte_length": 417,
+      "span_sha256": "e92b8481018bc708fbc041443d11f9241215d027912416419355504f46d0ace2",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Redefining already-present globals raises the expected named runtime errors even for false values in a replaced _ENV. Terminal OK follows the generated and runtime-error tests.",
+      "dynamic_invocation": "Execute the actual source calls load@466, pcall@467, string.find@468, load@470, pcall@471, string.find@472, print@476 in section runtime-global-redefinition-errors-and-completion. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected goto.lua section runtime-global-redefinition-errors-and-completion; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "load",
+          "line": 466,
+          "source_statement": "  local f = assert(load(\"global print = 10\"))"
+        },
+        {
+          "name": "pcall",
+          "line": 467,
+          "source_statement": "  local st, msg = pcall(f)"
+        },
+        {
+          "name": "string.find",
+          "line": 468,
+          "source_statement": "  assert(string.find(msg, \"global 'print' already defined\"))"
+        },
+        {
+          "name": "load",
+          "line": 470,
+          "source_statement": "  local f = assert(load(\"local _ENV = {AA = false}; global AA = 10\"))"
+        },
+        {
+          "name": "pcall",
+          "line": 471,
+          "source_statement": "  local st, msg = pcall(f)"
+        },
+        {
+          "name": "string.find",
+          "line": 472,
+          "source_statement": "  assert(string.find(msg, \"global 'AA' already defined\"))"
+        },
+        {
+          "name": "print",
+          "line": 476,
+          "source_statement": "print'OK'"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 476,
+          "kind": "source-phase-output",
+          "source_statement": "print'OK'"
+        }
+      ]
+    }
+  ],
+  "supplemental_obligations": [],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": []
+}

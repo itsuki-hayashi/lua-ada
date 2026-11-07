@@ -1,5 +1,24 @@
 # Project Status
 
+## Expanded T conformance (2026-11-07)
+
+The approved delivery on codex/m3-expanded-t-conformance retains the nine
+previously exercised primary files and adds constructs.lua, closure.lua,
+pm.lua and math.lua. It must resolve every selected T obligation and the
+bwcoercion.lua helper across all 26 contexts. Implementation and acceptance
+are in progress; no additional file or complete T coverage is claimed.
+The [current session](sessions/2026-11-07-expanded-t-conformance.md) records
+the failed initial draft build and the remaining verification work.
+
+Current local Windows/upstream-test/validation/static evidence passes 1,380
+AUnit cases, the seven-phase C-driver regression and unchanged coroutine.lua
+with both T API sections enabled. Separate native default/instrumented runs
+pass 48 new public C contract cases. These dirty local observations do not
+complete the 13-file or 26-context gate; scoped source/API/runtime evidence
+and final-revision acceptance remain pending.
+The full local default/validation/static pipeline also passes all 13 primary
+files, both constructs templates and retained consumer/CLI/binary checks.
+
 ## Four-file conformance follow-up (2026-11-07)
 
 [PR #9](https://github.com/itsuki-hayashi/lua-ada/pull/9) covers
@@ -27,8 +46,12 @@ resolved 708 runtime/audit entries and 77 scoped API entries; 191 lexical
 entries retain their non-runtime classifications. The
 [contract index](../tests/conformance/scopes/gc-io-events.contracts.json)
 binds each operation to its approved protocol. Final scoped acceptance
-requires a fresh 26-context run against the resolved ledger and approved
-contracts, followed by independent reconciliation of all 208 process reports.
+passed at 6b263193e8c165df75158f144cf4738dbb040def in workflows
+[42330407879](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42330407879)
+and [42330402884](https://github.com/itsuki-hayashi/lua-ada/actions/runs/42330402884).
+Both passed all 24 jobs/26 contexts; independent reconciliation accepted all
+104 operations and 208 process reports. PR #9 is merged. Final certificates
+are published in its tested head's gc-io-events-conformance Git note.
 Full M3, aggregate and heavy execution, and unrelated C ABI obligations remain
 outside this scope.
 

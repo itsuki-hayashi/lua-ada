@@ -3,7 +3,15 @@
 IDs are stable. Completion requires evidence, including relevant platform gates.
 M1 is complete; [all five gates passed](validation.md).
 
-The active 2026-11-07 bounded follow-up is `gc-io-events` on
+The active 2026-11-07 delivery is `expanded-t-conformance` on
+`codex/m3-expanded-t-conformance`, based on merged PR #9. It retains all nine
+previously exercised primary files, adds constructs.lua, closure.lua, pm.lua
+and math.lua, and resolves their T/helper obligations in all 26 contexts.
+See the [current session](sessions/2026-11-07-expanded-t-conformance.md).
+Implementation and complete acceptance remain in progress. Merge is authorized
+after passing current-head CI, independent scoped acceptance and review fixes.
+
+The preceding 2026-11-07 bounded follow-up was `gc-io-events` on
 `codex/m3-gc-io-conformance`, based on merged PR #8. It covers events.lua,
 gc.lua, gengc.lua and files.lua, including T and all 26 applicable contexts.
 This supersedes earlier branch instructions for this batch only. Existing M3

@@ -1,0 +1,922 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "closure.lua",
+  "role": "primary",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/closure.lua",
+    "sha256": "d03b641a7a7c4cb395762321200532f786e1554395e8499838e702b56d21880a",
+    "byte_length": 5784,
+    "line_count": 279
+  },
+  "original_anchor_count": 63,
+  "original_pending_ledger_sha256": "d6a444885d141c7377dc9ff61aee272084b375006dc6643023536a436d0123c4",
+  "appended_runtime_blocks": 8,
+  "proposal": {
+    "path": "tests/conformance/reviews/closure.expanded-classification-proposal.jsonl",
+    "sha256": "e4dc85eeae7f1a811689f731aa6ff6fb852605efaba4eaa65fd939b8b4797630"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/closure.jsonl",
+    "sha256": "378314fc66c2e6af9df740a030a1aea975bf582e7ffc345e022fe18fe8e86874"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "environment-boolean-key-and-retained-captures",
+      "runtime_id": "LUA-CLOSURE-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 53,
+      "span_end_line": 54,
+      "byte_offset": 0,
+      "byte_length": 1065,
+      "span_sha256": "2e706f0fb8a670b7627289a644116ff38005663f2421e7ed4fd64cbfa804207f",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "An environment boolean key survives closure access. One thousand separately captured cells survive explicit and allocation-pressure collections; shared outer A/B updates and each independent y state remain correct.",
+      "dynamic_invocation": "Execute the actual source calls print@6, aux@11, collectgarbage@26, dummy@27, collectgarbage@30, f@35, setmetatable@38, collectgarbage@46, getmetatable@51 in section environment-boolean-key-and-retained-captures. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected closure.lua section environment-boolean-key-and-retained-captures; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "print",
+          "line": 6,
+          "source_statement": "print \"testing closures\""
+        },
+        {
+          "name": "aux",
+          "line": 11,
+          "source_statement": "  assert(aux() == 10)"
+        },
+        {
+          "name": "collectgarbage",
+          "line": 26,
+          "source_statement": "  collectgarbage()"
+        },
+        {
+          "name": "dummy",
+          "line": 27,
+          "source_statement": "  A = 1; assert(dummy() == a[1]); A = 0;"
+        },
+        {
+          "name": "collectgarbage",
+          "line": 30,
+          "source_statement": "  collectgarbage()"
+        },
+        {
+          "name": "f",
+          "line": 35,
+          "source_statement": "local a = f(10)"
+        },
+        {
+          "name": "setmetatable",
+          "line": 38,
+          "source_statement": "setmetatable(x, {__mode = 'kv'})"
+        },
+        {
+          "name": "collectgarbage",
+          "line": 46,
+          "source_statement": "collectgarbage()"
+        },
+        {
+          "name": "getmetatable",
+          "line": 51,
+          "source_statement": "assert(getmetatable(x).__mode == 'kv')"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 19,
+          "source_statement": "  for i=1,1000 do"
+        },
+        {
+          "line": 39,
+          "source_statement": "while x[1] do   -- repeat until GC"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 6,
+          "kind": "source-phase-output",
+          "source_statement": "print \"testing closures\""
+        }
+      ]
+    },
+    {
+      "id": "closure-identity-and-for-capture-cells",
+      "runtime_id": "LUA-CLOSURE-REVIEWED-BLOCK-0002",
+      "first_line": 54,
+      "last_line": 97,
+      "span_end_line": 98,
+      "byte_offset": 1065,
+      "byte_length": 801,
+      "span_sha256": "0f2f03e9e69f91b7a79be1d0933886778227e09dee5ac191f1dd42d2bc80c8f2",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Closures with different loop captures are distinct while returning the same retained closure preserves identity. Numeric-loop captures and per-iteration k cells survive break and independent setter mutations.",
+      "dynamic_invocation": "Execute the actual source calls math.sin@62, f@66, ].set@88, ].get@89, ].get@91, ].set@93, ].get@94 in section closure-identity-and-for-capture-cells. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected closure.lua section closure-identity-and-for-capture-cells; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "math.sin",
+          "line": 62,
+          "source_statement": "  local a = function (x)  return math.sin(_ENV[x])  end"
+        },
+        {
+          "name": "f",
+          "line": 66,
+          "source_statement": "  assert(f() == f())"
+        },
+        {
+          "name": "f",
+          "line": 66,
+          "source_statement": "  assert(f() == f())"
+        },
+        {
+          "name": "].set",
+          "line": 88,
+          "source_statement": "a[1].set(10)"
+        },
+        {
+          "name": "].get",
+          "line": 89,
+          "source_statement": "local r,s = a[2].get()"
+        },
+        {
+          "name": "].get",
+          "line": 91,
+          "source_statement": "r,s = a[1].get()"
+        },
+        {
+          "name": "].set",
+          "line": 93,
+          "source_statement": "a[2].set('a')"
+        },
+        {
+          "name": "].get",
+          "line": 94,
+          "source_statement": "r,s = a[2].get()"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 74,
+          "source_statement": "  if i == 3 then break end"
+        },
+        {
+          "line": 86,
+          "source_statement": "  if i == 2 then break end"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 58,
+          "source_statement": "for i = 1, 5 do  a[i] = function (x) return i + a + _ENV end  end"
+        },
+        {
+          "line": 72,
+          "source_statement": "for i=1,10 do"
+        },
+        {
+          "line": 82,
+          "source_statement": "for i = 1, #t do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "break-created-captures",
+      "runtime_id": "LUA-CLOSURE-REVIEWED-BLOCK-0003",
+      "first_line": 98,
+      "last_line": 114,
+      "span_end_line": 115,
+      "byte_offset": 1866,
+      "byte_length": 270,
+      "span_sha256": "1eacf5f9378a933545549092c396e81cccb1aa67c41c18df2cb010d558ebaeb4",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Both numeric-for loops retain their current control variable and body-local value in closures after an immediate break.",
+      "dynamic_invocation": "Execute the actual source calls f@104, f@111, f@112 in section break-created-captures. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected closure.lua section break-created-captures; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "f",
+          "line": 104,
+          "source_statement": "assert(f() == 1)"
+        },
+        {
+          "name": "f",
+          "line": 111,
+          "source_statement": "assert(({f()})[1] == 1)"
+        },
+        {
+          "name": "f",
+          "line": 112,
+          "source_statement": "assert(({f()})[2] == \"a\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [
+        {
+          "line": 100,
+          "source_statement": "for i=1,3 do"
+        },
+        {
+          "line": 106,
+          "source_statement": "for k = 1, #t do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "break-return-error-capture-closing",
+      "runtime_id": "LUA-CLOSURE-REVIEWED-BLOCK-0004",
+      "first_line": 115,
+      "last_line": 149,
+      "span_end_line": 150,
+      "byte_offset": 2136,
+      "byte_length": 618,
+      "span_sha256": "d3120e235018b0036a4be63c9b087c8433b5f92060c47ba38317f0e0b0a12a00",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Captures created before break, return, repeated loop entry and protected error remain readable and mutable afterward with the expected distinct x-dependent values.",
+      "dynamic_invocation": "Execute the actual source calls error@132, f@139, b@140, b@141, pcall@145, b@146, b@147 in section break-return-error-capture-closing. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected closure.lua section break-return-error-capture-closing; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "error",
+          "line": 132,
+          "source_statement": "    else if x ~= 3 then error() end"
+        },
+        {
+          "name": "f",
+          "line": 139,
+          "source_statement": "  f(i)"
+        },
+        {
+          "name": "b",
+          "line": 140,
+          "source_statement": "  assert(b('get') == 'xuxu')"
+        },
+        {
+          "name": "b",
+          "line": 141,
+          "source_statement": "  b('set', 10); assert(b('get') == 10+i)"
+        },
+        {
+          "name": "b",
+          "line": 141,
+          "source_statement": "  b('set', 10); assert(b('get') == 10+i)"
+        },
+        {
+          "name": "pcall",
+          "line": 145,
+          "source_statement": "pcall(f, 4);"
+        },
+        {
+          "name": "b",
+          "line": 146,
+          "source_statement": "assert(b('get') == 'xuxu')"
+        },
+        {
+          "name": "b",
+          "line": 147,
+          "source_statement": "b('set', 10); assert(b('get') == 14)"
+        },
+        {
+          "name": "b",
+          "line": 147,
+          "source_statement": "b('set', 10); assert(b('get') == 14)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 121,
+          "source_statement": "    if x == 3 and not first then return end"
+        },
+        {
+          "line": 124,
+          "source_statement": "          if op == 'set' then"
+        },
+        {
+          "line": 130,
+          "source_statement": "    if x == 1 then do break end"
+        },
+        {
+          "line": 132,
+          "source_statement": "    else if x ~= 3 then error() end"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 120,
+          "source_statement": "  while 1 do"
+        },
+        {
+          "line": 138,
+          "source_statement": "for i=1,3 do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "multi-level-and-sibling-capture-scopes",
+      "runtime_id": "LUA-CLOSURE-REVIEWED-BLOCK-0005",
+      "first_line": 150,
+      "last_line": 183,
+      "span_end_line": 184,
+      "byte_offset": 2754,
+      "byte_length": 533,
+      "span_sha256": "8959a178a7957c88128108f9b63ceaab47ae5b93b0407f3da355cd5993a81826",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Nested closures retain all three lexical levels and the captured outer local w. Break detaches the loop capture from a later local of the same name so sibling closures return10 and20 independently.",
+      "dynamic_invocation": "Execute the actual source calls f@158, y@160, math.sin@166, X@180, Y@180 in section multi-level-and-sibling-capture-scopes. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected closure.lua section multi-level-and-sibling-capture-scopes; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "f",
+          "line": 158,
+          "source_statement": "y = f(10)"
+        },
+        {
+          "name": "y",
+          "line": 160,
+          "source_statement": "assert(y(20)(30) == 60+w)"
+        },
+        {
+          "name": "math.sin",
+          "line": 166,
+          "source_statement": "  local a = math.sin(0)"
+        },
+        {
+          "name": "X",
+          "line": 180,
+          "source_statement": "  assert(X() == 10 and Y() == 20)"
+        },
+        {
+          "name": "Y",
+          "line": 180,
+          "source_statement": "  assert(X() == 10 and Y() == 20)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 171,
+          "source_statement": "    if a then break end"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 168,
+          "source_statement": "  while a do"
+        }
+      ],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "repeat-until-and-branch-capture-cells",
+      "runtime_id": "LUA-CLOSURE-REVIEWED-BLOCK-0006",
+      "first_line": 184,
+      "last_line": 225,
+      "span_end_line": 226,
+      "byte_offset": 3287,
+      "byte_length": 886,
+      "span_sha256": "f2570a54c9660835afd8b28560833a2ff1b8d5060db02c9cfec1874ae00732a2",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Repeat-until reads its body local and closures mutate the outer loop variable; all ten then/elseif/goto branch captures retain their own initial values and later mutations.",
+      "dynamic_invocation": "Execute the actual source calls error@203, error@211, error@216, print@225 in section repeat-until-and-branch-capture-cells. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected closure.lua section repeat-until-and-branch-capture-cells; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "error",
+          "line": 203,
+          "source_statement": "    error'not here'"
+        },
+        {
+          "name": "error",
+          "line": 211,
+          "source_statement": "    error(\"should never be here!\")"
+        },
+        {
+          "name": "error",
+          "line": 216,
+          "source_statement": "    error(\"should never be here!\")"
+        },
+        {
+          "name": "print",
+          "line": 225,
+          "source_statement": "print'+'"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 198,
+          "source_statement": "  if i % 3 == 0 then"
+        }
+      ],
+      "loop_sites": [
+        {
+          "line": 188,
+          "source_statement": "repeat"
+        },
+        {
+          "line": 197,
+          "source_statement": "for i = 1, 10 do"
+        },
+        {
+          "line": 221,
+          "source_statement": "for i = 1, 10 do"
+        }
+      ],
+      "protocol_witnesses": [
+        {
+          "line": 225,
+          "kind": "source-phase-output",
+          "source_statement": "print'+'"
+        }
+      ]
+    },
+    {
+      "id": "tail-vararg-capture-closing",
+      "runtime_id": "LUA-CLOSURE-REVIEWED-BLOCK-0007",
+      "first_line": 226,
+      "last_line": 237,
+      "span_end_line": 238,
+      "byte_offset": 4173,
+      "byte_length": 285,
+      "span_sha256": "7bef128c045dc7988df02f09031709bd0da077c645b24d44a1d88bdced00f5b6",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "A vararg tail-call chain closes a captured x while its callback still returns the intended value; the invoked inner c assertion verifies the actual callback result.",
+      "dynamic_invocation": "Execute the actual source calls c@231, f@231, v@233, t@235 in section tail-vararg-capture-closing. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected closure.lua section tail-vararg-capture-closing; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "c",
+          "line": 231,
+          "source_statement": "  local function v(f, ...) c(\"test\", f() ~= 1 and \"FAILED\" or \"OK\") end"
+        },
+        {
+          "name": "f",
+          "line": 231,
+          "source_statement": "  local function v(f, ...) c(\"test\", f() ~= 1 and \"FAILED\" or \"OK\") end"
+        },
+        {
+          "name": "v",
+          "line": 233,
+          "source_statement": "  return v(function() return x end)"
+        },
+        {
+          "name": "t",
+          "line": 235,
+          "source_statement": "t()"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "debug-upvalue-identities-and-joining",
+      "runtime_id": "LUA-CLOSURE-REVIEWED-BLOCK-0008",
+      "first_line": 238,
+      "last_line": 279,
+      "span_end_line": 280,
+      "byte_offset": 4458,
+      "byte_length": 1326,
+      "span_sha256": "02107553fcd71a84e0471d93dc56501209164531fb5eb44237229c78a66bcc4b",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Real upvalue IDs distinguish shared and shadowed captures, expose the native gmatch capture, and change sharing exactly through upvaluejoin. Invalid indexes, nonfunctions and C/Lua-incompatible joins fail; terminal OK follows.",
+      "dynamic_invocation": "Execute the actual source calls require@239, debug.upvalueid@252, debug.upvalueid@253, debug.upvalueid@254, debug.upvalueid@255, debug.upvalueid@256, debug.upvalueid@257, debug.upvalueid@258, debug.upvalueid@259, debug.upvalueid@261, string.gmatch@261, foo1@263, foo2@263, debug.upvaluejoin@264, foo1@265, foo2@265, foo3@266, debug.upvaluejoin@267, foo3@268, debug.upvaluejoin@269, foo3@270, pcall@272, pcall@273, pcall@274, pcall@275, pcall@276, pcall@277, print@279 in section debug-upvalue-identities-and-joining. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected closure.lua section debug-upvalue-identities-and-joining; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "require",
+          "line": 239,
+          "source_statement": "local debug = require'debug'"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 252,
+          "source_statement": "assert(debug.upvalueid(foo1, 1))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 253,
+          "source_statement": "assert(debug.upvalueid(foo1, 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 254,
+          "source_statement": "assert(not debug.upvalueid(foo1, 3))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 255,
+          "source_statement": "assert(debug.upvalueid(foo1, 1) == debug.upvalueid(foo2, 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 255,
+          "source_statement": "assert(debug.upvalueid(foo1, 1) == debug.upvalueid(foo2, 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 256,
+          "source_statement": "assert(debug.upvalueid(foo1, 2) == debug.upvalueid(foo2, 1))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 256,
+          "source_statement": "assert(debug.upvalueid(foo1, 2) == debug.upvalueid(foo2, 1))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 257,
+          "source_statement": "assert(debug.upvalueid(foo3, 1))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 258,
+          "source_statement": "assert(debug.upvalueid(foo1, 1) ~= debug.upvalueid(foo3, 1))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 258,
+          "source_statement": "assert(debug.upvalueid(foo1, 1) ~= debug.upvalueid(foo3, 1))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 259,
+          "source_statement": "assert(debug.upvalueid(foo1, 2) == debug.upvalueid(foo3, 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 259,
+          "source_statement": "assert(debug.upvalueid(foo1, 2) == debug.upvalueid(foo3, 2))"
+        },
+        {
+          "name": "debug.upvalueid",
+          "line": 261,
+          "source_statement": "assert(debug.upvalueid(string.gmatch(\"x\", \"x\"), 1) ~= nil)"
+        },
+        {
+          "name": "string.gmatch",
+          "line": 261,
+          "source_statement": "assert(debug.upvalueid(string.gmatch(\"x\", \"x\"), 1) ~= nil)"
+        },
+        {
+          "name": "foo1",
+          "line": 263,
+          "source_statement": "assert(foo1() == 3 + 5 and foo2() == 5 + 3)"
+        },
+        {
+          "name": "foo2",
+          "line": 263,
+          "source_statement": "assert(foo1() == 3 + 5 and foo2() == 5 + 3)"
+        },
+        {
+          "name": "debug.upvaluejoin",
+          "line": 264,
+          "source_statement": "debug.upvaluejoin(foo1, 2, foo2, 2)"
+        },
+        {
+          "name": "foo1",
+          "line": 265,
+          "source_statement": "assert(foo1() == 3 + 3 and foo2() == 5 + 3)"
+        },
+        {
+          "name": "foo2",
+          "line": 265,
+          "source_statement": "assert(foo1() == 3 + 3 and foo2() == 5 + 3)"
+        },
+        {
+          "name": "foo3",
+          "line": 266,
+          "source_statement": "assert(foo3() == 10 + 5)"
+        },
+        {
+          "name": "debug.upvaluejoin",
+          "line": 267,
+          "source_statement": "debug.upvaluejoin(foo3, 2, foo2, 1)"
+        },
+        {
+          "name": "foo3",
+          "line": 268,
+          "source_statement": "assert(foo3() == 10 + 5)"
+        },
+        {
+          "name": "debug.upvaluejoin",
+          "line": 269,
+          "source_statement": "debug.upvaluejoin(foo3, 2, foo2, 2)"
+        },
+        {
+          "name": "foo3",
+          "line": 270,
+          "source_statement": "assert(foo3() == 10 + 3)"
+        },
+        {
+          "name": "pcall",
+          "line": 272,
+          "source_statement": "assert(not pcall(debug.upvaluejoin, foo1, 3, foo2, 1))"
+        },
+        {
+          "name": "pcall",
+          "line": 273,
+          "source_statement": "assert(not pcall(debug.upvaluejoin, foo1, 1, foo2, 3))"
+        },
+        {
+          "name": "pcall",
+          "line": 274,
+          "source_statement": "assert(not pcall(debug.upvaluejoin, foo1, 0, foo2, 1))"
+        },
+        {
+          "name": "pcall",
+          "line": 275,
+          "source_statement": "assert(not pcall(debug.upvaluejoin, print, 1, foo2, 1))"
+        },
+        {
+          "name": "pcall",
+          "line": 276,
+          "source_statement": "assert(not pcall(debug.upvaluejoin, {}, 1, foo2, 1))"
+        },
+        {
+          "name": "pcall",
+          "line": 277,
+          "source_statement": "assert(not pcall(debug.upvaluejoin, foo1, 1, print, 1))"
+        },
+        {
+          "name": "print",
+          "line": 279,
+          "source_statement": "print'OK'"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": [
+        {
+          "line": 279,
+          "kind": "source-phase-output",
+          "source_statement": "print'OK'"
+        }
+      ]
+    }
+  ],
+  "supplemental_obligations": [],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": []
+}

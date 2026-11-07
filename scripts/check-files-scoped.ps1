@@ -1,14 +1,16 @@
 param(
+    [string] $OutputDirectory = '',
     [Parameter(Mandatory)][string] $Interpreter,
     [Parameter(Mandatory)][string] $ReferenceInterpreter,
     [Parameter(Mandatory)][string] $RuntimeDirectory,
+    [ValidateSet('gc-io-events','expanded-t-conformance')][string] $Scope = 'gc-io-events',
     [ValidateSet('default','upstream-test')][string] $Configuration = 'default',
     [ValidateSet('development','validation','release')][string] $Profile = 'validation',
     [ValidateSet('static','static-pic','relocatable')][string] $LibraryType = 'static'
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$directory = Join-Path $root ('reports/scoped-files/' + [Guid]::NewGuid().ToString('N'))
+$directory = if ($OutputDirectory -ne '') { [IO.Path]::GetFullPath($OutputDirectory) } else { Join-Path $root ('reports/scoped-files/' + [Guid]::NewGuid().ToString('N')) }
 [void][IO.Directory]::CreateDirectory($directory)
 $hostName = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
 $link = if ($LibraryType -eq 'relocatable') { 'shared' } else { $LibraryType }
@@ -20,11 +22,11 @@ $policy=@{acceptance=$false;contracts=@{}}
 Import-Module "$PSScriptRoot/ScopedAcceptancePolicy.psm1" -Force
 Import-Module "$PSScriptRoot/FilesOutput.psm1" -Force
 try {
-    $policy=Get-ScopedAcceptancePolicy -Root $root -Context $context
+    $policy=Get-ScopedAcceptancePolicy -Root $root -Context $context -Scope $Scope
     foreach ($target in @('ReferenceC','Ada')) {
         $contract=$null
         $report = Join-Path $directory "$target-files.lua.json"
-        $arguments = @{Target=$target; Configuration=$Configuration; Scope='gc-io-events';
+        $arguments = @{Target=$target; Configuration=$Configuration; Scope=$Scope;
             Mode='File'; File='files.lua'; Report=$report; ReportOnly=$true; Context=$context;
             Interpreter=$(if ($target -eq 'Ada') { $Interpreter } else { $ReferenceInterpreter })}
         if ($target -eq 'Ada') { $arguments.RuntimeDirectory = $RuntimeDirectory }
@@ -84,7 +86,7 @@ try {
     $phase=if($policy.acceptance){'Ada scoped operation accepted; final matrix review pending'}else{'diagnostic observations; scoped acceptance pending'}
     Write-Output "PASS: matching $Configuration scoped C/Ada file observations; $phase"
 } finally {
-    [ordered]@{schema_version=1; scope='gc-io-events'; configuration=$Configuration; context=$context;
+    [ordered]@{schema_version=1; scope=$Scope; configuration=$Configuration; context=$context;
         diagnostic_only=(-not $policy.acceptance); scope_accepted=$false; observations=$records} |
         ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $directory 'index.json') -Encoding utf8
 }

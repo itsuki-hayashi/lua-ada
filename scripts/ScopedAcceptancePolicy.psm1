@@ -5,8 +5,9 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 
 function Assert-ScopedContractIndex {
     param([string] $Root, [Collections.IDictionary] $Index,
-          [string[]] $Contexts, [string[]] $Files)
-    if ($Index.schema_version -ne 1 -or $Index.scope -cne 'gc-io-events') { throw 'Invalid scoped contract index' }
+          [string[]] $Contexts, [string[]] $Files,
+          [ValidateSet('gc-io-events','expanded-t-conformance')][string] $Scope = 'gc-io-events')
+    if ($Index.schema_version -ne 1 -or $Index.scope -cne $Scope) { throw 'Invalid scoped contract index' }
     $review=$Index.review
     if ($review.status -cne 'accepted' -or [string]::IsNullOrWhiteSpace($review.author) -or
         [string]::IsNullOrWhiteSpace($review.reviewer) -or $review.author -ceq $review.reviewer) {
@@ -48,23 +49,24 @@ function Assert-ScopedContractIndex {
 }
 
 function Get-ScopedAcceptancePolicy {
-    param([string] $Root, [string] $Context)
+    param([string] $Root, [string] $Context,
+          [ValidateSet('gc-io-events','expanded-t-conformance')][string] $Scope = 'gc-io-events')
     # Structural failures always propagate. Only genuinely pending obligations
     # select observation mode; a complete ledger cannot silently lose contracts
     # or fall back to ReportOnly when its final acceptance prerequisites fail.
-    $scope=Test-ConformanceScope -Root $Root
-    if ($scope.UnresolvedSourceAnchors -gt 0 -or $scope.UnresolvedApiEntries -gt 0) {
+    $scopeRecord=Test-ConformanceScope -Root $Root -Scope $Scope
+    if ($scopeRecord.UnresolvedSourceAnchors -gt 0 -or $scopeRecord.UnresolvedApiEntries -gt 0) {
         return @{acceptance=$false; contracts=@{}; full_m3_acceptance=$false}
     }
-    $null=Test-ConformanceScope -Root $Root -RequireScopedComplete
+    $null=Test-ConformanceScope -Root $Root -Scope $Scope -RequireScopedComplete
     $suite=Get-Content (Join-Path $Root 'tests/conformance/suite.json') -Raw | ConvertFrom-Json -AsHashtable
     if ($Context -cnotin $suite.acceptance_contexts) { throw 'Unknown scoped acceptance context' }
-    $index=Get-Content (Join-Path $Root 'tests/conformance/scopes/gc-io-events.contracts.json') -Raw |
+    $index=Get-Content (Join-Path $Root "tests/conformance/scopes/$Scope.contracts.json") -Raw |
         ConvertFrom-Json -AsHashtable -Depth 64
     $all=Assert-ScopedContractIndex -Root $Root -Index $index -Contexts $suite.acceptance_contexts `
-        -Files @($scope.Definition.files.path)
+        -Files @($scopeRecord.Definition.files.path) -Scope $Scope
     $selected=@{}
-    foreach ($file in $scope.Definition.files.path) { $selected[$file]=$all[$Context+'/'+$file] }
+    foreach ($file in $scopeRecord.Definition.files.path) { $selected[$file]=$all[$Context+'/'+$file] }
     return @{acceptance=$true; contracts=$selected; full_m3_acceptance=$false}
 }
 

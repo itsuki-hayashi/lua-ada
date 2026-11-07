@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "kind": "independent-expanded-source-semantic-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "author": "Codex /root/expanded_source_audit",
+  "reviewer": "Codex /root/conformance_scope",
+  "decision": "accepted-source-classification-with-runtime-obligations-pending",
+  "packet": {
+    "path": "tests/conformance/reviews/expanded-t-conformance.source-author-packet.json",
+    "sha256": "14dab2ad7f2c623c90aae9eed861e74f5cd0b3b92f95d773e23e93551845ce35"
+  },
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "files": [
+    {
+      "file": "tpack.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/tpack.lua",
+        "sha256": "43984831af8269b9f9c1be90d39880863b395e835bf094e5dc5be2025674a246",
+        "byte_length": 10641,
+        "line_count": 323
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/tpack.expanded-candidate.json",
+        "sha256": "d3728d5332a000bbe9ac49878819c5e0b426dd349b85a1eddd18cca8961eb461"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/tpack.expanded-classification-proposal.jsonl",
+        "sha256": "680972d8cbc1eef6b5e6a1c0539f508a4f579528a6d16f45e77beb40efbe5a1c"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/tpack.jsonl",
+        "sha256": "8edf4c5f58780945849e5dd2f4709c13cb63bcac14ab99bedc4382f406ac6bf3"
+      },
+      "original_anchors": 96,
+      "runtime_blocks": 11
+    },
+    {
+      "file": "utf8.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/utf8.lua",
+        "sha256": "ba41997fb956fcd4a48d07c31c0b9e404cb88f0e2ea99ddf4a5cdcf48eb09696",
+        "byte_length": 8273,
+        "line_count": 292
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/utf8.expanded-candidate.json",
+        "sha256": "6e285dad6cbe88db9bab63a956879882718f9848b361b35958775eb0082f13c1"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/utf8.expanded-classification-proposal.jsonl",
+        "sha256": "1da9cf40599df03ffb9a3ee8a159521edd45574eb323513e2dd7f03f57c12a4b"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/utf8.jsonl",
+        "sha256": "e379874b50880aa2c6356fc4ac8a97c0ee9df65fc0dd7019ef6fbd555ffe6698"
+      },
+      "original_anchors": 59,
+      "runtime_blocks": 9
+    },
+    {
+      "file": "bitwise.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/bitwise.lua",
+        "sha256": "ea36f2c261483e85a65dffe41b0674fb92869a6372ac744ed7fea8304e6a8a19",
+        "byte_length": 10141,
+        "line_count": 363
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/bitwise.expanded-candidate.json",
+        "sha256": "7fa60c7121507278450d01b207846c609bb13388ac872a36e64c88622f35c36d"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/bitwise.expanded-classification-proposal.jsonl",
+        "sha256": "1ca8eab2fee10217e525d077ba36ff60df0346ed2f6ed45383d1a77dd831ee58"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/bitwise.jsonl",
+        "sha256": "e668830d947778cdcf97ee7a97905bf3dffe0c718ca59aa0b093fc980dc10132"
+      },
+      "original_anchors": 155,
+      "runtime_blocks": 10
+    },
+    {
+      "file": "bwcoercion.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/bwcoercion.lua",
+        "sha256": "e74cea2bb42125daca7f5536df31bb2684b74ffcbeb3b1198e31cc257aa659f6",
+        "byte_length": 1792,
+        "line_count": 78
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/bwcoercion.expanded-candidate.json",
+        "sha256": "bd61b2443c7cbc47f7bf63f0c82be6fd410a873e30682d89a031a6267711f13d"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/bwcoercion.expanded-classification-proposal.jsonl",
+        "sha256": "d9d486b59b2f773b39c7e698d412b8ab10b4c49aeadbfc55283e870bec123d6d"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/bwcoercion.jsonl",
+        "sha256": "4d80d54c1763677d2e5293c4e7bdce811e304ccf79af694f27db132edd8fddd6"
+      },
+      "original_anchors": 5,
+      "runtime_blocks": 3
+    },
+    {
+      "file": "goto.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/goto.lua",
+        "sha256": "2e5168bba512878d4874398ba43d411741db0a68400a49818ec7b52ba62dc7cf",
+        "byte_length": 10668,
+        "line_count": 477
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/goto.expanded-candidate.json",
+        "sha256": "c2c0d014d21ae1fa2e807acfb9f5184a1fdbce25a2b71f1c56648938c7b1c899"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/goto.expanded-classification-proposal.jsonl",
+        "sha256": "2f5b5c27e22b8dcf809ace1f40b1eaacdfcbfb159bbe3c1f685543b868a59edc"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/goto.jsonl",
+        "sha256": "0d9344de782a450311faa99408e5a9c15d2d62fa10350adaf916ca07bd3e2914"
+      },
+      "original_anchors": 62,
+      "runtime_blocks": 12
+    },
+    {
+      "file": "constructs.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/constructs.lua",
+        "sha256": "fd4eeece596bf53ee3a8ed015960dd34f34abcc9991a332e3c4b83a374cb5514",
+        "byte_length": 9946,
+        "line_count": 406
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/constructs.expanded-candidate.json",
+        "sha256": "f569ac32c295c2440f102f1d38bd55478d49bbfa40e3a113167c5e0225cb128c"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/constructs.expanded-classification-proposal.jsonl",
+        "sha256": "c1a6e5de25531075de78dddbb7e14a4860505d4f85ce92da23e5b7e06fd39702"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/constructs.jsonl",
+        "sha256": "bbc8a596fa96583d666617d386c25e681b79ada349d5685301b6b2ba4834ee54"
+      },
+      "original_anchors": 83,
+      "runtime_blocks": 12
+    },
+    {
+      "file": "closure.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/closure.lua",
+        "sha256": "d03b641a7a7c4cb395762321200532f786e1554395e8499838e702b56d21880a",
+        "byte_length": 5784,
+        "line_count": 279
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/closure.expanded-candidate.json",
+        "sha256": "d76f426041f169b1eb01c23e2c7dc6dbd1d5d9c5eff8a33c39c2e4be880cc8b5"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/closure.expanded-classification-proposal.jsonl",
+        "sha256": "e4dc85eeae7f1a811689f731aa6ff6fb852605efaba4eaa65fd939b8b4797630"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/closure.jsonl",
+        "sha256": "378314fc66c2e6af9df740a030a1aea975bf582e7ffc345e022fe18fe8e86874"
+      },
+      "original_anchors": 63,
+      "runtime_blocks": 8
+    },
+    {
+      "file": "pm.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/pm.lua",
+        "sha256": "f1413157b8dc0979f9cda8b2551cc9a953a719e5b14d2b84f375462e56355dc5",
+        "byte_length": 14163,
+        "line_count": 452
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/pm.expanded-candidate.json",
+        "sha256": "d13cd93cec29943cf55819eb9023af255323d85f2947c340e81b92457d387001"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/pm.expanded-classification-proposal.jsonl",
+        "sha256": "2ad6a9970e449b4b637a2ad39463cf7a3331225ad159a5e737ceed4b14b16f79"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/pm.jsonl",
+        "sha256": "64e20bca81f2dd886661421295be3e8d45d4a83de647adacb7ab68385be658fc"
+      },
+      "original_anchors": 184,
+      "runtime_blocks": 13
+    },
+    {
+      "file": "math.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/math.lua",
+        "sha256": "24b1e2a94ab2e5f70d1fca0820e0c2746deca27d7e1a6152499b033de1b463b1",
+        "byte_length": 33144,
+        "line_count": 1145
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/math.expanded-candidate.json",
+        "sha256": "1f04ad9d19a6f95e86a888c4a8c572da0ae49460b19fafd9599546e44b924784"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/math.expanded-classification-proposal.jsonl",
+        "sha256": "3b9c4f92b4fe6e64aa847ccf5db2b3ffca74e8d0c4cd8e14c7f9c95bcb43007b"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/math.jsonl",
+        "sha256": "bc38010be4fe9eec429801fcfb17047c11ead884e72b521a952d7334da5416b0"
+      },
+      "original_anchors": 468,
+      "runtime_blocks": 26
+    },
+    {
+      "file": "coroutine.lua",
+      "decision": "accepted-source-classification",
+      "source": {
+        "path": "references/lua/testes/coroutine.lua",
+        "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9",
+        "byte_length": 34752,
+        "line_count": 1263
+      },
+      "candidate": {
+        "path": "tests/conformance/reviews/coroutine.expanded-candidate.json",
+        "sha256": "c1fd8c4cd91148edaf170cf92ec76c8a212d640f88d55edfc3a196bac9751bc0"
+      },
+      "proposal": {
+        "path": "tests/conformance/reviews/coroutine.expanded-classification-proposal.jsonl",
+        "sha256": "2c13009473c30b28d1855f3c945b72800b0cf7a7575b35c611968cb38175f9f0"
+      },
+      "pending_ledger": {
+        "path": "tests/conformance/coverage/coroutine.jsonl",
+        "sha256": "34219d9e1184bf1f0d5f837b1f63be20cb36c332cb8413e95c502949447e41d9"
+      },
+      "original_anchors": 287,
+      "runtime_blocks": 28
+    }
+  ],
+  "method": [
+    "Read the complete bytes of all ten pinned Lua sources and compared each of the 124 contiguous semantic sections plus eight supplemental obligations to its actual setup, helper bodies, generated programs, loops, callbacks and completion boundary.",
+    "Checked all original anchor identities against HEAD and all candidate/proposal/pending-ledger hashes. Original 1462 records are unchanged; all 132 appended obligations remain pending without execution evidence.",
+    "Inspected every proposed conditional guard/report and width/endian applicability mapping, including default coroutine omission and early-return paths, every instrumented command/continuation script, and both generated constructs templates.",
+    "Verified the section tiling and span hashes against the unchanged source; overlapping supplemental guard obligations deliberately identify measured source predicates instead of claiming execution of inactive body assertions."
+  ],
+  "resolved_findings": [
+    {
+      "id": "CR1",
+      "source": "constructs.lua:330-347",
+      "resolution": "The random selection guard links both generated-template obligations and the complete combinatorial campaign. The false-template span includes the actual F selection; both seeded unchanged executions are mandatory in every context."
+    },
+    {
+      "id": "CR2",
+      "source": "closure.lua:98-112,150-160",
+      "resolution": "The packet describes both loops as numeric and w as a captured outer local, matching the actual source rather than inventing a generic iterator or global binding."
+    },
+    {
+      "id": "CR3",
+      "source": "math.lua:144-154",
+      "resolution": "The packet distinguishes the actual integer i/j assertions from separately explicit typed cases; computed but unused floating x/y locals do not establish a type Cartesian matrix."
+    },
+    {
+      "id": "CR4",
+      "source": "utf8.lua:108-123",
+      "resolution": "The invalid-length section now includes all original checklen calls, including the final two spurious-continuation cases."
+    },
+    {
+      "id": "CR5",
+      "source": "bwcoercion.lua:19-32 and bitwise-helper-witness.lua",
+      "resolution": "The supplemental wrapper covers all six coercing handlers, raw secondary lookup, operand order, false/nil result truncation, all operator error paths and exact source/caller-line attribution. Helper coverage remains bound to bitwise rather than counted as a separate primary suite."
+    },
+    {
+      "id": "CR6",
+      "source": "goto.lua:272-288",
+      "resolution": "The invariant narrows the post-jump assertion to scope/name visibility and explicitly avoids attributing direct observation of global X cleanup to an assertion that does not inspect it."
+    },
+    {
+      "id": "CR7",
+      "source": "coroutine.lua:591-594,1054-1057",
+      "resolution": "Both guards apply to both configurations; reports are default-only. The early default OK/return has its own default-only runtime obligation, and every T body remains instrumented-only."
+    },
+    {
+      "id": "CR8",
+      "source": "math.lua:73-76,202-213,242-289,323-343,867-873; tpack.lua:170-174; bitwise.lua:355-360",
+      "resolution": "Explicit measured conditions and conditional_applicability preserve inactive lexical assertions as reviewed references. Measured guard obligations require per-process source-profile facts, and do not become body-execution passes for false alternatives."
+    },
+    {
+      "id": "CR9",
+      "source": "math.lua:891-959",
+      "resolution": "Invocation text records inclusive zero-based random loops and distinguishes actual rounds-plus-one draws from the original nominal printed cumulative counters."
+    }
+  ],
+  "accepted_boundaries": [
+    "Default and instrumented goto keyword behavior remains distinct and source-bound.",
+    "Constructs requires both real seeded branches without replacing random or editing upstream bytes.",
+    "PM full non-soft large-string tests, nested replacement callbacks and all four long-string identity cases remain required. The identifier T in its original lexical references is a local table, not the C test adapter.",
+    "UTF8 lowercase terminal ok, packing native-layout branches and bitwise helper completion retain their real source spelling and meaning.",
+    "Coroutines require both default omission messages, all common lifecycle/metamethod/iterator tests and every T-only hook/API/continuation assertion; an early default OK cannot certify their tail."
+  ],
+  "unresolved_runtime_obligations": [
+    "No original or appended runtime obligation is promoted by this review. Every applicable original-C and actual Ada result remains required on the clean final revision in all 26 contexts.",
+    "Per-context source-profile captures must substantiate native-width, endian and precision applicability. A fact measured false never establishes execution of that body.",
+    "Both constructs templates and the helper wrapper require source-hashed actual execution evidence. Math actual seed pairs, full retry/range and precision phases must be retained.",
+    "The prior four-file scope requires fresh changed-runtime evidence, and the expanded public C API requires separately reviewed named C/AUnit witnesses and native baselines."
+  ],
+  "limitations": [
+    "This approval covers the author source classification only. It does not approve runtime behavior, accepted execution contracts, API mappings, final matrix evidence or the harness implementation.",
+    "The reviewer authored portions of the scope/matrix/profile harness; those changes require another independent implementation review and are expressly outside this approval.",
+    "A source-preserving wrapper adds observable helper/branch evidence while leaving the pinned files unchanged. Its latest runtime observations still need clean-revision C/Ada and cross-platform reconciliation."
+  ],
+  "execution_evidence": []
+}

@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "kind": "expanded-source-semantic-candidate",
+  "scope": "expanded-t-conformance",
+  "file": "bwcoercion.lua",
+  "role": "helper",
+  "author": "Codex /root/expanded_source_audit",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/bwcoercion.lua",
+    "sha256": "e74cea2bb42125daca7f5536df31bb2684b74ffcbeb3b1198e31cc257aa659f6",
+    "byte_length": 1792,
+    "line_count": 78
+  },
+  "original_anchor_count": 5,
+  "original_pending_ledger_sha256": "67d2cf87b68ec3740a9fa1370d41bcde6eab7888a7467c02769f4dfe76028627",
+  "appended_runtime_blocks": 3,
+  "proposal": {
+    "path": "tests/conformance/reviews/bwcoercion.expanded-classification-proposal.jsonl",
+    "sha256": "d9d486b59b2f773b39c7e698d412b8ab10b4c49aeadbfc55283e870bec123d6d"
+  },
+  "coverage_ledger": {
+    "path": "tests/conformance/coverage/bwcoercion.jsonl",
+    "sha256": "4d80d54c1763677d2e5293c4e7bdce811e304ccf79af694f27db132edd8fddd6"
+  },
+  "independent_review_status": "pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "sections": [
+    {
+      "id": "conversion-and-secondary-handler-selection",
+      "runtime_id": "LUA-BWCOERCION-REVIEWED-BLOCK-0001",
+      "first_line": 1,
+      "last_line": 36,
+      "span_end_line": 37,
+      "byte_offset": 0,
+      "byte_length": 1029,
+      "span_sha256": "aaef9115ed744bba66d919c88d266fdb748cd91667f4470e4573468c1c87ce63",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "tonumber and math.tointeger coerce valid integral strings without assuming arithmetic coercion. If coercion fails, raw lookup of the non-string second operand handler is attempted before reporting the operator/type error with the intended caller level.",
+      "dynamic_invocation": "Installed handlers are invoked by bitwise.lua numeric-string tests and unsupported operand tests; this helper has no standalone completion marker.",
+      "execution_condition": "Selected bwcoercion.lua section conversion-and-secondary-handler-selection; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "tonumber",
+          "line": 11,
+          "source_statement": "  x = tonumber(x)   -- handle numerical strings"
+        },
+        {
+          "name": "tointeger",
+          "line": 15,
+          "source_statement": "  return tointeger(x)"
+        },
+        {
+          "name": "type",
+          "line": 23,
+          "source_statement": "  if type(y) ~= \"string\" then    -- avoid recalling original metamethod"
+        },
+        {
+          "name": "getmetatable",
+          "line": 24,
+          "source_statement": "    local mt = getmetatable(y)"
+        },
+        {
+          "name": "rawget",
+          "line": 25,
+          "source_statement": "    local mm = mt and rawget(mt, mtname)"
+        },
+        {
+          "name": "mm",
+          "line": 27,
+          "source_statement": "      return mm(x, y)"
+        },
+        {
+          "name": "error",
+          "line": 31,
+          "source_statement": "  error(\"attempt to '\" .. strsub(mtname, 3) .."
+        },
+        {
+          "name": "..strsub",
+          "line": 31,
+          "source_statement": "  error(\"attempt to '\" .. strsub(mtname, 3) .."
+        },
+        {
+          "name": "..type",
+          "line": 32,
+          "source_statement": "        \"' a \" .. type(x) .. \" with a \" .. type(y), 4)"
+        },
+        {
+          "name": "..type",
+          "line": 32,
+          "source_statement": "        \"' a \" .. type(x) .. \" with a \" .. type(y), 4)"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 12,
+          "source_statement": "  if not x then"
+        },
+        {
+          "line": 23,
+          "source_statement": "  if type(y) ~= \"string\" then    -- avoid recalling original metamethod"
+        },
+        {
+          "line": 26,
+          "source_statement": "    if mm then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "checked-binary-operand-protocol",
+      "runtime_id": "LUA-BWCOERCION-REVIEWED-BLOCK-0002",
+      "first_line": 37,
+      "last_line": 48,
+      "span_end_line": 49,
+      "byte_offset": 1029,
+      "byte_length": 167,
+      "span_sha256": "cba58a8ef329000657a5ed6da77202a9c0926dd4c25c16b9849b08e2c81b6728",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "checkargs returns two true integer operands only when both convert; otherwise it returns the actual secondary-handler result and nil to prevent repeating the primitive bitwise operation.",
+      "dynamic_invocation": "Execute the actual source calls toint@37, toint@38, trymt@42, getmetatable@47 in section checked-binary-operand-protocol. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected bwcoercion.lua section checked-binary-operand-protocol; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "toint",
+          "line": 37,
+          "source_statement": "  local xi = toint(x)"
+        },
+        {
+          "name": "toint",
+          "line": 38,
+          "source_statement": "  local yi = toint(y)"
+        },
+        {
+          "name": "trymt",
+          "line": 42,
+          "source_statement": "    return trymt(x, y, mtname), nil"
+        },
+        {
+          "name": "getmetatable",
+          "line": 47,
+          "source_statement": "local smt = getmetatable(\"\")"
+        }
+      ],
+      "guard_sites": [
+        {
+          "line": 39,
+          "source_statement": "  if xi and yi then"
+        }
+      ],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    },
+    {
+      "id": "installed-string-bitwise-handlers",
+      "runtime_id": "LUA-BWCOERCION-REVIEWED-BLOCK-0003",
+      "first_line": 49,
+      "last_line": 78,
+      "span_end_line": 79,
+      "byte_offset": 1196,
+      "byte_length": 596,
+      "span_sha256": "bf55342da966b11f72fff17d9db266cf4c8ae852d93cc11a1e86921e4ead131a",
+      "configurations": [
+        "default",
+        "upstream-test"
+      ],
+      "invariant": "Actual string metatable handlers for band/bor/bxor/shl/shr/bnot execute the checked conversion/dispatch protocol and preserve secondary-handler return values. All six operators require direct invocation evidence through bitwise.lua plus the helper witness.",
+      "dynamic_invocation": "Execute the actual source calls checkargs@50, checkargs@55, checkargs@60, checkargs@65, checkargs@70, checkargs@75 in section installed-string-bitwise-handlers. The source-local loop/guard sites below retain their original bounds and conditional effects; this statement is an invocation requirement, not an execution observation.",
+      "execution_condition": "Selected bwcoercion.lua section installed-string-bitwise-handlers; no reduction flags may be enabled. Source-local control and invocation sites are recorded below; conditional bodies apply only when their recorded source predicate is true.",
+      "required_contexts": [
+        "default/windows/development/static",
+        "default/windows/development/shared",
+        "default/windows/validation/static",
+        "default/windows/validation/shared",
+        "default/windows/release/static",
+        "default/windows/release/shared",
+        "upstream-test/windows/validation/static",
+        "upstream-test/windows/validation/shared",
+        "default/linux/development/static",
+        "default/linux/development/shared",
+        "default/linux/validation/static",
+        "default/linux/validation/shared",
+        "default/linux/release/static",
+        "default/linux/release/shared",
+        "upstream-test/linux/validation/static",
+        "upstream-test/linux/validation/shared",
+        "default/macos/development/static",
+        "default/macos/development/shared",
+        "default/macos/validation/static",
+        "default/macos/validation/shared",
+        "default/macos/release/static",
+        "default/macos/release/shared",
+        "upstream-test/macos/validation/static",
+        "upstream-test/macos/validation/shared",
+        "default/windows/validation/static-pic",
+        "upstream-test/windows/validation/static-pic"
+      ],
+      "invocation_sites": [
+        {
+          "name": "checkargs",
+          "line": 50,
+          "source_statement": "  local x, y = checkargs(x, y, \"__band\")"
+        },
+        {
+          "name": "checkargs",
+          "line": 55,
+          "source_statement": "  local x, y = checkargs(x, y, \"__bor\")"
+        },
+        {
+          "name": "checkargs",
+          "line": 60,
+          "source_statement": "  local x, y = checkargs(x, y, \"__bxor\")"
+        },
+        {
+          "name": "checkargs",
+          "line": 65,
+          "source_statement": "  local x, y = checkargs(x, y, \"__shl\")"
+        },
+        {
+          "name": "checkargs",
+          "line": 70,
+          "source_statement": "  local x, y = checkargs(x, y, \"__shr\")"
+        },
+        {
+          "name": "checkargs",
+          "line": 75,
+          "source_statement": "  local x, y = checkargs(x, x, \"__bnot\")"
+        }
+      ],
+      "guard_sites": [],
+      "loop_sites": [],
+      "protocol_witnesses": []
+    }
+  ],
+  "supplemental_obligations": [],
+  "notes": [
+    "Author audit of the complete pinned source, not independent review or passing runtime evidence.",
+    "Original lexical anchors are retained unchanged and pending. Additional source-hashed semantic blocks are pending with no pass evidence.",
+    "Proposed lexical references identify the semantic block, including invoked helper bodies, generated source, conditional alternatives and callback invariants; no inactive assertion is represented as an executed call.",
+    "All reduction flags remain unset. Numeric width/native property alternatives require actual measured applicability; native C/Ada disagreement is not a waiver.",
+    "Review must reconcile all original sites, exact dynamic invocation, actual original-C outcomes, clean-revision C/Ada reports and named supplemental witnesses before any promotion."
+  ],
+  "execution_evidence": [],
+  "helper_execution_witness": {
+    "path": "tests/conformance/bitwise-helper-witness.lua",
+    "sha256": "1a858b2c5592f2945bbe7b17d7cfa4269774908069c125de1d1f1a87ea086f55",
+    "protocol": "Execute the unchanged bitwise.lua, whose real require executes unchanged bwcoercion.lua, then six-handler/coercion/raw-secondary-fallback/error assertions; upstream OK precedes terminal BWCOERCION HELPER OK.",
+    "runtime_acceptance": false,
+    "independent_review_status": "pending"
+  }
+}

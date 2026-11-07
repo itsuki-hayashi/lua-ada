@@ -111,6 +111,15 @@ function Assert-MatrixReviewBinding {
         if ($matches.Count -ne 1 -or $seen.ContainsKey($key)) { throw 'Matrix review operation missing or duplicated' }
         $seen[$key] = $true
         $decision = $matches[0]
+        if ($Manifest.scope -ceq 'expanded-t-conformance' -and $entry.file -ceq 'constructs.lua') {
+            if (-not $decision.Contains('supplemental') -or @($decision.supplemental).Count -ne 1 -or
+                $decision.supplemental[0].variant -cne 'constructs-branch-1' -or
+                $decision.supplemental[0].decision -cne 'accepted' -or
+                $decision.supplemental[0].c_report_sha256 -cne $entry.supplemental[0].c.sha256 -or
+                $decision.supplemental[0].ada_report_sha256 -cne $entry.supplemental[0].ada.sha256) {
+                throw 'Matrix supplemental report review differs'
+            }
+        }
         if ($decision.decision -cne 'accepted' -or
             $decision.c_report_sha256 -cne $entry.c.sha256 -or
             $decision.ada_report_sha256 -cne $entry.ada.sha256 -or

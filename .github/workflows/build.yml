@@ -55,6 +55,7 @@ jobs:
             reports/launcher-selftest/**
             reports/core-image/**
             reports/gc-events/**
+            reports/expanded-conformance/**
             reports/scoped-files/**
             reports/conformance/**/*.json
             reports/conformance/**/*.stdout
@@ -103,6 +104,9 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/check-conformance-scope.ps1
           ./scripts/test-conformance-scope.ps1
+          ./scripts/test-expanded-conformance.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/test-expanded-matrix-bundle.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./scripts/test-conformance-matrix.ps1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -170,6 +174,7 @@ jobs:
             LICENSE
             reports/posix-files/**
             reports/gc-events/**
+            reports/expanded-conformance/**
             reports/scoped-files/**
             reports/conformance/**/*.json
             reports/conformance/**/*.stdout

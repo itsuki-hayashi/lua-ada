@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "kind": "independent-foreign-runtime-integration-review",
+  "scope": "expanded-t-conformance",
+  "author": "Codex /root/draft_assessment",
+  "reviewer": "Codex /root/expanded_source_audit",
+  "decision": "accepted-local-runtime-invariants-with-final-matrix-pending",
+  "date": "2026-11-07",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_bindings": [
+    {
+      "path": "c_api/c/lua_ada_boundary.c",
+      "sha256": "5bcb766b663ed5951840b79edf29c5558e53e96a06da60b1623efefb5401ae27"
+    },
+    {
+      "path": "c_api/include/lua_ada_boundary.h",
+      "sha256": "d4dbae56789bb3222d8820feabe5a76db5b99021ae66af079be2425105e8d9f1"
+    },
+    {
+      "path": "c_api/c/lua_ada_debug.c",
+      "sha256": "35943173582e58788c79957d1a253a0796a89cc53c6c23fac3f78b1336a92370"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "sha256": "fc50958412b3e2cc130972f409c0aef8e9ca219cd800216a4e9057889fbb405c"
+    },
+    {
+      "path": "src/lua-engine-foreign.ads",
+      "sha256": "3a224871abc0228702e72114debc26f592a6803100ba5cf4e8ffa2f81b0f8fef"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "sha256": "34cdcdd5c09c2854db467727acb81472a89e3d8a3d87c010986d8b2c50a21987"
+    },
+    {
+      "path": "src/lua-engine-machine.ads",
+      "sha256": "4396cf618bec1c9d9a7185a09dbc48b277253fdebe34e60a2b38b5dd78ffe9eb"
+    },
+    {
+      "path": "src/lua-engine-foreign_hooks.adb",
+      "sha256": "2f5a6ffc8e1c9e08113a9514029a99dc30f97c4e119b1a9ee9c6ddb583c43cee"
+    },
+    {
+      "path": "src/lua-engine-foreign_hooks.ads",
+      "sha256": "265039c9d1a51131e22a131440019c3b815a234d6ce24ff3283d90bffbcd22e6"
+    },
+    {
+      "path": "src/lua-engine-inspection.adb",
+      "sha256": "482bae3f4e704a4e79281d4423409a737e7eee9d1d4178c13847d7c52634fcc8"
+    }
+  ],
+  "inspected_evidence": [
+    {
+      "path": "reports/expanded-t-conformance/runtime-instrumented-build-9.log",
+      "sha256": "10c9682c3879f9bc17ec252a8352fd4b45a46c10e9fe545360ea565e7d32d9ed"
+    },
+    {
+      "path": "reports/expanded-t-conformance/runtime-instrumented-tests-6.log",
+      "sha256": "5b45a5ded5f5e368571ca2d62843208c1f78f0cc2db8ba7eff4668b7fe9a1566"
+    },
+    {
+      "path": "reports/expanded-t-conformance/t-api-smoke-9.log",
+      "sha256": "6d2279968a38a6e0e7b68a25a338d11faedbf834deba8f6f91e13d4549b75668"
+    },
+    {
+      "path": "reports/expanded-t-conformance/coroutine-t-3.json",
+      "sha256": "77b3a093cd487614b23054b189098faf52fd4dc84487360a4e1f00ca4a38ecc9"
+    },
+    {
+      "path": "reports/expanded-t-conformance/coroutine-t-3.stdout",
+      "sha256": "67684281e453d226eff6c1aa9e9dcffdec4f631b170e6716d1ca1cd8896df204"
+    },
+    {
+      "path": "reports/expanded-t-conformance/coroutine-t-3.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/expanded-native-foreign-default.log",
+      "sha256": "224af993ac7d7ff01081a9f15593458230525fa0c34fdbe5dc5e69bc212269f4"
+    },
+    {
+      "path": "reports/expanded-native-foreign-upstream-test.log",
+      "sha256": "224af993ac7d7ff01081a9f15593458230525fa0c34fdbe5dc5e69bc212269f4"
+    }
+  ],
+  "accepted_invariants": [
+    "The C callback pump installs its guard only after ada_lua_dispatch returns; actual K callbacks are invoked by the C pump with saved status/context and do not nonlocally jump across active Ada scheduler frames.",
+    "Each pending C call now records its owning activation. Suspension selects the foreign boundary belonging to that activation rather than repeatedly marking the nearest sentinel; three nested K boundaries are covered by named case20 and the unchanged coroutine tail.",
+    "Resume preserves its live scalar execution window and places host-facing results outside suspended registers; a later resume roots supplied arguments before restoring the saved execution view.",
+    "Completed child resume driver/call/context/native-depth ownership is restored before fallible host-result publication, so a refused result-window growth cannot strand the parent under the completed driver.",
+    "A successfully completed thread with an actual new callable can be reused through public C resume; missing-body/error-dead/running states remain distinguished. Independent from-state identity supplies depth without replacing the resumed universe.",
+    "Synchronous success returns to the original C body even when yieldable. A protected error in a yieldable K-aware frame reaches K even before a yield; resumed error versus YIELD status and full-width context are real frame data.",
+    "C hook line/count yields preserve the interrupted instruction and live registers. Public valid getstack/getinfo line inspection skips the synthetic transport callback; suspended debug locals use the retained hook PC.",
+    "The public C debug selector scope is explicitly l only. Expired-frame rejection is an Ada safety invariant and is not claimed as valid native C behavior.",
+    "Retiring C activations run their actual to-be-closed slots on return/error/resumed continuation, with retained outgoing result/error roots through collection."
+  ],
+  "resolved_findings": [
+    {
+      "id": "R-RESUME-REUSE",
+      "finding": "Earlier Begin_Resume rejected all completed contexts.",
+      "resolution": "Fresh now includes empty successfully completed contexts without a failure value, and the unchanged T thread-reuse scenario completes."
+    },
+    {
+      "id": "R-RESUME-RESTORE",
+      "finding": "Earlier result Push could allocate before parent driver restoration.",
+      "resolution": "Driver/context/depth restoration now precedes result Push; actual packet remains rooted in the caller boundary result owner."
+    },
+    {
+      "id": "R-NESTED-BOUNDARY",
+      "finding": "Earlier unwinding selected the nearest foreign sentinel for every pending call.",
+      "resolution": "Pending.Activation identifies the matching Foreign_Previous_Frame, with focused three-level K regression and unchanged full T coroutine success."
+    },
+    {
+      "id": "R-HOOK-FRAME",
+      "finding": "Earlier valid getstack inside a C hook could expose synthetic callback frame.",
+      "resolution": "Foreign_Hooks excludes the active foreign hook trampoline; callback case2 queries valid getstack/getinfo and checks actual interrupted line."
+    }
+  ],
+  "local_observations": [
+    "Inspected strict instrumented build9 success. AUnit log reports1366run/1366successful/0assertion failures/0unexpected errors.",
+    "Inspected six real T API smoke phase markers and terminal T COROUTINE API OK.",
+    "Inspected actual coroutine-t-3 process report: exit0, no timeout/capture/pipe failures,274stdoutbytes,0stderrbytes; instrumented output reaches both coroutine API phases and terminalOK.",
+    "Independently compiled identical public foreign C contracts against the separate native C oracle in both configurations:20continuation+9valid-hook+5math cases produce34PASS lines and terminal public foreign contract. Hook6 is deliberately outside the native valid-lifetime contract."
+  ],
+  "exclusions": [
+    "I authored the new per-module math RNG fix and math/library-opener regression sources; this is not independent approval of those changes. Root or another independent reviewer must approve them.",
+    "No final clean-revision26context scope or global M3 acceptance is claimed. The inspected local Ada/native artifacts are implementation diagnostics and must be refreshed through the final matrix.",
+    "This review does not establish omitted public C debug selectors, complete foreign API semantics, all.lua, heavy.lua or unrelated upstream file coverage."
+  ],
+  "execution_evidence": []
+}

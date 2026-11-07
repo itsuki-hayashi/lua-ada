@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "kind": "independent-expanded-consumer-semantic-witness-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "author": "Codex /root/expanded_source_audit",
+  "reviewer": "Codex /root/draft_assessment",
+  "decision": "accepted-semantic-witness-mapping",
+  "proposal": {
+    "sha256": "489591186429805e8ff71c8b67f889ded81cb225ea8a6b248160370e648a3a8e",
+    "path": "tests/conformance/reviews/expanded-t-conformance.consumer-witness-author-proposal.json"
+  },
+  "source_bindings": [
+    {
+      "path": "tests/src/lua-foreign_continuation_tests.adb",
+      "sha256": "74905cbc53a5098363a89fc0c4eda0275204f87d8dba56206de4e6b7c4ad8a2d"
+    },
+    {
+      "path": "tests/c/foreign_continuation_contract.c",
+      "sha256": "9abe8c102f495f924f7bdfc2df015fbdb9d1ee0f8b305f3564fa0dfe142bae9c"
+    },
+    {
+      "path": "tests/src/lua-foreign_hook_tests.adb",
+      "sha256": "07b38131c5d01b4264fad8ca800df15ffc7c1fa6682700d539f7ead6f9fa2dce"
+    },
+    {
+      "path": "tests/c/foreign_hook_contract.c",
+      "sha256": "6eafd0d3f2b0e37d693e18da1aa3d3715c0bbf7c9a5e90ba778ceec9d73aae4b"
+    },
+    {
+      "path": "tests/src/lua-math_reopen_tests.adb",
+      "sha256": "d268c079f5c31d9d093e5447a2bb77cd0c25208bca14f124cbeaf985faf59d7d"
+    },
+    {
+      "path": "tests/c/math_reopen_contract.c",
+      "sha256": "a2f702157d5a5b755f93bd594f929602ea8d3cc9a0612bddd11ee740c5085119"
+    },
+    {
+      "path": "tests/src/lua-library_opener_tests.adb",
+      "sha256": "2c6719b2b44561737dc0e691949ce05917d6a345ab0db1d0459f2c2f5a256890"
+    },
+    {
+      "path": "tests/c/library_opener_contract.c",
+      "sha256": "295a74a92127ea99f9fad99f307d70e45d8150722e0fbcc4c105ddc178eca426"
+    },
+    {
+      "path": "c_api/tests/foreign_api_contract.c",
+      "sha256": "aac33164afc2f48007b9b919eece945b47606cc0bee4019dcc59dea42e457431"
+    },
+    {
+      "path": "c_api/tests/consumer_allocator.h",
+      "sha256": "c888b195716ea9ea6023b01d06e9b21eb82035f6ee5beca1cf2bb7095749268c"
+    },
+    {
+      "path": "tests/c/conformance_api.c",
+      "sha256": "50e583644a8bd4345dd1ad6f237ee3ad8a7be40488ee1c2573c95ead820eade5"
+    },
+    {
+      "path": "tests/c/conformance_api.h",
+      "sha256": "c2069b39b0114a22c24ef1679932951bf535f54fe0723e5ea7fc9157f6f2e683"
+    },
+    {
+      "path": "tests/c/conformance_adapter.c",
+      "sha256": "f7ee6817ba2acbb3fcbf53192dd1e15781becb85e838755ad3a86bac9de92842"
+    },
+    {
+      "path": "references/lua/testes/coroutine.lua",
+      "sha256": "d38f7fa8570abb09154d9bf0d8cea34fee08953f0880f3e9c5a641a826c6dfc9"
+    },
+    {
+      "path": "c_api/tests/c_api_consumer.c",
+      "sha256": "3b9087e5a9d18336d89536f18ec90449dcc015f2ee0378b4b88ed3dec69e9b67"
+    },
+    {
+      "path": "c_api/tests/io_contract.h",
+      "sha256": "9553a625db792889399df3aa246594018aed850a90404659fe189c0835c47f86"
+    },
+    {
+      "path": "c_api/tests/gc_contract.h",
+      "sha256": "daa2a9a9a5eabe4c87b1db8c3452f0c828edcee5e8a42ea6378954bc2350a3c6"
+    },
+    {
+      "path": "tests/src/lua-collector_tests.adb",
+      "sha256": "d2676d7bfc11fe0ca8501fb74efffe06459a85b9fb9d65fe100597c59da17cf4"
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter_tests.adb",
+      "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"
+    },
+    {
+      "path": "tests/src/lua-physical_stack_tests.adb",
+      "sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd"
+    },
+    {
+      "path": "tests/src/lua-gc_control_tests.adb",
+      "sha256": "9e5a1dd3d16abe4e58d5fde4cfcd1f54d8f284458ca14b6d3a68492b63e4e1c8"
+    },
+    {
+      "path": "tests/src/lua-finalizer_runtime_tests.adb",
+      "sha256": "fa5110c03d1fe5d2d6fc21ddc40e08ac654c2c8b75f807c050e91ebff7ae9ff8"
+    },
+    {
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json",
+      "sha256": "8029452181a82c149b37730fdcc9ba7564c2553f40ebefa2f0f0e3622dc59f5e"
+    },
+    {
+      "path": "tests/conformance/reviews/gc-parameter-api.mapping-proposal.json",
+      "sha256": "af5d3cf818dd164d073cdcf74dd89c03ef1f8390e73be34e1bb0021233fa02c4"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "8071c9872cc2244d59cc8de256b530262820e453cd802c5edbf6cee7db16c9e5"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "ae2e8b732e37f09edd0477c862d99950f3c00293aeff39405958dea804fb0ec2"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "b03f1471382c5e28e4f4a0a538459eaa7e77ed4a4f42f7b42306385e0afd4037"
+    },
+    {
+      "path": "scripts/check-aunit-evidence.ps1",
+      "sha256": "7dd78afe0f556c6e6717e465a44c9dd95fb177dbbe49828e18a07eb1c8f034a7"
+    }
+  ],
+  "review_scope": "Semantic witness mapping only: public header anchors, actual named C selector/assertion behavior, exact registered AUnit labels, supporting versus direct API attribution and selected unchanged coroutine T obligations. This decision grants no production-runtime or platform-context acceptance.",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "findings": [],
+  "resolved_review_findings": [
+    "String/table/UTF8 opener presence alone was insufficient; four direct bare-state constructor cases now assert actual function type, stack delta, global absence and module behavior.",
+    "T-specific public-call attribution now binds conformance_api.c/.h, conformance_adapter.c and the pinned unchanged coroutine source.",
+    "AUnit warning expectation now uses exact actual Short_Source text, preserving all warning bytes and rejecting appended diagnostics."
+  ],
+  "verified_counts": {
+    "retained_c_cases": 52,
+    "named_aunit_cases": 84,
+    "foreign_c_cases": 48,
+    "api_entries": 159,
+    "named_c_cases": 100
+  },
+  "verified_boundaries": [
+    "Synchronous callk/pcallk does not establish yielded K behavior; distinct suspended/zero/fixed/open/error/nested/non-K child witnesses are required.",
+    "lua_getstack/getinfo use valid active hook frames; exported C getinfo is limited to selector l. Inactive-frame rejection is explicitly Ada-only.",
+    "lua_isuserdata light-state dispatch and direct T yield require their selected unchanged coroutine runtime blocks; bootstrap supporting cases alone do not establish them.",
+    "lua_load and C lua_getlocal/lua_setlocal remain excluded unexercised public exports; Lua inspection does not imply those exports.",
+    "to-close return/error/resumed continuation, immediate top-lowering and explicit closeslot have distinct named cases; live result/error identity is asserted.",
+    "Resume-refusal recovery uses protected calls only on the healthy parent; failed-child recovery is ordinary stack access.",
+    "All author proposal runtime statuses and evidence remain pending; final clean revision, all26 contexts and independent matrix review are separate gates."
+  ],
+  "verification": {
+    "script_sha256": "5f61ed939aaefe5b4d7460db38380b9c7de4235b68068fb7a35b28dd4f2ab687",
+    "log": "reports/expanded-t-conformance/independent-witness-mapping-verification.log",
+    "result": "159 original header anchors,100 C mapping links,84 exact fresh AUnit labels, current source hashes and48 separately native C contracts in both configurations verified; all checks passed",
+    "log_sha256": "6d3266ec10966754ac035d4227b98718da0841f0cfb03790edbde39cd4336941",
+    "script": "reports/expanded-t-conformance/verify-independent-witness-mappings.ps1"
+  }
+}
