@@ -20,6 +20,7 @@ param(
     [ValidateSet(0,1)][int] $ConstructsBranch = 0,
     [string] $EquivalentManifest = '',
     [string] $TAdaptationManifest = '',
+    [string] $FileProtocolManifest = '',
     [string] $NativeApplicability = '',
     [switch] $AllowUnreviewedEquivalent
 )
@@ -32,6 +33,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceFileProtocols.psm1')
 $root = Split-Path -Parent $PSScriptRoot
 $original = Get-Location
 $revision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
@@ -51,6 +53,10 @@ if (($TargetPolicy -ne '' -and ($Scope -ne '' -or $RequireAcceptance -or $Requir
 }
 if ($TargetPolicy -ne '' -and $Mode -cnotin @('File','Aggregate','Heavy')) {
     throw 'Full-target policy requires File, Aggregate or Heavy mode'
+}
+if ($FileProtocolManifest -ne '' -and ($TargetPolicy -eq '' -or $Mode -cne 'File' -or
+    $null -eq (Get-TargetFileProtocolDefinition -File $File))) {
+    throw 'FileProtocolManifest requires a remaining-target File with a completion protocol'
 }
 if ($TargetPolicy -ne '' -and $Mode -ceq 'File' -and $File -ceq 'constructs.lua') {
     $expectedVariant = if ($ConstructsBranch -eq 1) { 'constructs-branch-1' } else { 'primary' }
@@ -145,6 +151,7 @@ $evidence = [ordered]@{
     execution_disposition = 'unchanged'
     equivalent = $null
     t_adaptation = $null
+    file_completion_protocol = $null
     native_applicability = $null
     native_applicability_verified = $false
     repl_preflight_process = $null
@@ -286,6 +293,7 @@ try {
     foreach ($relative in @('scripts/run-conformance.ps1', 'scripts/ConformanceRunner.psm1',
         'scripts/ConformanceInventory.psm1', 'scripts/ConformanceScope.psm1',
         'scripts/ManagedTelemetry.psm1', 'scripts/ConformanceReview.psm1',
+        'scripts/ConformanceFileProtocols.psm1',
         'scripts/ConformanceTransforms.psm1','scripts/New-ConformanceTTransform.ps1',
         'scripts/New-ConformanceEquivalent.ps1', 'tests/conformance/suite.json')) {
         $evidence.harness_source_records += [ordered]@{
@@ -800,6 +808,31 @@ try {
                 $File -cin @('api.lua','code.lua','memerr.lua')) { '' }
                 elseif ($File -ceq 'utf8.lua') { 'ok' } else { 'OK' }
         }
+        if ($TargetPolicy -ne '' -and $Mode -ceq 'File' -and
+            $null -ne (Get-TargetFileProtocolDefinition -File $File)) {
+            $protocolPath = if ($FileProtocolManifest -ne '') { $FileProtocolManifest }
+                else { 'tests/conformance/targets/remaining-upstream-compatibility/file-completion.author-proposal.json' }
+            $protocol = Read-TargetFileProtocolManifest -Root $root -Path $protocolPath -RequireReview:$RequireTargetAcceptance
+            $wrapper = Join-Path $root $protocol.manifest.wrapper.path
+            $wrapperCopy = Join-Path $runRoot 'target-file-completion.lua'
+            Copy-Item -LiteralPath $wrapper -Destination $wrapperCopy
+            $wrapperHash = (Get-FileHash -LiteralPath $wrapperCopy).Hash.ToLowerInvariant()
+            if ($wrapperHash -cne $protocol.manifest.wrapper.sha256) { throw 'Target completion wrapper copy changed bytes' }
+            # Replace only the selected chunk argument; setup, native fixtures,
+            # adapter and source-profile setup stay in the same process.
+            $chunk = $arguments[-1]
+            $chunkFull = if ([IO.Path]::IsPathRooted($chunk)) { $chunk } else { Join-Path $fixtureDirectory $chunk }
+            $definition = Get-TargetFileProtocolDefinition -File $File
+            $evidence.file_completion_protocol = [ordered]@{file=$File;entry=$definition.entry;
+                manifest_path=$protocol.path;manifest_sha256=$protocol.sha256;wrapper_artifact=$wrapperCopy;
+                wrapper_sha256=$wrapperHash;chunk_path=$chunk;
+                executed_sha256=(Get-FileHash -LiteralPath $chunkFull).Hash.ToLowerInvariant();
+                disposition=$null;terminal_witness=$null;source_completed=$false;
+                runtime_acceptance=$false;coverage_authority=$false}
+            $arguments = @($arguments[0],$arguments[1],$wrapperCopy,$File,$chunk)
+            $marker = 'target file completion ' + $File + ': ' +
+                $(if ($Configuration -ceq 'default' -and $definition.t_absent_return) { 'T absent' } else { 'complete' })
+        }
     }
     if ($acceptanceRequested -or $isolatedLauncher) {
         $environment.LUA_ADA_CONFORMANCE_RUN_ID = $runId
@@ -809,6 +842,12 @@ try {
         -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'execution') `
         -TimeoutSeconds $evidence.timeout_seconds -Environment $environment
     $evidence.outcome = Get-ConformanceOutcome -Process $evidence.process -Marker $marker
+    if ($null -ne $evidence.file_completion_protocol) {
+        $completed = Assert-TargetFileCompletion -File $File -Configuration $Configuration -Process $evidence.process
+        foreach ($field in @('disposition','terminal_witness','source_completed')) {
+            $evidence.file_completion_protocol[$field] = $completed[$field]
+        }
+    }
     if ($hasProfileWitness) {
         $evidence.source_profile_facts = Get-ScopedSourceProfileFacts `
             -Output ([IO.File]::ReadAllText($evidence.process.stdout_path)) -Observed $observed
@@ -880,6 +919,10 @@ try {
                 throw 'Acceptance requires committed, configuration-verified, unchanged inputs'
             }
             $contract = Get-Content -LiteralPath $AcceptanceContract -Raw | ConvertFrom-Json -AsHashtable
+            if ($RequireTargetAcceptance -and $null -ne $evidence.file_completion_protocol) {
+                [void](Assert-TargetFileProtocolBinding -Root $root -Report $evidence `
+                    -WrapperPath $evidence.file_completion_protocol.wrapper_artifact -Contract $contract -RequireReview)
+            }
             if ($EquivalentManifest -ne '' -and
                 ($contract.equivalent_manifest_sha256 -cne $evidence.equivalent.manifest_sha256 -or
                  $contract.executed_sha256 -cne $evidence.equivalent.output_sha256 -or

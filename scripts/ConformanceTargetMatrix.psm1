@@ -7,6 +7,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceMatrix.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceFileProtocols.psm1')
 
 function Assert-TargetTransformReplay {
     param([string] $Root, [string] $ArtifactRoot,
@@ -427,6 +428,16 @@ function Test-FullTargetMatrix {
                 -ExclusionPolicySha256 $manifest.exclusion_policy.sha256 -Exclusions $inventory.Exclusions
             Assert-TargetTransformReplay -Root $Root -ArtifactRoot $artifacts -Report $report -Entry $entry `
                 -Contract $contract -ResolvedExclusions $resolvedExclusions -RequireAcceptance:$RequireTargetAcceptance
+            if ($entry.operation.StartsWith('file:',[StringComparison]::Ordinal) -and
+                $null -ne (Get-TargetFileProtocolDefinition -File $entry.operation.Substring(5))) {
+                if (-not $report.Contains('file_completion_protocol') -or $null -eq $report.file_completion_protocol) {
+                    throw 'Full-target File report lacks its completion protocol'
+                }
+                $wrapper = Resolve-TargetCapture -Root $artifacts -Original $report.file_completion_protocol.wrapper_artifact `
+                    -Sha256 $report.file_completion_protocol.wrapper_sha256
+                [void](Assert-TargetFileProtocolBinding -Root $Root -Report $report -WrapperPath $wrapper `
+                    -Contract $contract -RequireReview:$RequireTargetAcceptance)
+            }
             $imageKey = $entry.context + '/' + $target
             $signature = $observed.executable_sha256 + '|' + (@($observed.images.Keys | Sort-Object |
                 ForEach-Object { $_ + ':' + $observed.images[$_] }) -join '|')

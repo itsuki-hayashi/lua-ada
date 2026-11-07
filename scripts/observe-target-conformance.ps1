@@ -4,6 +4,7 @@ param(
     [Parameter(Mandatory)][string] $RuntimeDirectory,
     [string] $NativeLibraryDirectory = '',
     [string] $GCEquivalentManifest = '',
+    [string] $FileProtocolManifest = '',
     [ValidateSet('default','upstream-test')][string] $Configuration = 'default',
     [ValidateSet('development','validation','release')][string] $Profile = 'validation',
     [ValidateSet('static','static-pic','relocatable')][string] $LibraryType = 'static',
@@ -15,6 +16,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceFileProtocols.psm1')
 $suite = Get-Content -LiteralPath (Join-Path $root 'tests/conformance/suite.json') -Raw |
     ConvertFrom-Json -AsHashtable -Depth 32
 $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
@@ -72,6 +74,9 @@ try {
         if ($entry.file -ceq 'constructs.lua') { $arguments.ConstructsBranch = $entry.constructs_branch }
         if ($entry.equivalent_manifest -ne '') {
             $arguments.EquivalentManifest = $entry.equivalent_manifest
+        }
+        if ($FileProtocolManifest -ne '' -and $null -ne (Get-TargetFileProtocolDefinition -File $entry.file)) {
+            $arguments.FileProtocolManifest = $FileProtocolManifest
         }
         & (Join-Path $PSScriptRoot 'run-conformance.ps1') @arguments
         $code = $LASTEXITCODE

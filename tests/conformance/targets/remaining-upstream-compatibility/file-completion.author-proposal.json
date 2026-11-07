@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "kind": "target-file-completion-protocols",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "wrapper": {
+    "path": "tests/conformance/target-file-completion.lua",
+    "sha256": "702b638a6ca0d3a54c29b72b1ce6648c6914ab0eb175dc5851d308a3157327a3"
+  },
+  "orchestrator": {
+    "path": "references/lua/testes/all.lua",
+    "sha256": "f1b8b8075a71e7abc40260f6b9112e8d2a1057772f26374df4bc800d10296309"
+  },
+  "review": {
+    "status": "pending",
+    "author": "Codex /root/validation_delivery",
+    "reviewer": null,
+    "artifact": null,
+    "artifact_sha256": null
+  },
+  "files": [
+    {
+      "file": "api.lua",
+      "source": {
+        "path": "references/lua/testes/api.lua",
+        "sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": true,
+      "source_links": [
+        {
+          "start_byte": 40018,
+          "length_bytes": 9,
+          "sha256": "abd24699e5b47f6e82adc910795ea3a12d5cb235ecb681722e6e37912d22fcf9",
+          "text": "print'OK'",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        },
+        {
+          "start_byte": 64,
+          "length_bytes": 101,
+          "sha256": "6f5f4b60db25bfae9020333e97d5aaa7b3b807e4086af05ea36003dd45f81c90",
+          "text": "if T==nil then\n  (Message or print)('\\n >>> testC not active: skipping API tests <<<\\n')\n  return\nend",
+          "rationale": "A literal T-absence return is an omission, never complete instrumented execution."
+        },
+        {
+          "start_byte": 3100,
+          "length_bytes": 161,
+          "sha256": "4990deacadee7b98d2dca25a65a730577cc8ec44e07d36a419da0c213728f2c8",
+          "text": "-- testing warnings\nT.testC([[\n  warningC \"#This should be a\"\n  warningC \" single \"\n  warning \"warning\"\n  warningC \"#This should be \"\n  warning \"another one\"\n]])",
+          "rationale": "Continued warning fragments must form exactly two complete warning lines."
+        }
+      ]
+    },
+    {
+      "file": "attrib.lua",
+      "source": {
+        "path": "references/lua/testes/attrib.lua",
+        "sha256": "dd2eb13be29628ac0268cddfafdc6a816edcba6552ae15e8637afc6a79742e52"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [
+        "returned 27"
+      ],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 14004,
+          "length_bytes": 11,
+          "sha256": "c5db24cffb1fd397d8035491305088c438f1f129de8314db0a61e95bce88b4bb",
+          "text": "print('OK')",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        },
+        {
+          "start_byte": 9453,
+          "length_bytes": 20,
+          "sha256": "03fe9eea1d1b3afd9a7dcc9eff993987f853300e77002db5231cc0131e408050",
+          "text": "local res, res2 = 27",
+          "rationale": "The original result is 27."
+        },
+        {
+          "start_byte": 14017,
+          "length_bytes": 10,
+          "sha256": "23c95a125b619acdfca96d50d3d14c03e72855ebbf9d51b59ffc7f7073cdff81",
+          "text": "return res",
+          "rationale": "all.lua explicitly checks the first returned result equals 27."
+        }
+      ]
+    },
+    {
+      "file": "big.lua",
+      "source": {
+        "path": "references/lua/testes/big.lua",
+        "sha256": "6396916f2f7c857cf1e1bfa70e5de58bbdbcf44984357c2c4d1578d33eee12e6"
+      },
+      "entry": "coroutine",
+      "source_marker": "OK",
+      "phases": [
+        "yielded b",
+        "returned a"
+      ],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 2126,
+          "length_bytes": 9,
+          "sha256": "abd24699e5b47f6e82adc910795ea3a12d5cb235ecb681722e6e37912d22fcf9",
+          "text": "print'OK'",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        },
+        {
+          "start_byte": 1381,
+          "length_bytes": 18,
+          "sha256": "5bd81940f0f8da8e5eea75a89b76f2df8476a259d1cf72c230edfe709aa9873f",
+          "text": "coroutine.yield'b'",
+          "rationale": "all.lua expects this suspension before the terminal OK and final return."
+        },
+        {
+          "start_byte": 2137,
+          "length_bytes": 10,
+          "sha256": "e6181dfb8b46fdb3c9c03fe55fb46aac54a4b8e34f9880c58a82f544ffe52ed8",
+          "text": "return 'a'",
+          "rationale": "The second resume must return a and terminate the coroutine."
+        }
+      ]
+    },
+    {
+      "file": "calls.lua",
+      "source": {
+        "path": "references/lua/testes/calls.lua",
+        "sha256": "e0331ba5557c09ba844c11a54810ca7cc01998638316d5192e252a2ab0a2d407"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [
+        "returned deep"
+      ],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 14850,
+          "length_bytes": 11,
+          "sha256": "c5db24cffb1fd397d8035491305088c438f1f129de8314db0a61e95bce88b4bb",
+          "text": "print('OK')",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        },
+        {
+          "start_byte": 14862,
+          "length_bytes": 11,
+          "sha256": "653fd033fa286144eca7d203242817a3e16e63a9767747b05fbe1357b8a07abd",
+          "text": "return deep",
+          "rationale": "all.lua compares the returned exported deep function and requires it to be truthy."
+        }
+      ]
+    },
+    {
+      "file": "code.lua",
+      "source": {
+        "path": "references/lua/testes/code.lua",
+        "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+      },
+      "entry": "strip",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": true,
+      "source_links": [
+        {
+          "start_byte": 14703,
+          "length_bytes": 10,
+          "sha256": "929f2ec193fd1320c2287738747727fcf663817d66faeed8384da3b5aa32c70c",
+          "text": "print 'OK'",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        },
+        {
+          "start_byte": 83,
+          "length_bytes": 104,
+          "sha256": "6cbc2276f7214ec212214a3f5dbf2f48914a46ab90adebe20f15d6c38f631050",
+          "text": "if T==nil then\n  (Message or print)('\\n >>> testC not active: skipping opcode tests <<<\\n')\n  return\nend",
+          "rationale": "A literal T-absence return is an omission, never complete instrumented execution."
+        }
+      ]
+    },
+    {
+      "file": "cstack.lua",
+      "source": {
+        "path": "references/lua/testes/cstack.lua",
+        "sha256": "52ad964a0cf6161c58161d9dd0fcbec81bec949fb7ebd4ea1201c5c978df899c"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 5381,
+          "length_bytes": 9,
+          "sha256": "abd24699e5b47f6e82adc910795ea3a12d5cb235ecb681722e6e37912d22fcf9",
+          "text": "print'OK'",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        }
+      ]
+    },
+    {
+      "file": "db.lua",
+      "source": {
+        "path": "references/lua/testes/db.lua",
+        "sha256": "82ed710f0aa5ab23eb86fc0ad73705e6d8f8b0cd9c8a3d1b4da31623c3e40f10"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 26587,
+          "length_bytes": 9,
+          "sha256": "e31a48294811e40967e60b578e9ac65819daceac846c608925217974bec2e4e5",
+          "text": "print\"OK\"",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        }
+      ]
+    },
+    {
+      "file": "errors.lua",
+      "source": {
+        "path": "references/lua/testes/errors.lua",
+        "sha256": "57bb9cc9e622b16646f5aec072e4f9295a2401b886e98ad4af21f4bd5b19f53d"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 22332,
+          "length_bytes": 11,
+          "sha256": "c5db24cffb1fd397d8035491305088c438f1f129de8314db0a61e95bce88b4bb",
+          "text": "print('OK')",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        }
+      ]
+    },
+    {
+      "file": "literals.lua",
+      "source": {
+        "path": "references/lua/testes/literals.lua",
+        "sha256": "ab77f2eb07f794cbb1d704000752fee994a10b6d865c5281f0050fdc149b5af3"
+      },
+      "entry": "direct",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 11657,
+          "length_bytes": 11,
+          "sha256": "c5db24cffb1fd397d8035491305088c438f1f129de8314db0a61e95bce88b4bb",
+          "text": "print('OK')",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        }
+      ]
+    },
+    {
+      "file": "locals.lua",
+      "source": {
+        "path": "references/lua/testes/locals.lua",
+        "sha256": "56b5126c40f48bb1a701f041af28cd72a3a7d50b3db9b05da5659f2485f740c1"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [
+        "returned 5"
+      ],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 31207,
+          "length_bytes": 11,
+          "sha256": "c5db24cffb1fd397d8035491305088c438f1f129de8314db0a61e95bce88b4bb",
+          "text": "print('OK')",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        },
+        {
+          "start_byte": 31220,
+          "length_bytes": 10,
+          "sha256": "bcaf0e37c87d2f76afd10f8df3b58b78ea5652acd9feb08b215c3a8aff4a19e1",
+          "text": "return 5,f",
+          "rationale": "all.lua checks the first result is 5; it intentionally ignores the second result."
+        }
+      ]
+    },
+    {
+      "file": "main.lua",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 16134,
+          "length_bytes": 11,
+          "sha256": "c545f64dcb52f029589224057770de0b4068b80f7d1fbe86354a7ef531d1bd6e",
+          "text": "print(\"OK\")",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        },
+        {
+          "start_byte": 7936,
+          "length_bytes": 730,
+          "sha256": "fc5a702bef511d73252b670aac13dd5bca23a602d69eb2c90be48f841d3b07bb",
+          "text": "print(\"testing warnings\")\n\n-- no warnings by default\nRUN('echo \"io.stderr:write(1); warn[[XXX]]\" | lua 2> %s', out)\ncheckout(\"1\")\n\nprepfile[[\nwarn(\"@allow\")               -- unknown control, ignored\nwarn(\"@off\", \"XXX\", \"@off\")  -- these are not control messages\nwarn(\"@off\")                 -- this one is\nwarn(\"@on\", \"YYY\", \"@on\")    -- not control, but warn is off\nwarn(\"@off\")                 -- keep it off\nwarn(\"@on\")                  -- restart warnings\nwarn(\"\", \"@on\")              -- again, no control, real warning\nwarn(\"@on\")                  -- keep it \"started\"\nwarn(\"Z\", \"Z\", \"Z\")          -- common warning\n]]\nRUN('lua -W %s 2> %s', prog, out)\ncheckout[[\nLua warning: @offXXX@off\nLua warning: @on\nLua warning: ZZZ\n]]",
+          "rationale": "Original subprocess assertions validate warning controls and continued messages."
+        },
+        {
+          "start_byte": 14437,
+          "length_bytes": 1695,
+          "sha256": "b9da1bbe7c5199b3b6d5362b0fcbadb40fe239703ae023c9b1af98997f2f659f",
+          "text": "print('testing Ctrl C')\ndo\n  -- interrupt a script\n  local function kill (pid)\n    return os.execute(string.format('kill -INT %s 2> /dev/null', pid))\n  end\n\n  -- function to run a script in background, returning its output file\n  -- descriptor and its pid\n  local function runback (luaprg)\n    -- shell script to run 'luaprg' in background and echo its pid\n    local shellprg = string.format('%s -e \"%s\" & echo $!', progname, luaprg)\n    local f = io.popen(shellprg, \"r\")   -- run shell script\n    local pid = f:read()   -- get pid for Lua script\n    print(\"(if test fails now, it may leave a Lua script running in \\z\n            background, pid \" .. pid .. \")\")\n    return f, pid\n  end\n\n  -- Lua script that runs protected infinite loop and then prints '42'\n  local f, pid = runback[[\n    pcall(function () print(12); while true do end end); print(42)]]\n  -- wait until script is inside 'pcall'\n  assert(f:read() == \"12\")\n  kill(pid)  -- send INT signal to Lua script\n  -- check that 'pcall' captured the exception and script continued running\n  assert(f:read() == \"42\")  -- expected output\n  assert(f:close())\n  print(\"done\")\n\n  -- Lua script in a long unbreakable search\n  local f, pid = runback[[\n    print(15); string.find(string.rep('a', 100000), '.*b')]]\n  -- wait (so script can reach the loop)\n  assert(f:read() == \"15\")\n  assert(os.execute(\"sleep 1\"))\n  -- must send at least two INT signals to stop this Lua script\n  local n = 100\n  for i = 0, 100 do   -- keep sending signals\n    if not kill(pid) then   -- until it fails\n      n = i   -- number of non-failed kills\n      break\n    end\n  end\n  assert(f:close())\n  assert(n >= 2)\n  print(string.format(\"done (with %d kills)\", n))\n\nend",
+          "rationale": "Both original interrupt subprocesses must reach their asserted terminal messages and close pipes."
+        }
+      ]
+    },
+    {
+      "file": "memerr.lua",
+      "source": {
+        "path": "references/lua/testes/memerr.lua",
+        "sha256": "02cc2a754e688bdfcbf507e009d899c4d367f27ced45094b68fdf208a6912491"
+      },
+      "entry": "dump",
+      "source_marker": "Ok",
+      "phases": [],
+      "t_absent_return": true,
+      "source_links": [
+        {
+          "start_byte": 7499,
+          "length_bytes": 10,
+          "sha256": "c0d6fbe734827483d7b7aec5bbe6b4be99b878fda33b4d27497e417675610d27",
+          "text": "print \"Ok\"",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        },
+        {
+          "start_byte": 190,
+          "length_bytes": 117,
+          "sha256": "a33dea5a26d991a7e1f74e509f20ce5a7c857f418a094145bb634dcf6ed8eafb",
+          "text": "if T==nil then\n  (Message or print)\n      ('\\n >>> testC not active: skipping memory error tests <<<\\n')\n  return\nend",
+          "rationale": "A literal T-absence return is an omission, never complete instrumented execution."
+        },
+        {
+          "start_byte": 7084,
+          "length_bytes": 291,
+          "sha256": "42cc62600c7888426bbbdfb05ff7cf5982ec945f128933682fbe028665eeaee6",
+          "text": "local Count = 0\ntestamem(\"finalizers\", function ()\n  local X = false\n  local obj = setmetatable({}, {__gc = function ()  X = true end})\n  obj = nil\n  T.resetCI()   -- remove extra CallInfos\n  T.reallocstack(18)   -- remove extra stack slots\n  Count = Count + 1\n  io.stderr:write(Count, \"\\n\")",
+          "rationale": "The dynamic stderr progress counter starts at one and increases without gaps."
+        }
+      ]
+    },
+    {
+      "file": "nextvar.lua",
+      "source": {
+        "path": "references/lua/testes/nextvar.lua",
+        "sha256": "a49a917beb9e5c000d60baed697cefcdcb4ca985bba27b71d587cff8776b5029"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 22740,
+          "length_bytes": 9,
+          "sha256": "e31a48294811e40967e60b578e9ac65819daceac846c608925217974bec2e4e5",
+          "text": "print\"OK\"",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        }
+      ]
+    },
+    {
+      "file": "sort.lua",
+      "source": {
+        "path": "references/lua/testes/sort.lua",
+        "sha256": "283f72b600acda62016689c92a694f2b91c1fc49dbcba377a9a5ed78b2784dc3"
+      },
+      "entry": "strip",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 9615,
+          "length_bytes": 9,
+          "sha256": "e31a48294811e40967e60b578e9ac65819daceac846c608925217974bec2e4e5",
+          "text": "print\"OK\"",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        }
+      ]
+    },
+    {
+      "file": "strings.lua",
+      "source": {
+        "path": "references/lua/testes/strings.lua",
+        "sha256": "29ae5d36a220f6afcb865e094806fa70c9a05effc35bb83ace0e0bf647097fa6"
+      },
+      "entry": "direct",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 19392,
+          "length_bytes": 11,
+          "sha256": "c5db24cffb1fd397d8035491305088c438f1f129de8314db0a61e95bce88b4bb",
+          "text": "print('OK')",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        }
+      ]
+    },
+    {
+      "file": "vararg.lua",
+      "source": {
+        "path": "references/lua/testes/vararg.lua",
+        "sha256": "46405b18946c40a9c092cc63216df9a3944562ce222acfd5e63ae78f19f356be"
+      },
+      "entry": "dump",
+      "source_marker": "OK",
+      "phases": [],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 6203,
+          "length_bytes": 11,
+          "sha256": "c5db24cffb1fd397d8035491305088c438f1f129de8314db0a61e95bce88b4bb",
+          "text": "print('OK')",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        }
+      ]
+    },
+    {
+      "file": "verybig.lua",
+      "source": {
+        "path": "references/lua/testes/verybig.lua",
+        "sha256": "2b6d30c69cbe6974068881108eae297bdedd275b429be8ec614bf5f8ee89707e"
+      },
+      "entry": "strip",
+      "source_marker": "OK",
+      "phases": [
+        "returned 10"
+      ],
+      "t_absent_return": false,
+      "source_links": [
+        {
+          "start_byte": 3699,
+          "length_bytes": 9,
+          "sha256": "abd24699e5b47f6e82adc910795ea3a12d5cb235ecb681722e6e37912d22fcf9",
+          "text": "print'OK'",
+          "rationale": "The original terminal source marker must precede the wrapper return completion."
+        },
+        {
+          "start_byte": 3647,
+          "length_bytes": 27,
+          "sha256": "0b6286575376f0357a0cacd11b5bfe8ea9d7c6cfc6b657c3ffaa7a0aab5160cb",
+          "text": "local result = dofile(file)",
+          "rationale": "The generated large source is executed before returning its result."
+        },
+        {
+          "start_byte": 3709,
+          "length_bytes": 13,
+          "sha256": "bffa478fd43608c06d50aa5022c6b4a8407fc234526250dfaa512d5200d252ac",
+          "text": "return result",
+          "rationale": "all.lua requires the generated source result to be 10 and then collects."
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Author-only source protocol proposal; no runtime acceptance or coverage authority.",
+    "Fresh original C and Ada observations and independent per-context contracts are required.",
+    "main.lua Unix shell/native applicability requires original C evidence and reviewed exact platform transforms where applicable.",
+    "Default T-absent returns do not discharge omitted instrumented obligations.",
+    "Static entry/return assertions are completion checks, not coverage ledger evidence."
+  ]
+}

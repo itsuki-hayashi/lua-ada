@@ -291,3 +291,5 @@ if ($LASTEXITCODE -ne 0) { throw 'Full-target matrix regressions failed' }
 if ($LASTEXITCODE -ne 0) { throw 'Exact-byte transform regressions failed' }
 & (Join-Path $PSScriptRoot 'test-target-development-observer.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Development observer regressions failed' }
+& (Join-Path $PSScriptRoot 'test-target-file-protocols.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Target file completion regressions failed' }

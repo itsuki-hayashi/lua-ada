@@ -286,3 +286,33 @@ private static assertion sites are linked to proposed obligations. These counts
 describe source inventory, not executed coverage. Constant-type and return-arity
 implications still require independent review and public runtime witnesses.
 The production exclusion overlay is not changed by these author packets.
+
+`file-completion.author-proposal.json` describes the seventeen remaining File
+entry protocols. `target-file-completion.lua` runs the selected original or
+exact reviewed derived chunk once using all.lua's entry operation: dump/load,
+stripped dump/load, direct text loading, or the two big.lua coroutine resumes.
+It observes calls.lua's exported deep result, attrib.lua's 27, locals.lua's 5
+and verybig.lua's 10 without treating discarded extra returns as failures.
+The original source marker must precede the wrapper's terminal return witness.
+big.lua must suspend with b before its OK and die after returning a. memerr.lua
+uses its actual case-sensitive Ok and a consecutive numbered stderr progress
+sequence; api.lua must emit its two exact continued warnings. main.lua must
+finish its original warning assertions and both interrupt subprocesses before
+OK. Its platform applicability remains a separate original-C review obligation.
+
+These descriptors are author-only source proposals, without runtime or ledger
+authority. The target runner and observer accept `-FileProtocolManifest` to
+select an independently approved successor explicitly. Final target operation
+and matrix acceptance require accepted independent source review binding the
+wrapper, all.lua and every exact protocol/source span, and the per-context
+execution contract must bind `file_completion_protocol_sha256` and
+`file_completion_wrapper_sha256`. Matrix replay verifies the copied wrapper,
+actual entry arguments, selected original/derived chunk hash and captured
+return/yield/warning phases. Existing thirteen-file protocols remain unchanged.
+Default api/code/memerr witnesses say T absent and retain the ordinary coverage
+omission links; they never certify their omitted instrumented bodies.
+
+`test-target-file-protocols.ps1` uses explicitly synthetic byte/capture/review
+fixtures. Its optional `-ReferenceInterpreter` cases run tiny synthetic chunks
+to reject incorrect return values and incorrect coroutine termination; those
+checks do not execute the original upstream files or establish Ada conformance.
