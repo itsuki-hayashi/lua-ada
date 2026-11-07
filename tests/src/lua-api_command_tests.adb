@@ -25,6 +25,13 @@ package body Lua.API_Command_Tests is
    procedure Loaded_File;
    procedure Oversized_Userdata;
    procedure Panic_Refusal_Sweep;
+   procedure Not_False;
+   procedure Not_Nil;
+   procedure Not_Zero;
+   procedure Not_Empty_String;
+   procedure Not_Table;
+   procedure Not_Function;
+   procedure Check_Not (Expression : String; Expected : Boolean);
    procedure Light_Upvalues;
    procedure Absent_Upvalue;
    procedure Stack_Reordering;
@@ -487,6 +494,49 @@ package body Lua.API_Command_Tests is
              "error(n..':'..tostring(ok)..':'..tostring(e))end end", True);
    end Panic_Refusal_Sweep;
 
+   procedure Check_Not (Expression : String; Expected : Boolean) is
+   begin
+      --  The operand is a parameter, so constant folding cannot remove NOT.
+      --  Construct values before refusal; clear it only after the word runs.
+      --  Check also validates final physical provider ownership independently.
+      Check ("local function invert(x)T.alloccount(0);" &
+             "local r=not x;T.alloccount();return r end;" &
+             "local x=" & Expression & ";assert(invert(x)==" &
+             (if Expected then "true" else "false") & ")", True);
+   end Check_Not;
+
+   procedure Not_False is
+   begin
+      Check_Not ("false", True);
+   end Not_False;
+
+   procedure Not_Nil is
+   begin
+      Check_Not ("nil", True);
+   end Not_Nil;
+
+   procedure Not_Zero is
+   begin
+      Check_Not ("0", False);
+   end Not_Zero;
+
+   procedure Not_Empty_String is
+   begin
+      Check_Not ("''", False);
+   end Not_Empty_String;
+
+   procedure Not_Table is
+   begin
+      --  Even a hostile handler cannot participate in logical truth.
+      Check_Not ("setmetatable({},{__len=function()error('length')end})",
+                 False);
+   end Not_Table;
+
+   procedure Not_Function is
+   begin
+      Check_Not ("function()end", False);
+   end Not_Function;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "API driver: light C upvalues",
@@ -565,5 +615,17 @@ package body Lua.API_Command_Tests is
                         Oversized_Userdata'Access);
       Test_Support.Add (Suite, "Panic: provider refusal cleanup sweep",
                         Panic_Refusal_Sweep'Access);
+      Test_Support.Add (Suite, "Primitive NOT: false under refusal",
+                        Not_False'Access);
+      Test_Support.Add (Suite, "Primitive NOT: nil under refusal",
+                        Not_Nil'Access);
+      Test_Support.Add (Suite, "Primitive NOT: zero under refusal",
+                        Not_Zero'Access);
+      Test_Support.Add (Suite, "Primitive NOT: empty string under refusal",
+                        Not_Empty_String'Access);
+      Test_Support.Add (Suite, "Primitive NOT: table under refusal",
+                        Not_Table'Access);
+      Test_Support.Add (Suite, "Primitive NOT: function under refusal",
+                        Not_Function'Access);
    end Register;
 end Lua.API_Command_Tests;

@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [scalar NOT correction](sessions/2026-11-08-scalar-not-refusal.md) has six
+native-paired refusal cases and clean strict builds. Correct the six integrated
+I/O borrowed-operand diagnostic failures without weakening the borrow check,
+then continue string.find's fresh result-packet allocation under refusal and
+the assigned common Lua CI/custom C hook view. Full target acceptance is open.
+
 The [shared traceback renderer](sessions/2026-11-08-shared-traceback.md) has
 twenty-two native-paired C cases and two host-policy regressions within 2,052
 passing AUnit cases per local configuration. Complete the retained registry

@@ -1206,7 +1206,13 @@ package body Lua.Engine.Canonical is
                Binary_Request (Metamethod_Operator (Reg_C), Left, Right,
                                Part (State, Previous, A));
             end;
-         when Op_UNM | Op_BNOT | Op_NOT | Op_LEN =>
+         when Op_NOT =>
+            --  Logical negation has no metamethod and never needs a helper
+            --  activation or argument packet. It must remain a scalar word
+            --  operation when an earlier protected failure has exhausted the
+            --  allocator, including checkerr's ordinary `not stat` test.
+            Put (Reg_A, (Boolean_Kind, not Truth (Reg (Reg_B))));
+         when Op_UNM | Op_BNOT | Op_LEN =>
             declare
                Arguments : Values.Vector := Owned_Values (State);
             begin
@@ -1215,7 +1221,6 @@ package body Lua.Engine.Canonical is
                  (case Op is
                      when Op_UNM => Lua.Lexers.Minus,
                      when Op_BNOT => Lua.Lexers.Bit_Xor,
-                     when Op_NOT => Lua.Lexers.Not_Word,
                      when others => Lua.Lexers.Length));
             end;
          when Op_CONCAT =>

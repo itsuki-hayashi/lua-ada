@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [scalar NOT checkpoint](sessions/2026-11-08-scalar-not-refusal.md) removes
+an allocation from logical negation under provider refusal. Six named cases
+pass both local configurations and all four native/Ada producer/VM combinations
+match. The full integrated suites remain 2,088/2,094 with six I/O diagnostic
+borrow failures assigned to the parent; these are not passing full suites.
+Unchanged memerr.lua next reaches a fresh string.find result-vector allocation.
+
 The [traceback checkpoint](sessions/2026-11-08-shared-traceback.md) exports
 luaL_traceback through the same owned renderer as debug.traceback. Twenty-two
 C cases match both native and both Ada configurations; each local Ada

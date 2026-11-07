@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [scalar logical negation](2026-11-08-scalar-not-refusal.md).
+
 Component: [panic and provider controls](2026-11-08-panic-provider-controls.md).
 
 Component: [shared traceback rendering](2026-11-08-shared-traceback.md).
