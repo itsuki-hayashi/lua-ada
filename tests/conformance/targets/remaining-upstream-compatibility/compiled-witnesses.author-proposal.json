@@ -171,7 +171,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -324,7 +324,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -495,7 +497,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -648,7 +650,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -819,7 +823,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -1018,7 +1022,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -1189,7 +1195,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -1348,7 +1354,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -1519,7 +1527,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -1684,7 +1692,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -1855,7 +1865,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -2014,7 +2024,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -2185,7 +2197,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -2350,7 +2362,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -2521,7 +2535,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -2674,7 +2688,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -2845,7 +2861,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -2998,7 +3014,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -3169,7 +3187,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -3368,7 +3386,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -3539,7 +3559,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -3698,7 +3718,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -3869,7 +3891,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -4034,7 +4056,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -4205,7 +4229,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -4364,7 +4388,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -4535,7 +4561,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -4700,7 +4726,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -4871,7 +4899,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -5024,7 +5052,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -5195,7 +5225,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -5348,7 +5378,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -5519,7 +5551,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -5718,7 +5750,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -5889,7 +5923,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -6048,7 +6082,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -6219,7 +6255,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -6384,7 +6420,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -6555,7 +6593,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -6714,7 +6752,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -6885,7 +6925,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -7050,7 +7090,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -7221,7 +7263,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -7374,7 +7416,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -7545,7 +7589,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -7698,7 +7742,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -7869,7 +7915,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -8068,7 +8114,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -8239,7 +8287,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -8398,7 +8446,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -8569,7 +8619,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -8734,7 +8784,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -8905,7 +8957,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -9064,7 +9116,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -9235,7 +9289,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -9400,7 +9454,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -9571,7 +9627,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -9724,7 +9780,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -9895,7 +9953,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -10048,7 +10106,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -10219,7 +10279,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -10418,7 +10478,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -10589,7 +10651,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -10748,7 +10810,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -10919,7 +10983,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -11084,7 +11148,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -11255,7 +11321,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -11414,7 +11480,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -11585,7 +11653,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -11750,7 +11818,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -11921,7 +11991,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -12074,7 +12144,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -12245,7 +12317,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -12398,7 +12470,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -12569,7 +12643,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -12768,7 +12842,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -12939,7 +13015,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -13098,7 +13174,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -13269,7 +13347,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -13434,7 +13512,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -13605,7 +13685,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -13764,7 +13844,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -13935,7 +14017,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -14100,7 +14182,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -14271,7 +14355,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -14424,7 +14508,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -14595,7 +14681,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -14748,7 +14834,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -14919,7 +15007,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -15124,7 +15212,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -15295,7 +15385,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -15458,7 +15548,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -15629,7 +15721,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -15792,7 +15884,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -15963,7 +16057,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -16122,7 +16216,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -16293,7 +16389,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -16458,7 +16554,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -16629,7 +16727,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -16788,7 +16886,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -16959,7 +17059,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -17124,7 +17224,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -17295,7 +17397,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -17448,7 +17550,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -17619,7 +17723,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -17772,7 +17876,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -17943,7 +18049,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -18148,7 +18254,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -18319,7 +18427,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -18482,7 +18590,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -18653,7 +18763,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -18816,7 +18926,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -18987,7 +19099,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -19146,7 +19258,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -19317,7 +19431,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -19482,7 +19596,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -19653,7 +19769,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -19812,7 +19928,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -19983,7 +20101,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -20148,7 +20266,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -20319,7 +20439,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -20478,7 +20598,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -20649,7 +20771,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -20808,7 +20930,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -20979,7 +21103,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -21166,7 +21290,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -21337,7 +21463,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -21496,7 +21622,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -21667,7 +21795,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -21826,7 +21954,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -21997,7 +22127,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -22184,7 +22314,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -22355,7 +22487,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -22514,7 +22646,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -22685,7 +22819,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -22844,7 +22978,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -23015,7 +23151,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -23202,7 +23338,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -23373,7 +23511,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -23532,7 +23670,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -23703,7 +23843,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -23862,7 +24002,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -24033,7 +24175,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -24220,7 +24362,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -24391,7 +24535,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -24550,7 +24694,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -24721,7 +24867,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -24880,7 +25026,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -25051,7 +25199,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -25238,7 +25386,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -25409,7 +25559,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -25568,7 +25718,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -25739,7 +25891,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -25898,7 +26050,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -26069,7 +26223,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -26256,7 +26410,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -26427,7 +26583,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -26586,7 +26742,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -26757,7 +26915,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -26916,7 +27074,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -27087,7 +27247,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -27280,7 +27440,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -27451,7 +27613,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -27620,7 +27782,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -27791,7 +27955,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -27960,7 +28124,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -28131,7 +28297,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -28290,7 +28456,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -28461,7 +28629,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -28620,7 +28788,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -28791,7 +28961,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -28984,7 +29154,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -29155,7 +29327,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -29324,7 +29496,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -29495,7 +29669,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -29664,7 +29838,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -29835,7 +30011,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -29994,7 +30170,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -30165,7 +30343,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -30324,7 +30502,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -30495,7 +30675,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -30682,7 +30862,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -30853,7 +31035,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -31012,7 +31194,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -31183,7 +31367,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -31342,7 +31526,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -31513,7 +31699,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -31700,7 +31886,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -31871,7 +32059,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -32030,7 +32218,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -32201,7 +32391,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -32360,7 +32550,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -32531,7 +32723,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -32718,7 +32910,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -32889,7 +33083,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -33048,7 +33242,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -33219,7 +33415,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -33378,7 +33574,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -33549,7 +33747,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -33736,7 +33934,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -33907,7 +34107,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -34066,7 +34266,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -34237,7 +34439,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -34396,7 +34598,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -34567,7 +34771,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -34754,7 +34958,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -34925,7 +35131,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -35084,7 +35290,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -35255,7 +35463,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -35414,7 +35622,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -35585,7 +35795,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -35772,7 +35982,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -35943,7 +36155,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -36102,7 +36314,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -36273,7 +36487,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -36432,7 +36646,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "global_classification_review_status": "pending",
@@ -36607,7 +36823,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -36796,7 +37012,9 @@
           "output": "{root}/reports/target-builds/upstream-test-macos-validation-static/compiled/header-upstream-test-macos-validation-static-facade-c/native",
           "execution_arguments": []
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -36967,7 +37185,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -37136,7 +37354,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -37307,7 +37527,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -37476,7 +37696,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -37647,7 +37869,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -37806,7 +38028,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -37977,7 +38201,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -38136,7 +38360,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "global_classification_review_status": "pending",
@@ -38311,7 +38537,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -38500,7 +38726,9 @@
           "output": "{root}/reports/target-builds/upstream-test-macos-validation-shared/compiled/header-upstream-test-macos-validation-shared-facade-c/native",
           "execution_arguments": []
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -38671,7 +38899,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -38840,7 +39068,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -39011,7 +39241,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -39180,7 +39410,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -39351,7 +39583,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -39504,7 +39736,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -39675,7 +39909,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -39828,7 +40062,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "global_classification_review_status": "pending",
@@ -40003,7 +40239,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -40198,7 +40434,9 @@
           "output": "{root}/reports/target-builds/default-windows-validation-static-pic/compiled/header-default-windows-validation-static-pic-facade-c/native.exe",
           "execution_arguments": []
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -40369,7 +40607,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -40528,7 +40766,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -40699,7 +40939,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -40864,7 +41104,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -41035,7 +41277,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -41194,7 +41436,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -41365,7 +41609,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -41530,7 +41774,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -41701,7 +41947,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -41854,7 +42100,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -42025,7 +42273,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -42178,7 +42426,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "ordinary-public-SDK-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "global_classification_review_status": "pending",
@@ -42353,7 +42603,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -42554,7 +42804,9 @@
           "output": "{root}/reports/target-builds/upstream-test-windows-validation-static-pic/compiled/header-upstream-test-windows-validation-static-pic-facade-c/native.exe",
           "execution_arguments": []
         }
-      }
+      },
+      "compiler_role": "actual-implementation-C-configuration",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -42725,7 +42977,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -42888,7 +43140,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -43059,7 +43313,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -43222,7 +43476,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "native-private-T-caller-header-role",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -43393,7 +43649,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -43552,7 +43808,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -43723,7 +43981,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -43888,7 +44146,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -44059,7 +44319,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -44218,7 +44478,9 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     },
     {
       "runtime_acceptance": false,
@@ -44389,7 +44651,7 @@
           "path": "tests/conformance/header_declarations.c"
         },
         {
-          "sha256": "7bf0bb64fc907b1b4984c8fe6f89511c3279171ce7b2bead4b9f68f0c0205881",
+          "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
           "path": "scripts/HeaderDeclarationProbes.psm1"
         },
         {
@@ -44554,10 +44816,12 @@
             "{root}/tests/conformance/header_declarations.c"
           ]
         }
-      }
+      },
+      "compiler_role": "supplemental-Windows-header-branch-independent-of-target-linkage",
+      "declaration_linkage_claim": "none-no-Lua-library-linked"
     }
   ],
-  "independent_review_status": "pending",
+  "independent_review_status": "accepted-source-and-configuration-only",
   "runtime_acceptance": false,
   "kind": "target-compiled-witness-mapping",
   "api_anchors": [
@@ -47871,11 +48135,11 @@
     }
   ],
   "review": {
-    "status": "pending",
-    "artifact_sha256": null,
-    "reviewer": null,
-    "author": "Codex /root/validation_delivery",
-    "artifact": null
+    "artifact_sha256": "4024c191cff3d1d8a7240b40f1299ae34a29074bfb9db0fbe5f94ea8669c9881",
+    "status": "accepted",
+    "artifact": "tests/conformance/targets/remaining-upstream-compatibility/reviews/header-probes.source-approval.json",
+    "reviewer": "Claude Haiku CLI",
+    "author": "Codex /root/validation_delivery"
   },
   "target": "remaining-upstream-compatibility",
   "coverage_authority": false,
@@ -47884,6 +48148,8 @@
     "Declaration/type/header observations only; no Lua implementation is linked and no Lua API executes.",
     "Public C/C++ consumers, DLL import/export declarations and private T callers are distinct modes.",
     "The implementation-facade receiver is C99-only, matching the actual C implementation; it makes no C++ facade claim.",
+    "Supplemental Windows DLL import/export cases exercise header branches independently of target linkage: no Lua library is linked and no static-context DLL linkage is claimed.",
+    "Ordinary public static callers retain plain declarations; Windows facade export flags match unconditional C_ABI_Defines in the bound lua_ada.gpr, including exported static hosts.",
     "On these 64-bit contexts the exact header roles assert pointer8, ordinary/facade extraspace8 and native private-T lock declaration16; this does not assert Ada lock storage.",
     "Private T extraspace and buffer declarations do not certify ordinary SDK extraspace mutation or runtime representation.",
     "All function/data entries and behavioral macros retain independently reviewed actual runtime routes.",

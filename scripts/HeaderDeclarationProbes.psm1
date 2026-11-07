@@ -27,6 +27,7 @@ function New-HeaderDeclarationMapping {
     $anchors=@($anchors|ForEach-Object{Anchor-Identity $_})
     $ids=@($anchors.id)
     $applicability=@($api|Where-Object{ $_.id -cnotin $ids -and $_.conditions.Count -gt 0 }|ForEach-Object{Anchor-Identity $_})
+    if($applicability.Count -ne 28){throw 'Original conditional behavioral applicability inventory changed'}
     $source='tests/conformance/header_declarations.c';$hash=(Get-FileHash (Join-Path $Root $source)).Hash.ToLowerInvariant()
     $bindings=@(@{path=$source;sha256=$hash})
     foreach($script in @('scripts/HeaderDeclarationProbes.psm1','scripts/run-target-compiled-witnesses.ps1',
@@ -42,6 +43,10 @@ function New-HeaderDeclarationMapping {
         $parts=$context.Split('/');$modes=@(@{id='public-c';language='c';extra=@()},@{id='public-cpp';language='c++';extra=@()})
         $facadeFlags=@('-include','{root}/c_api/include/lua_ada_runtime_configuration.h')
         if($parts[0] -ceq 'upstream-test'){$facadeFlags+='-DLUA_ADA_AUXILIARY_BUFFER_BYTES=23'}
+        # The implementation's actual Windows C_ABI_Defines are unconditional
+        # in lua_ada.gpr: static executables export the C facade too. Linkage
+        # does not select these declarations. Ordinary static SDK callers keep
+        # the separate plain public-c/public-cpp receiver without DLL flags.
         if($parts[1] -ceq 'windows'){$facadeFlags+=@('-DLUA_BUILD_AS_DLL','-DLUA_CORE','-DLUA_LIB')}
         $modes+=@{id='facade-c';language='c';extra=$facadeFlags}
         if($parts[0] -ceq 'upstream-test'){$modes+=@(@{id='private-t-c';language='c';extra=@('-DLUA_USER_H=<{root}/references/lua/ltests.h>')},
@@ -79,6 +84,10 @@ function New-HeaderDeclarationMapping {
                 }
             }
             $cases+=@{id=$id;protocol='paired-header-profile-v1';contexts=@($context);mode=$mode.id;language=$mode.language;
+                declaration_linkage_claim='none-no-Lua-library-linked';
+                compiler_role=$(if($mode.id.StartsWith('dll-')){'supplemental-Windows-header-branch-independent-of-target-linkage'}
+                    elseif($mode.id -ceq 'facade-c'){'actual-implementation-C-configuration'}
+                    elseif($mode.id.StartsWith('private-t-')){'native-private-T-caller-header-role'}else{'ordinary-public-SDK-caller-header-role'});
                 source=@{path=$source;sha256=$hash};source_bindings=$sourceBindings;profile_fields=$fields;
                 profile_assertions=@{LUA_VERSION_NUM=505;LUA_VERSION_RELEASE_NUM=50501;
                     'sizeof.lua_State *'=8;'sizeof.lua_Integer'=8;'sizeof.lua_Unsigned'=8;'sizeof.lua_Number'=8;
@@ -99,6 +108,8 @@ function New-HeaderDeclarationMapping {
         boundaries=@('Declaration/type/header observations only; no Lua implementation is linked and no Lua API executes.',
             'Public C/C++ consumers, DLL import/export declarations and private T callers are distinct modes.',
             'The implementation-facade receiver is C99-only, matching the actual C implementation; it makes no C++ facade claim.',
+            'Supplemental Windows DLL import/export cases exercise header branches independently of target linkage: no Lua library is linked and no static-context DLL linkage is claimed.',
+            'Ordinary public static callers retain plain declarations; Windows facade export flags match unconditional C_ABI_Defines in the bound lua_ada.gpr, including exported static hosts.',
             'On these 64-bit contexts the exact header roles assert pointer8, ordinary/facade extraspace8 and native private-T lock declaration16; this does not assert Ada lock storage.',
             'Private T extraspace and buffer declarations do not certify ordinary SDK extraspace mutation or runtime representation.',
             'All function/data entries and behavioral macros retain independently reviewed actual runtime routes.',
@@ -242,7 +253,7 @@ function Assert-HeaderDeclarationMapping {
     # The generated schedule is closed over every real context/language/mode.
     # A caller cannot drop the C++ or DLL observation which selects a branch
     # while retaining an easier counterpart where that branch is inactive.
-    foreach($field in @('candidate_category_decisions','api_anchors','applicability_anchors','cases')){
+    foreach($field in @('boundaries','candidate_category_decisions','api_anchors','applicability_anchors','cases')){
         if((Get-HeaderProbePayloadHash $Mapping[$field]) -cne (Get-HeaderProbePayloadHash $actual[$field])){
             throw "Paired header source or complete probe schedule differs: $field"
         }
@@ -255,6 +266,7 @@ function Get-HeaderDeclarationReviewClaims([Collections.IDictionary] $Mapping) {
     # so that its content-addressed identity does not become circular.
     return [ordered]@{scope='header-probe-source-and-configuration';target=$Mapping.target;
         reference_revision=$Mapping.reference_revision;api_anchors=$Mapping.api_anchors;
+        boundaries=$Mapping.boundaries;
         candidate_category_decisions=$Mapping.candidate_category_decisions;
         applicability_anchors=$Mapping.applicability_anchors;cases=$Mapping.cases;
         global_api_classifications_accepted=$false;runtime_acceptance=$false}

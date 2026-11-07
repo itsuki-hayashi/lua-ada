@@ -1,0 +1,111 @@
+{
+  "kind": "header-source-independent-review-final-hardening",
+  "author": "Codex /root/validation_delivery",
+  "claims_sha256": "3c98f3435b4e0fa45949236b197ecd9ee034299bcdee9bcd93068adb2c0f1094",
+  "target": "remaining-upstream-compatibility",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source_bindings": [
+    {
+      "sha256": "007608c5e2abd231a9f61dc6cf4080ff6d4b54c845aa87b08162b5c778960443",
+      "path": "c_api/include/api/lauxlib.h"
+    },
+    {
+      "sha256": "5e00319e803893f4310b1206394c80b82f03f42609b40ceb306d92a6740d828e",
+      "path": "c_api/include/api/lua.h"
+    },
+    {
+      "sha256": "1e617ae6f206d701018941b64ed61851da4ffc3573a0f96b73ebe64e340bfb5d",
+      "path": "c_api/include/api/luaconf.h"
+    },
+    {
+      "sha256": "ca847f045256db26a03a654c60ca4db567fc63a54679bba4233114f0c3d532d1",
+      "path": "c_api/include/api/lualib.h"
+    },
+    {
+      "sha256": "446cfe00e648bec85ec3ed877980a3d986b7aff9526b222991198662900ea05f",
+      "path": "c_api/include/lua_ada_runtime_configuration.h"
+    },
+    {
+      "sha256": "f81e266682fd97d0f7632742d5e7477d6ae44cee87c4854fb2b3a9f10791fcba",
+      "path": "lua_ada.gpr"
+    },
+    {
+      "sha256": "007608c5e2abd231a9f61dc6cf4080ff6d4b54c845aa87b08162b5c778960443",
+      "path": "references/lua/lauxlib.h"
+    },
+    {
+      "sha256": "6d2e3db39c58bdadc3a0aaf3ded12873e0b56ad898ce11a872717da72efb4829",
+      "path": "references/lua/ltests.h"
+    },
+    {
+      "sha256": "5e00319e803893f4310b1206394c80b82f03f42609b40ceb306d92a6740d828e",
+      "path": "references/lua/lua.h"
+    },
+    {
+      "sha256": "1e617ae6f206d701018941b64ed61851da4ffc3573a0f96b73ebe64e340bfb5d",
+      "path": "references/lua/luaconf.h"
+    },
+    {
+      "sha256": "ca847f045256db26a03a654c60ca4db567fc63a54679bba4233114f0c3d532d1",
+      "path": "references/lua/lualib.h"
+    },
+    {
+      "sha256": "d7ab429f6ce8e6d335803c3bda4e072ebf4a02b63708e8371d550c514550df04",
+      "path": "runtime_configuration.gpr"
+    },
+    {
+      "sha256": "abb2bf330c387807c0dbdd4e57312c94346403848818528ac410fe8728c3df7c",
+      "path": "scripts/HeaderDeclarationProbes.psm1"
+    },
+    {
+      "sha256": "5a2ad3cffc937e3c72a0e0eddc996de5b4ae1178e3d576091ce19c3154ac937c",
+      "path": "scripts/run-target-compiled-witnesses.ps1"
+    },
+    {
+      "sha256": "e1fa739b503ac087220f8cbd56f8dc294927095b7c8c2f59e9c7e2d57be983ea",
+      "path": "scripts/TargetCompiledWitnesses.psm1"
+    },
+    {
+      "sha256": "6cbfbb7a1b22a2848476127c79a438610fd8833fd115b27df2f59a5d84b52842",
+      "path": "scripts/TargetWitnessPolicy.psm1"
+    },
+    {
+      "sha256": "992f1a86a969799138c5112e4277f907f3a98d0149ffd351cb2ed50316e3ae4e",
+      "path": "src/configurations/default/lua-runtime_configuration.ads"
+    },
+    {
+      "sha256": "83e4774b5df0f64fe1bee8a5acd30990c94c52ba7b2008f826a487ad343769d4",
+      "path": "src/configurations/upstream-test/lua-runtime_configuration.ads"
+    },
+    {
+      "sha256": "90743481652a5b99cdb3217b905ea16650d89d3ac5bd83e96b74c9a20e261024",
+      "path": "tests/conformance/header_declarations.c"
+    }
+  ],
+  "candidate_category_decisions": {
+    "callable_function": "runtime-required",
+    "object_macro": "eligible-compiled-candidate",
+    "status": "candidate-not-semantic-classification",
+    "conditional_behavioral_applicability": "not-runtime-evidence",
+    "type_layout": "eligible-compiled-candidate",
+    "behavioral_macro": "runtime-required"
+  },
+  "declaration_count": 228,
+  "applicability_count": 28,
+  "cases": 132,
+  "boundaries": [
+    "Declaration/type/header observations only; no Lua implementation is linked and no Lua API executes.",
+    "Public C/C++ consumers, DLL import/export declarations and private T callers are distinct modes.",
+    "The implementation-facade receiver is C99-only, matching the actual C implementation; it makes no C++ facade claim.",
+    "Supplemental Windows DLL import/export cases exercise header branches independently of target linkage: no Lua library is linked and no static-context DLL linkage is claimed.",
+    "Ordinary public static callers retain plain declarations; Windows facade export flags match unconditional C_ABI_Defines in the bound lua_ada.gpr, including exported static hosts.",
+    "On these 64-bit contexts the exact header roles assert pointer8, ordinary/facade extraspace8 and native private-T lock declaration16; this does not assert Ada lock storage.",
+    "Private T extraspace and buffer declarations do not certify ordinary SDK extraspace mutation or runtime representation.",
+    "All function/data entries and behavioral macros retain independently reviewed actual runtime routes.",
+    "All 473 global semantic classifications and coverage ledger entries remain pending."
+  ],
+  "global_api_classifications_accepted": false,
+  "runtime_acceptance": false,
+  "previous_accepted_review": "reports/header-independent-review/aa67d33a2ed94ef4a4014b8da2a17a5c/claude-output.json",
+  "only_change": "Explicit applicability.Count -ne 28 guard immediately after applicability collection, as the accepted review requested optional hardening."
+}

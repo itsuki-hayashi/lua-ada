@@ -1,6 +1,6 @@
 {
   "global_api": {
-    "sha256": "ab5791959fa2f1f04a31fe886e36a06c3d4185080ad5d3e3e73eb4b170456bf1",
+    "sha256": "f02e71f5dfd1d2fbce674aa228001a065f71c5178607a23fe792cdb7f8f3fb69",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/global-api.author-proposal.json"
   },
   "retained_api_routes": 159,
@@ -65,11 +65,11 @@
   "runtime_acceptance": false,
   "global_api_entries": 473,
   "witness_policy": {
-    "sha256": "48e1235c15fd7782c65a8f76c99ed976ec9d0ca52efc9233d630e405e08fe80a",
+    "sha256": "a5d69e19575be15a95eb8c4714c6b67690d653438fe55c18ad2cb3772e2f9e82",
     "path": "tests/conformance/targets/remaining-upstream-compatibility/witness-policy.author-proposal.json"
   },
   "source_snapshot": {
-    "revision": "60cd38470435c42036f60f969ca40f5bf1d468ba",
+    "revision": "7882cfcf7232201f6e6d1f65d52706ce8dba1ef9",
     "repository_dirty": true,
     "kind": "repository-source-snapshot"
   },

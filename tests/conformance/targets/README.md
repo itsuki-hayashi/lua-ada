@@ -689,6 +689,22 @@ original ltests.h without an oracle public-header fallback. Candidate category
 decisions and the final classification verifier source are hash-bound by the
 review claims. Compiled reports explicitly retain their development and source
 review status, and an absent compiled schedule is a failed/not-run phase.
+Supplemental Windows DLL import/export roles are header branch observations
+independent of the target's linkage. They link no Lua library and claim no
+static-context DLL linkage. Ordinary static SDK callers keep their plain
+declaration roles. The facade's Windows export flags match the unconditional
+implementation C definitions in the bound GPR, including exported static hosts.
+
+The target-owned `reviews/header-probes.source-approval.json` records the
+distinct Claude Haiku CLI source/configuration review. Its narrative preserves
+the actual changes-required responses, accepted follow-ups and source-bound
+packet identities. The author addressed the SDK fallback, verifier binding,
+extraspace/role assertions, development labels, candidate-category claims and
+DLL scope findings, including the optional applicability count guard. The
+reviewer used read-only tools and explicitly did not recompute hashes or run
+compilers. Machine replay checks source hashes separately. This approval
+accepts candidate eligibility and probe design only; it leaves every global
+semantic classification and all runtime/platform/coverage acceptance pending.
 
 Final image replay also binds the actual selected C/C++ frontend identities,
 the compiler/query processes, both executables and every capture. Declaration

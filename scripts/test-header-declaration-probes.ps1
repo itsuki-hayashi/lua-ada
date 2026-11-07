@@ -20,6 +20,7 @@ Case 'closed declaration schedule retains all contexts C++ DLL and distinct priv
         $entry.declaration -cnotmatch '^#define\s+[A-Za-z_][A-Za-z0-9_]*\(')) 'A function or callable macro acquired declaration-only classification'}
     foreach($case in $mapping.cases){
         Assert-True ('scripts/TargetWitnessPolicy.psm1' -cin @($case.source_bindings.path)) 'The final declaration/runtime boundary was not source-bound'
+        Assert-True ($case.declaration_linkage_claim -ceq 'none-no-Lua-library-linked') 'Header observation claimed runtime linkage'
         Assert-True ($case.profile_assertions.LUA_EXTRASPACE -eq $(if($case.mode.StartsWith('private-t-')){16}else{8})) 'The exact header extraspace role was not asserted'
         $includes=@($case.sides.sdk.compile_arguments|Where-Object{$_ -cmatch '^\{root\}/(?:references/lua|c_api/include/api)$'})
         Assert-True ($includes.Count -eq 1 -and $includes[0] -ceq '{root}/c_api/include/api') 'SDK headers can fall back to the reference public tree'
