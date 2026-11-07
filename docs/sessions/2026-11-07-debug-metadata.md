@@ -728,3 +728,15 @@ scalar prefix below pending TBC slots; the coordinated C reset work owns that
 physical-window lifetime extension. Regular C callback error deferral must also
 wait until the corresponding typed C guard has acknowledged abandonment.
 Ownerless reader, warning and external-release guards remain real barriers.
+
+## 2026-11-08 native C error-close policy fixture
+
+The new public close_yield_contract consumer captures nine independently named
+cases: lua_call, lua_pcall without a continuation, and lua_pcallk, each through
+normal return, body error and close-handler error. It checks the exact two-step
+coroutine transfer, integer error identity, the actual public caller of a
+closing handler, and the pinned C-call-boundary/dead-coroutine diagnostics.
+The same unmodified first-party C source passes all nine cases against both
+isolated native configurations, with zero counted bytes/blocks after close.
+This records native policy and is not a passing Ada result. The production
+error-close and regular callback deferral implementation remains in progress.
