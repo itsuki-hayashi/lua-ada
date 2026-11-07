@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "kind": "independent-named-evidence-binding-delta-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-source-delta",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "path": "scripts/ConformanceReview.psm1",
+      "sha256": "579c5948ce448d665fc11c7f4d33595c9e3f1bbefc230378556051129c81465e"
+    },
+    {
+      "path": "scripts/ConsumerEvidence.psm1",
+      "sha256": "ebde52b4b532380332d68dc1cb78a8e0c4169a1d0dfde6ea1b84a1f832885247"
+    },
+    {
+      "path": "scripts/AUnitEvidence.psm1",
+      "sha256": "968267f7440f417979ea8da8507c5431047daf3f1e4e2177e29fa90e288c616a"
+    },
+    {
+      "path": "scripts/test-conformance-review.ps1",
+      "sha256": "46736698cdd70a4daec16ec4ecc2671096ca07390c5e3e6318dd4014ec9e9b91"
+    },
+    {
+      "path": "scripts/test-consumer-evidence.ps1",
+      "sha256": "a5edf523d1b2c035fe204196179122beed70a48a9ede2a92a58651a6638c7224"
+    },
+    {
+      "path": "scripts/test-aunit-evidence.ps1",
+      "sha256": "99822b76ecc3c4ef8fa9536511fdd2a2bf5d5a0c3a4f9be8203503be10f8ad8f"
+    }
+  ],
+  "accepted_checks": [
+    "Final matrix approval now binds both named mapping identities including review hashes, plus independently accepted per-context report hashes. Empty/mismatched/duplicate report sets reject; downstream replay still checks actual files and full context set.",
+    "Both evidence helpers translate only suite context spelling shared to build spelling relocatable, preserving other dimensions and concrete child/report library checks.",
+    "Five added review negatives cover mapping/review identity changes, consumer/AUnit report changes and missing named report sets; positive shared-context fixtures exercise the naming translation."
+  ],
+  "limitations": [
+    "Independent source review only; parent-reported test totals are not final runtime acceptance.",
+    "Actual all26 contexts and clean-revision artifact replay remain required."
+  ],
+  "execution_evidence": []
+}

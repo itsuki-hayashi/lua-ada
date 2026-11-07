@@ -91,18 +91,18 @@ Write-Output 'SCOPE TEST PASS: full M3 completion still rejects unresolved cover
 $stdoutPath = Join-Path $temporary 'synthetic-process.stdout'
 function Test-ProcessWitness {
     param([string] $Name, [string] $File, [string] $Output,
-          [scriptblock] $Mutate = {}, [string] $Expected = '', [switch] $NativeOracle)
+          [scriptblock] $Mutate = {}, [string] $Expected = '', [switch] $NativeOracle, [string] $Platform='')
     [IO.File]::WriteAllText($stdoutPath, $Output)
     $process = @{ exit_code=0; timed_out=$false; capture_exceeded=$false;
         pipe_drain_failed=$false; process_tree_kill_error=$null;
         process_id=123; stdout_path=$stdoutPath }
     $telemetry = @{schema_version=1; process_id=123; run_id='synthetic'; configuration='upstream-test';
         allocator_limit_bytes=2147483648L; managed_refusals=1; outstanding_bytes=0;
-        outstanding_blocks=0; shutdown_complete=$true; accounting_fault=$false}
+        outstanding_blocks=0; shutdown_complete=$true; accounting_fault=$false; expected_finalizer_warnings=10}
     & $Mutate $process $telemetry
     $failure = $null
     try { Assert-ScopedProcessCompletion -File $File -Process $process -Telemetry $telemetry `
-        -RunId 'synthetic' -Configuration upstream-test -NativeOracle:$NativeOracle }
+        -RunId 'synthetic' -Configuration upstream-test -NativeOracle:$NativeOracle -Platform $Platform }
     catch { $failure = $_.Exception.Message }
     if (($Expected -eq '' -and $null -ne $failure) -or
         ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))) {
@@ -122,6 +122,8 @@ $dateWitness = "test done on 01/01/2026, at 00:00:00`nLua 5.5`n"
 $ioWitness = "native unbuffered visibility counterpart OK`ntesting i/o`ntesting flush`ntesting failed write`ntesting large files (> BUFSIZ)`ntesting popen/pclose and execute`ntesting date/time`n"
 $nativeWitness = "native branch facts: cint=4 lua_integer=8`nnative branch facts: time_2pow40=representable`nnative branch facts: year4000=representable`nnative branch facts: isdst=boolean`nnative C-int field boundary counterpart OK`nnative time range recovery counterpart OK`nnative DST inference counterpart OK`n"
 $ioWitness += $nativeWitness
+Test-ProcessWitness 'macOS requires nested shell counterpart' files.lua ($ioWitness+$dateWitness) -Platform macos -Expected 'nested shell status'
+Test-ProcessWitness 'macOS nested shell counterpart observed' files.lua ("native macOS nested shell status counterpart OK`n"+$ioWitness+$dateWitness) -Platform macos
 Test-ProcessWitness 'files requires actual native year fact' files.lua `
     ($ioWitness.Replace("native branch facts: year4000=representable`n", '') + $dateWitness) -Expected 'native branch fact: year'
 Test-ProcessWitness 'files rejects duplicate native branch fact' files.lua `
@@ -143,6 +145,10 @@ Test-ProcessWitness 'instrumented events requires real refusal' events.lua "OK`n
 Test-ProcessWitness 'C oracle T refusal is below wrapper accounting' events.lua "OK`n" `
     { param($p,$t) $t.managed_refusals=0 } -NativeOracle
 Test-ProcessWitness 'missing physical shutdown fails' events.lua "OK`n" { param($p,$t) $t.shutdown_complete=$false } 'shutdown'
+Test-ProcessWitness 'missing last GC close callback fails' gc.lua "OK`n>>> closing state <<<`n" {param($p,$t) $t.expected_finalizer_warnings=9} 'delivery count'
+Test-ProcessWitness 'missing GC close counter fails' gc.lua "OK`n>>> closing state <<<`n" {param($p,$t) $t.Remove('expected_finalizer_warnings')} 'delivery count'
+Test-ProcessWitness 'duplicate GC close callback fails' gc.lua "OK`n>>> closing state <<<`n" {param($p,$t) $t.expected_finalizer_warnings=11} 'delivery count'
+Test-ProcessWitness 'text GC close count fails' gc.lua "OK`n>>> closing state <<<`n" {param($p,$t) $t.expected_finalizer_warnings='10'} 'delivery count'
 Test-ProcessWitness 'leaked blocks fail scoped completion' events.lua "OK`n" { param($p,$t) $t.outstanding_blocks=1 } 'unbalanced'
 Test-ProcessWitness 'wrong child configuration fails' events.lua "OK`n" { param($p,$t) $t.configuration='default' } 'Mismatched'
 Write-Output "PASS: $script:Cases scoped inventory/process regressions"

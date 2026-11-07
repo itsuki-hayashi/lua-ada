@@ -839,3 +839,34 @@ probes. Independent semantic review binds 14 collector/internal-equivalent
 labels. Named-case replay checks summary consistency; the retained whole-suite
 CI gate remains separate. Final-context and matrix-level acceptance fixtures
 remain outstanding, and no ledger obligations were promoted.
+
+Clean 6316df1 Windows default AUnit replay verified all 14 reviewed labels in
+1306 passed cases (reports/review-aunit-clean-evidence.json). The matrix now
+exercises its named-evidence binding helper in 12 synthetic cases, and final
+approval binds named C/AUnit report hashes as well as file reports. Shared
+contexts correctly map to relocatable build identities. Review binding tests
+now total 37, C evidence tests24 and AUnit evidence tests18.
+
+GC shutdown review found that the closing marker alone could miss the last of
+ten expected-error callbacks. Both test-only warning observers now count fully
+delivered unique errors after the original handler returns; post-close telemetry
+must contain integer10. Final strict builds and matching instrumented C/Ada
+GC/events runs pass in reports/review-close-count-final-*.log, with both GC
+reports under reports/gc-events/5718f50921804b09a349bea68467fefa showing10
+and zero outstanding allocations. Process scope/reset and original callback
+semantics are documented in the adapter source manifest.
+
+Mac diagnostic artifact13553243298 from run42319597449/job128240653355 was
+verified against archiveSHA bfd1857b074cb52de212580129f3fcb6589245514528328ebd6f427b2825cd20.
+It demonstrates nested-shell tail execution returns signal1; explicit outer
+waiting returns exit129, while direct HUP/KILL return signal1/9. The narrow
+line801 replacement and named shell counterpart now have standard independent
+four-span approval. Generated equivalentSHA is
+32c93f26bd5b4d04bbcb33b61715d75405d5b4b8e9c9407f586aa246b1aea0bf.
+The instrumented Mac artifact13553138818 at4c00054 independently repeats those
+facts and passes all8warning regressions plus C/Ada events/gc/gengc; files still
+fails at the shell assertion. Its verified archiveSHA is
+f142d2452ede5db32d23256c351db44d713305b0a27654d1021497cb82e9efbf.
+Corrected Mac execution, final26contexts and per-obligation evidence promotion
+remain pending. GC/files execution packets are review proposals with empty
+final evidence bindings; no original coverage status was promoted.

@@ -9,11 +9,12 @@ function Test-NamedConsumerEvidence {
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
     $parts = $Context.Split('/')
+    $libraryType = if ($parts.Count -eq 4 -and $parts[3] -eq 'shared') { 'relocatable' } elseif ($parts.Count -eq 4) { $parts[3] } else { '' }
     if ($parts.Count -ne 4 -or $Report.repository_revision -cne $Revision -or
         $Report.repository_dirty -ne $false -or
         $Report.configuration -cne $parts[0] -or
         $Report.platform -cne $parts[1] -or
-        $Report.profile -cne $parts[2] -or $Report.library_type -cne $parts[3]) {
+        $Report.profile -cne $parts[2] -or $Report.library_type -cne $libraryType) {
         throw 'Named consumer context/revision differs or is dirty'
     }
     if (@($Report.library_files).Count -eq 0) { throw 'Named consumer library identity missing' }
@@ -30,7 +31,7 @@ function Test-NamedConsumerEvidence {
         $record = $matches[0]
         if ($record.exit_code -ne 0 -or $record.timed_out -ne $false -or
             $record.configuration -cne $parts[0] -or $record.profile -cne $parts[2] -or
-            $record.library_type -cne $parts[3] -or
+            $record.library_type -cne $libraryType -or
             $record.executable_sha256 -cnotmatch '^[0-9a-f]{64}$') {
             throw "Named consumer process failed or differs: $name"
         }

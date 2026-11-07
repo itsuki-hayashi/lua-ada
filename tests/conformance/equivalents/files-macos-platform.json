@@ -7,10 +7,11 @@
   "platform": "macos",
   "disposition": "native-platform-equivalent",
   "review": {
-    "status": "pending",
+    "status": "accepted",
     "author": "Codex",
-    "reviewer": null,
-    "artifact": null
+    "reviewer": "/root/review_files",
+    "artifact": "tests/conformance/reviews/files-macos.equivalent-approval.json",
+    "artifact_sha256": "fe6af9557b6b06ecd60e82805af12cd508c64b21f63b84edb714e6c843e686e8"
   },
   "replacements": [
     {
@@ -51,6 +52,19 @@
         "tests/conformance/platform/macos-buffered-failure.lua"
       ],
       "replacement": "  local f = _test_failing_stream(assert(io.tmpfile()))\n"
+    },
+    {
+      "invariant": "Preserve direct HUP/KILL signal termination while keeping the outer shell alive to wait for a nested HUP and return exit status129; popen and execute must agree.",
+      "id": "macos-nested-shell-wait",
+      "replacement": "    {\"sh -c 'kill -s HUP $$'; result=$?; exit $result\", \"exit\"},\n",
+      "start_byte": 21302,
+      "length_bytes": 40,
+      "end_line": 801,
+      "source_sha256": "9a74b20b8b70d7f371dc5e0b5e92875e3b8c1df64f96a3b057d885eeaf893794",
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-shell-status.lua"
+      ],
+      "start_line": 801
     }
   ]
 }

@@ -93,6 +93,9 @@ package body Lua.Conformance_Allocator is
    procedure Finish is
       use Ada.Environment_Variables;
       use Ada.Text_IO;
+      function Expected_Warnings return Interfaces.C.unsigned_long_long
+        with Import, Convention => C,
+             External_Name => "lua_ada_test_expected_finalizer_warnings";
    begin
       if not Attached or else Finished then return; end if;
       Finished := True;
@@ -124,6 +127,8 @@ package body Lua.Conformance_Allocator is
               ",""outstanding_bytes"":" & Live_Bytes'Image &
               ",""outstanding_blocks"":" & Live_Blocks'Image &
               ",""peak_managed_bytes"":" & Peak_Bytes'Image &
+              ",""expected_finalizer_warnings"":" &
+              Expected_Warnings'Image &
               ",""shutdown_complete"":true,""accounting_fault"":" &
               (if Fault then "true" else "false") & "}");
             Close (Output);

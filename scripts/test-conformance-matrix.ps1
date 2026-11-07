@@ -12,6 +12,7 @@ $script:serial = 0
 $script:cases = 0
 $nativeWitness = "native branch facts: cint=4 lua_integer=8`nnative branch facts: time_2pow40=representable`nnative branch facts: year4000=representable`nnative branch facts: isdst=boolean`nnative C-int field boundary counterpart OK`nnative time range recovery counterpart OK`nnative DST inference counterpart OK`n"
 $nativeSource = 'tests/conformance/platform/files-native-branches.lua'
+$nativeWitness += "native macOS nested shell status counterpart OK`n"
 $nativeCopy = Join-Path $captureDirectory 'equivalent-files-native-branches.lua'
 Copy-Item -LiteralPath (Join-Path $root $nativeSource) -Destination $nativeCopy
 $nativeHash = (Get-FileHash $nativeCopy).Hash.ToLowerInvariant()
@@ -41,7 +42,7 @@ function New-Telemetry([string] $RunId, [string] $Configuration, [int] $PidValue
     $path = Join-Path $captureDirectory "telemetry-$script:serial.$PidValue.json"
     $data = @{schema_version=1; run_id=$RunId; configuration=$Configuration; process_id=$PidValue;
         allocator_limit_bytes=2147483648L; managed_refusals=1; outstanding_bytes=0; outstanding_blocks=0;
-        shutdown_complete=$true; accounting_fault=$false}
+        shutdown_complete=$true; accounting_fault=$false; expected_finalizer_warnings=10}
     $hash = Write-Json $path $data
     return @{path=$path; sha256=$hash; data=$data}
 }
@@ -268,3 +269,4 @@ Write-Output "PASS: $script:cases matrix regressions; no executed conformance cl
 & (Join-Path $PSScriptRoot 'test-conformance-review.ps1')
 & (Join-Path $PSScriptRoot 'test-consumer-evidence.ps1')
 & (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')
+& (Join-Path $PSScriptRoot 'test-matrix-named-evidence.ps1')

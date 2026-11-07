@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "kind": "independent-shutdown-warning-counter-review",
+  "author": "Codex primary agent /root",
+  "reviewer": "Codex independent review agent /root/review_gc",
+  "decision": "accepted-source-invariant-with-schema-hardening",
+  "runtime_acceptance": false,
+  "bindings": [
+    {
+      "sha256": "9f97b86315630bff7fcffb4e95a440992b9f9d0e493572fa28672a32bec79a4b",
+      "path": "tests/c/conformance_adapter.c"
+    },
+    {
+      "sha256": "8dda4fb7b3cb09b4fbaf6b5361d5b7caad17d546f5e6667129932834defd51e6",
+      "path": "tests/src/lua-conformance_allocator.adb"
+    },
+    {
+      "sha256": "78ae618e2ba95fd2caee688fa992e8a366dbd43ca96b43ad658d2a29d6693f30",
+      "path": "experiments/conformance/c/bounded_ltests.c"
+    },
+    {
+      "sha256": "cfd0f64c1e10e172413cb9d41d7632f1b5b5d519fef30648b142c9e7e3f8ad26",
+      "path": "experiments/conformance/c/conformance_cli.c"
+    },
+    {
+      "sha256": "091eac241a15b48a14e29d7e22f0a0bb4f3f163df4b311f8399116affd0d37c1",
+      "path": "scripts/ConformanceScope.psm1"
+    },
+    {
+      "sha256": "2bcabd179f538751d19c01bce5401a514f784e1136656f6dbf90867dfc1d8c1d",
+      "path": "scripts/test-conformance-scope.ps1"
+    },
+    {
+      "sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+      "path": "references/lua/testes/gc.lua"
+    },
+    {
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+      "path": "references/lua/ltests.c"
+    }
+  ],
+  "obligation": "LUA-GC-REVIEWED-BLOCK-0026",
+  "invariant": "Exactly ten successfully delivered complete warnings containing the unique @expected warning payload after actual Lua state closure, combined with original ordinal/_WARN assertions, prove all ten selected shutdown callbacks reached their terminal intentional error.",
+  "source_review": [
+    "Pinned gc.lua emits the unique token only at line687 after callback order and previous-warning checks; line681 merely searches it. Other intentional GC errors use distinct tokens.",
+    "An assertion failure in callback10 prevents its terminal error, reducing count or causing existing unhandled-warning failure. Missing trailing callbacks similarly produce fewer than10. Duplicate expected deliveries exceed10.",
+    "Ada counts only after the existing handler completes raw _WARN storage/normal handling and restores the C stack. Controls return before counting, fragments are already concatenated by existing state-owned warning logic, overflow aborts.",
+    "C wrapper calls the original pinned warnf with its unchanged original userdata before recording the fragment. The existing handler retains controls, _WARN checks, rejection and buffer semantics. Completed message counting occurs after successful underlying callback return.",
+    "C observer mirrors200byte fragment capacity and guards subtraction/overflow via bounded current length; valid controls complete/reset observer text without matching unique token.",
+    "C CLI writes telemetry only after conformance_cli_main returns from state closure; Ada shared CLI Finish follows Execute_Main/session cleanup, and scope additionally requires zero outstanding storage/clean shutdown.",
+    "Counters are process-scoped and reset on handler installation. This is sufficient for isolated selected-file CLI runs, not a general multi-state lifetime counter contract."
+  ],
+  "requested_hardening": [
+    "Require expected_finalizer_warnings to be an integer numeric JSON value, not merely PowerShell-coercible equal to10; add wrong-type negative."
+  ],
+  "execution_status": "Parent reports initial C gc run passed; not independently accepted here. Ada run and final26contexts remain pending.",
+  "execution_evidence": [],
+  "type_hardening_delta": {
+    "decision": "accepted-source-invariant",
+    "finding": "integer-schema hardening",
+    "resolution": "ConformanceScope requires int/int64 before exact10 comparison; explicit string10 negative exercises coercion rejection. Manifest documents process scope and reset.",
+    "bindings": [
+      {
+        "sha256": "091eac241a15b48a14e29d7e22f0a0bb4f3f163df4b311f8399116affd0d37c1",
+        "path": "scripts/ConformanceScope.psm1"
+      },
+      {
+        "sha256": "2bcabd179f538751d19c01bce5401a514f784e1136656f6dbf90867dfc1d8c1d",
+        "path": "scripts/test-conformance-scope.ps1"
+      },
+      {
+        "sha256": "900ab0a536e4d9b2cfe24f0ef62fef6f3d64c8fd900d7529928ade840da4e9a3",
+        "path": "tests/c/conformance_adapter.sources.md"
+      }
+    ],
+    "runtime_acceptance": false,
+    "execution_evidence": []
+  },
+  "current_source_bindings": [
+    {
+      "sha256": "9f97b86315630bff7fcffb4e95a440992b9f9d0e493572fa28672a32bec79a4b",
+      "path": "tests/c/conformance_adapter.c"
+    },
+    {
+      "sha256": "8dda4fb7b3cb09b4fbaf6b5361d5b7caad17d546f5e6667129932834defd51e6",
+      "path": "tests/src/lua-conformance_allocator.adb"
+    },
+    {
+      "sha256": "78ae618e2ba95fd2caee688fa992e8a366dbd43ca96b43ad658d2a29d6693f30",
+      "path": "experiments/conformance/c/bounded_ltests.c"
+    },
+    {
+      "sha256": "cfd0f64c1e10e172413cb9d41d7632f1b5b5d519fef30648b142c9e7e3f8ad26",
+      "path": "experiments/conformance/c/conformance_cli.c"
+    },
+    {
+      "sha256": "091eac241a15b48a14e29d7e22f0a0bb4f3f163df4b311f8399116affd0d37c1",
+      "path": "scripts/ConformanceScope.psm1"
+    },
+    {
+      "sha256": "2bcabd179f538751d19c01bce5401a514f784e1136656f6dbf90867dfc1d8c1d",
+      "path": "scripts/test-conformance-scope.ps1"
+    },
+    {
+      "sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
+      "path": "references/lua/testes/gc.lua"
+    },
+    {
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199",
+      "path": "references/lua/ltests.c"
+    }
+  ]
+}

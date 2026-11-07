@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 
 struct adapter_result {
     int count;
@@ -27,6 +28,14 @@ struct warning_state {
     char text[200];
 };
 static const char warning_registry_key = 0;
+static unsigned long long expected_finalizer_warnings;
+
+/* gc.lua's ten state-close callbacks each reach this distinctive error only
+ * after their ordering/stored-warning assertions. Count completed deliveries,
+ * not fragments or Lua registrations; the process driver reads after close. */
+unsigned long long lua_ada_test_expected_finalizer_warnings(void) {
+    return expected_finalizer_warnings;
+}
 
 static void warning_failure(const char *reason, const char *message) {
     fprintf(stderr, "T warning failure: %s: %s\n", reason, message);
@@ -74,6 +83,11 @@ static void test_warning(void *data, const char *message, int continued) {
         fprintf(stderr, "Lua warning: %s\n", w->text);
     }
     lua_settop(L, top);
+    if (strstr(w->text, "@expected warning") != NULL) {
+        if (expected_finalizer_warnings == ULLONG_MAX)
+            warning_failure("warning counter overflow", w->text);
+        expected_finalizer_warnings++;
+    }
     w->length = 0;
     w->text[0] = '\0';
 }
@@ -82,6 +96,7 @@ static int install_warning(lua_State *L) {
     struct warning_state *w = lua_newuserdatauv(L, sizeof(*w), 0);
     memset(w, 0, sizeof(*w));
     w->L = L;
+    expected_finalizer_warnings = 0;
     lua_rawsetp(L, LUA_REGISTRYINDEX, &warning_registry_key);
     lua_setwarnf(L, test_warning, w);
     return 0;

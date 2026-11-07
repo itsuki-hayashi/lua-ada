@@ -118,6 +118,30 @@ function Assert-MatrixReviewBinding {
             throw 'Matrix reviewed report or contract differs'
         }
     }
+    # Named regressions are evidence inputs in their own right. Bind their
+    # report identities to the final independent review, just like file runs.
+    foreach ($kind in @('consumer','aunit')) {
+        $mapping = $Manifest["${kind}_mapping"]
+        $approvedMapping = $approval["${kind}_mapping"]
+        foreach ($field in @('path','sha256','review','review_sha256')) {
+            if ($null -eq $mapping -or $null -eq $approvedMapping -or
+                [string]::IsNullOrWhiteSpace([string]$mapping[$field]) -or
+                $mapping[$field] -cne $approvedMapping[$field]) { throw 'Matrix named mapping review differs' }
+        }
+        $field = if ($kind -eq 'consumer') { 'named_consumers' } else { 'named_aunit' }
+        $entries = @($Manifest[$field])
+        $approved = @($approval[$field])
+        if ($entries.Count -eq 0 -or $entries.Count -ne $approved.Count) { throw 'Matrix named report set differs' }
+        $seen = @{}
+        foreach ($entry in $entries) {
+            $matches = @($approved | Where-Object { $_.context -ceq $entry.context })
+            if ($matches.Count -ne 1 -or $seen.ContainsKey($entry.context) -or
+                $matches[0].decision -cne 'accepted' -or $matches[0].sha256 -cne $entry.sha256) {
+                throw 'Matrix named report review differs'
+            }
+            $seen[$entry.context] = $true
+        }
+    }
 }
 
 function Assert-NativeBranchReviewBinding {

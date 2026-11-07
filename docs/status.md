@@ -5,29 +5,22 @@
 The maintainer resumed implementation after merged PR #8 on
 codex/m3-gc-io-conformance. The target is complete events.lua, gc.lua,
 gengc.lua and files.lua coverage, including T obligations and all 26 contexts.
-The [current handoff](sessions/2026-11-07-gc-io-conformance.md) records actual
-evidence: the integration checkpoint `1cd294e` is signed and published. The
-subsequent real test adapter and shared CLI launcher have passing local
-Windows validation/static AUnit runs in both configurations. The retained
-default pipeline passes at the 1,305-case Windows checkpoint. Instrumented events.lua
-and gengc.lua reach OK in exploratory runs. The source-hashed gc.lua equivalent
-candidate completes its state-close assertions, with actual allocator and
-collector inspection; independent semantic review accepts its mapping while
-complete execution acceptance remains pending. Unchanged gc.lua
-still fails its C-specific fixed memory allowance. The ten-span Windows files.lua
-candidate completes in C and Ada, including a real native counterpart for the
-guarded partial-write block. Its mappings now have source-bound independent
-approval, including a cross-reviewed adjacent native time-boundary fix. Linux
-unchanged file observations pass in both configurations. The first macOS
-instrumented static job passes 1,299 AUnit cases and matching GC/events
-observations, then both C and Ada fail files.lua at the unavailable /dev/full.
-A macOS native equivalent and explicit flush counterpart are implemented.
-The first final-revision macOS runs exposed Windows-only test registration
-and a native buffered-close error. The correction separates pipe capabilities,
-checks Darwin close failure with physical closure, and covers the second
-guarded /dev/full open. Its platform execution remains pending. Independent
-reviews are now authorized and in progress; their findings remain acceptance
-work until corrected and verified.
+PR #9 remains a draft. The [current handoff](sessions/2026-11-07-gc-io-conformance.md)
+records exact revisions, reports and limits. Local Windows default and
+instrumented validation/static AUnit runs pass 1,306 cases. Reviewed GC and
+Windows file equivalents execute against the actual Ada runtime; unchanged
+Linux file observations pass in both configurations. The C-specific GC byte
+allowance remains an explicitly reviewed Ada equivalent, never an unchanged pass.
+Mac instrumented static at 4c00054 passes eight warning regressions and matching
+C/Ada events, GC and generational observations. Its file run fails the nested
+shell-status assumption after passing native IO and nonblocking stages.
+Captured C diagnostics show direct HUP/KILL signal statuses and an explicit
+outer-shell wait returning exit129. The four-span Mac mapping now has independent
+semantic approval and a named shell counterpart; corrected complete Mac runs
+remain pending. The test warning observer also measures all ten instrumented
+GC shutdown errors after their original ordering assertions; actual local C
+and Ada runs report ten with balanced storage. Independent semantic reviews
+are recorded separately from final-revision execution acceptance.
 These observations do not close
 any selected file's full coverage; complete T inspection, reviewed equivalents,
 scoped harness acceptance and the final 26-context matrix remain open.

@@ -18,6 +18,16 @@ Pinned `ltests.c` SHA-256:
 
 Collector color, age, phase, allocation statistics, parameter codec and physical
 storage controls use real Ada state. They do not emulate C private layouts.
+The warning adapter also counts completed deliveries containing the distinct
+`@expected warning` token used only by `gc.lua`'s ten state-close callbacks.
+The test launcher writes this measured count after state closure. The separate
+C oracle's `bounded_ltests.c` wraps warning installation while preserving the
+original callback/data and fragment/control semantics, and observes the same
+completed deliveries. Neither observer edits upstream Lua or supplies a count
+from registered objects. Instrumented GC acceptance requires exactly ten,
+in addition to the original ordering assertions and closing-state output.
+This counter is process-scoped for the isolated single-file launcher and resets
+when its test warning handler is installed; it is not a general per-state API.
 `T.checkmemory` inspects the real registry, collector lists, heap/code edges,
 live activation windows, finalizer queues and allocator headers/accounting.
 Its implementation and negative tests still require independent review of the

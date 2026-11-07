@@ -84,6 +84,11 @@ Run-Case 'different rehashed oracle output' {param($r)
 Run-Case 'duplicate completion marker' {param($r)
     Replace-Capture $r 'io-api' 'stdout' ($markers['io-api'] + $markers['io-api'])
 } 'completion missing/duplicate'
+$context='default/windows/validation/shared'
+Run-Case 'shared context uses relocatable build' {param($r)
+    $r.library_type='relocatable'; foreach($child in $r.consumers){$child.library_type='relocatable'}
+} ''
+$context='default/windows/validation/static'
 $mapping.cases[0].exact_witnesses=@('missing case')
 Run-Case 'missing named case' {} 'witness missing'
 $mapping.cases[0].exact_witnesses=@('case passed')

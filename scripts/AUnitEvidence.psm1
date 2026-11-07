@@ -5,10 +5,11 @@ function Test-NamedAUnitEvidence {
     param([Collections.IDictionary] $Report, [Collections.IDictionary] $Mapping,
           [string] $Revision, [string] $Context, [scriptblock] $ResolveCapture)
     $parts = $Context.Split('/')
+    $libraryType = if ($parts.Count -eq 4 -and $parts[3] -eq 'shared') { 'relocatable' } elseif ($parts.Count -eq 4) { $parts[3] } else { '' }
     if ($parts.Count -ne 4 -or $Report.repository_revision -cne $Revision -or
         $Report.repository_dirty -ne $false -or $Report.configuration -cne $parts[0] -or
         $Report.platform -cne $parts[1] -or $Report.profile -cne $parts[2] -or
-        $Report.library_type -cne $parts[3] -or $Report.completed -ne $true -or
+        $Report.library_type -cne $libraryType -or $Report.completed -ne $true -or
         $Report.exit_code -ne 0 -or $Report.executable_sha256 -cnotmatch '^[0-9a-f]{64}$') {
         throw 'AUnit evidence identity or completion differs'
     }

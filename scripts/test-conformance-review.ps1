@@ -68,6 +68,14 @@ function New-Fixture {
     $matrixApproval = @{schema_version=1;kind='matrix-approval';author='fixture-author';reviewer='fixture-reviewer';decision='accepted';scope='gc-io-events';revision=('a'*40);
         review_evidence=@{path='narrative.json';sha256=$narrativeHash};
         operations=@(@{file='events.lua';context='default/windows/validation/static';decision='accepted';c_report_sha256=('1'*64);ada_report_sha256=('2'*64);contract_sha256=('3'*64)})}
+    foreach ($kind in @('consumer','aunit')) {
+        $identity=@{path="$kind-mapping.json";sha256=('5'*64);review="$kind-review.json";review_sha256=('6'*64)}
+        $matrix["${kind}_mapping"]=$identity.Clone()
+        $matrixApproval["${kind}_mapping"]=$identity.Clone()
+        $field=if($kind -eq 'consumer'){'named_consumers'}else{'named_aunit'}
+        $matrix[$field]=@(@{context='default/windows/validation/static';sha256=('7'*64)})
+        $matrixApproval[$field]=@(@{context='default/windows/validation/static';sha256=('7'*64);decision='accepted'})
+    }
     $matrix.review.artifact_sha256=Write-Json (Join-Path $directory 'matrix-approval.json') $matrixApproval
     @{Root=$directory;Spec=$spec;Approval=$approval;Matrix=$matrix;MatrixApproval=$matrixApproval}
 }
@@ -126,5 +134,10 @@ Reject 'matrix wrong context' {param($f) $f.Matrix.operations[0].context='defaul
 Reject 'matrix C report differs' {param($f) $f.Matrix.operations[0].c.sha256='4'*64} 'report or contract' -Matrix
 Reject 'matrix Ada report differs' {param($f) $f.Matrix.operations[0].ada.sha256='4'*64} 'report or contract' -Matrix
 Reject 'matrix contract differs' {param($f) $f.Matrix.operations[0].contract.sha256='4'*64} 'report or contract' -Matrix
+Reject 'matrix consumer mapping differs' {param($f) $f.Matrix.consumer_mapping.sha256='4'*64} 'named mapping review' -Matrix
+Reject 'matrix AUnit review differs' {param($f) $f.Matrix.aunit_mapping.review_sha256='4'*64} 'named mapping review' -Matrix
+Reject 'matrix consumer report differs' {param($f) $f.Matrix.named_consumers[0].sha256='4'*64} 'named report review' -Matrix
+Reject 'matrix AUnit report differs' {param($f) $f.Matrix.named_aunit[0].sha256='4'*64} 'named report review' -Matrix
+Reject 'matrix named report missing' {param($f) $f.Matrix.named_consumers=@()} 'named report set' -Matrix
 Write-Output "PASS: $script:cases review-artifact binding regressions; synthetic authority only"
 & (Join-Path $PSScriptRoot 'test-native-branch-review.ps1')

@@ -28,11 +28,12 @@ $resolve={param($path,$expected)
     return $path
 }
 $count=0
+$context='default/windows/validation/static'
 function Run-Case($Name,$Mutation,$Expected) {
     $r=$baseline | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashtable
     & $Mutation $r
     $failure=$null
-    try{$null=Test-NamedAUnitEvidence $r $mapping $revision 'default/windows/validation/static' $resolve}
+    try{$null=Test-NamedAUnitEvidence $r $mapping $revision $context $resolve}
     catch{$failure=$_.Exception.Message}
     if(($Expected -eq '' -and $null -ne $failure) -or
         ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))){throw "$Name failed: $failure"}
@@ -57,6 +58,9 @@ Run-Case 'wrong compiled configuration' {param($r)
 } 'compiled configuration'
 Run-Case 'stale source' {param($r) $r.sources[0].sha256='f'*64} 'source differs'
 Run-Case 'no library' {param($r) $r.library_files=@()} 'library identity'
+$context='default/windows/validation/shared'
+Run-Case 'shared context uses relocatable build' {param($r) $r.library_type='relocatable'} ''
+$context='default/windows/validation/static'
 $mapping.entries[0].case=''
 Run-Case 'blank named case' {} 'mapping duplicate/empty'
 $mapping.entries=@()

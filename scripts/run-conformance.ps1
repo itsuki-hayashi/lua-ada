@@ -554,6 +554,13 @@ try {
                 source_sha256=(Get-FileHash $diagnostic).Hash.ToLowerInvariant(); artifact=$diagnosticCopy;
                 artifact_sha256=(Get-FileHash $diagnosticCopy).Hash.ToLowerInvariant(); diagnostic_only=$true}
             $nativeSetup += "; dofile('equivalent-macos-shell-diagnostic.lua')"
+            $counterpart = Join-Path $root 'tests/conformance/platform/macos-shell-status.lua'
+            $counterpartCopy = Join-Path $fixtureDirectory 'equivalent-macos-shell-status.lua'
+            Copy-Item -LiteralPath $counterpart -Destination $counterpartCopy
+            $evidence.native_fixture_records += [ordered]@{source='tests/conformance/platform/macos-shell-status.lua';
+                source_sha256=(Get-FileHash $counterpart).Hash.ToLowerInvariant(); artifact=$counterpartCopy;
+                artifact_sha256=(Get-FileHash $counterpartCopy).Hash.ToLowerInvariant()}
+            $nativeSetup += "; dofile('equivalent-macos-shell-status.lua')"
         }
     }
     if ($Scope -ne '' -and $File -eq 'files.lua') {
@@ -621,7 +628,7 @@ try {
         $telemetryPath = $environment.LUA_ADA_CONFORMANCE_TELEMETRY + '.' + $evidence.process.process_id + '.json'
         $telemetry = Get-Content -LiteralPath $telemetryPath -Raw | ConvertFrom-Json -AsHashtable
         Assert-ScopedProcessCompletion -File $File -Process $evidence.process `
-            -Telemetry $telemetry -RunId $runId -Configuration $Configuration -NativeOracle:($Target -eq 'ReferenceC')
+            -Telemetry $telemetry -RunId $runId -Configuration $Configuration -Platform $evidence.host.platform -NativeOracle:($Target -eq 'ReferenceC')
         $evidence.allocator_telemetry = [ordered]@{ path=$telemetryPath;
             sha256=(Get-FileHash -LiteralPath $telemetryPath -Algorithm SHA256).Hash.ToLowerInvariant(); data=$telemetry }
         if ($File -eq 'files.lua') {
@@ -687,7 +694,7 @@ try {
                 $evidence.coverage_validation = Test-ConformanceScope -Root $root -Scope $Scope -RequireScopedComplete
                 $evidence.scope_complete = $evidence.coverage_validation.ScopeComplete
                 Assert-ScopedProcessCompletion -File $File -Process $evidence.process `
-                    -Telemetry $telemetry -RunId $runId -Configuration $Configuration
+                    -Telemetry $telemetry -RunId $runId -Configuration $Configuration -Platform $evidence.host.platform
             } else {
                 $evidence.coverage_validation = Test-ConformanceInventory -Root $root -RequireComplete
             }

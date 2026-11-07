@@ -143,6 +143,7 @@ function Assert-ScopedProcessCompletion {
           [Parameter(Mandatory)][Collections.IDictionary] $Telemetry,
           [Parameter(Mandatory)][string] $RunId,
           [Parameter(Mandatory)][string] $Configuration,
+          [string] $Platform = '',
           [switch] $NativeOracle)
     if ($Process.exit_code -ne 0 -or $Process.timed_out -or $Process.capture_exceeded -or
         $Process.pipe_drain_failed -or $Process.process_tree_kill_error) {
@@ -174,6 +175,7 @@ function Assert-ScopedProcessCompletion {
             'testing i/o', 'testing flush', 'testing large files (> BUFSIZ)',
             'testing popen/pclose and execute', 'testing date/time')
         if ($Configuration -eq 'upstream-test') { $markers += 'testing failed write' }
+        if ($Platform -eq 'macos') { $markers += 'native macOS nested shell status counterpart OK' }
         foreach ($marker in $markers) {
             if ($stdout -notmatch ('(?m)^' + [regex]::Escape($marker) + '\r?$')) {
                 throw "File IO completion witness missing: $marker"
@@ -185,6 +187,13 @@ function Assert-ScopedProcessCompletion {
     }
     if ($File -eq 'gc.lua' -and $stdout -notmatch '(?ms)^OK\r?\n.*^>>> closing state <<<\r?$') {
         throw 'GC state-close completion witness missing'
+    }
+    if ($File -eq 'gc.lua' -and $Configuration -eq 'upstream-test' -and
+        (-not $Telemetry.Contains('expected_finalizer_warnings') -or
+         ($Telemetry.expected_finalizer_warnings -isnot [int] -and
+          $Telemetry.expected_finalizer_warnings -isnot [long]) -or
+         $Telemetry.expected_finalizer_warnings -ne 10)) {
+        throw 'GC state-close finalizer delivery count differs'
     }
     if ($File -eq 'gengc.lua' -and $Configuration -eq 'upstream-test' -and
         $stdout -notmatch '(?m)^testing stop-the-world collection\r?$') {
