@@ -605,6 +605,15 @@ Regeneration preserves existing JSON key order so fresh source bindings and
 new proposals remain reviewable without unrelated changes across the 473 API
 entries and their future context routes.
 
+`new-target-declaration-proposal.ps1` writes a separate source-only review
+queue bound to all 473 original API anchors and both SDK/reference header
+trees. The companion `compiled-declarations.author-design.md` describes the
+proposed paired probes and their limits. Its 228 declaration candidates are
+unapproved mechanical triage; the 157 function/data and 88 function-like macro
+anchors retain behavioral obligations. No compiled cases are installed by this
+generator, and the existing global catalogue, acceptance policy and historical
+scopes remain the authorities for their respective validation modes.
+
 Artifact transport follows the official [upload-artifact v7 documentation](https://github.com/actions/upload-artifact/tree/v7.0.2)
 and [download-artifact v8 documentation](https://github.com/actions/download-artifact/tree/v8).
 Unix mode bits are restored from the content-bound image manifest because the
