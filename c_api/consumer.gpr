@@ -12,7 +12,8 @@ project Consumer is
       "debug_api_contract.c", "builtin_api_contract.c",
       "format_api_contract.c", "external_string_contract.c",
       "value_api_contract.c", "auxiliary_api_contract.c",
-      "conversion_api_contract.c", "operator_api_contract.c");
+      "conversion_api_contract.c", "operator_api_contract.c",
+      "index_type_api_contract.c");
    for Object_Dir use
      "../build/c-api/consumer/" & Lua_Ada.Configuration_Subdir &
        Lua_Ada_Config.Build_Profile & "/" & Lua_Ada.Library_Mode;
@@ -25,7 +26,8 @@ project Consumer is
       "debug_api_contract.c", "builtin_api_contract.c",
       "format_api_contract.c", "external_string_contract.c",
       "value_api_contract.c", "auxiliary_api_contract.c",
-      "conversion_api_contract.c", "operator_api_contract.c");
+      "conversion_api_contract.c", "operator_api_contract.c",
+      "index_type_api_contract.c");
    for Create_Missing_Dirs use "True";
 
    package Compiler is
