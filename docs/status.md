@@ -9,6 +9,12 @@ fixtures load into the static host. A disposable Windows-corrected attrib.lua
 matches C output; its adaptation is not yet reviewed acceptance evidence.
 Native image receipts, lifetime/fault campaigns and final matrix remain open.
 
+Its subsequent nine-case C lifetime driver matches Ada default/static and
+both native C configurations, including finalizer calls, external payload
+release, balanced storage and actual OS unload. Integrated local source
+passes 1,714 AUnit cases; module-owned allocators, Ada T/shared/POSIX and
+immutable final acceptance remain pending in that session record.
+
 The [closing-prefix prerequisite](sessions/2026-11-08-closing-stack-prefix.md)
 retains actual departing scalars while execution ownership retires. Five
 new VM lifetime/refusal cases pass within 1,705 AUnit cases. Automatic error

@@ -82,3 +82,37 @@ metamethods on public package/registry fields, environment/CLI children and the
 final matrix. The remaining public auxiliary
 surface, relevant T drivers, source obligations, aggregate/stress execution,
 full acceptance, GitHub review and authorized merge remain unfinished.
+
+## Subsequent lifetime-driver checkpoint
+
+The separately named `native_module_contract.c` now executes nine public C
+cases against local Ada default/static, native C default and native C T.
+All three outputs match SHA-256
+`cf8431b2792ef0a65b0ae1b8c0349538ad9ef6c74029b0e4b4db571e356fc979`.
+Each case uses a fresh provider-backed state and verifies zero blocks/bytes
+and actual OS module absence after close. The cases exercise open/symbol
+failure stages, real fixture calls, both inter-library dependencies, root and
+hyphen searchers, retained native calls from a state-close finalizer, a
+registry-held external string and exactly-once explicit external release.
+The external header belongs to the unchanged fixture, not private Lua data.
+
+The first-party fixture builder uses actual PE exports/imports and generates
+an import library bound to the driver's final basename. Its default Ada and
+native-T runs capture source, compiler, module alias, dependency and owner
+identities. The independent nine-case linkage regression also passes,
+including real function/data pointer identity, rejection of a renamed host
+with old imports and successful regeneration for its new basename. Those
+small C image checks are infrastructure tests, not Lua conformance.
+
+The integrated module/base-C-closing/retirement/prefix source builds strictly
+and passes 1,714 AUnit cases and fifteen existing C consumers. These are local
+development observations; the runtime also contains uncommitted auxiliary
+buffer work whose behavior is not certified by this run. Raw driver logs are
+`reports/remaining-native-module-consumer-{Ada,C-default,C-upstream-test}.log`;
+the fixture receipts are `reports/remaining-native-module-fixture-receipt.json`
+and `reports/remaining-native-module-T-fixture-receipt.json`. A Haiku draft was
+corrected against the actual fixture sources before compilation/execution.
+Its original unsupported fixture assumptions are not passing evidence.
+
+Ada T/shared/POSIX, a module-owned allocator, allocation-failure sweeps,
+immutable final-head replay and independent acceptance remain unfinished.
