@@ -27,7 +27,8 @@ function Get-TargetObservationClaims {
         arg_child_configuration_stdout_sha256=$Report.arg_child_configuration_process.stdout_sha256;
         stdout_sha256=$Report.process.stdout_sha256;stderr_sha256=$Report.process.stderr_sha256;
         exclusion_policy_sha256=$Report.exclusion_policy_sha256;excluded_obligations=@($Report.excluded_obligations|Sort-Object);
-        execution_disposition=$Report.execution_disposition;native_applicability=$NativeApplicability}
+        execution_disposition=$Report.execution_disposition;
+        aggregate_replay=$(if($Report.Contains('aggregate_replay')){$Report.aggregate_replay}else{$null});native_applicability=$NativeApplicability}
 }
 
 function Assert-TargetObservationEnvelope {

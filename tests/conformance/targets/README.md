@@ -447,6 +447,45 @@ The workflow's named `development_observations` input instead selects the
 pending author protocol proposal for diagnostics. This choice remains visible
 in partition planning and supplies no final source or execution authority.
 
+Aggregate can select `-AggregateManifest` through its execution policy. A
+`target-aggregate-replay` manifest identifies the configuration, implementation,
+platform, all 34 original source hashes and a distinct selection per changed
+source. Each selection binds an `equivalent` or `t-private` manifest by path and
+hash. Every selected transformation must already pass its own independent
+source review; the aggregate selection also needs independent approval. The
+approval's `selection_sha256` is the canonical `Get-TargetAggregateClaims`
+payload hash. Its content-bound narrative explicitly preserves the original
+aggregate protocol and public assertions. `new-target-aggregate-proposal.ps1`
+creates pending author metadata under `reports/`; it grants no source review.
+
+Execution keeps the original prepared fixture snapshot intact and copies it
+to a separate disposable tree. Only selected Lua files receive reconstructed
+bytes. Every execution input is hashed before and after the original `all.lua`
+runs from that tree. Unselected files, including the driver, retain their
+original bytes. The complete 34-file source set, exact T exclusion union,
+entry arguments and separate original snapshot remain mandatory. A source
+cannot combine overlapping transforms, and an Ada internal equivalent cannot
+replace original C execution. Heavy remains a separate operation.
+
+The Aggregate report's `aggregate_replay` records the selection identity,
+execution directory/input hashes and any changed inputs. Its disposition is
+`reviewed-aggregate-replay`; observations still grant no acceptance. The
+reviewed execution contract has `aggregate_replays.Ada` and/or
+`aggregate_replays.ReferenceC` identities with `manifest_sha256`,
+`selection_sha256`, `executed_sources_sha256`, `setup_sha256` and disposition.
+The executed-source digest uses the canonical `{sources: expected_sources}`
+object, preserving the suite's source order. The collector copies only these
+byte identities into its pending contract proposal and leaves semantic stdout,
+warning, omission and completion expectations for independent review.
+
+Native applicability for Aggregate uses a content-bound
+`target-aggregate-native-applicability` index with exact context/revision and
+one `mappings` entry per native transformation. Each entry identifies `source`,
+`manifest_sha256` and its independently reviewed applicability `identity`.
+The post-observation envelope may supply that index after original C baseline
+capture. Final replay checks every proof and original C host/library image;
+the index itself is transport metadata and confers no semantic approval.
+
 Artifact transport follows the official [upload-artifact v7 documentation](https://github.com/actions/upload-artifact/tree/v7.0.2)
 and [download-artifact v8 documentation](https://github.com/actions/download-artifact/tree/v8).
 Unix mode bits are restored from the content-bound image manifest because the

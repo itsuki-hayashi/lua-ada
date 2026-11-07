@@ -20,6 +20,7 @@ param(
     [ValidateSet(0,1)][int] $ConstructsBranch = 0,
     [string] $EquivalentManifest = '',
     [string] $TAdaptationManifest = '',
+    [string] $AggregateManifest = '',
     [string] $FileProtocolManifest = '',
     [string] $NativeApplicability = '',
     [switch] $AllowUnreviewedEquivalent
@@ -34,6 +35,7 @@ Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceFileProtocols.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceAggregateReplay.psm1')
 $root = Split-Path -Parent $PSScriptRoot
 $original = Get-Location
 $revision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
@@ -85,6 +87,10 @@ if ($TAdaptationManifest -ne '' -and ($TargetPolicy -eq '' -or $Target -cne 'Ada
 }
 if ($TargetPolicy -ne '' -and $EquivalentManifest -ne '' -and $Mode -cne 'File') {
     throw 'Single-file equivalent manifests require full-target File mode'
+}
+if($AggregateManifest -ne '' -and ($TargetPolicy -eq '' -or $Mode -cne 'Aggregate' -or
+    $EquivalentManifest -ne '' -or $TAdaptationManifest -ne '' -or $FileProtocolManifest -ne '')){
+    throw 'AggregateManifest requires an explicit full-target Aggregate without single-file selections'
 }
 if (($EquivalentManifest -ne '' -and $Scope -eq '' -and $TargetPolicy -eq '') -or
     ($AllowUnreviewedEquivalent -and ($EquivalentManifest -eq '' -or $acceptanceRequested))) {
@@ -154,6 +160,7 @@ $evidence = [ordered]@{
     file_completion_protocol = $null
     native_applicability = $null
     native_applicability_verified = $false
+    aggregate_replay = $null
     repl_preflight_process = $null
     reference_source_records = @()
     harness_source_records = @()
@@ -294,7 +301,7 @@ try {
         'scripts/ConformanceInventory.psm1', 'scripts/ConformanceScope.psm1',
         'scripts/ManagedTelemetry.psm1', 'scripts/ConformanceReview.psm1',
         'scripts/ConformanceFileProtocols.psm1',
-        'scripts/ConformanceTransforms.psm1','scripts/New-ConformanceTTransform.ps1',
+        'scripts/ConformanceTransforms.psm1','scripts/ConformanceAggregateReplay.psm1','scripts/New-ConformanceTTransform.ps1',
         'scripts/New-ConformanceEquivalent.ps1', 'tests/conformance/suite.json')) {
         $evidence.harness_source_records += [ordered]@{
             path = $relative
@@ -327,7 +334,7 @@ try {
                 ($Mode -ceq 'Heavy' -and $_.source -ceq 'heavy.lua') -or
                 ($Mode -ceq 'File' -and $_.source -ceq $File)
             } | ForEach-Object id | Sort-Object)
-            if ($evidence.excluded_obligations.Count -gt 0 -and $TAdaptationManifest -eq '') {
+            if ($evidence.excluded_obligations.Count -gt 0 -and $TAdaptationManifest -eq '' -and $AggregateManifest -eq '') {
                 throw 'Full-target excluded obligations require an independently reviewed exact T transformation'
             }
         }
@@ -338,6 +345,16 @@ try {
             $evidence.coverage_validation = Test-ConformanceInventory -Root $root `
                 -TargetPolicy $TargetPolicy -RequireComplete
         }
+    }
+    $aggregateReplay=$null
+    if($AggregateManifest -ne ''){
+        $aggregatePath=(Resolve-Path -LiteralPath $AggregateManifest).Path
+        $aggregateSpec=Get-Content -LiteralPath $aggregatePath -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+        $aggregateSuite=Get-Content -LiteralPath (Join-Path $root 'tests/conformance/suite.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+        $aggregateExclusions=@{};foreach($exclusion in $evidence.coverage_validation.Exclusions){$aggregateExclusions[$exclusion.id]=$exclusion}
+        $aggregateReplay=Get-TargetAggregateReplay -Root $root -Specification $aggregateSpec -Suite $aggregateSuite `
+            -Configuration $Configuration -Implementation $Target -Platform $evidence.host.platform `
+            -PolicySha256 $evidence.exclusion_policy_sha256 -ResolvedExclusions $aggregateExclusions
     }
     if ($acceptanceRequested) {
         # Observation mode remains useful during implementation. Final mode is
@@ -635,14 +652,19 @@ try {
             }
         }
         $arguments = @($generated)
-        if ($File -eq 'files.lua' -and $IsWindows -and $mapping.id -ceq 'files-windows-platform') {
+    }
+    $platformMappings=if($null -ne $aggregateReplay){@($aggregateReplay.transforms|Where-Object{ $_.replay.disposition -ceq 'native-platform-equivalent' }|ForEach-Object mapping)}
+        elseif($EquivalentManifest -ne ''){@($mapping)}else{@()}
+    foreach($mapping in $platformMappings){
+        $mappingFile=[IO.Path]::GetFileName($mapping.source)
+        if ($mappingFile -eq 'files.lua' -and $IsWindows -and $mapping.id -ceq 'files-windows-platform') {
             Build-WindowsFileFixtures -Directory $fixtureDirectory -LibraryDirectory $libraryDirectory
             if ($Target -eq 'ReferenceC') {
                 $nativeSetup = "; local p=assert(package.loadlib('conformance_platform.dll','luaopen_conformance_platform'))(); " +
                     '_test_failing_stream=p.failing_stream; _test_nonblocking_pair=p.nonblocking_pair'
             }
         }
-        if ($File -eq 'files.lua' -and $IsMacOS -and $mapping.id -ceq 'files-macos-platform') {
+        if ($mappingFile -eq 'files.lua' -and $IsMacOS -and $mapping.id -ceq 'files-macos-platform') {
             # Keep the native failure setup outside the unchanged interpreter.
             # Both targets run the same separately named counterpart before
             # the source-hashed equivalent, within the measured owned state.
@@ -706,7 +728,7 @@ try {
         $evidence.execution_disposition = 'reviewed-t-adapted'
         $arguments = @($generated)
     }
-    if ($isolatedLauncher -and $File -eq 'files.lua') {
+    if ($isolatedLauncher -and ($File -eq 'files.lua' -or $Mode -ceq 'Aggregate')) {
         # Upstream's read-only no-buffer example ignores its write result. The
         # separate C/Ada counterpart proves immediate visibility through a
         # second native handle, without adding any unmeasured subprocess.
@@ -751,7 +773,7 @@ try {
         $setup += if ($Configuration -eq 'upstream-test') {
             "assert(type(T)=='table' and type(T.checkmemory)=='function'); T.checkmemory()"
         } else { 'assert(T==nil)' }
-        if ($File -eq 'files.lua' -and $Configuration -eq 'upstream-test' -and -not $IsWindows) {
+        if (($File -eq 'files.lua' -or $Mode -ceq 'Aggregate') -and $Configuration -eq 'upstream-test' -and -not $IsWindows) {
             $setup += "; assert(type(T.nonblock)=='function')"
         }
         if ($hasProfileWitness) {
@@ -838,8 +860,23 @@ try {
         $environment.LUA_ADA_CONFORMANCE_RUN_ID = $runId
         $environment.LUA_ADA_CONFORMANCE_TELEMETRY = Join-Path $runRoot 'allocator'
     }
+    $executionDirectory=$fixtureDirectory
+    if($null -ne $aggregateReplay){
+        $executionDirectory=Join-Path $runRoot 'aggregate-execution'
+        $executionRecords=New-TargetAggregateExecutionTree -Root $root -SourceDirectory $fixtureDirectory `
+            -Destination $executionDirectory -Replay $aggregateReplay
+        $evidence.aggregate_replay=@{entry='all.lua';execution_directory=$executionDirectory;
+            original_directory=$fixtureDirectory;
+            manifest_path=[IO.Path]::GetRelativePath($root,$aggregatePath).Replace('\','/');
+            manifest_sha256=(Get-FileHash -LiteralPath $aggregatePath).Hash.ToLowerInvariant();
+            selection_sha256=$aggregateReplay.selection_sha256;expected_sources=$aggregateReplay.expected_sources;
+            execution_input_records=$executionRecords;execution_changes=@()}
+        $evidence.execution_disposition='reviewed-aggregate-replay'
+        if($NativeApplicability -ne ''){$evidence.native_applicability=@{path=(Resolve-Path -LiteralPath $NativeApplicability).Path;
+            sha256=(Get-FileHash -LiteralPath $NativeApplicability).Hash.ToLowerInvariant()}}
+    }
     $evidence.process = Invoke-ConformanceProcess -Executable $Interpreter -Arguments $arguments `
-        -Directory $fixtureDirectory -OutputPrefix (Join-Path $runRoot 'execution') `
+        -Directory $executionDirectory -OutputPrefix (Join-Path $runRoot 'execution') `
         -TimeoutSeconds $evidence.timeout_seconds -Environment $environment
     $evidence.outcome = Get-ConformanceOutcome -Process $evidence.process -Marker $marker
     if ($null -ne $evidence.file_completion_protocol) {
@@ -865,6 +902,10 @@ try {
         }
     }
     $evidence.fixture_changes = Test-ConformanceFixtureHashes -Directory $fixtureDirectory -Records $evidence.fixture_records
+    if($null -ne $evidence.aggregate_replay){
+        $evidence.aggregate_replay.execution_changes=Test-ConformanceFixtureHashes -Directory $executionDirectory -Records $executionRecords
+        if($evidence.aggregate_replay.execution_changes.Count -ne 0){throw 'Aggregate executed fixture input changed during the process'}
+    }
     $evidence.status = if ($evidence.fixture_changes.Count -gt 0) { 'fixture-source-changed' } else { $evidence.outcome.status }
     if ($isolatedLauncher) {
         $telemetryPath = $environment.LUA_ADA_CONFORMANCE_TELEMETRY + '.' + $evidence.process.process_id + '.json'
@@ -919,6 +960,12 @@ try {
                 throw 'Acceptance requires committed, configuration-verified, unchanged inputs'
             }
             $contract = Get-Content -LiteralPath $AcceptanceContract -Raw | ConvertFrom-Json -AsHashtable
+            if($null -ne $evidence.aggregate_replay){
+                $null=Assert-TargetAggregateReportReplay -Root $root -ArtifactRoot $root -Report $evidence -Contract $contract `
+                    -Suite $aggregateSuite -ResolvedExclusions $aggregateExclusions
+                $null=Get-TargetAggregateNativeProofs -Root $root -ArtifactRoot $root -Report $evidence -Replay $aggregateReplay `
+                    -Identity $evidence.native_applicability -RequireRuntimeEvidence
+            }
             if ($RequireTargetAcceptance -and $null -ne $evidence.file_completion_protocol) {
                 [void](Assert-TargetFileProtocolBinding -Root $root -Report $evidence `
                     -WrapperPath $evidence.file_completion_protocol.wrapper_artifact -Contract $contract -RequireReview)

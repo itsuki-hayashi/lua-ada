@@ -563,7 +563,10 @@ Case 'full-target smoke and mixed acceptance flags reject before setup' {
     foreach ($arguments in @(
         @('-TargetPolicy','remaining-upstream-compatibility','-Mode','Smoke'),
         @('-TargetPolicy','remaining-upstream-compatibility','-Scope','expanded-t-conformance','-Mode','File','-File','api.lua'),
-        @('-RequireTargetAcceptance','-Target','Ada','-Mode','File','-File','api.lua')
+        @('-RequireTargetAcceptance','-Target','Ada','-Mode','File','-File','api.lua'),
+        @('-AggregateManifest','unreviewed.json','-Mode','Aggregate'),
+        @('-AggregateManifest','unreviewed.json','-TargetPolicy','remaining-upstream-compatibility','-Mode','File','-File','code.lua'),
+        @('-AggregateManifest','unreviewed.json','-TargetPolicy','remaining-upstream-compatibility','-Mode','Aggregate','-TAdaptationManifest','unreviewed-t.json')
     )) {
         $process = Invoke-ConformanceProcess -Executable $shell `
             -Arguments (@('-NoProfile','-File',(Join-Path $PSScriptRoot 'run-conformance.ps1')) + $arguments) `

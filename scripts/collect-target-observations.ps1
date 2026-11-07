@@ -3,6 +3,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'TargetContext.psm1')
+Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
 $plan=Get-TargetContextPlan -Root $root
 $revision=(& git -C $root rev-parse HEAD).Trim()
 if($LASTEXITCODE -ne 0){throw 'Cannot identify observation bundle revision'}
@@ -91,6 +92,23 @@ foreach($pair in $pairs.Values|Sort-Object context,operation,variant){
         review=@{author='Codex /root/validation_delivery';reviewer=$null;artifact=$null;artifact_sha256=$null;
             rationale='Pending source semantic protocol and exact observed interpretation review; never infer expectations from successful output.';
             original_c_evidence=$pair.c.report};runtime_acceptance=$false;coverage_authority=$false}
+    if($pair.operation -ceq 'aggregate'){
+        # These are only byte identities from the raw observation. Semantic
+        # completion/warning/return expectations remain empty until review.
+        # C and Ada can select different independently reviewed source sets.
+        $contract.aggregate_replays=@{}
+        foreach($target in @('ada','c')){
+            $raw=Get-Content -LiteralPath (Join-Path $output $pair[$target].report) -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+            if($raw.Contains('aggregate_replay') -and $null -ne $raw.aggregate_replay){
+                $implementation=if($target -ceq 'ada'){'Ada'}else{'ReferenceC'}
+                $contract.aggregate_replays[$implementation]=@{manifest_sha256=$raw.aggregate_replay.manifest_sha256;
+                    selection_sha256=$raw.aggregate_replay.selection_sha256;
+                    executed_sources_sha256=(Get-TargetWitnessPayloadHash @{sources=$raw.aggregate_replay.expected_sources});
+                    setup_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($raw.process.arguments[1]))).ToLowerInvariant();
+                    disposition='reviewed-aggregate-replay'}
+            }
+        }
+    }
     $contractHash=Save (Join-Path $output $contractPath) $contract
     $pair.contract=@{path=$contractPath;sha256=$contractHash}
     if($pair.variant -ceq 'primary'){

@@ -11,6 +11,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceFileProtocols.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetObservationEnvelope.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
 Import-Module (Join-Path $PSScriptRoot 'TargetCompiledWitnesses.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceAggregateReplay.psm1')
 
 function Assert-TargetNativeOriginalImageBindings {
     param([string] $ArtifactRoot,[Collections.IDictionary] $Proof,[Collections.IDictionary] $ContextImage)
@@ -30,6 +31,19 @@ function Assert-TargetTransformReplay {
           [Collections.IDictionary] $ContextImage = $null,
           [switch] $RequireAcceptance)
     if ($Report.execution_disposition -ceq 'unchanged') { return }
+    if($Report.execution_disposition -ceq 'reviewed-aggregate-replay'){
+        if($Entry.operation -cne 'aggregate'){throw 'Aggregate replay cannot replace a File or Heavy operation'}
+        $suite=Get-Content (Join-Path $Root 'tests/conformance/suite.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+        $replay=Assert-TargetAggregateReportReplay -Root $Root -ArtifactRoot $ArtifactRoot -Report $Report `
+            -Contract $Contract -Suite $suite -ResolvedExclusions $ResolvedExclusions
+        $nativeIdentity=if($null -ne $ReviewedNativeApplicability){$ReviewedNativeApplicability}else{$Report.native_applicability}
+        $proofs=Get-TargetAggregateNativeProofs -Root $Root -ArtifactRoot $ArtifactRoot -Report $Report -Replay $replay `
+            -Identity $nativeIdentity -RequireRuntimeEvidence:$RequireAcceptance
+        if($RequireAcceptance){foreach($proof in $proofs){
+            Assert-TargetNativeOriginalImageBindings -ArtifactRoot $ArtifactRoot -Proof $proof -ContextImage $ContextImage
+        }}
+        return
+    }
     $sourceName = if ($Entry.operation -ceq 'aggregate') { 'all.lua' }
         elseif ($Entry.operation -ceq 'heavy') { 'heavy.lua' } else { $Entry.operation.Substring(5) }
     $adapted = $Report.execution_disposition -ceq 'reviewed-t-adapted'
@@ -233,7 +247,7 @@ function Test-TargetMatrixReport {
         $Report.setup_error -or $Report.acceptance_error -or @($Report.fixture_changes).Count -ne 0 -or
         $Report.gate_acceptance -ne $false -or $Report.scoped_operation_acceptance -ne $false -or
         $Report.status -cnotin @('passed','completed-with-skips') -or
-        $Report.execution_disposition -cnotin @('unchanged','ada-internal-equivalent','native-platform-equivalent','reviewed-t-adapted') -or
+        $Report.execution_disposition -cnotin @('unchanged','ada-internal-equivalent','native-platform-equivalent','reviewed-t-adapted','reviewed-aggregate-replay') -or
         $Report.synthetic_fixture -isnot [bool]) { throw 'Full-target report revision, identity or policy differs' }
     $variant = if ($Entry.Contains('variant')) { $Entry.variant } else { 'primary' }
     if ($Report.variant -cne $variant) { throw 'Full-target report variant differs' }
@@ -327,7 +341,8 @@ function Test-TargetMatrixReport {
         $Report.exclusion_policy_sha256 -cne $ExclusionPolicySha256) {
         throw 'Full-target report excluded obligation set or policy hash differs'
     }
-    if (($excludedIds.Count -gt 0) -ne ($Report.execution_disposition -ceq 'reviewed-t-adapted')) {
+    if (($excludedIds.Count -gt 0 -and $Report.execution_disposition -cnotin @('reviewed-t-adapted','reviewed-aggregate-replay')) -or
+        ($excludedIds.Count -eq 0 -and $Report.execution_disposition -ceq 'reviewed-t-adapted')) {
         throw 'Full-target exclusions and adapted execution disposition differ'
     }
     return @{report=$Report;telemetry=$telemetry;images=$images;

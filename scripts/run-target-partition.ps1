@@ -78,7 +78,7 @@ try{
                 $_.context -ceq $Context -and $_.variant -ceq $operation.variant})
             if($selected.Count -gt 1){throw 'Duplicate execution selection'}
             if($selected.Count -eq 1){
-                foreach($field in @('EquivalentManifest','TAdaptationManifest','FileProtocolManifest','NativeApplicability')){
+                foreach($field in @('EquivalentManifest','TAdaptationManifest','AggregateManifest','FileProtocolManifest','NativeApplicability')){
                     if($selected[0].Contains($field) -and $null -ne $selected[0][$field]){
                         $identity=$selected[0][$field]
                         $arguments[$field]=Resolve-ReviewedFile -Root $root -Path $identity.path -Sha256 $identity.sha256
@@ -97,15 +97,25 @@ try{
             }
             $null=Read-TargetFileProtocolManifest -Root $root -Path $arguments.FileProtocolManifest -RequireReview:(-not $DevelopmentObservation)
         }
-        if($operation.target -ceq 'ReferenceC' -and $arguments.ContainsKey('EquivalentManifest')){
+        $nativeBaselineMapping=$null
+        if($operation.target -ceq 'ReferenceC' -and $arguments.ContainsKey('AggregateManifest')){
+            $aggregate=Get-Content -LiteralPath $arguments.AggregateManifest -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+            foreach($selection in $aggregate.selections){if($selection.kind -ceq 'equivalent'){
+                $selectionPath=Resolve-ReviewedFile -Root $root -Path $selection.manifest.path -Sha256 $selection.manifest.sha256
+                $mapping=Get-Content -LiteralPath $selectionPath -Raw|ConvertFrom-Json -AsHashtable -Depth 64
+                if($mapping.disposition -ceq 'native-platform-equivalent'){$nativeBaselineMapping=$arguments.AggregateManifest}
+            }}
+        }elseif($operation.target -ceq 'ReferenceC' -and $arguments.ContainsKey('EquivalentManifest')){
             $mapping=Get-Content -LiteralPath $arguments.EquivalentManifest -Raw|ConvertFrom-Json -AsHashtable -Depth 48
-            if($mapping.disposition -ceq 'native-platform-equivalent'){
+            if($mapping.disposition -ceq 'native-platform-equivalent'){$nativeBaselineMapping=$arguments.EquivalentManifest}
+        }
+        if($null -ne $nativeBaselineMapping){
                 # Preserve the exact original C observation separately, even
                 # when its native assumption fails. It is applicability input
                 # for a later independent source-linked review, never a passing
                 # primary or a replacement for the transformed C/Ada pair.
                 $baseline=$arguments.Clone()
-                foreach($field in @('EquivalentManifest','TAdaptationManifest','NativeApplicability')){[void]$baseline.Remove($field)}
+                foreach($field in @('EquivalentManifest','TAdaptationManifest','AggregateManifest','NativeApplicability')){[void]$baseline.Remove($field)}
                 $baseline.Variant='native-original'
                 $baseline.Report=Join-Path $directory ('ReferenceC-'+$operation.operation.Replace(':','-')+'-native-original.json')
                 & (Join-Path $PSScriptRoot 'run-conformance.ps1') @baseline
@@ -119,10 +129,9 @@ try{
                 }
                 $nativeOriginal+=@{operation=$operation.operation;target='ReferenceC';variant='native-original';
                     report=$baseline.Report;sha256=(Get-FileHash -LiteralPath $baseline.Report).Hash.ToLowerInvariant();
-                    source_mapping=@{path=[IO.Path]::GetRelativePath($root,$arguments.EquivalentManifest).Replace('\','/');
-                        sha256=(Get-FileHash -LiteralPath $arguments.EquivalentManifest).Hash.ToLowerInvariant()};
+                    source_mapping=@{path=[IO.Path]::GetRelativePath($root,$nativeBaselineMapping).Replace('\','/');
+                        sha256=(Get-FileHash -LiteralPath $nativeBaselineMapping).Hash.ToLowerInvariant()};
                     status=$baselineReport.status;collector_exit_code=$baselineExit;runtime_acceptance=$false;coverage_authority=$false}
-            }
         }
         & (Join-Path $PSScriptRoot 'run-conformance.ps1') @arguments
         $exitCode=$LASTEXITCODE

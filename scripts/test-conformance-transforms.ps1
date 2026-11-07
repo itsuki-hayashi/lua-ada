@@ -4,6 +4,9 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ConformanceTransforms.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceAggregateReplay.psm1')
+Import-Module (Join-Path $PSScriptRoot 'TargetWitnessPolicy.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 $temporary = Join-Path $root ('reports/transform-selftest/' + [Guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($temporary)
 $utf8 = [Text.UTF8Encoding]::new($false)
@@ -408,6 +411,134 @@ Case 'original C applicability cannot borrow a different frozen host runtime or 
         switch($change){host{$altered.files[0].sha256='0'*64};runtime{$altered.files[1].sha256='0'*64};context{$altered.context='default/windows/release/static'};missing{$altered=$null}}
         Reject {Replay-NativeImage $f $altered} 'frozen|context image identity'
     }
+}
+
+function New-AggregateFixture([switch]$WithFrozenEquivalents) {
+    $f=New-TFixture code.lua
+    $suite=Get-Content (Join-Path $root 'tests/conformance/suite.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 32
+    foreach($source in $suite.files){
+        $path=Join-Path $f.root ('references/lua/testes/'+$source.path)
+        if($source.path -cne 'code.lua'){[IO.File]::WriteAllText($path,('-- synthetic unexecuted '+$source.path+"`n"),$utf8)}
+        $source.sha256=(Get-FileHash $path).Hash.ToLowerInvariant()
+    }
+    if($WithFrozenEquivalents){
+        # Old counterpart bytes remain a frozen unit-test input. They do not
+        # approve the current production source; the explicit synthetic bundle
+        # flag prevents this fixture from becoming runtime authority.
+        foreach($file in Get-ChildItem -LiteralPath $frozenRoot -File -Recurse){
+            $relative=[IO.Path]::GetRelativePath($frozenRoot,$file.FullName)
+            $destination=Join-Path $f.root $relative
+            [void][IO.Directory]::CreateDirectory((Split-Path -Parent $destination))
+            [IO.File]::Copy($file.FullName,$destination,$true)
+        }
+        foreach($source in $suite.files){$source.sha256=(Get-FileHash (Join-Path $f.root ('references/lua/testes/'+$source.path))).Hash.ToLowerInvariant()}
+    }
+    $selectionHash=Write-Json (Join-Path $f.root 'selected-t-transform.json') $f.spec
+    $bundle=@{schema_version=1;kind='target-aggregate-replay';target='remaining-upstream-compatibility';id='synthetic-aggregate';
+        reference_revision=$suite.reference_revision;configuration='upstream-test';implementation='Ada';platform='windows';
+        synthetic_fixture=$true;runtime_acceptance=$false;coverage_authority=$false;
+        original_sources=@($suite.files|ForEach-Object{@{path=$_.path;sha256=$_.sha256}});
+        selections=@(@{source='code.lua';kind='t-private';manifest=@{path='selected-t-transform.json';sha256=$selectionHash}});
+        review=@{status='accepted';author='synthetic-author';reviewer='synthetic-reviewer';artifact='bundle-approval.json';artifact_sha256=''}}
+    $f.suite=$suite;$f.bundle=$bundle;Set-AggregateApproval $f
+    return $f
+}
+function Set-AggregateApproval([Collections.IDictionary]$Fixture){
+    $narrative=@{reviewer='synthetic-reviewer';decision='accepted';replay_id=$Fixture.bundle.id;synthetic_fixture=$true;
+        preserves_aggregate_protocol=$true;preserves_public_assertions=$true;source_preservation='Fabricated binding fixture only; original driver and all other source bytes are retained.'}
+    $narrativeHash=Write-Json (Join-Path $Fixture.root 'bundle-narrative.json') $narrative
+    $approval=@{schema_version=1;kind='target-aggregate-replay-approval';author='synthetic-author';reviewer='synthetic-reviewer';
+        decision='accepted';synthetic_fixture=$true;selection_sha256=(Get-TargetWitnessPayloadHash (Get-TargetAggregateClaims $Fixture.bundle));
+        review_evidence=@{path='bundle-narrative.json';sha256=$narrativeHash}}
+    $Fixture.bundle.review.artifact_sha256=Write-Json (Join-Path $Fixture.root 'bundle-approval.json') $approval
+}
+function Replay-Aggregate([Collections.IDictionary]$Fixture,[switch]$Actual,[string]$Implementation='Ada',[string]$Configuration='upstream-test',[string]$Platform='windows'){
+    Get-TargetAggregateReplay -Root $Fixture.root -Specification $Fixture.bundle -Suite $Fixture.suite -Configuration $Configuration `
+        -Implementation $Implementation -Platform $Platform -PolicySha256 ('a'*64) -ResolvedExclusions $Fixture.resolved -AllowSynthetic:(-not $Actual)
+}
+Case 'Aggregate reconstructs every source while preserving the original driver and heavy bytes' {
+    $f=New-AggregateFixture;$r=Replay-Aggregate $f
+    Assert-True ($r.expected_sources.Count -eq 34 -and $r.transforms.Count -eq 1 -and -not $r.runtime_acceptance -and -not $r.coverage_authority) 'Aggregate source set or authority changed'
+    foreach($name in @('all.lua','heavy.lua')){$record=@($r.expected_sources|Where-Object path -CEQ $name)[0];Assert-True ($record.sha256 -ceq $record.original_sha256) 'An unselected driver/heavy source changed'}
+    Reject {Replay-Aggregate $f -Actual} 'Invalid aggregate replay identity'
+}
+Case 'Aggregate source selection rejects missing duplicate heavy mixed and wrong-source mappings' {
+    $f=New-AggregateFixture;$f.bundle.original_sources=$f.bundle.original_sources[1..33];Reject {Replay-Aggregate $f} 'complete original source set'
+    $f=New-AggregateFixture;$f.bundle.selections+=@($f.bundle.selections[0]);Reject {Replay-Aggregate $f} 'duplicate heavy or mixed'
+    $f=New-AggregateFixture;$f.bundle.selections[0].source='heavy.lua';Reject {Replay-Aggregate $f} 'duplicate heavy or mixed'
+    $f=New-AggregateFixture;$f.bundle.selections[0].source='all.lua';Reject {Replay-Aggregate $f} 'another source or configuration'
+}
+Case 'Aggregate cannot omit an approved exclusion or widen the independently reviewed T bytes' {
+    $f=New-AggregateFixture;$extra=$f.resolved.Values|Select-Object -First 1;$copy=$extra.Clone();$copy.id='ANOTHER-PRIVATE-OBLIGATION';$f.resolved[$copy.id]=$copy
+    Reject {Replay-Aggregate $f} 'exactly its approved exclusions'
+    $f=New-AggregateFixture;$f.spec.replacements[0].start_byte--
+    $f.bundle.selections[0].manifest.sha256=Write-Json (Join-Path $f.root 'selected-t-transform.json') $f.spec
+    Reject {Replay-Aggregate $f} 'wider than or differs'
+}
+Case 'Aggregate cannot borrow another source selection approval or self-review' {
+    $f=New-AggregateFixture;$f.bundle.review.reviewer=$f.bundle.review.author;Reject {Replay-Aggregate $f} 'independent source selection review'
+    $f=New-AggregateFixture;$f.bundle.id='changed-bundle';Reject {Replay-Aggregate $f} 'exact source selection'
+    $f=New-AggregateFixture;$f.bundle.review.status='pending';Reject {Replay-Aggregate $f} 'independent source selection review'
+}
+Case 'Aggregate preserves independent C execution and rejects default T or another native platform' {
+    $f=New-AggregateFixture;$f.bundle.implementation='ReferenceC'
+    Reject {Replay-Aggregate $f -Implementation ReferenceC} 'T adaptation cannot replace default or original C'
+    $f=New-AggregateFixture;$f.bundle.configuration='default'
+    Reject {Replay-Aggregate $f -Configuration default} 'another source or configuration|T adaptation cannot replace default'
+    $f=New-AggregateFixture -WithFrozenEquivalents
+    $path='tests/conformance/equivalents/gc-ada-instrumented.json'
+    $f.bundle.selections=@(@{source='gc.lua';kind='equivalent';manifest=@{path=$path;sha256=(Get-FileHash (Join-Path $f.root $path)).Hash.ToLowerInvariant()}})
+    $f.resolved=@{};Set-AggregateApproval $f
+    $null=Replay-Aggregate $f
+    $f.bundle.implementation='ReferenceC';Reject {Replay-Aggregate $f -Implementation ReferenceC} 'Ada equivalent cannot replace original C'
+    $path='tests/conformance/equivalents/files-windows-platform.json'
+    $f.bundle.selections=@(@{source='files.lua';kind='equivalent';manifest=@{path=$path;sha256=(Get-FileHash (Join-Path $f.root $path)).Hash.ToLowerInvariant()}})
+    $f.bundle.platform='linux'
+    Reject {Replay-Aggregate $f -Implementation ReferenceC -Platform linux} 'native equivalent identifies another platform'
+}
+Case 'Aggregate native applicability requires exact original C mappings for its context' {
+    $f=New-NativeFixture
+    $replay=@{transforms=@(@{source='sample.lua';manifest=@{sha256=('d'*64)};mapping=$f.mapping;replay=@{disposition='native-platform-equivalent'}})}
+    $report=@{acceptance_context='default/windows/validation/static';repository_revision=('b'*40);requested_configuration='default';host=@{platform='windows'}}
+    Reject {Get-TargetAggregateNativeProofs -Root $f.root -ArtifactRoot $f.root -Report $report -Replay $replay -RequireRuntimeEvidence} 'lack source-linked original C'
+    $index=@{schema_version=1;kind='target-aggregate-native-applicability';context=$report.acceptance_context;revision=$report.repository_revision;synthetic_fixture=$true;
+        mappings=@(@{source='sample.lua';manifest_sha256=('d'*64);identity=$f.native_identity})}
+    $identity=@{path='reports/native/index.json';sha256=(Write-Json (Join-Path $f.root 'reports/native/index.json') $index)}
+    $proofs=Get-TargetAggregateNativeProofs -Root $f.root -ArtifactRoot $f.root -Report $report -Replay $replay -Identity $identity
+    Assert-True ($proofs.Count -eq 1 -and -not $proofs[0].runtime_verified) 'Synthetic aggregate applicability gained authority'
+    $index.mappings[0].manifest_sha256='0'*64;$identity.sha256=Write-Json (Join-Path $f.root 'reports/native/index.json') $index
+    Reject {Get-TargetAggregateNativeProofs -Root $f.root -ArtifactRoot $f.root -Report $report -Replay $replay -Identity $identity} 'missing or duplicate source bindings'
+    $index.context='default/windows/release/static';$identity.sha256=Write-Json (Join-Path $f.root 'reports/native/index.json') $index
+    Reject {Get-TargetAggregateNativeProofs -Root $f.root -ArtifactRoot $f.root -Report $report -Replay $replay -Identity $identity} 'another context or transform set'
+}
+Case 'Aggregate derived tree keeps original snapshots immutable and detects changed executed bytes' {
+    $f=New-AggregateFixture;$r=Replay-Aggregate $f;$directory=Join-Path $f.root 'reports/execution';$original=Join-Path $f.root 'reports/original'
+    $originalRecords=Copy-ConformanceFixtures -Source (Join-Path $f.root 'references/lua/testes') -Destination $original
+    $records=New-TargetAggregateExecutionTree -Root $f.root -SourceDirectory $original -Destination $directory -Replay $r
+    $changes=Test-ConformanceFixtureHashes -Directory $original -Records $r.original_sources
+    Assert-True ($changes.Count -eq 0) 'Original source snapshot changed'
+    $manifestHash=Write-Json (Join-Path $f.root 'aggregate.json') $f.bundle
+    $report=@{operation='aggregate';execution_disposition='reviewed-aggregate-replay';requested_configuration='upstream-test';target='Ada';host=@{platform='windows'};
+        exclusion_policy_sha256=('a'*64);excluded_obligations=$r.excluded_obligations;fixture_records=$originalRecords;
+        process=@{working_directory=$directory;arguments=@('-e','synthetic setup never executed','all.lua')};
+        aggregate_replay=@{entry='all.lua';execution_directory=$directory;original_directory=$original;expected_sources=$r.expected_sources;manifest_path='aggregate.json';manifest_sha256=$manifestHash;
+            selection_sha256=$r.selection_sha256;execution_changes=@();execution_input_records=$records}}
+    $contract=@{aggregate_replays=@{Ada=@{manifest_sha256=$manifestHash;selection_sha256=$r.selection_sha256;
+        executed_sources_sha256=(Get-TargetWitnessPayloadHash @{sources=$r.expected_sources});setup_sha256=(Get-ConformanceHash ($utf8.GetBytes('synthetic setup never executed')));
+        disposition='reviewed-aggregate-replay'}}}
+    function Replay-AggregateReport {
+        Assert-TargetAggregateReportReplay -Root $f.root -ArtifactRoot $f.root -Report $report -Contract $contract -Suite $f.suite -ResolvedExclusions $f.resolved -AllowSynthetic
+    }
+    $null=Replay-AggregateReport
+    [IO.File]::AppendAllText((Join-Path $directory 'code.lua'),'changed',$utf8)
+    Reject {Replay-AggregateReport} 'observation path or hash differs'
+    [IO.File]::WriteAllBytes((Join-Path $directory 'code.lua'),$r.transforms[0].replay.bytes)
+    [IO.File]::AppendAllText((Join-Path $original 'all.lua'),'changed',$utf8)
+    Reject {Replay-AggregateReport} 'observation path or hash differs'
+    [IO.File]::Copy((Join-Path $f.root 'references/lua/testes/all.lua'),(Join-Path $original 'all.lua'),$true)
+    $report.process.arguments[2]='different.lua';Reject {Replay-AggregateReport} 'exact reviewed driver tree'
+    $report.process.arguments[2]='all.lua';$contract.aggregate_replays.Ada.setup_sha256='0'*64
+    Reject {Replay-AggregateReport} 'execution contract'
 }
 
 Write-Output "PASS: $script:Cases exact-byte transform regressions; synthetic approval fixtures, no runtime conformance claim"
