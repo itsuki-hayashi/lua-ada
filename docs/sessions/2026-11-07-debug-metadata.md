@@ -155,3 +155,49 @@ assignment store's opening-line attribution. Native probes also show actual
 RHS mutation differences for local/upvalue environments and table operands.
 Deferred operand/conflict handling is authorized follow-up work; it is not
 claimed implemented here. Full debug-file and platform acceptance remain open.
+
+## Deferred operand and assignment checkpoint
+
+Shared prefix/expression/list nodes now retain their final consumed token using
+a brief in-place metadata borrow. Canonical indexed descriptors distinguish
+live local/upvalue table operands from computed register snapshots, and keys
+distinguish register, short constant and immediate integer operands. Small
+short-string upvalue accesses use actual GETTABUP/SETTABUP words. Nonconstant
+keys force an upvalue table after key evaluation; computed bases remain
+captured before their key/RHS. Later conflicting local/upvalue LHS targets
+explicitly snapshot earlier receivers/keys before reverse-order assignment.
+Ordinary RHS callbacks alone do not create those conflict snapshots.
+
+The same distinction preserves live local arithmetic operands while indexed
+operands are discharged before the RHS. Concatenation retains its separate
+left-value snapshot. Indexed materialization uses actual consumer token lines,
+and stores use the final RHS token. No hook is hidden or replaced with an
+expected trace. The existing compiler environment test was updated to inspect
+the real GETTABUP upvalue zero and owned key `x`, preserving its ownership and
+resolution invariant instead of requiring the former eager helper sequence.
+
+Sixteen separately named public-session regressions and their native fixture
+cover local/upvalue environment changes, local table/key mutation, integer vs.
+short-string upvalue capture, key callback timing, parallel conflicts, computed
+base/key effects and GC roots, arithmetic/concat distinctions, large-gap trace
+phases and store current-line inspection. Initial execution passed all sixteen
+new cases and 1,434 of 1,435 total cases; the remaining failure was the old
+helper-sequence structural assertion described above. Final local evidence:
+
+- Strict default Windows validation/static root and test builds pass.
+- All 1,435 AUnit cases pass with zero failed assertions or unexpected errors.
+- `canonical_assignment_phases.lua` matches native C stdout byte-for-byte;
+  both runtimes exit zero with empty stderr. Instrumented native C also passes.
+- The fixture passes all four producer/runtime combinations: both C and Ada
+  execute both producers' chunks with the same reference output and empty
+  stderr. The retained 36-case four-way campaign passes too.
+- Fresh existing frontend/opcode oracles match all 34 lexer/parser inputs,
+  10,000 arbitrary-byte inputs, 2,000 grammar cases, 2,000 mutations, the
+  allocation-pressure diagnostic, and 85 opcodes/4,096 words.
+
+The unchanged-source `@db.lua` diagnostic now completes every generated
+large-gap expression trace and reaches the hook callback inspection at line
+312. Its hook frame does not yet report `namewhat == "hook"`. Hook/traceback
+metadata is the next debug task. These component results do not establish a
+whole-file debug pass, final instrumented Ada/platform acceptance, or a full
+upstream completion claim.

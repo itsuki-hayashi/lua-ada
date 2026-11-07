@@ -58,10 +58,16 @@ package body Lua.Canonical_Compiler is
       Last_Line : Natural := 0;
       Has_Closing : Boolean := False;
    end record;
+   type Index_Kind is (Register_Key, Constant_Key, Integer_Key);
    type Lvalue is record
       Where : Place;
-      Table, Key : Natural := 0;
+      Table : Place;
+      Key : Natural := 0;
+      Key_Kind : Index_Kind := Register_Key;
       Is_Table : Boolean := False;
+      --  Indexed targets retain a live local/upvalue operand until the store,
+      --  unless a computed expression or later LHS conflict needs a snapshot.
+      --  These are compiler descriptors, never borrowed runtime values.
    end record;
    package Lvalues is new Lua.Storage.Vectors (Lvalue);
 
@@ -379,7 +385,7 @@ package body Lua.Canonical_Compiler is
             procedure Expression
               (Fn : in out Function_State; Id : Node_Id;
                Destination : Natural; Wanted : Integer := 1;
-               Tail : Boolean := False);
+               Tail : Boolean := False; At_Line : Natural := 0);
             procedure Statement
               (Fn : in out Function_State; Id : Node_Id);
             procedure Block
@@ -430,6 +436,120 @@ package body Lua.Canonical_Compiler is
                   Count := Natural (Wanted);
                end if;
             end Values;
+            function Fold
+              (Fn : Function_State; Id : Node_Id; Data : out Constant_Value)
+               return Boolean;
+            function End_Line (Id : Node_Id) return Natural;
+            function End_Line (Id : Node_Id) return Natural is
+               Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+            begin
+               return (if Item.End_Line /= 0 then Item.End_Line else
+                         Item.Site.Line);
+            end End_Line;
+            function Direct_Local
+              (Fn : Function_State; Id : Node_Id) return Place;
+            function Direct_Local
+              (Fn : Function_State; Id : Node_Id) return Place
+            is
+               Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+               Value : Place;
+            begin
+               if Item.Kind = Name_Reference and then
+                 Item.Symbol /= No_Symbol
+               then
+                  Value := Locate (Fn, Item.Symbol);
+                  if Value.Kind = Stack_Place then return Value; end if;
+               elsif Item.Kind = Parenthesized then
+                  return Direct_Local (Fn, Item.Children (1));
+               end if;
+               return (Constant_Place, 0, (Kind => Nil_Constant));
+            end Direct_Local;
+            function Register_Operand
+              (Fn : in out Function_State; Id : Node_Id; Line : Natural)
+               return Natural;
+            function Register_Operand
+              (Fn : in out Function_State; Id : Node_Id; Line : Natural)
+               return Natural
+            is
+               Value : constant Place := Direct_Local (Fn, Id);
+               Index : Natural;
+            begin
+               --  A live local register is already an operand, not a value
+               --  copied before later callbacks can mutate its shared cell.
+               if Value.Kind = Stack_Place then return Value.Index; end if;
+               Index := Temporary (Fn);
+               Expression (Fn, Id, Index, At_Line => Line);
+               return Index;
+            end Register_Operand;
+            procedure Key_Data
+              (Fn : in out Function_State; Target : in out Lvalue;
+               Data : Constant_Value);
+            procedure Key_Data
+              (Fn : in out Function_State; Target : in out Lvalue;
+               Data : Constant_Value)
+            is
+               Index : Natural;
+            begin
+               if Data.Kind = Integer_Constant and then
+                 Data.Integer_Data in 0 .. 255
+               then
+                  Target.Key_Kind := Integer_Key;
+                  Target.Key := Natural (Data.Integer_Data);
+               elsif Data.Kind = String_Constant then
+                  Index := Constant_Index (Fn, Data);
+                  if Index < 256 and then String_Length
+                    (Result.Code, Data.String_Data) <= 40
+                  then
+                     Target.Key_Kind := Constant_Key;
+                     Target.Key := Index;
+                  else
+                     Target.Key := Temporary (Fn);
+                     if Index < 2 ** 17 then
+                        Put (Fn, ABx (Op_LOADK, Target.Key, Index));
+                     else
+                        Put (Fn, ABx (Op_LOADKX, Target.Key, 0));
+                        Put (Fn, Field_Set (Create (Op_EXTRAARG), Ax, Index));
+                     end if;
+                  end if;
+               else
+                  Target.Key := Temporary (Fn);
+                  Load (Fn, Target.Key, Data);
+               end if;
+            end Key_Data;
+            procedure Capture_Table
+              (Fn : in out Function_State; Target : in out Lvalue);
+            procedure Capture_Table
+              (Fn : in out Function_State; Target : in out Lvalue)
+            is
+               Index : Natural;
+            begin
+               if Target.Table.Kind = Constant_Place or else
+                 (Target.Table.Kind = Upvalue_Place and then
+                  Target.Key_Kind /= Constant_Key)
+               then
+                  Index := Temporary (Fn);
+                  Read (Fn, Target.Table, Index);
+                  Target.Table := (Stack_Place, Index,
+                                   (Kind => Nil_Constant));
+               end if;
+            end Capture_Table;
+            function Global_Address
+              (Fn : in out Function_State; Environment : Symbol_Id;
+               Name : Text_Ref) return Lvalue;
+            function Global_Address
+              (Fn : in out Function_State; Environment : Symbol_Id;
+               Name : Text_Ref) return Lvalue
+            is
+               Target : Lvalue;
+            begin
+               Target.Is_Table := True;
+               Target.Table := Locate (Fn, Environment);
+               Key_Data (Fn, Target, Constant_Value'
+                 (String_Constant, Intern_Text (Name),
+                  Text_Length (Name) > 40));
+               Capture_Table (Fn, Target);
+               return Target;
+            end Global_Address;
             function Address
               (Fn : in out Function_State; Id : Node_Id) return Lvalue;
             function Address
@@ -437,31 +557,72 @@ package body Lua.Canonical_Compiler is
             is
                Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
                Target : Lvalue;
+               Base_Node : Node_Id;
+               Base : Place;
+               Data : Constant_Value;
             begin
                Site := Item.Site;
-               if Item.Kind = Name_Reference and then
-                 Item.Symbol /= No_Symbol
-               then
-                  Target.Where := Locate (Fn, Item.Symbol);
-               else
-                  --  Capture receiver/key bytes before RHS evaluation. The
-                  --  copied receiver preserves parallel assignment semantics
-                  --  when another target overwrites its original local/_ENV.
-                  Target.Is_Table := True;
-                  Target.Table := Temporary (Fn);
-                  if Item.Kind = Name_Reference then
-                     Read (Fn, Locate (Fn, Item.Environment), Target.Table);
-                     Target.Key := Temporary (Fn);
-                     Load (Fn, Target.Key, Constant_Value'
-                       (String_Constant, Intern_Text (Item.Text), False));
+               if Item.Kind = Name_Reference then
+                  if Item.Symbol /= No_Symbol then
+                     Target.Where := Locate (Fn, Item.Symbol);
                   else
-                     Expression (Fn, Item.Children (1), Target.Table);
-                     Target.Key := Temporary (Fn);
-                     Expression (Fn, Item.Children (2), Target.Key);
+                     Target := Global_Address
+                       (Fn, Item.Environment, Item.Text);
                   end if;
+               else
+                  Target.Is_Table := True;
+                  Base_Node := Item.Children (1);
+                  Base := Direct_Local (Fn, Base_Node);
+                  if Base.Kind = Stack_Place then
+                     Target.Table := Base;
+                  elsif Fetch (Base_Node).Kind = Name_Reference and then
+                    Fetch (Base_Node).Symbol /= No_Symbol and then
+                    Locate (Fn, Fetch (Base_Node).Symbol).Kind = Upvalue_Place
+                  then
+                     Target.Table := Locate
+                       (Fn, Fetch (Base_Node).Symbol);
+                  else
+                     Target.Table := (Stack_Place, Temporary (Fn),
+                                      (Kind => Nil_Constant));
+                     Expression (Fn, Base_Node, Target.Table.Index);
+                  end if;
+                  if Fold (Fn, Item.Children (2), Data) then
+                     Site := Fetch (Item.Children (2)).Site;
+                     Site.Line := End_Line (Item.Children (2));
+                     Key_Data (Fn, Target, Data);
+                  else
+                     Target.Key := Register_Operand
+                       (Fn, Item.Children (2), End_Line (Item.Children (2)));
+                  end if;
+                  --  An upvalue with a short constant key is read at the
+                  --  eventual table operation. Other keys force its table
+                  --  only after key evaluation (luaK_indexed), so a key
+                  --  callback can replace the referenced upvalue first.
+                  Capture_Table (Fn, Target);
                end if;
                return Target;
             end Address;
+            procedure Read_Target
+              (Fn : in out Function_State; Target : Lvalue;
+               Destination : Natural);
+            procedure Read_Target
+              (Fn : in out Function_State; Target : Lvalue;
+               Destination : Natural) is
+            begin
+               if not Target.Is_Table then
+                  Read (Fn, Target.Where, Destination);
+               elsif Target.Table.Kind = Upvalue_Place then
+                  Put (Fn, ABC (Op_GETTABUP, Destination,
+                                Target.Table.Index, Target.Key));
+               else
+                  Put (Fn, ABC
+                    ((case Target.Key_Kind is
+                        when Register_Key => Op_GETTABLE,
+                        when Constant_Key => Op_GETFIELD,
+                        when Integer_Key => Op_GETI),
+                     Destination, Target.Table.Index, Target.Key));
+               end if;
+            end Read_Target;
             procedure Store
               (Fn : in out Function_State; Target : Lvalue; Source : Natural);
             procedure Store
@@ -469,8 +630,17 @@ package body Lua.Canonical_Compiler is
                 Natural) is
             begin
                if Target.Is_Table then
-                  Put (Fn, ABC (Op_SETTABLE, Target.Table, Target.Key,
-                    Source));
+                  if Target.Table.Kind = Upvalue_Place then
+                     Put (Fn, ABC (Op_SETTABUP, Target.Table.Index,
+                                   Target.Key, Source));
+                  else
+                     Put (Fn, ABC
+                       ((case Target.Key_Kind is
+                           when Register_Key => Op_SETTABLE,
+                           when Constant_Key => Op_SETFIELD,
+                           when Integer_Key => Op_SETI),
+                        Target.Table.Index, Target.Key, Source));
+                  end if;
                elsif Target.Where.Kind = Stack_Place then
                   Move (Fn, Target.Where.Index, Source);
                elsif Target.Where.Kind = Upvalue_Place then
@@ -479,12 +649,67 @@ package body Lua.Canonical_Compiler is
                   raise Program_Error with "assignment to folded constant";
                end if;
             end Store;
+            procedure Add_Target
+              (Fn : in out Function_State; Targets : in out Lvalues.Vector;
+               Item : Lvalue);
+            procedure Add_Target
+              (Fn : in out Function_State; Targets : in out Lvalues.Vector;
+               Item : Lvalue)
+            is
+               Saved : Natural := 0;
+               Has_Saved : Boolean := False;
+               function Snapshot return Natural;
+               procedure Preserve (Earlier : in out Lvalue);
+
+               function Snapshot return Natural is
+               begin
+                  if not Has_Saved then
+                     Saved := Temporary (Fn);
+                     Read (Fn, Item.Where, Saved);
+                     Has_Saved := True;
+                  end if;
+                  return Saved;
+               end Snapshot;
+
+               procedure Preserve (Earlier : in out Lvalue) is
+               begin
+                  if Earlier.Is_Table then
+                     if Earlier.Table.Kind = Item.Where.Kind and then
+                       Earlier.Table.Index = Item.Where.Index
+                     then
+                        Earlier.Table :=
+                          (Stack_Place, Snapshot, (Kind => Nil_Constant));
+                     end if;
+                     if Item.Where.Kind = Stack_Place and then
+                       Earlier.Key_Kind = Register_Key and then
+                       Earlier.Key = Item.Where.Index
+                     then
+                        Earlier.Key := Snapshot;
+                     end if;
+                  end if;
+               end Preserve;
+            begin
+               --  Parallel assignments store in reverse order. A later LHS
+               --  rebinding a local/upvalue must preserve any earlier table
+               --  or key operand that uses that same binding. Ordinary RHS
+               --  callbacks alone do not cause a snapshot (check_conflict).
+               if not Item.Is_Table and then
+                 Item.Where.Kind in Stack_Place | Upvalue_Place
+               then
+                  for Index in Targets.First_Index .. Targets.Last_Index loop
+                     Targets.Update_Element (Index, Preserve'Access);
+                  end loop;
+               end if;
+               Targets.Append (Item);
+            end Add_Target;
             procedure Expression
               (Fn : in out Function_State; Id : Node_Id;
                Destination : Natural; Wanted : Integer := 1;
-               Tail : Boolean := False)
+               Tail : Boolean := False; At_Line : Natural := 0)
             is
                Item : constant Nodes.Constant_Reference_Type := Fetch (Id);
+               Materialization_Line : constant Natural :=
+                 (if At_Line /= 0 then At_Line else End_Line (Id));
                Mark, Left, Right, Branch, Finish, Index : Natural;
                Count : Natural;
                Open_Last : Boolean;
@@ -492,6 +717,10 @@ package body Lua.Canonical_Compiler is
                Where : Lvalue;
             begin
                Site := Item.Site;
+               if Item.Kind in Literal | Name_Reference | Index_Expression
+               then
+                  Site.Line := Materialization_Line;
+               end if;
                Reserve (Fn, Destination + Natural (Integer'Max (1, Wanted)));
                Mark := Fn.Next;
                case Item.Kind is
@@ -522,34 +751,18 @@ package body Lua.Canonical_Compiler is
                      end case;
                   when Name_Reference | Index_Expression =>
                      Where := Address (Fn, Id);
-                     if Where.Is_Table then
-                        if Item.Kind = Index_Expression and then
-                          Fetch (Item.Children (2)).Kind = Literal and then
-                          Fetch (Item.Children (2)).Value.Kind =
-                            Integer_Literal and then
-                          Fetch (Item.Children (2)).Value.Numeric.Integer_Item
-                            in 0 .. 255
-                        then
-                           --  An immediate integer lookup has field
-                           --  provenance even for _ENV. Retain the shared
-                           --  frontend's evaluated receiver/key order, but
-                           --  encode its literal using the real GETI word
-                           --  instead of losing that distinction in GETTABLE.
-                           Put (Fn, ABC (Op_GETI, Destination, Where.Table,
-                             Natural (Fetch (Item.Children (2)).Value.Numeric.
-                               Integer_Item)));
-                        else
-                           Put (Fn, ABC (Op_GETTABLE, Destination,
-                                         Where.Table, Where.Key));
-                        end if;
-                     else
-                        Read (Fn, Where.Where, Destination);
-                     end if;
+                     --  Index preparation can run effectful base/key code.
+                     --  Discharge the selected value only at its consumer's
+                     --  real token line, after that preparation completes.
+                     Site := Item.Site;
+                     Site.Line := Materialization_Line;
+                     Read_Target (Fn, Where, Destination);
                   when Parenthesized =>
-                     Expression (Fn, Item.Children (1), Destination);
+                     Expression (Fn, Item.Children (1), Destination,
+                                 At_Line => Materialization_Line);
                   when Unary_Expression =>
-                     Left := Temporary (Fn);
-                     Expression (Fn, Item.Children (1), Left);
+                     Left := Register_Operand
+                       (Fn, Item.Children (1), End_Line (Item.Children (1)));
                      Op := (case Item.Operator is
                        when Minus => Op_UNM, when Bit_Xor => Op_BNOT,
                        when Not_Word => Op_NOT, when Length => Op_LEN,
@@ -561,7 +774,8 @@ package body Lua.Canonical_Compiler is
                         --  Keep the original operand, not a booleanized copy.
                         --  Only the selected RHS executes, and each operand
                         --  is scalar-adjusted before its truth is inspected.
-                        Expression (Fn, Item.Children (1), Destination);
+                        Expression (Fn, Item.Children (1), Destination,
+                                    At_Line => Item.Site.Line);
                         Put (Fn, ABC (Op_TEST, Destination,
                           Flag => Item.Operator = Or_Word));
                         Branch := Jump (Fn);
@@ -571,10 +785,20 @@ package body Lua.Canonical_Compiler is
                         if Item.Operator = Concatenate then
                            Reserve (Fn, Destination + 2);
                         end if;
-                        Left := Temporary (Fn);
-                        Expression (Fn, Item.Children (1), Left);
-                        Right := Temporary (Fn);
-                        Expression (Fn, Item.Children (2), Right);
+                        if Item.Operator = Concatenate then
+                           --  Concatenation requires a contiguous result
+                           --  range and discharges its left value before
+                           --  parsing/evaluating the RHS (luaK_infix).
+                           Left := Temporary (Fn);
+                           Expression (Fn, Item.Children (1), Left,
+                                       At_Line => Item.Site.Line);
+                        else
+                           Left := Register_Operand
+                             (Fn, Item.Children (1), Item.Site.Line);
+                        end if;
+                        Right := Register_Operand
+                          (Fn, Item.Children (2),
+                           End_Line (Item.Children (2)));
                         Site := Item.Site;
                         if Item.Operator in Equal | Not_Equal | Less |
                           Less_Equal | Greater | Greater_Equal
@@ -799,14 +1023,10 @@ package body Lua.Canonical_Compiler is
                  (Fn, Constant_Value'
                    (String_Constant, Intern_Text (Name), False));
             begin
-               Put (Fn, ABC (Op_GETTABLE, Register_Id,
-                             Target.Table, Target.Key));
+               Read_Target (Fn, Target, Register_Id);
                Put (Fn, ABx (Op_ERRNNIL, Register_Id,
                              (if Index < 2 ** 17 - 1 then Index + 1 else 0)));
             end Check_Global;
-            function Fold
-              (Fn : Function_State; Id : Node_Id; Data : out Constant_Value)
-               return Boolean;
             function Fold
               (Fn : Function_State; Id : Node_Id; Data : out Constant_Value)
                return Boolean
@@ -968,8 +1188,9 @@ package body Lua.Canonical_Compiler is
                      for Position in 1 ..
                        Natural (Item.Children.Length) - 1
                      loop
-                        Targets.Append (Address
-                          (Fn, Item.Children (Position)));
+                        Add_Target
+                          (Fn, Targets,
+                           Address (Fn, Item.Children (Position)));
                      end loop;
                      Left := Fn.Next;
                      if Fetch (Item.Children.Last_Element).Kind =
@@ -981,6 +1202,7 @@ package body Lua.Canonical_Compiler is
                           Integer (Targets.Length), Open_Last, Count);
                      end if;
                      Site := Item.Site;
+                     Site.Line := End_Line (Item.Children.Last_Element);
                      if Item.Flag then
                         Check_Global (Fn, Targets (1),
                           Fetch (Item.Children (1)).Text);
@@ -999,15 +1221,9 @@ package body Lua.Canonical_Compiler is
                                  if Unit.Names (Positive (Symbol)).Kind /=
                                    Collective_Name
                                  then
-                                    Target.Is_Table := True;
-                                    Target.Table := Temporary (Fn);
-                                    Read (Fn, Locate (Fn, Item.Environment),
-                                          Target.Table);
-                                    Target.Key := Temporary (Fn);
-                                    Load (Fn, Target.Key, Constant_Value'
-                                      (String_Constant, Intern_Text
-                                        (Unit.Names
-                                          (Positive (Symbol)).Name), False));
+                                    Target := Global_Address
+                                      (Fn, Item.Environment, Unit.Names
+                                        (Positive (Symbol)).Name);
                                     Targets.Append (Target);
                                  end if;
                               end;
@@ -1016,6 +1232,7 @@ package body Lua.Canonical_Compiler is
                            Values (Fn, Item.Children (1), Left,
                              Integer (Targets.Length), Open_Last, Count);
                            Site := Item.Site;
+                           Site.Line := End_Line (Item.Children (1));
                            for Position in reverse
                              1 .. Natural (Targets.Length)
                            loop

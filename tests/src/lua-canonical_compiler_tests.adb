@@ -67,6 +67,7 @@ package body Lua.Canonical_Compiler_Tests is
       Memory : Lua.Storage.Owner;
       Result : constant Compilation_Result := Lower ("return x", Memory);
       Node : constant Prototype_Access := Root (Result.Code);
+      Resolved_Environment : Boolean := False;
    begin
       --  The frontend unit has already died inside Lower. Its canonical source
       --  and initial _ENV upvalue must still be owned by the resulting
@@ -74,7 +75,23 @@ package body Lua.Canonical_Compiler_Tests is
       Assert (Result.Outcome = Succeeded and then
               Node.Upvalues.Length = 1 and then Node.Flags = 1,
               "main environment/vararg contract");
-      Assert (Has (Node, Op_GETUPVAL) and then Has (Node, Op_GETTABLE),
+      --  The deferred global descriptor now discharges through the actual
+      --  GETTABUP word. Inspect its real upvalue/key operands rather than
+      --  requiring the former eager GETUPVAL/GETTABLE helper sequence.
+      for Instruction of Node.Code loop
+         if Operation (Instruction) = Op_GETTABUP then
+            declare
+               Key : constant Constant_Value :=
+                 Node.Constants (Get (Instruction, C).Value + 1);
+            begin
+               Resolved_Environment := Get (Instruction, B).Value = 0
+                 and then Key.Kind = String_Constant and then
+                 String_Length (Result.Code, Key.String_Data) = 1 and then
+                 String_Element (Result.Code, Key.String_Data, 1) = 'x';
+            end;
+         end if;
+      end loop;
+      Assert (Resolved_Environment,
               "global access did not use the resolved environment");
       Assert (String_Length (Result.Code, Node.Source) = 15,
               "source identity depends on the discarded frontend");

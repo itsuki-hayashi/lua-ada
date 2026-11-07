@@ -81,6 +81,7 @@ package body Lua.Syntax_Trees is
         range Name_Reference .. Empty_Statement;
       function Make (What : Structural_Kind) return Node_Id;
       procedure Child (Parent, Item : Node_Id);
+      procedure Remember_End (Id : Node_Id);
       function New_Name
         (Name : Text_Ref; Mode : Attribute := Regular;
          Kind : Binding_Kind := Local_Name) return Symbol_Id;
@@ -228,6 +229,15 @@ package body Lua.Syntax_Trees is
          --  no arena node is allocated until the reference leaves scope.
          Value.Children.Append (Item);
       end Child;
+
+      procedure Remember_End (Id : Node_Id) is
+         Item : constant Nodes.Reference_Type :=
+           Unit.Tree.Reference (Positive (Id));
+      begin
+         --  Retain only consumed-token metadata. This brief borrow never
+         --  copies a node's input-sized lists or survives a tree append.
+         Item.End_Line := Last_Line;
+      end Remember_End;
 
       procedure Enter is
       begin
@@ -389,6 +399,7 @@ package body Lua.Syntax_Trees is
             Child (Result, Expression);
             exit when not Take (Comma);
          end loop;
+         Remember_End (Result);
          return Result;
       end Expression_List;
 
@@ -508,6 +519,7 @@ package body Lua.Syntax_Trees is
             Error ("expression expected");
             return No_Node;
          end if;
+         Remember_End (Result);
          loop
             Method := False;
             if Take (Left_Bracket) then
@@ -561,6 +573,7 @@ package body Lua.Syntax_Trees is
                end if;
                Result := Next;
             end if;
+            Remember_End (Result);
          end loop;
          return Result;
       end Prefix;
@@ -628,6 +641,9 @@ package body Lua.Syntax_Trees is
               ((if Op in Power | Concatenate then Rank - 1 else Rank)));
             Result := Next;
          end loop;
+         --  Consumers can materialize a deferred expression later. Keep its
+         --  final consumed token rather than guessing from lookahead/source.
+         Remember_End (Result);
          Leave;
          return Result;
       end Expression;
