@@ -107,6 +107,19 @@ package Lua.Sessions is
    --  @param Sink Optional borrowed output destination; never retained.
    --  @return Success or structured error, including output already produced.
 
+   function Execute_Display
+     (Self : in out Session; Source : String;
+      Name : String := "=stdin"; Display_Failed : out Boolean)
+      return Execution_Result;
+   --  Execute Source like Execute, then call the session's current global
+   --  print with every value the chunk returned, in a second sequential
+   --  drive (no helper Lua frame). The results stay in a traced root across
+   --  allocation, collection and printing; no VM value escapes. Nothing is
+   --  printed for an empty result list, a failed chunk or a process exit.
+   --  @param Display_Failed True when the chunk succeeded and the failure
+   --  came from calling print; Error.Message is then the raw error text
+   --  and the host adds its "error calling 'print'" framing.
+
    function Set_Arguments
      (Self : in out Session; Arguments : Argument_Array)
       return Execution_Result;
@@ -115,6 +128,13 @@ package Lua.Sessions is
    --  @param Self Session whose global arg table is replaced.
    --  @param Arguments Index-preserving strings, including zero/negative keys.
    --  @return Structured success/resource failure; never an engine exception.
+
+   function Set_Warnings_Enabled
+     (Self : in out Session; Enabled : Boolean) return Execution_Result;
+   --  Send the native @on/@off control to the owning warning handler without
+   --  consulting the replaceable Lua warn global. Custom callbacks use the
+   --  same guarded scheduler as execution. Serialize this host operation
+   --  with all other calls on Self; it starts its own bounded work epoch.
 
    procedure Set_Limits (Self : in out Session; Bounds : Execution_Limits);
    --  Select bounded policy and change limits for later calls. This

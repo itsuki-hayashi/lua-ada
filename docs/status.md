@@ -8,6 +8,11 @@ rounding. Its strict Windows validation/static component build passes 1,418
 AUnit cases, including eight new focused cases. Final integrated acceptance
 remains pending.
 
+The [CLI process checkpoint](sessions/2026-11-08-cli-process-controls.md)
+passes strict Windows validation/static builds, 1,422 component AUnit cases,
+86 Ada process protocols and 32 corresponding pinned-C protocols. Native
+loading, signals/readline and complete main.lua acceptance remain open.
+
 Implementation resumes from merged PR #10 on
 codex/m3-remaining-upstream-compatibility. The approved target includes all
 remaining primary files, aggregate, heavy case, helpers and native fixtures.

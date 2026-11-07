@@ -48,6 +48,21 @@ receives the completed output synchronously and is never retained. Sink
 exceptions produce `Host_Error`; Lua syntax/runtime/resource failures have
 separate statuses and do not escape as unhandled Ada language exceptions.
 
+`Execute_Display` supports host read-eval-print loops without exposing returned
+objects. It executes one chunk, retains all returned values as traced roots,
+then resolves and calls the current global `print` through a second sequential
+drive. Environment lookup and callable metamethods retain ordinary Lua behavior.
+The two phases share one instruction budget; callbacks cannot restart it.
+`Display_Failed` distinguishes a failure during display from a failed chunk.
+An empty result packet does not call `print`. Output policy and typed exit
+requests have the same meaning as for `Execute`.
+
+`Set_Warnings_Enabled` sends an actual warning control from an idle session.
+It is independent of the public `warn` global, so host options retain their
+meaning after Lua code replaces that global. Custom C warning handlers use the
+same guarded callback portal. Both methods require serialized session access;
+neither may be called recursively from an active callback.
+
 Sessions initialize and reset to Output_Policy.Captured. Set_Output_Policy
 can explicitly select Process_Streams without changing globals or execution
 quotas. That mode publishes bytes to actual C stdout during execution and

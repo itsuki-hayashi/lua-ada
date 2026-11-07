@@ -34,6 +34,8 @@ with Lua.Engine.Warnings;
 with Lua.Engine.Mathematics;
 
 package body Lua.Engine.Machine is
+   Warning_On : aliased constant String := "@on" & Character'Val (0);
+   Warning_Off : aliased constant String := "@off" & Character'Val (0);
    GC_Warning_Start_Text : aliased constant String :=
      "error in " & ASCII.NUL;
    GC_Warning_Start : constant Byte_String :=
@@ -2926,6 +2928,44 @@ package body Lua.Engine.Machine is
             State.Current.Non_Yieldable := State.Current.Non_Yieldable + 1;
          end if;
          Action := Operating_System.Advance (State, Activation);
+      elsif Name = "@host.display" then
+         --  Resolve print through the real environment lookup, including
+         --  __index. The activation retains the chunk results across that
+         --  lookup and the subsequent call, so neither phase borrows a
+         --  transient host packet or reenters the executor.
+         if Activation.Native_Stage = 0 then
+            Packet.Append (Global_Environment (State));
+            Packet.Append (New_String (State, "print"));
+            Activation.Native_Stage := 1;
+            Schedule (Self, "@get", Packet, 0);
+         elsif Activation.Native_Stage = 1 then
+            Handler := First (Activation.Native_Results);
+            Activation.Native_Stage := 2;
+            Dispatch (Self, Handler, Activation.Native_Arguments, 0);
+         else
+            Complete (Self, Values.Empty_Vector);
+         end if;
+         return;
+      elsif Name in "@host.warning.on" | "@host.warning.off" then
+         --  CLI/host controls call the warning mechanism, not the global
+         --  warn function which user code can replace. Static message bytes
+         --  outlive every deferred C callback; the hidden activation owns the
+         --  existing allocation-free event until its guard acknowledges it.
+         if Activation.Native_Stage = 0 then
+            Activation.Native_Stage := 1;
+            if Name = "@host.warning.on" then
+               Warnings.Emit
+                 (State, Byte_String'(Warning_On (Warning_On'First)'Address,
+                          Warning_On'Length - 1));
+            else
+               Warnings.Emit
+                 (State, Byte_String'(Warning_Off (Warning_Off'First)'Address,
+                          Warning_Off'Length - 1));
+            end if;
+         else
+            Complete (Self, Values.Empty_Vector);
+         end if;
+         return;
       elsif Name = "base.warn" then
          Action := Warnings.Advance (State, Activation);
       elsif Name = "table.create" then
@@ -4759,6 +4799,81 @@ package body Lua.Engine.Machine is
          Finish (Self);
          raise;
    end Run;
+
+   procedure Drive_To_Completion (State : in out World; Self : in out Driver);
+   procedure Drive_To_Completion (State : in out World; Self : in out Driver)
+   is
+   begin
+      --  Same iterative loop as Run: one scheduler step per iteration, and
+      --  foreign/warning callbacks are serviced above this waiting host
+      --  activation. No executor entry is ever nested.
+      while not Is_Complete (Self) loop
+         if Needs_Foreign_Call (Self) or else Warnings.Pending (State) then
+            Lua.Engine.Foreign.Invoke_Borrowed (State, Self);
+         else
+            Step (Self);
+         end if;
+      end loop;
+   end Drive_To_Completion;
+
+   procedure Run_Retaining (State : in out World; Code : Prototype_Access) is
+      Self : Driver;
+   begin
+      Start_Borrowed
+        (Self, World_View (World_Addresses.To_Pointer (State'Address)),
+         Code, Nil_Value, State.Current.Arguments);
+      Drive_To_Completion (State, Self);
+      if State.Exit_Phase /= Exit_Complete and then
+        Outcome (Self) = Completed
+      then
+         --  Ownership transition: the packet moves from the driver's root
+         --  context into the context's traced Arguments vector without any
+         --  allocation, so there is no safe point at which it is unowned.
+         --  Arguments held the chunk's (empty for the REPL) input only; the
+         --  drive is complete, so clearing it cannot disturb a live frame.
+         State.Current.Arguments.Clear;
+         Take_Results (Self, State.Current.Arguments);
+      end if;
+      Finish (Self);
+   exception
+      when others =>
+         Self.Failed := True;
+         Finish (Self);
+         raise;
+   end Run_Retaining;
+
+   procedure Run_Display (State : in out World) is
+      Self : Driver;
+   begin
+      Prepare
+        (Self, World_View (World_Addresses.To_Pointer (State'Address)));
+      Schedule (Self, "@host.display", State.Current.Arguments, 0);
+      Drive_To_Completion (State, Self);
+      Finish (Self);
+   exception
+      when others =>
+         Self.Failed := True;
+         Finish (Self);
+         raise;
+   end Run_Display;
+   procedure Run_Warning_Control
+     (State : in out World; Enabled : Boolean)
+   is
+      Self : Driver;
+   begin
+      Prepare
+        (Self, World_View (World_Addresses.To_Pointer (State'Address)));
+      Schedule
+        (Self, (if Enabled then "@host.warning.on" else "@host.warning.off"),
+         Values.Empty_Vector, 0);
+      Drive_To_Completion (State, Self);
+      Finish (Self);
+   exception
+      when others =>
+         Self.Failed := True;
+         Finish (Self);
+         raise;
+   end Run_Warning_Control;
    procedure Close_Lua_State (State : in out World) is
       Self : Driver;
    begin

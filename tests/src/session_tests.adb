@@ -59,6 +59,12 @@ package body Session_Tests is
    procedure Explicit_Base_Conversion;
    procedure Table_Cycle;
    procedure Primitive_Infinity;
+   procedure Display_All_Results;
+   procedure Display_Result_Roots;
+   procedure Display_Environment_Handler;
+   procedure Display_Error_Recovery;
+   procedure Display_Bounded_Policy;
+   procedure Host_Warning_Control;
 
    procedure Check (Source, Expected : String) is
       Universe : Session;
@@ -604,6 +610,111 @@ package body Session_Tests is
       Check ("print(pcall(function() return ~'3' end) == false)", "true");
    end Bitwise_String_Unary;
 
+   procedure Display_All_Results is
+      Universe : Session;
+      Failed : Boolean;
+      Result : Execution_Result;
+   begin
+      --  A host display preserves the entire result packet, including nil;
+      --  an empty packet must not call print at all.
+      Result := Universe.Execute_Display ("return 1,nil,3", "=stdin", Failed);
+      Assert (Result.Status = Succeeded and then not Failed and then
+              To_String (Result.Output) = "1" & Ada.Characters.Latin_1.HT &
+                "nil" & Ada.Characters.Latin_1.HT & "3" &
+                Ada.Characters.Latin_1.LF, "display result arity");
+      Result := Universe.Execute_Display
+        ("print=function() error('empty print') end", "=stdin", Failed);
+      Assert (Result.Status = Succeeded and then not Failed,
+              "empty result packet called print");
+   end Display_All_Results;
+
+   procedure Display_Result_Roots is
+      Universe : Session;
+      Failed : Boolean;
+      Result : Execution_Result;
+   begin
+      --  Replace print in the chunk, then collect before inspecting its
+      --  returned table and long string. The second drive must own both.
+      Result := Universe.Execute_Display
+        ("print=function(t,s) collectgarbage(); " &
+         "assert(t[1]==42 and #s==4000); io.write('rooted') end; " &
+         "return {42},string.rep('x',4000)", "=stdin", Failed);
+      Assert (Result.Status = Succeeded and then not Failed and then
+              To_String (Result.Output) = "rooted", "display lost roots");
+   end Display_Result_Roots;
+
+   procedure Display_Environment_Handler is
+      Universe : Session;
+      Failed : Boolean;
+      Result : Execution_Result;
+   begin
+      --  Global lookup has ordinary __index semantics, even when print was
+      --  removed by this same chunk. Calling the resolved function is real.
+      Result := Universe.Execute_Display
+        ("local p=print; print=nil; setmetatable(_G,{__index=" &
+         "function(_,k) if k=='print' then return p end end}); return 42",
+         "=stdin", Failed);
+      Assert (Result.Status = Succeeded and then not Failed and then
+              To_String (Result.Output) = "42" & Ada.Characters.Latin_1.LF,
+              "display bypassed environment handler");
+   end Display_Environment_Handler;
+
+   procedure Display_Error_Recovery is
+      Universe : Session;
+      Failed : Boolean;
+      Result : Execution_Result;
+   begin
+      --  A failed printer is distinguished from a failed chunk. Neither
+      --  failure may leave active frames or contaminate the next drive.
+      Result := Universe.Execute_Display
+        ("print=function() error('printer',0) end; return 1",
+         "=stdin", Failed);
+      Assert (Result.Status = Runtime_Error and then Failed and then
+              To_String (Result.Error.Message) = "printer",
+              "printer failure classification");
+      Result := Universe.Execute_Display ("error('chunk',0)",
+                                          "=stdin", Failed);
+      Assert (Result.Status = Runtime_Error and then not Failed,
+              "chunk failure classified as printer");
+      Result := Universe.Execute ("io.write('recovered')");
+      Assert (Result.Status = Succeeded and then
+              To_String (Result.Output) = "recovered",
+              "display failure left a live drive");
+   end Display_Error_Recovery;
+
+   procedure Display_Bounded_Policy is
+      Universe : Session;
+      Failed : Boolean;
+      Result : Execution_Result;
+   begin
+      --  A replaced printer is user code; the second drive must consume the
+      --  same bounded session budget rather than escaping host policy.
+      Universe.Set_Limits ((Instructions => 500, others => <>));
+      Result := Universe.Execute_Display
+        ("print=function() while true do end end; return 1",
+         "=stdin", Failed);
+      Assert (Result.Status = Resource_Error and then Failed,
+              "printer escaped bounded execution");
+      Result := Universe.Execute ("assert(1+1==2)");
+      Assert (Result.Status = Succeeded, "bounded display did not recover");
+   end Display_Bounded_Policy;
+
+   procedure Host_Warning_Control is
+      Universe : Session;
+      Result : Execution_Result;
+   begin
+      --  The host delivers controls through the warning mechanism after Lua
+      --  removes warn. Both controls must succeed and leave the VM reusable.
+      Result := Universe.Execute ("warn=nil");
+      Assert (Result.Status = Succeeded, "warning setup failed");
+      Result := Universe.Set_Warnings_Enabled (True);
+      Assert (Result.Status = Succeeded, "host warning enable failed");
+      Result := Universe.Set_Warnings_Enabled (False);
+      Assert (Result.Status = Succeeded, "host warning disable failed");
+      Result := Universe.Execute ("assert(warn==nil)");
+      Assert (Result.Status = Succeeded, "host warning replaced global");
+   end Host_Warning_Control;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -759,5 +870,17 @@ package body Session_Tests is
       Test_Support.Add
         (Suite, "session: method self is scalar",
          Method_Self_Is_Scalar'Access);
+      Test_Support.Add (Suite, "session: display all results",
+                        Display_All_Results'Access);
+      Test_Support.Add (Suite, "session: display rooted results",
+                        Display_Result_Roots'Access);
+      Test_Support.Add (Suite, "session: display environment handler",
+                        Display_Environment_Handler'Access);
+      Test_Support.Add (Suite, "session: display error recovery",
+                        Display_Error_Recovery'Access);
+      Test_Support.Add (Suite, "session: display bounded policy",
+                        Display_Bounded_Policy'Access);
+      Test_Support.Add (Suite, "session: host warning controls",
+                        Host_Warning_Control'Access);
    end Register;
 end Session_Tests;

@@ -18,6 +18,11 @@ within a passing 1,418-case component run. See its dated
 [checkpoint](sessions/2026-11-08-runtime-numeric-locale.md); this does not close
 literals.lua or the full library gate without fresh integrated execution.
 
+Ordered CLI controls, environment initialization, shared binary stdin and host
+REPL phases now have passing component AUnit/process evidence. The dated
+[checkpoint](sessions/2026-11-08-cli-process-controls.md) preserves remaining
+main.lua and platform obligations; this does not close M3-11.
+
 IDs are stable. Completion requires evidence, including relevant platform gates.
 M1 is complete; [all five gates passed](validation.md).
 

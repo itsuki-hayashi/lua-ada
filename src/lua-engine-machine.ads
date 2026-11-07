@@ -172,6 +172,24 @@ package Lua.Engine.Machine is
    procedure Run (State : in out World; Code : Prototype_Access);
    --  Synchronous Ada convenience wrapper over Start, Step and Finish.
 
+   procedure Run_Retaining (State : in out World; Code : Prototype_Access);
+   --  Run Code exactly like Run, but on normal completion move the chunk's
+   --  result packet into State.Current.Arguments. That vector is a traced
+   --  root, so the values survive every later allocation and collection
+   --  until the caller consumes or clears it. A typed process exit, which
+   --  produces no displayable packet, leaves the vector empty. Failure
+   --  propagates as in Run and retains nothing.
+
+   procedure Run_Display (State : in out World);
+   --  Start a sequential drive to resolve the current global print through
+   --  ordinary lookup and call it with State.Current.Arguments. Hidden host
+   --  phases add no Lua helper frame. Never call from an active drive.
+
+   procedure Run_Warning_Control (State : in out World; Enabled : Boolean);
+   --  Deliver a host warning control through the actual warning handler,
+   --  independently of replaceable Lua globals. Custom C callbacks use the
+   --  ordinary borrowed portal and complete before this host call returns.
+
    procedure Close_Lua_State (State : in out World);
    --  Drive an idle main thread's TBC/finalizer close protocol, leaving
    --  physical ownership with the caller. Never call from an active drive.

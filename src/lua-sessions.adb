@@ -1,6 +1,8 @@
 with Ada.Exceptions;
 with Ada.Unchecked_Deallocation;
+with Lua.Engine.Compiler;
 with Lua.Engine.Machine;
+with Lua.Storage;
 
 package body Lua.Sessions is
    use Ada.Strings.Unbounded;
@@ -35,6 +37,30 @@ package body Lua.Sessions is
       end if;
       return Result;
    end Failure;
+
+   procedure Apply_Exit
+     (Self : in out Session; Result : in out Execution_Result);
+
+   procedure Apply_Exit
+     (Self : in out Session; Result : in out Execution_Result) is
+   begin
+      --  Shared by Execute and Execute_Display: publish a completed typed
+      --  os.exit request. Unchanged from the original inline sequence.
+      Result.Status := Exit_Requested;
+      Result.Exit_Request :=
+        (Self.State.Exit_Code, Self.State.Exit_Close_State);
+      if Self.State.Exit_Close_State then
+         --  The scheduler has already drained main-thread TBC values
+         --  and finalizers. Snapshot the public result before physical
+         --  release; a C-owned pump follows the same ordering.
+         Lua.Engine.Finalize (Self.State.all, Lua.Engine.Lua_State_Close);
+         Free (Self.State);
+      else
+         Self.State.Exit_Phase := Lua.Engine.No_Process_Exit;
+         Self.State.Current := Self.State.Main_Context;
+         Self.State.Current.Status := Lua.Engine.Suspended_Context;
+      end if;
+   end Apply_Exit;
 
    overriding procedure Initialize (Self : in out Session) is
    begin
@@ -147,21 +173,7 @@ package body Lua.Sessions is
       if Lua.Engine.Execute (Self.State.all, Source, Name) then
          Result.Output := Self.State.Output;
          if Self.State.Exit_Phase = Lua.Engine.Exit_Complete then
-            Result.Status := Exit_Requested;
-            Result.Exit_Request :=
-              (Self.State.Exit_Code, Self.State.Exit_Close_State);
-            if Self.State.Exit_Close_State then
-               --  The scheduler has already drained main-thread TBC values
-               --  and finalizers. Snapshot the public result before physical
-               --  release; a C-owned pump follows the same ordering.
-               Lua.Engine.Finalize
-                 (Self.State.all, Lua.Engine.Lua_State_Close);
-               Free (Self.State);
-            else
-               Self.State.Exit_Phase := Lua.Engine.No_Process_Exit;
-               Self.State.Current := Self.State.Main_Context;
-               Self.State.Current.Status := Lua.Engine.Suspended_Context;
-            end if;
+            Apply_Exit (Self, Result);
          end if;
       else
          Result := Failure (Self, Name);
@@ -188,6 +200,191 @@ package body Lua.Sessions is
            To_Unbounded_String ("host storage exhausted");
          return Result;
    end Execute;
+
+   function Execute_Display
+     (Self : in out Session; Source : String;
+      Name : String := "=stdin"; Display_Failed : out Boolean)
+      return Execution_Result
+   is
+      Result : Execution_Result;
+      Phase_One_Done : Boolean := False;
+
+      procedure Unwind (Collect_After : Boolean := True);
+      procedure Unwind (Collect_After : Boolean := True) is
+         --  Mirrors the failure epilogue of Lua.Engine.Execute so a failed
+         --  display session is as reusable as a failed ordinary chunk.
+         State : Lua.Engine.World renames Self.State.all;
+      begin
+         State.Entry_Code := null;
+         State.Current.Status := Lua.Engine.Suspended_Context;
+         State.Current.Arguments.Clear;
+         Lua.Engine.Machine.Clear_Frames (State);
+         if Collect_After and then State.GC_Running then
+            Lua.Engine.Collect (State);
+         end if;
+      end Unwind;
+   begin
+      Display_Failed := False;
+      if Self.State = null then
+         return Failure (Self, Name);
+      end if;
+      declare
+         State : Lua.Engine.World renames Self.State.all;
+         Code : Lua.Engine.Prototype_Access;
+      begin
+         --  Phase one: the prelude is the same state reset Engine.Execute
+         --  performs. Results of the REPL chunk are never visible before
+         --  the chunk has completed, as in lua.c's docall/l_print split.
+         State.Current.Arguments.Clear;
+         State.Current.Status := Lua.Engine.Running_Context;
+         State.Current.Failure := Lua.Engine.Nil_Value;
+         State.Current.Has_Failure_Value := False;
+         State.Current.Failure_Text := Null_Unbounded_String;
+         State.Current.Failure_Class := Lua.Engine.No_Failure;
+         State.Current.Failure_Handled := False;
+         State.Current.Protected_Failure_Class := Lua.Engine.No_Failure;
+         State.Current.Protected_Handler_Called := False;
+         State.Output := Null_Unbounded_String;
+         State.Output_Used := 0;
+         State.Steps := 0;
+         State.Current.Failure_At := (others => 1);
+         if State.GC_Running then
+            Lua.Engine.Collect (State);
+         end if;
+         if Source'Length > State.Bounds.Source_Bytes then
+            Lua.Engine.Fail
+              (State, "source byte limit exceeded", Resource => True);
+         end if;
+         Lua.Engine.Begin_Operation (State);
+         Code := Lua.Engine.Compiler.Compile (State, Source, Name);
+         State.Entry_Code := Code;
+         Lua.Engine.Machine.Run_Retaining (State, Code);
+         State.Entry_Code := null;
+         Lua.Engine.End_Operation (State);
+         Phase_One_Done := True;
+         if State.Exit_Phase = Lua.Engine.Exit_Complete then
+            Result.Output := State.Output;
+            Apply_Exit (Self, Result);
+            return Result;
+         end if;
+         if not State.Current.Arguments.Is_Empty then
+            --  Phase two: look up the *current* global print only now, as
+            --  lua.c does after the chunk returns. The packet in Arguments
+            --  is a traced root through the key allocation and the call.
+            Display_Failed := True;
+            Lua.Engine.Machine.Run_Display (State);
+            Display_Failed := False;
+         end if;
+         State.Current.Arguments.Clear;
+         if State.GC_Running then
+            Lua.Engine.Collect (State);
+         end if;
+         State.Current.Status := Lua.Engine.Suspended_Context;
+         Result.Output := State.Output;
+         if State.Exit_Phase = Lua.Engine.Exit_Complete then
+            --  print (a replaced global) may itself request process exit.
+            Apply_Exit (Self, Result);
+         end if;
+         return Result;
+      end;
+   exception
+      when Lua.Engine.Language_Error =>
+         if not Phase_One_Done then
+            Lua.Engine.End_Operation (Self.State.all);
+            Display_Failed := False;
+         end if;
+         Unwind;
+         return Failure (Self, Name);
+      when Lua.Storage.Allocation_Error =>
+         Lua.Engine.End_Operation (Self.State.all);
+         Lua.Engine.Record_Memory_Error (Self.State.all);
+         Unwind (Collect_After => False);
+         return Failure (Self, Name);
+      when Storage_Error =>
+         if Self.State /= null then
+            Lua.Engine.End_Operation (Self.State.all);
+            Unwind (Collect_After => False);
+            Self.State.Current.Failure_Class := Lua.Engine.Host_Abort;
+         end if;
+         Result.Status := Resource_Error;
+         Result.Error.Source := To_Unbounded_String (Name);
+         Result.Error.Message :=
+           To_Unbounded_String ("host storage exhausted");
+         return Result;
+      when Error : Constraint_Error | Program_Error =>
+         Lua.Engine.End_Operation (Self.State.all);
+         if Lua.Storage.Refusal_Pending (Self.State.Memory) then
+            Lua.Engine.Record_Memory_Error (Self.State.all);
+         else
+            Self.State.Current.Failure_Text := To_Unbounded_String
+              ("internal Ada check: " &
+               Ada.Exceptions.Exception_Message (Error));
+         end if;
+         Unwind (Collect_After => False);
+         return Failure (Self, Name);
+   end Execute_Display;
+
+   function Set_Warnings_Enabled
+     (Self : in out Session; Enabled : Boolean) return Execution_Result
+   is
+      Result : Execution_Result;
+      procedure Recover;
+      procedure Recover is
+         State : Lua.Engine.World renames Self.State.all;
+      begin
+         Lua.Engine.End_Operation (State);
+         Lua.Engine.Machine.Clear_Frames (State);
+         State.Current.Arguments.Clear;
+         State.Current.Status := Lua.Engine.Suspended_Context;
+      end Recover;
+   begin
+      if Self.State = null then
+         return Failure (Self, "(warning)");
+      end if;
+      declare
+         State : Lua.Engine.World renames Self.State.all;
+      begin
+         --  This is an idle host entry, not a recursive executor call from a
+         --  Lua callback. The warning's native phase retains every deferred
+         --  callback event; changing the public warn binding has no effect.
+         State.Current.Failure := Lua.Engine.Nil_Value;
+         State.Current.Has_Failure_Value := False;
+         State.Current.Failure_Text := Null_Unbounded_String;
+         State.Current.Failure_Class := Lua.Engine.No_Failure;
+         State.Current.Failure_Handled := False;
+         State.Current.Protected_Failure_Class := Lua.Engine.No_Failure;
+         State.Current.Protected_Handler_Called := False;
+         State.Current.Failure_At := (others => 1);
+         State.Current.Arguments.Clear;
+         State.Output := Null_Unbounded_String;
+         State.Output_Used := 0;
+         State.Steps := 0;
+         Lua.Engine.Begin_Operation (State);
+         Lua.Engine.Machine.Run_Warning_Control (State, Enabled);
+         Lua.Engine.End_Operation (State);
+         State.Current.Status := Lua.Engine.Suspended_Context;
+         Result.Output := State.Output;
+         if State.Exit_Phase = Lua.Engine.Exit_Complete then
+            Apply_Exit (Self, Result);
+         end if;
+      end;
+      return Result;
+   exception
+      when Lua.Engine.Language_Error =>
+         Recover;
+         return Failure (Self, "(warning)");
+      when Lua.Storage.Allocation_Error =>
+         Lua.Engine.Record_Memory_Error (Self.State.all);
+         Recover;
+         return Failure (Self, "(warning)");
+      when Storage_Error =>
+         Recover;
+         Result.Status := Resource_Error;
+         Result.Error.Source := To_Unbounded_String ("(warning)");
+         Result.Error.Message :=
+           To_Unbounded_String ("host storage exhausted");
+         return Result;
+   end Set_Warnings_Enabled;
 
    function Set_Arguments
      (Self : in out Session; Arguments : Argument_Array)
