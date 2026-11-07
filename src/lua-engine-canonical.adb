@@ -9,6 +9,7 @@ with Lua.Engine.Machine;
 with Lua.Engine.Stacks;
 
 package body Lua.Engine.Canonical is
+   use type Lua.Prototypes.Constant_Kind;
    use Lua.Opcodes;
    use type Interfaces.Unsigned_8;
    use type Interfaces.Integer_8;
@@ -422,6 +423,7 @@ package body Lua.Engine.Canonical is
 
       Current : Prototype_Access;
       Pending_Text : Value;
+      Literal_Strings : Scalar_Values.Vector;
       procedure String_Value (Text : String);
       procedure String_Value (Text : String) is
       begin
@@ -439,6 +441,18 @@ package body Lua.Engine.Canonical is
       Lua.Prototypes.Move (Owner.Model, Program);
       Owner.Wrappers.Reserve_Capacity (Ada.Containers.Count_Type
         (Lua.Prototypes.Prototype_Count (Owner.Model)));
+      --  The owned model already interns literals across all nested nodes.
+      --  Materialize each such string once for this program, rather than
+      --  losing its identity when another wrapper mentions the same ID.
+      --  This temporary index uses the universe allocator and contains only
+      --  values already retained by registered wrappers; it creates no new
+      --  collector root or universe-wide long-string interning policy.
+      Literal_Strings.Set_Owner (Lua.Storage.Reference (State.Memory));
+      Literal_Strings.Reserve_Capacity (Ada.Containers.Count_Type
+        (Lua.Prototypes.String_Count (Owner.Model)));
+      for Index in 1 .. Lua.Prototypes.String_Count (Owner.Model) loop
+         Literal_Strings.Append (Nil_Value);
+      end loop;
       --  Each wrapper is registered before materializing its constants. The
       --  compiling bridge roots partial construction during allocation retry;
       --  no opaque fake private instructions stand in for canonical metadata.
@@ -450,6 +464,12 @@ package body Lua.Engine.Canonical is
          Current.Canonical_Owner := Owner;
          Current.Canonical_Node :=
            Lua.Prototypes.Prototype_At (Owner.Model, Index);
+         --  Once a new literal exists, publication into its wrapper must
+         --  require no further allocation. Reserve all scalar slots before
+         --  creating heap values, keeping construction and cache publication
+         --  in one interval without a possible allocation safe point.
+         Current.Canonical_Constants.Reserve_Capacity
+           (Current.Canonical_Node.Constants.Length);
          Current.First_Line := Current.Canonical_Node.First_Line;
          Current.Last_Line := Current.Canonical_Node.Last_Line;
          Current.Register_Count := Natural (Current.Canonical_Node.Max_Stack);
@@ -470,11 +490,22 @@ package body Lua.Engine.Canonical is
                when Lua.Prototypes.Number_Constant =>
                   Pending_Text := (Real_Kind, Item.Number_Data);
                when Lua.Prototypes.String_Constant =>
-                  Lua.Prototypes.Query_String
-                    (Owner.Model, Item.String_Data, String_Value'Access);
+                  Pending_Text := Literal_Strings
+                    (Positive (Item.String_Data));
+                  if Pending_Text.Kind = Nil_Kind then
+                     Lua.Prototypes.Query_String
+                       (Owner.Model, Item.String_Data, String_Value'Access);
+                  end if;
             end case;
             Current.Canonical_Constants.Append (Pending_Text);
             Code_Barrier (State, Current);
+            if Item.Kind = Lua.Prototypes.String_Constant then
+               --  Publish in the non-rooting index only after the wrapper
+               --  owns the value. Capacity was reserved before construction,
+               --  so this update cannot allocate or introduce a safe point.
+               Literal_Strings.Replace_Element
+                 (Positive (Item.String_Data), Pending_Text);
+            end if;
          end loop;
       end loop;
       if Lua.Prototypes.Root (Owner.Model) = null then

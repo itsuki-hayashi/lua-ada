@@ -25,6 +25,9 @@ package body Library_Runtime_Tests is
    procedure Nested_Loads;
    procedure Preload_Cache;
    procedure Binary_Lua_Module;
+   procedure Nested_Literal_Identity;
+   procedure Dynamic_Long_String_Identity;
+   procedure Retained_Literal_Identity;
    procedure Preload_False_Reload;
    procedure Preload_Nil_Default;
    procedure Loaded_Registry_Identity;
@@ -274,6 +277,42 @@ package body Library_Runtime_Tests is
              "assert(value.answer==42 and data==path); " &
              "assert(require('binary_fixture')==value)");
    end Binary_Lua_Module;
+
+   procedure Nested_Literal_Identity is
+      --  One compiled graph owns one literal even when its nested function
+      --  independently mentions the same bytes. This regressed when each
+      --  runtime wrapper materialized the interned model entry separately.
+   begin
+      Check ("local s='01234567890123456789012345678901234567890123456789'; " &
+             "local function f() return " &
+             "'01234567890123456789012345678901234567890123456789' end; " &
+             "assert(string.format('%p',s)==string.format('%p',f()))");
+   end Nested_Literal_Identity;
+
+   procedure Dynamic_Long_String_Identity is
+      --  Sharing a compiled literal must not intern newly produced long
+      --  strings by content. The original literal remains independently
+      --  owned while concatenation produces equal bytes at a new address.
+   begin
+      Check ("local s='01234567890123456789012345678901234567890123456789'; " &
+             "local prefix='0123456789'; local t=prefix.." &
+             "'0123456789012345678901234567890123456789'; " &
+             "assert(s==t and string.format('%p',s)~=" &
+             "string.format('%p',t))");
+   end Dynamic_Long_String_Identity;
+
+   procedure Retained_Literal_Identity is
+      --  A retained nested closure roots its canonical owner and sibling
+      --  literals after the compiling chunk dies. Repeated collection must
+      --  preserve both content and identity without the temporary index.
+   begin
+      Check ("local f=assert(load([[return function() return " &
+             "'012345678901234567890123456789" &
+             "01234567890123456789' end]]))(); " &
+             "local s=f(); collectgarbage(); collectgarbage(); " &
+             "assert(s==f() and string.format('%p',s)==" &
+             "string.format('%p',f()))");
+   end Retained_Literal_Identity;
 
    procedure Preload_False_Reload is
       --  False is a legitimate stored module result but does not satisfy
@@ -619,6 +658,12 @@ package body Library_Runtime_Tests is
                         Preload_Cache'Access);
       Test_Support.Add (Suite, "require native binary Lua module",
                         Binary_Lua_Module'Access);
+      Test_Support.Add (Suite, "nested compiled literal identity",
+                        Nested_Literal_Identity'Access);
+      Test_Support.Add (Suite, "dynamic long string identity",
+                        Dynamic_Long_String_Identity'Access);
+      Test_Support.Add (Suite, "retained compiled literal identity",
+                        Retained_Literal_Identity'Access);
       Test_Support.Add (Suite, "require false reload",
                         Preload_False_Reload'Access);
       Test_Support.Add (Suite, "require nil default",
