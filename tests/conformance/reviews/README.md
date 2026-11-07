@@ -128,3 +128,12 @@ all completion markers. C and Ada must report identical native branch facts.
 An inactive original branch is never reported as an unchanged assertion pass.
 The semantic mapping and diagnostic integration reviews do not by themselves
 provide an execution acceptance contract.
+
+`Assert-NativeBranchReviewBinding` verifies the explicit accepted semantic
+revision in the native review, its proposal/counterpart hashes, independent
+authorship and original byte spans. `Assert-NativeBranchWitnesses` enforces
+every mapping-declared completion marker exactly once. The runner records the
+review identity and the matrix replays it; supplemental native equivalent IDs
+remain separate from unchanged file execution. The native review selftest
+exercises malformed authority and missing/duplicate witnesses with disposable
+copies, without creating any runtime acceptance evidence.

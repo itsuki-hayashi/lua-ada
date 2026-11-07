@@ -15,6 +15,11 @@ $nativeSource = 'tests/conformance/platform/files-native-branches.lua'
 $nativeCopy = Join-Path $captureDirectory 'equivalent-files-native-branches.lua'
 Copy-Item -LiteralPath (Join-Path $root $nativeSource) -Destination $nativeCopy
 $nativeHash = (Get-FileHash $nativeCopy).Hash.ToLowerInvariant()
+$nativeMappingPath = 'tests/conformance/reviews/files-native-branches.proposal.json'
+$nativeReviewPath = 'tests/conformance/reviews/files-native-branches.gc-cross-review.json'
+$nativeReview = @{mapping=$nativeMappingPath; review=$nativeReviewPath;
+    mapping_sha256=(Get-FileHash (Join-Path $root $nativeMappingPath)).Hash.ToLowerInvariant();
+    review_sha256=(Get-FileHash (Join-Path $root $nativeReviewPath)).Hash.ToLowerInvariant()}
 function Write-Json([string] $Path, $Value) {
     [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 32) + "`n")
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -88,6 +93,7 @@ foreach ($context in $suite.acceptance_contexts) {
             if ($file -eq 'files.lua') {
                 $report.process = New-Process ($nativeWitness + $output) 103 900
                 $report.native_branch_facts = Get-ScopedNativeBranchFacts -Output $nativeWitness
+                $report.native_branch_review = $nativeReview
                 $report.native_fixture_records = @(@{source=$nativeSource; source_sha256=$nativeHash;
                     artifact=$nativeCopy; artifact_sha256=$nativeHash; disposition='native-platform-equivalent'})
                 $windows = $context.Split('/')[1] -eq 'windows'

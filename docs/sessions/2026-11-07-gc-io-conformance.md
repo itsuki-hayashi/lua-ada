@@ -775,3 +775,27 @@ preflight now records direct and nested shell statuses, inherited traps and
 an explicit non-tail nested HUP command before original execution. It neither
 replaces assertions nor approves native equivalence. Windows can validate its
 Lua syntax only; actual Mac status observations remain required.
+
+Native calendar counterparts now have executable review binding: the runner
+and matrix verify the approved mapping/narrative hashes, independent nonempty
+authorship, exact original spans, counterpart bytes and every declared unique
+completion marker. Matrix results list supplemental native equivalents
+separately from the file execution disposition. Eighteen focused binding
+regressions reject missing/stale/self-reviewed mappings, altered spans/source,
+absent authors and missing/duplicate declared witnesses. The final local
+matrix checks and both configurations' C/Ada file reruns pass in
+reports/review-native-approval-matrix-final.log and
+reports/review-native-approval-{default,instrumented}-files-final.log.
+
+Mac instrumented shared job 128234058496 at c247afb exposed a distinct warning
+diagnostic: GNAT's last-chance handler prints PROGRAM_ERROR/unhandled signal
+and returns 1, bypassing Linux's Execute/CLI diagnostic paths. Artifact
+13552062263 was downloaded with archive hash
+22dd26f3c88c5d8dfd095881ed951657b5a5aaa3bc1388aad233e42c77440bc3.
+The platform-specific verifier requires that exact exception, termination
+header and case-specific T warning; shutdown still requires preceding OK.
+Twenty-one classifier fixtures and eight actual Windows instrumented cases
+pass in reports/review-scoped-warnings-darwin-final. Independent review tests
+the verifier against the actual downloaded Mac normal-warning stderr and
+rejects unrelated/cross-platform diagnostics. Corrected Mac shutdown/runtime
+evidence is still pending; synthetic classification is never called a Mac pass.

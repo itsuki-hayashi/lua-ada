@@ -120,4 +120,66 @@ function Assert-MatrixReviewBinding {
     }
 }
 
-Export-ModuleMember -Function Assert-EquivalentReviewBinding, Assert-MatrixReviewBinding
+function Assert-NativeBranchReviewBinding {
+    param([Parameter(Mandatory)][string] $Root,
+          [Parameter(Mandatory)][Collections.IDictionary] $Identity)
+    # Supplemental native executions leave the original file intact. Bind
+    # their explicitly reviewed source spans and counterpart bytes separately
+    # instead of treating an inactive original branch as an unchanged pass.
+    $path = Resolve-ReviewedFile -Root $Root -Path $Identity.mapping -Sha256 $Identity.mapping_sha256
+    $mapping = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 32
+    $path = Resolve-ReviewedFile -Root $Root -Path $Identity.review -Sha256 $Identity.review_sha256
+    $review = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable -Depth 32
+    if ($mapping.kind -cne 'native-branch-counterpart-proposal' -or
+        $review.kind -cne 'independent-native-counterpart-review' -or
+        $review.revision_review.decision -cne 'accepted-semantic-mapping' -or
+        [string]::IsNullOrWhiteSpace([string]$mapping.author) -or
+        [string]::IsNullOrWhiteSpace([string]$review.reviewer) -or
+        $review.author -cne $mapping.author -or $review.author -ceq $review.reviewer) {
+        throw 'Native branch mapping lacks independent semantic approval'
+    }
+    foreach ($binding in @(
+        @{path=$Identity.mapping; sha256=$Identity.mapping_sha256},
+        @{path=$mapping.counterpart.path; sha256=$mapping.counterpart.sha256})) {
+        $matches = @($review.revision_review.bindings | Where-Object {
+            $_.path -ceq $binding.path -and $_.sha256 -ceq $binding.sha256 })
+        if ($matches.Count -ne 1) { throw 'Native branch review does not bind current mapping and counterpart' }
+        [void](Resolve-ReviewedFile -Root $Root -Path $binding.path -Sha256 $binding.sha256)
+    }
+    $source = Resolve-ReviewedFile -Root $Root -Path $mapping.source -Sha256 $mapping.source_sha256
+    $bytes = [IO.File]::ReadAllBytes($source)
+    $seen = @{}
+    if (@($mapping.branches).Count -eq 0) { throw 'Native branch mapping is empty' }
+    foreach ($branch in $mapping.branches) {
+        if ([string]::IsNullOrWhiteSpace([string]$branch.id) -or $seen.ContainsKey($branch.id) -or
+            [string]::IsNullOrWhiteSpace([string]$branch.counterpart_invariant) -or
+            [string]::IsNullOrWhiteSpace([string]$branch.required_marker) -or
+            @($branch.source_spans).Count -eq 0) { throw 'Native branch mapping lacks distinct obligations' }
+        $seen[$branch.id]=$true
+        foreach ($span in $branch.source_spans) {
+            if ($span.byte_offset -lt 0 -or $span.byte_length -le 0 -or
+                $span.byte_offset -gt $bytes.Length -or
+                $span.byte_length -gt $bytes.Length - $span.byte_offset) {
+                throw 'Native branch source span outside original'
+            }
+            $slice = [byte[]]::new($span.byte_length)
+            [Array]::Copy($bytes,$span.byte_offset,$slice,0,$slice.Length)
+            $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($slice)).ToLowerInvariant()
+            if ($hash -cne $span.sha256) { throw 'Native branch source span differs' }
+        }
+    }
+    return $mapping
+}
+
+function Assert-NativeBranchWitnesses {
+    param([Parameter(Mandatory)][Collections.IDictionary] $Mapping,
+          [Parameter(Mandatory)][string] $Output)
+    foreach ($branch in $Mapping.branches) {
+        $pattern='(?m)^'+[regex]::Escape($branch.required_marker)+'\r?$'
+        if ([regex]::Matches($Output,$pattern).Count -ne 1) {
+            throw "Native branch reviewed completion witness missing or duplicated: $($branch.id)"
+        }
+    }
+}
+
+Export-ModuleMember -Function Assert-EquivalentReviewBinding, Assert-MatrixReviewBinding, Assert-NativeBranchReviewBinding, Assert-NativeBranchWitnesses

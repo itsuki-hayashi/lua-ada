@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "kind": "independent-native-binding-review",
+  "author": "Codex /root",
+  "reviewer": "Codex /root/review_events_harness",
+  "decision": "accepted-source-binding-with-runtime-evidence-pending",
+  "coverage_authority": false,
+  "source_bindings": [
+    {
+      "sha256": "f356e0e86f24eaeb523ccf6c1033cd09b201210921458b987f211401c0ff4050",
+      "path": "scripts/ConformanceReview.psm1"
+    },
+    {
+      "sha256": "43db5fb99886115ad03b17d1ff18ded25cee1606387a107a60227afe7dcae277",
+      "path": "scripts/run-conformance.ps1"
+    },
+    {
+      "sha256": "0779bc9ca745db65df2cad200030962f83e0e319d534e04267fff456718282ee",
+      "path": "scripts/ConformanceMatrix.psm1"
+    },
+    {
+      "sha256": "8f1dff1b05802a331dcb7d2694701231c46431ef78216b7c396b796b0f78f5e5",
+      "path": "scripts/test-native-branch-review.ps1"
+    },
+    {
+      "sha256": "a4192503037b292722269b341f5c28c4a7e5bcdcecbfdc0fd1b6ef46a556fecd",
+      "path": "tests/conformance/reviews/files-native-branches.proposal.json"
+    },
+    {
+      "sha256": "a8200c38a9a54bb52be33ea4459f73bc5486c4bc7feee0599685aa1b3159aff1",
+      "path": "tests/conformance/reviews/files-native-branches.gc-cross-review.json"
+    }
+  ],
+  "accepted_design": [
+    "Mapping and independent revision approval hashes bind the actual source and counterpart; source spans are independently range checked and hashed.",
+    "Runner retains review identity; matrix replays authority and current fixture integrity, preserving separate supplemental_native_equivalents instead of labelling inactive originals unchanged.",
+    "Synthetic tests mutate inner source spans and approval decisions with outer hashes updated, exercising substantive checks."
+  ],
+  "findings": [
+    {
+      "id": "NATIVE-BINDING-1",
+      "requested_change": "Require nonempty author and reject empty-author synthetic case.",
+      "problem": "Both mapping.author and review.author can be empty while reviewer is nonempty; current equality tests accept missing authorship."
+    },
+    {
+      "id": "NATIVE-BINDING-2",
+      "requested_change": "Require exact declared marker set or verify each declared marker uniquely in captured stdout; reject a nonempty marker absent from execution.",
+      "problem": "required_marker is only nonempty-checked; execution validates fixed markers rather than the mapping-declared required marker. Current mapping agrees, but future approved witness drift would not be enforced."
+    }
+  ],
+  "execution_evidence": [],
+  "revision_review": {
+    "decision": "accepted",
+    "reviewer": "Codex /root/review_events_harness",
+    "bindings": [
+      {
+        "sha256": "307ed209655b9b8eb18c56f59505380f5223a833d87c59b4ac514d0312685022",
+        "path": "scripts/ConformanceReview.psm1"
+      },
+      {
+        "sha256": "c7e6f0578fcba00b9556562cc452638859acf3ac5ab56b95ddc52cc59bd8921b",
+        "path": "scripts/run-conformance.ps1"
+      },
+      {
+        "sha256": "8d49f71076e37485a142f094259d00d557f88b566cd91412c85869498ddd6e2b",
+        "path": "scripts/ConformanceMatrix.psm1"
+      },
+      {
+        "sha256": "4243eb9989260d76e9eff398110fd1a72934a8aafb8759ffe62dde590785b330",
+        "path": "scripts/test-native-branch-review.ps1"
+      },
+      {
+        "sha256": "a4192503037b292722269b341f5c28c4a7e5bcdcecbfdc0fd1b6ef46a556fecd",
+        "path": "tests/conformance/reviews/files-native-branches.proposal.json"
+      },
+      {
+        "sha256": "a8200c38a9a54bb52be33ea4459f73bc5486c4bc7feee0599685aa1b3159aff1",
+        "path": "tests/conformance/reviews/files-native-branches.gc-cross-review.json"
+      }
+    ],
+    "resolved_findings": [
+      {
+        "id": "NATIVE-BINDING-1",
+        "resolution": "Nonempty mapping author now mandatory; review author must equal it and differ from reviewer. Empty-author rejection regression added."
+      },
+      {
+        "id": "NATIVE-BINDING-2",
+        "resolution": "Shared Assert-NativeBranchWitnesses uses escaped exact-line matching and requires each approved marker exactly once. Runner and matrix call it against actual captured output. Missing declared marker and duplicate witness regressions added."
+      }
+    ],
+    "execution_note": "Parent reports18 native-binding regression cases passed; independent delta source review performed here. Actual final-context acceptance remains pending."
+  }
+}

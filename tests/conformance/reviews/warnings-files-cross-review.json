@@ -170,5 +170,53 @@
       "The shutdown POSIX diagnostic route is source-derived, not observed passing POSIX execution. Corrected CI must supply actual shutdown evidence.",
       "Local v4 observations are Windows C/Ada only; no full scoped acceptance claimed."
     ]
+  },
+  "darwin_last_chance_delta_review": {
+    "reviewer": "Codex independent review agent /root/review_files",
+    "author": "Codex /root",
+    "decision": "accepted-diagnostic-matcher",
+    "runtime_acceptance": false,
+    "source": {
+      "path": "scripts/test-scoped-warnings.ps1",
+      "sha256": "606779ded513f01d7320b8619707c9dff9b158cf6cf395cf47bf808bc8be2cf3"
+    },
+    "observed_mac_capture": {
+      "path": "reports/ci-artifacts/c247afb-mac-warnings/gc-events/c49036e386bb46ad811e811863aede2b/warnings/Ada-normal-warning.stderr",
+      "sha256": "f78c0139546aa480cd7186ac37dae0078847377d9bcec623048f3c0ebbbf6f9c"
+    },
+    "local_evidence": {
+      "path": "reports/review-scoped-warnings-darwin-verifier/index.json",
+      "sha256": "adc65c20bac74e08eb511239adcf12594a46610f2406c0d6914b19259a77f26f",
+      "case_count": 8,
+      "scope": "Actual Windows instrumented C/Ada cases; Darwin cases are synthetic verifier inputs"
+    },
+    "verification": "Independent invocation of actual parsed Test-WarningTermination accepted the downloaded Darwin normal-warning exit1 diagnostic. Rejected four mutations (exception class, unhandled-signal text, execution header, warning case text) and rejected Darwin diagnostic under non-Mac routing. Rehashed stdout/stderr of all8 local instrumented cases.",
+    "rationale": [
+      "Darwin-only exit1 requires the case-specific T unexpected-warning line plus anchored GNAT execution-terminated header and exact PROGRAM_ERROR/unhandled signal line. Arbitrary exceptions or exit1 are not accepted.",
+      "Shutdown requires its own assertion diagnostic and top-level OK, including in the Darwin branch; code134 remains separately gated by the case-specific T diagnostic.",
+      "Actual caller supplies IsMacOS; Linux command-line/close routes and Windows3/C1/default0 remain unchanged."
+    ],
+    "metadata_note": "At review time verifier_fixture_count excludes seven Darwin fixtures; report their count separately or include them before final evidence regeneration.",
+    "limitations": [
+      "Observed Mac evidence is the prior normal-warning failure, not a corrected full campaign pass.",
+      "Mac shutdown last-chance expectation and positive controls require actual next-CI execution.",
+      "No final-revision or full-context runtime acceptance is granted."
+    ],
+    "final_binding_update": {
+      "decision": "accepted-with-metadata-correction",
+      "source": {
+        "path": "scripts/test-scoped-warnings.ps1",
+        "sha256": "410f4592b1e16e542b60e11ac6e7e9e2f7e1e8f1a79757e5ac881b8508244c9d"
+      },
+      "evidence": {
+        "path": "reports/review-scoped-warnings-darwin-final/index.json",
+        "sha256": "6d68127b87ac303290ad24470d9aeb0f0747f0851ad7c2c7c223264eb4e3784b"
+      },
+      "verifier_fixture_count": 21,
+      "actual_windows_instrumented_case_count": 8,
+      "resolved_metadata_note": "Named macFixtures contributes its seven cases to the verifier count. Earlier count note retained above as review history.",
+      "verification": "Verified final source binding and all16 stdout/stderr hashes for eight actual Windows cases. The21 verifier inputs remain distinct from runtime cases; no synthetic Darwin input is counted as Mac execution.",
+      "runtime_acceptance": false
+    }
   }
 }

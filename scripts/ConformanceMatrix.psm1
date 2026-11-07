@@ -205,7 +205,13 @@ function Test-ScopedMatrix {
             Assert-ScopedProcessCompletion -File $entry.file -Process $report.process -Telemetry $telemetry `
                 -RunId $report.run_id -Configuration $configuration -NativeOracle:($target -eq 'c')
             if ($entry.file -eq 'files.lua') {
+                $nativeMapping = Assert-NativeBranchReviewBinding -Root $Root -Identity $report.native_branch_review
+                if ($nativeMapping.source -cne 'references/lua/testes/files.lua' -or
+                    $nativeMapping.counterpart.path -cne 'tests/conformance/platform/files-native-branches.lua') {
+                    throw 'Matrix native mapping identifies another source or counterpart'
+                }
                 $facts = Get-ScopedNativeBranchFacts -Output ([IO.File]::ReadAllText($report.process.stdout_path))
+                Assert-NativeBranchWitnesses -Mapping $nativeMapping -Output ([IO.File]::ReadAllText($report.process.stdout_path))
                 $encodedFacts = $facts | ConvertTo-Json -Compress
                 foreach ($key in $facts.Keys) {
                     if ($report.native_branch_facts[$key] -cne $facts[$key]) {
@@ -282,7 +288,8 @@ function Test-ScopedMatrix {
                     -CoverageComplete $scope.ScopeComplete -CoverageRecords $coverage -Telemetry $telemetry)
             }
             $records += [ordered]@{file=$entry.file; context=$entry.context; target=$expectedTarget;
-                disposition=$report.execution_disposition; report_sha256=$identity.sha256}
+                disposition=$report.execution_disposition; report_sha256=$identity.sha256;
+                supplemental_native_equivalents=$(if($entry.file -eq 'files.lua'){@($nativeMapping.branches.id)}else{@()})}
         }
     }
     return [ordered]@{scope=$manifest.scope; revision=$manifest.revision; contexts=$suite.acceptance_contexts.Count;

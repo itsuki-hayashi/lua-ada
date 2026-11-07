@@ -24,6 +24,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 $root = Split-Path -Parent $PSScriptRoot
 $original = Get-Location
 $revision = '7579fc9d7ed90240487251dfb69168f8e64e9294'
@@ -102,6 +103,7 @@ $evidence = [ordered]@{
     build_processes = @()
     native_fixture_records = @()
     native_branch_facts = $null
+    native_branch_review = $null
     allocator_limit_bytes = if ($Mode -eq 'Heavy') { 67108864L } else { 2147483648L }
     timeout_seconds = if ($Mode -eq 'Aggregate') { 3600 } elseif ($Mode -eq 'Heavy') { 600 } else { 900 }
     fixture_records = @()
@@ -571,6 +573,16 @@ try {
         # not an inferred pass for an inactive original branch. Preserve this
         # input in the artifact bundle separately from unchanged upstream.
         $counterpart = Join-Path $root 'tests/conformance/platform/files-native-branches.lua'
+        $mappingPath = 'tests/conformance/reviews/files-native-branches.proposal.json'
+        $reviewPath = 'tests/conformance/reviews/files-native-branches.gc-cross-review.json'
+        $evidence.native_branch_review = [ordered]@{
+            mapping=$mappingPath; mapping_sha256=(Get-FileHash (Join-Path $root $mappingPath)).Hash.ToLowerInvariant();
+            review=$reviewPath; review_sha256=(Get-FileHash (Join-Path $root $reviewPath)).Hash.ToLowerInvariant()}
+        $nativeMapping = Assert-NativeBranchReviewBinding -Root $root -Identity $evidence.native_branch_review
+        if ($nativeMapping.source -cne 'references/lua/testes/files.lua' -or
+            $nativeMapping.counterpart.path -cne 'tests/conformance/platform/files-native-branches.lua') {
+            throw 'Native branch mapping identifies another source or counterpart'
+        }
         $counterpartCopy = Join-Path $fixtureDirectory 'equivalent-files-native-branches.lua'
         Copy-Item -LiteralPath $counterpart -Destination $counterpartCopy
         $sourceHash = (Get-FileHash $counterpart -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -614,6 +626,7 @@ try {
             sha256=(Get-FileHash -LiteralPath $telemetryPath -Algorithm SHA256).Hash.ToLowerInvariant(); data=$telemetry }
         if ($File -eq 'files.lua') {
             $evidence.native_branch_facts = Get-ScopedNativeBranchFacts -Output ([IO.File]::ReadAllText($evidence.process.stdout_path))
+            Assert-NativeBranchWitnesses -Mapping $nativeMapping -Output ([IO.File]::ReadAllText($evidence.process.stdout_path))
             foreach ($sidecar in Get-ChildItem -LiteralPath $runRoot -Filter 'allocator.*.json') {
                 $childId = [int]($sidecar.BaseName.Split('.')[-1])
                 if ($childId -eq $evidence.process.process_id) { continue }

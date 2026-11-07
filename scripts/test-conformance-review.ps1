@@ -127,3 +127,4 @@ Reject 'matrix C report differs' {param($f) $f.Matrix.operations[0].c.sha256='4'
 Reject 'matrix Ada report differs' {param($f) $f.Matrix.operations[0].ada.sha256='4'*64} 'report or contract' -Matrix
 Reject 'matrix contract differs' {param($f) $f.Matrix.operations[0].contract.sha256='4'*64} 'report or contract' -Matrix
 Write-Output "PASS: $script:cases review-artifact binding regressions; synthetic authority only"
+& (Join-Path $PSScriptRoot 'test-native-branch-review.ps1')

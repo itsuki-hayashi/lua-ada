@@ -13,7 +13,8 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1') -Force
 function Test-WarningTermination {
     param([string] $Mode, [string] $Target, [bool] $Windows,
         [int] $Code, [string] $Diagnostic,
-        [string] $CaseName = 'normal-warning', [string] $Output = '')
+        [string] $CaseName = 'normal-warning', [string] $Output = '',
+        [bool] $MacOS = $false)
     if ($Mode -eq 'default') { return $Code -eq 0 }
     if ($Target -eq 'ReferenceC') { return $Code -eq 1 }
     if ($Windows) { return $Code -eq 3 }
@@ -23,6 +24,14 @@ function Test-WarningTermination {
             [regex]::Escape($expectedText) + '[^\r\n]*\r?$')) { return $false }
     if ($CaseName -eq 'shutdown-warning' -and $Output -notmatch '(?m)^OK\r?$') { return $false }
     if ($Code -eq 134) { return $true }
+    # Darwin GNAT reports this signal exception through its last-chance
+    # handler rather than Execute's conversion. The actual Mac normal-warning
+    # capture has both lines below; an arbitrary exception/exit remains invalid.
+    if ($MacOS) {
+        return $Code -eq 1 -and
+            $Diagnostic -match '(?m)^Execution of [^\r\n]+ terminated by unhandled exception\r?$' -and
+            $Diagnostic -match '(?m)^raised PROGRAM_ERROR : unhandled signal\r?$'
+    }
     # Close runs outside Execute's error conversion and reaches Lua_CLI's
     # outer handler. This source-derived expectation still needs CI evidence.
     if ($CaseName -eq 'shutdown-warning') {
@@ -62,6 +71,20 @@ foreach ($fixture in $shutdownFixtures) {
     $actual = Test-WarningTermination -Mode upstream-test -Target Ada -Windows $false `
         -Code 1 -Diagnostic $fixture.diagnostic -CaseName $fixture.name -Output $fixture.output
     if ($actual -ne $fixture.expected) { throw 'Shutdown warning verifier regression' }
+}
+$macWarning = "T warning failure: unexpected warning: scoped unexpected warning`nExecution of /fixture/conformance_runner terminated by unhandled exception`nraised PROGRAM_ERROR : unhandled signal`n"
+$macFixtures = @(
+    @{name='normal-warning';output='';diagnostic=$macWarning;expected=$true},
+    @{name='normal-warning';output='';diagnostic=$macWarning.Replace('PROGRAM_ERROR','STORAGE_ERROR');expected=$false},
+    @{name='normal-warning';output='';diagnostic=$macWarning.Replace('unhandled signal','unrelated error');expected=$false},
+    @{name='normal-warning';output='';diagnostic=$macWarning.Replace('T warning failure:','other:');expected=$false},
+    @{name='shutdown-warning';output='OK';diagnostic=$macWarning.Replace('scoped unexpected warning','scoped shutdown assertion');expected=$true},
+    @{name='shutdown-warning';output='';diagnostic=$macWarning.Replace('scoped unexpected warning','scoped shutdown assertion');expected=$false},
+    @{name='shutdown-warning';output='OK';diagnostic=$macWarning;expected=$false})
+foreach ($fixture in $macFixtures) {
+    $actual = Test-WarningTermination -Mode upstream-test -Target Ada -Windows $false -MacOS $true `
+        -Code 1 -Diagnostic $fixture.diagnostic -CaseName $fixture.name -Output $fixture.output
+    if ($actual -ne $fixture.expected) { throw 'Darwin warning verifier regression' }
 }
 $root = Split-Path -Parent $PSScriptRoot
 [void][IO.Directory]::CreateDirectory($OutputDirectory)
@@ -130,7 +153,7 @@ foreach ($target in @('ReferenceC','Ada')) {
             # Keep C exit 1 and Windows abort 3, while recognizing the
             # specifically diagnosed GNAT POSIX signal conversion.
             if (-not (Test-WarningTermination -Mode $Configuration -Target $target `
-                    -Windows $IsWindows -Code $process.exit_code -Diagnostic $stderr `
+                    -Windows $IsWindows -MacOS $IsMacOS -Code $process.exit_code -Diagnostic $stderr `
                     -CaseName $case.name -Output $stdout)) {
                 throw "Unexpected warning termination status: $target/$($case.name): $($process.exit_code)"
             }
@@ -150,6 +173,6 @@ foreach ($target in @('ReferenceC','Ada')) {
 [ordered]@{schema_version=1;configuration=$Configuration;repository_revision=$revision;
     repository_dirty=($repositoryStatus.Count -ne 0);repository_status=$repositoryStatus;
     source_records=@($sourceRecords);library_records=$libraryRecords;
-    verifier_fixture_count=($verifierCases.Count + $shutdownFixtures.Count);cases=$records} |
+    verifier_fixture_count=($verifierCases.Count + $shutdownFixtures.Count + $macFixtures.Count);cases=$records} |
     ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $directory 'index.json') -Encoding utf8
 Write-Output "PASS: $($records.Count) actual scoped warning regressions"
