@@ -1175,6 +1175,7 @@ package body Lua.Engine is
       Item.Blocks_Yield := False;
       Item.Callee := Nil_Value;
       Item.Is_Tail_Call := False;
+      Item.Call_Metamethod_Count := 0;
       Item.Native_Tail_State := No_Native_Tail;
       Item.Call_Name := Null_Unbounded_String;
       Item.Name_Kind := Null_Unbounded_String;

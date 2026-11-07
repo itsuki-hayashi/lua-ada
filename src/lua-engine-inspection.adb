@@ -454,7 +454,13 @@ package body Lua.Engine.Inspection is
                   Fail (State, "invalid option");
                end if;
             end loop;
-            if Selected /= null and then not Selected.Is_Native then
+            if Selected /= null and then not Selected.Is_Native and then
+              (Selected.Code.Canonical_Node = null or else not
+               Selected.Code.Canonical_Node.Lines.Is_Empty)
+            then
+               --  A stripped prototype has no current source line. Its
+               --  decoder's zero sentinel is internal, whereas debug reports
+               --  -1 for unavailable line information, just as for natives.
                Line := Integer_Value
                  (Line_At (Selected, Current_PC (Selected) + 1));
             end if;
@@ -529,6 +535,9 @@ package body Lua.Engine.Inspection is
                Field (Info, "istailcall",
                       (Boolean_Kind, Selected /= null and then
                          Selected.Is_Tail_Call));
+               Field (Info, "extraargs", (Integer_Kind,
+                 (if Selected = null then 0 else
+                    Integer_Value (Selected.Call_Metamethod_Count))));
             end if;
             if Wants ('f') then
                Field (Info, "func", Function_Value);
@@ -547,26 +556,30 @@ package body Lua.Engine.Inspection is
                        Integer_Value (Selected.Transfer_Count) else 0)));
                end;
             end if;
-            if Wants ('L') then
+            if Wants ('L') and then Code /= null then
                declare
                   Lines : constant Value := New_Table (State);
                begin
-                  if Code /= null then
-                     if Code.Canonical_Node /= null then
-                        for PC in 1 .. Code.Canonical_Node.Lines.Last_Index
-                        loop
-                           Set (State, Lines, (Integer_Kind,
-                             Integer_Value (Canonical.Source_Line
-                               (Code, PC - 1))), (Boolean_Kind, True));
-                        end loop;
-                     else
-                        for Instruction of Code.Code loop
-                           Set (State, Lines,
-                                (Integer_Kind,
-                                 Integer_Value (Instruction.Location.Line)),
-                                (Boolean_Kind, True));
-                        end loop;
-                     end if;
+                  --  Native functions have no line table, so their L field
+                  --  remains absent. A stripped Lua function still receives
+                  --  an empty table. For varargs, VARARGPREP is entry setup,
+                  --  not an executable source line: including its definition
+                  --  line would advertise a breakpoint that never fires.
+                  if Code.Canonical_Node /= null then
+                     for PC in (if Code.Vararg then 2 else 1) ..
+                       Code.Canonical_Node.Lines.Last_Index
+                     loop
+                        Set (State, Lines, (Integer_Kind,
+                          Integer_Value (Canonical.Source_Line
+                            (Code, PC - 1))), (Boolean_Kind, True));
+                     end loop;
+                  else
+                     for Instruction of Code.Code loop
+                        Set (State, Lines,
+                             (Integer_Kind,
+                              Integer_Value (Instruction.Location.Line)),
+                              (Boolean_Kind, True));
+                     end loop;
                   end if;
                   Field (Info, "activelines", Lines);
                end;

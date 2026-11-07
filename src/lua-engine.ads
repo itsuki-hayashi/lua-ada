@@ -525,6 +525,10 @@ private package Lua.Engine is
       Blocks_Yield : Boolean := False;
       Callee : Value;
       Is_Tail_Call : Boolean := False;
+      Call_Metamethod_Count : Natural range 0 .. 15 := 0;
+      --  Receivers inserted on entry to this logical frame, independently
+      --  of ordinary arguments or varargs. Suspension and Lua tail reuse
+      --  retain this count; a separate native tail frame gets its own count.
       Native_Tail_State : Native_Tail_Phase := No_Native_Tail;
       Call_Name : Unbounded_String;
       Name_Kind : Unbounded_String;

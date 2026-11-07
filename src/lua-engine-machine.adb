@@ -1663,6 +1663,7 @@ package body Lua.Engine.Machine is
       Effective_Base : Natural := Call_Base;
       Use_Window : Boolean := Has_Call_Window;
       Native_Tail : Boolean := False;
+      Call_Metamethod_Count : Natural := 0;
       Packet : Values.Vector := Owned_Values (State);
    begin
       Pin (State, Function_Value);
@@ -1694,6 +1695,7 @@ package body Lua.Engine.Machine is
                Function_Item := Handler;
             end if;
          end loop;
+         Call_Metamethod_Count := Hops;
       end;
       if Function_Item.Kind in Closure_Kind | Native_Closure_Kind |
         Native_Kind_Value | Foreign_Function_Kind
@@ -1705,6 +1707,11 @@ package body Lua.Engine.Machine is
                Old : Frame_Access := State.Current.Stack.Last_Element;
             begin
                if Function_Item.Kind = Closure_Kind then
+                  --  Pinned Lua tail reuse retains the original frame's
+                  --  __call count even when the replacement's receiver
+                  --  chain differs. Only a separate native tail frame
+                  --  reports the new chain's count (luaD_pretailcall).
+                  Call_Metamethod_Count := Old.Call_Metamethod_Count;
                   Return_To := Old.Return_To;
                   Protection := Protection + Old.Protection;
                   if Old.Has_Stack_Window then
@@ -1770,6 +1777,12 @@ package body Lua.Engine.Machine is
             State.Current.Stack.Last_Element.Foreign_Handler :=
               Function_Item.Reference.Foreign_Handler;
          end if;
+         --  Publish the number of inserted receivers on the actual callee,
+         --  after either frame construction path. It describes this logical
+         --  frame, never a previous use of a cached activation, and therefore
+         --  survives yields without borrowing Dispatch locals.
+         State.Current.Stack.Last_Element.Call_Metamethod_Count :=
+           Call_Metamethod_Count;
          if Function_Item.Kind /= Closure_Kind then
             Open_Stack_Window
               (State, State.Current.Stack.Last_Element,
