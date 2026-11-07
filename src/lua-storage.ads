@@ -114,6 +114,15 @@ private package Lua.Storage is
    --  Release a valid block belonging to Self, clearing the caller's address.
    --  Null is harmless. A live block from another owner raises Program_Error.
 
+   procedure Release_Using
+     (Self : in out Owner; Block : in out System.Address;
+      Allocate : not null Allocation_Function; Data : System.Address);
+   --  Unlink/account exactly like Release, then call a retained compatible
+   --  provider. Auxiliary buffer publication captures its external payload
+   --  deallocator; later lua_setallocf must not retarget that callback.
+   --  Allocate/Data obey the same lifetime and non-reentry contract as the
+   --  selected provider, and must accept this block's recorded raw extent.
+
    type Allocation_Statistics is record
       Live_Blocks : Byte_Count := 0;
       Payload_Bytes : Byte_Count := 0;

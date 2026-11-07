@@ -64,7 +64,8 @@ package Lua.Engine.Foreign is
       Prepare_Arithmetic, Prepare_Comparison,
       String_To_Number,
       Create_Formatter, Append_Format_Value, Append_Format_UTF8,
-      Finish_Formatter, Release_Formatter, Charge_Aux_Work);
+      Finish_Formatter, Release_Formatter, Charge_Aux_Work,
+      Create_Aux_Box, Resize_Aux_Box, Release_Aux_Box, Publish_Aux_Box);
    for Operation_Code use
      (Create_State => 0, Create_Default_State => 1, Close_State => 2,
       Create_Thread => 3, Get_Top => 4, Set_Top => 5,
@@ -106,7 +107,9 @@ package Lua.Engine.Foreign is
       String_To_Number => 106,
       Create_Formatter => 120, Append_Format_Value => 121,
       Append_Format_UTF8 => 122, Finish_Formatter => 123,
-      Release_Formatter => 124, Charge_Aux_Work => 125);
+      Release_Formatter => 124, Charge_Aux_Work => 125,
+      Create_Aux_Box => 126, Resize_Aux_Box => 127,
+      Release_Aux_Box => 128, Publish_Aux_Box => 129);
    for Operation_Code'Size use Interfaces.C.int'Size;
    pragma Convention (C, Operation_Code);
 

@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+Eight public buffer exports have [local ownership evidence](sessions/2026-11-08-auxiliary-buffer-ownership.md),
+including seventeen native-default/T matched C cases and 1,738 passing
+AUnit cases. Finish file/trace/substitution/default-allocator helpers,
+instrumented/shared/POSIX and immutable full-target replay.
+
 Native loading now has [local component observations](sessions/2026-11-08-native-module-loading.md).
 Complete immutable same-image fixtures, reviewed platform counterparts,
 explicit unload/provider fault witnesses and instrumented/shared/POSIX gates.

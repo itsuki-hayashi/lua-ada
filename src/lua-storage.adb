@@ -315,7 +315,10 @@ package body Lua.Storage is
       Block := User;
    end Reallocate;
 
-   procedure Release (Self : in out Owner; Block : in out System.Address) is
+   procedure Release_Using
+     (Self : in out Owner; Block : in out System.Address;
+      Allocate : not null Allocation_Function; Data : System.Address)
+   is
       Saved : Header;
       Unused : System.Address;
    begin
@@ -338,10 +341,15 @@ package body Lua.Storage is
       Self.Counts.Payload_Bytes := Self.Counts.Payload_Bytes - Saved.Size;
       Self.Counts.Raw_Bytes := Self.Counts.Raw_Bytes - Saved.Raw_Size;
       Block := System.Null_Address;
-      Unused := Self.Provider
-        (Self.Provider_Data, Saved.Raw,
+      Unused := Allocate
+        (Data, Saved.Raw,
          Interfaces.C.size_t (Saved.Raw_Size), 0);
       pragma Unreferenced (Unused);
+   end Release_Using;
+
+   procedure Release (Self : in out Owner; Block : in out System.Address) is
+   begin
+      Release_Using (Self, Block, Self.Provider, Self.Provider_Data);
    end Release;
 
    procedure Release_All (Self : in out Owner) is

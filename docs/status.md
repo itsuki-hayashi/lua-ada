@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [auxiliary buffer checkpoint](sessions/2026-11-08-auxiliary-buffer-ownership.md)
+completes eight exports locally: seventeen identical-source C cases match
+both native configurations, and strict local builds pass 1,738 AUnit cases
+and fifteen retained C consumers. Captured providers, actual refused growth,
+bounded near-limit content and disposal without Lua have focused evidence.
+The remaining auxiliary surface and full target acceptance stay open.
+
 The [native module checkpoint](sessions/2026-11-08-native-module-loading.md)
 builds the owned loader and CLI environment control locally, with 1,691
 passing AUnit cases and fourteen passing C consumers. Unchanged native

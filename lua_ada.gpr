@@ -96,6 +96,7 @@ library project Lua_Ada is
       "lua_ada_builtins.c",
       "lua_ada_format.c",
       "lua_ada_auxiliary.c",
+      "lua_ada_buffer.c",
       "lua_ada_modules.c",
       "lua_ada_host_numerics.c",
       "lua_ada_streams.c",

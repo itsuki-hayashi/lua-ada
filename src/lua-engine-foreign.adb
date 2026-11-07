@@ -42,6 +42,24 @@ package body Lua.Engine.Foreign is
    --  A live C raw guard owns each temporary. No pointer or Lua value is
    --  retained beyond that guard; refusal/host abort releases Bytes before
    --  propagating. Its payload grows only through this world's provider.
+   type Aux_Box is record
+      Owner : Memory.Owner_Access;
+      Block : System.Address := System.Null_Address;
+      Size : Natural := 0;
+      Release_Function : Memory.Allocation_Function;
+      Release_Data : System.Address := System.Null_Address;
+   end record;
+   type Aux_Box_Access is access Aux_Box;
+   for Aux_Box_Access'Storage_Pool use Memory.Pool;
+   package Aux_Box_Views is new
+     System.Address_To_Access_Conversions (Aux_Box);
+   function Aux_Box_Handle is new Ada.Unchecked_Conversion
+     (Aux_Box_Views.Object_Pointer, Aux_Box_Access);
+   procedure Free_Aux_Box is new Ada.Unchecked_Deallocation
+     (Aux_Box, Aux_Box_Access);
+   --  A public luaL_Buffer's actual userdata owns this handle until its
+   --  payload transfers to an external string. Both descriptor and bytes
+   --  belong to the selected owner; no C malloc buffer bypasses accounting.
    use System.Storage_Elements;
    use type C.long_long;
    use type C.size_t;
@@ -52,6 +70,66 @@ package body Lua.Engine.Foreign is
    use type C.unsigned_long_long;
    use type System.Address;
    use type Lua.Prototypes.Prototype_Access;
+
+   procedure Dispose_Aux_Box
+     (Item : in out Aux_Box_Access; Captured : Boolean := False);
+   procedure Dispose_Aux_Box
+     (Item : in out Aux_Box_Access; Captured : Boolean := False) is
+   begin
+      if Captured then
+         Memory.Release_Using
+           (Item.Owner.all, Item.Block,
+            Item.Release_Function, Item.Release_Data);
+      else
+         Memory.Release (Item.Owner.all, Item.Block);
+      end if;
+      Free_Aux_Box (Item);
+   end Dispose_Aux_Box;
+
+   procedure Cleanup_Aux_Box
+     (Owner : not null Memory.Owner_Access;
+      Payload, Opaque : System.Address; Reason : Resource_Release_Reason);
+   procedure Cleanup_Aux_Box
+     (Owner : not null Memory.Owner_Access;
+      Payload, Opaque : System.Address; Reason : Resource_Release_Reason)
+   is
+      pragma Unreferenced (Owner, Opaque, Reason);
+      Handle : System.Address with Import, Address => Payload;
+      Item : Aux_Box_Access;
+   begin
+      --  Physical disposal can follow a host abort that forbids running any
+      --  more Lua/C finalizers. The actual userdata's native cleanup still
+      --  releases an untransferred buffer without allocating or executing
+      --  Lua. Ordinary __close/__gc and successful transfer clear this same
+      --  handle first, so this fallback cannot release a payload twice.
+      if Handle /= System.Null_Address then
+         Item := Aux_Box_Handle (Aux_Box_Views.To_Pointer (Handle));
+         Handle := System.Null_Address;
+         Dispose_Aux_Box (Item);
+      end if;
+   end Cleanup_Aux_Box;
+
+   function Release_Aux_Payload
+     (Opaque, Block : System.Address; Old_Size, New_Size : C.size_t)
+      return System.Address with Convention => C;
+   function Release_Aux_Payload
+     (Opaque, Block : System.Address; Old_Size, New_Size : C.size_t)
+      return System.Address
+   is
+      pragma Unreferenced (Block, Old_Size, New_Size);
+      Item : Aux_Box_Access := Aux_Box_Handle
+        (Aux_Box_Views.To_Pointer (Opaque));
+   begin
+      --  A package-level C callback has a stable code address and no borrowed
+      --  activation. The existing external-string portal invokes it before
+      --  owner disposal; it only frees storage and never executes Lua.
+      --  Opaque is this callback's canonical ownership record. The private
+      --  release-only callback does not reinterpret transport lengths or
+      --  raise diagnostic exceptions across the C portal; the owner retains
+      --  the exact raw extent needed by its captured provider.
+      Dispose_Aux_Box (Item, Captured => True);
+      return System.Null_Address;
+   end Release_Aux_Payload;
 
    function Close_Regular (State : System.Address) return C.int
      with Import, Convention => C,
@@ -930,6 +1008,13 @@ package body Lua.Engine.Foreign is
      (State : in out World; Context : not null Context_Access;
       Input : Request; Output : in out Response) is separate;
 
+   procedure Buffer_API
+     (State : in out World; Context : not null Context_Access;
+      Input : Request; Output : in out Response);
+   procedure Buffer_API
+     (State : in out World; Context : not null Context_Access;
+      Input : Request; Output : in out Response) is separate;
+
    function Dispatch
      (State : System.Address; Input : not null access constant Request;
       Output : not null access Response) return Action_Status
@@ -1410,6 +1495,9 @@ package body Lua.Engine.Foreign is
          when Create_Formatter | Append_Format_Value | Append_Format_UTF8 |
            Finish_Formatter | Release_Formatter | Charge_Aux_Work =>
             Format_API (Owner.Universe.all, Context, Input.all, Output.all);
+         when Create_Aux_Box | Resize_Aux_Box | Release_Aux_Box |
+           Publish_Aux_Box =>
+            Buffer_API (Owner.Universe.all, Context, Input.all, Output.all);
          when Prepare_External_Release =>
             if External_Releases.Pending (Owner.Universe.all) then
                External_Request (Owner.Universe.all, Output.all);
