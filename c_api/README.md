@@ -19,6 +19,14 @@ same-source cases match both native configurations locally; thread reset and
 full public auxiliary-buffer acceptance remain pending. See
 [ADR 0026](../docs/decisions/0026-base-c-closing-ownership.md) for ownership.
 
+The [protected error-closing checkpoint](../docs/sessions/2026-11-08-protected-error-closing.md)
+preserves actual regular C guard ownership across yieldable outer cleanup.
+Thirteen identical-source C cases match native default/T, including suspended
+callk boundaries, failed traceback locals and warm persistent-refusal transfer.
+Ownerless borrowed guards retain their real barriers; full reset and final
+matrix acceptance remain separate. See
+[ADR 0027](../docs/decisions/0027-protected-error-closing.md).
+
 The [public value/auxiliary checkpoint](../docs/sessions/2026-11-08-public-value-auxiliary.md)
 adds lua_len, lua_concat and lua_numbertocstring, plus 28 argument, option,
 metatable, userdata, reference, registration and error/result helpers. All

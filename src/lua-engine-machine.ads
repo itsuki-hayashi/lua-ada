@@ -154,13 +154,29 @@ package Lua.Engine.Machine is
    --  Token is the exact identity returned with this callback request; a
    --  stale/null/other activation identity is rejected before state mutation.
 
+   procedure Adopt_Deferred_Error_Scopes
+     (State : in out World; Token : Callback_Identity;
+      Owner : out Frame_Access; Prefix_Floor : out Natural;
+      Retained_Traceback : out Boolean);
+   --  After the exact regular C guard has returned, remove its held error
+   --  view and restore the context-owned scope chain without allocation or
+   --  executing an old PC. The token is the real completed callback identity;
+   --  all inner borrowed guards must have acknowledged first. Reject a stale
+   --  owner or a noncurrent error view before mutation. The caller chooses
+   --  protected recovery or genuine thread reset and retires execution there.
+
    procedure Start_Foreign_Boundary
      (Self : Driver; Callee : Value; Arguments : Values.Vector;
       Message_Handler : Value := Nil_Value;
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False;
       Yieldable : Boolean := False; Wanted : Integer := 0;
-      Protected_Call : Boolean := False; Direct_Builtin : Boolean := False);
+      Protected_Call : Boolean := False; Direct_Builtin : Boolean := False;
+      Error_Token : Callback_Identity := (others => <>));
    function Has_Foreign_Result (Self : Driver) return Boolean;
+   function Pending_Foreign_Error_Transfer (Self : Driver) return Boolean;
+   --  A regular unprotected C guard still owns this error. Its actual
+   --  temporary C view is already published; the pump must not overwrite
+   --  preserved closing slots before the matching callback acknowledges it.
    procedure Take_Foreign_Result
      (Self : Driver; Packet : in out Values.Vector; Error_Status : out Natural;
       Handler_Called : out Boolean);

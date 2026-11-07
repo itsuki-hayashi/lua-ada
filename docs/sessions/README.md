@@ -42,6 +42,7 @@ into one major PR. Historical session results retain their original scope.
 | 2026-11-08 | [Host base C closing](2026-11-08-base-c-closing.md)                  |
 | 2026-11-08 | [Closing scalar prefixes](2026-11-08-closing-stack-prefix.md)        |
 | 2026-11-08 | [Auxiliary buffers](2026-11-08-auxiliary-buffer-ownership.md)        |
+| 2026-11-08 | [Protected error closing](2026-11-08-protected-error-closing.md)     |
 
 Add one record per substantive AI session, using `YYYY-MM-DD-topic.md` and
 the user's timezone (currently Asia/Tokyo). Include objective, changes, decisions,

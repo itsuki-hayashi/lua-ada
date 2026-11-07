@@ -1242,6 +1242,13 @@ package body Lua.Engine is
       Item.Foreign_Suspended := False;
       Item.Foreign_Wanted := 0;
       Item.Foreign_Protected := False;
+      Item.Error_Guard_Owner := null;
+      Item.Deferred_Error_Head := null;
+      Item.Deferred_Error_Next := null;
+      Item.Deferred_Error_Count := 0;
+      Item.Deferred_Error_Traceback := False;
+      Item.Pending_Error_Transfer := False;
+      Item.Error_Previous_Prefix := 0;
       Item.Warning_Phase := No_Pending_Warning;
       Item.Warning_Previous := null;
       Item.Warning_Window := null;
@@ -1324,6 +1331,7 @@ package body Lua.Engine is
       Item.Unwind_Failure_Class := Language_Failure;
       Item.Unwind_Handler_Called := False;
       Item.Unwind_Has_Error := False;
+      Item.Unwind_Previous_Prefix := 0;
    end Clear_Frame;
 
    function New_Frame
@@ -1417,6 +1425,9 @@ package body Lua.Engine is
          raise Program_Error with "activation is not borrowed";
       end if;
       Context := Item.Context;
+      if Item.Deferred_Error_Head /= null then
+         raise Program_Error with "returning owned deferred error scopes";
+      end if;
       Item.Lifecycle := Retiring;
       Clear_Frame (Item);
       if Context.Base_C_Frame = Item then
@@ -1440,6 +1451,7 @@ package body Lua.Engine is
      (State : in out World; Context : not null Context_Access)
    is
       Item : Frame_Access;
+      Deferred : Frame_Access;
    begin
       if Context.Memory /= Lua.Storage.Reference (State.Memory) then
          raise Program_Error with "teardown belongs to another universe";
@@ -1459,6 +1471,19 @@ package body Lua.Engine is
          if Context.Base_C_Frame = Item then
             Context.Base_C_Frame := null;
          end if;
+         --  A host abort may destroy a context while C error transfer owns
+         --  detached, already retired scopes. No callback can execute here;
+         --  remove every intrusive owner before freeing its record.
+         while Item.Deferred_Error_Head /= null loop
+            Deferred := Item.Deferred_Error_Head;
+            Item.Deferred_Error_Head := Deferred.Deferred_Error_Next;
+            if Deferred.Deferred_Error_Head /= null then
+               raise Program_Error with "nested deferred scope ownership";
+            end if;
+            Deferred.Deferred_Error_Next := null;
+            Clear_Frame (Deferred);
+            Free_Frame (Deferred);
+         end loop;
          Clear_Frame (Item);
          Free_Frame (Item);
       end loop;
@@ -1476,6 +1501,9 @@ package body Lua.Engine is
       --  depth from the active resumer chain. Reclaim only its own counters;
       --  subtracting again would corrupt an unrelated running context.
       Context.Stack_Slots := 0;
+      Context.Deferred_Error_Depth := 0;
+      Context.Error_Recovery_Pending := False;
+      Context.Error_Recovery_Floor := 0;
       Context.Native_Depth := 0;
       Context.Non_Yieldable := 0;
       Context.Message_Depth := 0;

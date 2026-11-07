@@ -11,6 +11,9 @@
 #include "consumer_allocator.h"
 
 static struct allocation_counts counts;
+static int callk_continued;
+static int refusal_closed, refusal_stable;
+static size_t refusal_growths;
 
 static int call_plain(lua_State *L) {
     lua_getglobal(L, "close_target");
@@ -39,6 +42,43 @@ static int pcall_yieldable(lua_State *L) {
     lua_getglobal(L, "close_target");
     status = lua_pcallk(L, 0, LUA_MULTRET, 0, 0, pcall_cont);
     return pcall_cont(L, status, 0);
+}
+
+static int callk_cont(lua_State *L, int status, lua_KContext context) {
+    (void)context;
+    assert(status == LUA_YIELD);
+    ++callk_continued;
+    return lua_gettop(L);
+}
+
+static int call_yieldable(lua_State *L) {
+    lua_getglobal(L, "close_target");
+    lua_callk(L, 0, LUA_MULTRET, 0, callk_cont);
+    return lua_gettop(L);
+}
+
+static int call_refusing(lua_State *L) {
+    lua_getglobal(L, "close_target");
+    lua_pushvalue(L, 1);
+    lua_call(L, 1, LUA_MULTRET);
+    return lua_gettop(L);
+}
+
+static int raise_refusing(lua_State *L) {
+    lua_pushinteger(L, 17);
+    if (lua_toboolean(L, 1)) {
+        refusal_growths = counts.growths;
+        counts.refuse = 1;
+    }
+    return lua_error(L);
+}
+
+static int release_refusal(lua_State *L) {
+    assert(lua_gettop(L) == 2 && lua_tointeger(L, 2) == 17);
+    if (counts.refuse) refusal_stable = counts.growths == refusal_growths;
+    counts.refuse = 0;
+    ++refusal_closed;
+    return 0;
 }
 
 static void run(lua_State *L, const char *source) {
@@ -89,6 +129,84 @@ static void check(lua_State *L, const char *kind, const char *mode) {
     fflush(stdout);
 }
 
+static void unhandled_traceback(lua_State *L) {
+    lua_State *co;
+    lua_Debug ar;
+    const char *name;
+    int count = 0;
+    /* lua_resume's error catch does not reset its failed CallInfo graph or
+     * close TBC slots. Both ordinary locals remain inspectable/rooted until
+     * an explicit reset; an outer Lua pcall has different closing semantics. */
+    run(L, "closed=0;failed_weak=setmetatable({},{__mode='v'});"
+        "close_target=function()local before={};failed_weak[1]=before;"
+        "local c <close> =setmetatable({},{__close=function()closed=closed+1 "
+        "end});local after={};failed_weak[2]=after;error(17)end");
+    co = lua_newthread(L);
+    lua_pushcfunction(co, call_plain);
+    assert(lua_resume(co, L, 0, &count) == LUA_ERRRUN && count >= 1);
+    assert(lua_tointeger(co, -1) == 17);
+    lua_getglobal(L, "closed");
+    assert(lua_tointeger(L, -1) == 0);
+    lua_pop(L, 1);
+    lua_gc(L, LUA_GCCOLLECT);
+    run(L, "assert(failed_weak[1] and failed_weak[2] and closed==0)");
+    assert(lua_getstack(co, 1, &ar));
+    assert(lua_getinfo(co, "S", &ar) && strcmp(ar.what, "Lua") == 0);
+    /* getlocal pushes onto the failed thread's current C API window. */
+    assert(lua_checkstack(co, 2));
+    name = lua_getlocal(co, &ar, 1);
+    assert(name && strcmp(name, "before") == 0 && lua_istable(co, -1));
+    lua_pop(co, 1);
+    name = lua_getlocal(co, &ar, 3);
+    assert(name && strcmp(name, "after") == 0 && lua_istable(co, -1));
+    lua_pop(co, 1);
+    lua_settop(L, 0);
+    puts("PASS: close-yield-unhandled-traceback");
+}
+
+static void suspended_callk_inner_protection(lua_State *L) {
+    /* An error caught inside the Lua callee cannot abandon the surrounding
+     * callk continuation. Its already suspended C body still owns a valid K. */
+    callk_continued = 0;
+    run(L, "close_target=function()coroutine.yield('first');"
+        "local a,b=pcall(error,23);assert(not a and b==23);return 77 end;"
+        "local co=coroutine.wrap(function()return pcall(call_yieldable)end);"
+        "assert(co()=='first');local a,b=co();assert(a and b==77)");
+    assert(callk_continued == 1);
+    puts("PASS: close-yield-suspended-callk-inner-protection");
+}
+
+static void suspended_callk_error_closing(lua_State *L) {
+    /* An escaping error never calls an unprotected callk's K. Its original
+     * guard is already gone, so the outer Lua pcall owns yieldable closing. */
+    callk_continued = 0;
+    run(L, "close_target=function()coroutine.yield('first');"
+        "local c <close> =setmetatable({},{__close=function(_,e)"
+        "assert(debug.getinfo(2,'f').func==pcall);"
+        "coroutine.yield('closing',e)end});error(17)end;"
+        "local co=coroutine.wrap(function()return pcall(call_yieldable)end);"
+        "assert(co()=='first');local a,b=co();assert(a=='closing' and b==17);"
+        "a,b=co();assert(a==false and b==17)");
+    assert(callk_continued == 0);
+    puts("PASS: close-yield-suspended-callk-error-closing");
+}
+
+static void refusing_error_transfer(lua_State *L) {
+    /* Warm actual frames/packet capacity, then refuse every growth after the
+     * C error object is ready until its first real closer runs after guard ACK.
+     * Deferring/adopting scopes and publishing the error view must not retry
+     * an allocator or replace the original integer error with memory failure. */
+    refusal_closed = refusal_stable = 0;
+    run(L, "refusal_object=setmetatable({},{__close=release_refusal});"
+        "close_target=function(refuse)local c <close> =refusal_object;"
+        "raise_refusing(refuse)end;"
+        "for i=1,2 do local a,b=pcall(call_refusing,false);"
+        "assert(not a and b==17)end;"
+        "local a,b=pcall(call_refusing,true);assert(not a and b==17)");
+    assert(refusal_closed == 3 && refusal_stable && !counts.refuse);
+    puts("PASS: close-yield-refusing-error-transfer");
+}
+
 int main(void) {
     lua_State *L = lua_newstate(counted_allocator, &counts, 371U);
     assert(L);
@@ -96,6 +214,10 @@ int main(void) {
     lua_register(L, "call_plain", call_plain);
     lua_register(L, "pcall_plain", pcall_plain);
     lua_register(L, "pcall_yieldable", pcall_yieldable);
+    lua_register(L, "call_yieldable", call_yieldable);
+    lua_register(L, "call_refusing", call_refusing);
+    lua_register(L, "raise_refusing", raise_refusing);
+    lua_register(L, "release_refusal", release_refusal);
     run(L, setup);
     check(L, "call_plain", "normal");
     check(L, "call_plain", "bodyerror");
@@ -106,6 +228,10 @@ int main(void) {
     check(L, "pcall_yieldable", "normal");
     check(L, "pcall_yieldable", "bodyerror");
     check(L, "pcall_yieldable", "closeerror");
+    unhandled_traceback(L);
+    suspended_callk_inner_protection(L);
+    suspended_callk_error_closing(L);
+    refusing_error_transfer(L);
     lua_close(L);
     assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: real C ownership during error closing");

@@ -1139,6 +1139,7 @@ package body Lua.Engine.Foreign is
          Packet : Values.Vector renames Caller.Boundary_Results;
          Error_Status : Natural := 0;
          Handler_Called : Boolean := False;
+         Held_Error_View : Boolean := False;
          Count : Natural;
          Address : System.Address;
       begin
@@ -1336,6 +1337,11 @@ package body Lua.Engine.Foreign is
                  (Driver, Packet, Error_Status, Handler_Called);
             end if;
          end if;
+         --  Root completion below may free its owned driver. Capture the
+         --  nested boundary's transport state while this borrow is live;
+         --  result publication must never inspect a released Driver object.
+         Held_Error_View := not Pending.Is_Root and then
+           VM.Pending_Foreign_Error_Transfer (Driver);
          if Pending.Is_Root then
             VM.Finish (Driver);
             if Pending.Is_Resume then
@@ -1375,7 +1381,7 @@ package body Lua.Engine.Foreign is
               (if Error_Status = 1 then Caller.Foreign_Base
                else Caller.Resume_Return_Top);
             Caller.Host_Stack_Top := Caller.Foreign_Top;
-         else
+         elsif not Held_Error_View then
             Set_C_Top (Owner.Universe.all, Caller, Pending.Base);
          end if;
          Count := (if Error_Status not in 0 | 1 then 1
@@ -1412,11 +1418,13 @@ package body Lua.Engine.Foreign is
                Owner.Universe.Native_Depth := Saved_Depth;
                Output.Length := C.size_t (Count);
             end if;
-            for Index in 1 .. Count loop
-               Push (Owner.Universe.all, Caller,
-                 (if Index <= Natural (Packet.Length) then Packet (Index)
-                  else Nil_Value));
-            end loop;
+            if not Held_Error_View then
+               for Index in 1 .. Count loop
+                  Push (Owner.Universe.all, Caller,
+                    (if Index <= Natural (Packet.Length) then Packet (Index)
+                     else Nil_Value));
+               end loop;
+            end if;
             if Direct_Builtin then
                Output.Length := C.size_t (Count);
             end if;
@@ -2865,7 +2873,8 @@ package body Lua.Engine.Foreign is
                         Yieldable => Input.Continuation /= null,
                         Wanted => Integer (Input.Count),
                         Protected_Call => Input.Integer_Data /= 0,
-                        Direct_Builtin => Input.Operation = Begin_Builtin);
+                        Direct_Builtin => Input.Operation = Begin_Builtin,
+                        Error_Token => Input.Callback_Token);
                   end if;
                exception
                   when Language_Error => Start_Error := True;

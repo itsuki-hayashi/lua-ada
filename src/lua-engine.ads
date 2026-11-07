@@ -546,6 +546,18 @@ private package Lua.Engine is
       Foreign_Protected : Boolean := False;
       --  C continuations retain scalar metadata, never an abandoned C stack.
       --  A suspended boundary owns its result adjustment until resumption.
+      Error_Guard_Owner : Frame_Access;
+      Deferred_Error_Head, Deferred_Error_Next : Frame_Access;
+      Deferred_Error_Count : Natural := 0;
+      Deferred_Error_Traceback : Boolean := False;
+      Pending_Error_Transfer : Boolean := False;
+      Error_Previous_Prefix : Natural := 0;
+      --  An unprotected regular C call first transfers through its exact
+      --  live callback guard. Its boundary owns the abandoned scope chain
+      --  until that guard acknowledges the error; no old opcode may resume.
+      --  Protected cleanup retains frozen ownership after retirement. An
+      --  unhandled coroutine error instead preserves its original traceback
+      --  windows until reset, as recorded by Deferred_Error_Traceback.
       Warning_Phase : Warning_Event_Phase := No_Pending_Warning;
       Warning_Previous : Frame_Access;
       Warning_Window : Frame_Access;
@@ -660,6 +672,10 @@ private package Lua.Engine is
       Unwind_Failure_Class : Failure_Kind := Language_Failure;
       Unwind_Handler_Called : Boolean := False;
       Unwind_Has_Error : Boolean := False;
+      Unwind_Previous_Prefix : Natural := 0;
+      --  An active close keeps any outer close's real scalar floor. A failed
+      --  handler transfers this floor to fresh recovery before dropping its
+      --  now-abandoned controller and original return temporaries.
    end record;
    --  A packet preserves all results of a call/vararg expression. Scalar
    --  consumers read its first value; parentheses explicitly collapse it.
@@ -761,6 +777,13 @@ private package Lua.Engine is
       Host_Owned : Boolean := True;
       Non_Yieldable : Natural := 0;
       Stack_Slots : Natural := 0;
+      Deferred_Error_Depth : Natural := 0;
+      --  Detached cleanup records still consume metadata capacity. Reserving
+      --  for this count makes restoration after a C guard allocation-free.
+      Error_Recovery_Pending : Boolean := False;
+      Error_Recovery_Floor : Natural := 0;
+      --  A typed C ACK schedules recovery on this existing driver. The next
+      --  step processes the error before hooks, collection or an abandoned PC.
       Stack_Error_Phase : Stack_Space_Phase := Normal_Stack;
       Stack_Allocated_Bound : Natural := Initial_Stack_Size;
       --  The semantic allocated bound is independent of a backing vector's

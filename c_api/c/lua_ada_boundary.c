@@ -120,6 +120,7 @@ int lua_ada_guard_probe(lua_State *state, lua_CFunction body) {
     int status;
     guard.previous = state->guard;
     guard.error_handled = 0;
+    memset(&guard.callback_token, 0, sizeof guard.callback_token);
     state->guard = &guard;
     status = setjmp(guard.target);
     if (status == 0) body(state);
@@ -138,6 +139,7 @@ int lua_ada_run_protected(lua_State *state,
     int status;
     guard.previous = state->guard;
     guard.error_handled = 0;
+    memset(&guard.callback_token, 0, sizeof guard.callback_token);
     state->guard = &guard;
     /* An ABI helper can catch a refusal without adding a Lua call frame.
      * Its caller owns data and must release temporary storage on every
@@ -282,6 +284,8 @@ static int drive_call(lua_State *state, int arguments, int results,
     input.error_index = error_function;
     input.continuation = continuation;
     input.kcontext = context;
+    if (state->guard != NULL)
+        input.callback_token = state->guard->callback_token;
     action = dispatch_raw(state, &input, &output);
     action = pump_callbacks(action, &output);
     if (protected_call &&
@@ -321,6 +325,8 @@ int lua_ada_invoke_builtin(lua_State *state, int id) {
     input.count = LUA_MULTRET;
     input.continuation = builtin_continuation;
     input.kcontext = lua_gettop(state);
+    if (state->guard != NULL)
+        input.callback_token = state->guard->callback_token;
     action = dispatch_raw(state, &input, &output);
     action = pump_callbacks(action, &output);
     raise_action(state, action, &output);
@@ -424,6 +430,7 @@ int lua_ada_read_guarded(lua_State *state, lua_Reader reader, void *data,
     memset(completion, 0, sizeof *completion);
     guard.previous = state->guard;
     guard.error_handled = 0;
+    memset(&guard.callback_token, 0, sizeof guard.callback_token);
     state->guard = &guard;
     /* This checkpoint is ABOVE the suspended shared Ada frontend. A reader
      * can call the public API recursively, but its error/yield jumps only to
@@ -449,6 +456,7 @@ int lua_load(lua_State *state, lua_Reader reader, void *data,
     int status;
     guard.previous = state->guard;
     guard.error_handled = 0;
+    memset(&guard.callback_token, 0, sizeof guard.callback_token);
     state->guard = &guard;
     status = setjmp(guard.target);
     if (status == 0) {
@@ -508,6 +516,7 @@ int lua_dump(lua_State *state, lua_Writer writer, void *data, int strip) {
      * NULL/zero callback, and a nonzero writer result stops all further calls. */
     guard.previous = state->guard;
     guard.error_handled = 0;
+    memset(&guard.callback_token, 0, sizeof guard.callback_token);
     state->guard = &guard;
     status = setjmp(guard.target);
     if (status == 0) {

@@ -22,10 +22,17 @@ release, balanced storage and actual OS unload. Integrated local source
 passes 1,714 AUnit cases; module-owned allocators, Ada T/shared/POSIX and
 immutable final acceptance remain pending in that session record.
 
+The [protected error-closing checkpoint](sessions/2026-11-08-protected-error-closing.md)
+wires actual execution retirement and saved scalar floors into error drivers.
+Eight new Lua/AUnit cases and thirteen same-source C cases have scoped native
+default/T evidence; all 1,713 local AUnit cases pass. Unchanged default locals.lua
+source runs reach OK with matching output. Ownerless guard policy, T-enabled
+locals obligations, thread reset and final matrix/review acceptance remain open.
+
 The [closing-prefix prerequisite](sessions/2026-11-08-closing-stack-prefix.md)
 retains actual departing scalars while execution ownership retires. Five
-new VM lifetime/refusal cases pass within 1,705 AUnit cases. Automatic error
-and thread-reset callers still require integration and public verification.
+new VM lifetime/refusal cases pass within 1,705 AUnit cases. Error callers now
+use this prerequisite; thread-reset callers and final public verification remain.
 
 The [host base C closing checkpoint](sessions/2026-11-08-base-c-closing.md)
 adds actual idle C closing slots and allocation-free registration/thread

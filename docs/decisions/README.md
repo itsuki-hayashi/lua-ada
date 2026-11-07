@@ -58,3 +58,6 @@ records explicitly instead of silently rewriting historical rationale.
 
 ADR 0026 records [real base C closing ownership](0026-base-c-closing-ownership.md)
 and stack-reserved closing links without registration allocation.
+
+ADR 0027 records [protected error closing](0027-protected-error-closing.md),
+actual C guard acknowledgement and retained failed-coroutine scope ownership.

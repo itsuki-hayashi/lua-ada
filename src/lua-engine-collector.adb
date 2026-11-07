@@ -482,31 +482,9 @@ package body Collector is
       begin
          Shade_Value (State, Item);
       end Mark_Value;
-   begin
-      if Context = null then
-         return;
-      end if;
-      for Item of Context.Boundary_Results loop
-         Mark_Value (Item);
-      end loop;
-      Lua.Engine.Stacks.Trace
-        (Context, Mark_Value'Access, Mark'Access);
-      if State.GC.Phase = Enter_Atomic and then not State.GC.Emergency then
-         --  Mark/clear the actual live union before optional physical copies.
-         --  No vector borrow survives Trace; absolute indices and stable
-         --  cells remain authoritative after both arrays move together.
-         Shrink_Context_Storage (State, Context);
-      end if;
-      Mark_Value (Context.Hook);
-      Mark_Value (Context.Entry_Function);
-      Mark_Value (Context.Failure);
-      for Item of Context.Transfer.Results loop
-         Mark_Value (Item);
-      end loop;
-      for Item of Context.Arguments loop
-         Mark_Value (Item);
-      end loop;
-      for Activation of Context.Stack loop
+      procedure Mark_Activation (Activation : not null Frame_Access);
+      procedure Mark_Activation (Activation : not null Frame_Access) is
+      begin
          Mark_Value (Activation.Callee);
          Mark_Value (Activation.Message_Handler);
          Mark_Value (Activation.Warning_Root);
@@ -544,6 +522,44 @@ package body Collector is
          for Item of Activation.Varargs loop
             Mark_Value (Item);
          end loop;
+      end Mark_Activation;
+   begin
+      if Context = null then
+         return;
+      end if;
+      for Item of Context.Boundary_Results loop
+         Mark_Value (Item);
+      end loop;
+      Lua.Engine.Stacks.Trace
+        (Context, Mark_Value'Access, Mark'Access);
+      if State.GC.Phase = Enter_Atomic and then not State.GC.Emergency then
+         --  Mark/clear the actual live union before optional physical copies.
+         --  No vector borrow survives Trace; absolute indices and stable
+         --  cells remain authoritative after both arrays move together.
+         Shrink_Context_Storage (State, Context);
+      end if;
+      Mark_Value (Context.Hook);
+      Mark_Value (Context.Entry_Function);
+      Mark_Value (Context.Failure);
+      for Item of Context.Transfer.Results loop
+         Mark_Value (Item);
+      end loop;
+      for Item of Context.Arguments loop
+         Mark_Value (Item);
+      end loop;
+      for Activation of Context.Stack loop
+         Mark_Activation (Activation);
+         declare
+            Deferred : Frame_Access := Activation.Deferred_Error_Head;
+         begin
+            --  A boundary remains on the real context stack while its C
+            --  guard owns error transfer. Every detached scope must keep
+            --  its frozen cells/closers/prototype traced in that interval.
+            while Deferred /= null loop
+               Mark_Activation (Deferred);
+               Deferred := Deferred.Deferred_Error_Next;
+            end loop;
+         end;
       end loop;
    end Trace_Context;
 
