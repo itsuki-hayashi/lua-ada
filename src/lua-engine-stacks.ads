@@ -27,6 +27,9 @@ package Lua.Engine.Stacks is
       Index : Positive; Item : Value);
    --  Cell_Value is authoritative while a slot has an open capture. Writes
    --  synchronize its cached scalar and actual individually owned cell.
+   --  No allocation occurs. The caller publishes the slot's live interval
+   --  before any later GC safe point. Uncaptured scalar roots are marked by
+   --  the mandatory atomic thread rescan; captured cells keep heap barriers.
 
    function Capture
      (State : in out World; Context : not null Context_Access;

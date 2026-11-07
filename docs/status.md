@@ -24,6 +24,11 @@ caused by a dead condition temporary remaining a GC root. The reviewed compiler
 repair and five native-matched regressions pass all 1,385 Windows AUnit cases
 in both configurations, unchanged closure.lua, and coroutine.lua with T.
 Corrected cross-platform execution and final scope adjudication remain pending.
+The next macOS run exposed additional eager marking of transient scalar writes
+during multi-slice propagation. The narrow atomic-rescan repair passes all
+1,390 Windows AUnit cases in both configurations, including new retained and
+transient main/suspended-stack tests and a native-matched Lua reproducer.
+Fresh cross-platform acceptance is still required.
 
 ## Four-file conformance follow-up (2026-11-07)
 

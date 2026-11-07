@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "kind": "independent-scalar-stack-root-barrier-review",
+  "scope": "expanded-t-conformance",
+  "date": "2026-11-07",
+  "authors": [
+    "Codex /root/draft_assessment",
+    "Codex /root"
+  ],
+  "reviewer": "Codex /root/conformance_scope",
+  "decision": "accepted-narrow-stack-barrier-fix-with-platform-revalidation-pending",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "predecessor_review": {
+    "path": "tests/conformance/reviews/expanded-condition-roots.cross-review.json",
+    "sha256": "fcc8833405756300096a0f6d450dd6215770776d529e051cff506db212059508"
+  },
+  "source_bindings": [
+    {
+      "path": "src/lua-engine-stacks.adb",
+      "sha256": "5756806521ec2fc798d126e728fc44829b2ce9e51ebf634492d61a91b8ec5dd8"
+    },
+    {
+      "path": "src/lua-engine-stacks.ads",
+      "sha256": "939309a0ebddfc02228787fb432049ce23ee15eee53d4feefaa11a620b8a44a3"
+    },
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "78c65de3905f577de905da998744c861cad59151929365f2f4864d267b982554"
+    },
+    {
+      "path": "src/lua-engine-canonical.adb",
+      "sha256": "887e4007ffc1b5da7875b1566476493c6b4d671b99361a5e6d68aaaf29af0bb9"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "sha256": "1a444907c253e9cec17aca2a5b5c85a6b8a4b97c28ab9390f59213018e04ec93"
+    },
+    {
+      "path": "src/lua-engine-foreign.adb",
+      "sha256": "31590d9a9a56aaa6e50e1dbbcd4834c722af8433bc8f8d1e3ceba86415f3f829"
+    },
+    {
+      "path": "src/lua-engine-warnings.adb",
+      "sha256": "a055cb0358d259f4eeca22632d21f437192e3066b2fbfac4abe76c896abbc176"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "1c15ba0c7b50ec7c138750ab865f3408edf56d5b3ab670f71afa2a66cfe21197"
+    },
+    {
+      "path": "src/lua-engine.ads",
+      "sha256": "5195bea52ce308e6df621b2f99051ee3e4a94da32a4a56afaeec600c53e02038"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.adb",
+      "sha256": "1ae0b6346959458d4e5f7adecf9eaee91429bc0660c31a61480e128ec978a859"
+    },
+    {
+      "path": "tests/src/lua-collector_stack_tests.ads",
+      "sha256": "49449173d1f133c1cdd3b86220afa307663d16cfb54766b36b7ab75e8e3b767d"
+    },
+    {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "9e492e52fe6385282d94c5bef6508081da726a426253569d803a8b068ba10bd8"
+    },
+    {
+      "path": "tests/lua/collector_scalar_weak_progress.lua",
+      "sha256": "05ae6d2d685bb7bd2f864e728694d1b841fd9672428b5efc2bd6b78982657e90"
+    }
+  ],
+  "trigger": {
+    "workflow_run": 42345240052,
+    "revision": "95baf857b6f9ac238886216ead0195518d094740",
+    "context": "default/macos/validation/static",
+    "report": {
+      "path": "reports/ci-artifacts/95baf85-42345240052/lifecycle-macOS-validation-static/reports/expanded-conformance/6c1eea39a77e4a98b7bcc63f63357583/Ada-closure.lua.json",
+      "sha256": "6cb03b5cc4e439c209d57621676f75b4178deda42445cbda5fc732752b8d522d"
+    },
+    "observed": "The compiler retirement fix alone did not prevent a 900-second unchanged closure timeout on macOS. Repeated uncaptured weak reads still shaded their targets during propagation."
+  },
+  "evidence": [
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-build-1.log",
+      "sha256": "8143f40e4e576cbd6ce7b883c0cadffa7340ea4fcb724ed36eb025ea4afff583"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-tests-1.log",
+      "sha256": "f7e4466af5ce32b822eeca73b8fd958c344fb14015f30bd6e871827e97cedacc"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-old-ada.log",
+      "sha256": "7ae37144036fe7ea57e6b8841a0ec4ebf09c3caf37af0f1d43d04a38703fef0e"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-fixed-ada.log",
+      "sha256": "e9ff9ef026c091dedd5cfb13806f5c6c64a62a312a8aa9db4edd0e4c7e180ffc"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-native-default.log",
+      "sha256": "e9ff9ef026c091dedd5cfb13806f5c6c64a62a312a8aa9db4edd0e4c7e180ffc"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-native-upstream-test.log",
+      "sha256": "e9ff9ef026c091dedd5cfb13806f5c6c64a62a312a8aa9db4edd0e4c7e180ffc"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-closure-default.log",
+      "sha256": "390eccb5e25c581a0b897697363f20d42082371ff4cb7d91b4d8d2fbce9a91d9"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-independent/index.json",
+      "sha256": "243206455549460070b890f7c0a0b08f69beab2a6440aa85468801b8d66a876e"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-instrumented-build-1.log",
+      "sha256": "dad5950624a2d509f83d27b032daa92b44b548977f6b7a511eb54733226d735c"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-instrumented-tests-1.log",
+      "sha256": "f7e4466af5ce32b822eeca73b8fd958c344fb14015f30bd6e871827e97cedacc"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-t-api.log",
+      "sha256": "772956dd0f8ddcc22497bda0172db0631bb1689042a3058932f85f5be61fe6f1"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-coroutine-t.log",
+      "sha256": "67684281e453d226eff6c1aa9e9dcffdec4f631b170e6716d1ca1cd8896df204"
+    },
+    {
+      "path": "reports/expanded-t-conformance/scalar-root-fixed-instrumented.log",
+      "sha256": "e9ff9ef026c091dedd5cfb13806f5c6c64a62a312a8aa9db4edd0e4c7e180ffc"
+    }
+  ],
+  "reviewed_invariants": [
+    "The only runtime change is conditional omission of Root_Barrier for uncaptured scalar writes. Captured slots retain the original Root_Barrier before cache publication and Store_Cell afterward; heap, code, operation-packet and native result barriers are unchanged.",
+    "Root_Barrier previously acted only during Propagating. Atomic is indivisible: Trace_Roots, gray-again thread transfer, Propagate_All and ephemeron convergence precede weak-value clearing. The finalizer-root wave and another convergence precede the second weak clearing pass.",
+    "Every propagated thread enters Gray_Again during propagation. Reachable suspended Lua-owned threads are therefore rescanned even when they are absent from the active-root family. Main, host-owned, running and normal contexts remain explicit roots.",
+    "A retained scalar value is discovered from its actual live interval at atomic; a consumed value overwritten before atomic adds no heap edge. Stacks.Trace continues to validate and visit the exact ordered interval union, including detached public resume windows and borrowed warning prefixes.",
+    "Stacks.Write and captured-cell stores perform no allocation. Canonical fixed/open result publication reserves storage before nonallocating slot writes and top publication; frame opening roots callee/arguments before reserve and copies; Foreign.Push reserves before its nonallocating write followed by Publish_Top.",
+    "Sweep behavior is unchanged because the previous root barrier did not run during sweeping. New allocations retain their current-white semantics. Generational minors are indivisible and old thread stacks stay remembered; heap old-to-young barriers are unchanged.",
+    "The four private phase cases verify transient and retained main/suspended slots. Suspended cases explicitly reach Revisit_Gray while propagation is unfinished; saved immutable serials and weak slots verify actual reclamation or survival without dereferencing freed objects.",
+    "The public Lua regression retains 1000 tables, repeatedly consumes weak reads and performs 2000 small manual collection steps. It reproduces the defect with the previous compiler fix already present, so the new test isolates propagation shading rather than host timing."
+  ],
+  "verification": {
+    "independently_executed_public_lua": {
+      "native_default": "passed",
+      "native_upstream_test": "passed",
+      "patched_ada_default": "passed",
+      "exact_marker": "INCREMENTAL SCALAR ROOT OK",
+      "stderr_empty": true,
+      "patched_ada_upstream_test": "passed",
+      "total_cases": 4
+    },
+    "prepatch_95_ada": "The same public regression fails the exact transient-scalar-rescued-weak-value assertion.",
+    "default_strict_build": "Recorded implementation/test build succeeded with retained warning and runtime-check settings.",
+    "fresh_default_aunit": {
+      "total": 1390,
+      "successful": 1390,
+      "failed_assertions": 0,
+      "unexpected_errors": 0,
+      "new_labels": [
+        "collector stack: transient main scalar",
+        "collector stack: retained main scalar",
+        "collector stack: transient suspended scalar",
+        "collector stack: retained suspended scalar",
+        "collector stack: incremental Lua weak lookup"
+      ]
+    },
+    "unchanged_closure_default": "Original closure.lua reaches testing closures, plus and terminal OK with the patched Ada runner.",
+    "documentation_timing": "The specification comment followed the default build; the subsequent successful upstream-test strict build compiled the final documented specification.",
+    "fresh_upstream_test_aunit": {
+      "successful": 1390,
+      "total": 1390,
+      "failed_assertions": 0,
+      "unexpected_errors": 0
+    },
+    "fresh_upstream_test_strict_build": "Final source bytes, including the stacks.ads publication documentation, compiled successfully with retained strict warning and runtime-check settings.",
+    "t_validation": "All seven first-party C-driver phases, unchanged full upstream coroutine.lua with T, and the incremental public Lua regression pass on the instrumented Ada runner."
+  },
+  "findings": [],
+  "limits": [
+    "The production assessment composes with the prior consumed-condition retirement repair; it does not certify the earlier failed 95baf85 candidate.",
+    "Local focused runs cover Windows default and upstream-test Ada plus both native configurations. Corrected macOS/Linux execution and all 26 fresh contexts remain pending.",
+    "No source/API ledger entry, execution contract or final matrix acceptance is promoted by this review."
+  ]
+}

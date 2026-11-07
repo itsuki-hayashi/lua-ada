@@ -221,3 +221,37 @@ all 1,385 AUnit cases pass in both configurations; unchanged closure.lua and
 coroutine.lua with T pass again, along with all seven focused T API phases.
 Fresh macOS execution and the entire corrected 26-context matrix remain
 required. The 900-second/2 GiB primary policy is unchanged.
+
+## Multi-slice scalar root repair
+
+Clean 95baf85 passes both complete local pipelines again in
+default-full-check-5.log and instrumented-full-check-3.log. The broader ABI,
+frontend/opcode, layout, 1,120-library and 1,024-lifecycle campaigns also pass
+again in retained-campaigns-2.log. Its first Linux and Windows CI jobs pass.
+Fresh macOS executions still time out in unchanged closure.lua despite all
+1,383 applicable AUnit cases passing, including the consumed-condition tests.
+The first repair is necessary but does not finish automatic GC progress.
+
+Propagation spans multiple work slices on this graph. Every uncaptured scalar
+write previously shaded its value immediately, so repeatedly reading a weak
+entry could rescue it in each cycle even after the compiler retired the slot.
+The new public Lua regression interleaves weak reads with deliberately small
+real collection steps; it passes native default/T and fails the 95baf85 Ada
+binary's exact transient-scalar assertion. This removes the host-timing
+dependency from the second failure too.
+
+Uncaptured scalar writes now defer marking to the collector's mandatory atomic
+stack snapshot. Active/host-owned threads are rescanned directly, and already
+visited reachable suspended threads are revisited through gray-again before
+weak clearing. Captured-cell, heap-edge, generation and root-packet barriers
+remain intact. The private Write contract requires callers to publish the live
+interval before the next allocating or collection safe point; Write itself
+cannot allocate between storage and publication.
+
+Five separate collector-stack tests cover retained/transient values in both
+main and already-visited suspended contexts, plus the native-matched Lua
+program. Both strict Windows configurations pass all 1,390 AUnit cases with
+zero failed assertions or unexpected errors. The new Lua program, unchanged
+closure.lua, unchanged coroutine.lua with T and all seven project T API phases
+pass on the repaired local runtime. New cross-platform execution, the entire
+26-context gate and final independent adjudication remain pending.

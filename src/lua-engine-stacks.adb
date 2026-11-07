@@ -129,7 +129,19 @@ package body Lua.Engine.Stacks is
       --  No vector reference survives either operation. Cached scalar writes
       --  and cell writes cannot allocate; both describe one Lua binding.
       Cell := Context.Stack_Cells.Element (Index);
-      Root_Barrier (State, Item);
+      --  Uncaptured stack values are roots at the next atomic snapshot,
+      --  rather than heap edges requiring immediate forward shading. Atomic
+      --  rescans active/host threads and every reachable suspended thread on
+      --  the gray-again list before clearing weak entries. Shading each weak
+      --  lookup here would retain even a consumed condition throughout a
+      --  multi-slice propagation cycle, preventing automatic weak progress.
+      --  Callers publish the live interval before their next safe point;
+      --  no allocation can occur between this write and that publication.
+      --  Captured bindings remain real heap cells and keep their existing
+      --  root/store barriers, including old-to-young remembered edges.
+      if Cell /= null then
+         Root_Barrier (State, Item);
+      end if;
       Context.Foreign_Stack.Replace_Element (Index, Item);
       if Cell /= null then
          Store_Cell (State, Cell, Item);
