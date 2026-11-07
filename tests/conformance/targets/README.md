@@ -541,6 +541,25 @@ function and data pointers, rejects an old import after renaming the host and
 then rebuilds the import for that exact new basename. It builds no Ada code
 and acquires no Alire/profile lease.
 
+`NativeLuaFixtures.psm1` exposes `Build-NativeLuaFixtures` for the five unchanged
+upstream C modules. Call it after the real host is linked, with absolute
+`-HostPath`, `-RuntimeDirectory` and `-Compiler`, explicit implementation,
+library type, platform and configuration, plus disposable `-FixtureDirectory`
+and new `-RecordDirectory` paths. `-CompilerSha256` can bind the frozen context
+toolchain. Static Windows modules import the actual executable; shared modules
+import the actual DLL and validate the host's DLL import. POSIX static plans
+use exported host symbol lookup without a `liblua.a` link. Shared plans select
+an actual dynamic library rather than falling back to an archive.
+
+The builder verifies the reference tree and every copied support source,
+records actual compiler processes and module imports, and produces both
+Windows `.dll` and `.so` names with identical bytes. The forced Windows header
+uses `dllimport` for Lua functions/data and exports only fixture entrypoints.
+Returned `identity`, `records`, `library_directory` and `evidence` values are
+build/linkage observations with false runtime/coverage authority. A successful
+build does not establish that the module's Lua/C operations or lifetime driver
+ran. POSIX host export/lookup behavior still needs actual platform execution.
+
 Artifact transport follows the official [upload-artifact v7 documentation](https://github.com/actions/upload-artifact/tree/v7.0.2)
 and [download-artifact v8 documentation](https://github.com/actions/download-artifact/tree/v8).
 Unix mode bits are restored from the content-bound image manifest because the
