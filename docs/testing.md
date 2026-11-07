@@ -212,6 +212,11 @@ It checks real state/thread/stack/allocator identity and the actual pool address
 and GNAT elaboration counter; the latter two are compiler-specific test probes.
 No test observer is added to the interpreter library. Raw output, executable/
 library hashes and process results are retained under reports/core-image.
+Within a combined campaign, the runtime-producing build explicitly selects
+`LUA_ADA_PREBUILT=false`. Subsequent host builds import that existing library
+with `LUA_ADA_PREBUILT=true`; they must not rebind a second image. The core
+image driver verifies the selected library hash before and after consumer
+linking and execution. Standalone invocation still builds the runtime first.
 [The validation owner](validation-one-core.md) records executed configurations.
 scripts/check.ps1 invokes this campaign per job; a missing platform run is not
 implied by the workflow. Native module loading and full C exports remain separate.

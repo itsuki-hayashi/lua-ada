@@ -4,7 +4,8 @@ param(
     [ValidateSet('development', 'validation', 'release')]
     [string] $Profile = 'validation',
     [ValidateSet('default', 'upstream-test')]
-    [string] $Configuration = 'default'
+    [string] $Configuration = 'default',
+    [switch] $UseExistingRuntime
 )
 
 $ErrorActionPreference = 'Stop'
@@ -109,11 +110,22 @@ try {
     }
     # Select the requested generated profile through Alire, never by editing
     # generated configuration. All subsequent projects import this same root.
-    Invoke-Build (@('-n', 'build', "--$Profile", '--') + $scenarios)
-    Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/consumer.gpr', '-p') + $scenarios)
-    Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/image_consumer.gpr', '-p') + $scenarios)
-
     $runtimeDirectory = Join-Path $projectRoot "lib/$configurationPart$Profile/$LibraryType"
+    if (-not $UseExistingRuntime) {
+        Invoke-Build (@('-n', 'build', "--$Profile", '--', '-XLUA_ADA_PREBUILT=false') + $scenarios)
+    }
+    $imageName = if ($LibraryType -ne 'relocatable') { 'liblua.a' }
+        elseif ($IsWindows) { 'liblua.dll' } elseif ($IsMacOS) { 'liblua.dylib' } else { 'liblua.so' }
+    $imagePath = Join-Path $runtimeDirectory $imageName
+    $inputHash = (Get-FileHash -LiteralPath $imagePath).Hash
+    # The consumers import the already compiled SAL. A fresh gprlib bind would
+    # give the C cases another archive/shared object even at the same revision.
+    $consumerScenarios = $scenarios + @('-XLUA_ADA_PREBUILT=true')
+    Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/consumer.gpr', '-p') + $consumerScenarios)
+    Invoke-Build (@('exec', '--', 'gprbuild', '-P', 'c_api/image_consumer.gpr', '-p') + $consumerScenarios)
+    if ((Get-FileHash -LiteralPath $imagePath).Hash -cne $inputHash) {
+        throw 'Consumer build changed the selected runtime image'
+    }
     $env:PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $savedPath
     $env:LD_LIBRARY_PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $savedLdPath
     $env:DYLD_LIBRARY_PATH = $runtimeDirectory + [IO.Path]::PathSeparator + $adaRuntimeDirectory + $savedDyldPath
@@ -193,6 +205,9 @@ try {
         [ordered]@{ file = $_.Name; sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
     if ($libraries.Count -eq 0) { throw 'Selected root lua image is absent' }
+    if ((Get-FileHash -LiteralPath $imagePath).Hash -cne $inputHash) {
+        throw 'Consumer execution changed the selected runtime image'
+    }
     [ordered]@{ profile = $Profile; library_type = $LibraryType;
         repository_revision = $repositoryRevision;
         repository_dirty = ($repositoryChanges.Count -ne 0);

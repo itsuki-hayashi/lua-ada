@@ -8,7 +8,7 @@
   "runtime_acceptance": false,
   "proposal": {
     "path": "tests/conformance/reviews/gc-execution-obligations.proposal.json",
-    "sha256": "309af98713b8a6d7cca76b6a90a20c64369fbf2249e059a4d613e640280a830f"
+    "sha256": "d0a82ad491aeac272bc370d0b10f5fe6059f6c1779ccebcb9d7df56a3e3844b9"
   },
   "source_bindings": [
     {
@@ -106,5 +106,16 @@
       }
     ],
     "basis": "The two packet changes refresh the scope and shutdown review hashes only. Same-process instrumented count must still be exactly ten; no context execution evidence added."
+  },
+  "owner_image_delta": {
+    "previous": "309af98713b8a6d7cca76b6a90a20c64369fbf2249e059a4d613e640280a830f",
+    "previous_sources": [],
+    "review": "The runtime owner selects PREBUILT=false explicitly. Subsequent consumers import the selected runtime image. The AUnit procedures, labels, file spans and observed shutdown count requirements retain their reviewed definitions. Final execution requires matching image identities."
+  },
+  "physical_witness_delta": {
+    "prior_proposal": "772d8fac31325f3d76e4974faac823e5bcee0d66bb42a6ff0a0ff8ca490c2d0b",
+    "review": "Reviewed 21 additional exact registered labels, their AUnit fixture instantiations and asserted behavior. They measure paired storage release or preservation on failed copies, retain live cells across shrinking and atomic work, and exercise emergency queuing, weak clearing, resurrection, and deferred finalizer progress. These supplement the existing 14 witnesses. Final contexts require actual successful stdout and matching runtime image.",
+    "prior_binding_only_revision": "512fc8cbdc771ee016fed2373d2534e4a383974d9320d47e9af9de1bf7b9eb92",
+    "source_binding_review": "All 35 AUnit entries have exactly one proposal source binding matching the case and actual source bytes."
   }
 }

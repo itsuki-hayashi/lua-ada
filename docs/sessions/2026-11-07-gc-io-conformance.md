@@ -911,3 +911,26 @@ now requires linked passing evidence in a supported instrumented context;
 the reviewed execution contract still determines the exact omitted IDs.
 Local regressions pass 43 runner, 52 scope and 35 matrix cases. Semantic
 review, observed executions and final acceptance remain distinct.
+
+Corrected Mac instrumented static job128260521944 at8196b80 passes all four
+files, including matching C/Ada five-span file equivalents and balanced
+post-close storage. Downloaded artifact13555770304 has archive SHA-256
+16a29f427a7fb321e78d9b6ea04dc7ec35c59126669165086fc66355573f983e.
+The two Linux instrumented job archives in run42325758894 passed actual
+per-file, 41 named consumer and 14 AUnit witness replay. Combined evidence
+correctly failed: separately built C consumers identified different liblua
+bytes from AUnit and scoped executions in both static and shared jobs.
+The reference C oracle library matched. The combined campaign now builds
+one runtime and selects the externally built project for subsequent consumer
+links. The standalone C driver still builds its runtime. GPR checks, runtime
+flags and the matrix byte-identity requirement remain in force.
+
+Both serialized Windows validation/static pipelines pass 1306 AUnit cases
+and four-file observations with the revised build order. Named consumer and
+AUnit reports identify the same liblua.a in each configuration: default
+a85de4800f74a095bd10727cc50e120056629b55b9023b7669c0a8e675a514bb and
+upstream-test 1f8803f4baa71135d469fd008035883c0572b2cde8970375774388b952b50d4b.
+These are local diagnostics, not final clean-context acceptance. The collector
+replay mapping now selects 35 named regressions, including 21 witnesses for
+physical frame/stack release, rollback, deferred finalization, resurrection,
+root retention and recovery. The suite's registration count is unchanged.

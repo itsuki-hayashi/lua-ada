@@ -43,14 +43,14 @@ try {
     }
     & (Join-Path $PSScriptRoot 'check-documentation.ps1')
     & (Join-Path $PSScriptRoot 'test-pe-unwind.ps1')
-    Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario)
+    Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario, '-XLUA_ADA_PREBUILT=false')
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-core-image.ps1'),
-        '-LibraryType', $LibraryType, '-Profile', $Profile)
+        '-LibraryType', $LibraryType, '-Profile', $Profile, '-UseExistingRuntime')
     foreach ($crateName in @('cli', 'tests')) {
         Set-Location (Join-Path $projectRoot $crateName)
         Invoke-Alire -Arguments @('-n', 'build', $profileArgument,
-            "--profiles=lua_ada=$Profile", '--', $scenario)
+            "--profiles=lua_ada=$Profile", '--', $scenario, '-XLUA_ADA_PREBUILT=true')
     }
 
     # Pin runtime lookup to the exact library that this job compiled. Searching

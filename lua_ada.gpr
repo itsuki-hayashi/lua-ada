@@ -5,6 +5,12 @@ library project Lua_Ada is
    type Library_Type is ("static", "static-pic", "relocatable");
    Library_Mode : Library_Type :=
      external ("LUA_ADA_LIBRARY_TYPE", "static");
+   --  A conformance campaign builds the runtime once before linking its
+   --  independent hosts. Imported projects must not rebind or replace that
+   --  image: executable and allocation evidence refers to its exact bytes.
+   type Build_Choice is ("false", "true");
+   Prebuilt : Build_Choice := external ("LUA_ADA_PREBUILT", "false");
+   for Externally_Built use Prebuilt;
    Configuration_Subdir := Runtime_Configuration.Artifact_Subdir;
    Tasking_Runtime_Archive :=
      external ("LUA_ADA_TASKING_RUNTIME_ARCHIVE", "");

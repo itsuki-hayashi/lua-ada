@@ -89,7 +89,7 @@ try {
     }
     # Build serially with the same strict project switches as ordinary jobs.
     Invoke-CheckedAlire @('-n', '-C', 'tests', 'build', '--validation',
-        '--profiles=lua_ada=validation', '--', "-XLUA_ADA_LIBRARY_TYPE=$LibraryType")
+        '--profiles=lua_ada=validation', '--', "-XLUA_ADA_LIBRARY_TYPE=$LibraryType", '-XLUA_ADA_PREBUILT=false')
     # Shared executables need the selected compiler's support DLLs as well as
     # liblua. Obtain that search path from Alire instead of the ambient shell.
     $selectedPath = & alr exec -- pwsh -NoProfile -Command '$env:PATH'
@@ -147,7 +147,7 @@ try {
     # Exercise the real public C consumers in this configuration too. Keep
     # Alire invocations serialized with the test and oracle builds above.
     & "$PSScriptRoot/check-core-image.ps1" -Profile validation `
-        -LibraryType $LibraryType -Configuration upstream-test
+        -LibraryType $LibraryType -Configuration upstream-test -UseExistingRuntime
     if ($LASTEXITCODE -ne 0) { throw 'Instrumented C consumer checks failed' }
     Write-Output "PASS: instrumented validation/$LibraryType regressions; scope acceptance remains pending"
 } finally {

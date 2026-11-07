@@ -8,7 +8,7 @@
   "runtime_acceptance": false,
   "proposal": {
     "path": "tests/conformance/reviews/gc-aunit-context-replay.proposal.json",
-    "sha256": "dab45c62c54b32f90d1856a159dbcaad69a575c90990e1fe68ba09e5da197c31"
+    "sha256": "8653f8e6c8d73bde9202f507ebdad3911c2e3f5f22fae8415de1b8dd3d6d0f9f"
   },
   "source_bindings": [
     {
@@ -29,11 +29,11 @@
     },
     {
       "path": "scripts/check.ps1",
-      "sha256": "2a7fb8af7e502bdb0e3e603722e65e13e76d23ff59044a677a5883cff53877c0"
+      "sha256": "3b7be34cb68bb3e59db6533e3317274e8013b4b320fca11e704c12dc0258e7f8"
     },
     {
       "path": "scripts/check-instrumented.ps1",
-      "sha256": "9255360b864da57d85c0fe0ac84f8c7146865c261ee8b8b009827a13b1d7b622"
+      "sha256": "d4f0208208f1c48a1a8394bb200f365c15f5810236b8f638f53b794e8b67ef1c"
     },
     {
       "path": "tests/src/test_runner.adb",
@@ -42,6 +42,18 @@
     {
       "path": "scripts/check-aunit-evidence.ps1",
       "sha256": "b2854afcbe49536dd13d7423d345b0ca1d5e4473d8854b8522725fb190251a7e"
+    },
+    {
+      "path": "tests/src/lua-physical_stack_tests.adb",
+      "sha256": "831e73fd4127935689ac179e3159e78b20f7ea4a80b3ac77567331f76757bddd"
+    },
+    {
+      "path": "tests/src/lua-gc_control_tests.adb",
+      "sha256": "9e5a1dd3d16abe4e58d5fde4cfcd1f54d8f284458ca14b6d3a68492b63e4e1c8"
+    },
+    {
+      "path": "tests/src/lua-finalizer_runtime_tests.adb",
+      "sha256": "fa5110c03d1fe5d2d6fc21ddc40e08ac654c2c8b75f807c050e91ebff7ae9ff8"
     }
   ],
   "verification": [
@@ -74,5 +86,30 @@
     "rationale": "Current proposal distinguishes source-observed shared capture improvements from historical gaps, refreshes all active bindings and retains no final-runtime claim. All active hashes match. Fourteen case identities, exact labels and semantic mappings remain unchanged.",
     "implementation_boundary": "Configuration-probe enforcement is separately reviewed by the parent/events reviewer. This decision accepts the semantic witness mapping and its current bindings, not unexecuted harness behavior.",
     "runtime_acceptance": false
+  },
+  "consuming_driver_delta": {
+    "prior_proposal": "dab45c62c54b32f90d1856a159dbcaad69a575c90990e1fe68ba09e5da197c31",
+    "prior_sources": [
+      {
+        "path": "scripts/check.ps1",
+        "sha256": "2a7fb8af7e502bdb0e3e603722e65e13e76d23ff59044a677a5883cff53877c0"
+      },
+      {
+        "path": "scripts/check-instrumented.ps1",
+        "sha256": "9255360b864da57d85c0fe0ac84f8c7146865c261ee8b8b009827a13b1d7b622"
+      }
+    ],
+    "review": "Default builds the selected library first and imports the prebuilt image for hosts. Instrumented builds the AUnit host before the consumers and then reuses its library. All fourteen exact label and procedure mappings are retained. Actual identity must be checked from the resulting job artifacts."
+  },
+  "owner_image_delta": {
+    "previous": "317689c9f1886629923e89d67f0379b3a40a2626af411d0f90df5e9988ee77d1",
+    "previous_sources": [],
+    "review": "The runtime owner selects PREBUILT=false explicitly. Subsequent consumers import the selected runtime image. The AUnit procedures, labels, file spans and observed shutdown count requirements retain their reviewed definitions. Final execution requires matching image identities."
+  },
+  "physical_witness_delta": {
+    "prior_proposal": "066d3e894fb69b0bac90e992e93f74fe702250dc48ca5c96bce1d286fe844819",
+    "review": "Reviewed 21 additional exact registered labels, their AUnit fixture instantiations and asserted behavior. They measure paired storage release or preservation on failed copies, retain live cells across shrinking and atomic work, and exercise emergency queuing, weak clearing, resurrection, and deferred finalizer progress. These supplement the existing 14 witnesses. Final contexts require actual successful stdout and matching runtime image.",
+    "prior_binding_only_revision": "47e993d84ad6afb28544162084a035e6ef6d63afaf8422437e77a3e195dfdfd5",
+    "source_binding_review": "All 35 AUnit entries have exactly one proposal source binding matching the case and actual source bytes."
   }
 }

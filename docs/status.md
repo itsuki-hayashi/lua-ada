@@ -17,7 +17,12 @@ passed the repaired shell counterpart before reaching a calendar difference.
 At e028dae, the Mac C oracle normalized seconds 60 and 61 at maximum `tm_year`
 to midnight on the same date; direct input of the next year was rejected.
 The fifth Mac equivalent span now checks those native results, reverse conversion
-and recovery. Complete corrected Mac C/Ada file runs remain pending.
+and recovery. Both the C oracle and Ada runtime passed the complete corrected
+Mac instrumented static file equivalent at 8196b80 with zero outstanding
+storage. Independent Linux artifact replay found that the named C consumers
+used a different runtime image from AUnit and the scoped file executions.
+The combined campaign now links each host against the one prebuilt runtime;
+fresh cross-platform hash reconciliation remains required.
 The scoped events launcher also verifies the unchanged file returns 12 through
 `dofile`, matching the check in upstream `all.lua`. The test warning observer
 measures all ten instrumented

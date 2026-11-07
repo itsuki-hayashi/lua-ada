@@ -26,7 +26,7 @@
       "path": "tests/conformance/reviews/gc-ada.equivalent-approval.json"
     },
     {
-      "sha256": "dab45c62c54b32f90d1856a159dbcaad69a575c90990e1fe68ba09e5da197c31",
+      "sha256": "8653f8e6c8d73bde9202f507ebdad3911c2e3f5f22fae8415de1b8dd3d6d0f9f",
       "path": "tests/conformance/reviews/gc-aunit-context-replay.proposal.json"
     },
     {
@@ -4617,7 +4617,8 @@
     {
       "id": "GC-PHYSICAL-REPLAY",
       "finding": "Current whole-file telemetry balances storage but does not prove each physical cache/stack/refusal invariant separately.",
-      "required_resolution": "Replay required exact AUnit labels from gc-aunit-context-replay proposal and add relevant frame/stack/finalizer-refusal labels when promoting those specific obligations."
+      "required_resolution": "Replay required exact AUnit labels from gc-aunit-context-replay proposal and add relevant frame/stack/finalizer-refusal labels when promoting those specific obligations.",
+      "status": "Source mappings extended to 35 required AUnit labels. Actual final-context replay pending."
     }
   ],
   "promotion_constraints": [

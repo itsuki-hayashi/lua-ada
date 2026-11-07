@@ -45,7 +45,7 @@
     },
     {
       "path": "scripts/check-core-image.ps1",
-      "sha256": "c299fc50efbc1c85652311673c7213db81eaee6921f4599bc9db412381afa9b5"
+      "sha256": "84cea400b26c24619c706ada585e76b1e126c943f3ba0bd065172e9358d96b31"
     }
   ],
   "verification": {
@@ -99,5 +99,12 @@
       "path": "scripts/check-core-image.ps1",
       "sha256": "e148bfc71a8b8c7aa698cf6d815de8675c245d3e7aceb478bef15609a1294402"
     }
+  },
+  "consuming_driver_delta": {
+    "previous": {
+      "path": "scripts/check-core-image.ps1",
+      "sha256": "c299fc50efbc1c85652311673c7213db81eaee6921f4599bc9db412381afa9b5"
+    },
+    "review": "Campaigns supply the selected runtime to the C consumer and image consumer. Owner builds explicitly disable externally built mode. The consumer driver hashes the selected input, requires both GPR imports to use the prebuilt library and compares its bytes after linking and after execution. The named C witnesses and output checks retain their behavior. Runtime identity requires fresh matching job artifacts."
   }
 }
