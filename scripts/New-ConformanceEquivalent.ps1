@@ -6,6 +6,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 $root = Split-Path -Parent $PSScriptRoot
 $spec = Get-Content -LiteralPath $Manifest -Raw | ConvertFrom-Json
 if ($spec.schema_version -ne 1) { throw 'Unsupported equivalent manifest' }
@@ -59,6 +60,10 @@ try {
     }
     $stream.Write($bytes, $cursor, $bytes.Length - $cursor)
     $result = $stream.ToArray()
+    if ($spec.review.status -eq 'accepted') {
+        $reviewedSpec = $spec | ConvertTo-Json -Depth 64 | ConvertFrom-Json -AsHashtable -Depth 64
+        Assert-EquivalentReviewBinding -Root $root -Specification $reviewedSpec -GeneratedSha256 (Get-Hash $result)
+    }
     [IO.File]::WriteAllBytes($target, $result)
     [ordered]@{
         id=$spec.id

@@ -56,9 +56,11 @@ native test glue. It replaces the descriptor of a fresh owned FILE with a
 read-only `/dev/null` descriptor, preserving FILE/closer identity and avoiding
 SIGPIPE or global signal-handler changes. Its separately named Lua counterpart
 checks repeated buffered writes, flush errors, default stream restoration and
-closure. The one-span `files-macos-platform.json` candidate replaces only the
-unavailable `/dev/full` open; all remaining assertions and the actual POSIX
-T.nonblock block remain intact. Independent mapping review is pending.
+closure. The `files-macos-platform.json` candidate replaces both unavailable
+`/dev/full` opens and separately checks Darwin's buffered-close error with
+closed FILE ownership. The unbuffered zero-byte refusal and actual POSIX
+nonblocking pipe assertions remain intact. Independent mapping review and
+successful platform execution of the correction remain pending.
 
 Upstream license notice (also retained in the pinned public `lua.h`):
 

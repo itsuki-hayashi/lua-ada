@@ -1,0 +1,250 @@
+{
+  "decision": "accepted",
+  "decisions": [
+    {
+      "decision": "accepted",
+      "start_byte": 1241,
+      "counterparts": [
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#temporary-name lifecycle"
+        }
+      ],
+      "replacement_sha256": "e0007267e6b4583a0cb1be200dee78c8ed444ec177c163d65a30e1e70f1e466b",
+      "source_sha256": "8bc250c152e4ab0ef4dbe1921f696a1863c74121920c32eb5da070c17ed25dc2",
+      "review_evidence": {
+        "sha256": "94ffb5b1c005da074a267156046c8c05dce841741ab10fac06333a947ee0333c",
+        "path": "tests/conformance/reviews/files.independent-review.json"
+      },
+      "reviewer": "/root/review_files",
+      "length_bytes": 26,
+      "id": "windows-span-01",
+      "rationale": "Native Windows temporary basenames preserve generated unique names and complete disposable create/read/remove lifecycle without claiming reserved-name semantics.",
+      "author": "Codex"
+    },
+    {
+      "decision": "accepted",
+      "start_byte": 1467,
+      "counterparts": [
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#temporary-name lifecycle"
+        }
+      ],
+      "replacement_sha256": "764f69379878c1bb22d2e5e7fa181f1e2e44ab020b45a19d4720911374851eb1",
+      "source_sha256": "3f15acf6236e4b7008168be6d0125f0ada0622dba223ade674a14128d8497dc3",
+      "review_evidence": {
+        "sha256": "94ffb5b1c005da074a267156046c8c05dce841741ab10fac06333a947ee0333c",
+        "path": "tests/conformance/reviews/files.independent-review.json"
+      },
+      "reviewer": "/root/review_files",
+      "length_bytes": 31,
+      "id": "windows-span-02",
+      "rationale": "The second native temporary basename preserves rename/destination lifecycle and remains distinct from the first.",
+      "author": "Codex"
+    },
+    {
+      "decision": "accepted",
+      "start_byte": 2291,
+      "counterparts": [
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#native stdin and invalid seek"
+        }
+      ],
+      "replacement_sha256": "8eb73f7ef96588e9e390778142c7ad37e8d20a6a95932094a3d7191659d39c5c",
+      "source_sha256": "b93243fa9e870f3f2ee5284a089051424360b19e9ee51333f62fa9c339906169",
+      "review_evidence": {
+        "sha256": "94ffb5b1c005da074a267156046c8c05dce841741ab10fac06333a947ee0333c",
+        "path": "tests/conformance/reviews/files.independent-review.json"
+      },
+      "reviewer": "/root/review_files",
+      "length_bytes": 74,
+      "id": "windows-span-03",
+      "rationale": "Measured harness stdin seek success remains explicit; real negative-offset regular-file seek preserves native failure tuple and physical close.",
+      "author": "Codex"
+    },
+    {
+      "decision": "accepted",
+      "start_byte": 12369,
+      "counterparts": [
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#native null device"
+        }
+      ],
+      "replacement_sha256": "95bbd9e325337a7adb83140b745bb4ae65c0bea82bab99e05038a7c32257b4c0",
+      "source_sha256": "075fa744187ce9a70b9985517a12fd23982c9f5e047af225c9e0e2ac22a87dbd",
+      "review_evidence": {
+        "sha256": "94ffb5b1c005da074a267156046c8c05dce841741ab10fac06333a947ee0333c",
+        "path": "tests/conformance/reviews/files.independent-review.json"
+      },
+      "reviewer": "/root/review_files",
+      "length_bytes": 35,
+      "id": "windows-span-04",
+      "rationale": "Windows NUL provides the native discard device; buffered write, flush and close success remain asserted.",
+      "author": "Codex"
+    },
+    {
+      "decision": "accepted",
+      "start_byte": 12613,
+      "counterparts": [
+        {
+          "sha256": "58a7c7a97aeffb76c14fd4015ebcc29917c01436d8a0afa1f6322406e2fe2238",
+          "path": "tests/conformance/platform/windows-buffered-failure.lua"
+        }
+      ],
+      "replacement_sha256": "c24a32d368ee7d083ed42b3db45377418ce79572ba43e64b608a3cb01e492dd8",
+      "source_sha256": "48c1e51d8186351c111dc276508073d24cb07b63914ed3bf615708157ae638f3",
+      "review_evidence": {
+        "sha256": "94ffb5b1c005da074a267156046c8c05dce841741ab10fac06333a947ee0333c",
+        "path": "tests/conformance/reviews/files.independent-review.json"
+      },
+      "reviewer": "/root/review_files",
+      "length_bytes": 35,
+      "id": "windows-span-05",
+      "rationale": "Actual broken native pipe retains the public FILE pointer/closer/ownership. Buffered writes and flush refusal preserve order with genuine errors and physical close.",
+      "author": "Codex"
+    },
+    {
+      "decision": "accepted",
+      "start_byte": 18862,
+      "counterparts": [
+        {
+          "sha256": "92404376ed98567be38acc3e98b181d3c1e8ad9283ed6d1be404d5c38a986635",
+          "path": "tests/conformance/platform/windows-partial-write.lua"
+        }
+      ],
+      "replacement_sha256": "4427e5fcd0bc7afe79f71df7bec0b1153c2ec06a1634fa74d1efdaf627d1a838",
+      "source_sha256": "3ff8558724db19fb5015aa14e1d77810717ab49e7b65446c80dce2f5784c3c95",
+      "review_evidence": {
+        "sha256": "94ffb5b1c005da074a267156046c8c05dce841741ab10fac06333a947ee0333c",
+        "path": "tests/conformance/reviews/files.independent-review.json"
+      },
+      "reviewer": "/root/review_files",
+      "length_bytes": 893,
+      "id": "windows-span-06",
+      "rationale": "Windows CRT atomic oversized-write refusal is represented by zero-byte refusal and measured multiargument partial progress. Exact reader bytes, EOF and both endpoint closes are checked; POSIX single-fwrite partial counts are not fabricated.",
+      "author": "Codex"
+    },
+    {
+      "decision": "accepted",
+      "start_byte": 20771,
+      "counterparts": [
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#temporary-name lifecycle"
+        },
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#same implementation pipe copy"
+        }
+      ],
+      "replacement_sha256": "da82d485ce958cf8a479e7407c88ff69fea5c127f010ec70cd8c82867753d7e5",
+      "source_sha256": "240a259576242b2e970d04fddc25d5a94b6d4e8ab4186d77da60622241b71e38",
+      "review_evidence": {
+        "sha256": "94ffb5b1c005da074a267156046c8c05dce841741ab10fac06333a947ee0333c",
+        "path": "tests/conformance/reviews/files.independent-review.json"
+      },
+      "reviewer": "/root/review_files",
+      "length_bytes": 186,
+      "id": "windows-span-07",
+      "rationale": "Same-implementation Lua children preserve both pipe directions, exact copied bytes, status and temporary-file cleanup under Windows shell syntax.",
+      "author": "Codex"
+    },
+    {
+      "decision": "accepted",
+      "start_byte": 21098,
+      "counterparts": [
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#native null device"
+        },
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#forced termination and shell status"
+        },
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#quoted executable and typed exit"
+        }
+      ],
+      "replacement_sha256": "40eb01556a6467617281d37e5ea4081e9f2834ad114c1386c60e02ee9d9872f1",
+      "source_sha256": "050ac54d392a4dbe4e38d24bd74a31f8438adab5eed5ef7d49e0b1e014b1938c",
+      "review_evidence": {
+        "sha256": "94ffb5b1c005da074a267156046c8c05dce841741ab10fac06333a947ee0333c",
+        "path": "tests/conformance/reviews/files.independent-review.json"
+      },
+      "reviewer": "/root/review_files",
+      "length_bytes": 386,
+      "id": "windows-span-08",
+      "rationale": "Native TerminateProcess, command-shell execution and quoted arg-selected executable preserve genuine failure/success status, child ordering and cleanup while explicitly replacing POSIX signal interpretation.",
+      "author": "Codex"
+    },
+    {
+      "decision": "accepted",
+      "start_byte": 24080,
+      "counterparts": [
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#unsupported native date modifiers"
+        },
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#large signed date normalization"
+        }
+      ],
+      "replacement_sha256": "275e4cc98f597e0c42369b6c41167c77f71485a8277cf838f46ef359620a2a5c",
+      "source_sha256": "74c6683b2f4c7c4abe084b408baf5479bfcfef7c5dc9fdab98122d6e565a8e4a",
+      "review_evidence": {
+        "sha256": "94ffb5b1c005da074a267156046c8c05dce841741ab10fac06333a947ee0333c",
+        "path": "tests/conformance/reviews/files.independent-review.json"
+      },
+      "reviewer": "/root/review_files",
+      "length_bytes": 428,
+      "id": "windows-span-09",
+      "rationale": "Pinned Windows native E/O modifier rejection replaces unsupported POSIX formatting; year2100 keeps both signed31-bit normalization differences inside the native range.",
+      "author": "Codex"
+    },
+    {
+      "decision": "accepted",
+      "start_byte": 25302,
+      "counterparts": [
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#native year representability"
+        },
+        {
+          "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2",
+          "path": "tests/conformance/platform/windows-files-contract.lua#native final instant and next-second overflow"
+        }
+      ],
+      "replacement_sha256": "142c8f5318df7ec19de79c25638f21f2b1fadb5d29e146e026dba50f84f3ce3f",
+      "source_sha256": "d6833dfb481387b31ea99684470206df11b055ce0fb2f5b5062c2e5499643acb",
+      "review_evidence": {
+        "sha256": "1ffe122668d6fb21b2232ea39047eb9d34b3259396bfaf7a1d03d5763b366dd8",
+        "path": "tests/conformance/reviews/file-fixes.cross-review.json"
+      },
+      "reviewer": "Codex /root",
+      "length_bytes": 79,
+      "id": "windows-span-10",
+      "rationale": "Root cross-review independently accepts the repaired adjacent native last-instant/next-normalized-second boundary, witnessed in UTC and converted to local calendar before mktime; measured C/Ada probes pass in JST-9 and UTC0.",
+      "author": "Codex independent review agent /root/review_files"
+    }
+  ],
+  "reviewer": "/root/review_files",
+  "equivalent": {
+    "platform": "windows",
+    "disposition": "native-platform-equivalent",
+    "configuration": "default-and-upstream-test",
+    "source": "references/lua/testes/files.lua",
+    "generated_sha256": "3683ad7b602810b7bda0c0360e5f085e7edf6259c6c4ec0558bfbc1aceed4452",
+    "id": "files-windows-platform",
+    "source_sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86"
+  },
+  "kind": "equivalent-approval",
+  "date": "2026-11-07",
+  "schema_version": 1,
+  "scope_limit": "Independent semantic approval of the ten Windows native mapping spans. This is not complete files.lua runtime coverage, final-revision evidence, Mac acceptance, or full M3 acceptance. Span10 is accepted by the distinct root cross-reviewer, not its author.",
+  "author": "Codex"
+}

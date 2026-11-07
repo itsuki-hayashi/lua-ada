@@ -101,4 +101,16 @@ test('native year representability', function()
   rejected('represented', os.time,
            {year=(1 << 31)+1899, month=12, day=31, hour=23, min=59, sec=59})
 end)
+
+test('native final instant and next-second overflow', function()
+  -- Measured against the pinned Windows C oracle in UTC0 and the host zone.
+  -- Convert the last native timestamp to LOCAL calendar fields before using
+  -- mktime, so the same boundary is tested without assuming a timezone.
+  local last = 32535244799
+  assert(os.date('!%Y-%m-%d %H:%M:%S', last) == '3001-01-01 07:59:59')
+  local fields = os.date('*t', last)
+  assert(os.time(fields) == last)
+  fields.sec = fields.sec + 1
+  rejected('represented', os.time, fields)
+end)
 print('native Windows file contracts OK')

@@ -6,7 +6,12 @@
   "configuration": "default-and-upstream-test",
   "platform": "macos",
   "disposition": "native-platform-equivalent",
-  "review": { "status": "pending", "author": "Codex", "reviewer": null, "artifact": null },
+  "review": {
+    "status": "pending",
+    "author": "Codex",
+    "reviewer": null,
+    "artifact": null
+  },
   "replacements": [
     {
       "id": "macos-buffered-flush-failure",
@@ -16,8 +21,36 @@
       "end_line": 474,
       "source_sha256": "48c1e51d8186351c111dc276508073d24cb07b63914ed3bf615708157ae638f3",
       "invariant": "Preserve buffered write, failed native flush, repeated write/flush and close using a real non-writable descriptor; macOS does not provide /dev/full.",
-      "counterpart_tests": ["tests/conformance/platform/macos-buffered-failure.lua"],
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-buffered-failure.lua"
+      ],
       "replacement": "  local f = io.output(_test_failing_stream(assert(io.tmpfile())))\n"
+    },
+    {
+      "id": "macos-buffered-close-error",
+      "start_byte": 12850,
+      "length_bytes": 20,
+      "start_line": 479,
+      "end_line": 479,
+      "source_sha256": "04b6b13c7f7f5a7c690456d62b558f986685082c563b463747259b5cf7f9aa83",
+      "invariant": "Darwin retries buffered bytes during fclose and reports the native error while physically closing the FILE; preserve the close result and verify closed ownership.",
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-buffered-failure.lua"
+      ],
+      "replacement": "  local ok, message, code = f:close()\n  assert(ok == nil and type(message) == \"string\" and code > 0)\n  assert(io.type(f) == \"closed file\")\n"
+    },
+    {
+      "id": "macos-unbuffered-write-refusal",
+      "start_byte": 18977,
+      "length_bytes": 38,
+      "start_line": 722,
+      "end_line": 722,
+      "source_sha256": "7fdb6bed4012a83a2546d7b2ec460192054136feae520ddcbb239c8faa842197",
+      "invariant": "Exercise the guarded T block with actual native unbuffered refusal and zero transferred bytes; retain the following real POSIX nonblocking pipe test unchanged.",
+      "counterpart_tests": [
+        "tests/conformance/platform/macos-buffered-failure.lua"
+      ],
+      "replacement": "  local f = _test_failing_stream(assert(io.tmpfile()))\n"
     }
   ]
 }

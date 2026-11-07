@@ -4,6 +4,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceScope.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 
 function Assert-MatrixReview {
     param([Collections.IDictionary] $Review)
@@ -111,6 +112,7 @@ function Test-ScopedMatrix {
             }
         }
         Assert-MatrixReview -Review $manifest.review
+        Assert-MatrixReviewBinding -Root $Root -Manifest $manifest
         $head = (& git -C $Root rev-parse HEAD).Trim()
         if ($LASTEXITCODE -ne 0 -or $head -cne $manifest.revision) { throw 'Matrix is not the final checkout revision' }
         $dirty = @(& git -C $Root -c core.fsmonitor=false status --porcelain=v1 --untracked-files=normal)
@@ -178,6 +180,24 @@ function Test-ScopedMatrix {
                 } elseif ($text -cne $expectedConfiguration) { throw 'Matrix child configuration differs' }
             }
             Set-MatrixProcessCaptures -Process $report.process -ArtifactRoot $artifacts
+            if ([string]::IsNullOrWhiteSpace([string]$report.launcher_probe_run_id) -or
+                $report.launcher_probe_run_id -ceq $report.run_id) {
+                throw 'Matrix launcher probes require a separate run identity'
+            }
+            $probeTelemetry = @()
+            foreach ($probeRecord in $report.launcher_probe_telemetry) {
+                $probePath = Resolve-MatrixCapture -Original $probeRecord.path `
+                    -ArtifactRoot $artifacts -Hash $probeRecord.sha256
+                $measured = Get-Content -LiteralPath $probePath -Raw | ConvertFrom-Json -AsHashtable
+                if ($measured.process_id -ne [int]([IO.Path]::GetFileNameWithoutExtension($probePath).Split('.')[-1])) {
+                    throw 'Matrix launcher probe telemetry filename differs from PID'
+                }
+                $probeTelemetry += $measured
+            }
+            Assert-ScopedProbeTelemetry -Telemetry $probeTelemetry -Processes @{
+                parent=$report.configuration_process; bare=$report.child_configuration_process;
+                arg=$report.arg_child_configuration_process } -RunId $report.launcher_probe_run_id `
+                -Configuration $configuration -Target $expectedTarget
             $telemetryPath = Resolve-MatrixCapture -Original $report.allocator_telemetry.path `
                 -ArtifactRoot $artifacts -Hash $report.allocator_telemetry.sha256
             $telemetry = Get-Content -LiteralPath $telemetryPath -Raw | ConvertFrom-Json -AsHashtable
@@ -217,6 +237,8 @@ function Test-ScopedMatrix {
                     $mapping = Read-MatrixHashedJson -Path (Join-Path $Root "tests/conformance/equivalents/$id.json") `
                         -Hash $report.equivalent.manifest_sha256
                     Assert-MatrixReview -Review $mapping.review
+                    Assert-EquivalentReviewBinding -Root $Root -Specification $mapping `
+                        -GeneratedSha256 $report.equivalent.output_sha256
                     if ($mapping.source -cne "references/lua/testes/$($entry.file)" -or
                         $mapping.source_sha256 -cne $original.sha256 -or
                         $mapping.configuration -cnotin @($configuration,'default-and-upstream-test') -or

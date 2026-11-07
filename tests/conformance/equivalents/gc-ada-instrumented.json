@@ -5,10 +5,11 @@
   "source_sha256": "e1768dd5a40921af0e5d24b1d61c9fd4727c45716e28bf167246a45e38735a99",
   "configuration": "default-and-upstream-test",
   "review": {
-    "status": "pending",
+    "status": "accepted",
     "author": "Codex",
-    "reviewer": null,
-    "artifact": null
+    "reviewer": "Codex independent review agent /root/review_gc",
+    "artifact": "tests/conformance/reviews/gc-ada.equivalent-approval.json",
+    "artifact_sha256": "bf1668acb83299a3dc9107df9c54ecfd25e58dc1dbe524a02fff307b368547c6"
   },
   "replacements": [
     {
@@ -18,7 +19,7 @@
       "source_sha256": "4bb49bacb1a6d2575ad3abbb475fd83ff2e7ad65102d29c93d02e7bdf43f700e",
       "invariant": "Measure actual live bytes with both long string payloads retained before collection.",
       "counterpart_tests": [
-        "collector: weak string payload reclamation"
+        "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
       ],
       "replacement": "a[{}] = 14; local ada_live = collectgarbage(\"count\") -- measured payloads"
     },
@@ -29,7 +30,7 @@
       "source_sha256": "c520c19e1c58d291af4e63c84b5083a165dd416be4983767261653ccd569cbc6",
       "invariant": "Both 4 MiB string payloads are released; retained empty Ada table capacity is excluded from the C one-KiB allowance.",
       "counterpart_tests": [
-        "collector: weak string payload reclamation"
+        "tests/src/lua-conformance_adapter_tests.adb#Weak_String_Payloads"
       ],
       "replacement": "assert(collectgarbage(\"count\") <= ada_live - 2^13)"
     },
@@ -40,7 +41,7 @@
       "source_sha256": "3368876c423554b8967a1fca42de51cf3fc6dc96f2dbe3bc3263b2f14b5aacdf",
       "invariant": "A black independently owned Ada cell forward-marks its new child; the same cycle must still collect the weak coroutine and preserve the final captured value.",
       "counterpart_tests": [
-        "collector: orphan cell survives atomic sweep"
+        "tests/src/lua-conformance_adapter_tests.adb#Atomic_Orphan_Cell"
       ],
       "replacement": "assert(T.gccolor(a) == \"gray\")"
     },
@@ -51,7 +52,7 @@
       "source_sha256": "342a5139c4c1d3792c706e27094019af1eb85691e390a7fafbca2ad2d3b75559",
       "invariant": "200 real Ada table allocations within one measured table of headroom require actual allocator refusals and emergency recovery; the independent host ceiling remains active.",
       "counterpart_tests": [
-        "collector: measured emergency table headroom"
+        "tests/src/lua-conformance_adapter_tests.adb#Measured_Emergency_Headroom"
       ],
       "replacement": "local r,c,b = T.ada_emergency_tables(200)\n  assert(r >= 199 and c >= 199)\n  assert(b > 0)"
     }

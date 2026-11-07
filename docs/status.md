@@ -9,25 +9,32 @@ The [current handoff](sessions/2026-11-07-gc-io-conformance.md) records actual
 evidence: the integration checkpoint `1cd294e` is signed and published. The
 subsequent real test adapter and shared CLI launcher have passing local
 Windows validation/static AUnit runs in both configurations. The retained
-default pipeline passes at the 1,304-case Windows checkpoint. Instrumented events.lua
+default pipeline passes at the 1,305-case Windows checkpoint. Instrumented events.lua
 and gengc.lua reach OK in exploratory runs. The source-hashed gc.lua equivalent
 candidate completes its state-close assertions, with actual allocator and
-collector inspection; independent review remains pending. Unchanged gc.lua
+collector inspection; independent semantic review accepts its mapping while
+complete execution acceptance remains pending. Unchanged gc.lua
 still fails its C-specific fixed memory allowance. The ten-span Windows files.lua
 candidate completes in C and Ada, including a real native counterpart for the
-guarded partial-write block. Its mappings await independent review. Linux
+guarded partial-write block. Its mappings now have source-bound independent
+approval, including a cross-reviewed adjacent native time-boundary fix. Linux
 unchanged file observations pass in both configurations. The first macOS
 instrumented static job passes 1,299 AUnit cases and matching GC/events
 observations, then both C and Ada fail files.lua at the unavailable /dev/full.
-A one-span macOS native equivalent and explicit flush counterpart are now
-implemented; actual macOS validation and independent review remain pending.
+A macOS native equivalent and explicit flush counterpart are implemented.
+The first final-revision macOS runs exposed Windows-only test registration
+and a native buffered-close error. The correction separates pipe capabilities,
+checks Darwin close failure with physical closure, and covers the second
+guarded /dev/full open. Its platform execution remains pending. Independent
+reviews are now authorized and in progress; their findings remain acceptance
+work until corrected and verified.
 These observations do not close
 any selected file's full coverage; complete T inspection, reviewed equivalents,
 scoped harness acceptance and the final 26-context matrix remain open.
 The C facade now exposes real IO/OS module openers with shared Ada export
 construction, stable file-metatable identity on reopen, and public FILE/closer
 consumer regressions. Both Linux instrumented jobs pass on published 915df28;
-final-revision acceptance and independent equivalent review remain outstanding.
+final-revision acceptance remains outstanding.
 Real lua_gc controls now share the production collector, with C-owned finalizer
 calls and explicit state-close finalizer drainage. Seven shared public C
 contracts compare controls, steps, finalizers, warnings, allocator refusal and
@@ -41,14 +48,16 @@ all four selected files; this does not replace final-revision evidence or review
 File equivalents now use the same scoped operation/report path, with native
 counterpart tests retained separately. Platform launchers verify measured
 parent/bare-child/arg-child settings and balanced probe/main-child telemetry.
-Full local default and instrumented validation/static pipelines retain 1,304
-AUnit cases. Shared harness regressions total 40, scope regressions 35, plus
+Full local default and instrumented validation/static pipelines retain 1,305
+AUnit cases. Shared harness regressions total 40, scope regressions 38, plus
 two actual launcher-isolation regressions in each configuration.
 The matrix reconciliation command requires all 104 file/context pairs and
 paired C/Ada reports. It rehashes captures, replays completion/acceptance checks,
 and verifies compiled runtime/launcher profiles and library type against each
-context. Twenty-two synthetic matrix regressions pass; they establish harness
-behavior only. The complete reviewed real matrix remains outstanding.
+context. Thirty synthetic matrix and thirty review-artifact binding regressions
+pass; they establish harness behavior only. Accepted equivalent decisions now
+bind actual reviewed files, spans, replacement bytes and counterpart sources.
+The complete reviewed real matrix remains outstanding.
 The same three public IO/OS consumer cases now also run in an isolated C-oracle
 executable, comparing real FILE/closer layout, module reopening and native
 closure with Ada. The shared contract requires zero allocator bytes/blocks

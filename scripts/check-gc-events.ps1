@@ -16,6 +16,9 @@ $hostName = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { '
 $link = if ($LibraryType -eq 'relocatable') { 'shared' } else { $LibraryType }
 $context = "$Configuration/$hostName/$Profile/$link"
 try {
+    & "$PSScriptRoot/test-scoped-warnings.ps1" -Interpreter $Interpreter `
+        -ReferenceInterpreter $ReferenceInterpreter -RuntimeDirectory $RuntimeDirectory `
+        -Configuration $Configuration -OutputDirectory (Join-Path $directory 'warnings')
     foreach ($file in @('events.lua','gengc.lua','gc.lua')) {
         foreach ($target in @('ReferenceC','Ada')) {
             $report = Join-Path $directory "$target-$file.json"
@@ -59,7 +62,11 @@ try {
     }
     Write-Output "PASS: matching $Configuration C/Ada GC/events observations; GC mapping review pending"
 } finally {
+    $warningPath = Join-Path $directory 'warnings/index.json'
+    $warningEvidence = if (Test-Path -LiteralPath $warningPath -PathType Leaf) {
+        [ordered]@{report=$warningPath;sha256=(Get-FileHash -LiteralPath $warningPath -Algorithm SHA256).Hash.ToLowerInvariant()}
+    } else { $null }
     [ordered]@{schema_version=1; scope='gc-io-events'; configuration=$Configuration; context=$context;
-        diagnostic_only=$true; scope_accepted=$false; observations=$records} |
+        diagnostic_only=$true; scope_accepted=$false; warning_regressions=$warningEvidence; observations=$records} |
         ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $directory 'index.json') -Encoding utf8
 }

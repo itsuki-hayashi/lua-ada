@@ -1,0 +1,55 @@
+{
+  "evidence": [
+    {
+      "path": "reports/review-files-native-probes.json",
+      "description": "Eight measured C/Ada executions with executable/script hashes and outputs.",
+      "sha256": "4d792d20cf1aebc4834a3c446625e2484b30029a82a2133fc2a22fc200775a4c"
+    },
+    {
+      "path": "reports/review-fixes-aunit.stdout",
+      "description": "1305 successful AUnit cases including new visibility test.",
+      "sha256": "8b145737a0e25c35542dd7d0ff7ee943520777eaa6897f75c451c48a82531b7c"
+    }
+  ],
+  "schema_version": 1,
+  "findings": [
+    {
+      "id": "WINDOWS-FINAL-INSTANT",
+      "decision": "accepted",
+      "rationale": "The modified span retains representable and gross out-of-range cases and additionally tests the adjacent native boundary. The fixed timestamp is witnessed in UTC; conversion to local calendar fields preserves ambient-zone semantics before incrementing exactly one second. Actual pinned C and Ada executions pass in JST-9 and UTC0. This addresses the missing boundary invariant without asserting C-int maximum-year portability."
+    },
+    {
+      "id": "UNBUFFERED-VISIBILITY",
+      "decision": "accepted",
+      "rationale": "The writer is opened writable and explicitly unbuffered. A second reader is opened before a checked NUL-containing write and reads the exact thirteen bytes before any writer flush, seek or close. Both handles are closed and the temporary file removed. The AUnit case and shared C/Ada counterpart test observable visibility rather than setvbuf return alone."
+    }
+  ],
+  "sources": [
+    {
+      "path": "tests/conformance/equivalents/files-windows-platform.json",
+      "sha256": "ba7394f3cef55e3f6ec795a39f8020ac07b4cbcecb7250f18d9ddc133e55cb6f"
+    },
+    {
+      "path": "tests/conformance/platform/windows-files-contract.lua",
+      "sha256": "d34a9d4e4ebf511254b73cba833022b2a91e07515be10a072f8446bb471d10c2"
+    },
+    {
+      "path": "tests/conformance/platform/unbuffered-visibility.lua",
+      "sha256": "0d800dfcfb5b551b2fcb79bfb683eb02421290448a498ee7c0e90fd6692b5045"
+    },
+    {
+      "path": "tests/src/io_runtime_tests.adb",
+      "sha256": "ecfd5ae3552f1536f1438885e51985b4d1fcab2ac1be34479c262dbae1c6a02d"
+    }
+  ],
+  "date": "2026-11-07",
+  "limits": [
+    "This cross-review covers the fixes authored by the independent files reviewer, not unrelated original implementation authored by this reviewer.",
+    "Complete final-revision and macOS evidence, source/API ledger resolution and full scoped acceptance remain pending."
+  ],
+  "reviewer": "Codex /root",
+  "implementation_author": "Codex independent review agent /root/review_files",
+  "coverage_authority": false,
+  "review_id": "root-cross-review-file-fixes-2026-11-07",
+  "decision": "accepted-semantic-fixes"
+}

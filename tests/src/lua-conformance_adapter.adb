@@ -457,6 +457,7 @@ package body Lua.Conformance_Adapter is
    end Inspect;
 
    function Has_Failing_Stream return Boolean is (Callback (15) /= null);
+   function Has_Nonblocking_Pair return Boolean is (Callback (16) /= null);
 
    procedure Install_Platform (State : in out World) is
       Item : Value;

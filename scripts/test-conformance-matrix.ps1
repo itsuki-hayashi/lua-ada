@@ -30,7 +30,7 @@ function New-Telemetry([string] $RunId, [string] $Configuration, [int] $PidValue
     $script:serial++
     $path = Join-Path $captureDirectory "telemetry-$script:serial.$PidValue.json"
     $data = @{schema_version=1; run_id=$RunId; configuration=$Configuration; process_id=$PidValue;
-        allocator_limit_bytes=2147483648L; managed_refusals=0; outstanding_bytes=0; outstanding_blocks=0;
+        allocator_limit_bytes=2147483648L; managed_refusals=1; outstanding_bytes=0; outstanding_blocks=0;
         shutdown_complete=$true; accounting_fault=$false}
     $hash = Write-Json $path $data
     return @{path=$path; sha256=$hash; data=$data}
@@ -58,7 +58,7 @@ foreach ($context in $suite.acceptance_contexts) {
             $output = switch ($file) {
                 'gc.lua' { "OK`n>>> closing state <<<`n" }
                 'gengc.lua' { "testing stop-the-world collection`nOK`n" }
-                'files.lua' { "testing i/o`ntesting flush`ntesting large files (> BUFSIZ)`ntesting popen/pclose and execute`ntesting date/time`ntesting failed write`ntest done on 01/01/2026, at 00:00:00`nLua 5.5`n" }
+                'files.lua' { "native unbuffered visibility counterpart OK`ntesting i/o`ntesting flush`ntesting large files (> BUFSIZ)`ntesting popen/pclose and execute`ntesting date/time`ntesting failed write`ntest done on 01/01/2026, at 00:00:00`nLua 5.5`n" }
                 default { "OK`n" }
             }
             $runId = "$context/$file/$target"
@@ -73,8 +73,13 @@ foreach ($context in $suite.acceptance_contexts) {
                 runtime_library_records=@(@{sha256=('2'*64)}); reference_library_records=@(@{sha256=('2'*64)});
                 configuration_process=(New-Process $text 100); child_configuration_process=(New-Process $text 101);
                 arg_child_configuration_process=(New-Process $text 102); process=(New-Process $output 103 900);
+                launcher_probe_run_id="$runId/probes"; launcher_probe_telemetry=@();
                 run_id=$runId; allocator_telemetry=(New-Telemetry $runId $configuration 103);
                 child_allocator_telemetry=@(); execution_disposition='unchanged'; scoped_operation_acceptance=$false}
+            $probePids = if ($target -eq 'ada') { @(100,101,102,104,105) } else { @(101,102) }
+            foreach ($probePid in $probePids) {
+                $report.launcher_probe_telemetry += New-Telemetry "$runId/probes" $configuration $probePid
+            }
             if ($file -eq 'files.lua') {
                 $windows = $context.Split('/')[1] -eq 'windows'
                 $count = if($windows){4}else{2}
@@ -135,6 +140,44 @@ foreach ($case in @(
     Reject $case.Name {param($m) $m.operations[0].c.sha256=$hash} $case.Expected -Full
 }
 [IO.File]::WriteAllText($reportPath,$savedReport)
+# These mutations preserve report hashing but alter the actual probe state
+# records, demonstrating that matching configuration output cannot hide a
+# missing, duplicated, wrong-run or leaked probe lifetime.
+foreach ($case in @(
+    @{Name='missing probe telemetry'; Mutate={param($r) $r.launcher_probe_telemetry=@()}; Expected='probe telemetry missing'},
+    @{Name='duplicate probe telemetry'; Mutate={param($r) $r.launcher_probe_telemetry[1]=$r.launcher_probe_telemetry[0]}; Expected='duplicates a process'},
+    @{Name='shared main and probe run'; Mutate={param($r) $r.launcher_probe_run_id=$r.run_id}; Expected='separate run identity'},
+    @{Name='wrong probe run'; Mutate={param($r) $r.launcher_probe_run_id='wrong'}; Expected='Mismatched or unbalanced'},
+    @{Name='probe PID not owned by recorded parent'; Mutate={param($r) $r.child_configuration_process.process_id=999}; Expected='probe telemetry missing parent'},
+    @{Name='changed probe capture hash'; Mutate={param($r) $r.launcher_probe_telemetry[0].sha256='0'*64}; Expected='capture hash mismatch'})) {
+    $r=$savedReport | ConvertFrom-Json -AsHashtable -Depth 64
+    & $case.Mutate $r
+    $hash=Write-Json $reportPath $r
+    Reject $case.Name {param($m) $m.operations[0].c.sha256=$hash} $case.Expected -Full
+}
+[IO.File]::WriteAllText($reportPath,$savedReport)
+$r=$savedReport | ConvertFrom-Json -AsHashtable -Depth 64
+$probePath=$r.launcher_probe_telemetry[0].path
+$savedProbe=[IO.File]::ReadAllText($probePath)
+$probeData=$savedProbe | ConvertFrom-Json -AsHashtable
+$probeData.outstanding_blocks=1
+$r.launcher_probe_telemetry[0].sha256=Write-Json $probePath $probeData
+$hash=Write-Json $reportPath $r
+Reject 'leaked probe allocation' {param($m) $m.operations[0].c.sha256=$hash} 'Mismatched or unbalanced' -Full
+[IO.File]::WriteAllText($probePath,$savedProbe)
+[IO.File]::WriteAllText($reportPath,$savedReport)
+$adaReportPath=Join-Path $temporary $manifest.operations[0].ada.report
+$savedAdaReport=[IO.File]::ReadAllText($adaReportPath)
+$adaReport=$savedAdaReport | ConvertFrom-Json -AsHashtable -Depth 64
+$adaProbePath=$adaReport.launcher_probe_telemetry[0].path
+$savedAdaProbe=[IO.File]::ReadAllText($adaProbePath)
+$adaProbe=$savedAdaProbe | ConvertFrom-Json -AsHashtable
+$adaProbe.shutdown_complete=$false
+$adaReport.launcher_probe_telemetry[0].sha256=Write-Json $adaProbePath $adaProbe
+$hash=Write-Json $adaReportPath $adaReport
+Reject 'Ada probe lacks physical shutdown' {param($m) $m.operations[0].ada.sha256=$hash} 'Missing shutdown' -Full
+[IO.File]::WriteAllText($adaProbePath,$savedAdaProbe)
+[IO.File]::WriteAllText($adaReportPath,$savedAdaReport)
 $r=$savedReport | ConvertFrom-Json -AsHashtable -Depth 64
 [IO.File]::AppendAllText($r.process.stdout_path,'tamper')
 Reject 'changed captured output' {param($m)} 'capture hash mismatch' -Full
@@ -179,3 +222,6 @@ foreach ($case in @(
     Write-Output "MATRIX TEST PASS: rejects $($case.Name)"
 }
 Write-Output "PASS: $script:cases matrix regressions; no executed conformance claim"
+# Approval-file binding is tested separately from synthetic execution reports.
+# Both default CI and instrumented campaigns call this retained entrypoint.
+& (Join-Path $PSScriptRoot 'test-conformance-review.ps1')

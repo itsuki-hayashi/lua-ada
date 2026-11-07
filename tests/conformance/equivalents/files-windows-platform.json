@@ -7,10 +7,11 @@
   "platform": "windows",
   "configuration": "default-and-upstream-test",
   "review": {
-    "status": "pending",
+    "status": "accepted",
     "author": "Codex",
-    "reviewer": null,
-    "artifact": null
+    "reviewer": "/root/review_files",
+    "artifact": "tests/conformance/reviews/files-windows.equivalent-approval.json",
+    "artifact_sha256": "4d9f865f3c70e9a7ab2b13553bc00293a28e1c23e8527c1a7f051c1921685d09"
   },
   "replacements": [
     {
@@ -141,11 +142,12 @@
       "start_line": 923,
       "end_line": 923,
       "source_sha256": "d6833dfb481387b31ea99684470206df11b055ce0fb2f5b5062c2e5499643acb",
-      "invariant": "Exercise a representable Windows year 3000 and reject the C-int maximum year that the native CRT cannot represent.",
+      "invariant": "Exercise a representable Windows year 3000, reject the C-int maximum year, and verify the measured native last instant succeeds while its next normalized second fails.",
       "counterpart_tests": [
-        "tests/conformance/platform/windows-files-contract.lua#native year representability"
+        "tests/conformance/platform/windows-files-contract.lua#native year representability",
+        "tests/conformance/platform/windows-files-contract.lua#native final instant and next-second overflow"
       ],
-      "replacement": "          {year=3000, month=12, day=31, hour=12, min=0, sec=0}))\n        checkerr(\"represented\", os.time,\n          {year=(1 << 31) + 1899, month=12, day=31, hour=23, min=59, sec=59})\n"
+      "replacement": "          {year=3000, month=12, day=31, hour=12, min=0, sec=0}))\n        checkerr(\"represented\", os.time,\n          {year=(1 << 31) + 1899, month=12, day=31, hour=23, min=59, sec=59})\n        -- Measured native last instant, expressed in the current local zone.\n        local last = 32535244799\n        assert(os.date('!%Y-%m-%d %H:%M:%S', last) == '3001-01-01 07:59:59')\n        local fields = os.date('*t', last)\n        assert(os.time(fields) == last)\n        fields.sec = fields.sec + 1\n        checkerr('represented', os.time, fields)\n"
     }
   ]
 }

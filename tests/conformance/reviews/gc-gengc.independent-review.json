@@ -1,0 +1,1059 @@
+{
+  "schema_version": 1,
+  "review_id": "gc-gengc-independent-2026-11-07",
+  "reviewer": "Codex independent review agent /root/review_gc",
+  "implementation_author": "Codex /root",
+  "reviewed_revision": "810e25466e3ccec973b4085b9f7298d5592fa3f1",
+  "date": "2026-11-07",
+  "status": "changes-required",
+  "coverage_authority": false,
+  "scope": [
+    "gc.lua",
+    "gengc.lua",
+    "gc-ada-instrumented equivalent",
+    "collector and adapter paths directly exercised by those files"
+  ],
+  "sources": [
+    {
+      "path": "src/lua-engine-collector.adb",
+      "sha256": "78c65de3905f577de905da998744c861cad59151929365f2f4864d267b982554"
+    },
+    {
+      "path": "src/lua-engine-finalizers.adb",
+      "sha256": "cd29399060bc6f9d045f1d247d76a2419e06e62e9a5ca5055b27213c65c62b62"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "sha256": "f6e2fe9aaabd3d19817da604607de7750cd2f335c61a8274d490306d9fb87181"
+    },
+    {
+      "path": "src/lua-engine-stacks.adb",
+      "sha256": "7fac42db3b3f13447cacefa37e08ecc298a7159b9d3957add6f889a27e786221"
+    },
+    {
+      "path": "tests/conformance/equivalents/gc-ada-instrumented.json",
+      "sha256": "5c366ee15c580fb55ffdea562940887fcde1b9ecfdf85823317780cbece1e582"
+    },
+    {
+      "path": "tests/conformance/reviews/gc.candidate.json",
+      "sha256": "7c221aec5e03508e2f47829f128e6ca07527b79d6527520384c63508d55db6de"
+    },
+    {
+      "path": "tests/conformance/reviews/gengc.candidate.json",
+      "sha256": "2693997435dab63a6efd3bacffe275a7bae0dffde1580b9e586a2751249be8e8"
+    }
+  ],
+  "method": [
+    "Read both pinned Lua files in full, compared all 40 contiguous semantic sections and verified their original source hashes.",
+    "Inspected production collector propagation/atomic/sweep/minor/major/parameter/debt/barrier paths, root traversal, finalizer enrollment/lookup/queueing, dead-context teardown, real test adapter allocation/count/color/age/phase/cache/stack paths, and corresponding focused regressions.",
+    "Independently loaded 72 C/Ada gc/gengc reports across 18 Windows/Linux contexts from downloaded artifact bundles. Verified report and stdout hashes, exact implementation revision, zero exit/empty stderr, allocator zero outstanding bytes/blocks, gc post-OK closure witness, and instrumented gengc tail/no omission.",
+    "Reproduced a suppressed unexpected shutdown warning using the actual existing instrumented launcher before proposing warning-entry hardening. No Ada builds or new conformance passes were claimed by this review."
+  ],
+  "findings": [
+    {
+      "id": "GC-REVIEW-001",
+      "priority": "P1",
+      "status": "fix-proposed-requires-cross-review-and-final-evidence",
+      "title": "Enable scoped warnings before the first finalizer assertions",
+      "locations": [
+        "scripts/run-conformance.ps1:522",
+        "tests/c/conformance_adapter.c:83",
+        "references/lua/testes/gc.lua:315",
+        "references/lua/testes/gc.lua:381"
+      ],
+      "explanation": "The actual T handler starts with enabled=0, as does the pinned C handler. The scoped setup at the reviewed revision checks T but never enables warnings. gc.lua enables @on only at line 381, so earlier callback assertions (notably weak-value clearing versus finalization ordering) can become suppressed finalizer warnings. Default gc.lua never takes the enabling block. gengc.lua never enables warnings. A successful process and empty stderr cannot certify those callback assertions. Instrumented gc.lua shutdown IS after its own @on and is not invalidated by this specific initial-state issue.",
+      "reproduction": "Actual tests/bin/upstream-test/static/conformance_runner.exe -e: assert(T); _keep=setmetatable({}, {__gc=function() error('REVIEW unexpected shutdown failure') end}); print('OK'). Observed exit 0, stdout OK, stderr empty. Launcher SHA256 bc38147773d571518f9404d226047e37c9716e22b4f59f0cd3e9910ea9e87f9c. Captures: reports/review-gc-warning-off.stdout and .stderr.",
+      "required_fix": "Enable warn('@on') in the separately identified scoped setup before executing unchanged/equivalent files, preserve intentional upstream @off/@store controls, and run actual normal/shutdown negative cases in both C and Ada configurations. Rerun final evidence with the fixed harness.",
+      "proposed_regressions": "scripts/test-scoped-warnings.ps1: six default and eight instrumented actual C/Ada process checks pass locally; this review agent authored these additions, so another reviewer must review them."
+    }
+  ],
+  "mapping_decisions": [
+    {
+      "ids": [
+        "measure-live-payloads",
+        "reclaim-payloads"
+      ],
+      "decision": "accepted-semantic-equivalent",
+      "reason": "The original C one-KiB residual allowance does not describe retained Ada table/index capacity. The replacement samples actual live managed bytes with both original 4-MiB string payloads present, then requires at least 8 MiB to be released. The untouched weak-value/key removal, last-entry deletion, empty traversal and safe dead-key lookup checks remain. Production New_String owns one real text buffer; the test does not substitute fabricated C-size counts. The focused 64-KiB case repeats three times and is present as OK in the instrumented Windows AUnit artifact.",
+      "counterpart": "collector: weak string payload reclamation"
+    },
+    {
+      "ids": [
+        "stable-cell-color"
+      ],
+      "decision": "accepted-semantic-equivalent",
+      "reason": "The independently allocated Ada cell owns its value and applies the production forward barrier at the update. A black cell shades the new table gray, unlike the C open-upvalue white assumption. The replacement changes only that inspection assertion; the weak coroutine must still be white, disappear in the same cycle, and leave an exported closure returning 30. Dead context teardown clears cell associations without dereferencing already reclaimed cells before frame destruction.",
+      "counterpart": "collector: orphan cell survives atomic sweep"
+    },
+    {
+      "ids": [
+        "measured-emergency-headroom"
+      ],
+      "decision": "accepted-semantic-equivalent",
+      "reason": "The test-only adapter measures the actual empty-table allocation cost, permits only one table of headroom, and performs 200 real New_Table operations under the production test ceiling. Construction serial roots are preserved; real allocation refusals invoke production emergency retry. Returned refusal and collection deltas must each be at least 199; the limit is removed on success and exceptions, and the independent 2-GiB host ceiling is untouched. Subsequent original exact table/closure/thread count assertions remain. No Lua finalizer is invoked by the emergency collection path.",
+      "counterpart": "collector: measured emergency table headroom"
+    }
+  ],
+  "runtime_assessment": [
+    "Incremental work is real: intrusive gray queues persist across Advance calls, traversed edges contribute measured work, atomic performs root recheck/ephemeron convergence/weak clearing/finalizer enrollment, and object/program sweeping advances real cursors.",
+    "Generational minor collection uses age lists, remembered owners and actual young sweeping. New/survival/old0/old1/touched transitions are inspected directly by T; there is no operation-history label simulation. Promotion bytes and mode thresholds use actual allocation storage.",
+    "T.gcstate drives production Advance_Collection to real phase boundaries. T.gccolor/gcage read object metadata; totalmem uses actual provider statistics and registry identities. resetCI physically frees unused activation records; reallocstack copies the retained live-window union to exact-capacity owned buffers.",
+    "The source inventory correctly preserves default T omissions: gc has multiple silent guarded blocks as well as the printed userdata omission; gengc returns before userdata, zero-step-size, codification, and prior-mode restoration. Its instrumented tail and 64 parameter combinations are distinct obligations.",
+    "The gc shutdown witness follows OK. Instrumented gc enables @on earlier and retains its warning handler through close; ten ordered finalizers validate preceding stored warnings, followed by the older closing-state witness. Warning hardening is still needed before the earlier finalizers and in default execution.",
+    "checkmemory performs genuine provider/list/registry/edge/activation ownership validation, not C-layout simulation. This review does not claim it implements every invariant checked by full upstream ltests.c outside the selected files."
+  ],
+  "sections": [
+    {
+      "file": "gc.lua",
+      "id": "mode-returns-and-extreme-parameters",
+      "first_line": 1,
+      "last_line": 49,
+      "span_sha256": "28922c9e6bdbdb7566acd11fe869607b258324f62b0c64aa5ccc078d6e324867",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "measured-step-work",
+      "first_line": 50,
+      "last_line": 80,
+      "span_sha256": "fe72b2fb5dae5cc1500fcfa1c649d2419cf571c4c81d9da18eb58330984f104c",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "allocation-triggered-progress-helpers",
+      "first_line": 81,
+      "last_line": 125,
+      "span_sha256": "49cf0e8f2055054ddf9eb904b7251769c2e7c15417e1d258291d406866e5d6b6",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "object-and-prototype-churn",
+      "first_line": 126,
+      "last_line": 162,
+      "span_sha256": "feb3c8e9c9612ac9e502bc2b90dfc674ee74af14fb51d9e85a21722e4635a10e",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "failed-load-cleanup",
+      "first_line": 163,
+      "last_line": 185,
+      "span_sha256": "70a38f5d62786dd4767a70b52d132b4cce84db95a5dcae142349811b391ccd4b",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "long-string-and-global-root-retention",
+      "first_line": 186,
+      "last_line": 203,
+      "span_sha256": "034a3fad1d9a31c6ce1335bd474a6c26fdcc2e6130123bae09662cb7a2e1c503",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "stop-restart-and-memory-debt",
+      "first_line": 204,
+      "last_line": 219,
+      "span_sha256": "4713d758ec3124bb8b691c2dfd3dbb11fab7f2822377f11b236a7d82ae6a8716",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "deleted-table-keys-and-iteration-roots",
+      "first_line": 220,
+      "last_line": 239,
+      "span_sha256": "bdb8aaa7c139d0fecefed1fe323185d7e7fd0d3fcbaed5e95beb7a6e8a124b28",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "weak-keys-values-and-both",
+      "first_line": 240,
+      "last_line": 296,
+      "span_sha256": "c2ac0f96cd0299bff17838f2bdea269356045e0cf4ad25e73484dedfee33d00a",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "all-weak-metatable-publication-at-atomic",
+      "first_line": 297,
+      "last_line": 306,
+      "span_sha256": "809eb653ca2b4add1d34f6a233b9768f9e3eebd75d7c972b4ba0c22d47e96152",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "weak-clearing-before-finalization",
+      "first_line": 307,
+      "last_line": 326,
+      "span_sha256": "dfa5a0b496907690082ab2175e856dbf8cb6f39bbc9fac8b1a3686ee9b94cdff",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "ephemeron-fixed-point",
+      "first_line": 327,
+      "last_line": 360,
+      "span_sha256": "b8508b3d515b5b457b076bd4640769795f802296f6f6326118e4b5f6b0703935",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "finalizer-order-error-and-warning-storage",
+      "first_line": 361,
+      "last_line": 398,
+      "span_sha256": "ea32a4cf26cc6b8fc03548020b33b9d4f1959840a170a8dc309b0ac37f626a5a",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "full-userdata-finalization-and-weak-visibility",
+      "first_line": 399,
+      "last_line": 439,
+      "span_sha256": "6c63f098efe009d1a261f4d5e6dea677b604dc305feed074ef4824f4d6600e3d",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "invocation-time-handler-and-weak-metatable-content",
+      "first_line": 440,
+      "last_line": 458,
+      "span_sha256": "249388f5fb6873736f01d91c10958d82ad37eead047d1f223a58b53e2841414d",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "weak-long-string-storage",
+      "first_line": 459,
+      "last_line": 480,
+      "span_sha256": "860213c73b5389ca702caaaba333e0a0486f28afaa0dd262bb0660723b784e80",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "ordinary-finalizer-warning",
+      "first_line": 481,
+      "last_line": 491,
+      "span_sha256": "f9817fb72f1816ef6557d9e464e3e5652742d4284973f77df7ef311eb2f0008e",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "deep-list-physical-collection",
+      "first_line": 492,
+      "last_line": 501,
+      "span_sha256": "fa11ed81b6c5e856f3d6108fb95a8281149f5092e1226fc2f56bceb2c168b290",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "self-referential-coroutines-and-cells",
+      "first_line": 502,
+      "last_line": 548,
+      "span_sha256": "392f4cc6456110d120eb978f0735ea81223216502c882be8f636edcd9f4d216b",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "explicit-step-preserves-stopped-mode",
+      "first_line": 549,
+      "last_line": 561,
+      "span_sha256": "a3475540a3bb9692544d0c12cddbe15dbb196a63ad0846f4edd4e777a80d03ca",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "orphan-cell-atomic-and-sweep-barriers",
+      "first_line": 562,
+      "last_line": 604,
+      "span_sha256": "178809de1cb07a502d0e271ce44c6016ce038a2d2f0dfd7ed3e9e62a13dd1f2c",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "enrollment-order-memory-invariants",
+      "first_line": 605,
+      "last_line": 617,
+      "span_sha256": "b67a6c0a8dff5cf1fbeff072aacf44671dd3386e98a0cef2b1670c0d39da5cfc",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "delegation-write-tricolor-invariant",
+      "first_line": 618,
+      "last_line": 632,
+      "span_sha256": "ff84a903ebde8b027113266f4f29c1ba8300536f5469618bd5a90808a69e0b94",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "emergency-refusal-and-real-object-counts",
+      "first_line": 633,
+      "last_line": 652,
+      "span_sha256": "2946e815a8a2a8a5a00a4c98273115daf9831e11771c47bd9f3643912d5c43ec",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "state-close-resurrection-witness",
+      "first_line": 653,
+      "last_line": 669,
+      "span_sha256": "705b262f7e414b766535e0e55c25332e8e4bd3a6f52126366c3b348350926a55",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "state-close-order-and-warning-assertions",
+      "first_line": 670,
+      "last_line": 694,
+      "span_sha256": "3d71a6ad6da07aec5933c1edc8ba807640ff7a4ed3655a328439adf52d7625db",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "nonreentrancy-and-mode-restoration",
+      "first_line": 695,
+      "last_line": 710,
+      "span_sha256": "312e91e3326fb8cbce8a591ad145117b81717805a58710a5521e8abb3b608e84",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "deferred-finalizer-physical-storage-refusal",
+      "first_line": 711,
+      "last_line": 750,
+      "span_sha256": "9fbd39d0ebe2c9bae5ad636cd1f9644a4657f1035e0678dc36b7a63acfb90ad6",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gc.lua",
+      "id": "top-level-completion-before-shutdown",
+      "first_line": 751,
+      "last_line": 752,
+      "span_sha256": "15804548a950e310c6d45895dd46c245e44af6217d6ec20ba27673a3e0cbdbaf",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "running-state-and-mode-entry",
+      "first_line": 1,
+      "last_line": 14,
+      "span_sha256": "a8f5c07ebd40d54e935324b1f4aeadcb24c1ef4a03ccac0423e4fedaceae24bc",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "table-generational-barrier",
+      "first_line": 15,
+      "last_line": 39,
+      "span_sha256": "c90a5c429fef186630fa0e909e984f24e460621fb9b27ffd3f49cfea6ddf53cf",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "finalizer-enrollment-removes-old-list-member",
+      "first_line": 40,
+      "last_line": 55,
+      "span_sha256": "a8bd70ddc7a50859af7ace2ce58088b30dd5c48d4a4f4d3f90d03642c1bb1f12",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "old1-finalizer-resurrection",
+      "first_line": 56,
+      "last_line": 82,
+      "span_sha256": "fc912c48fa15116e2e4cf7c000967d696480261b79e789b0965268a8d9f5800b",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "coroutine-open-cell-and-old-table-barriers",
+      "first_line": 83,
+      "last_line": 108,
+      "span_sha256": "cb25c10e4f8f788e3f9eac1bc9b9742ed0118392591e6c6eccd28bbb94ad6dd7",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "all-weak-table-revisitation",
+      "first_line": 109,
+      "last_line": 125,
+      "span_sha256": "82925843f081b7a0d4a55abf08a525ff626164fdc27c4565c2434f0a4c4602f1",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "default-early-return",
+      "first_line": 126,
+      "last_line": 133,
+      "span_sha256": "a43fedb5179d09da967a64cb6dff344506639d29a26d698636051c3b035fbbec",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "userdata-uservalue-barrier",
+      "first_line": 134,
+      "last_line": 160,
+      "span_sha256": "d679406e72823c090f523649590b1784c59388ffa09d8b5b0e6db8968de6c62f",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "running-state-and-zero-step-size",
+      "first_line": 161,
+      "last_line": 179,
+      "span_sha256": "1fd49ed334c0b2a90d4c4c42ace4b7c6ce3073e0fa83a2982abb1d1e73584373",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "production-parameter-codification",
+      "first_line": 180,
+      "last_line": 192,
+      "span_sha256": "a4ee3284b8c14fcefbd7250e4df96d938db30776faa58abd6079e96fea8707b0",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    },
+    {
+      "file": "gengc.lua",
+      "id": "previous-mode-restoration-and-completion",
+      "first_line": 193,
+      "last_line": 196,
+      "span_sha256": "16bfecefcb8f493baabc48c08ae9b91f1fce6a9da3fe8159d75267257741eb25",
+      "semantic_inventory_review": "accepted",
+      "runtime_acceptance": "pending-warning-hardening-and-final-context-evidence"
+    }
+  ],
+  "evidence": {
+    "ci_run": "https://github.com/itsuki-hayashi/lua-ada/actions/runs/42283072557",
+    "contexts": 18,
+    "paired_file_context_operations": 36,
+    "report_count": 72,
+    "records": [
+      {
+        "context": "default/linux/development/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-development-relocatable/reports/reports/gc-events/e8aba0e217334b4cba0c94a45945de1d/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "848014004e687abbf84ee9c24a7d85db3df9e36896913931d0652ac368499fad",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/linux/development/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-development-relocatable/reports/reports/gc-events/e8aba0e217334b4cba0c94a45945de1d/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "ee43eb75133177c344e55e1706fe8d659388f56a0a183906785b4259b46f2698",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/development/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-development-relocatable/reports/reports/gc-events/e8aba0e217334b4cba0c94a45945de1d/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "3e44276838f62b0b5262ad34ff586f23e5ce550ed997fb4953c33fd32960af2c",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/development/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-development-relocatable/reports/reports/gc-events/e8aba0e217334b4cba0c94a45945de1d/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "899be0e0d779e8f41a8af56dc45a6fd64174b696db27c1e5acbd8946913e2b68",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/development/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-development-static/reports/reports/gc-events/980e306740424ef6a7483b0b97387bfb/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "2ada8b2ec1088e4150cb062a8b3daf9b2bc22370b0806075e2a8c35f590ef842",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/linux/development/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-development-static/reports/reports/gc-events/980e306740424ef6a7483b0b97387bfb/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "7b3ba06201fa72d43af67c9bc7d3bc05fec28034f9d625b85a517416f7a33949",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/development/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-development-static/reports/reports/gc-events/980e306740424ef6a7483b0b97387bfb/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "9590e5316c8fe5a081a20ecab8b0480f70842e84b25f6f8638091301b1fe9f8d",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/development/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-development-static/reports/reports/gc-events/980e306740424ef6a7483b0b97387bfb/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "bf5622503962851774b538ef8bbeaccda251a3fb26a96328c5038026b8418e83",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/release/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-release-relocatable/reports/reports/gc-events/d2f420f9421d4c649a094a0cfab8bd6e/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "952369e9dc42e8deda94f5a12e4294240bafed5fbc30b596e8cbb4b07a961426",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/linux/release/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-release-relocatable/reports/reports/gc-events/d2f420f9421d4c649a094a0cfab8bd6e/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "87d4b3fee573e2f74065a7099d2b3c200caa7157527a595df7a9f3fc1534d943",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/release/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-release-relocatable/reports/reports/gc-events/d2f420f9421d4c649a094a0cfab8bd6e/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "e3a327275fe692bb1e3e57ec8d1013a13d0af77e365153095c95aea71c5c0c68",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/release/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-release-relocatable/reports/reports/gc-events/d2f420f9421d4c649a094a0cfab8bd6e/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "50acf69c4bf6784e7ba8eb5ed7d70b02bf920abf64808220571bfe2cac40e107",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/release/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-release-static/reports/reports/gc-events/e479dcef929647cca871cba23cafa49e/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "15c01a5351738720916f9827b53d7049dc4ff9b3a0a824254d54c5d02472bb6b",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/linux/release/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-release-static/reports/reports/gc-events/e479dcef929647cca871cba23cafa49e/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "9aac6171be0380ec422c78b335498a4745d0e68d2c50f3f58dadfd9465f3151e",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/release/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-release-static/reports/reports/gc-events/e479dcef929647cca871cba23cafa49e/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "299d82974c64d4d59850cc16cdda38b418be7b678e179a141b69f26d57f1be48",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/release/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-release-static/reports/reports/gc-events/e479dcef929647cca871cba23cafa49e/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "ac000fc1b541e4c8a73fcdf6912703048aaa3c9896add788283a68e23f8d6e75",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/validation/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-validation-relocatable/reports/reports/gc-events/9357608b19894aa6a6c8ff615a52ba6f/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "25086e3b3f8c0f464ba423efb3338ee7c72b76731d83360f53dfb900fe7d2779",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/linux/validation/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-validation-relocatable/reports/reports/gc-events/9357608b19894aa6a6c8ff615a52ba6f/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "667c877d4b852e238893846fa0996fcb27f8d2ba1198f7a75c239fb86bc08d3b",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/validation/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-validation-relocatable/reports/reports/gc-events/9357608b19894aa6a6c8ff615a52ba6f/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "4e593079d89a598c279462617604da6238cf0704e1b22e5f2383e38b87acef42",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/validation/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-validation-relocatable/reports/reports/gc-events/9357608b19894aa6a6c8ff615a52ba6f/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "0e19f5083d008b1cc2f90bff57ae2e1afb15ed46dd3636fce22eb263cc881a3b",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/validation/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-validation-static/reports/reports/gc-events/acffb8992ca54b1a906a276f058a974c/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "b79f86ca3a2b9241c8d90133359c09a227b9ca1b8b403de935b5963db5126583",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/linux/validation/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-validation-static/reports/reports/gc-events/acffb8992ca54b1a906a276f058a974c/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "8f33f4e8220b47e031aac346362da220ab11f35dd78c1514ccd6128fb17c98e9",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/validation/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Linux-validation-static/reports/reports/gc-events/acffb8992ca54b1a906a276f058a974c/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "9ee9a7ed96d030cab1c35ae46b1a5294c2d153d6ae31efb10e90f3755e87e1eb",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/linux/validation/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Linux-validation-static/reports/reports/gc-events/acffb8992ca54b1a906a276f058a974c/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "629fc476e6204daef95cc3ed87a89f126db75f62e4e3513f56e089f63ba49812",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/development/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-development-relocatable/reports/reports/gc-events/9ae2df42a88544a082ec22ac45e0c9f1/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "c618c5b0e029b4345213e71a26efa8822ecd9be472b02f17d84a0552a70bcfa9",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/windows/development/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-development-relocatable/reports/reports/gc-events/9ae2df42a88544a082ec22ac45e0c9f1/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "8cedfdafe2175cb7bb91bd571e2b126375f1d153d9a337c85f80996233509797",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/development/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-development-relocatable/reports/reports/gc-events/9ae2df42a88544a082ec22ac45e0c9f1/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "dd8054dab31df22fa5568d0c1e2c7959341e675ecd3e8375b2c85d1ff01dcee4",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/development/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-development-relocatable/reports/reports/gc-events/9ae2df42a88544a082ec22ac45e0c9f1/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "48bb0f12bb134d957aa0438c8b9534cf67e480d4cce6442656c40f8b6705524e",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/development/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-development-static/reports/reports/gc-events/0a5bcb36183a4e31b1e2456bfc5236c0/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "a8c4f0731cb039787f9ae1e53874b4c510a11a40afb97d7f1964c7e3fe5bb2bb",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/windows/development/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-development-static/reports/reports/gc-events/0a5bcb36183a4e31b1e2456bfc5236c0/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "907c096a13784eef476c13c0e109bc667cdb320b59940696f23e5cb8f3a896aa",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/development/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-development-static/reports/reports/gc-events/0a5bcb36183a4e31b1e2456bfc5236c0/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "73fbd14064e351adef0463a56d62ed9afee4d7b0970f42246e190a8a6b3f9a9a",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/development/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-development-static/reports/reports/gc-events/0a5bcb36183a4e31b1e2456bfc5236c0/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "cff18cb5ea0ae44a245a627fb62d220df3f989781f1944db0f333e489e380001",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/release/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-release-relocatable/reports/reports/gc-events/7b2856102d39472ba1a2d5e44e224b5b/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "b5801e32c0e06871d8f864f4276bdb6e9b8271848c747eb7fc32839e23d62753",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/windows/release/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-release-relocatable/reports/reports/gc-events/7b2856102d39472ba1a2d5e44e224b5b/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "732fad78e75685d8fd4ff442862ee2bf9c3f03068b5b35b3cd3d226ea6649aca",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/release/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-release-relocatable/reports/reports/gc-events/7b2856102d39472ba1a2d5e44e224b5b/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "692888a6bee876aa0ff334ec9edf3c778925504748055cb04fcd4c700ecd7b0d",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/release/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-release-relocatable/reports/reports/gc-events/7b2856102d39472ba1a2d5e44e224b5b/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "e5d40a1fe4d0bc3e5ddd67a441aa585c5cac01b3fc3702a678d2d156cb873dc2",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/release/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-release-static/reports/reports/gc-events/942c1fb4974f467d982ef117215e5ec7/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "868aad0a08e57921a0c61a1f6c74b687ccffef09c3196827353bad4f56e7f0d0",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/windows/release/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-release-static/reports/reports/gc-events/942c1fb4974f467d982ef117215e5ec7/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "687c1c8ce2e2d2a226e38aeeeb7607bbf42f02cf924d38502272bd60a633ecc6",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/release/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-release-static/reports/reports/gc-events/942c1fb4974f467d982ef117215e5ec7/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "2caecf0b940fe312be86977391ab72f019d6d89890ac17a4c8faf72e81f28a4a",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/release/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-release-static/reports/reports/gc-events/942c1fb4974f467d982ef117215e5ec7/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "08f7bbf3ebb41d12dfcaf819ff5768d45bff051cb6570b2f9fcf928e7ba0a061",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/validation/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-validation-relocatable/reports/reports/gc-events/077a97501ec942778a9621b37bf1d59b/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "335b529374a09621b4e48951357bfd4385f816afe5e83d586b4c67890ffce1b9",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/windows/validation/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-validation-relocatable/reports/reports/gc-events/077a97501ec942778a9621b37bf1d59b/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "a75091e8135b02eaa32e80478e09fec9374d7a75a216edee25d9a77e7cf4195d",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/validation/shared",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-validation-relocatable/reports/reports/gc-events/077a97501ec942778a9621b37bf1d59b/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "d6e2ea24c79aa8914b20f3a32e18c3f4349c716fc86bcecfa2b2491d2b6190e0",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/validation/shared",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-validation-relocatable/reports/reports/gc-events/077a97501ec942778a9621b37bf1d59b/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "c3bb0ae4178599ae35ecbb1de8dac358e872133c6e68be2f8a2e9d64b71ecd86",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/validation/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-validation-static/reports/reports/gc-events/52a0f867f96e45928d61ff5f25ad2882/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "a9b326cd7b481c8c034e31208aa859500787a5e1438fd7f6e161825166279e31",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/windows/validation/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-validation-static/reports/reports/gc-events/52a0f867f96e45928d61ff5f25ad2882/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "c46b188dcf817a3f06a663b0db3f360e29ae7f731fd8def930a39939abe50824",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/validation/static",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-validation-static/reports/reports/gc-events/52a0f867f96e45928d61ff5f25ad2882/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "6039be9f538bd3f5c6040c1607b14bbcaed8db5659f4cf8034a41248e379b334",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/validation/static",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-validation-static/reports/reports/gc-events/52a0f867f96e45928d61ff5f25ad2882/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "62a9db782bc911e5b2738e64d860f4daed5875be5cc9583cf198eaeddaa002be",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/validation/static-pic",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-validation-static/reports/reports/gc-events/069d90683d514d1a830f765d1f468d7c/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "c388257f82c8f78e532efc7ae098d1bc79c6faebf5278dffd59b81b50732e53f",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "default/windows/validation/static-pic",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-validation-static/reports/reports/gc-events/069d90683d514d1a830f765d1f468d7c/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "f93ad7da084b50a79e2c564d58f9509e0a90937dde8a33b1a9decbd1fd4a86df",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/validation/static-pic",
+        "target": "ada",
+        "report": "810e254-lifecycle-Windows-validation-static/reports/reports/gc-events/069d90683d514d1a830f765d1f468d7c/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "115207fbf03aaa4c3286e6a0a1ad37e0e3cb39b1d3d43d4d1389e6529fb2351a",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "default/windows/validation/static-pic",
+        "target": "c",
+        "report": "810e254-lifecycle-Windows-validation-static/reports/reports/gc-events/069d90683d514d1a830f765d1f468d7c/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "bb91b51c49a064d02f444810f8eb81a9368a77cc71d46ffcc5b291998bd952be",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/linux/validation/shared",
+        "target": "ada",
+        "report": "810e254-linux-shared/reports/gc-events/ce5ff449f1154358bcb2d70205678534/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "5b65e651d54881c495d3c6555f400d84f060f1c6f7270857f853cefc1fa42c53",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "upstream-test/linux/validation/shared",
+        "target": "c",
+        "report": "810e254-linux-shared/reports/gc-events/ce5ff449f1154358bcb2d70205678534/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "74db3e0e448647e805f95552042bd5b062d6482d459eddf4fe757612af259dd4",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/linux/validation/shared",
+        "target": "ada",
+        "report": "810e254-linux-shared/reports/gc-events/ce5ff449f1154358bcb2d70205678534/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "56733a28bd86d66a001f76931f60f6b96f2c74d377fb532e2b2f541dafe7bb81",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/linux/validation/shared",
+        "target": "c",
+        "report": "810e254-linux-shared/reports/gc-events/ce5ff449f1154358bcb2d70205678534/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "7e5ecd343896b44178efc10afe2b621774faf2148f01a8f997f9287244e41b84",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/linux/validation/static",
+        "target": "ada",
+        "report": "810e254-linux-static/reports/gc-events/a1c5581e3b5e47e485a46e9535e2eeb6/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "4214ce366f94968128ed4f5ccb7117ff5f2c014a07de933dcd15692ebfec5311",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "upstream-test/linux/validation/static",
+        "target": "c",
+        "report": "810e254-linux-static/reports/gc-events/a1c5581e3b5e47e485a46e9535e2eeb6/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "45678079aed7c42ae10c76a18cdeca5ad031b2f533dcbe82902dde4674ee5406",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/linux/validation/static",
+        "target": "ada",
+        "report": "810e254-linux-static/reports/gc-events/a1c5581e3b5e47e485a46e9535e2eeb6/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "c508344c78d0c6d4715944d381985dc708272194144635e657e8d432447e3ff6",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/linux/validation/static",
+        "target": "c",
+        "report": "810e254-linux-static/reports/gc-events/a1c5581e3b5e47e485a46e9535e2eeb6/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "9febaab120750715fedc24701a421352c3dadbb4a5f8c8d9a133252e013a8e9b",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/windows/validation/shared",
+        "target": "ada",
+        "report": "810e254-windows-shared/reports/gc-events/632fcd8b668e42ca8aa6e1266d87012e/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "544c782c6d915813d6f13d575145b7321b08578e0a24dca521e7c81809dbd0de",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "upstream-test/windows/validation/shared",
+        "target": "c",
+        "report": "810e254-windows-shared/reports/gc-events/632fcd8b668e42ca8aa6e1266d87012e/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "2dc1b8bc4a4cbbcd3df88d3a1d35a47580cb34523ff8cad499262213e66fd1f7",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/windows/validation/shared",
+        "target": "ada",
+        "report": "810e254-windows-shared/reports/gc-events/632fcd8b668e42ca8aa6e1266d87012e/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "f6dbadbaacebffd1db871af839eb1769773371470cb84473b214cd8a5feb4971",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/windows/validation/shared",
+        "target": "c",
+        "report": "810e254-windows-shared/reports/gc-events/632fcd8b668e42ca8aa6e1266d87012e/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "b05f6fa7b9025b7ee1aa1d0ba060fdbc3add73056c2065acaffde20e33055ed6",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/windows/validation/static",
+        "target": "ada",
+        "report": "810e254-instrumented-Windows-static/reports/gc-events/136be121622644df9a8600eb9d0ae9d0/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "921dcdf736feafb7e1230dd0e77478f907cc2ef52d0e43f1d882ec9955b12bba",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "upstream-test/windows/validation/static",
+        "target": "c",
+        "report": "810e254-instrumented-Windows-static/reports/gc-events/136be121622644df9a8600eb9d0ae9d0/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "e7ff20c7dbad925acb2abd34aea7556e411d68111a0fd1274c8f36f470b2f567",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/windows/validation/static",
+        "target": "ada",
+        "report": "810e254-instrumented-Windows-static/reports/gc-events/136be121622644df9a8600eb9d0ae9d0/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "fd1505733a080cc5e58e4f39dcae85d2f7accee47aab2051630f51ea0c55088c",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/windows/validation/static",
+        "target": "c",
+        "report": "810e254-instrumented-Windows-static/reports/gc-events/136be121622644df9a8600eb9d0ae9d0/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "bbd73bc9e0015c67c7998edd692d2283b70231ff25fcb24d61cbea3058891754",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/windows/validation/static-pic",
+        "target": "ada",
+        "report": "810e254-instrumented-Windows-static/reports/gc-events/891785a3c52c4823b95e1ec1cc6fbc16/Ada-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "d3673e9c90ce07232ec8ba53ceeb4f39f5bdda128b85752a9bf60b771a287fbb",
+        "disposition": "ada-internal-equivalent"
+      },
+      {
+        "context": "upstream-test/windows/validation/static-pic",
+        "target": "c",
+        "report": "810e254-instrumented-Windows-static/reports/gc-events/891785a3c52c4823b95e1ec1cc6fbc16/ReferenceC-gc.lua.json",
+        "file": "gc.lua",
+        "sha256": "fd67ee0edd554b1def4d5d5c6a19d2f3b73b0ead72b1e88f371214798c62d351",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/windows/validation/static-pic",
+        "target": "ada",
+        "report": "810e254-instrumented-Windows-static/reports/gc-events/891785a3c52c4823b95e1ec1cc6fbc16/Ada-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "8e415489bfdb1c424a07d1e6ea66acec47dc2c278531445257c929184363cdb3",
+        "disposition": "unchanged"
+      },
+      {
+        "context": "upstream-test/windows/validation/static-pic",
+        "target": "c",
+        "report": "810e254-instrumented-Windows-static/reports/gc-events/891785a3c52c4823b95e1ec1cc6fbc16/ReferenceC-gengc.lua.json",
+        "file": "gengc.lua",
+        "sha256": "285067b02ace25047ffeaff3570461c2c77eedae3ada5c359652ea1efce9ab0e",
+        "disposition": "unchanged"
+      }
+    ],
+    "focused_case_artifact": "reports/ci-artifacts/810e254-instrumented-Windows-static/reports/instrumented/static/aunit.stdout"
+  },
+  "acceptance_limits": [
+    "MacOS eight contexts were not available to this review at the evidence checkpoint.",
+    "No source/API ledger entry is promoted by this artifact. Semantic inventory and mapping approval are distinct from passing runtime coverage.",
+    "GC-REVIEW-001 must be fixed, cross-reviewed and covered by final-revision evidence; existing executions cannot retroactively acquire enabled initial warning state.",
+    "All 26 final contexts and complete scoped acceptance remain required; full M3 remains pending.",
+    "The warning regression additions authored by this reviewer require independent cross-review."
+  ]
+}

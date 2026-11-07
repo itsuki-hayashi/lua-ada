@@ -85,10 +85,37 @@ function Test-ScopedLauncher {
     # C's --conformance-config returns before constructing a state; only its
     # two Lua probe parents have allocator records. Ada's measured protocol
     # constructs/disposes a real session in all five participating processes.
-    $expectedCount = if ($Target -eq 'Ada') { 5 } else { 2 }
-    if ($telemetry.Count -ne $expectedCount) { throw 'Scoped launcher probe telemetry missing' }
+    Assert-ScopedProbeTelemetry -Telemetry $telemetry -Processes $records `
+        -RunId $probeRunId -Configuration $Configuration -Target $Target
     return [ordered]@{ verified=$true; observed=$observed; processes=$records; telemetry=$telemetry;
         executable_sha256=(Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant() }
+}
+
+function Assert-ScopedProbeTelemetry {
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]] $Telemetry,
+          [Parameter(Mandatory)][Collections.IDictionary] $Processes,
+          [Parameter(Mandatory)][string] $RunId,
+          [Parameter(Mandatory)][string] $Configuration,
+          [Parameter(Mandatory)][ValidateSet('Ada','ReferenceC')][string] $Target)
+    # Parent configuration, bare-child and arg-child probes have their own
+    # state lifetimes. Reconcile actual PID records, not merely their matching
+    # JSON output: successful probes must not conceal leaked child sessions.
+    $seen = @{}
+    foreach ($item in $Telemetry) {
+        $id = [int]$item.process_id
+        if ($seen.ContainsKey($id)) { throw 'Scoped launcher probe telemetry duplicates a process' }
+        Assert-ManagedTelemetry -Telemetry $item -RunId $RunId -ProcessId $id `
+            -Configuration $Configuration -RequireShutdown:($Target -eq 'Ada')
+        $seen[$id] = $true
+    }
+    $required = if ($Target -eq 'Ada') { @('parent','bare','arg') } else { @('bare','arg') }
+    $expectedCount = if ($Target -eq 'Ada') { 5 } else { 2 }
+    if ($seen.Count -ne $expectedCount) { throw 'Scoped launcher probe telemetry missing' }
+    foreach ($name in $required) {
+        if (-not $seen.ContainsKey([int]$Processes[$name].process_id)) {
+            throw "Scoped launcher probe telemetry missing parent: $name"
+        }
+    }
 }
 
 function Assert-ScopedProcessCompletion {
@@ -104,6 +131,12 @@ function Assert-ScopedProcessCompletion {
     }
     Assert-ManagedTelemetry -Telemetry $Telemetry -RunId $RunId `
         -ProcessId $Process.process_id -Configuration $Configuration -RequireShutdown:(-not $NativeOracle)
+    # C's T.allocfailnext refuses inside ltests' allocator, below the outer
+    # conformance wrapper counter. Ada's measured provider owns this refusal.
+    if (-not $NativeOracle -and $File -eq 'events.lua' -and $Configuration -eq 'upstream-test' -and
+        $Telemetry.managed_refusals -lt 1) {
+        throw 'Instrumented events lacks actual allocator refusal'
+    }
     $stdout = [IO.File]::ReadAllText($Process.stdout_path)
     if ($File -eq 'files.lua') {
         if ($stdout -notmatch '(?m)^test done on \d{2}/\d{2}/\d+, at \d{2}:\d{2}:\d{2}\r?\nLua 5\.5\r?\n\z') {
@@ -115,7 +148,8 @@ function Assert-ScopedProcessCompletion {
         if ($stdout -match '(?i)skipping|omitted|not implemented') {
             throw 'File execution omitted required IO obligations'
         }
-        $markers = @('testing i/o', 'testing flush', 'testing large files (> BUFSIZ)',
+        $markers = @('native unbuffered visibility counterpart OK',
+            'testing i/o', 'testing flush', 'testing large files (> BUFSIZ)',
             'testing popen/pclose and execute', 'testing date/time')
         if ($Configuration -eq 'upstream-test') { $markers += 'testing failed write' }
         foreach ($marker in $markers) {
@@ -253,4 +287,4 @@ function Test-ConformanceScope {
         StructuralInventory=$inventory; Definition=$definition }
 }
 
-Export-ModuleMember -Function Test-ConformanceScope, Assert-ScopedProcessCompletion, Test-ScopedLauncher, Assert-ScopedBuildIdentity
+Export-ModuleMember -Function Test-ConformanceScope, Assert-ScopedProcessCompletion, Test-ScopedLauncher, Assert-ScopedBuildIdentity, Assert-ScopedProbeTelemetry

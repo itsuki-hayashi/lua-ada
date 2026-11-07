@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/review_files",
+  "date": "2026-11-07",
+  "coverage_authority": false,
+  "warning_review": {
+    "author": "/root/review_gc",
+    "status": "changes-requested",
+    "reviewed_script_sha256": "e8d0da41055ed2a93ce428e36b638a680c3a3bd1e62ff9807d78cfd171e144a5",
+    "reviewed_hook_sha256": "ebf55f88ee77ef6d22d7db261227569266ae6c52d9f471a904a366248bd383d2",
+    "files": ["scripts/test-scoped-warnings.ps1", "scripts/check-gc-events.ps1"],
+    "accepted_design": [
+      "Root run-conformance setup enables warn('@on') before native counterparts and selected upstream execution, preventing the initial off state from hiding unexpected warnings.",
+      "The retained global __gc object stays rooted until state closure. Requiring stdout OK in the shutdown negative distinguishes top-level completion from an earlier script error.",
+      "Default warnings preserve normal process success but must be rejected by the scoped empty-stderr criterion. The real T warning handler rejects unexpected warnings as a process failure.",
+      "Explicit @off remains a successful control. Fragmented @store publication, exact _WARN content, explicit consumption and restoration to @normal are checked.",
+      "Timeout, capture overflow, pipe-drain failure and process-tree kill failure are rejected. Diagnostic substring requirements prevent a missing executable/library alone from being mistaken for a successful warning negative."
+    ],
+    "findings": [
+      {
+        "id": "WARN-X1",
+        "priority": 2,
+        "location": "scripts/test-scoped-warnings.ps1:56",
+        "finding": "A matching diagnostic plus any nonzero exit is accepted, including a crash after emitting that diagnostic. Default normal-warning does not require top-level OK either.",
+        "required_resolution": "Require the known normal/default zero exit and OK, C test handler EXIT_FAILURE, and the actual Ada abort status for the platform; reject unrelated termination statuses while retaining the diagnostic and shutdown-order checks."
+      },
+      {
+        "id": "WARN-X2",
+        "priority": 2,
+        "location": "scripts/test-scoped-warnings.ps1:73",
+        "finding": "The index records arguments, executable/capture hashes and results but no repository/source/library identity. The parent GC/events index does not hash-link this warning index; the main runner source list omits both warning/hook scripts.",
+        "required_resolution": "Bind the warning evidence to its source/revision/library identities and retain a hash link from the parent campaign. A passing local output alone must not become final-revision warning evidence."
+      }
+    ],
+    "inspected_evidence": {
+      "default": "reports/review-scoped-warnings-default/index.json",
+      "instrumented": "reports/review-scoped-warnings-upstream/index.json",
+      "capture_hashes_verified": true,
+      "observed_cases": 14,
+      "actual_results": "Six default C/Ada cases exit zero; warning negatives have the expected diagnostics and shutdown OK. Eight instrumented cases show C warning failures exit 1, Ada Windows warning failures exit 3; explicit-off and consumed-store controls exit zero. All retained stdout/stderr hashes match.",
+      "limitation": "These are local Windows observations of the reviewed draft; they do not establish Linux/macOS or complete scoped coverage."
+    }
+  },
+  "warning_revision_review": {
+    "author": "/root/review_gc",
+    "reviewer": "/root/review_files",
+    "decision": "accepted-warning-regression-fixes",
+    "script_sha256": "ec8fcf2245e10b3b44b317d0c59e07a78b6bd5b980006bc09b7a62df943a9038",
+    "hook_sha256": "4a1687956c353ce61a64dbf1a85dbcd787f32a076c4e5be027492cf0b23041f1",
+    "resolved_findings": ["WARN-X1", "WARN-X2"],
+    "rationale": [
+      "Default negatives now require exit zero and top-level OK, while still requiring the specific warning diagnostic and rejecting empty stderr. A warning followed by an unrelated abnormal exit is no longer accepted.",
+      "The C T failure matches pinned ltests.c badexit EXIT_FAILURE; the Ada handler matches its explicit abort path (Windows 3, supported POSIX Process.ExitCode 134). Unexpected termination codes are rejected in addition to process/capture failures and missing diagnostics.",
+      "The retained-global shutdown case still requires OK before its finalizer diagnostic. Explicit off and fragmented store-consume-normal positive controls remain zero-exit/empty-stderr checks.",
+      "The warning index now binds repository revision/dirty state, six source hashes, actual runtime/reference library hashes, executable hashes, exact command arguments and capture hashes. The GC/events campaign index links it by path and hash. A partial or failed warning run cannot produce successful later file observations because the hook throws before those executions."
+    ],
+    "evidence": [
+      {"path": "reports/review-scoped-warnings-default-v2/index.json", "sha256": "10000d9f87590ac207964aca1a8e85fff47cdb7260561a395b492a147924e819"},
+      {"path": "reports/review-scoped-warnings-upstream-v2/index.json", "sha256": "b1ab5c9b5356fe74c9f2fa1c560e59a6f042b2444e98f3fdb947290a5e923c2c"}
+    ],
+    "verification": "Independently rehashed all 14 cases' stdout/stderr captures and both reviewed script identities in the recorded source lists. Observed default exits are zero, C T negatives one, Ada Windows T negatives three, and positive controls zero. No Alire build or source change by this cross-reviewer was needed.",
+    "limitations": [
+      "Local evidence records a dirty implementation checkout honestly; final clean revision and all platform executions remain required.",
+      "POSIX abort-status handling is a fail-closed expectation derived from abort/SIGABRT and the process runner, not a claim that the newly added tests have already passed POSIX CI.",
+      "This accepts the warning regression changes and provenance design, not complete scoped or full-M3 acceptance."
+    ]
+  },
+  "capability_review": {
+    "author": "/root",
+    "status": "accepted-for-registration-design",
+    "sources": [
+      {"path": "tests/src/lua-conformance_adapter.adb", "sha256": "be303995f084caa3a44a41e088174ae6f09936ea5ae9b04e79872a0f5c71d11d"},
+      {"path": "tests/src/lua-conformance_adapter.ads", "sha256": "4bdd229b2d7392a4cdc2d5cb5d44b5a9a73b850c2255dc9fb97c10973a47f5da"},
+      {"path": "tests/src/lua-conformance_adapter_tests.adb", "sha256": "243c0d70ba7531b27d89457296ff30bc868b45bae6c4ef45dcf5f079432a51a8"}
+    ],
+    "rationale": "Has_Nonblocking_Pair reads callback 16 independently from failing-stream callback 15. The native dispatcher supplies 16 only on Windows, so pair/protocol tests cannot run on macOS merely because a failing-stream fixture exists there. Shared file validation and zero-byte refusal tests remain selected on both supported hosts. Buffered-close expectations are explicitly separated by native capability rather than suppressing a failing test.",
+    "limitation": "This accepts the capability/registration correction, not the inferred Darwin close behavior. The Darwin test and three-span equivalent still need actual native C/Ada execution before semantic acceptance."
+  }
+}

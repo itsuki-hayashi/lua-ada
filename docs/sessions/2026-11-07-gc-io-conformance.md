@@ -625,3 +625,57 @@ confirms the corrected CI provenance. It retains the generated gc.lua source
 and separately reports that run as an Ada-internal equivalent, while the other
 three Linux files are unchanged. Alire 2.1.1, GNAT 16.1.0 and GPRbuild 26.0.1
 are recorded in both job logs. These observations do not close pending reviews.
+
+The maintainer explicitly authorized independent review sub-agents. Collector,
+file/OS, and events/API/harness reviewers now inspect semantics and retained
+evidence. Their findings already exposed gaps beyond green process status:
+initially disabled warnings, missing scoped launcher-probe telemetry, an
+unchecked unbuffered-visibility assertion, and incomplete native date/device
+equivalents. Review artifacts distinguish independent findings from subsequent
+fixes authored by a reviewer, which require cross-review.
+
+Published 810e254 completed all 18 Windows/Linux contexts. The 144 paired
+reports (72 file/context operations) were downloaded with archive hashes
+checked and process-completion/allocator telemetry replayed. These remain
+historical observations, not acceptance for the revised warning/probe policy.
+All eight macOS jobs subsequently failed at AUnit: the newly available native
+failure helper accidentally enabled Windows pipe-pair tests, and the buffered
+native close reported Bad file descriptor. Logs are retained under
+reports/ci-810e254. Capability registration is now separated, and the macOS
+candidate checks a buffered-close error with closed-file ownership while
+covering the second /dev/full open in the T block. Its three original source
+spans validate against the unchanged pinned file; the generated candidate hash
+is 4a847ad07f3d3ee2b08e0de70bcccd4a0abdaef01d4c9b9453ecbd3619e446ef.
+Actual macOS confirmation of that correction is pending.
+
+The local default validation/static AUnit rerun passes 1,305 cases after the
+capability split and a new two-handle unbuffered-visibility regression, with
+zero failed assertions or unexpected errors. Strict build and execution logs
+are reports/review-fixes-build.log and reports/review-fixes-aunit.stdout;
+stderr contains the existing intentional ordinary-finalizer warning. Complete
+post-review pipelines and final-revision platform evidence remain pending.
+
+The post-review local default validation/static pipeline now passes all
+retained checks and four scoped file observations in
+reports/review-full-default.log. The instrumented retry likewise passes in
+reports/review-full-instrumented-retry.log, with 1,305 AUnit cases, 40 runner,
+38 scope and 30 matrix regressions, actual warning tests, and identical public
+GC/IO contracts. A first instrumented attempt correctly exposed an erroneous
+new harness assumption: C's ltests refusal is below its outer allocator
+counter. The measured events refusal witness now applies to Ada only, with an
+explicit C-oracle zero-counter control. The source obligation remains active
+and executed in C; no counter value is fabricated.
+
+Thirty separate artifact-binding regressions pass in
+reports/review-binding-final.log. Accepted equivalent mappings require a
+real hashed review artifact, exact original and replacement spans, generated
+bytes, counterpart source hashes, and independent per-span decisions. Windows
+and GC mappings now have those approvals; macOS remains pending actual native
+execution. Cross-review separates fixes authored by the reviewers from their
+independent findings. The tightened warning tests were separately rerun in
+both configurations (six default/eight instrumented), with exact expected
+termination and source/library/capture provenance; their independent
+cross-review resolves WARN-X1/WARN-X2. Reports are under
+reports/review-scoped-warnings-default-v2 and
+reports/review-scoped-warnings-upstream-v2. Complete scoped ledger promotion
+and the final 26-context matrix are still outstanding.

@@ -90,6 +90,8 @@ $evidence = [ordered]@{
     child_configuration_process = $null
     arg_child_configuration_process = $null
     launcher_identity = $null
+    launcher_probe_run_id = $null
+    launcher_probe_telemetry = @()
     execution_disposition = 'unchanged'
     equivalent = $null
     repl_preflight_process = $null
@@ -226,7 +228,8 @@ try {
     }
     foreach ($relative in @('scripts/run-conformance.ps1', 'scripts/ConformanceRunner.psm1',
         'scripts/ConformanceInventory.psm1', 'scripts/ConformanceScope.psm1',
-        'scripts/ManagedTelemetry.psm1', 'tests/conformance/suite.json')) {
+        'scripts/ManagedTelemetry.psm1', 'scripts/ConformanceReview.psm1',
+        'scripts/New-ConformanceEquivalent.ps1', 'tests/conformance/suite.json')) {
         $evidence.harness_source_records += [ordered]@{
             path = $relative
             sha256 = (Get-FileHash -LiteralPath (Join-Path $root $relative) -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -297,6 +300,14 @@ try {
     $environment = @{
         LUA_ADA_CONFORMANCE_ALLOCATOR = [string]$evidence.allocator_limit_bytes
         MEMLIMIT = [string]$evidence.allocator_limit_bytes
+    }
+    if ($Scope -ne '') {
+        # Probe states finish before the selected file starts. Retain their
+        # independent shutdown records without contaminating the file's child
+        # count or allowing probe refusals to stand in for a tested refusal.
+        $evidence.launcher_probe_run_id = [Guid]::NewGuid().ToString('N')
+        $environment.LUA_ADA_CONFORMANCE_RUN_ID = $evidence.launcher_probe_run_id
+        $environment.LUA_ADA_CONFORMANCE_TELEMETRY = Join-Path $runRoot 'probe-allocator'
     }
     if ($Target -eq 'ReferenceC') {
         if (-not (Test-Path -LiteralPath $libraryDirectory)) { throw 'Build the conformance C library first' }
@@ -445,6 +456,20 @@ try {
                 [IO.File]::ReadAllText($probe.stdout_path).Trim()) {
             throw 'Arg-selected child does not retain the selected configuration/allocator ceiling'
         }
+        $probeTelemetry = @()
+        foreach ($sidecar in Get-ChildItem -LiteralPath $runRoot -Filter 'probe-allocator.*.json') {
+            $measured = Get-Content -LiteralPath $sidecar.FullName -Raw | ConvertFrom-Json -AsHashtable
+            if ($measured.process_id -ne [int]($sidecar.BaseName.Split('.')[-1])) {
+                throw 'Scoped launcher probe telemetry filename differs from PID'
+            }
+            $probeTelemetry += $measured
+            $evidence.launcher_probe_telemetry += [ordered]@{ path=$sidecar.FullName;
+                sha256=(Get-FileHash -LiteralPath $sidecar.FullName -Algorithm SHA256).Hash.ToLowerInvariant();
+                data=$measured }
+        }
+        Assert-ScopedProbeTelemetry -Telemetry $probeTelemetry `
+            -Processes @{parent=$probe; bare=$child; arg=$argChild} `
+            -RunId $evidence.launcher_probe_run_id -Configuration $Configuration -Target $Target
     }
     $marker = ''
     $arguments = @()
@@ -518,8 +543,25 @@ try {
             $nativeSetup += "; dofile('macos-buffered-failure.lua')"
         }
     }
+    if ($Scope -ne '' -and $File -eq 'files.lua') {
+        # Upstream's read-only no-buffer example ignores its write result. The
+        # separate C/Ada counterpart proves immediate visibility through a
+        # second native handle, without adding any unmeasured subprocess.
+        $counterpart = Join-Path $root 'tests/conformance/platform/unbuffered-visibility.lua'
+        $counterpartCopy = Join-Path $fixtureDirectory 'unbuffered-visibility.lua'
+        Copy-Item -LiteralPath $counterpart -Destination $counterpartCopy
+        $sourceHash = (Get-FileHash $counterpart -Algorithm SHA256).Hash.ToLowerInvariant()
+        $copyHash = (Get-FileHash $counterpartCopy -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($sourceHash -cne $copyHash) { throw 'Unbuffered counterpart copy changed bytes' }
+        $evidence.native_fixture_records += [ordered]@{source='tests/conformance/platform/unbuffered-visibility.lua';
+            source_sha256=$sourceHash; artifact=$counterpartCopy; artifact_sha256=$copyHash}
+        $nativeSetup += "; dofile('unbuffered-visibility.lua')"
+    }
     if ($Scope -ne '') {
-        $setup = 'assert(_soft==nil and _port==nil); '
+        # Enable normal warnings before upstream execution, including close-time
+        # finalizers. Otherwise the test handler's initial off state can hide
+        # early assertions before a source explicitly enables its warnings.
+        $setup = "assert(_soft==nil and _port==nil); warn('@on'); "
         $setup += if ($Configuration -eq 'upstream-test') {
             "assert(type(T)=='table' and type(T.checkmemory)=='function'); T.checkmemory()"
         } else { 'assert(T==nil)' }

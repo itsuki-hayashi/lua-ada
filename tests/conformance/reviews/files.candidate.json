@@ -12,7 +12,7 @@
     "Author analysis of all pinned source bytes, not independent review or passing coverage. The Windows ten-span mapping and native counterparts require separate review and matching C evidence.",
     "Most IO code is guarded by successful opening of os.tmpname. Date/version output alone can still occur after that block is skipped; acceptance must require the IO section witnesses and reject the temporary-file omission.",
     "Run with _soft and _port unset. Instrumented POSIX execution must have T.nonblock; a false capability guard cannot close partial-write coverage. Windows executes the separately named native pipe counterpart.",
-    "The source launches two empty-command Lua children and four typed-exit Lua children via popen and execute. POSIX instrumented adds one bare-lua receiver. The harness adds two configuration probes: totals are eight/nine Ada and four/five normal-return C telemetry records. C os.exit bypasses its CLI writer.",
+    "The source launches two empty-command Lua children and four typed-exit Lua children via popen and execute. POSIX instrumented adds one bare-lua receiver. Scoped main-child telemetry totals are six/seven Ada and two/three C on POSIX; Windows totals are eight Ada and four C. Configuration probes have separate telemetry. Only the legacy POSIX runner adds its two setup children to those totals. C os.exit bypasses its CLI writer.",
     "Embedded Lua chunks, generated date assertions and shell receiver assertions are dynamic obligations, not inert strings or lexical pass evidence."
   ],
   "sections": [

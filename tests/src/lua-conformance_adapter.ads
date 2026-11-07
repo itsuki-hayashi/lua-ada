@@ -6,6 +6,8 @@ private package Lua.Conformance_Adapter is
    --  T-absent configuration. No counterpart is an unchanged execution.
    function Has_Failing_Stream return Boolean;
    --  Whether this host provides a native buffered failure counterpart.
+   function Has_Nonblocking_Pair return Boolean;
+   --  Whether this host provides the Windows native pipe-pair driver.
    procedure Install (State : in out Lua.Engine.World);
    --  Install supported T operations into this test-owned universe. C
    --  callbacks borrow State until destruction; never install on a copy.

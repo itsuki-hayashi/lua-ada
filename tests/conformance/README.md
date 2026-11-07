@@ -243,7 +243,7 @@ path in both configurations. POSIX selects the original source; Windows selects
 the explicit native-platform candidate and builds only its required native
 fixtures, recording source and artifact hashes. Parent and child allocator
 records are validated separately. Independent native-counterpart runners remain
-in the pipeline. macOS uses a separate one-span native-platform candidate for its unavailable
+in the pipeline. macOS uses a separate native-platform candidate for its unavailable
 `/dev/full`. Its named buffered-failure counterpart runs before the equivalent
 in the same measured C/Ada state; the original POSIX nonblocking-write block
 still executes when T is present. This candidate is not reviewed acceptance.

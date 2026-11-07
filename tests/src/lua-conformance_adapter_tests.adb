@@ -57,6 +57,7 @@ package body Lua.Conformance_Adapter_Tests is
    procedure Measured_Emergency_Headroom;
    procedure Weak_String_Payloads;
    procedure Native_Flush_Failure;
+   procedure Darwin_Flush_Failure;
    procedure Native_Flush_Validation;
    procedure Native_Write_Refusal;
    procedure Native_Partial_Write;
@@ -415,6 +416,24 @@ package body Lua.Conformance_Adapter_Tests is
         "io.output(old)", Platform => True);
    end Native_Flush_Failure;
 
+   procedure Darwin_Flush_Failure is
+   begin
+      --  Darwin retains failed buffered bytes. Closing retries the native
+      --  write and reports its error, but still releases the owned FILE.
+      --  Observe that result rather than replacing the closer or suppressing
+      --  the native failure to imitate another libc's buffer policy.
+      Check ("local old=io.output(); local f=io.tmpfile(); " &
+        "assert(_test_failing_stream(f)==f); io.output(f); " &
+        "assert(f:write('abcd')==f,'first buffered write'); " &
+        "assert(not f:flush(),'first native flush'); " &
+        "assert(f:write('abcd')==f,'second buffered write'); " &
+        "assert(not io.flush(),'second native flush'); " &
+        "local ok,msg,err=f:close(); " &
+        "assert(ok==nil and type(msg)=='string' and err>0, " &
+        "'native close failure'); assert(io.type(f)=='closed file'); " &
+        "io.output(old)", Platform => True);
+   end Darwin_Flush_Failure;
+
    procedure Native_Flush_Validation is
    begin
       --  Reject nonfiles and closed files before touching native descriptors.
@@ -516,13 +535,21 @@ package body Lua.Conformance_Adapter_Tests is
       Test_Support.Add (Suite, "collector: weak string payload reclamation",
                         Weak_String_Payloads'Access);
       if Conformance_Adapter.Has_Failing_Stream then
-         Test_Support.Add (Suite, "Windows IO: buffered native flush failure",
-                           Native_Flush_Failure'Access);
-         Test_Support.Add (Suite, "Windows IO: failure driver validates files",
+         if Conformance_Adapter.Has_Nonblocking_Pair then
+            Test_Support.Add
+              (Suite, "Windows IO: buffered native flush failure",
+               Native_Flush_Failure'Access);
+         else
+            Test_Support.Add (Suite, "macOS IO: buffered failure and close",
+                              Darwin_Flush_Failure'Access);
+         end if;
+         Test_Support.Add (Suite, "native IO: failure driver validates files",
                            Native_Flush_Validation'Access);
          Test_Support.Add
-           (Suite, "Windows IO: refused write counts zero bytes",
+           (Suite, "native IO: refused write counts zero bytes",
             Native_Write_Refusal'Access);
+      end if;
+      if Conformance_Adapter.Has_Nonblocking_Pair then
          Test_Support.Add
            (Suite, "Windows IO: nonblocking partial write count",
             Native_Partial_Write'Access);

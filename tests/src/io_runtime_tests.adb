@@ -36,6 +36,7 @@ package body IO_Runtime_Tests is
    procedure Seek_Origins;
    procedure Invalid_Seek_Origin;
    procedure Buffering_Modes;
+   procedure Unbuffered_Visibility;
    procedure Closed_File;
    procedure Standard_Close;
    procedure Iterator_Results;
@@ -262,6 +263,24 @@ package body IO_Runtime_Tests is
              "local f=assert(io.tmpfile()); assert(f:setvbuf(mode,128)); " &
              "assert(f:write('x')); assert(f:flush()); f:close() end");
    end Buffering_Modes;
+
+   procedure Unbuffered_Visibility is
+   begin
+      --  The upstream no-buffer example opens a read-only file and ignores
+      --  its write result. Use two real handles here: the reader must see
+      --  the complete binary write before any writer flush, seek or close.
+      --  A successful setvbuf call alone cannot establish this behavior.
+      Ada.Directories.Create_Path ("reports/io-library-tests");
+      Check ("local path='reports/io-library-tests/unbuffered.tmp'; " &
+             "local w <close> = assert(io.open(path,'wb')); " &
+             "assert(w:setvbuf('no')); " &
+             "local r <close> = assert(io.open(path,'rb')); " &
+             "assert(w:write('visible\0bytes')==w); " &
+             "assert(r:read(13)=='visible\0bytes'); " &
+             "assert(r:close()); assert(w:close())");
+      Ada.Directories.Delete_File
+        ("reports/io-library-tests/unbuffered.tmp");
+   end Unbuffered_Visibility;
 
    procedure Closed_File is
    begin
@@ -650,6 +669,8 @@ package body IO_Runtime_Tests is
                         Invalid_Seek_Origin'Access);
       Test_Support.Add (Suite, "IO: actual libc buffering modes",
                         Buffering_Modes'Access);
+      Test_Support.Add (Suite, "IO: unbuffered bytes visible before flush",
+                        Unbuffered_Visibility'Access);
       Test_Support.Add (Suite, "IO: closed payload never dereferences FILE",
                         Closed_File'Access);
       Test_Support.Add (Suite, "IO: borrowed standard stream refuses close",

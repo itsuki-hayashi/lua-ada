@@ -87,18 +87,18 @@ Write-Output 'SCOPE TEST PASS: full M3 completion still rejects unresolved cover
 $stdoutPath = Join-Path $temporary 'synthetic-process.stdout'
 function Test-ProcessWitness {
     param([string] $Name, [string] $File, [string] $Output,
-          [scriptblock] $Mutate = {}, [string] $Expected = '')
+          [scriptblock] $Mutate = {}, [string] $Expected = '', [switch] $NativeOracle)
     [IO.File]::WriteAllText($stdoutPath, $Output)
     $process = @{ exit_code=0; timed_out=$false; capture_exceeded=$false;
         pipe_drain_failed=$false; process_tree_kill_error=$null;
         process_id=123; stdout_path=$stdoutPath }
     $telemetry = @{schema_version=1; process_id=123; run_id='synthetic'; configuration='upstream-test';
-        allocator_limit_bytes=2147483648L; managed_refusals=0; outstanding_bytes=0;
+        allocator_limit_bytes=2147483648L; managed_refusals=1; outstanding_bytes=0;
         outstanding_blocks=0; shutdown_complete=$true; accounting_fault=$false}
     & $Mutate $process $telemetry
     $failure = $null
     try { Assert-ScopedProcessCompletion -File $File -Process $process -Telemetry $telemetry `
-        -RunId 'synthetic' -Configuration upstream-test }
+        -RunId 'synthetic' -Configuration upstream-test -NativeOracle:$NativeOracle }
     catch { $failure = $_.Exception.Message }
     if (($Expected -eq '' -and $null -ne $failure) -or
         ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))) {
@@ -115,7 +115,9 @@ Test-ProcessWitness 'files rejects OK without final date' files.lua "OK`n" -Expe
 Test-ProcessWitness 'files requires final version' files.lua "test done on 01/01/2026, at 00:00:00`n" -Expected 'date/version'
 Test-ProcessWitness 'balanced GC shutdown witness' gc.lua "OK`n>>> closing state <<<`n"
 $dateWitness = "test done on 01/01/2026, at 00:00:00`nLua 5.5`n"
-$ioWitness = "testing i/o`ntesting flush`ntesting failed write`ntesting large files (> BUFSIZ)`ntesting popen/pclose and execute`ntesting date/time`n"
+$ioWitness = "native unbuffered visibility counterpart OK`ntesting i/o`ntesting flush`ntesting failed write`ntesting large files (> BUFSIZ)`ntesting popen/pclose and execute`ntesting date/time`n"
+Test-ProcessWitness 'files requires unbuffered visibility counterpart' files.lua `
+    ($ioWitness.Replace("native unbuffered visibility counterpart OK`n", '') + $dateWitness) -Expected 'unbuffered visibility'
 Test-ProcessWitness 'date alone does not certify IO' files.lua $dateWitness -Expected 'IO completion witness'
 Test-ProcessWitness 'instrumented files require partial-write witness' files.lua `
     ($ioWitness.Replace("testing failed write`n", '') + $dateWitness) -Expected 'testing failed write'
@@ -125,6 +127,9 @@ Test-ProcessWitness 'final files date and IO witnesses' files.lua ($ioWitness + 
 Test-ProcessWitness 'instrumented generational early return fails' gengc.lua "OK`n" -Expected 'instrumented tail'
 Test-ProcessWitness 'instrumented generational tail witness' gengc.lua "testing stop-the-world collection`nOK`n"
 Test-ProcessWitness 'successful output cannot hide timeout' events.lua "OK`n" { param($p,$t) $p.timed_out=$true } 'complete cleanly'
+Test-ProcessWitness 'instrumented events requires real refusal' events.lua "OK`n" { param($p,$t) $t.managed_refusals=0 } 'actual allocator refusal'
+Test-ProcessWitness 'C oracle T refusal is below wrapper accounting' events.lua "OK`n" `
+    { param($p,$t) $t.managed_refusals=0 } -NativeOracle
 Test-ProcessWitness 'missing physical shutdown fails' events.lua "OK`n" { param($p,$t) $t.shutdown_complete=$false } 'shutdown'
 Test-ProcessWitness 'leaked blocks fail scoped completion' events.lua "OK`n" { param($p,$t) $t.outstanding_blocks=1 } 'unbalanced'
 Test-ProcessWitness 'wrong child configuration fails' events.lua "OK`n" { param($p,$t) $t.configuration='default' } 'Mismatched'
