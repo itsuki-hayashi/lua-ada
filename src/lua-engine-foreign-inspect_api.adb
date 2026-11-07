@@ -50,20 +50,8 @@ is
       else Natural'Max (1, Item.PC - 1) - 1);
 
    function Caller_Of (Item : Frame_Access) return Frame_Access is
-      Found : Boolean := False;
    begin
-      for Candidate of reverse Context.Stack loop
-         if Candidate = Item then
-            Found := True;
-         elsif Found and then not Candidate.Is_C_Hook_Transport and then
-           (not Candidate.Is_Native or else
-            (Length (Candidate.Native_Name) > 0 and then
-             Element (Candidate.Native_Name, 1) /= '@'))
-         then
-            return Candidate;
-         end if;
-      end loop;
-      return null;
+      return Inspection.Caller_Frame (State, Context, Item);
    end Caller_Of;
 
    function Cell (Item : Value; Index : C.long_long) return Object_Access is
@@ -197,7 +185,19 @@ is
          Info.Extra_Arguments := C.int (Selected.Call_Metamethod_Count);
       end if;
       if Wants ('n') and then Selected /= null then
-         if Length (Selected.Name_Kind) > 0 then
+         if Selected.Is_Finalizer_Call and then not Selected.Is_Tail_Call then
+            if Context.Hook_Active and then
+              Caller_Of (Selected) = Context.Hook_Frame
+            then
+               Info.Name := Call_Names.Hook_Name.Address;
+               Info.Name_Kind :=
+                 Call_Names.Name_Kind'Pos (Call_Names.Hook_Call);
+            else
+               Info.Name := Call_Names.Finalizer_Name.Address;
+               Info.Name_Kind :=
+                 Call_Names.Name_Kind'Pos (Call_Names.Metamethod_Call);
+            end if;
+         elsif Length (Selected.Name_Kind) > 0 then
             Info.Name_Kind := Origin_Kind (To_String (Selected.Name_Kind));
             if Length (Selected.Call_Name) > 0 then
                Info.Name := Selected.Call_Name_Bytes.Address;

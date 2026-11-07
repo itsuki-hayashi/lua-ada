@@ -1,6 +1,7 @@
 with Ada.Unchecked_Conversion;
 with Interfaces.C;
 with Lua.Engine.Canonical;
+with Lua.Engine.Inspection;
 with Lua.Prototypes;
 with System;
 
@@ -15,18 +16,10 @@ package body Lua.Engine.Foreign_Hooks is
    function Function_Address is new Ada.Unchecked_Conversion
      (Foreign.C_Function, System.Address);
 
-   function Public_Frame (Item : Frame_Access) return Boolean;
-   function Public_Frame (Item : Frame_Access) return Boolean is
-     (not Item.Is_C_Hook_Transport and then
-      (not Item.Is_Native or else
-       (Length (Item.Native_Name) > 0 and then
-        Element (Item.Native_Name, 1) /= '@')));
-
    procedure Handle
      (State : in out World; Context : not null Context_Access;
       Input : Foreign.Request; Output : in out Foreign.Response)
    is
-      pragma Unreferenced (State);
       Selected : Frame_Access;
    begin
       case Input.Operation is
@@ -96,22 +89,8 @@ package body Lua.Engine.Foreign_Hooks is
                --  lua_Debug identifies the actual interrupted Lua/C frame.
                Selected := Context.Hook_Frame;
             elsif Input.Index >= 0 then
-               declare
-                  Remaining : C.int := Input.Index;
-               begin
-                  for Item of reverse Context.Stack loop
-                     if Public_Frame (Item) then
-                        --  A C hook borrows its interrupted frame. The
-                        --  foreign trampoline is scheduler transport and
-                        --  cannot become public stack level zero.
-                        if Remaining = 0 then
-                           Selected := Item;
-                           exit;
-                        end if;
-                        Remaining := Remaining - 1;
-                     end if;
-                  end loop;
-               end;
+               Selected := Inspection.Logical_Frame
+                 (State, Context, Natural (Input.Index));
             end if;
             if Selected /= null then
                Output.Pointer := Selected.all'Address;

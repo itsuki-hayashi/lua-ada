@@ -1,7 +1,8 @@
 package Lua.Engine.Call_Names is
    type Name_Kind is
      (Unknown, Local_Binding, Upvalue_Binding, Constant_Value,
-      Global_Field, Table_Field, Method_Call, Iterator_Call, Metamethod_Call);
+      Global_Field, Table_Field, Method_Call, Iterator_Call, Metamethod_Call,
+      Hook_Call);
    type Identity is record
       Item : Value;
       Kind : Name_Kind := Unknown;
@@ -16,6 +17,11 @@ package Lua.Engine.Call_Names is
    --  Infer through the same reaching-definition walk without allocating.
    --  Bytes are NUL-terminated immutable graph/constant storage, or static
    --  markers; the caller must retain its actual activation/prototype owner.
+   function Finalizer_Name return Byte_String;
+   --  Borrow the static NUL-terminated __gc origin marker. Its lifetime is
+   --  the package lifetime and no allocation or prototype owner is needed.
+   function Hook_Name return Byte_String;
+   --  Borrow the static '?' marker for an actual hook-origin call.
    function Kind_Image (Kind : Name_Kind) return String;
    function From_Caller
      (State : in out World; Caller : Frame_Access) return Identity;

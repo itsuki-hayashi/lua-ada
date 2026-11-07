@@ -34,6 +34,14 @@ with Lua.Engine.Warnings;
 with Lua.Engine.Mathematics;
 
 package body Lua.Engine.Machine is
+   function Collector_Drain_Address return System.Address
+     with Import, Convention => C,
+          External_Name => "lua_ada_collector_drain_address";
+   Collector_Transport : constant System.Address := Collector_Drain_Address;
+   --  A process-lifetime borrow of the actual C pump address. Recognizing it
+   --  before its first scheduler step preserves public call/return hooks;
+   --  guard ownership, real stack windows and native charging stay intact.
+
    Warning_On : aliased constant String := "@on" & Character'Val (0);
    Warning_Off : aliased constant String := "@off" & Character'Val (0);
    GC_Warning_Start_Text : aliased constant String :=
@@ -1155,7 +1163,8 @@ package body Lua.Engine.Machine is
             (To_String (State.Current.Hook_Mask), "" & Mask) /= 0));
       Line : Natural;
    begin
-      if State.Current.Hook_Active or else
+      if Item.Is_C_Collector_Transport or else
+        State.Current.Hook_Active or else
         State.Current.Finalizer_Hook_Suppression /= 0
       then
          return False;
@@ -1709,6 +1718,7 @@ package body Lua.Engine.Machine is
       end if;
       if not State.Current.Hook_Active and then
         State.Current.Finalizer_Hook_Suppression = 0 and then
+        not Activation.Is_C_Collector_Transport and then
         not Activation.Return_Hook_Done and then
         Hooks.Enabled (State.Current) and then
         (if State.Current.Foreign_Hook /= System.Null_Address then
@@ -1873,6 +1883,8 @@ package body Lua.Engine.Machine is
             Root_Barrier (State, State.Current.Stack.Last_Element.Callee);
             State.Current.Stack.Last_Element.Foreign_Handler :=
               Function_Item.Identity;
+            State.Current.Stack.Last_Element.Is_C_Collector_Transport :=
+              Function_Item.Identity = Collector_Transport;
          elsif Function_Item.Kind = Native_Kind_Value then
             Schedule
               (Self, Lua.Builtin_Registry.Implementation
@@ -1919,6 +1931,8 @@ package body Lua.Engine.Machine is
             Root_Barrier (State, State.Current.Stack.Last_Element.Native_Self);
             State.Current.Stack.Last_Element.Foreign_Handler :=
               Function_Item.Reference.Foreign_Handler;
+            State.Current.Stack.Last_Element.Is_C_Collector_Transport :=
+              Function_Item.Reference.Foreign_Handler = Collector_Transport;
          end if;
          --  Publish the number of inserted receivers on the actual callee,
          --  after either frame construction path. It describes this logical
@@ -2627,6 +2641,12 @@ package body Lua.Engine.Machine is
                Dispatch (Self, Handler, Packet, 0,
                          Call_Base => Activation.Native_Index,
                          Has_Call_Window => Activation.Native_Aux /= 0);
+               --  Record the actual finalizer entry without allocating a
+               --  name buffer while collection is active. Read-only C
+               --  inspection borrows its static marker; ordinary nested
+               --  calls and Lua tail replacements have independent origins.
+               State.Current.Stack.Last_Element.Is_Finalizer_Call :=
+                 Name = "@finalizer.invoke";
             end if;
             Activation.Native_Arguments.Clear;
          else

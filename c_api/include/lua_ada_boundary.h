@@ -155,6 +155,9 @@ int lua_ada_run_protected(lua_State *state,
 void lua_ada_propagate_status(lua_State *state, int status);
 void lua_ada_aux_charge(lua_State *state, size_t amount);
 int lua_ada_invoke_builtin(lua_State *state, int id);
+/* Identity of the real private finalizer-pump transport, not a callable Lua
+ * API. Its lifetime is the loaded library; no Lua allocation is involved. */
+void *lua_ada_collector_drain_address(void);
 
 /* Test-only C guard probe. It demonstrates that a failing exported operation
  * returned through Ada before C unwinds. It is not a lua_pcall replacement. */

@@ -482,6 +482,159 @@ static void suspended_pending_temporary(lua_State *L) {
     lua_settop(L, 0);
 }
 
+static int origin_queries;
+
+static int inspect_call_origin(lua_State *L) {
+    lua_Debug ar;
+    const char *kind = lua_tostring(L, 1);
+    const char *name = lua_tostring(L, 2);
+    assert(kind != NULL);
+    assert(lua_getstack(L, 1, &ar));
+    /* These names belong to a real calling opcode, finalizer entry or
+     * protection boundary. The n query must borrow them without allocating,
+     * including when the handler itself runs during collection. */
+    counts.refuse = 1;
+    assert(lua_getinfo(L, "n", &ar));
+    counts.refuse = 0;
+    if (strcmp(ar.namewhat, kind) != 0) {
+        int level;
+        fprintf(stderr, "origin expected %s/%s, got %s/%s\n", kind,
+                name ? name : "(nil)", ar.namewhat,
+                ar.name ? ar.name : "(nil)");
+        for (level = 0; level < 8; ++level) {
+            lua_Debug frame;
+            if (!lua_getstack(L, level, &frame)) break;
+            assert(lua_getinfo(L, "nS", &frame));
+            fprintf(stderr, "  %d %s %s/%s\n", level, frame.what,
+                    frame.namewhat, frame.name ? frame.name : "(nil)");
+        }
+    }
+    assert(strcmp(ar.namewhat, kind) == 0);
+    if (name) assert(ar.name && strcmp(ar.name, name) == 0);
+    else assert(ar.name == NULL);
+    ++origin_queries;
+    return 0;
+}
+
+static void prepare_origin_query(lua_State *L) {
+    origin_queries = 0;
+    lua_pushcfunction(L, inspect_call_origin);
+    lua_setglobal(L, "origin_probe");
+}
+
+static void arithmetic_call_origin(lua_State *L) {
+    prepare_origin_query(L);
+    run(L, "local a=setmetatable({}, {__add=function() "
+           "origin_probe('metamethod','add'); return 7 end});"
+           "assert(a+1==7)");
+    assert(origin_queries == 1);
+}
+
+static void index_call_origin(lua_State *L) {
+    prepare_origin_query(L);
+    run(L, "local a=setmetatable({}, {__index=function() "
+           "origin_probe('metamethod','index'); return 7 end});"
+           "assert(a.x==7)");
+    assert(origin_queries == 1);
+}
+
+static void close_call_origin(lua_State *L) {
+    prepare_origin_query(L);
+    run(L, "do local x <close> =setmetatable({}, {__close=function() "
+           "origin_probe('metamethod','close') end}) end");
+    assert(origin_queries == 1);
+}
+
+static void error_close_call_origin(lua_State *L) {
+    prepare_origin_query(L);
+    run(L, "local function f() local x <close> =setmetatable({}, "
+           "{__close=function()origin_probe('',nil)end});error('boom')end;"
+           "assert(not pcall(f))");
+    assert(origin_queries == 1);
+}
+
+static void coroutine_close_call_origin(lua_State *L) {
+    prepare_origin_query(L);
+    run(L, "local co=coroutine.create(function()local x <close> ="
+           "setmetatable({}, {__close=function()origin_probe('',nil)end});"
+           "coroutine.yield()end);assert(coroutine.resume(co));"
+           "assert(coroutine.close(co))");
+    assert(origin_queries == 1);
+}
+
+static void finalizer_call_origin(lua_State *L) {
+    prepare_origin_query(L);
+    run(L, "setmetatable({}, {__gc=function()"
+           "origin_probe('metamethod','__gc')end});collectgarbage()");
+    assert(origin_queries == 1);
+}
+
+static void collect_from_hook(lua_State *L, lua_Debug *ar) {
+    (void)ar;
+    /* Removing the installation leaves this actual invocation hooked until
+     * it returns. A direct lua_gc API call adds no ordinary C call frame. */
+    lua_sethook(L, NULL, 0, 0);
+    lua_pushnil(L); lua_setglobal(L, "hook_finalizer_target");
+    lua_gc(L, LUA_GCCOLLECT);
+}
+
+static void hooked_finalizer_call_origin(lua_State *L) {
+    int i;
+    prepare_origin_query(L);
+    run(L, "return function()origin_probe('hook','?')end");
+    lua_createtable(L, 0, 1);
+    lua_pushvalue(L, 1); lua_setfield(L, 2, "__gc");
+    lua_newuserdatauv(L, 0, 0);
+    lua_pushvalue(L, 2); lua_setmetatable(L, 3);
+    lua_setglobal(L, "hook_finalizer_target");
+    lua_settop(L, 0);
+    /* A Lua hook protects the interrupted activation's complete register
+     * window. Clear old host temporaries so no stale slot retains the target
+     * after the hook removes its only intended global owner. */
+    assert(lua_checkstack(L, 64));
+    for (i = 0; i < 64; ++i) lua_pushnil(L);
+    lua_settop(L, 0);
+    lua_sethook(L, collect_from_hook, LUA_MASKLINE, 0);
+    run(L, "local x=1; x=x+1");
+    assert(lua_gethook(L) == NULL && origin_queries == 1);
+}
+
+static int direct_gc_finalizers;
+static int direct_gc_hook_events;
+
+static int direct_gc_finalizer(lua_State *L) {
+    (void)L;
+    ++direct_gc_finalizers;
+    return 0;
+}
+
+static void direct_gc_hook(lua_State *L, lua_Debug *ar) {
+    (void)L; (void)ar;
+    ++direct_gc_hook_events;
+}
+
+static void direct_gc_no_transport_events(lua_State *L) {
+    int i;
+    /* Direct API collection enters no public function. Its actual finalizer
+     * suppresses hooks too. A protected implementation pump must not invent
+     * call/return events before or after that callback. */
+    lua_newuserdatauv(L, 0, 0);
+    lua_createtable(L, 0, 1);
+    lua_pushcfunction(L, direct_gc_finalizer);
+    lua_setfield(L, 2, "__gc");
+    lua_setmetatable(L, 1);
+    lua_settop(L, 0);
+    assert(lua_checkstack(L, 64));
+    for (i = 0; i < 64; ++i) lua_pushnil(L);
+    lua_settop(L, 0);
+    direct_gc_finalizers = 0;
+    direct_gc_hook_events = 0;
+    lua_sethook(L, direct_gc_hook, LUA_MASKCALL | LUA_MASKRET, 0);
+    lua_gc(L, LUA_GCCOLLECT);
+    lua_sethook(L, NULL, 0, 0);
+    assert(direct_gc_finalizers == 1 && direct_gc_hook_events == 0);
+}
+
 static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     assert(lua_gettop(L) == 0);
     body(L);
@@ -512,6 +665,14 @@ int main(void) {
     check("suspended-capture-local", suspended_capture_local, L);
     check("caller-temporary-extent", caller_temporary_extent, L);
     check("suspended-pending-temporary", suspended_pending_temporary, L);
+    check("arithmetic-call-origin", arithmetic_call_origin, L);
+    check("index-call-origin", index_call_origin, L);
+    check("close-call-origin", close_call_origin, L);
+    check("error-close-call-origin", error_close_call_origin, L);
+    check("coroutine-close-call-origin", coroutine_close_call_origin, L);
+    check("finalizer-call-origin", finalizer_call_origin, L);
+    check("hooked-finalizer-call-origin", hooked_finalizer_call_origin, L);
+    check("direct-gc-no-transport-events", direct_gc_no_transport_events, L);
     lua_close(L); assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public debug contract");
     return 0;

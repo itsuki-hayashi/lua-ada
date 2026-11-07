@@ -426,3 +426,68 @@ scalar result publication, prefix/argument normalization, obsolete packet-root
 release and return-phase continuation handling. The completed implementation
 must compile and pass these cases before final acceptance; this checkpoint
 does not establish that result.
+
+## 2026-11-08 metamethod, close and finalizer call origins
+
+The shared name resolver now implements the actual calling-opcode cases in
+pinned ldebug.c:funcnamefromcode (lines 615-652): indexed reads/stores, all
+MMBIN forms with typed TMS event names, unary/concatenation/comparison calls,
+and CLOSE/RETURN. Static NUL-terminated identities support both Lua debug
+materialization and allocation-free C borrows. No opcode trace or hook result
+is fabricated. The real finalizer activation carries a resettable entry
+marker, preserving descendants and tail replacement as independent origins.
+Pinned funcnamefromcall (lines 659-672) gives an actual hooked caller priority
+over its finalizer flag; GCTM in lgc.c disables hooks around the real callback.
+
+Lua getinfo/traceback and public C getstack/getinfo now share one budgeted,
+allocation-free traversal. It omits actual scheduler transports and failed
+owners retained only to close cells after error/coroutine unwinding. Normal
+scope/return owners remain visible, as do genuine protected C callers. This
+removes misleading error()/yield() names without changing their lifetimes or
+closing transfers. Forty-four separately named AUnit cases and the complete
+metamethod_name_phases.lua fixture cover opcode variants, normal/error/return/
+coroutine closing, descendants, tail replacement, traceback and frame reuse.
+The old component binary failed forty of those source cases and passed four.
+
+Eight new named public-header C cases preserve the existing twenty. They
+exercise arithmetic/index/normal/error/coroutine/finalizer origins while
+refusing allocation for the actual n query, plus direct collection from a C
+hook and direct API collection with call/return hooks installed. The latter
+edge revealed the real private drain_collector guard wrapper as an extra
+public C frame. A private getter returns that exact callback address through
+a checked function-pointer byte copy. Dispatch classifies its activation
+before entry hooks; frame queries, physical local boundaries and call/return
+eligibility treat this known implementation transport consistently. The
+protected C pump, physical windows, rooting and native charging remain intact.
+A distinct marker avoids confusing collector transport with hook origin.
+The native hook fixture also clears stale host temporary slots explicitly,
+so an interrupted activation cannot accidentally retain its userdata target.
+
+Strict default Windows validation/static results at component base efa9368:
+
+- Root, test and C consumer builds pass under GNAT 16.1.0 with all required
+  warning/style/check flags. All 1,577 AUnit cases pass, with zero failed
+  assertions or unexpected errors. This isolated base excludes newer parser
+  tests already present in the parent integration; its count is not a claim
+  about that integrated head.
+- All twenty-eight public debug C cases pass with zero counted allocations
+  outstanding at close. The identical source passes pinned native default
+  and instrumented C builds using GCC 13.2.0 MinGW-W64 x86_64-ucrt.
+- Both producers' complete metamethod fixture chunks pass on both runtimes;
+  source and all four outputs have SHA256
+  6D52BF6EA18D6C7CE18CFC9FBFB25EA3EF542619BA7D50ED82F1A92603A1E386,
+  with empty stderr. All thirty-six retained four-way compiler/runtime cases
+  pass as well. These chunk cross-checks use the default configuration.
+- Earlier strict attempts found unused positional enum literals, corrected
+  with a named aggregate, and a new test convenience call to the still-missing
+  luaL_checklstring, replaced with core lua_tostring plus a non-null assertion.
+  Neither failed attempt is counted as passing; the metadata checks remain.
+- Reference files and pins are unchanged; git diff --check is clean.
+
+The unchanged-source disposable-tree diagnostics advance db.lua from line
+528 to 603 (empty numeric-loop count-hook instruction shape) and soft locals.lua
+from line 544 to 562 (removed __close call-error provenance). Neither full file,
+T-enabled Ada execution nor full-upstream acceptance is established. A separate
+T.listcode inspection of a default-produced chunk hits the native test build's
+MAXIWTHABS=3 assumption versus the default compiler interval128; configuration
+line-anchor validation remains separate from these default cross-checks.

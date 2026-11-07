@@ -829,6 +829,19 @@ static int drain_collector(lua_State *state) {
     return 0;
 }
 
+void *lua_ada_collector_drain_address(void) {
+    typedef char pointer_sizes_match[
+        sizeof(lua_CFunction) == sizeof(void *) ? 1 : -1];
+    lua_CFunction function = drain_collector;
+    void *address;
+    (void)sizeof(pointer_sizes_match);
+    /* Ada classifies this actual private C guard transport before scheduling
+     * it. It is not a Lua call and must not add a public frame or hook event.
+     * The callback still executes through its ordinary protected C pump. */
+    memcpy(&address, &function, sizeof address);
+    return address;
+}
+
 int lua_gc(lua_State *state, int what, ...) {
     struct lua_ada_request input = request(ADA_COLLECTOR_CONTROL);
     struct lua_ada_response output;

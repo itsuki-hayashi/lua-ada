@@ -62,8 +62,11 @@ package body Lua.Engine.Inspection is
       --  parent's locals. Follow the real window links, not opcode guesses
       --  or a fabricated stack layout. A C hook borrows its interrupted
       --  frame, so its immutable transport marker contributes no boundary.
+      --  The protected C collector pump likewise creates no public call.
       while Window /= null and then Window /= Item loop
-         if not Window.Is_C_Hook_Transport then
+         if not Window.Is_C_Hook_Transport and then
+           not Window.Is_C_Collector_Transport
+         then
             Child := Window;
          end if;
          Window := Window.Previous_Stack_Window;
@@ -76,6 +79,89 @@ package body Lua.Engine.Inspection is
       end if;
       return Limit;
    end Visible_Local_Top;
+
+   procedure Query_Work (State : in out World);
+   procedure Query_Work (State : in out World) is
+   begin
+      if State.Steps >= State.Bounds.Instructions then
+         Fail (State, "instruction limit exceeded", Resource => True);
+      end if;
+      if State.Policy = Bounded then
+         State.Steps := State.Steps + 1;
+      end if;
+   end Query_Work;
+
+   function Published_Frame (Item : Frame_Access) return Boolean;
+   function Published_Frame (Item : Frame_Access) return Boolean is
+     (not Item.Is_C_Hook_Transport and then
+      not Item.Is_C_Collector_Transport and then
+      (not Item.Is_Native or else
+       (Length (Item.Native_Name) > 0 and then
+        Element (Item.Native_Name, 1) /= '@')));
+
+   function Failed_Owner
+     (State : in out World; Context : not null Context_Access;
+      Candidate : Frame_Access) return Boolean;
+   function Failed_Owner
+     (State : in out World; Context : not null Context_Access;
+      Candidate : Frame_Access) return Boolean
+   is
+   begin
+      --  Every @unwind owns a cleanup charge (Start_Unwind/Release_Frame).
+      --  Ordinary inspection therefore avoids an otherwise full-stack scan.
+      if Context.Cleanup_Depth = 0 then return False; end if;
+      for Driver of Context.Stack loop
+         Query_Work (State);
+         if Driver.Is_Native and then Driver.Native_Name = "@unwind" and then
+           Driver.Unwind in Error_Exit | Coroutine_Exit and then
+           Driver.Unwind_Owner = Candidate
+         then
+            return True;
+         end if;
+      end loop;
+      return False;
+   end Failed_Owner;
+
+   function Logical_Frame
+     (State : in out World; Context : not null Context_Access; Level : Natural)
+      return Frame_Access
+   is
+      Remaining : Natural := Level;
+   begin
+      for Item of reverse Context.Stack loop
+         Query_Work (State);
+         if Published_Frame (Item) and then
+           not Failed_Owner (State, Context, Item)
+         then
+            if Remaining = 0 then return Item; end if;
+            Remaining := Remaining - 1;
+         end if;
+      end loop;
+      return null;
+   end Logical_Frame;
+
+   function Caller_Frame
+     (State : in out World; Context : not null Context_Access;
+      Callee : not null Frame_Access) return Frame_Access
+   is
+      Found : Boolean := False;
+   begin
+      --  Error/coroutine-close owners stay alive to close their real cells,
+      --  but their calls have unwound to protection or the coroutine base.
+      --  They must not make a closer look like error() or yield(). Preserve
+      --  actual native protection frames.
+      for Item of reverse Context.Stack loop
+         Query_Work (State);
+         if Item = Callee then
+            Found := True;
+         elsif Found and then Published_Frame (Item) and then
+           not Failed_Owner (State, Context, Item)
+         then
+            return Item;
+         end if;
+      end loop;
+      return null;
+   end Caller_Frame;
 
    function Inspect
      (State : in out World; Activation : Frame_Access;
@@ -121,12 +207,7 @@ package body Lua.Engine.Inspection is
 
       procedure Work is
       begin
-         if State.Steps >= State.Bounds.Instructions then
-            Fail (State, "instruction limit exceeded", Resource => True);
-         end if;
-         if State.Policy = Bounded then
-            State.Steps := State.Steps + 1;
-         end if;
+         Query_Work (State);
       end Work;
 
       function Integer_Arg (Index : Positive) return Integer_Value is
@@ -135,57 +216,16 @@ package body Lua.Engine.Inspection is
       end Integer_Arg;
 
       function Public_Frame (Item : Frame_Access) return Boolean is
-        (not Item.Is_C_Hook_Transport and then
-         (not Item.Is_Native or else
-          (Length (Item.Native_Name) > 0 and then
-           Element (Item.Native_Name, 1) /= '@')));
+        (Published_Frame (Item));
 
       function Logical_Frame (Level : Natural) return Frame_Access is
-         Remaining : Natural := Level;
-         function Failed_Owner (Candidate : Frame_Access) return Boolean;
-         function Failed_Owner (Candidate : Frame_Access) return Boolean is
-         begin
-            --  An errored Lua activation is retained only to own its closing
-            --  cells. Its logical call has already unwound to protection.
-            for Driver of Context.Stack loop
-               if Driver.Is_Native and then Driver.Native_Name = "@unwind"
-                 and then Driver.Unwind = Error_Exit and then
-                 Driver.Unwind_Owner = Candidate
-               then
-                  return True;
-               end if;
-            end loop;
-            return False;
-         end Failed_Owner;
       begin
-         --  Scheduler helper activations are implementation phases, not Lua
-         --  stack frames. Public native closures retain their logical frame.
-         for Item of reverse Context.Stack loop
-            Work;
-            if Public_Frame (Item) and then not Failed_Owner (Item) then
-               if Remaining = 0 then
-                  return Item;
-               end if;
-               Remaining := Remaining - 1;
-            end if;
-         end loop;
-         return null;
+         return Inspection.Logical_Frame (State, Context, Level);
       end Logical_Frame;
 
       function Caller_Of (Callee : Frame_Access) return Frame_Access is
-         Found : Boolean := False;
       begin
-         --  Name inference is deliberately lazy: ordinary function calls never
-         --  scan preceding code. Skip explicit scheduler phases when finding
-         --  the logical caller, and preserve real native library boundaries.
-         for Item of reverse Context.Stack loop
-            if Item = Callee then
-               Found := True;
-            elsif Found and then Public_Frame (Item) then
-               return Item;
-            end if;
-         end loop;
-         return null;
+         return Caller_Frame (State, Context, Callee);
       end Caller_Of;
 
       function Inferred_Name
@@ -199,6 +239,20 @@ package body Lua.Engine.Inspection is
          if Item /= null and then Length (Item.Name_Kind) = 0 and then
            not Item.Is_Tail_Call
          then
+            if Item.Is_Finalizer_Call then
+               Caller := Caller_Of (Item);
+               if Context.Hook_Active and then Caller = Context.Hook_Frame then
+                  --  A direct lua_gc call from a C hook adds no public call
+                  --  frame. Its actual interrupted caller still has the hook
+                  --  origin even after removing the installation; pinned
+                  --  funcnamefromcall gives CIST_HOOKED priority over FIN.
+                  return (New_String (State,
+                    To_String (Call_Names.Hook_Name)), Call_Names.Hook_Call);
+               end if;
+               return (New_String (State,
+                 To_String (Call_Names.Finalizer_Name)),
+                 Call_Names.Metamethod_Call);
+            end if;
             Caller := Caller_Of (Item);
             if Caller /= null and then not Caller.Is_Native and then
               Caller.Code.Canonical_Node /= null
@@ -965,7 +1019,7 @@ package body Lua.Engine.Inspection is
                   Work;
                   if Driver.Is_Native and then
                     Driver.Native_Name = "@unwind" and then
-                    Driver.Unwind = Error_Exit
+                    Driver.Unwind in Error_Exit | Coroutine_Exit
                   then
                      Failed.Append (Driver.Unwind_Owner);
                   end if;

@@ -15,13 +15,130 @@ package body Lua.Engine.Call_Names is
      "for iterator" & Character'Val (0);
    Unknown_Bytes : constant Byte_String := (Unknown_Name'Address, 1);
 
+   --  The enum order is the pinned ltm.h TMS word contract used by MMBIN
+   --  C fields. These immutable NUL-terminated markers support both Lua
+   --  materialization and allocation-free C debug borrows.
+   type Metamethod_Event is
+     (Index_Event,
+      Newindex_Event,
+      GC_Event,
+      Mode_Event,
+      Length_Event,
+      Equal_Event,
+      Add_Event,
+      Subtract_Event,
+      Multiply_Event,
+      Modulo_Event,
+      Power_Event,
+      Divide_Event,
+      Floor_Divide_Event,
+      Bit_And_Event,
+      Bit_Or_Event,
+      Bit_Xor_Event,
+      Shift_Left_Event,
+      Shift_Right_Event,
+      Unary_Minus_Event,
+      Bit_Not_Event,
+      Less_Event,
+      Less_Equal_Event,
+      Concatenate_Event,
+      Call_Event,
+      Close_Event);
+   type Name_Access is access constant String;
+   Index_Text : aliased constant String :=
+     "index" & Character'Val (0);
+   Newindex_Text : aliased constant String :=
+     "newindex" & Character'Val (0);
+   GC_Text : aliased constant String :=
+     "gc" & Character'Val (0);
+   Mode_Text : aliased constant String :=
+     "mode" & Character'Val (0);
+   Length_Text : aliased constant String :=
+     "len" & Character'Val (0);
+   Equal_Text : aliased constant String :=
+     "eq" & Character'Val (0);
+   Add_Text : aliased constant String :=
+     "add" & Character'Val (0);
+   Subtract_Text : aliased constant String :=
+     "sub" & Character'Val (0);
+   Multiply_Text : aliased constant String :=
+     "mul" & Character'Val (0);
+   Modulo_Text : aliased constant String :=
+     "mod" & Character'Val (0);
+   Power_Text : aliased constant String :=
+     "pow" & Character'Val (0);
+   Divide_Text : aliased constant String :=
+     "div" & Character'Val (0);
+   Floor_Divide_Text : aliased constant String :=
+     "idiv" & Character'Val (0);
+   Bit_And_Text : aliased constant String :=
+     "band" & Character'Val (0);
+   Bit_Or_Text : aliased constant String :=
+     "bor" & Character'Val (0);
+   Bit_Xor_Text : aliased constant String :=
+     "bxor" & Character'Val (0);
+   Shift_Left_Text : aliased constant String :=
+     "shl" & Character'Val (0);
+   Shift_Right_Text : aliased constant String :=
+     "shr" & Character'Val (0);
+   Unary_Minus_Text : aliased constant String :=
+     "unm" & Character'Val (0);
+   Bit_Not_Text : aliased constant String :=
+     "bnot" & Character'Val (0);
+   Less_Text : aliased constant String :=
+     "lt" & Character'Val (0);
+   Less_Equal_Text : aliased constant String :=
+     "le" & Character'Val (0);
+   Concatenate_Text : aliased constant String :=
+     "concat" & Character'Val (0);
+   Call_Text : aliased constant String :=
+     "call" & Character'Val (0);
+   Close_Text : aliased constant String :=
+     "close" & Character'Val (0);
+   Event_Names : constant array (Metamethod_Event) of Name_Access :=
+     [Index_Event => Index_Text'Access,
+      Newindex_Event => Newindex_Text'Access,
+      GC_Event => GC_Text'Access,
+      Mode_Event => Mode_Text'Access,
+      Length_Event => Length_Text'Access,
+      Equal_Event => Equal_Text'Access,
+      Add_Event => Add_Text'Access,
+      Subtract_Event => Subtract_Text'Access,
+      Multiply_Event => Multiply_Text'Access,
+      Modulo_Event => Modulo_Text'Access,
+      Power_Event => Power_Text'Access,
+      Divide_Event => Divide_Text'Access,
+      Floor_Divide_Event => Floor_Divide_Text'Access,
+      Bit_And_Event => Bit_And_Text'Access,
+      Bit_Or_Event => Bit_Or_Text'Access,
+      Bit_Xor_Event => Bit_Xor_Text'Access,
+      Shift_Left_Event => Shift_Left_Text'Access,
+      Shift_Right_Event => Shift_Right_Text'Access,
+      Unary_Minus_Event => Unary_Minus_Text'Access,
+      Bit_Not_Event => Bit_Not_Text'Access,
+      Less_Event => Less_Text'Access,
+      Less_Equal_Event => Less_Equal_Text'Access,
+      Concatenate_Event => Concatenate_Text'Access,
+      Call_Event => Call_Text'Access,
+      Close_Event => Close_Text'Access];
+   Finalizer_Text : aliased constant String := "__gc" & Character'Val (0);
+
+   function Finalizer_Name return Byte_String is
+     ((Finalizer_Text'Address, Finalizer_Text'Length - 1));
+   function Hook_Name return Byte_String is (Unknown_Bytes);
+
+   function Event_Name (Event : Metamethod_Event) return Borrowed_Identity;
+   function Event_Name (Event : Metamethod_Event) return Borrowed_Identity is
+     ((Event_Names (Event).all'Address, Event_Names (Event)'Length - 1),
+      Metamethod_Call);
+
    function Kind_Image (Kind : Name_Kind) return String is
      (case Kind is
          when Unknown => "", when Local_Binding => "local",
          when Upvalue_Binding => "upvalue", when Constant_Value => "constant",
          when Global_Field => "global", when Table_Field => "field",
          when Method_Call => "method", when Iterator_Call => "for iterator",
-         when Metamethod_Call => "metamethod");
+         when Metamethod_Call => "metamethod", when Hook_Call => "hook");
 
    function Resolve_Name
      (State : in out World; Caller : Frame_Access; Operand_Index : Natural)
@@ -263,6 +380,26 @@ package body Lua.Engine.Call_Names is
          when Op_TFORCALL =>
             return ((Iterator_Name'Address, Iterator_Name'Length - 1),
                     Iterator_Call);
+         when Op_SELF | Op_GETTABUP | Op_GETTABLE | Op_GETI | Op_GETFIELD =>
+            return Event_Name (Index_Event);
+         when Op_SETTABUP | Op_SETTABLE | Op_SETI | Op_SETFIELD =>
+            return Event_Name (Newindex_Event);
+         when Op_MMBIN | Op_MMBINI | Op_MMBINK =>
+            if Part (Instruction, C) <=
+              Metamethod_Event'Pos (Metamethod_Event'Last)
+            then
+               return Event_Name
+                 (Metamethod_Event'Val (Part (Instruction, C)));
+            end if;
+            return (others => <>);
+         when Op_UNM => return Event_Name (Unary_Minus_Event);
+         when Op_BNOT => return Event_Name (Bit_Not_Event);
+         when Op_LEN => return Event_Name (Length_Event);
+         when Op_CONCAT => return Event_Name (Concatenate_Event);
+         when Op_EQ => return Event_Name (Equal_Event);
+         when Op_LT | Op_LTI | Op_GTI => return Event_Name (Less_Event);
+         when Op_LE | Op_LEI | Op_GEI => return Event_Name (Less_Equal_Event);
+         when Op_CLOSE | Op_RETURN => return Event_Name (Close_Event);
          when others => return (others => <>);
       end case;
    end Resolve_Name;

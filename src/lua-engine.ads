@@ -569,6 +569,13 @@ private package Lua.Engine is
       --  A native hook borrows the interrupted frame. This actual scheduler
       --  wrapper is transport even if the callback replaces/removes its hook
       --  while running; mutable callback identity cannot identify the frame.
+      Is_C_Collector_Transport : Boolean := False;
+      --  The real C protected collector pump is an implementation transport,
+      --  not a Lua-visible call. Its identity is fixed before entry hooks.
+      Is_Finalizer_Call : Boolean := False;
+      --  This actual activation was entered by the finalizer controller.
+      --  It has the __gc origin even without a Lua calling opcode. Reuse and
+      --  Lua tail replacement clear the marker; descendants do not inherit it.
       Is_Tail_Call : Boolean := False;
       Call_Metamethod_Count : Natural range 0 .. 15 := 0;
       --  Receivers inserted on entry to this logical frame, independently
