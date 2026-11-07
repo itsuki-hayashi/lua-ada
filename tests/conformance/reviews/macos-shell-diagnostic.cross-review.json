@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "kind": "independent-diagnostic-review",
+  "author": "Codex /root",
+  "reviewer": "Codex independent review agent /root/review_files",
+  "decision": "accepted-diagnostic-design",
+  "coverage_authority": false,
+  "runtime_acceptance": false,
+  "source_bindings": [
+    {
+      "path": "tests/conformance/platform/macos-shell-diagnostic.lua",
+      "sha256": "e5e62ec569ee862a8252432fb0aa25583f60c1878a3f695cd1a7b36e7cc7d174"
+    },
+    {
+      "path": "scripts/run-conformance.ps1",
+      "sha256": "30df392aa9b982b677ab6dae8dfdb4c4e6967d6047d0d4c84e5b9132971671b6"
+    },
+    {
+      "path": "references/lua/testes/files.lua",
+      "sha256": "fe0469dd776f79ae0ffb8a09a011c379b290539d2cb6bc4afc0f22c597792b86"
+    }
+  ],
+  "observed_failure": {
+    "capture": "reports/ci-artifacts/2e9a145-mac-default/reports/conformance/e31c85c625514b71b490c84413223270/execution.stderr",
+    "sha256": "8a82d7beaa720bbb51ba3ce3ed16cb33b09d4bddc9c704fb8fb06240bc8bc1c2",
+    "meaning": "Generated line816 is original status-kind assertion814; preceding popen/execute triple comparison passed. The failed row/status are not yet identified."
+  },
+  "rationale": [
+    "Seven source-faithful native shell command rows plus one explicit non-tail nested HUP comparison expose direct/nested signal versus exit behavior. Expected values are never inferred or substituted into upstream assertions.",
+    "Each row opens and closes its pipe, executes the same command through os.execute, prints all six tuple values and flushes stdout. Trap output is separately captured, its pipe is closed, and no Lua subprocess command is added.",
+    "Launcher runs the identical source-copied diagnostic for both C and Ada only in the Mac files-equivalent setup, before executing the original source-hashed equivalent. Native fixture records bind source/copy hashes and explicitly mark diagnostic_only.",
+    "No pinned upstream file, equivalent replacement span, accepted shell expectation, managed allocation ceiling or Lua-child count is changed by this diagnostic."
+  ],
+  "limitations": [
+    "This review executes no Mac process and approves no new native equivalent. Actual next-CI row/trap output remains required.",
+    "Trap output may not fully expose inherited ignored-signal behavior; distinguish it from direct evidence of a signal disposition.",
+    "Diagnostic commands can add expected native shell stderr; their observations are not completion witnesses or accepted shell coverage.",
+    "The original failing assertion remains authoritative; observing matching C/Ada tuples alone cannot establish that upstream expected semantics were met."
+  ]
+}

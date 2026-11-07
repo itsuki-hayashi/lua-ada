@@ -542,6 +542,16 @@ try {
                 source_sha256=(Get-FileHash $counterpart).Hash.ToLowerInvariant(); artifact=$counterpartCopy;
                 artifact_sha256=(Get-FileHash $counterpartCopy).Hash.ToLowerInvariant()}
             $nativeSetup += "; dofile('macos-buffered-failure.lua')"
+            # Retain actual direct/nested shell statuses before the immutable
+            # upstream loop diagnoses its expected-kind mismatch. These are
+            # observations only; no dynamic status becomes an accepted value.
+            $diagnostic = Join-Path $root 'tests/conformance/platform/macos-shell-diagnostic.lua'
+            $diagnosticCopy = Join-Path $fixtureDirectory 'equivalent-macos-shell-diagnostic.lua'
+            Copy-Item -LiteralPath $diagnostic -Destination $diagnosticCopy
+            $evidence.native_fixture_records += [ordered]@{source='tests/conformance/platform/macos-shell-diagnostic.lua';
+                source_sha256=(Get-FileHash $diagnostic).Hash.ToLowerInvariant(); artifact=$diagnosticCopy;
+                artifact_sha256=(Get-FileHash $diagnosticCopy).Hash.ToLowerInvariant(); diagnostic_only=$true}
+            $nativeSetup += "; dofile('equivalent-macos-shell-diagnostic.lua')"
         }
     }
     if ($Scope -ne '' -and $File -eq 'files.lua') {

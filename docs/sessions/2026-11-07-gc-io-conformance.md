@@ -762,3 +762,16 @@ remains empty. All 41 scoped regressions pass after this metadata transition.
 At published c247afb, all 18 Windows/Linux contexts have passed; eight macOS
 contexts remain running/queued. Final-revision evidence for this new checkpoint
 and authoritative native-branch execution contracts are still outstanding.
+
+Mac default validation/static job 128228632344 in run 42316001148 now supplies
+the next failure: the C oracle passes the native buffered/unbuffered fixtures
+but fails generated files.lua line 816 (original line 814), the shell-status
+kind assertion. The immediately preceding popen/execute triple equality passed.
+Archive 13550738500 was downloaded and verified as
+209ba7392bc0c1451e580c463d4ac269ecb5d841463e7b0005a52eefa1496462;
+captures are retained under reports/ci-artifacts/2e9a145-mac-default.
+The capture does not identify which command failed. A separate diagnostic
+preflight now records direct and nested shell statuses, inherited traps and
+an explicit non-tail nested HUP command before original execution. It neither
+replaces assertions nor approves native equivalence. Windows can validate its
+Lua syntax only; actual Mac status observations remain required.
