@@ -140,6 +140,14 @@ package body Lua.Engine.Call_Names is
          when Method_Call => "method", when Iterator_Call => "for iterator",
          when Metamethod_Call => "metamethod", when Hook_Call => "hook");
 
+   function Kind_From_Image (Text : String) return Name_Kind is
+   begin
+      for Kind in Name_Kind loop
+         if Kind_Image (Kind) = Text then return Kind; end if;
+      end loop;
+      return Unknown;
+   end Kind_From_Image;
+
    function Resolve_Name
      (State : in out World; Caller : Frame_Access; Operand_Index : Natural)
       return Borrowed_Identity;

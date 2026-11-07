@@ -1256,6 +1256,15 @@ private package Lua.Engine is
    function Equal (Left, Right : Value) return Boolean;
    function Truth (Item : Value) return Boolean;
    function Type_Name (Item : Value) return String;
+   function Diagnostic_Type (State : World; Item : Value) return String;
+   --  VM error type spelling: only table/userdata raw string __name fields
+   --  override primitive type(). The rendered name ends at its first NUL.
+   function Argument_Type
+     (State : World; Item : Value; Present : Boolean := True) return String;
+   --  Auxiliary argument spelling: any raw string __name takes priority,
+   --  then light userdata receives its special name. Present=False denotes
+   --  an absent slot rather than an explicit nil. Both queries invoke no
+   --  handlers and allocate no Lua objects; returned Ada text is immediate.
    function Image (Memory : not null Lua.Storage.Owner_Access;
                    Item : Value) return String;
    function Image (Item : Value) return String;

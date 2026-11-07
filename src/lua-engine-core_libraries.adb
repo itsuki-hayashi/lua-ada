@@ -1,4 +1,5 @@
 with Lua.Engine.Mathematics;
+with Lua.Engine.Diagnostics;
 with Ada.Containers;
 with Ada.Unchecked_Conversion;
 with Interfaces;
@@ -183,7 +184,7 @@ package body Lua.Engine.Core_Libraries is
       procedure Require (Count : Positive) is
       begin
          if Natural (Arguments.Length) < Count then
-            Fail (State, "bad argument to " & Name & " (value expected)");
+            Diagnostics.Argument_Error (State, Count, "value expected");
          end if;
       end Require;
 
@@ -203,7 +204,9 @@ package body Lua.Engine.Core_Libraries is
                end if;
             when others => null;
          end case;
-         Fail (State, "bad argument to " & Name & " (number expected)");
+         Diagnostics.Type_Error
+           (State, Index, "number", Item,
+            Present => Index <= Natural (Arguments.Length));
          return (Kind => Lua.Numbers.Invalid);
       end Numeric;
 
@@ -212,7 +215,8 @@ package body Lua.Engine.Core_Libraries is
          Value : constant Integer_Value := As_Integer (Numeric (Index), Valid);
       begin
          if not Valid then
-            Fail (State, "number has no integer representation");
+            Diagnostics.Argument_Error
+              (State, Index, "number has no integer representation");
          end if;
          return Value;
       end Integral;

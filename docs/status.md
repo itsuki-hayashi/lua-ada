@@ -24,6 +24,13 @@ standalone C consumers pass. Final instrumented/shared/platform evidence and
 the remaining traceback helper remain pending.
 
 
+The [library argument diagnostic checkpoint](sessions/2026-11-08-library-argument-diagnostics.md)
+shares VM/auxiliary type policies and actual argument call origins. Thirty
+new cases pass within 1,856 local AUnit cases; both producer/runtime paths
+and the nineteen-case C builtin contract have scoped native comparisons.
+Unchanged errors.lua next fails named tostring. Registry fallback callbacks,
+actual C concat windows and complete target acceptance remain open.
+
 The [concatenation operation checkpoint](sessions/2026-11-08-concat-operation-diagnostics.md)
 preserves actual operand capture, merged source events, primitive/index
 diagnostic names and rendered C name boundaries. Eighty named cases pass

@@ -120,8 +120,6 @@ package body Lua.Engine.Machine is
       Expand_Last : Boolean := True) return Values.Vector;
    function Numeric (State : in out World; Item : Value)
                      return Lua.Numbers.Number;
-   function Diagnostic_Type (State : in out World; Item : Value)
-                            return String;
    function Integral
      (State : in out World; Item : Value; Operand_Index : Natural := 0)
       return Integer_Value;
@@ -194,34 +192,6 @@ package body Lua.Engine.Machine is
       end loop;
       return Result;
    end Flatten;
-
-   function Diagnostic_Type (State : in out World; Item : Value)
-                            return String
-   is
-      Name : constant Value :=
-        (if Item.Kind in Table_Kind | Userdata_Kind then
-            Metafield (State, Item, "__name") else Nil_Value);
-   begin
-      --  type() remains the language's primitive category. Error wording
-      --  alone honors a table/userdata owner's raw string __name. Pinned
-      --  luaT_objtypename ignores names on shared primitive metatables.
-      if Name.Kind = String_Kind then
-         declare
-            Text : constant String := Image (State.Current.Memory, Name);
-         begin
-            --  luaT_objtypename returns a C string. Its diagnostic use ends
-            --  at an embedded NUL even though the underlying Lua __name is a
-            --  counted byte string; the type() result remains primitive.
-            for Index in Text'Range loop
-               if Text (Index) = Character'Val (0) then
-                  return Text (Text'First .. Index - 1);
-               end if;
-            end loop;
-            return Text;
-         end;
-      end if;
-      return Type_Name (Item);
-   end Diagnostic_Type;
 
    procedure Operation_Error
      (State : in out World; Message : String; Operand_Index : Natural := 0;

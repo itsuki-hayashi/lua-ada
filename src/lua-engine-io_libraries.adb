@@ -3,6 +3,7 @@ with Ada.Unchecked_Conversion;
 with Interfaces;
 with Interfaces.C;
 with Lua.Engine.File_Resources;
+with Lua.Engine.Diagnostics;
 with Lua.Engine.Machine;
 with Lua.Engine.Strings;
 with Lua.Engine.System_Results;
@@ -60,7 +61,7 @@ package body Lua.Engine.IO_Libraries is
                            Opened : Boolean := True) return Value is
    begin
       if not Files.Is_File (State, Item) then
-         Fail (State, "FILE* expected");
+         Diagnostics.Type_Error (State, 1, "FILE*", Item);
       elsif Opened and then Files.Header (Item).Closer = null then
          Fail (State, "attempt to use a closed file");
       elsif Opened and then Files.Header (Item).File = Streams.No_Stream then
@@ -744,7 +745,8 @@ package body Lua.Engine.IO_Libraries is
         Name (Name'First .. Name'First + 7) = "io.file." and then
         Activation.Native_Arguments.Is_Empty
       then
-         Fail (State, "bad argument #1 (FILE* expected, got no value)");
+         Diagnostics.Type_Error
+           (State, 1, "FILE*", Nil_Value, Present => False);
       end if;
       if Name = "io.type" then
          if Activation.Native_Arguments.Is_Empty then

@@ -1,3 +1,5 @@
+with Lua.Engine.Call_Names;
+
 private package Lua.Engine.Inspection is
    function Short_Source (Source : String) return String;
    --  Format the pinned bounded Lua chunk identifier used by debug metadata
@@ -25,6 +27,15 @@ private package Lua.Engine.Inspection is
      with Pre => Callee.Context = Context;
    --  Borrow the public caller of this validated active frame. Unwound
    --  ownership records cannot contribute a misleading source call name.
+
+   function Call_Identity
+     (State : in out World; Context : not null Context_Access;
+      Callee : Frame_Access) return Call_Names.Borrowed_Identity
+     with Pre => Callee = null or else Callee.Context = Context;
+   --  Borrow an actual activation's explicit or inferred public call origin.
+   --  Hook/finalizer priority and tail-call loss follow getinfo semantics;
+   --  no Lua objects are allocated. Retain the frame/prototype while using
+   --  the immutable name bytes; Name_Image supplies rendered C text.
 
    function Inspect
      (State : in out World; Activation : Frame_Access;

@@ -1,9 +1,8 @@
-with Lua.Engine.Call_Names;
+with Lua.Engine.Diagnostics;
 with Lua.Engine.Hooks;
 with Lua.Engine.Canonical;
 with Lua.Engine.Stacks;
 with Lua.Prototypes;
-with Lua.Engine.Strings;
 with Ada.Strings.Fixed;
 with Interfaces.C;
 with System;
@@ -165,6 +164,37 @@ package body Lua.Engine.Inspection is
       return null;
    end Caller_Frame;
 
+   function Call_Identity
+     (State : in out World; Context : not null Context_Access;
+      Callee : Frame_Access) return Call_Names.Borrowed_Identity
+   is
+      Caller : Frame_Access;
+   begin
+      if Callee = null then return (others => <>); end if;
+      --  Match the real debug origin rather than the scheduler phase that
+      --  happens to request an argument diagnostic. A direct C builtin may
+      --  execute in a hidden phase while its original C CI remains public.
+      if Callee.Is_Finalizer_Call and then not Callee.Is_Tail_Call then
+         Caller := Caller_Frame (State, Context, Callee);
+         if Context.Hook_Active and then Caller = Context.Hook_Frame then
+            return (Call_Names.Hook_Name, Call_Names.Hook_Call);
+         end if;
+         return (Call_Names.Finalizer_Name, Call_Names.Metamethod_Call);
+      elsif Length (Callee.Name_Kind) > 0 then
+         return
+           ((Callee.Call_Name_Bytes.Address, Length (Callee.Call_Name_Bytes)),
+            Call_Names.Kind_From_Image (To_String (Callee.Name_Kind)));
+      elsif not Callee.Is_Tail_Call then
+         Caller := Caller_Frame (State, Context, Callee);
+         if Caller /= null and then not Caller.Is_Native and then
+           Caller.Code.Canonical_Node /= null
+         then
+            return Call_Names.View_From_Caller (State, Caller);
+         end if;
+      end if;
+      return (others => <>);
+   end Call_Identity;
+
    function Inspect
      (State : in out World; Activation : Frame_Access;
       Target_Frame : Frame_Access := null) return Values.Vector
@@ -214,7 +244,9 @@ package body Lua.Engine.Inspection is
 
       function Integer_Arg (Index : Positive) return Integer_Value is
       begin
-         return Strings.Integer_Argument (State, Arg (Index));
+         return Diagnostics.Integer_Argument
+           (State, Index, Arg (Index),
+            Present => Index <= Natural (Args.Length));
       end Integer_Arg;
 
       function Public_Frame (Item : Frame_Access) return Boolean is
@@ -406,9 +438,11 @@ package body Lua.Engine.Inspection is
             end if;
             if Setting then
                if Arg (1).Kind /= Userdata_Kind then
-                  Fail (State, "full userdata expected");
+                  Diagnostics.Type_Error
+                    (State, 1, "userdata", Arg (1), Present =>
+                       not Args.Is_Empty);
                elsif Args.Length < 2 then
-                  Fail (State, "value expected");
+                  Diagnostics.Argument_Error (State, 2, "value expected");
                end if;
             end if;
             if Arg (1).Kind /= Userdata_Kind or else Number < 1 or else

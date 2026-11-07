@@ -27,6 +27,8 @@ package Lua.Engine.Call_Names is
    function Hook_Name return Byte_String;
    --  Borrow the static '?' marker for an actual hook-origin call.
    function Kind_Image (Kind : Name_Kind) return String;
+   function Kind_From_Image (Text : String) return Name_Kind;
+   --  Decode the immutable activation's explicit public origin category.
    function From_Caller
      (State : in out World; Caller : Frame_Access) return Identity;
    --  Infer a logical callee's name only when debug inspection requests it.

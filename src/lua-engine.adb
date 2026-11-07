@@ -2101,6 +2101,48 @@ package body Lua.Engine is
            Foreign_Function_Kind =>
             "function");
 
+   function Error_Type
+     (State : World; Item : Value; Auxiliary : Boolean) return String;
+   function Error_Type
+     (State : World; Item : Value; Auxiliary : Boolean) return String
+   is
+      Meta : constant Object_Access := Raw_Metatable (State, Item);
+      Name : constant Value :=
+        (if Meta /= null and then
+           (Auxiliary or else Item.Kind in Table_Kind | Userdata_Kind)
+         then Tables.Raw_Field (Meta, "__name") else Nil_Value);
+   begin
+      --  luaT_objtypename and luaL_typeerror have deliberately different
+      --  primitive-metatable policies. Both read a raw field and use its C
+      --  string prefix. Borrow actual immutable bytes for the scan so a NUL
+      --  near the start does not first copy a potentially huge counted name.
+      if Name.Kind = String_Kind then
+         declare
+            Bytes : constant Byte_String := Name.Reference.Bytes;
+            Text : String (1 .. Bytes.Size)
+              with Import, Address => Bytes.Address;
+         begin
+            for Index in Text'Range loop
+               if Text (Index) = Character'Val (0) then
+                  return Text (Text'First .. Index - 1);
+               end if;
+            end loop;
+            return Text;
+         end;
+      elsif Auxiliary and then Item.Kind = Light_Identity_Kind then
+         return "light userdata";
+      end if;
+      return Type_Name (Item);
+   end Error_Type;
+
+   function Diagnostic_Type (State : World; Item : Value) return String is
+     (Error_Type (State, Item, Auxiliary => False));
+
+   function Argument_Type
+     (State : World; Item : Value; Present : Boolean := True) return String is
+     (if not Present then "no value" else
+        Error_Type (State, Item, Auxiliary => True));
+
    function Real_Image (Item : Real_Value) return String is
    begin
       if Item /= Item then

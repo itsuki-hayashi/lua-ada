@@ -50,6 +50,7 @@ into one major PR. Historical session results retain their original scope.
 | 2026-11-08 | [Auxiliary buffers](2026-11-08-auxiliary-buffer-ownership.md)        |
 | 2026-11-08 | [Protected error closing](2026-11-08-protected-error-closing.md)     |
 | 2026-11-08 | [Concatenation operations](2026-11-08-concat-operation-diagnostics.md) |
+| 2026-11-08 | [Library argument diagnostics](2026-11-08-library-argument-diagnostics.md) |
 
 | 2026-11-08 | [Public thread reset](2026-11-08-thread-reset.md)                    |
 

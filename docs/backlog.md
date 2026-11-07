@@ -21,6 +21,12 @@ native-matched C cases. Finish the traceback helper and the
 final allocator/lifecycle campaign across every required context.
 
 
+Shared library argument diagnostics have [local evidence](sessions/2026-11-08-library-argument-diagnostics.md):
+thirty new named cases within 1,856 passing AUnit cases and nineteen matched
+public builtin C cases. Complete named tostring and remaining errors.lua,
+actual registry-fallback callback continuations and C concat windows, then
+the original T/platform/final-head acceptance obligations.
+
 Concatenation has [local evaluation/diagnostic evidence](sessions/2026-11-08-concat-operation-diagnostics.md):
 eighty named primitive/index/name-boundary cases within 1,826 passing
 AUnit cases, two complete default four-way fixtures and a matching unchanged

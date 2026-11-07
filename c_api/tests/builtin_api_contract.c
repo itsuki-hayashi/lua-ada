@@ -13,6 +13,7 @@
 static struct allocation_counts counts;
 static lua_CFunction degrees, direct_pairs, direct_yield, direct_error;
 static lua_CFunction direct_pcall;
+static lua_CFunction direct_sin;
 static int after_direct;
 
 static void run(lua_State *L, const char *source) {
@@ -230,6 +231,46 @@ static void captured_refusal_recovery(lua_State *L) {
     lua_settop(L, 0);
 }
 
+static int forward_sin(lua_State *L) { return direct_sin(L); }
+
+static void direct_argument_owner(lua_State *L) {
+    /* A direct C pointer adds no public CI. Its argument diagnostic belongs
+       to this original C function, even when Ada schedules an owned phase. */
+    direct_sin = field(L, "math", "sin"); lua_pop(L, 1);
+    lua_pushcfunction(L, forward_sin); lua_setglobal(L, "forward_sin");
+    run(L, "local ok,e=pcall(forward_sin,{});assert(not ok and e=="
+           "\"bad argument #1 to 'forward_sin' (number expected, got table)\","
+           "tostring(e))");
+}
+
+static void direct_extra_argument_owner(lua_State *L) {
+    /* The callable receiver is an actual prepended C argument. Borrow its
+       real owner's extra count rather than a hidden phase's zero default. */
+    run(L, "local m=setmetatable({},{__call=forward_sin});"
+           "local ok,e=pcall(function()m()end);assert(not ok and "
+           "e:find(\"bad extra argument #1 to 'm' "
+           "(number expected, got table)\",1,true),tostring(e))");
+}
+
+static void direct_method_argument_owner(lua_State *L) {
+    /* The original C caller was invoked with colon syntax. Its first bad
+       value is self and has a distinct spelling, before regular numbering. */
+    run(L, "local t={go=forward_sin};"
+           "local ok,e=pcall(function()t:go()end);assert(not ok and "
+           "e:find(\"calling 'go' on bad self "
+           "(number expected, got table)\",1,true),tostring(e))");
+}
+
+static void direct_closure_argument_owner(lua_State *L) {
+    /* A captured C closure and its zero-upvalue function share code bytes
+       but have distinct callable identities in the actual registry search. */
+    lua_pushinteger(L, 1); lua_pushcclosure(L, forward_sin, 1);
+    lua_setglobal(L, "closure_sin");
+    run(L, "local ok,e=pcall(closure_sin,{});assert(not ok and e=="
+           "\"bad argument #1 to 'closure_sin' (number expected, got table)\","
+           "tostring(e))");
+}
+
 static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     assert(lua_gettop(L) == 0); body(L); assert(lua_gettop(L) == 0);
     printf("PASS: builtin-%s\n", name); fflush(stdout);
@@ -253,6 +294,10 @@ int main(void) {
     check("direct-callback-yield", direct_callback_yield, L);
     check("scalar-refusal", scalar_refusal, L);
     check("captured-refusal-recovery", captured_refusal_recovery, L);
+    check("direct-argument-owner", direct_argument_owner, L);
+    check("direct-extra-argument-owner", direct_extra_argument_owner, L);
+    check("direct-method-argument-owner", direct_method_argument_owner, L);
+    check("direct-closure-argument-owner", direct_closure_argument_owner, L);
     lua_close(L); assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public builtin contract");
     return 0;
