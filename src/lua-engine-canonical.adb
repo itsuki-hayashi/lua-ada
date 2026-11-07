@@ -671,6 +671,57 @@ package body Lua.Engine.Canonical is
       end if;
    end Prepare_For;
 
+   procedure Charge_Companion (State : in out World);
+   procedure Charge_Companion (State : in out World) is
+   begin
+      --  Companion words share a VM dispatch boundary, as in pinned lvm.c,
+      --  but still consume the host's common work budget. Fusing an iterator
+      --  transfer must not turn bounded execution into an uncharged loop.
+      if State.Steps >= State.Bounds.Instructions then
+         Fail (State, "instruction limit exceeded", Resource => True);
+      end if;
+      if State.Policy = Bounded then State.Steps := State.Steps + 1; end if;
+   end Charge_Companion;
+
+   procedure Finish_Iterator_Call
+     (State : in out World; Activation : Frame_Access);
+   procedure Finish_Iterator_Call
+     (State : in out World; Activation : Frame_Access)
+   is
+      Prototype : constant Lua.Prototypes.Prototype_Access :=
+        Activation.Code.Canonical_Node;
+      Code : Word;
+      Base : Natural;
+      Target : Long_Long_Integer;
+   begin
+      --  TFORCALL consumes its following TFORLOOP after the iterator returns,
+      --  including after suspension. Results have already replaced the real
+      --  control register; no user callback or executor is entered here.
+      if Activation.PC > Prototype.Code.Last_Index or else
+        not Valid (Prototype.Code (Activation.PC)) or else
+        Lua.Opcodes.Operation (Prototype.Code (Activation.PC)) /= Op_TFORLOOP
+      then
+         Fail (State, "missing canonical iterator loop instruction");
+      end if;
+      Code := Prototype.Code (Activation.PC);
+      Base := Part (State, Code, A);
+      if Base + 3 /= Activation.Canonical_Base then
+         Fail (State, "canonical iterator loop register mismatch");
+      end if;
+      Charge_Companion (State);
+      Activation.PC := Activation.PC + 1;
+      if Read_Register (State, Activation, Base + 3).Kind /= Nil_Kind then
+         Target := Long_Long_Integer (Activation.PC) -
+           Long_Long_Integer (Part (State, Code, Bx));
+         if Target < 1 or else Target >
+           Long_Long_Integer (Prototype.Code.Last_Index) + 1
+         then
+            Fail (State, "canonical jump out of range");
+         end if;
+         Activation.PC := Positive (Target);
+      end if;
+   end Finish_Iterator_Call;
+
    procedure Deliver
      (State : in out World; Activation : Frame_Access;
       Results : Values.Vector)
@@ -704,6 +755,14 @@ package body Lua.Engine.Canonical is
                   if Activation.Context.Stack_Window = Activation then
                      Activation.Context.Foreign_Top := Activation.Stack_Base +
                        Activation.Canonical_Top;
+                  end if;
+                  if Activation.PC > 1 and then
+                    Valid (Activation.Code.Canonical_Node.Code
+                      (Activation.PC - 1)) and then
+                    Lua.Opcodes.Operation (Activation.Code.Canonical_Node.Code
+                      (Activation.PC - 1)) = Op_TFORCALL
+                  then
+                     Finish_Iterator_Call (State, Activation);
                   end if;
                end if;
             end;
@@ -757,6 +816,7 @@ package body Lua.Engine.Canonical is
         (Operator : Lua.Lexers.Token_Kind; A, B : Value; Destination : Natural;
          Test : Boolean := False);
       procedure Mark_Closing (Index : Natural);
+      procedure Invoke_Iterator (Base, Wanted : Natural);
       procedure Freeze_Closing (From : Natural);
       function Integral (Value_To_Test : Value) return Boolean;
       function Arithmetic_Operator (Operation_Id : Opcode)
@@ -791,6 +851,34 @@ package body Lua.Engine.Canonical is
             Fail (State, "missing canonical companion instruction");
          end if;
       end Require_Next;
+
+      procedure Invoke_Iterator (Base, Wanted : Natural) is
+         Arguments : Values.Vector := Owned_Values (State);
+      begin
+         Require_Next (Op_TFORLOOP);
+         if Part (State, Prototype.Code (Activation.PC), A) /= Base then
+            Fail (State, "canonical iterator loop register mismatch");
+         end if;
+         --  Keep the existing explicit call continuation and its real rooted
+         --  arguments. Entry preparation can invoke this same phase after
+         --  consuming TFORCALL, without an extra scheduler dispatch boundary.
+         Put (Base + 5, Reg (Base + 3));
+         Put (Base + 4, Reg (Base + 1));
+         Put (Base + 3, Reg (Base));
+         Arguments.Append (Reg (Base + 4));
+         Arguments.Append (Reg (Base + 5));
+         Copy_Roots (State, Activation.Native_Arguments, Arguments);
+         Activation.Native_Captures.Clear;
+         Append_Root (State, Activation.Native_Captures, Reg (Base));
+         Activation.Canonical_Pending := Store_Call_Results;
+         Activation.Canonical_Base := Base + 3;
+         Activation.Canonical_Wanted := Wanted;
+         Result := (Kind => Invoke_Function,
+                    Function_Value => Reg (Base), Arguments => Arguments,
+                    Destination => Base + 4,
+                    Call_Base => Activation.Stack_Base + Base + 4,
+                    Has_Call_Window => True, others => <>);
+      end Invoke_Iterator;
 
       procedure Request
         (Name : String; Arguments : Values.Vector; Destination : Natural;
@@ -1259,35 +1347,16 @@ package body Lua.Engine.Canonical is
             Put (Reg_A + 2, Item);
             Mark_Closing (Reg_A + 2);
             Branch (Operand (Bx));
+            Require_Next (Op_TFORCALL);
+            if Part (State, Prototype.Code (Activation.PC), A) /= Reg_A then
+               Fail (State, "canonical iterator call register mismatch");
+            end if;
+            Count := Part (State, Prototype.Code (Activation.PC), C);
+            Charge_Companion (State);
+            Activation.PC := Activation.PC + 1;
+            Invoke_Iterator (Reg_A, Count);
          when Op_TFORCALL =>
-            declare
-               Arguments : Values.Vector := Owned_Values (State);
-            begin
-               --  The iterator call preserves function/state/closer in the
-               --  first three registers and copies control before replacing
-               --  its old slot with the actual call function (lvm TFORCALL).
-               Put (Reg_A + 5, Reg (Reg_A + 3));
-               Put (Reg_A + 4, Reg (Reg_A + 1));
-               Put (Reg_A + 3, Reg (Reg_A));
-               Arguments.Append (Reg (Reg_A + 4));
-               Arguments.Append (Reg (Reg_A + 5));
-               Copy_Roots
-                 (State, Activation.Native_Arguments,
-                  Arguments);
-               Activation.Native_Captures.Clear;
-               Append_Root
-                 (State, Activation.Native_Captures,
-                  Reg (Reg_A));
-               Activation.Canonical_Pending := Store_Call_Results;
-               Activation.Canonical_Base := Reg_A + 3;
-               Activation.Canonical_Wanted := Reg_C;
-               Result := (Kind => Invoke_Function,
-                          Function_Value => Reg (Reg_A),
-                          Arguments => Arguments,
-                          Destination => Reg_A + 4,
-                          Call_Base => Activation.Stack_Base + Reg_A + 4,
-                          Has_Call_Window => True, others => <>);
-            end;
+            Invoke_Iterator (Reg_A, Reg_C);
          when Op_TFORLOOP =>
             if Reg (Reg_A + 3).Kind /= Nil_Kind then
                Branch (-Operand (Bx));

@@ -44,7 +44,8 @@ package Lua.Engine.Canonical is
 
    function Step
      (State : in out World; Activation : Frame_Access) return Action;
-   --  Execute one real canonical instruction, or request a scheduler action.
+   --  Execute one canonical dispatch phase, including required companion
+   --  words, or request a scheduler action. Iterator calls resume explicitly.
    --  Lua representation errors are controlled language errors; no invalid
    --  opcode/operand is passed to an unchecked enumeration conversion.
 

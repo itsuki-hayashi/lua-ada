@@ -1109,6 +1109,11 @@ package body Lua.Canonical_Compiler is
                            Item.Children (1)), Left, -1, Open_Last, Count);
                      end if;
                      Site := Item.Site;
+                     --  retstat emits after its expression list, before
+                     --  consuming an optional semicolon. An empty return
+                     --  keeps the keyword line; a multiline result uses its
+                     --  final token line (lparser.c:retstat/lcode:luaK_code).
+                     Site.Line := Item.End_Line;
                      Put (Fn, ABC (Op_RETURN, Left,
                        (if Open_Last then 0 else Count + 1),
                        (if (Fn.Code.Flags and 1) /= 0 then
@@ -1201,6 +1206,7 @@ package body Lua.Canonical_Compiler is
                         Bind_Hidden (Fn, "(for state)", Base + 1,
                                      Item.Symbols (1));
                         Branch := PC (Fn);
+                        Site.Line := Item.Header_Line;
                         Put (Fn, ABx (Op_FORPREP, Base, 0));
                         Bind (Fn, Item.Symbols (1), Base + 2);
                      else
@@ -1216,6 +1222,7 @@ package body Lua.Canonical_Compiler is
                         Reserve (Fn, Base + Natural'Max
                           (6, Natural (Item.Symbols.Length) + 3));
                         Branch := PC (Fn);
+                        Site.Line := Item.Header_Line;
                         Put (Fn, ABx (Op_TFORPREP, Base, 0));
                         for Position in
                           1 .. Natural (Item.Symbols.Length)
@@ -1233,6 +1240,15 @@ package body Lua.Canonical_Compiler is
                      --  acquires a fresh cell for the next iteration value.
                      Put (Fn, ABC (Op_CLOSE, Base +
                        (if Item.Kind = Numeric_For then 2 else 3)));
+                     --  Pinned forbody fixes both iterator-call and loop
+                     --  words to the loop control site, independently of the
+                     --  last body statement. Numeric loops revisit 'for';
+                     --  generic loops revisit their first iterator token.
+                     --  The separate entry preparation uses the consumed do
+                     --  line above, including multiline headers.
+                     Site.Line :=
+                       (if Item.Kind = Numeric_For then Item.Site.Line else
+                          Fetch (Item.Children (1)).Site.Line);
                      Index := PC (Fn);
                      if Item.Kind = Generic_For then
                         Put (Fn, ABC (Op_TFORCALL, Base, 0,
@@ -1243,6 +1259,13 @@ package body Lua.Canonical_Compiler is
                      Put (Fn, ABx
                        ((if Item.Kind = Numeric_For then Op_FORLOOP
                          else Op_TFORLOOP), Base, PC (Fn) - Start + 1));
+                     if Item.Kind = Generic_For then
+                        --  The implicit iterator closer leaves its scope
+                        --  after forstat consumes end, independently of the
+                        --  iterator revisit line. An initially empty loop
+                        --  must go straight from preparation to this close.
+                        Site.Line := Item.End_Line;
+                     end if;
                      Leave (Fn, Base, Active);
                      End_Loop (Fn);
                   when others =>
@@ -1311,13 +1334,19 @@ package body Lua.Canonical_Compiler is
                   for Symbol of Item.Captures loop Capture (Symbol); end loop;
                end if;
                Site := Item.Site;
+               if Id /= No_Node then
+                  --  Fixed parameters are live at PC zero, including in a
+                  --  not-yet-called vararg closure. Pinned parlist starts
+                  --  their debug lifetimes before emitting VARARGPREP; only
+                  --  the vararg table's lifetime begins after entry setup.
+                  for Symbol of Item.Symbols loop
+                     Bind (Fn, Symbol, Fn.Base);
+                  end loop;
+               end if;
                if Fn.Code.Flags /= 0 then
                   Put (Fn, ABC (Op_VARARGPREP));
                end if;
                if Id /= No_Node then
-                  for Symbol of Item.Symbols loop
-                     Bind (Fn, Symbol, Fn.Base);
-                  end loop;
                   if Item.Flag then
                      if Item.Symbol /= No_Symbol then
                         Bind (Fn, Item.Symbol, Fn.Base);

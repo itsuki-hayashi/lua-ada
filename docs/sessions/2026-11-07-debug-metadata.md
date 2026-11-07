@@ -96,3 +96,62 @@ an explicit `return` reports the following end token's line (three) instead of
 the return token's line (two). The parser currently creates that statement node
 after consuming the keyword. This subsequent defect, full file execution and
 all other acceptance contexts remain open.
+
+## Return, parameter and iterator transfer checkpoint
+
+The next checkpoint preserves the explicit return keyword site before parser
+lookahead advances, and retains its final result token before an optional
+semicolon. Fixed parameter debug lifetimes begin at PC zero before VARARGPREP;
+the named/hidden vararg table begins after that instruction. Break uses its
+keyword rather than the following end token. Numeric/generic loop control words
+use the pinned forbody source sites, with separate consumed do and end token
+metadata retained in the shared frontend. Those scalar updates use guarded
+references rather than copying node child vectors.
+
+A multiline generic header exposed a real dispatch discrepancy: pinned
+TFORPREP immediately fetches its TFORCALL companion, and TFORCALL consumes its
+TFORLOOP after the iterator returns. The Ada VM now follows those dispatch
+phases through its existing explicit call continuation. It validates each real
+companion and register base, publishes the same rooted argument/function state,
+and resumes the loop branch only after results are stored, including after a
+yield. Companion words remain charged to the common host work budget. No hook
+is suppressed and no executor is recursively invoked. The actual implicit
+generic closer is attributed to its consumed end token.
+
+Fifteen newly named regressions cover returns, fixed parameter names, break,
+numeric/generic loop sites, count-hook dispatch boundaries, iterator suspension,
+error object and closer identity, hard-quota recovery, and persistent allocator
+refusal during an iterator's native-operation call path. Initial verification
+passed 1,413 of 1,414 cases before actual iterator companion dispatch was added.
+The next verification passed 1,418 of 1,419: the remaining count witness exposed
+the compiler's generic closer still using the iterator line. Its end-token
+attribution was corrected. Final default Windows validation/static evidence:
+
+- Both strict builds pass; 1,419 AUnit cases pass with zero failed assertions
+  and zero unexpected errors.
+- `debug_return_lines.lua` and `debug_iterator_transfer.lua` have byte-identical
+  C/Ada stdout, successful exits and empty stderr. Native C also passes the
+  transfer probe in the instrumented configuration and the separate real
+  allocator-refusal/recovery witness.
+- All 36 four-way canonical compiler/runtime cases pass.
+- Existing frontend/opcode oracles replay successfully against the fresh Ada
+  probes: 10,000 arbitrary-byte inputs, 2,000 grammar cases, 2,000 mutations,
+  all 34 unchanged lex/parse inputs, and 85 opcodes/4,096 words. No oracle
+  rebuild was needed for this execution-only replay.
+
+Two capped read-only Claude Haiku investigations were inspected. Its source
+analysis identified deferred target/index materialization as the next real
+assignment and line-hook issue. Its fusion review alleged missing count ticks
+for companion words. That finding was rejected after reviewing the pinned
+direct-fetch/goto paths and running identical C-produced bytecode graphs on
+both runtimes: the empty iterator emits six count events, and the two-value
+iterator emits thirteen in both. `debug_iterator_counts.lua` is the source for
+that imported-bytecode witness; raw source compilers can emit different counts.
+The review did not replace execution evidence or independent PR review.
+
+The unmodified `db.lua` diagnostic now reaches its large-gap expression trace.
+The next discrepancy is eager indexed/global target materialization and the
+assignment store's opening-line attribution. Native probes also show actual
+RHS mutation differences for local/upvalue environments and table operands.
+Deferred operand/conflict handling is authorized follow-up work; it is not
+claimed implemented here. Full debug-file and platform acceptance remain open.

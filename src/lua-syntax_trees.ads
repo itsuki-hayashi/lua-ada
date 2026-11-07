@@ -36,6 +36,9 @@ private package Lua.Syntax_Trees is
    type Node (Kind : Node_Kind := Empty_Statement) is record
       Site : Lua.Lexers.Source_Location;
       End_Line : Natural := 0;
+      Header_Line : Natural := 0;
+      --  A for header's consumed do token. Entry preparation uses this line,
+      --  while loop revisits use the for/iterator-expression source site.
       Children : Node_Lists.Vector;
       Symbols : Symbol_Lists.Vector;
       Captures : Symbol_Lists.Vector;

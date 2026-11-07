@@ -52,6 +52,7 @@ package body Lua.Conformance_Adapter_Tests is
    procedure Memory_Inspection;
    procedure Corrupt_Heap_Edge;
    procedure Refusal_Reset;
+   procedure Iterator_Call_Refusal;
    procedure Finalizer_Frame_Refusal;
    procedure Finalizer_Stack_Refusal;
    procedure Measured_Emergency_Headroom;
@@ -352,6 +353,21 @@ package body Lua.Conformance_Adapter_Tests is
         "assert(type(t)=='table')");
    end Refusal_Reset;
 
+   procedure Iterator_Call_Refusal is
+   begin
+      --  The initial Lua iterator installs persistent allocation refusal
+      --  before attempting the real C userdata operation. Refused growth on
+      --  that rooted call path must unwind protection with a memory error;
+      --  a later loop executes after Lua restores its allocator normally.
+      Check ("local calls=0;local function iter()calls=calls+1;" &
+        "T.alloccount(0);return T.newuserdata(128)end;" &
+        "local ok,msg=pcall(function()for u in iter do " &
+        "error('body')end end);" &
+        "T.alloccount();assert(not ok and msg=='not enough memory' " &
+        "and calls==1);local sum=0;for _,v in ipairs{1,2,3}do " &
+        "sum=sum+v end;assert(sum==6)");
+   end Iterator_Call_Refusal;
+
    procedure Finalizer_Frame_Refusal is
    begin
       --  Remove actual unused frames, forbid all growth, and require the
@@ -526,6 +542,8 @@ package body Lua.Conformance_Adapter_Tests is
                         Corrupt_Heap_Edge'Access);
       Test_Support.Add (Suite, "allocator: Lua restores persistent refusal",
                         Refusal_Reset'Access);
+      Test_Support.Add (Suite, "allocator: iterator call refusal recovers",
+                        Iterator_Call_Refusal'Access);
       Test_Support.Add (Suite, "finalizer: Lua frame refusal and later retry",
                         Finalizer_Frame_Refusal'Access);
       Test_Support.Add (Suite, "finalizer: Lua stack refusal and later retry",

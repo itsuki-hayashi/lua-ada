@@ -938,6 +938,12 @@ package body Lua.Syntax_Trees is
                Expect (In_Word);
                Child (Result, Expression_List);
             end if;
+            declare
+               Header : constant Nodes.Reference_Type :=
+                 Unit.Tree.Reference (Positive (Result));
+            begin
+               Header.Header_Line := Here.Line;
+            end;
             Expect (Do_Word);
             for Symbol of Value.Symbols loop
                Active.Append (Symbol);
@@ -946,14 +952,31 @@ package body Lua.Syntax_Trees is
             Child (Result, Block);
             Loop_Depth := Loop_Depth - 1;
             Active := Saved;
+            declare
+               Loop_Node : constant Nodes.Reference_Type :=
+                 Unit.Tree.Reference (Positive (Result));
+            begin
+               Loop_Node.End_Line := Here.Line;
+            end;
             Expect (End_Word);
          elsif Take (Return_Word) then
-            Result := Make (Return_Statement);
+            --  Take has already scanned the following token. Preserve the
+            --  keyword's original site, not the following end/EOF location.
+            --  The emitted return uses the final expression token, retained
+            --  separately below before an optional semicolon is consumed.
+            Result := Add
+              ((Kind => Return_Statement, Site => Site, others => <>));
             if Kind not in End_Of_Input | End_Word | Else_Word |
               Elseif_Word | Until_Word | Semicolon
             then
                Child (Result, Expression_List);
             end if;
+            declare
+               Return_Node : constant Nodes.Reference_Type :=
+                 Unit.Tree.Reference (Positive (Result));
+            begin
+               Return_Node.End_Line := Last_Line;
+            end;
             if Take (Semicolon) then
                null;
             end if;
@@ -961,7 +984,8 @@ package body Lua.Syntax_Trees is
             if Loop_Depth = 0 then
                Error ("break outside loop");
             end if;
-            Result := Make (Break_Statement);
+            Result := Add
+              ((Kind => Break_Statement, Site => Site, others => <>));
          elsif Kind in Goto_Word | Double_Colon then
             declare
                Label : constant Boolean := Kind = Double_Colon;

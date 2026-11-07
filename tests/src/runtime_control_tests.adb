@@ -22,6 +22,20 @@ package body Runtime_Control_Tests is
    procedure Hook_Implicit_Return_Line;
    procedure Hook_Main_Implicit_Return_Line;
    procedure Hook_Closure_Creation_Line;
+   procedure Hook_Explicit_Empty_Return_Line;
+   procedure Hook_Explicit_Return_Expression_Line;
+   procedure Hook_Return_Semicolon_Line;
+   procedure Debug_Vararg_Parameter_Names;
+   procedure Debug_Named_Vararg_Parameter_Range;
+   procedure Hook_Break_Keyword_Line;
+   procedure Hook_Numeric_For_Control_Line;
+   procedure Hook_Numeric_For_Multiline_Header;
+   procedure Hook_Generic_For_Control_Line;
+   procedure Hook_Generic_For_Multiline_Header;
+   procedure Hook_Generic_Companion_Count;
+   procedure Generic_Iterator_Suspension;
+   procedure Generic_Iterator_Error_Close;
+   procedure Generic_Iterator_Quota_Recovery;
    procedure Hook_Main_Return_Trailing_Trivia;
    procedure Hook_Empty_Main_Return_Line;
    procedure Hook_Nested_Return_Trailing_Trivia;
@@ -1247,6 +1261,196 @@ package body Runtime_Control_Tests is
          "assert(#t==#expected);for i=1,#t do assert(t[i]==expected[i])end");
    end Hook_Closure_Creation_Line;
 
+   procedure Hook_Explicit_Empty_Return_Line is
+      --  An empty return precedes its enclosing end token on another line.
+      --  The return keyword is the executed site, while the parser's next
+      --  token is only lookahead. Upstream db.lua protects this exact trace.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load('do\nreturn\nend\n')));" &
+         "local t={};debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "assert(coroutine.resume(co));assert(#t==1 and t[1]==2)");
+   end Hook_Explicit_Empty_Return_Line;
+
+   procedure Hook_Explicit_Return_Expression_Line is
+      --  A multiline return emits after its final result expression token.
+      --  Two result lines execute without an extra keyword or EOF line;
+      --  transported values retain their original order and count.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load('return\n1,\n2\n')));" &
+         "local t={};debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "local ok,a,b=coroutine.resume(co);assert(ok and a==1 and b==2);" &
+         "assert(#t==2 and t[1]==2 and t[2]==3)");
+   end Hook_Explicit_Return_Expression_Line;
+
+   procedure Hook_Return_Semicolon_Line is
+      --  A trailing semicolon is consumed after the explicit return emits.
+      --  Put it on a later line and observe that no return hook line is
+      --  incorrectly attributed to this syntactic separator.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load('return\n1\n;\n')));" &
+         "local t={};debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "local ok,v=coroutine.resume(co);assert(ok and v==1);" &
+         "assert(#t==1 and t[1]==2)");
+   end Hook_Return_Semicolon_Line;
+
+   procedure Debug_Vararg_Parameter_Names is
+      --  Query a vararg closure before it has a running activation. Fixed
+      --  parameter names are live at PC zero; the hidden vararg table and
+      --  ordinary body locals are not exposed as extra parameters.
+   begin
+      Check
+        ("local function f(first,second,...)local body end;" &
+         "assert(debug.getlocal(f,1)=='first');" &
+         "assert(debug.getlocal(f,2)=='second');" &
+         "assert(debug.getlocal(f,3)==nil);local co=coroutine.create(f);" &
+         "assert(debug.getlocal(co,f,1)=='first');" &
+         "assert(debug.getlocal(co,f,2)=='second');" &
+         "assert(debug.getlocal(co,f,3)==nil)");
+   end Debug_Vararg_Parameter_Names;
+
+   procedure Debug_Named_Vararg_Parameter_Range is
+      --  A named vararg table is initialized by VARARGPREP, after fixed
+      --  parameters become live. Function-valued queries must not expose
+      --  that table as a third parameter before invocation.
+   begin
+      Check
+        ("local function f(first,second,...tail)local body end;" &
+         "assert(debug.getlocal(f,1)=='first');" &
+         "assert(debug.getlocal(f,2)=='second');" &
+         "assert(debug.getlocal(f,3)==nil)");
+   end Debug_Named_Vararg_Parameter_Range;
+
+   procedure Hook_Break_Keyword_Line is
+      --  A break completes before its following end token is consumed.
+      --  Observe the keyword's own line in an if nested inside a while;
+      --  compiler close/jump helpers must not move it to the lookahead line.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load('while math.sin(1) do\n" &
+         "if math.sin(1)\nthen break\nend\nend\na=1')));local t={};" &
+         "debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "assert(coroutine.resume(co));local expected={1,2,3,6};" &
+         "assert(#t==#expected);for i=1,#t do assert(t[i]==expected[i])end");
+   end Hook_Break_Keyword_Line;
+
+   procedure Hook_Numeric_For_Control_Line is
+      --  Each numeric-loop revisit belongs to its control header, not to
+      --  the preceding body assignment. Backward execution still emits a
+      --  line event when both source lines happen to be identical.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load('for i=1,3 do\na=i\n" &
+         "end\n')));local t={};debug.sethook(co,function(e,l)t[#t+1]=l " &
+         "end,'l');assert(coroutine.resume(co));" &
+         "local expected={1,2,1,2,1,2,1,3};assert(#t==#expected);" &
+         "for i=1,#t do assert(t[i]==expected[i])end");
+   end Hook_Numeric_For_Control_Line;
+
+   procedure Hook_Numeric_For_Multiline_Header is
+      --  Numeric FORPREP follows the consumed do token, while FORLOOP uses
+      --  the original for keyword. Split the header across four lines to
+      --  distinguish those two instruction sites and the default step load.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load('for i=\n1,\n2\ndo\n" &
+         "a=i\nend\n')));local t={};debug.sethook(co,function(e,l)" &
+         "t[#t+1]=l end,'l');assert(coroutine.resume(co));" &
+         "local expected={2,3,4,5,1,5,1,6};assert(#t==#expected);" &
+         "for i=1,#t do assert(t[i]==expected[i])end");
+   end Hook_Numeric_For_Multiline_Header;
+
+   procedure Hook_Generic_For_Control_Line is
+      --  Iterator calls and generic loop revisits share the iterator's
+      --  control line. Hook a real native iterator so callback scheduling
+      --  and body closure helpers cannot conceal or duplicate those events.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load('for i,v in pairs{1,2}" &
+         " do\na=tostring(i)..v\nend\n')));local t={};" &
+         "debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "assert(coroutine.resume(co));local expected={1,2,1,2,1,3};" &
+         "assert(#t==#expected);for i=1,#t do assert(t[i]==expected[i])end");
+   end Hook_Generic_For_Control_Line;
+
+   procedure Hook_Generic_For_Multiline_Header is
+      --  The generic revisit line is the first iterator-expression token,
+      --  which may follow for/in on another line. Entry preparation still
+      --  belongs to the subsequent consumed do token.
+   begin
+      Check
+        ("local co=coroutine.create(assert(load('for i,v in\nipairs{1,2}" &
+         "\ndo\na=i\nend\n')));local t={};" &
+         "debug.sethook(co,function(e,l)t[#t+1]=l end,'l');" &
+         "assert(coroutine.resume(co));local expected={2,3,4,2,4,2,5};" &
+         "assert(#t==#expected);for i=1,#t do assert(t[i]==expected[i])end");
+   end Hook_Generic_For_Multiline_Header;
+
+   procedure Hook_Generic_Companion_Count is
+      --  An empty native iterator returns from entry preparation without a
+      --  standalone TFORCALL/TFORLOOP fetch. A count hook can observe the
+      --  consumed do line, but cannot revisit the iterator line afterward.
+      --  Restrict observations to this real target frame, not hook internals.
+   begin
+      Check
+        ("local f=assert(load('for i,v in\nipairs{}\ndo\na=i\nend\n'));" &
+         "local co=coroutine.create(f);local prepared=false;local bad=false;" &
+         "debug.sethook(co,function()local i=debug.getinfo(2,'fl');" &
+         "if i.func==f then if i.currentline==3 then prepared=true " &
+         "elseif prepared and i.currentline==2 then bad=true end end " &
+         "end,'',1);assert(coroutine.resume(co));" &
+         "assert(prepared and not bad)");
+   end Hook_Generic_Companion_Count;
+
+   procedure Generic_Iterator_Suspension is
+      --  A Lua iterator yields on its initial and later calls. The loop's
+      --  continuation owns function/state/control across every suspension
+      --  and consumes the loop branch only after the resumed result arrives.
+   begin
+      Check
+        ("local function iter(_,i)coroutine.yield(i);" &
+         "if i<2 then return i+1 end end;local co=coroutine.create(" &
+         "function()local sum=0;for i in iter,nil,0 do sum=sum+i end;" &
+         "return sum end);for i=0,2 do local ok,v=coroutine.resume(co);" &
+         "assert(ok and v==i)end;local ok,v=coroutine.resume(co);" &
+         "assert(ok and v==3 and coroutine.status(co)=='dead')");
+   end Generic_Iterator_Suspension;
+
+   procedure Generic_Iterator_Error_Close is
+      --  Iterator preparation enrolls its closer before invoking user code.
+      --  An error on a later iterator call preserves its actual error object
+      --  through loop unwinding and closes the enrolled resource exactly once.
+   begin
+      Check
+        ("local e={};local closed=0;local body=0;local closer=" &
+         "setmetatable({},{__close=function(_,err)assert(err==e);" &
+         "closed=closed+1 end});local function iter(_,i)" &
+         "if i==0 then return 1 end;error(e)end;local ok,err=pcall(" &
+         "function()for i in iter,nil,0,closer do body=body+i end end);" &
+         "assert(not ok and err==e and closed==1 and body==1)");
+   end Generic_Iterator_Error_Close;
+
+   procedure Generic_Iterator_Quota_Recovery is
+      --  Companion consumption remains charged to the shared host budget.
+      --  An endless Lua iterator must still abort outside protection, and
+      --  the same owned session can execute a fresh finite chunk afterward.
+      Universe : Session;
+      Bounds : Execution_Limits;
+      Result : Execution_Result;
+   begin
+      Bounds.Instructions := 1_000;
+      Universe.Set_Limits (Bounds);
+      Result := Universe.Execute
+        ("pcall(function()for i in function(_,n)return n+1 end,nil,0 " &
+         "do end end)");
+      Assert (Result.Status = Resource_Error, "iterator quota abort");
+      Result := Universe.Execute ("local n=0;for i=1,3 do n=n+i end;" &
+        "assert(n==6)");
+      Assert (Result.Status = Succeeded, "iterator quota recovery");
+   end Generic_Iterator_Quota_Recovery;
+
    procedure Hook_Main_Return_Trailing_Trivia is
       --  Comments and whitespace after the final token never execute.
       --  Load a one-line assignment followed by trailing comment lines;
@@ -1864,6 +2068,48 @@ package body Runtime_Control_Tests is
       Test_Support.Add
         (Suite, "control: Hook_Closure_Creation_Line",
          Hook_Closure_Creation_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Explicit_Empty_Return_Line",
+         Hook_Explicit_Empty_Return_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Explicit_Return_Expression_Line",
+         Hook_Explicit_Return_Expression_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Return_Semicolon_Line",
+         Hook_Return_Semicolon_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Vararg_Parameter_Names",
+         Debug_Vararg_Parameter_Names'Access);
+      Test_Support.Add
+        (Suite, "control: Debug_Named_Vararg_Parameter_Range",
+         Debug_Named_Vararg_Parameter_Range'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Break_Keyword_Line",
+         Hook_Break_Keyword_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Numeric_For_Control_Line",
+         Hook_Numeric_For_Control_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Numeric_For_Multiline_Header",
+         Hook_Numeric_For_Multiline_Header'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Generic_For_Control_Line",
+         Hook_Generic_For_Control_Line'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Generic_For_Multiline_Header",
+         Hook_Generic_For_Multiline_Header'Access);
+      Test_Support.Add
+        (Suite, "control: Hook_Generic_Companion_Count",
+         Hook_Generic_Companion_Count'Access);
+      Test_Support.Add
+        (Suite, "control: Generic_Iterator_Suspension",
+         Generic_Iterator_Suspension'Access);
+      Test_Support.Add
+        (Suite, "control: Generic_Iterator_Error_Close",
+         Generic_Iterator_Error_Close'Access);
+      Test_Support.Add
+        (Suite, "control: Generic_Iterator_Quota_Recovery",
+         Generic_Iterator_Quota_Recovery'Access);
       Test_Support.Add
         (Suite, "control: Hook_Main_Return_Trailing_Trivia",
          Hook_Main_Return_Trailing_Trivia'Access);
