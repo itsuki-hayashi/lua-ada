@@ -531,6 +531,13 @@ private package Lua.Engine is
       Native_Captures : Values.Vector;
       Native_Self : Object_Access;
       Native_Buffer : Owned_Buffer;
+      Argument_Error_Index : Natural := 0;
+      Argument_Error_Detail : Owned_Buffer;
+      Argument_Error_Origin : Frame_Access;
+      --  An auxiliary name lookup can call registry __index before raising.
+      --  The failing activation retains its owned detail/index; a hidden
+      --  continuation borrows that still-active parent through Origin. No
+      --  saved Ada activation, value snapshot or exception text is borrowed.
       Native_Stage : Natural := 0;
       Native_Index : Natural := 0;
       Native_Aux : Natural := 0;

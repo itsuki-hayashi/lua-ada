@@ -2,6 +2,7 @@ with Ada.Strings.Fixed;
 with Lua.Engine.Call_Names;
 with Lua.Engine.Canonical;
 with Lua.Engine.Inspection;
+with Lua.Engine.Machine;
 with Lua.Engine.Tables;
 with Lua.Prototypes;
 with System;
@@ -25,13 +26,11 @@ package body Lua.Engine.Diagnostics is
    end Work;
 
    function Global_Name
-     (State : in out World; Target : Value) return String;
+     (State : in out World; Target, Modules : Value) return String;
    function Global_Name
-     (State : in out World; Target : Value) return String
+     (State : in out World; Target, Modules : Value) return String
    is
       Name : Unbounded_String;
-      Modules : constant Value :=
-        Tables.Raw_Field (State.Foreign_Registry, "_LOADED");
       function Find (Table : Object_Access; Depth : Natural) return Boolean;
       function Find (Table : Object_Access; Depth : Natural) return Boolean is
       begin
@@ -78,8 +77,12 @@ package body Lua.Engine.Diagnostics is
       return "?";
    end Global_Name;
 
-   procedure Argument_Error
-     (State : in out World; Index : Positive; Detail : String)
+   procedure Render_Argument_Error
+     (State : in out World; Index : Positive; Detail : String;
+      Modules : Value);
+   procedure Render_Argument_Error
+     (State : in out World; Index : Positive; Detail : String;
+      Modules : Value)
    is
       Context : constant Context_Access := State.Current;
       Owner : constant Frame_Access :=
@@ -101,7 +104,7 @@ package body Lua.Engine.Diagnostics is
          Label := To_Unbounded_String
            ((if Origin.Item.Address /= System.Null_Address then
                 Call_Names.Name_Image (Origin)
-             else Global_Name (State, Owner.Callee)));
+             else Global_Name (State, Owner.Callee, Modules)));
          Extra := Index <= Owner.Call_Metamethod_Count;
          if not Extra then
             Position := Index - Owner.Call_Metamethod_Count;
@@ -145,15 +148,96 @@ package body Lua.Engine.Diagnostics is
          end;
       end if;
       Fail (State, To_String (Description));
+   end Render_Argument_Error;
+
+   procedure Argument_Error
+     (State : in out World; Index : Positive; Detail : String)
+   is
+      Context : constant Context_Access := State.Current;
+      Owner : constant Frame_Access :=
+        Inspection.Logical_Frame (State, Context, 0);
+      Modules : constant Value :=
+        Tables.Raw_Field (State.Foreign_Registry, "_LOADED");
+      Registry : constant Value := (Table_Kind, State.Foreign_Registry);
+      Origin : Call_Names.Borrowed_Identity;
+      Phase : Frame_Access;
+      Key : Value;
+   begin
+      if Owner /= null then
+         Machine.Prepare_Argument_Diagnostic (State, Owner);
+         Origin := Inspection.Call_Identity (State, Context, Owner);
+      end if;
+      if Owner /= null and then
+        Origin.Item.Address = System.Null_Address and then
+        Modules.Kind = Nil_Kind and then
+        Metafield (State, Registry, "__index").Kind /= Nil_Kind
+      then
+         if not Owner.Is_Native or else Context.Stack_Window /= Owner then
+            raise Program_Error with "argument error has no real C window";
+         end if;
+         Phase := Context.Stack.Last_Element;
+         Phase.Argument_Error_Detail.Set_Value (Detail);
+         Phase.Argument_Error_Index := Index;
+         --  This operation will raise after the lookup; its Ada computation
+         --  never resumes. Retire the copied inputs before a real handler
+         --  can replace C locals and collect their old sole operand edges.
+         Phase.Native_Arguments.Clear;
+         Phase.Native_Captures.Clear;
+         --  pushglobalfuncname leaves the inspected function and getfield's
+         --  key in the real C frame before invoking registry __index. These
+         --  are actual operation values, not an invented debug-only view.
+         Machine.Push_Native_Value (State, Owner, Owner.Callee);
+         Key := New_String (State, "_LOADED");
+         Machine.Push_Native_Value (State, Owner, Key);
+         raise Deferred_Argument_Error;
+      end if;
+      Render_Argument_Error (State, Index, Detail, Modules);
    end Argument_Error;
+
+   procedure Finish_Argument_Error
+     (State : in out World; Origin : not null Frame_Access; Modules : Value)
+   is
+      procedure Render (Detail : String);
+      procedure Render (Detail : String) is
+      begin
+         Render_Argument_Error
+           (State, Positive (Origin.Argument_Error_Index), Detail, Modules);
+      end Render;
+   begin
+      if Origin.Argument_Error_Index = 0 then
+         raise Program_Error with "missing retained argument diagnostic";
+      end if;
+      Origin.Argument_Error_Detail.Query (Render'Access);
+   end Finish_Argument_Error;
 
    procedure Type_Error
      (State : in out World; Index : Positive; Expected : String;
-      Item : Value; Present : Boolean := True) is
+      Item : Value; Present : Boolean := True)
+   is
+      Owner : constant Frame_Access :=
+        Inspection.Logical_Frame (State, State.Current, 0);
+      Type_Name : constant Value :=
+        (if Present then Metafield (State, Item, "__name") else Nil_Value);
+      Detail : constant String :=
+        Expected & " expected, got " & Argument_Type (State, Item, Present);
+      Message : Value;
    begin
-      Argument_Error
-        (State, Index, Expected & " expected, got " &
-         Argument_Type (State, Item, Present));
+      if Owner /= null then
+         Machine.Prepare_Argument_Diagnostic (State, Owner);
+      end if;
+      if Owner /= null and then Owner.Is_Native and then
+        State.Current.Stack_Window = Owner
+      then
+         --  luaL_typeerror first leaves a supplied raw __name string, then
+         --  its formatted detail, on the actual C stack. A later fallback
+         --  registry callback can inspect/mutate those ordinary temporaries.
+         if Type_Name.Kind = String_Kind then
+            Machine.Push_Native_Value (State, Owner, Type_Name);
+         end if;
+         Message := New_String (State, Detail);
+         Machine.Push_Native_Value (State, Owner, Message);
+      end if;
+      Argument_Error (State, Index, Detail);
    end Type_Error;
 
    function Integer_Argument

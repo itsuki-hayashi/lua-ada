@@ -15,6 +15,12 @@ collector option. Ten focused Lua cases match both native configurations and
 both Ada configurations; each local configuration passes 2,028 AUnit cases.
 Unchanged errors.lua now reaches the string-method `bad self` diagnostic.
 This evidence does not establish completion of that file or the full target.
+The [argument registry checkpoint](sessions/2026-11-08-argument-registry-continuations.md)
+executes actual registry lookup callbacks before auxiliary errors, preserving
+original Lua/C owners, stack temporaries, collection and guard transfers.
+Both local configurations pass 2,039 AUnit cases; twenty-four builtin C cases
+match both native images. Borrowed Lua CI windows, remaining errors.lua and
+all final source/T/shared/platform acceptance remain open.
 
 The [public identity checkpoint](sessions/2026-11-08-public-value-identities.md)
 shares actual C/Lua identities and preserves returned long strings. Both

@@ -3,6 +3,7 @@
 Component: [shared traceback rendering](2026-11-08-shared-traceback.md).
 
 Component: [I/O and collector arguments](2026-11-08-io-collector-arguments.md).
+Component: [argument registry continuations](2026-11-08-argument-registry-continuations.md).
 
 Component: [public value identities](2026-11-08-public-value-identities.md).
 

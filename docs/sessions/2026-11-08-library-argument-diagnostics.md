@@ -73,6 +73,10 @@ executes that callback once and names math.sin; Ada executes none and reports
 repair needs an actual deferred lookup/error continuation, not a recursive
 executor call inside the synchronous formatter.
 
+That retained obligation has subsequent
+[registry continuation component evidence](2026-11-08-argument-registry-continuations.md).
+The observations above remain the original evidence for this dated checkpoint.
+
 Named tostring, remaining error-file behavior, actual public C concat
 windows, the explicit locals.lua progress-output policy, integrated Ada T,
 shared/platform matrices and immutable final acceptance remain open.

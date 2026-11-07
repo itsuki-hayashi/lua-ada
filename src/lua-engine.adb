@@ -1195,6 +1195,7 @@ package body Lua.Engine is
       Item.Error_Packet.Clear;
       Item.Native_Captures.Clear;
       Item.Native_Buffer.Clear;
+      Item.Argument_Error_Detail.Clear;
       Item.Call_Name_Bytes.Clear;
       for Index in Item.Slots.First_Index .. Item.Slots.Last_Index loop
          Item.Slots.Update_Element (Index, Clear_Packet'Access);
@@ -1233,6 +1234,8 @@ package body Lua.Engine is
       Item.Native_Stage := 0;
       Item.Native_Index := 0;
       Item.Native_Aux := 0;
+      Item.Argument_Error_Index := 0;
+      Item.Argument_Error_Origin := null;
       Item.Native_Operator := Lua.Lexers.End_Of_Input;
       Item.C_Closing_Level := 0;
       Item.Foreign_Handler := System.Null_Address;
@@ -1385,6 +1388,7 @@ package body Lua.Engine is
       Item.Context := Context;
       Item.Memory := Context.Memory;
       Item.Native_Buffer.Set_Owner (Item.Memory);
+      Item.Argument_Error_Detail.Set_Owner (Item.Memory);
       Item.Call_Name_Bytes.Set_Owner (Item.Memory);
       Item.Native_Arguments.Set_Owner (Item.Memory);
       Item.Native_Results.Set_Owner (Item.Memory);

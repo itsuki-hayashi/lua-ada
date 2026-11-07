@@ -67,6 +67,13 @@ package Lua.Engine.Machine is
    --  Append one rooted scalar through the same reservation/publication
    --  path. The native activation must be the current real stack window.
 
+   procedure Prepare_Argument_Diagnostic
+     (State : in out World; Owner : not null Frame_Access);
+   --  A directly called builtin can fail while a hidden phase still owns
+   --  its working scalar prefix. Transfer that actual prefix to the original
+   --  public C owner and retire the failed phase's window/request. The failed
+   --  operation must never resume; no callback or executor is invoked here.
+
    type Driver is limited private;
    type Driver_Access is access Driver;
    for Driver_Access'Storage_Pool use Lua.Storage.Pool;

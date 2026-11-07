@@ -1023,6 +1023,51 @@ package body Lua.Engine.Machine is
         (State, Activation.Context, Activation.Stack_Live_Top, Item);
    end Push_Native_Value;
 
+   procedure Prepare_Argument_Diagnostic
+     (State : in out World; Owner : not null Frame_Access)
+   is
+      Context : constant Context_Access := State.Current;
+      Phase : constant Frame_Access := Context.Stack.Last_Element;
+      Count, Last : Natural;
+      Item : Value;
+   begin
+      if Context.Stack_Window = Owner then return; end if;
+      if not Owner.Is_Native or else not Phase.Native_Builtin_Direct or else
+        not Phase.Has_Stack_Window or else Context.Stack_Window /= Phase or
+        else Phase.Previous_Stack_Window /= Owner or else
+        Phase.Stack_Base <= Owner.Stack_Base
+      then
+         raise Program_Error with "invalid builtin diagnostic ownership";
+      end if;
+      Count := Phase.Stack_Live_Top - Phase.Stack_Base;
+      Last := Owner.Stack_Base + Count;
+      if State.Policy = Bounded then
+         if Count > State.Bounds.Instructions -
+           Natural'Min (State.Steps, State.Bounds.Instructions)
+         then
+            Fail (State, "instruction limit exceeded", Resource => True);
+         end if;
+         State.Steps := State.Steps + Count;
+      end if;
+      --  Preserve both real prefixes until reservation succeeds. The C
+      --  body remains active below its synchronous builtin invocation; its
+      --  original function slot, close metadata and guard are never retired.
+      Resize_Stack_Window
+        (State, Owner, Natural'Max (Owner.Stack_Window_Length, Count));
+      for Index in 1 .. Count loop
+         Item := Stacks.Read (Context, Phase.Stack_Base + Index);
+         Stacks.Write (State, Context, Owner.Stack_Base + Index, Item);
+      end loop;
+      Owner.Stack_Live_Top := Last;
+      --  The destination begins below the private source, so ascending
+      --  writes are safe even if a grown prefix overlaps it. Those moved
+      --  rows now belong to Owner; retire only the remaining source tail.
+      Phase.Call_Base := Natural'Max (Phase.Call_Base, Last + 1);
+      Retire_Stack_Window (Phase);
+      Phase.Native_Arguments.Clear;
+      Phase.Native_Captures.Clear;
+   end Prepare_Argument_Diagnostic;
+
    procedure Release_Frame (State : in out World; Item : in out Frame_Access);
    procedure Release_Frame (State : in out World; Item : in out Frame_Access)
    is
@@ -2309,6 +2354,7 @@ package body Lua.Engine.Machine is
       end Bad_Call;
       procedure Activate (Args : Values.Vector);
       procedure Activate (Args : Values.Vector) is
+         Native_Tail_Owner : Frame_Access := null;
       begin
          Pin (State, Function_Item);
          Pin (State, Args);
@@ -2335,6 +2381,7 @@ package body Lua.Engine.Machine is
                   --  the native result/error returns. A later scheduler phase
                   --  performs its return; no Ada executor activation recurses.
                   Old.Native_Tail_State := Waiting_Native_Tail;
+                  Native_Tail_Owner := Old;
                   Native_Tail := True;
                   Return_To := 0;
                end if;
@@ -2425,6 +2472,15 @@ package body Lua.Engine.Machine is
             end if;
             State.Current.Stack.Last_Element.Call_Name := Call_Name;
             State.Current.Stack.Last_Element.Name_Kind := Name_Kind;
+         end if;
+         if Native_Tail_Owner /= null then
+            --  A native tail call retains the actual Lua CI until the C
+            --  result/error returns, including its visible locals/cells.
+            --  The new callee now owns its argument window and packet;
+            --  retire only the old call request, whose stale copies would
+            --  otherwise outlive debug mutations of every real caller slot.
+            Native_Tail_Owner.Native_Arguments.Clear;
+            Native_Tail_Owner.Native_Captures.Clear;
          end if;
       end Activate;
    begin
@@ -3962,6 +4018,46 @@ package body Lua.Engine.Machine is
             Handler := First (Activation.Native_Results);
             Return_Native (Handler);
          end if;
+      elsif Name = "@argument.error" then
+         if Activation.Argument_Error_Origin = null then
+            raise Program_Error with "argument lookup lost its origin";
+         end if;
+         if Activation.Native_Stage = 0 then
+            Packet.Append (Value'(Table_Kind, State.Foreign_Registry));
+            Packet.Append (New_String (State, "_LOADED"));
+            Activation.Native_Stage := 1;
+            --  This is the normal deferred table operation, including table
+            --  forwarding, Lua/C handlers, real handler origins and errors.
+            --  The original C activation remains public and owns the live
+            --  getfield key/function/detail slots throughout this lookup.
+            Schedule (Self, "@get", Packet, 0);
+         else
+            declare
+               Owner : constant Frame_Access :=
+                 Inspection.Logical_Frame (State, State.Current, 0);
+               Modules : constant Value := First (Activation.Native_Results);
+               Index : Natural;
+            begin
+               if Owner = null or else not Owner.Is_Native or else
+                 State.Current.Stack_Window /= Owner
+               then
+                  raise Program_Error with "argument lookup lost C window";
+               end if;
+               --  A completed getfield replaces its original key with the
+               --  actual returned table/value before raw name search. Keep
+               --  the native packet mirror coherent if this CI has one.
+               Index := Owner.Stack_Live_Top - Owner.Stack_Base;
+               Stacks.Write
+                 (State, State.Current, Owner.Stack_Live_Top, Modules);
+               if Index <= Natural (Owner.Native_Arguments.Length) then
+                  Replace_Root
+                    (State, Owner.Native_Arguments, Positive (Index), Modules);
+               end if;
+               Diagnostics.Finish_Argument_Error
+                 (State, Activation.Argument_Error_Origin, Modules);
+               raise Program_Error with "argument diagnostic returned";
+            end;
+         end if;
       elsif Name = "@api.concat" then
          if Activation.Native_Stage = 0 then
             Activation.Native_Aux := Natural
@@ -5112,6 +5208,25 @@ package body Lua.Engine.Machine is
                Execute_Instruction (Self);
             end if;
          exception
+            when Diagnostics.Deferred_Argument_Error =>
+               declare
+                  Origin : constant Frame_Access :=
+                    State.Current.Stack.Last_Element;
+               begin
+                  if Origin.Argument_Error_Index = 0 then
+                     raise Program_Error with "unowned argument lookup";
+                  end if;
+                  Schedule (Self, "@argument.error", Values.Empty_Vector, 0);
+                  State.Current.Stack.Last_Element.Argument_Error_Origin :=
+                    Origin;
+                  --  luaL_argerror is a synchronous C operation. Its lookup
+                  --  can reenter Lua but cannot yield across that actual
+                  --  operation; this continuation owns and retires the
+                  --  precise barrier even on callback error/host abort.
+                  State.Current.Stack.Last_Element.Blocks_Yield := True;
+                  State.Current.Non_Yieldable :=
+                    State.Current.Non_Yieldable + 1;
+               end;
             when Error : Language_Error |
               Lua.Storage.Allocation_Error | Program_Error =>
                if Lua.Storage.Refusal_Pending (State.Memory) or else

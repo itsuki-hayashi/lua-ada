@@ -13,6 +13,12 @@ failure after the [I/O/collector argument checkpoint](sessions/2026-11-08-io-col
 Its ten native-paired regressions and 2,028 AUnit cases in each local
 configuration cover the argument gates; remaining method diagnostics,
 traceback, relevant T paths and final platform acceptance remain open.
+Auxiliary registry lookup has
+[actual continuation evidence](sessions/2026-11-08-argument-registry-continuations.md):
+fifteen native-paired Lua cases, five real C owner/root/guard cases and a
+bounded recovery case within 2,039 passing AUnit cases in each configuration.
+Continue remaining errors.lua string argument/self diagnostics, the borrowed
+Lua CI scalar view and all unresolved source/T/final-head obligations.
 
 Public identities have [local evidence](sessions/2026-11-08-public-value-identities.md):
 1,993 AUnit cases in each configuration, native-paired pointer/rendering,
@@ -25,8 +31,8 @@ Public C concat has [original-slot component evidence](sessions/2026-11-08-c-con
 twenty-one native/Ada default/T paired cases and four bounded cases within
 1,983 passing AUnit cases in each configuration. Grouped primitive suffixes
 fit a native-proven provider allowance. Complete the independently measured
-borrowed-Lua-CI scalar view and registry fallback callback continuation, then
-all remaining source/T/final matrices.
+borrowed-Lua-CI scalar view, then all remaining source/T/final matrices. The
+subsequent registry checkpoint above implements its retained callback route.
 
 Metamethod request packets now have [actual ownership evidence](sessions/2026-11-08-metamethod-argument-roots.md):
 seven before/after weak-lifetime cases, 1,935 passing local AUnit cases and

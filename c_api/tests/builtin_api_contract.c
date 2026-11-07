@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "consumer_allocator.h"
+#include "../../tests/c/argument_registry_callbacks.h"
 
 static struct allocation_counts counts;
 static lua_CFunction degrees, direct_pairs, direct_yield, direct_error;
@@ -271,6 +272,26 @@ static void direct_closure_argument_owner(lua_State *L) {
            "tostring(e))");
 }
 
+static void registry_callback_owner(lua_State *L) {
+    registry_contract(L, 0);
+}
+
+static void registry_callback_roots(lua_State *L) {
+    registry_contract(L, 1);
+}
+
+static void registry_callback_guard(lua_State *L) {
+    registry_contract(L, 2);
+}
+
+static void registry_callback_captures(lua_State *L) {
+    registry_contract(L, 3);
+}
+
+static void registry_callback_prefix(lua_State *L) {
+    registry_contract(L, 4);
+}
+
 static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     assert(lua_gettop(L) == 0); body(L); assert(lua_gettop(L) == 0);
     printf("PASS: builtin-%s\n", name); fflush(stdout);
@@ -298,6 +319,11 @@ int main(void) {
     check("direct-extra-argument-owner", direct_extra_argument_owner, L);
     check("direct-method-argument-owner", direct_method_argument_owner, L);
     check("direct-closure-argument-owner", direct_closure_argument_owner, L);
+    check("registry-callback-original-owner", registry_callback_owner, L);
+    check("registry-callback-original-roots", registry_callback_roots, L);
+    check("registry-callback-error-guard", registry_callback_guard, L);
+    check("registry-callback-original-captures", registry_callback_captures, L);
+    check("registry-callback-extra-temporaries", registry_callback_prefix, L);
     lua_close(L); assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public builtin contract");
     return 0;
