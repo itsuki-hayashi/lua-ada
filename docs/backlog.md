@@ -2,6 +2,11 @@
 
 ## Active remaining-suite delivery
 
+Investigate the [macOS coroutine resident watchdog failure](sessions/2026-11-08-lifecycle-watchdog-evidence.md)
+with the new retained process/raw capture. Preserve the existing threshold and
+failed status; compare actual managed storage and native platform behavior
+before choosing a runtime fix. Readline observations remain a separate operation.
+
 Validate the [native readline component](sessions/2026-11-08-cli-native-readline.md)
 on Linux/macOS and real TTYs. Reconcile actual optional-backend selection,
 library warnings/-E, raw input, history and final-context report identities.

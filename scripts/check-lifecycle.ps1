@@ -17,7 +17,8 @@ $primary = $fixtures
 $utf8 = [Text.UTF8Encoding]::new($false)
 
 function Invoke-Interpreter {
-    param([string] $Executable, [string[]] $Arguments, [string] $Directory)
+    param([string] $Executable, [string[]] $Arguments, [string] $Directory,
+          [string] $OutputPrefix)
     $start = [Diagnostics.ProcessStartInfo]::new()
     $start.FileName = $Executable
     foreach ($argument in $Arguments) { $start.ArgumentList.Add($argument) }
@@ -34,10 +35,22 @@ function Invoke-Interpreter {
     }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $start
-    $outBuffer = [IO.MemoryStream]::new()
-    $errBuffer = [IO.MemoryStream]::new()
+    # Preserve bytes while the child runs. A killed process must retain its
+    # actual operation, streams and measurements; a watchdog exception cannot
+    # discard the only evidence of the original failing workload.
+    $outPath=$OutputPrefix+'.stdout';$errPath=$OutputPrefix+'.stderr'
+    $outBuffer = [IO.File]::Create($outPath)
+    $errBuffer = [IO.File]::Create($errPath)
+    $reason=$null
+    $record=@{schema_version=1;kind='lifecycle-process-observation';
+        runtime_acceptance=$false;coverage_authority=$false;
+        executable=$Executable;executable_sha256=(Get-FileHash $Executable).Hash.ToLowerInvariant();
+        arguments=$Arguments;working_directory=$Directory;
+        timeout_seconds=$TimeoutSeconds;sampled_resident_limit_bytes=$MemoryLimitBytes;
+        started_utc=[DateTime]::UtcNow.ToString('o')}
     try {
         [void]$process.Start()
+        $record.process_id=$process.Id
         # Capture byte streams before waiting so a full pipe cannot deadlock.
         # Decoding is deliberately reserved for failure diagnostics below.
         $stdout = $process.StandardOutput.BaseStream.CopyToAsync($outBuffer)
@@ -58,15 +71,32 @@ function Invoke-Interpreter {
                 $reason = if ($peakSampledResident -gt $MemoryLimitBytes) {
                     'PROCESS MEMORY WATCHDOG'
                 } else { 'PROCESS TIMEOUT' }
-                throw ($reason + ': ' + $Executable)
+                break
             }
         }
         [void]$stdout.GetAwaiter().GetResult()
         [void]$stderr.GetAwaiter().GetResult()
-        # PowerShell unwraps empty arrays produced by method expressions.
-        # Typed locals retain a real zero-length byte[] for empty stderr.
-        [byte[]] $capturedOut = $outBuffer.ToArray()
-        [byte[]] $capturedErr = $errBuffer.ToArray()
+        $outBuffer.Flush();$errBuffer.Flush()
+        $outBuffer.Dispose();$errBuffer.Dispose()
+        $record.exit_code=$process.ExitCode
+        $record.elapsed_milliseconds=$clock.ElapsedMilliseconds
+        $record.peak_sampled_resident_bytes=$peakSampledResident
+        $record.watchdog_failure=$reason
+        foreach($stream in @('stdout','stderr')){
+            $path=if($stream -ceq 'stdout'){$outPath}else{$errPath}
+            $record[$stream]=@{path=$path;bytes=(Get-Item $path).Length;
+                sha256=(Get-FileHash $path).Hash.ToLowerInvariant()}
+        }
+        [IO.File]::WriteAllText($OutputPrefix+'.process.json',
+            ($record|ConvertTo-Json -Depth 8).Replace("`r`n","`n")+"`n",$utf8)
+        if($null -ne $reason){
+            throw ($reason+': '+($Arguments -join ' ')+
+                '; sampled resident bytes='+$peakSampledResident+
+                '; evidence='+$OutputPrefix+'.process.json')
+        }
+        # Read only completed captures; empty streams remain real byte arrays.
+        [byte[]] $capturedOut = [IO.File]::ReadAllBytes($outPath)
+        [byte[]] $capturedErr = [IO.File]::ReadAllBytes($errPath)
         return @{
             Code = $process.ExitCode
             Out = $capturedOut
@@ -143,14 +173,10 @@ try {
                 throw "Fixture copy changed bytes: $fixture"
             }
         }
-        $expected = Invoke-Interpreter -Executable $Oracle -Directory $directory -Arguments @(
+        $expected = Invoke-Interpreter -Executable $Oracle -Directory $directory -OutputPrefix (Join-Path $directory 'c') -Arguments @(
             '-e', "assert(rawget(_G, 'T') == nil); package.path = './?.lua;./?/init.lua'", $name)
-        $actual = Invoke-Interpreter -Executable $Interpreter -Directory $directory -Arguments @(
+        $actual = Invoke-Interpreter -Executable $Interpreter -Directory $directory -OutputPrefix (Join-Path $directory 'ada') -Arguments @(
             '-e', "assert(rawget(_G, 'T') == nil); package.path = './?.lua;./?/init.lua'", $name)
-        [IO.File]::WriteAllBytes((Join-Path $directory 'c.stdout'), $expected.Out)
-        [IO.File]::WriteAllBytes((Join-Path $directory 'c.stderr'), $expected.Err)
-        [IO.File]::WriteAllBytes((Join-Path $directory 'ada.stdout'), $actual.Out)
-        [IO.File]::WriteAllBytes((Join-Path $directory 'ada.stderr'), $actual.Err)
         $marker = 'OK'
         Require-Success -Result $expected -Label "C $name" -Marker $marker
         Require-Success -Result $actual -Label "Ada $name" -Marker $marker

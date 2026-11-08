@@ -72,6 +72,27 @@ jobs:
           Write-Output 'Development diagnostics only; no source approval, global API coverage or acceptance certificate.'
           ./scripts/build-target-context.ps1 -Context '${{ matrix.context }}' -DevelopmentObservation
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Observe native readline after an incomplete development campaign
+        if: always()
+        shell: pwsh
+        run: |
+          # This separate operation cannot repair the earlier failed build,
+          # renew source approvals or supply full context/image acceptance.
+          $configuration = '${{ matrix.context }}'.Split('/')[0]
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          $part = if ($configuration -ceq 'upstream-test') { 'upstream-test/' } else { '' }
+          $cli = "$PWD/cli/bin/${part}static/lua_ada$suffix"
+          if (-not (Test-Path -LiteralPath $cli -PathType Leaf)) {
+            throw 'Readline observation not run: no built Ada CLI'
+          }
+          alr exec -- gprbuild -P experiments/conformance/oracle.gpr "-XLUA_CONFORMANCE_CONFIGURATION=$configuration"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./scripts/check-cli-readline.ps1 -Interpreter $cli `
+            -ReferenceInterpreter "$PWD/build/conformance/$configuration/bin/lua$suffix" `
+            -ReferenceLibraryDirectory "$PWD/build/conformance/$configuration/lib" `
+            -Configuration $configuration `
+            -OutputDirectory "$PWD/reports/core-image/readline-diagnostic/${{ matrix.id }}"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Record diagnostic scope
         if: always()
         shell: pwsh
