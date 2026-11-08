@@ -5,6 +5,7 @@ with Lua.Conformance_Allocator;
 with Lua.Engine;
 with Lua.Sessions.CLI;
 with Lua.Storage;
+with System;
 with Test_Support;
 
 package body Lua.Sessions.CLI_Prompt_Tests is
@@ -12,6 +13,42 @@ package body Lua.Sessions.CLI_Prompt_Tests is
    use type Lua.Engine.Object_Access;
    use type Lua.Engine.Value_Kind;
    use type Lua.Storage.Byte_Count;
+   use type Interfaces.C.size_t;
+
+   procedure Observe_History (Pointer : System.Address)
+     with Convention => C;
+   procedure Install_History (Pointer : System.Address)
+     with Import, Convention => C,
+          External_Name => "lua_ada_cli_test_history";
+   procedure Restore_History
+     with Import, Convention => C,
+          External_Name => "lua_ada_cli_test_restore_history";
+   function History_Length (Pointer : System.Address)
+      return Interfaces.C.size_t
+     with Import, Convention => C,
+          External_Name => "lua_ada_cli_line_length";
+   History_Calls, History_Used : Natural := 0;
+   History_Bytes : String (1 .. 80) := [others => ' '];
+   History_Overflow : Boolean := False;
+
+   procedure Observe_History (Pointer : System.Address) is
+      Size : constant Interfaces.C.size_t := History_Length (Pointer);
+   begin
+      --  This real C callback only copies a bounded observation. Assertions
+      --  run after it returns, never unwinding an Ada exception through C.
+      History_Calls := History_Calls + 1;
+      if Size > History_Bytes'Length then
+         History_Overflow := True;
+      else
+         History_Used := Natural (Size);
+         declare
+            Bytes : String (1 .. History_Used)
+              with Import, Address => Pointer;
+         begin
+            History_Bytes (1 .. History_Used) := Bytes;
+         end;
+      end if;
+   end Observe_History;
 
    procedure Setup (Self : in out Session; Name : String);
    procedure Setup (Self : in out Session; Name : String) is
@@ -357,6 +394,71 @@ package body Lua.Sessions.CLI_Prompt_Tests is
       when others => Close_Checked (Self); raise;
    end Refusal_Recovery;
 
+   procedure Empty_History;
+   procedure Empty_History is
+      Self : Session;
+      Result : Execution_Result;
+   begin
+      Conformance_Allocator.Attach (Lua.Storage.Reference (Self.State.Memory));
+      History_Calls := 0;
+      Install_History (Observe_History'Address);
+      Conformance_Allocator.Set_Count_Limit (0);
+      Result := CLI.Save_REPL_Line (Self, "");
+      Assert (Result.Status = Succeeded and then History_Calls = 0 and then
+              Conformance_Allocator.Measurements.Refusals = 0,
+              "empty history must neither allocate nor invoke the backend");
+      Restore_History;
+      Close_Checked (Self);
+   exception
+      when others => Restore_History; Close_Checked (Self); raise;
+   end Empty_History;
+
+   procedure History_C_String;
+   procedure History_C_String is
+      Self : Session;
+      Result : Execution_Result;
+   begin
+      Conformance_Allocator.Attach (Lua.Storage.Reference (Self.State.Memory));
+      History_Calls := 0;
+      History_Overflow := False;
+      Install_History (Observe_History'Address);
+      Result := CLI.Save_REPL_Line (Self, "abc" & ASCII.NUL & "discard");
+      Assert (Result.Status = Succeeded and then History_Calls = 1 and then
+              not History_Overflow and then History_Used = 3 and then
+              History_Bytes (1 .. 3) = "abc",
+              "history callback must borrow the actual terminated prefix");
+      Restore_History;
+      Close_Checked (Self);
+   exception
+      when others => Restore_History; Close_Checked (Self); raise;
+   end History_C_String;
+
+   procedure History_Refusal;
+   procedure History_Refusal is
+      Self : Session;
+      Result : Execution_Result;
+   begin
+      Conformance_Allocator.Attach (Lua.Storage.Reference (Self.State.Memory));
+      History_Calls := 0;
+      Install_History (Observe_History'Address);
+      Conformance_Allocator.Set_Count_Limit (0);
+      Result := CLI.Save_REPL_Line (Self, "return 37");
+      Assert (Result.Status = Runtime_Error and then History_Calls = 0 and then
+              Conformance_Allocator.Measurements.Refusals > 0,
+              "real history-buffer refusal must precede the native call");
+      Conformance_Allocator.Clear_Count_Limit;
+      Result := CLI.Save_REPL_Line (Self, "return 37");
+      Assert (Result.Status = Succeeded and then History_Calls = 1,
+              "history owner must recover after the actual provider refusal");
+      Result := Self.Execute ("assert(6*7==42)", "=history-recovery");
+      Assert (Result.Status = Succeeded,
+              "history refusal must leave the session executable");
+      Restore_History;
+      Close_Checked (Self);
+   exception
+      when others => Restore_History; Close_Checked (Self); raise;
+   end History_Refusal;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add (Suite, "CLI prompt: nil primary", Primary_Nil'Access);
@@ -410,5 +512,11 @@ package body Lua.Sessions.CLI_Prompt_Tests is
                         Exit_With_Close'Access);
       Test_Support.Add (Suite, "CLI prompt: actual allocation refusal",
                         Refusal_Recovery'Access);
+      Test_Support.Add (Suite, "CLI history: empty performs no allocation",
+                        Empty_History'Access);
+      Test_Support.Add (Suite, "CLI history: actual C string borrow",
+                        History_C_String'Access);
+      Test_Support.Add (Suite, "CLI history: actual provider refusal retry",
+                        History_Refusal'Access);
    end Register;
 end Lua.Sessions.CLI_Prompt_Tests;

@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [native readline component](sessions/2026-11-08-cli-native-readline.md)
+retains rooted prompts through native input and selected-owner history buffers.
+Both local full AUnit suites pass 2,665 cases; fourteen exact paired Windows
+input cases pass per configuration. Unix/TTY and final-context acceptance are
+pending, including separate receipt/image reconciliation for these operations.
+
 The [retained Code component](sessions/2026-11-08-code-local-execution.md)
 matches native output locally with the approved instrumented adaptation and
 passes all eight paired binary compiler/VM execution roles. Exclusions remain

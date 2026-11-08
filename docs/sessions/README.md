@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [native CLI readline and fallback](2026-11-08-cli-native-readline.md).
+
 Observation: [retained Code execution and immutable artifacts](2026-11-08-code-local-execution.md).
 
 Source installation: [exact Code V3 decisions and guarded generation](2026-11-08-code-v3-source-installation.md).
