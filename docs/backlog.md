@@ -18,10 +18,11 @@ obligations and the fail-closed ledgers rather than describing them as completed
 - Complete real TTY/platform evidence and retain explicit native T warning and
   abrupt-exit diagnostics; component or batch CLI results do not close these gates.
 
-Investigate the [macOS coroutine resident watchdog failure](sessions/2026-11-08-lifecycle-watchdog-evidence.md)
-with the new retained process/raw capture. Preserve the existing threshold and
-failed status; compare actual managed storage and native platform behavior
-before choosing a runtime fix. Readline observations remain a separate operation.
+Preserve the dated [macOS coroutine resident watchdog failure](sessions/2026-11-08-lifecycle-watchdog-evidence.md).
+The frame-storage correction passes the retained default macOS static/shared
+watchdog at checkpoint 122d642 without changing its threshold. Revalidate that
+operation with the complete future 26-context campaign; the prior failed
+observation remains failed. Readline is a separate operation.
 
 Validate the [native readline component](sessions/2026-11-08-cli-native-readline.md)
 on Linux/macOS and real TTYs. Reconcile actual optional-backend selection,

@@ -63,6 +63,14 @@ the T-invalid local-global originals, plus all unchanged upstream files. Both
 Windows campaigns pass locally. Its private C scanner now holds the expected
 native lock while calling the reader/collector; the T lock assertions remain
 enabled. The separate default ABI oracle remains unchanged.
+At 122d642, default Linux and macOS static/shared checkpoints pass completely,
+including the retained macOS lifecycle watchdog under the unchanged 2 GiB
+threshold. The T campaigns pass the frontend, batch, readline and console
+stages, then expose the binary CLI harness's hard-coded default configuration.
+The corrected binary harness uses the selected measured configuration and
+retains all ten binary comparisons. Its fresh Windows T component passes all
+22 child processes; current-head CI must still pass all twelve contexts. These
+observations do not close the full target.
 The full-target workflow remains manually available and its validators reject
 incomplete receipts, stale approvals and missing global reconciliation. All
 remaining work is retained in the owning backlog and M3 contract.

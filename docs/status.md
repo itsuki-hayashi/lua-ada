@@ -14,9 +14,10 @@ Checkpoint CI is separate from the unchanged 26-context full-target contract.
 The [frame storage correction](sessions/2026-11-08-canonical-frame-footprint.md)
 removes two unused per-frame arenas. Local unchanged coroutine default peak
 falls from 1,968,500,975 to 1,896,476,423 managed bytes with the same 2 GiB
-ceiling and zero cleanup ownership. Eight strict builds, both 2,665-case AUnit
-suites and 26/27 C consumers pass. The macOS resident watchdog and full matrix
-remain unresolved; this local reduction does not certify either gate.
+ceiling and zero cleanup ownership. Eight strict local builds, both 2,665-case
+Windows AUnit suites and 26/27 C consumers pass. Checkpoint CI at 122d642 now
+passes the retained macOS default static/shared lifecycle watchdog with its
+unchanged 2 GiB limit. The complete 26-context matrix remains pending.
 
 The [native readline component](sessions/2026-11-08-cli-native-readline.md)
 retains rooted prompts through native input and selected-owner history buffers.
