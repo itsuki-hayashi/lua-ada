@@ -59,6 +59,25 @@ local cases={
   {"Stack_Reservation",function()
     assert(T.testC('rawcheckstack 32;return 1'));assert(not T.testC('rawcheckstack 2147483647;return 1'));local ok,e=pcall(T.testC,'checkstack 2147483647 required');assert(not ok and e:find('required'))
   end},
+  {"Traceback_Command",function()
+    local text=T.testC([[traceback "command message" 0;return 1]])
+    assert(text:sub(1,32)=='command message\nstack traceback:')
+    assert(text:find('testC',1,true))
+  end},
+  {"Traceback_Dynamic_Level",function()
+    local text=T.testC([[pushint 2147483647;traceback deep .;return 1]])
+    assert(text=='deep\nstack traceback:')
+  end},
+  {"Traceback_Suspended_Thread",function()
+    local f=assert(load("coroutine.yield('pause');return 37",'@api-trace-thread'))
+    local co=coroutine.create(f)
+    local ok,value=coroutine.resume(co);assert(ok and value=='pause')
+    local text=T.testC(co,[[traceback remote 0;return 1]])
+    assert(text:find('remote\nstack traceback:',1,true)==1)
+    assert(text:find('api-trace-thread',1,true))
+    assert(coroutine.status(co)=='suspended')
+    ok,value=coroutine.resume(co);assert(ok and value==37)
+  end},
 }
 for _,case in ipairs(cases)do
   if _API_COMMAND_CASE==nil or _API_COMMAND_CASE==case[1] then

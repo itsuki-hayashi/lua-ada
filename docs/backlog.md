@@ -9,9 +9,11 @@ traceback callbacks and linear reader integration. Both local 2,300-case AUnit
 passes and focused C/binary witnesses leave all final target gates required.
 The [coroutine result portal](sessions/2026-11-08-coroutine-result-portals.md)
 checkpoint passes six focused cases and original unchanged coroutine.lua in
-both local configurations. Continue the thin T traceback command, exact
-unreduced testC memory-refusal entry diagnosis, reader portal and integrated
-remote/aggregate acceptance. No source gate is omitted by this checkpoint.
+both local configurations. The separate [thin T traceback command](sessions/2026-11-08-t-traceback-command.md)
+adds three passing actual-frame cases within 2,301 local AUnit cases per mode.
+Continue exact unreduced testC memory-refusal entry, reusable call metadata,
+scalar return storage, reader portal and remote/aggregate acceptance. No source
+gate is omitted by either checkpoint.
 
 Integrate the [managed diagnostic-text component](sessions/2026-11-08-managed-diagnostic-text.md)
 into failure delivery after the pending return/close checkpoint. Preserve

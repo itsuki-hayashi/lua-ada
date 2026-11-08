@@ -8,6 +8,12 @@ Both local configurations pass 2,300 AUnit cases, all standalone C consumers
 and the eight compiler/VM roles for its public fixture. Long C-prefix mode
 errors and instruction-policy distinctions have focused regressions. The
 complete allocation audit and final source/platform acceptance remain open.
+The [thin T traceback command](sessions/2026-11-08-t-traceback-command.md)
+uses the public renderer for actual current/suspended frames. Three native-paired
+cases and instrumented four-way execution pass; both isolated configurations
+pass 2,301 AUnit cases. The driver inventory is now 97 names. Remaining
+zero-growth C entry, reader and aggregate obligations remain open.
+
 The [coroutine portal checkpoint](sessions/2026-11-08-coroutine-result-portals.md)
 returns native false/error behavior when a parent cannot hold child results,
 while preserving yielded/wrapped children and host-budget policy. Six new

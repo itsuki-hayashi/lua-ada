@@ -53,6 +53,10 @@ package body Lua.API_Command_Tests is
    procedure Warning_Fragments;
    procedure Hook_Command;
    procedure Stack_Reservation;
+   procedure Traceback_Command;
+   procedure Traceback_Dynamic_Level;
+   procedure Traceback_Suspended_Thread;
+
    procedure Driver_Rejection;
    procedure Shared_Cross_Budget;
    procedure Coroutine_Cross_Budget;
@@ -288,6 +292,42 @@ package body Lua.API_Command_Tests is
          "local ok,e=pcall(T.testC,'checkstack 2147483647 required');" &
          "assert(not ok and e:find('required'))");
    end Stack_Reservation;
+
+   procedure Traceback_Command is
+   begin
+      --  Delegate the real current stack and quoted message to the public
+      --  auxiliary API; the output must identify its actual C driver frame.
+      Check
+        ("local text=T.testC([[traceback ""command message"" 0;return 1]]);" &
+         "assert(text:sub(1,32)=='command message\nstack traceback:');" &
+         "assert(text:find('testC',1,true))");
+   end Traceback_Command;
+
+   procedure Traceback_Dynamic_Level is
+   begin
+      --  A dynamic numeric operand consumes the real stack top. A level
+      --  beyond every frame preserves only the exact message/header.
+      Check
+        ("local text=T.testC([[pushint 2147483647;" &
+         "traceback deep .;return 1]]);" &
+         "assert(text=='deep\nstack traceback:')");
+   end Traceback_Dynamic_Level;
+
+   procedure Traceback_Suspended_Thread is
+   begin
+      --  An addressed thread supplies its retained actual frames. Building
+      --  and copying the result cannot consume its suspended continuation.
+      Check
+        ("local f=assert(load(""coroutine.yield('pause');return 37""," &
+         "'@api-trace-thread'));local co=coroutine.create(f);" &
+         "local ok,value=coroutine.resume(co);" &
+         "assert(ok and value=='pause');" &
+         "local text=T.testC(co,[[traceback remote 0;return 1]]);" &
+         "assert(text:find('remote\nstack traceback:',1,true)==1);" &
+         "assert(text:find('api-trace-thread',1,true));" &
+         "assert(coroutine.status(co)=='suspended');" &
+         "ok,value=coroutine.resume(co);assert(ok and value==37)");
+   end Traceback_Suspended_Thread;
 
    procedure Driver_Rejection is
    begin
@@ -640,6 +680,12 @@ package body Lua.API_Command_Tests is
                         Child_Count_Limit'Access);
       Test_Support.Add (Suite, "API driver: public file load",
                         Loaded_File'Access);
+      Test_Support.Add (Suite, "API driver: actual traceback command",
+                        Traceback_Command'Access);
+      Test_Support.Add (Suite, "API driver: dynamic traceback level",
+                        Traceback_Dynamic_Level'Access);
+      Test_Support.Add (Suite, "API driver: suspended thread traceback",
+                        Traceback_Suspended_Thread'Access);
       Test_Support.Add (Suite, "API driver: oversized userdata diagnostic",
                         Oversized_Userdata'Access);
       Test_Support.Add (Suite, "Panic: provider refusal cleanup sweep",

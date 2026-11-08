@@ -451,6 +451,14 @@ static int run_commands(lua_State *L, lua_State *target, const char *pc) {
             lua_getglobal(target, token(L, argument, sizeof(argument), &pc));
         else if (strcmp(instruction, "setglobal") == 0)
             lua_setglobal(target, token(L, argument, sizeof(argument), &pc));
+        else if (strcmp(instruction, "traceback") == 0) {
+            const char *message = token(L, argument, sizeof(argument), &pc);
+            int level = number(L, target, &pc);
+            /* Pinned runC delegates the addressed state's actual frames to
+             * the public auxiliary API. The shared Ada renderer owns all
+             * traversal, limits and result storage; this is only its driver. */
+            luaL_traceback(target, target, message, level);
+        }
         else if (strcmp(instruction, "isyieldable") == 0) {
             lua_State *thread = lua_tothread(target,
                 index_operand(L, target, &pc));
