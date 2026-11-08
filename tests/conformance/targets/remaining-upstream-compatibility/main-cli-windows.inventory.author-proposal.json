@@ -1,0 +1,2717 @@
+{
+  "schema_version": 1,
+  "kind": "main-cli-windows-read-only-inventory-author-proposal",
+  "author": "Codex /root/runtime_gaps",
+  "date": "2026-11-08",
+  "source_snapshot_revision": "d3a3fd721b58f0a575d242962edb768ecddee9af",
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "platform_scope": "Windows CLI audit; conditional source comparison also records Linux/macOS readline branches",
+  "source_only": true,
+  "source_approval": false,
+  "adaptation_approval": false,
+  "native_applicability_approval": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "policy_installation": false,
+  "review": {
+    "status": "pending-independent-review",
+    "reviewer": null,
+    "artifact": null
+  },
+  "actual_new_lua_executions": 0,
+  "actual_new_builds": 0,
+  "transformed_source_emitted": false,
+  "source_mappings": [],
+  "source_exclusions": [],
+  "mode_flags": [],
+  "first_party_control_selection": {
+    "definitions": 112,
+    "always_capture_cases": 2,
+    "ordinary_array_cases": 91,
+    "prompt_cases": 19,
+    "full_selection": 112,
+    "native_protocol_selection": 59,
+    "prompt_protocol_selection": 21,
+    "all_inputs_redirected": true,
+    "shell_execute": false,
+    "per_case_timeout_seconds": 30,
+    "rule": "Static selections only, not newly executed or passing counts. Child stdout/stderr are decoded as text by check-cli.ps1; raw final conformance protocol remains separately required."
+  },
+  "bindings": [
+    {
+      "path": "references/lua/testes/main.lua",
+      "bytes": 16146,
+      "sha256": "844d13f96bdbf03a554b8b466fdf21aeac2bcddb907ad2b971814c994898d457"
+    },
+    {
+      "path": "references/lua/lua.c",
+      "bytes": 23870,
+      "sha256": "17ce8e73dd3586b84076ceaad9d638887723a1c60945c6ee086d723a6e61453f"
+    },
+    {
+      "path": "references/lua/luaconf.h",
+      "bytes": 20345,
+      "sha256": "1e617ae6f206d701018941b64ed61851da4ffc3573a0f96b73ebe64e340bfb5d"
+    },
+    {
+      "path": "references/lua/ldblib.c",
+      "bytes": 13217,
+      "sha256": "af19f54caa086a202d017a46233d7ee20c3709ae1a30548ac0ebcff5ef3023a9"
+    },
+    {
+      "path": "references/lua/ltests.c",
+      "bytes": 59576,
+      "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+    },
+    {
+      "path": "references/lua/manual/manual.of",
+      "bytes": 303316,
+      "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+    },
+    {
+      "path": "scripts/check-cli.ps1",
+      "bytes": 29039,
+      "sha256": "86a847e57b460058d190b4dd4deeda172db7093a743bb39ac456acb5a87ab0ab"
+    },
+    {
+      "path": "scripts/check-binary-cli.ps1",
+      "bytes": 6733,
+      "sha256": "406aaf510fe341d09ae06a7dffd3d89fbb6bea60c91ed6040ee76a48baf34968"
+    },
+    {
+      "path": "cli/shared/lua_cli.adb",
+      "bytes": 34820,
+      "sha256": "62de30c3309a0693a769c496a9c65fbaad5878b6f3ba0f115bde5de5f6b134bc"
+    },
+    {
+      "path": "cli/shared/lua-sessions-cli.adb",
+      "bytes": 9570,
+      "sha256": "aa56000998a806e5c09dd517af947c3830343672332360dc5e5725a10941b88e"
+    },
+    {
+      "path": "cli/shared/lua_ada_cli_prompt.c",
+      "bytes": 881,
+      "sha256": "7375ee2825b13bcc71364e87a6d6c352d1e5c00de95def9783e96f4873908e21"
+    },
+    {
+      "path": "src/lua-sessions.adb",
+      "bytes": 19572,
+      "sha256": "bc2427a58d0fa0d45f24fef006571af91c2feeb1dee617cc9285a6f1d282cac7"
+    },
+    {
+      "path": "src/lua-engine.adb",
+      "bytes": 115735,
+      "sha256": "4830ebe0cae9b5d007ecad4ac3a54f256ef2a38f27465fbec59820f690586409"
+    },
+    {
+      "path": "src/lua-engine-machine.adb",
+      "bytes": 350173,
+      "sha256": "a8679e1348552d54d9af30c86fe8c0143e7fea6146dffe336c159e0834fc2bf3"
+    },
+    {
+      "path": "src/lua-engine-library_openers.adb",
+      "bytes": 10870,
+      "sha256": "91fe4fbcbe1c6067d5a0b5c60732f6219266146d389e2c40729e588fb7993eb3"
+    },
+    {
+      "path": "src/lua-engine-inspection.adb",
+      "bytes": 51501,
+      "sha256": "0610e1751eb67bf513efc8b5e4f517876d3898c449f26d6ea7b7780c4d2b4f86"
+    },
+    {
+      "path": "src/platform/lua_ada_streams.c",
+      "bytes": 5346,
+      "sha256": "34286408888855276ef1451212090f84a00f20a4b1c6010b8d3a3c6b61ce32e9"
+    },
+    {
+      "path": "experiments/conformance/reference.gpr",
+      "bytes": 2389,
+      "sha256": "6c79ca4e821634be54685e72a159dc1afef528e13eeac1c59ef9fd4fcb24a676"
+    },
+    {
+      "path": "docs/cli.md",
+      "bytes": 6272,
+      "sha256": "a4425b9a5ec12d8da44af01770665635ed32fc28c48455e0348c8b7a5831f2ce"
+    },
+    {
+      "path": "docs/status.md",
+      "bytes": 52852,
+      "sha256": "90a480fc394e0e99f7e72a4036018096a34545c67dbbb47024e5aec82e35ec50"
+    },
+    {
+      "path": "docs/backlog.md",
+      "bytes": 52189,
+      "sha256": "6e3ca686a82f414401dee2dc76fdb16d5431691bb5cc133f57637bc4950962b3"
+    },
+    {
+      "path": "docs/milestones/m3.md",
+      "bytes": 18906,
+      "sha256": "a67abb068a024c4bc3a69ec68d1039de8c8ea576a6185971b04d103a37519eec"
+    },
+    {
+      "path": "docs/decisions/0039-cli-prompt-transport.md",
+      "bytes": 5554,
+      "sha256": "e774058240276c374b75e5dbe964d8e419737a6c4635839f1d7e4c40a3a3e34e"
+    },
+    {
+      "path": "docs/sessions/2026-11-08-main-cli-native-baseline.md",
+      "bytes": 5900,
+      "sha256": "0d821a238e628d8751cfc6978aeaa7d2497e3dc5b551ff4460dcec19ca0504b5"
+    },
+    {
+      "path": "docs/sessions/2026-11-08-cli-dynamic-prompts.md",
+      "bytes": 5675,
+      "sha256": "212bfca26b89dd1ee6ef4a3971b6cffd3642896b9ccd862ee605cd297ccd24c4"
+    },
+    {
+      "path": "tests/conformance/targets/remaining-upstream-compatibility/main-cli-native-platform.author-observation.json",
+      "bytes": 111240,
+      "sha256": "ba87386031ff36149f63835f9e35ef7d3c2f2b98aa7d8ef1f924a452e8596648"
+    }
+  ],
+  "source_blocks": [
+    {
+      "id": "MAIN-01",
+      "key": "preconditions",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 1,
+        "last_line": 17,
+        "byte_offset": 0,
+        "byte_length": 406,
+        "sha256": "fc6ccc5cc4898646502579362ce8c945bd75c10f926ece9b29ded967db6abc97"
+      },
+      "public_expectations": "Unix-like shell note, _port early return, initial banner and working system command.",
+      "related_cli_controls": [],
+      "classification": [
+        "host-shell",
+        "protected-source-precondition"
+      ],
+      "remaining": "No test invokes _port; os.execute() and full source entry remain required.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-02",
+      "key": "temporary-paths",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 18,
+        "last_line": 21,
+        "byte_offset": 406,
+        "byte_length": 83,
+        "sha256": "a3987577dacd2b8489005228432d5f93336bee20f96bc40bc2bc0932b0b77419"
+      },
+      "public_expectations": "Create three independent temporary paths through real os.tmpname calls.",
+      "related_cli_controls": [],
+      "classification": [
+        "host-path"
+      ],
+      "remaining": "Observed rooted Windows names cause denial; no API or return-value change is proposed here.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-03",
+      "key": "executable-identity",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 22,
+        "last_line": 30,
+        "byte_offset": 489,
+        "byte_length": 118,
+        "sha256": "46566b746ddbf43bbf9fab64e95c2f40c7894c0b51c137d987027b7bc699f857"
+      },
+      "public_expectations": "Recover actual executable from the negative arg indices and print it.",
+      "related_cli_controls": [
+        "CLI-019"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "Negative-index control does not recover the whole original executable search or prove child identity.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-04",
+      "key": "helpers",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 31,
+        "last_line": 78,
+        "byte_offset": 607,
+        "byte_length": 1185,
+        "sha256": "4eb2825f17087e115e5939fc032d7d1a5f2055ac7c72ae1f734fccd0403bb015"
+      },
+      "public_expectations": "Prepare text/binary files, read/remove output, exact or per-line comparisons, RUN success and NoRun failure/status/message checks.",
+      "related_cli_controls": [],
+      "classification": [
+        "host-shell",
+        "harness"
+      ],
+      "remaining": "Preserve actual os.execute, stdout/stderr streams, success/failure values and cleanup; direct first-party children do not stand in for original RUN/NoRun.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-05",
+      "key": "version",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 79,
+        "last_line": 85,
+        "byte_offset": 1792,
+        "byte_length": 185,
+        "sha256": "067cd33607123aaeb0db46fd13a31e76793b993041a65f18a16184cacfee69ad"
+      },
+      "public_expectations": "Two real -v children; redirect and parse actual release text.",
+      "related_cli_controls": [
+        "CLI-052"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "Native banner control is related; original redirection currently fails and no release extraction completes.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-06",
+      "key": "stdin-files",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 86,
+        "last_line": 102,
+        "byte_offset": 1977,
+        "byte_length": 249,
+        "sha256": "83382ef9aa8e6ceaf9a33a6f4a2a77a33fb229533e18705657930708526ba6bc"
+      },
+      "public_expectations": "Empty explicit stdin, multiline stdin via - --, and two piped echo statements.",
+      "related_cli_controls": [
+        "CLI-010",
+        "CLI-011",
+        "CLI-017"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell"
+      ],
+      "remaining": "No exact - -- control; Unix echo multiline and quotation behavior is a transport assumption.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-07",
+      "key": "bom",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 103,
+        "last_line": 129,
+        "byte_offset": 2226,
+        "byte_length": 562,
+        "sha256": "9dbe1952d0722cae4905fa64972a755b464db79f0627ff6826eb74117ac6ce30"
+      },
+      "public_expectations": "BOM-only, BOM+source, BOM+shebang, and four malformed/truncated BOM failures.",
+      "related_cli_controls": [
+        "CLI-021",
+        "CLI-027",
+        "CLI-028"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "Existing BOM+shebang and generic syntax tests do not exercise all seven original preambles.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-08",
+      "key": "dash-option",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 130,
+        "last_line": 133,
+        "byte_offset": 2788,
+        "byte_length": 86,
+        "sha256": "1a4d0069ffb585f8e08f615e91d9616232627eb217148bbb8d690e18d080d5ea"
+      },
+      "public_expectations": "After script dash, -h is a script argument rather than an option.",
+      "related_cli_controls": [
+        "CLI-017",
+        "CLI-018"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell"
+      ],
+      "remaining": "Missing exact dash+dash-prefixed-argument control; replace echo transport only after review.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-09",
+      "key": "path-init-environment",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 134,
+        "last_line": 173,
+        "byte_offset": 2874,
+        "byte_length": 1061,
+        "sha256": "67589801e513162bfb277b92d04edd8442d383b9d8c30f50c376bdb746dee8b0"
+      },
+      "public_expectations": "Plain and versioned PATH/CPATH/INIT, INIT sees arg, @file executes twice, and INIT source-name error.",
+      "related_cli_controls": [
+        "CLI-064",
+        "CLI-067",
+        "CLI-068",
+        "CLI-069",
+        "CLI-077"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell"
+      ],
+      "remaining": "The 112 lack direct plain CPATH/versioned CPATH, INIT access to arg[1], exact source-name, and init-file repeat-state checks. Unix env syntax is separate from these public operations.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-10",
+      "key": "ignore-environment",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 174,
+        "last_line": 199,
+        "byte_offset": 3935,
+        "byte_length": 765,
+        "sha256": "1e4615efbe66a0f36a5a6fde2a0a127021d4aa894ef2b8c266ee0bc017ab6c81"
+      },
+      "public_expectations": "-E protects clean paths and INIT; empty environment subprocess; default paths reject xxx and contain lua.",
+      "related_cli_controls": [
+        "CLI-001",
+        "CLI-002",
+        "CLI-070",
+        "CLI-078"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell"
+      ],
+      "remaining": "Original lines 187-190 store new output in local out but compare earlier output. Preserve that weak assertion, do not claim it checks equality of empty-environment output. No -E CPATH control.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-11",
+      "key": "readline-library",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 200,
+        "last_line": 215,
+        "byte_offset": 4700,
+        "byte_length": 639,
+        "sha256": "42936c67fd0cdb51260c2a39dfe9286ca89703991d7595d1fa9e45b0eaf2957c"
+      },
+      "public_expectations": "Release-gated bad-readline-library warning and -E suppression.",
+      "related_cli_controls": [],
+      "classification": [
+        "conditional-native-platform",
+        "product-deferred"
+      ],
+      "remaining": "lua.c only loads dynamically with LUA_USE_DLOPEN and LUA_READLINELIB, outside linked LUA_USE_READLINE branch. Stock Windows flags select neither; applicability review remains pending, not a new universal warning requirement.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-12",
+      "key": "path-expansion",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 216,
+        "last_line": 237,
+        "byte_offset": 5339,
+        "byte_length": 594,
+        "sha256": "e2bc228ea1e775db2da792839e33416daa9e4077fbd9a17b13ef6973aaa8683d"
+      },
+      "public_expectations": "Six exact LUA_PATH separator cases use actual default path.",
+      "related_cli_controls": [
+        "CLI-001",
+        "CLI-071",
+        "CLI-072",
+        "CLI-073",
+        "CLI-074"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell"
+      ],
+      "remaining": "Only-separators and first-expansion controls overlap; ;, a;;b, ;;b, a;;, a;b;;c are not all exact inputs in112.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-13",
+      "key": "library-order",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 238,
+        "last_line": 249,
+        "byte_offset": 5933,
+        "byte_length": 477,
+        "sha256": "27c878de514a7ee1d1c19b34a83bda0f78a7c80e74a4bf6be5e3a0781290d7d0"
+      },
+      "public_expectations": "Multiple Lua libraries, repeated require caching, implicit and explicit globals, attached/separate -l and order.",
+      "related_cli_controls": [
+        "CLI-054",
+        "CLI-055",
+        "CLI-056",
+        "CLI-058"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell",
+        "lua-literal-path"
+      ],
+      "remaining": "Original line 240 interpolates a path into a Lua quoted string without %q; no escaping adaptation is approved. Repeated multi-library/cached outputs are not the same as the smaller first-party controls.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-14",
+      "key": "versioned-native-module",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 250,
+        "last_line": 255,
+        "byte_offset": 6410,
+        "byte_length": 165,
+        "sha256": "3f9668d9e682c606b60be7efb3ca2ff1715690d5f1c69f3995a32124ed2fa7b0"
+      },
+      "public_expectations": "Actual lib2-v2 native module, suffix-stripped lib2 global and id() true.",
+      "related_cli_controls": [
+        "CLI-054",
+        "CLI-055"
+      ],
+      "classification": [
+        "related-partial",
+        "native-module-fixture",
+        "host-shell"
+      ],
+      "remaining": "Require_Library implements suffix removal but112 has no actual versioned native -l module case; .so is a platform fixture convention, not proof that a PE DLL can never have that extension.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-15",
+      "key": "argument-table",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 256,
+        "last_line": 268,
+        "byte_offset": 6575,
+        "byte_length": 427,
+        "sha256": "630bff4cd65858c67fcd5c1d16062f26e2c0bc42e5c727ec2a97fbc140137e91"
+      },
+      "public_expectations": "Exact positive/negative index table, absent endpoints, empty attached -e, --, and matching script varargs.",
+      "related_cli_controls": [
+        "CLI-018",
+        "CLI-019",
+        "CLI-020"
+      ],
+      "classification": [
+        "related-partial",
+        "lua-literal-path"
+      ],
+      "remaining": "Line260 interpolates progname into a Lua string without %q.112 does not check the entire original index layout or all absent endpoints.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-16",
+      "key": "argument-library",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 269,
+        "last_line": 273,
+        "byte_offset": 7002,
+        "byte_length": 164,
+        "sha256": "f5683718c009c9df6ec7095ad3bfbbfd0124032835fc8e7f1e9d81c7ce591ce9"
+      },
+      "public_expectations": "arg exists inside required module before stdin script.",
+      "related_cli_controls": [
+        "CLI-019",
+        "CLI-054"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell"
+      ],
+      "remaining": "No direct library-side assert(arg) in112.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-17",
+      "key": "mutable-argument-table",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 274,
+        "last_line": 278,
+        "byte_offset": 7166,
+        "byte_length": 177,
+        "sha256": "4cca106dd84f1fb72921c0e731cdad32ed2332287336d58dbf47218ad7f87c6c"
+      },
+      "public_expectations": "Changing arg[1] changes script varargs; replacing arg with non-table fails.",
+      "related_cli_controls": [],
+      "classification": [
+        "source-confirmed-product-gap",
+        "host-shell"
+      ],
+      "remaining": "CLI passes Arguments_After into Sessions.Execute, which constructs string values; it does not run lua.c pushargs against the current global arg. No execution of this finding in this audit.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-18",
+      "key": "repl-print-error",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 279,
+        "last_line": 282,
+        "byte_offset": 7343,
+        "byte_length": 146,
+        "sha256": "e9aff47152875789cec872e3351c2cdf678e0b17fc6aad77434cc3fdb1fe065f"
+      },
+      "public_expectations": "Removed print is reported through REPL error wrapper.",
+      "related_cli_controls": [
+        "CLI-090",
+        "CLI-091"
+      ],
+      "classification": [
+        "authored-input-overlap",
+        "host-shell"
+      ],
+      "remaining": "Authored print-removed input tests the same behavior; original echo and /dev/null still need native transport review.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-19",
+      "key": "debug-console",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 283,
+        "last_line": 286,
+        "byte_offset": 7489,
+        "byte_length": 151,
+        "sha256": "a0df66660bf254f319e0c2c7872078b8da4324ace1a9e899b816bf68901f4759"
+      },
+      "public_expectations": "debug.debug executes a command, cont exits, exact stderr prompts and output.",
+      "related_cli_controls": [],
+      "classification": [
+        "source-confirmed-product-gap",
+        "host-shell"
+      ],
+      "remaining": "Library_Openers does not publish debug.debug; pinned ldblib.c db_debug owns a separate interactive loop, not product REPL.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-20",
+      "key": "local-warnings",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 287,
+        "last_line": 296,
+        "byte_offset": 7640,
+        "byte_length": 296,
+        "sha256": "dde2b6045fccaa94ca92c24a32dd39f42326d60028eb33a603f343a836a010b7"
+      },
+      "public_expectations": "Leading whitespace local warns; local1 assignment/expression does not warn and prints13.",
+      "related_cli_controls": [
+        "CLI-088",
+        "CLI-082"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell"
+      ],
+      "remaining": "112 has a local warning as a side assertion, not both original lexical-boundary cases.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-21",
+      "key": "warning-fragments",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 297,
+        "last_line": 320,
+        "byte_offset": 7936,
+        "byte_length": 732,
+        "sha256": "8a1ea4c4eb16354e6f9452f84cbc896aa8ff822cf88dc7950c5a0584776293d5"
+      },
+      "public_expectations": "Warnings default off; -W controls/fragments produce exactly three messages without stray controls.",
+      "related_cli_controls": [
+        "CLI-059",
+        "CLI-060",
+        "CLI-061",
+        "CLI-062",
+        "CLI-063",
+        "CLI-065",
+        "CLI-066"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell"
+      ],
+      "remaining": "112 covers order/default/enabling but not the complete original multipart warning sequence.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-22",
+      "key": "finalizer-warnings",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 321,
+        "last_line": 330,
+        "byte_offset": 8668,
+        "byte_length": 327,
+        "sha256": "00804cf4a2508ec0f0383901c797bec2c97891955ded7ce4963a64d9e0fab83f"
+      },
+      "public_expectations": "Two state-close finalizer errors produce warnings in reverse order.",
+      "related_cli_controls": [
+        "CLI-008",
+        "CLI-009",
+        "CLI-007"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "No112 control for both finalizer failures and warning order.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-23",
+      "key": "reentrant-finalization",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 331,
+        "last_line": 362,
+        "byte_offset": 8995,
+        "byte_length": 745,
+        "sha256": "eb012beaf6c91481c8f54b435b6047911df2f50627f47f9b0448734b630c90ed"
+      },
+      "public_expectations": "Stopped collector; reverse state finalizers; newly created finalizer suppressed; collection unavailable; recursive close exit completes original finalizer order.",
+      "related_cli_controls": [
+        "CLI-007",
+        "CLI-008"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "112 proves ordinary state close, not this reentrant os.exit(true,true) finalization protocol.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-24",
+      "key": "many-arguments",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 363,
+        "last_line": 367,
+        "byte_offset": 9740,
+        "byte_length": 126,
+        "sha256": "ecc905e68cfa672d8488aec16ababf3a5e01fecebd9665d903f18708077371bf"
+      },
+      "public_expectations": "Thirty script arguments reach varargs slot30.",
+      "related_cli_controls": [
+        "CLI-018"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "Two-argument control does not cover original argument count or destination.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-25",
+      "key": "attached-actions",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 368,
+        "last_line": 370,
+        "byte_offset": 9866,
+        "byte_length": 76,
+        "sha256": "74d77a73f4617dce69d636edc3e1ec65ca6d8c4a12c7ae72af1e0902c03859a8"
+      },
+      "public_expectations": "Attached snippets and separate snippet retain order and shared state.",
+      "related_cli_controls": [
+        "CLI-014",
+        "CLI-015",
+        "CLI-016",
+        "CLI-056"
+      ],
+      "classification": [
+        "authored-input-overlap"
+      ],
+      "remaining": "Original combinations still require exact replay after transport review.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-26",
+      "key": "empty-prompts-expression",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 371,
+        "last_line": 380,
+        "byte_offset": 9942,
+        "byte_length": 166,
+        "sha256": "65a24e5a3925f5fd771fcb7fedd3ab9e4c9fd8112b3ab1d813ece2eae029467b"
+      },
+      "public_expectations": "Empty prompts, expression-first parsing, multiline assignment and printed values.",
+      "related_cli_controls": [
+        "CLI-096",
+        "CLI-082",
+        "CLI-083",
+        "CLI-084"
+      ],
+      "classification": [
+        "authored-input-overlap"
+      ],
+      "remaining": "CLI447 uses this original input content as authored fixture; it is not execution of original main.lua.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-27",
+      "key": "long-string-repl",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 381,
+        "last_line": 384,
+        "byte_offset": 10108,
+        "byte_length": 133,
+        "sha256": "f3cb8f77ba3bafe3c4ffe1269d3c3d8d41b6b1b41be38e7020a50f55b4b13e5a"
+      },
+      "public_expectations": "Long string across lines with empty prompts prints exact content.",
+      "related_cli_controls": [
+        "CLI-096",
+        "CLI-084"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "112 has multiline table/assignment, no exact long-string input.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-28",
+      "key": "repl-eof",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 385,
+        "last_line": 389,
+        "byte_offset": 10241,
+        "byte_length": 139,
+        "sha256": "e12d5ff00271a051ec026e934089ae93ce3631a7d2db362c68ae7631811b794c"
+      },
+      "public_expectations": "EOF during a. continuation reports near <eof>.",
+      "related_cli_controls": [
+        "CLI-086",
+        "CLI-089"
+      ],
+      "classification": [
+        "related-partial",
+        "host-shell"
+      ],
+      "remaining": "Existing malformed statement and unresolved goto controls do not test this actual incomplete continuation EOF.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-29",
+      "key": "custom-prompt",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 390,
+        "last_line": 397,
+        "byte_offset": 10380,
+        "byte_length": 196,
+        "sha256": "d3ce13a16dcaf51d357673dfb1b6f69774c309342eae368efb72f580f132ed56"
+      },
+      "public_expectations": "Prompt alo is resolved on each read, including EOF.",
+      "related_cli_controls": [
+        "CLI-094"
+      ],
+      "classification": [
+        "authored-input-overlap"
+      ],
+      "remaining": "Process442 uses matching two input lines and exact output; original child remains unexecuted beyond early failure.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-30",
+      "key": "default-prompt",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 398,
+        "last_line": 407,
+        "byte_offset": 10576,
+        "byte_length": 211,
+        "sha256": "09053f70868e72926b98c5e26245249ff9bcb5d6f2ccdddf3ce14e104fc47ddc"
+      },
+      "public_expectations": "Default > prompt appears for two lines and EOF.",
+      "related_cli_controls": [
+        "CLI-082"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "Existing REPL sequences exercise default prompts with different lines.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-31",
+      "key": "converted-prompt",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 408,
+        "last_line": 422,
+        "byte_offset": 10787,
+        "byte_length": 375,
+        "sha256": "cc340264624d128596412073d1b2778555ff066327607ddcd27e13a02786f75a"
+      },
+      "public_expectations": "Table prompt __tostring grows X each read; exact three prompt pattern.",
+      "related_cli_controls": [
+        "CLI-101"
+      ],
+      "classification": [
+        "authored-input-overlap"
+      ],
+      "remaining": "Dynamic prompt control uses equivalent authored fixture; no source authority inherited.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-32",
+      "key": "error-message-handler",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 423,
+        "last_line": 437,
+        "byte_offset": 11162,
+        "byte_length": 310,
+        "sha256": "ed4e1da44d78e2317d3a93f6fd0f6ec64163502452f1a7f3e547b2c81e0b782f"
+      },
+      "public_expectations": "Table error __tostring sees real message-handler ancestry/currentline; missing handler reports error object is a table value.",
+      "related_cli_controls": [
+        "CLI-029"
+      ],
+      "classification": [
+        "source-confirmed-product-gap",
+        "related-partial"
+      ],
+      "remaining": "CLI Report receives Failure_Image text, adds source/line and never runs lua.c msghandler __tostring/traceback phase. Fatal prompt raw reporting has a different contract.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-33",
+      "key": "broken-lines",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 438,
+        "last_line": 457,
+        "byte_offset": 11472,
+        "byte_length": 452,
+        "sha256": "4fe9c7da93a54bc405c5b0c0ff84a2c11aa702417d020c342f651b15bb8c877b"
+      },
+      "public_expectations": "Large multiline function, long/short strings, comments and multi-return expressions through REPL.",
+      "related_cli_controls": [
+        "CLI-083",
+        "CLI-084",
+        "CLI-096"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "No112 exact broken-every-space input or entire return tuple.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-34",
+      "key": "preambles",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 458,
+        "last_line": 465,
+        "byte_offset": 11924,
+        "byte_length": 224,
+        "sha256": "0388878c62c01a6f3df6ef863a2fefbca45c6c64fd483253ac2d227f97838ea3"
+      },
+      "public_expectations": "Shebang with EOF and binary dump after shebang executes.",
+      "related_cli_controls": [
+        "CLI-026",
+        "CLI-027"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "112 tests text shebang, not EOF-only shebang or binary preamble; separate binary CLI tests are not among112.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-35",
+      "key": "open-file-shutdown",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 466,
+        "last_line": 470,
+        "byte_offset": 12148,
+        "byte_length": 133,
+        "sha256": "09156e5f7f739e17bd0653132f86b40fa2ef76b4eac00a4c1f73b2aeb5cda660"
+      },
+      "public_expectations": "An open default output stream is flushed and closed by process shutdown.",
+      "related_cli_controls": [],
+      "classification": [
+        "no112control"
+      ],
+      "remaining": "File lifetime/finalization is a real obligation even after temporary-path repair.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-36",
+      "key": "banner-terminator",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 471,
+        "last_line": 476,
+        "byte_offset": 12281,
+        "byte_length": 153,
+        "sha256": "83428b5c46355612f57e77f1f23eaf21e3003b4c0f78368c11c958f1078fd09f"
+      },
+      "public_expectations": "Version line followed immediately by hello has no spurious NUL.",
+      "related_cli_controls": [
+        "CLI-052",
+        "CLI-093"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "Exact native banner and -i snippet controls do not assert this -v -e byte adjacency.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-37",
+      "key": "exit-status",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 477,
+        "last_line": 489,
+        "byte_offset": 12434,
+        "byte_length": 319,
+        "sha256": "889cc52237fe54b2756b0977274685dddcb50ef0e754fd6e7788385cdf296c5a"
+      },
+      "public_expectations": "nil/0/true exit success and1/false failure, close requested each time.",
+      "related_cli_controls": [
+        "CLI-003",
+        "CLI-004",
+        "CLI-006",
+        "CLI-007",
+        "CLI-092"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "Existing typed exit controls do not exercise all five original status forms.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-38",
+      "key": "main-closing",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 490,
+        "last_line": 503,
+        "byte_offset": 12753,
+        "byte_length": 387,
+        "sha256": "c9564f2e8e8ff5df281bb3f43e6fa32b742fe56ede82315765569a461c697c63"
+      },
+      "public_expectations": "os.exit(true,true) runs two actual lexical closers in reverse order with nil error.",
+      "related_cli_controls": [
+        "CLI-007"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "One ordinary closer+finalizer is not both original lexical closers/error checks.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-39",
+      "key": "temporary-cleanup",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 504,
+        "last_line": 508,
+        "byte_offset": 13140,
+        "byte_length": 107,
+        "sha256": "81c32a2d7f7f591027fe32430df775f9e89d282afe4273e632dd062ead2b3541"
+      },
+      "public_expectations": "Remove program and library files; output file must already have been removed.",
+      "related_cli_controls": [],
+      "classification": [
+        "harness"
+      ],
+      "remaining": "No orphan output files or indiscriminate cleanup may hide this original assertion.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-40",
+      "key": "invalid-options",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 509,
+        "last_line": 520,
+        "byte_offset": 13247,
+        "byte_length": 422,
+        "sha256": "2e0669c23231eeaf6bb57d5c6831242dd6aabb13d5da4372b743094892fbbd67"
+      },
+      "public_expectations": "Nine invalid option/syntax/script-name cases retain exact fragments and failure status.",
+      "related_cli_controls": [
+        "CLI-031",
+        "CLI-032",
+        "CLI-033",
+        "CLI-034",
+        "CLI-079",
+        "CLI-028"
+      ],
+      "classification": [
+        "related-partial"
+      ],
+      "remaining": "112 lacks -h, ---, -Ex, -vv, -iv, exact -e a syntax and -- -i script-name cases as a complete group.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-41",
+      "key": "t-startup-refusal",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 521,
+        "last_line": 524,
+        "byte_offset": 13669,
+        "byte_length": 140,
+        "sha256": "fc7456d3d7727c19417af7b92529b6803ebf874c1da6eba1ade34ecdfbc40376"
+      },
+      "public_expectations": "Only actual T configuration: MEMLIMIT=100 rejects state creation with not enough memory.",
+      "related_cli_controls": [],
+      "classification": [
+        "source-confirmed-test-host-gap",
+        "host-shell"
+      ],
+      "remaining": "No MEMLIMIT handling exists in inspected Ada CLI/session/adapter sources; test host Configure occurs after Session construction. Host conformance ceiling is a separate parent-owned change, not startup MEMLIMIT equivalence.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-42",
+      "key": "t-warning-store",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 525,
+        "last_line": 536,
+        "byte_offset": 13809,
+        "byte_length": 285,
+        "sha256": "de439fefb6674a8b219c2ba6e08ed49e05b918fc1e43ce94e8cebd87c9fd3162"
+      },
+      "public_expectations": "Actual T warning store captures all three concatenated fragment messages, then restores normal warnings.",
+      "related_cli_controls": [],
+      "classification": [
+        "no112control",
+        "requires-real-T"
+      ],
+      "remaining": "No T-absent return or ordinary product CLI run can credit this body; adapter unit evidence is separate.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-43",
+      "key": "warning-errors",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 537,
+        "last_line": 547,
+        "byte_offset": 14094,
+        "byte_length": 331,
+        "sha256": "ff4f7fc7dfb5f41f2de43fdc413a9dcebf32556373135966aaaa961e93744c49"
+      },
+      "public_expectations": "warn requires a string; failed partial warning leaves no unfinished warning state.",
+      "related_cli_controls": [],
+      "classification": [
+        "no112control"
+      ],
+      "remaining": "Retain both protected failure messages and absence of unfinished fragments in later warnings.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-44",
+      "key": "progress",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 548,
+        "last_line": 552,
+        "byte_offset": 14425,
+        "byte_length": 63,
+        "sha256": "471e6b50db13a43f21698006cfd1d6c5afcc1368c5f173829959c56ff18910fb"
+      },
+      "public_expectations": "Print + and announce Ctrl C; no completion credit.",
+      "related_cli_controls": [],
+      "classification": [
+        "progress-only"
+      ],
+      "remaining": "These markers cannot replace either actual interrupt assertion.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-45",
+      "key": "protected-interrupt",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 553,
+        "last_line": 579,
+        "byte_offset": 14488,
+        "byte_length": 1078,
+        "sha256": "4d5bafe85b566f94994b5f5d1b482a7e0edfbd8d34eea1282e4d7cb161227f62"
+      },
+      "public_expectations": "Real background child prints12 in protected loop; INT becomes catchable error; child prints42 and pipe close succeeds.",
+      "related_cli_controls": [],
+      "classification": [
+        "source-confirmed-product-gap",
+        "host-shell",
+        "real-signal-required"
+      ],
+      "remaining": "No production SIGINT bridge is present; kill -INT, & echo $!, /dev/null, PID/pipe status and process-group delivery all require reviewed native Windows counterpart, not force-kill.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-46",
+      "key": "native-loop-interrupt",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 580,
+        "last_line": 599,
+        "byte_offset": 15566,
+        "byte_length": 568,
+        "sha256": "c3503e6e06a81c51bc92f618d71adb714a19e8d84bfd6a4b2d565bdf5129e03c"
+      },
+      "public_expectations": "Actual long pattern search prints15; repeated INT delivery stops native loop; pipe closes; at least two successful signals observed.",
+      "related_cli_controls": [],
+      "classification": [
+        "source-confirmed-product-gap",
+        "host-shell",
+        "real-signal-required"
+      ],
+      "remaining": "First signal installs hook and restores default in lua.c; long C search has no Lua safe point before second signal. Replacing search with Lua loop, count with fabricated output, or taskkill is not equivalent.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    },
+    {
+      "id": "MAIN-47",
+      "key": "completion",
+      "source": {
+        "path": "references/lua/testes/main.lua",
+        "first_line": 600,
+        "last_line": 600,
+        "byte_offset": 16134,
+        "byte_length": 12,
+        "sha256": "41424c8dbcd84fdb4d29ffb8d9c2536591ba0ac2759de35fac71ae9b8490876f"
+      },
+      "public_expectations": "Final OK and zero-value main.lua return after both interrupt blocks and cleanup.",
+      "related_cli_controls": [],
+      "classification": [
+        "terminal-protocol"
+      ],
+      "remaining": "No original role reaches this marker in retained baseline;112 independent controls do not establish the final protocol.",
+      "original_execution_credit": false,
+      "independent_review": "pending"
+    }
+  ],
+  "cli_controls": [
+    {
+      "id": "CLI-001",
+      "title": "capture clean package.path default",
+      "line": 125,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-10",
+        "MAIN-12"
+      ],
+      "protocol_selection": "always-captured-default",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-002",
+      "title": "capture clean package.cpath default",
+      "line": 127,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-10"
+      ],
+      "protocol_selection": "always-captured-default",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-003",
+      "title": "negative process exit retains native status",
+      "line": 133,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-37"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-004",
+      "title": "oversized process exit retains low C int bits",
+      "line": 136,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-37"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-005",
+      "title": "unbuffered file accepts negative size_t input",
+      "line": 140,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-006",
+      "title": "typed exit without Lua close handlers",
+      "line": 143,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-37"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-007",
+      "title": "typed exit completes Lua close handlers",
+      "line": 146,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-22",
+        "MAIN-23",
+        "MAIN-37",
+        "MAIN-38"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-008",
+      "title": "state close finalizes reachable objects",
+      "line": 151,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-22",
+        "MAIN-23"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-009",
+      "title": "failed snippet closes reachable objects",
+      "line": 154,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-22"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-010",
+      "title": "no input executes empty redirected stdin",
+      "line": 159,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-06"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-011",
+      "title": "implicit redirected stdin",
+      "line": 161,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-06"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-012",
+      "title": "explicit help",
+      "line": 163,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-013",
+      "title": "version",
+      "line": 164,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-014",
+      "title": "single snippet",
+      "line": 166,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-25"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-015",
+      "title": "attached snippet",
+      "line": 167,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-25"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-016",
+      "title": "repeated snippets",
+      "line": 169,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-25"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-017",
+      "title": "explicit stdin",
+      "line": 171,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-06",
+        "MAIN-08"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-018",
+      "title": "script arguments and varargs",
+      "line": 174,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-08",
+        "MAIN-15",
+        "MAIN-24"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-019",
+      "title": "snippets see negative argument indices",
+      "line": 176,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-03",
+        "MAIN-15",
+        "MAIN-16"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-020",
+      "title": "option terminator",
+      "line": 179,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-15"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-021",
+      "title": "empty file",
+      "line": 180,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-07"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-022",
+      "title": "file debug source identity",
+      "line": 183,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-023",
+      "title": "dofile debug source identity",
+      "line": 185,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-024",
+      "title": "loadfile debug source identity",
+      "line": 188,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-025",
+      "title": "command-line debug source identity",
+      "line": 191,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-026",
+      "title": "file shebang",
+      "line": 194,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-34"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-027",
+      "title": "BOM and shebang",
+      "line": 195,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-07",
+        "MAIN-34"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-028",
+      "title": "syntax error",
+      "line": 197,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-07",
+        "MAIN-40"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-029",
+      "title": "runtime error",
+      "line": 199,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-32"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-030",
+      "title": "output before runtime error",
+      "line": 201,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-031",
+      "title": "missing snippet argument",
+      "line": 203,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-40"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-032",
+      "title": "snippet argument must not be an option",
+      "line": 205,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-40"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-033",
+      "title": "library option needs argument",
+      "line": 208,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-40"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-034",
+      "title": "unknown option",
+      "line": 210,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-40"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-035",
+      "title": "missing file",
+      "line": 212,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-036",
+      "title": "check snippet suppresses output",
+      "line": 217,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-037",
+      "title": "check valid deferred syntax",
+      "line": 219,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-038",
+      "title": "check repeated independent snippets",
+      "line": 221,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-039",
+      "title": "check explicit stdin",
+      "line": 223,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-040",
+      "title": "check file ignores script arguments",
+      "line": 225,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-041",
+      "title": "check option terminator",
+      "line": 227,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-042",
+      "title": "check file preamble",
+      "line": 229,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-043",
+      "title": "check syntax failure",
+      "line": 231,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-044",
+      "title": "check stops before later input",
+      "line": 233,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-045",
+      "title": "check no input",
+      "line": 236,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-046",
+      "title": "execute resolved label",
+      "line": 237,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-047",
+      "title": "compatible instruction policy",
+      "line": 239,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-048",
+      "title": "compatible file source policy",
+      "line": 242,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-049",
+      "title": "compatible stdin source policy",
+      "line": 244,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-050",
+      "title": "compatible check source policy",
+      "line": 247,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-051",
+      "title": "compatible runtime load source policy",
+      "line": 249,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-052",
+      "title": "-v prints the native banner only",
+      "line": 256,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-05",
+        "MAIN-36"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-053",
+      "title": "--version keeps the project banner",
+      "line": 258,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-054",
+      "title": "-l requires into the module-named global",
+      "line": 260,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-13",
+        "MAIN-14",
+        "MAIN-16"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-055",
+      "title": "-l g=mod requires into an explicit global",
+      "line": 263,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-13",
+        "MAIN-14"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-056",
+      "title": "-e and -l run in command-line order",
+      "line": 266,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-13",
+        "MAIN-25"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-057",
+      "title": "-l failure stops later actions",
+      "line": 269,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-058",
+      "title": "-l uses the current global require",
+      "line": 272,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-13"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-059",
+      "title": "-W is accepted before a snippet",
+      "line": 276,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-21"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-060",
+      "title": "-W bypasses overwritten warn",
+      "line": 278,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-21"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-061",
+      "title": "warning initialization bypasses removed warn",
+      "line": 282,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-21"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-062",
+      "title": "warning controls preserve action order",
+      "line": 286,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-21"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-063",
+      "title": "warnings default off",
+      "line": 290,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-21"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-064",
+      "title": "LUA_INIT runs before snippets",
+      "line": 292,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-09"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-065",
+      "title": "LUA_INIT warning control resets before actions",
+      "line": 295,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-21"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-066",
+      "title": "LUA_INIT warning uses initial enabled handler",
+      "line": 299,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-21"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-067",
+      "title": "LUA_INIT_5_5 takes precedence over LUA_INIT",
+      "line": 303,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-09"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-068",
+      "title": "LUA_INIT @file loads a file",
+      "line": 306,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-09"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-069",
+      "title": "LUA_INIT failure is reported",
+      "line": 309,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-09"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-070",
+      "title": "-E ignores LUA_INIT",
+      "line": 312,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-10"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-071",
+      "title": "LUA_PATH ;; expands to the default path",
+      "line": 315,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-12"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-072",
+      "title": "LUA_PATH only separators selects the complete default",
+      "line": 319,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-12"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-073",
+      "title": "LUA_PATH expands only the first double separator",
+      "line": 322,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-12"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-074",
+      "title": "LUA_PATH leading separator preserves the remaining suffix",
+      "line": 325,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-12"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-075",
+      "title": "LUA_CPATH only separators selects the complete default",
+      "line": 328,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-076",
+      "title": "LUA_CPATH expands only the first double separator",
+      "line": 331,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-077",
+      "title": "LUA_PATH_5_5 takes precedence over LUA_PATH",
+      "line": 334,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-09"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-078",
+      "title": "-E ignores LUA_PATH",
+      "line": 337,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-10"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-079",
+      "title": "file named - after -- is not stdin",
+      "line": 341,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-40"
+      ],
+      "protocol_selection": "full-only",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-080",
+      "title": "stdin preserves Ctrl-Z and NUL bytes",
+      "line": 345,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-081",
+      "title": "implicit stdin preserves Ctrl-Z byte",
+      "line": 348,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "full-only",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-082",
+      "title": "-i prints banner, prompts and expression results",
+      "line": 350,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-20",
+        "MAIN-26",
+        "MAIN-30"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-083",
+      "title": "REPL prints every result through print",
+      "line": 353,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-26",
+        "MAIN-33"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-084",
+      "title": "REPL multiline statement uses continuation prompt",
+      "line": 356,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-26",
+        "MAIN-27",
+        "MAIN-33"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-085",
+      "title": "REPL error is reported and the loop continues",
+      "line": 359,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-086",
+      "title": "REPL syntax error is reported and the loop continues",
+      "line": 363,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-28"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-087",
+      "title": "REPL calls the overwritten global print",
+      "line": 367,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-088",
+      "title": "REPL resolves print through the environment handler",
+      "line": 371,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-20"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-089",
+      "title": "REPL semantic EOF error does not consume next command",
+      "line": 376,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-28"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-090",
+      "title": "REPL print failure is wrapped and not fatal",
+      "line": 380,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-18"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-091",
+      "title": "REPL with print removed reports and continues",
+      "line": 385,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-18"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-092",
+      "title": "REPL typed exit skips later input",
+      "line": 389,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-37"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-093",
+      "title": "-i runs snippets before the loop",
+      "line": 392,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-36"
+      ],
+      "protocol_selection": "native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-094",
+      "title": "REPL resolves a custom primary prompt",
+      "line": 442,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-29"
+      ],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-095",
+      "title": "REPL resolves a custom continuation prompt",
+      "line": 444,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-096",
+      "title": "REPL accepts empty primary and continuation prompts",
+      "line": 447,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-26",
+        "MAIN-27",
+        "MAIN-33"
+      ],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-097",
+      "title": "REPL converts numeric prompt values",
+      "line": 451,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-098",
+      "title": "REPL converts boolean prompt values",
+      "line": 453,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-099",
+      "title": "REPL truncates rendered prompt at NUL",
+      "line": 455,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-100",
+      "title": "REPL ignores replaced global tostring",
+      "line": 457,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-101",
+      "title": "REPL resolves dynamic tostring on every prompt",
+      "line": 459,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [
+        "MAIN-31"
+      ],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "see-block-specific-limits"
+    },
+    {
+      "id": "CLI-102",
+      "title": "REPL tostring sees the actual anonymous C frame",
+      "line": 461,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-103",
+      "title": "REPL global handler sees the actual anonymous C frame",
+      "line": 463,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-104",
+      "title": "REPL invalid tostring terminates without reading input",
+      "line": 465,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-105",
+      "title": "REPL prompt error terminates with raw message",
+      "line": 469,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-106",
+      "title": "REPL prompt table error uses raw report fallback",
+      "line": 472,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-107",
+      "title": "REPL prompt boolean error uses raw report fallback",
+      "line": 476,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-108",
+      "title": "REPL prompt NUL error displays only its C prefix",
+      "line": 480,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-109",
+      "title": "REPL global lookup error terminates with raw message",
+      "line": 483,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-110",
+      "title": "REPL prompt yield is rejected",
+      "line": 486,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-111",
+      "title": "REPL prompt typed exit without close retains status",
+      "line": 490,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    },
+    {
+      "id": "CLI-112",
+      "title": "REPL prompt typed exit with close retains status",
+      "line": 493,
+      "source": "scripts/check-cli.ps1",
+      "original_main_execution_credit": false,
+      "mapped_blocks": [],
+      "protocol_selection": "prompt-and-native-and-full",
+      "relation_to_main": "no-specific-main-assertion"
+    }
+  ],
+  "priorities": [
+    {
+      "id": "WIN-MAIN-P0-PATHS",
+      "priority": 0,
+      "kind": "pending-native-platform-counterpart",
+      "blocks": [
+        "temporary-paths",
+        "helpers",
+        "library-order",
+        "argument-table",
+        "temporary-cleanup"
+      ],
+      "proposal": "Measure real os.tmpname results in private disposable CWD; retain all three actual calls and prove translated paths absent. Independently decide safe shell filename quoting AND Lua literal escaping (%q or equivalent source-reviewed span). Preserve actual executable and raw output, stdout/stderr and status checks. No transformed source or replacement helper is included.",
+      "positive_native_gate": "Actual Windows default/T children open/read/remove only disposable paths, preserve backslash/space argv and executable identity, then independently review exact source spans; Verybig12-byte approval does not automatically cover main."
+    },
+    {
+      "id": "WIN-MAIN-P1-TRANSPORT",
+      "priority": 1,
+      "kind": "pending-native-platform-counterpart",
+      "blocks": [
+        "stdin-files",
+        "dash-option",
+        "path-init-environment",
+        "ignore-environment",
+        "path-expansion",
+        "argument-library",
+        "repl-print-error",
+        "debug-console",
+        "local-warnings",
+        "warning-fragments"
+      ],
+      "proposal": "Split authored native subprocess controls into input-byte transport, per-child environment and null-device redirection. Use explicit argv/env/stdin for counterparts; any later original-source equivalent must preserve its real Lua os.execute/io.popen operations rather than delegate them away. Quote conventions require their own narrow review.",
+      "positive_native_gate": "Default/T native prove exact intended argv/stdin/environment/result/cleanup first; no env -i stronger assertion is attributed to original lines 189-190."
+    },
+    {
+      "id": "CLI-P1-DYNAMIC-ARGS",
+      "priority": 1,
+      "kind": "real-product-gap",
+      "blocks": [
+        "mutable-argument-table",
+        "argument-table"
+      ],
+      "proposal": "First freeze native/Ada probes for mutated/replaced global arg, mixed actual Lua values, __len/raw indexing and selected script identity. Then design a private CLI/Sessions child operation using existing driver and traced actual values, not Lua shim or conversion to strings.",
+      "positive_native_gate": "Actual native pushargs uses global arg, luaL_len, rawgeti1..n, and retains selected script name independent of arg[0]. Native behavior must determine callback/error/yield/refusal controls before implementation."
+    },
+    {
+      "id": "CLI-P1-MESSAGE-HANDLER",
+      "priority": 1,
+      "kind": "real-product-gap",
+      "blocks": [
+        "error-message-handler",
+        "repl-eof"
+      ],
+      "proposal": "Measure ordinary string/nonstring handler behavior and exact public C ancestry for batch and REPL. Add a guarded host message-handler phase using existing iterative executor; retain original error identity, native tostring return rules, traceback and process/REPL prefix differences.",
+      "positive_native_gate": "Native table error returns exact currentline-derived6 for original body; no-handler table fallback and REPL continuation recovery verified. Prompt fatal raw-report tests are kept separate."
+    },
+    {
+      "id": "CLI-P1-DEBUG-CONSOLE",
+      "priority": 1,
+      "kind": "real-library-gap",
+      "blocks": [
+        "debug-console"
+      ],
+      "proposal": "Implement only after focused native debug.debug command/cont/error/stdio observations and an owned iterative continuation design. This is a standard library function, distinct from product REPL or T-only internals.",
+      "positive_native_gate": "Real debug.debug commands use =(debug command), actual stderr prompts, caller resumes after cont, no extra Lua lexical scope or recursive executor."
+    },
+    {
+      "id": "T-MAIN-P1-STARTUP",
+      "priority": 1,
+      "kind": "test-host-gap",
+      "blocks": [
+        "t-startup-refusal",
+        "t-warning-store"
+      ],
+      "proposal": "Measure actual MEMLIMIT=100 constructor refusal in frozen native T. Design allocator fault selection before actual Ada state construction while preserving independently configured host hard ceiling and balanced failed construction; do not substitute post-creation T.alloccount.",
+      "positive_native_gate": "T body actually executes, state creation genuinely refuses with selected provider evidence and canonical diagnostic; ordinary mode receives no T credit."
+    },
+    {
+      "id": "CLI-P2-RETENTION",
+      "priority": 2,
+      "kind": "missing-focused-controls-and-original-replay",
+      "blocks": [
+        "bom",
+        "versioned-native-module",
+        "finalizer-warnings",
+        "reentrant-finalization",
+        "many-arguments",
+        "long-string-repl",
+        "broken-lines",
+        "preambles",
+        "open-file-shutdown",
+        "banner-terminator",
+        "exit-status",
+        "main-closing",
+        "invalid-options",
+        "warning-errors"
+      ],
+      "proposal": "Add small source-linked first-party native/Ada cases for unmatched public assertions, in coherent loader/module/warning/lifecycle groups. Bind actual module image to current host (no reference runtime delegation). Continue to require actual main.lua review/replay rather than marking blocks covered from112.",
+      "positive_native_gate": "Both configurations; actual files, finalizers, closers and streams; native module lib2-v2 entry and global naming; clean child ownership and no text normalization."
+    },
+    {
+      "id": "PLATFORM-P3-READLINE",
+      "priority": 3,
+      "kind": "conditional-native-applicability-review",
+      "blocks": [
+        "readline-library"
+      ],
+      "proposal": "Independently review exact active preprocessing branch for Windows, Linux and linked-readline macOS. A native build without DLOPEN+READLINELIB cannot satisfy original positive warning merely because release is 5.5.1. Preserve dynamic platforms warning/fallback/-E obligations and fallback input/prompt behavior on Windows; no decision is installed.",
+      "positive_native_gate": "Record actual compile flags/preprocessor definitions and run both positive/ignored-variable native controls in selected configurations. A version check or missing optional library alone is not evidence."
+    },
+    {
+      "id": "CLI-P3-SIGNALS-TERMINAL",
+      "priority": 3,
+      "kind": "real-product-and-platform-evidence-gaps",
+      "blocks": [
+        "protected-interrupt",
+        "native-loop-interrupt"
+      ],
+      "proposal": "Separate true terminal detection evidence from line editing and signal integration. Use native Windows console/process-group delivery to the actual Lua child; verify first signal becomes catchable in protected Lua loop and later signal terminates native pattern search. Preserve PID/pipe/wait results, at-least-two signal observation and deadline/tree cleanup; no taskkill replacement.",
+      "positive_native_gate": "Actual native Windows positive before source equivalence; distinguish signal acknowledgement from kill count/timing. True terminal input must be verified by actual native isatty behavior rather than treating all pipes or a pseudo-console wrapper as terminals."
+    }
+  ],
+  "retained_observation": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/main-cli-native-platform.author-observation.json",
+    "source_snapshot_revision": "0f3c780bb83a461bdba12ce8679525f9d1d0e786",
+    "outcome": "All four original roles fail RUN67 at caller81 temporary output redirection; no later source block receives coverage.",
+    "new_evidence": false,
+    "limits": "Do not import old image/runtime authority into this source inventory."
+  },
+  "source_confirmed_findings": [
+    {
+      "id": "DYNAMIC-ARG",
+      "evidence": [
+        "cli/shared/lua_cli.adb:776-784",
+        "src/lua-sessions.adb:157-168",
+        "references/lua/lua.c:251-274"
+      ],
+      "status": "unexecuted-source-gap"
+    },
+    {
+      "id": "DEBUG-DEBUG",
+      "evidence": [
+        "src/lua-engine-library_openers.adb:122-126",
+        "references/lua/ldblib.c:423-434",
+        "references/lua/manual/manual.of:9156-9167"
+      ],
+      "status": "unexecuted-source-gap"
+    },
+    {
+      "id": "MESSAGE-HANDLER",
+      "evidence": [
+        "cli/shared/lua_cli.adb:183-229",
+        "src/lua-sessions.adb:15-37",
+        "src/lua-engine.adb:494-504",
+        "references/lua/lua.c:142-170"
+      ],
+      "status": "unexecuted-source-gap"
+    },
+    {
+      "id": "TTY",
+      "evidence": [
+        "cli/shared/lua_cli.adb:792-800",
+        "src/platform/lua_ada_streams.c:112-117",
+        "scripts/check-cli.ps1:49-53"
+      ],
+      "status": "detection-implemented-terminal-evidence-missing"
+    },
+    {
+      "id": "NOENV-DOC-DRIFT",
+      "evidence": [
+        "src/lua-engine-machine.adb:4672-4683",
+        "src/lua-sessions.adb:386-446",
+        "docs/cli.md"
+      ],
+      "status": "registry-LUA_NOENV-is-implemented-and-doc-line-is-stale; native-loading-deferred-line-also-stale"
+    }
+  ],
+  "limitations": [
+    "No native/Ada main.lua or new counterpart was executed by this task.",
+    "No current whole-file coverage, final return tuple, interrupt completion, module execution or immutable acceptance is established.",
+    "No whole-file _port return, _soft mode, skip, source deletion, stdout normalization, fake sourced delegation or eligibility installation is proposed.",
+    "Parent-owned allocator observer/host-ceiling files are dirty in Root and are not bound or changed here; MEMLIMIT startup requirement remains a separate test-host finding.",
+    "Each related112control is separate author-created input; relation never grants original-source coverage.",
+    "Historical passing112 counts belong to dated component evidence, not this audit."
+  ]
+}
