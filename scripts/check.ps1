@@ -56,6 +56,7 @@ try {
     & (Join-Path $PSScriptRoot 'test-aunit-launch.ps1')
     & (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')
     & (Join-Path $PSScriptRoot 'test-foreign-contract-evidence.ps1')
+    & (Join-Path $PSScriptRoot 'test-configured-fixture-selection.ps1')
     Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario, '-XLUA_ADA_PREBUILT=false')
     $coreArguments=@('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-core-image.ps1'),
@@ -94,8 +95,10 @@ try {
         (Join-Path $PSScriptRoot 'check-output-policy.ps1'),
         '-Consumer', (Join-Path $projectRoot "tests/bin/$LibraryType/output_consumer$suffix"),
         '-Interpreter', $absoluteCli)
+    $cliAdaReport=Join-Path $projectRoot ('reports/core-image/cli-'+[guid]::NewGuid().ToString('N')+'/ada.json')
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
-        (Join-Path $PSScriptRoot 'check-cli.ps1'), '-Interpreter', $absoluteCli)
+        (Join-Path $PSScriptRoot 'check-cli.ps1'), '-Interpreter', $absoluteCli,
+        '-Configuration','default','-Profile',$Profile,'-LibraryType',$LibraryType,'-Report',$cliAdaReport,'-RuntimeDirectory',$runtimePath)
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-lifecycle.ps1'),
         '-Interpreter', $absoluteCli)
@@ -133,9 +136,20 @@ try {
         '-Configuration','default','-RuntimeDirectory',$runtimePath,
         '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
         '-Profile',$Profile,'-LibraryType',$LibraryType,'-Report',$configuredReport)
+    $cliPairReport=Join-Path (Split-Path -Parent $cliAdaReport) 'pair.json'
+    Invoke-Alire -Arguments @('exec','--','pwsh','-NoProfile','-File',
+        (Join-Path $PSScriptRoot 'check-configured-cli.ps1'),'-Interpreter',$absoluteCli,
+        '-ReferenceInterpreter',(Join-Path $projectRoot "build/conformance/default/bin/lua$suffix"),
+        '-ReferenceLibraryDirectory',(Join-Path $projectRoot 'build/conformance/default/lib'),
+        '-Configuration','default','-Profile',$Profile,'-LibraryType',$LibraryType,
+        '-AdaReport',$cliAdaReport,'-Report',$cliPairReport)
+    & (Join-Path $PSScriptRoot 'test-cli-fixtures.ps1') -Report $cliPairReport
+    & (Join-Path $PSScriptRoot 'test-cli-fixture-transport.ps1') `
+        -Interpreter (Join-Path $projectRoot "build/conformance/default/bin/lua$suffix") `
+        -RuntimeDirectory (Join-Path $projectRoot 'build/conformance/default/lib')
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'compare.ps1'), '-Interpreter', $absoluteCli,
-        '-ConfiguredWitnessReport',$configuredReport,'-ConfiguredInterpreter',$configuredRunner)
+        '-ConfiguredWitnessReport',$configuredReport,'-ConfiguredInterpreter',$configuredRunner,'-HostCliReport',$cliPairReport)
     Invoke-Alire -Arguments @('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-conformance-telemetry.ps1'),
         '-Interpreter', (Join-Path $projectRoot "tests/bin/$LibraryType/conformance_runner$suffix"),
@@ -172,7 +186,7 @@ try {
         $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
         $link = if ($LibraryType -ceq 'relocatable') { 'shared' } else { $LibraryType }
         $null = Write-TargetBuildWitnesses -Root $projectRoot -Policy $targetWitnesses `
-            -Context "default/$platform/$Profile/$link" -PreviousReports $previousTargetReports -ConfiguredReport $configuredReport
+            -Context "default/$platform/$Profile/$link" -PreviousReports $previousTargetReports -ConfiguredReport $configuredReport -CliReport $cliPairReport
         Write-Output 'Target build phase completed; File/Aggregate/Heavy executions belong to immutable-image partition jobs; target acceptance=False'
     }
 

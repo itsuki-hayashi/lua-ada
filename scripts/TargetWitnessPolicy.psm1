@@ -419,7 +419,8 @@ function Assert-TargetGlobalApiRoutes {
 function Write-TargetBuildWitnesses {
     param([Parameter(Mandatory)][string] $Root,[Parameter(Mandatory)][Collections.IDictionary] $Policy,
           [Parameter(Mandatory)][string] $Context,[string[]] $PreviousReports=@(),
-          [Parameter(Mandatory)][string]$ConfiguredReport)
+          [Parameter(Mandatory)][string]$ConfiguredReport,
+          [Parameter(Mandatory)][string]$CliReport)
     $revision = (& git -C $Root rev-parse HEAD).Trim()
     if ($LASTEXITCODE -ne 0) { throw 'Cannot identify target build witness revision' }
     $parts = $Context.Split('/')
@@ -446,6 +447,15 @@ function Write-TargetBuildWitnesses {
     $result['configured_fixtures']=@{path=[IO.Path]::GetFullPath($ConfiguredReport);sha256=(Get-FileHash $ConfiguredReport).Hash.ToLowerInvariant()}
     $result['configured_fixture_operations']=$configuredObserved.operations
     $result['configured_fixture_operation_roles']=$configuredObserved.operation_roles
+    Import-Module (Join-Path $PSScriptRoot 'CliFixtureEvidence.psm1')
+    $cli=Get-Content $CliReport -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    if($cli.repository_revision -cne $revision -or $cli.repository_dirty -isnot [bool] -or
+        $cli.repository_dirty -or $cli.context -cne $Context){throw 'Target CLI report is stale dirty or from another context'}
+    $cliObserved=Assert-CliFixturePair -Root $Root -Report $cli -Interpreter $cli.ada.executable -RequireProtocolReview:$Policy.source_reviewed
+    Assert-CliNamedCounterparts -Root $Root -Context $Context -NamedEvidence $result
+    $result['host_cli']=@{path=[IO.Path]::GetFullPath($CliReport);sha256=(Get-FileHash $CliReport).Hash.ToLowerInvariant()}
+    $result['host_cli_operations']=$cliObserved.operations
+    $result['host_cli_native_test_diagnostics']=$cliObserved.native_test_diagnostics
     $directory = Join-Path $Root ('reports/target-builds/' + $Context.Replace('/','-'))
     [void][IO.Directory]::CreateDirectory($directory)
     $result['schema_version'] = 1; $result['kind'] = 'target-build-named-witnesses'

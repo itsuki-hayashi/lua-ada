@@ -104,8 +104,8 @@ function Test-TargetImageBuildWitnesses {
           [Parameter(Mandatory)][Collections.IDictionary] $WitnessPolicy)
     $identity=Assert-TargetContextImage -ImageDirectory $ImageDirectory -Context $Context -Revision $Revision -RequireActual
     $image=$identity.manifest
-    if(@($image.build_witnesses).Count -lt 5){throw 'Final context image lacks actual source-bound build witness reports'}
-    $payload=Join-Path $ImageDirectory 'payload';$receipt=$null;$consumerPath=$null;$unitPath=$null;$buildLog=$null;$configuredPath=$null;$seen=@{}
+    if(@($image.build_witnesses).Count -lt 6){throw 'Final context image lacks actual source-bound build witness reports'}
+    $payload=Join-Path $ImageDirectory 'payload';$receipt=$null;$consumerPath=$null;$unitPath=$null;$buildLog=$null;$configuredPath=$null;$cliPath=$null;$seen=@{}
     foreach($witness in $image.build_witnesses){
         $path=Resolve-TargetImagePath -Root $payload -Relative $witness.path
         $file=@($image.files|Where-Object path -CEQ $witness.path)
@@ -136,6 +136,9 @@ function Test-TargetImageBuildWitnesses {
         }elseif($value.Contains('kind') -and $value.kind -ceq 'configured-fixture-observations'){
             if($null -ne $configuredPath){throw 'Duplicate configured fixture build report'}
             $configuredPath=$path
+        }elseif($value.Contains('kind') -and $value.kind -ceq 'host-cli-fixture-pair'){
+            if($null -ne $cliPath){throw 'Duplicate host CLI build report'}
+            $cliPath=$path
         }elseif($value.Contains('consumers')){
             if($null -ne $consumerPath){throw 'Duplicate target C build report'}
             $consumerPath=$path
@@ -144,7 +147,7 @@ function Test-TargetImageBuildWitnesses {
             $unitPath=$path
         }else{throw 'Unknown or fabricated context build witness report'}
     }
-    if($null -eq $receipt -or $null -eq $consumerPath -or $null -eq $unitPath -or $null -eq $buildLog -or $null -eq $configuredPath -or
+    if($null -eq $receipt -or $null -eq $consumerPath -or $null -eq $unitPath -or $null -eq $buildLog -or $null -eq $configuredPath -or $null -eq $cliPath -or
         $receipt.context -cne $Context -or $receipt.revision -cne $Revision -or
         $receipt.witness_policy.path -cne $WitnessPolicy.identity.path -or
         $receipt.witness_policy.sha256 -cne $WitnessPolicy.identity.sha256){throw 'Context image build receipt is missing or identifies another source policy'}
@@ -154,10 +157,17 @@ function Test-TargetImageBuildWitnesses {
         throw 'Configured fixture report differs from the source-bound build receipt'
     }
     $null=Assert-ConfiguredFixtureImageReport -Root $Root -Report $configured -Image $image -Payload $payload
+    Import-Module (Join-Path $PSScriptRoot 'CliFixtureEvidence.psm1')
+    $cli=Get-Content $cliPath -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+    if(-not $receipt.Contains('host_cli') -or $receipt.host_cli.sha256 -cne (Get-FileHash $cliPath).Hash.ToLowerInvariant()){
+        throw 'Host CLI report differs from the source-bound build receipt'
+    }
+    $null=Assert-CliFixtureImagePair -Root $Root -Report $cli -Image $image -Payload $payload
     if($WitnessPolicy.source_reviewed -ne $true){throw 'Final context image needs an independently reviewed source witness policy'}
     $named=Test-TargetNamedContextEvidence -Root $Root -Policy $WitnessPolicy -ConsumerReport $consumerPath -AUnitReport $unitPath `
         -Context $Context -Revision $Revision -ConsumerArtifactRoot $payload -AUnitArtifactRoot $payload
     Assert-ConfiguredFixtureNamedCounterparts -Root $Root -Context $Context -NamedEvidence $named
+    Assert-CliNamedCounterparts -Root $Root -Context $Context -NamedEvidence $named
     $consumer=Get-Content -LiteralPath $consumerPath -Raw|ConvertFrom-Json -AsHashtable -Depth 48
     Assert-TargetBuildRuntimeBindings -Image $image -ConsumerReport $consumer
     if($consumer.Contains('loadfile_contract') -and $null -ne $consumer.loadfile_contract){

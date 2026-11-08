@@ -394,5 +394,167 @@
       "selection": "paired-configured-T-only",
       "rationale": "All four real T.externKstr C-wrapper cases require actual instrumented public external-string operations, including binary payload, rooted borrow and key, remote source copied before child closure, and invalid-type recovery. Run the complete unfiltered native/Ada T pair; T absence is failure, never ordinary coverage."
     }
+  ],
+  "host_entries": [
+    {
+      "path": "tests/lua/cli_prompt_controls.lua",
+      "sha256": "bdd753ef728e9d6caa80e40b67894800ba061d655ae066695d6c14b7a9eec20e",
+      "selection": "configured-host-CLI-only",
+      "rationale": "This host setup chunk requires an explicit vararg case and returns before the actual CLI asks for a prompt. It deliberately errors unselected. Preserve full112 Ada CLI controls,19 same-host native prompt counterparts and all26 source-linked named AUnit controls; never claim a standalone Lua/T-absent pass.",
+      "driver": "scripts/check-configured-cli.ps1",
+      "full_ada_operation_count": 112,
+      "native_prompt_operation_count": 19,
+      "required_vararg_cases": [
+        "primary-nil",
+        "secondary-nil",
+        "custom-string",
+        "empty-string",
+        "number",
+        "boolean",
+        "embedded-nul",
+        "global-tostring",
+        "dynamic-tostring",
+        "numeric-tostring",
+        "index-value",
+        "tostring-frame",
+        "index-frame",
+        "bad-tostring",
+        "error-tostring",
+        "error-table",
+        "error-boolean",
+        "error-nul",
+        "index-error",
+        "yield-tostring",
+        "retired-root",
+        "budget",
+        "exit-no-close",
+        "exit-close"
+      ],
+      "bindings": [
+        {
+          "path": "tests/src/lua-sessions-cli_prompt_tests.adb",
+          "sha256": "b820bb87b52c74875ca3025244ffbf16f7f3c40f49eabb3b4ccea0c42d8976ef"
+        },
+        {
+          "path": "tests/src/lua-sessions-cli_prompt_tests.ads",
+          "sha256": "c54c8c133cfe4b2b6c46941651b00511a87dc1a592cc353d9feb7a03f8c7626e"
+        },
+        {
+          "path": "scripts/CliFixtureCases.psm1",
+          "sha256": "7666810b0873d71ac4e2d16760705694d14256bc98babda97ea8cdd061ad80f0"
+        },
+        {
+          "path": "scripts/check-cli.ps1",
+          "sha256": "70b8e2e1b3708d2c7a92306933ed743d698b334c1c4e4463bcf994fb9b1cb8bd"
+        }
+      ],
+      "aunit_named_cases": [
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Primary_Nil",
+          "required_stdout_line": "OK CLI prompt: nil primary"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Secondary_Nil",
+          "required_stdout_line": "OK CLI prompt: nil secondary"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Custom_String",
+          "required_stdout_line": "OK CLI prompt: custom string"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Empty_String",
+          "required_stdout_line": "OK CLI prompt: empty string"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Numeric_Prompt",
+          "required_stdout_line": "OK CLI prompt: numeric value"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Boolean_Prompt",
+          "required_stdout_line": "OK CLI prompt: boolean value"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Embedded_Nul",
+          "required_stdout_line": "OK CLI prompt: embedded NUL"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Replaced_Tostring",
+          "required_stdout_line": "OK CLI prompt: replaced global tostring"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Numeric_Handler",
+          "required_stdout_line": "OK CLI prompt: numeric handler result"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Global_Handler",
+          "required_stdout_line": "OK CLI prompt: global handler"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Tostring_Frame",
+          "required_stdout_line": "OK CLI prompt: actual tostring C frame"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Global_Frame",
+          "required_stdout_line": "OK CLI prompt: actual global C frame"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Invalid_Handler_Result",
+          "required_stdout_line": "OK CLI prompt: invalid handler result"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Handler_Error",
+          "required_stdout_line": "OK CLI prompt: handler error"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Table_Error",
+          "required_stdout_line": "OK CLI prompt: table error report"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Boolean_Error",
+          "required_stdout_line": "OK CLI prompt: boolean error report"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Nul_Error",
+          "required_stdout_line": "OK CLI prompt: NUL error display"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Global_Error",
+          "required_stdout_line": "OK CLI prompt: global error"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Handler_Yield",
+          "required_stdout_line": "OK CLI prompt: handler yield"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Dynamic_Handler",
+          "required_stdout_line": "OK CLI prompt: dynamic handler"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Retired_Root",
+          "required_stdout_line": "OK CLI prompt: retired weak argument"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Budget_Recovery",
+          "required_stdout_line": "OK CLI prompt: charged callback recovery"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Output_Budget",
+          "required_stdout_line": "OK CLI prompt: output policy"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Exit_Without_Close",
+          "required_stdout_line": "OK CLI prompt: exit without close"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Exit_With_Close",
+          "required_stdout_line": "OK CLI prompt: exit with close"
+        },
+        {
+          "case": "tests/src/lua-sessions-cli_prompt_tests.adb#Refusal_Recovery",
+          "required_stdout_line": "OK CLI prompt: actual allocation refusal"
+        }
+      ],
+      "execution_evidence": []
+    }
   ]
 }

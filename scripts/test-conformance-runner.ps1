@@ -617,7 +617,7 @@ Case 'public SDK macro protocols preserve actual configuration and expanded byte
 Write-Output "RUNNER TESTS: $script:cases cases; $($failures.Count) failed"
 if ($failures.Count -gt 0) { exit 1 }
 if ($ReferenceInterpreter -ne '') {
-    & (Join-Path $PSScriptRoot 'test-target-file-protocols.ps1') -ReferenceInterpreter $ReferenceInterpreter
+    & $shell -NoProfile -File (Join-Path $PSScriptRoot 'test-target-file-protocols.ps1') -ReferenceInterpreter $ReferenceInterpreter
     if ($LASTEXITCODE -ne 0) { throw 'Target file wrapper execution regressions failed' }
 }
 exit 0

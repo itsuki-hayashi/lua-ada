@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "kind": "native-t-exit-no-close-protocol-author-proposal",
+  "author": "Codex /root/validation_delivery",
+  "independent_review_status": "pending",
+  "reviewer": null,
+  "synthetic_fixture": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "source_adaptation_authority": false,
+  "execution_evidence": [],
+  "source_exclusions": [],
+  "source_snapshot": {
+    "revision": "f3865c65e24e1fac3a47cd9991b32601bf05dd3a",
+    "repository_dirty": true
+  },
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/cli-native-t-exit-no-close.independent-feature-review.json",
+    "sha256": "01c86546143077d126b2c23716a7ee49a3f9dc25106ff44c45a0dd2b759615ad"
+  },
+  "source_bindings": [
+    {
+      "path": "scripts/CliFixtureCases.psm1",
+      "sha256": "7666810b0873d71ac4e2d16760705694d14256bc98babda97ea8cdd061ad80f0"
+    },
+    {
+      "path": "scripts/CliFixtureEvidence.psm1",
+      "sha256": "8892496577efb47616179de544c2473622ccde1f9a1cd1e1182dbd13d50cf0a3"
+    },
+    {
+      "path": "scripts/ConformanceRunner.psm1",
+      "sha256": "0f31e38c246c3fd7552674d54f5ddd4f683f04372295fa3b4b6d5875721707cf"
+    },
+    {
+      "path": "scripts/check-cli.ps1",
+      "sha256": "70b8e2e1b3708d2c7a92306933ed743d698b334c1c4e4463bcf994fb9b1cb8bd"
+    },
+    {
+      "path": "scripts/check-configured-cli.ps1",
+      "sha256": "5d97dbbc683b0676ab4265cdfeb6e8c92c25307d2600df4fcfb29ab1f99e012e"
+    },
+    {
+      "path": "scripts/ConfiguredFixtureEvidence.psm1",
+      "sha256": "a430061a35a0b0580f23f09505edd92c1266260aab6ce62d80d1167bdd9cfeab"
+    },
+    {
+      "path": "scripts/compare.ps1",
+      "sha256": "b89cf01a02b244e820c97a85ebfeb727f5125400a948aefe6ef8997360e5d6c4"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "sha256": "bf96f7e568269b1efcb530a2d29365ada6fb28f6cd145aa4f66e0d90903806ee"
+    },
+    {
+      "path": "scripts/check-instrumented.ps1",
+      "sha256": "c02337787dff4a6be7712e3c867278b27b8b0abeb515e248b9026d1486865c4e"
+    },
+    {
+      "path": "scripts/TargetWitnessPolicy.psm1",
+      "sha256": "47db42a5bfd214c427b107c0f4c94e7734d13e86588ffa33529a0e476debbce1"
+    },
+    {
+      "path": "scripts/TargetObservationEnvelope.psm1",
+      "sha256": "5be5ff0b525da56cde235a1ceaab73ba6041242b7e6ae5d2a494babffddebcfe"
+    },
+    {
+      "path": "scripts/TargetContext.psm1",
+      "sha256": "1ec81be03f7c5cef720487bb73cb3ad8801aa2b1ddfbb2b86859ad0c4a69300d"
+    },
+    {
+      "path": "scripts/build-target-context.ps1",
+      "sha256": "345911733d8a07db60c26b698fd5e2ea383566e93403f9ba24917bb5ffd22d0c"
+    },
+    {
+      "path": "tests/conformance/targets/configured-fixture-classification.json",
+      "sha256": "1438e4c0da95ef8ccd6adb30067b3f43eb6a4b3eb611e119a8ff82ff0813f6e9"
+    }
+  ],
+  "review_scope": [
+    "Read the shared112 operation definitions and exact raw capture replay, including all19 native prompt operations and26 named AUnit linkage.",
+    "Verify exact Windows-only nativeT os.exit(37,false) zero-block assertion is observed as a nonpassing teardown diagnostic, with clean AdaT false, native default false and nativeT true siblings required.",
+    "Verify source/setup/selected runtime library/native T configuration identities; independent context-image membership binds CLI/default native counterpart and all raw input/output files.",
+    "Verify early broken input never becomes delivered input/EOF, and only the closed prompt-before-input terminal cases may observe it while generic pipe outcomes still fail.",
+    "Verify final source protocol review is separate from feature direction0570 and required by actual target image reconciliation."
+  ],
+  "remaining_requirements": [
+    "This file is pending author review input, never the accepted protocol review path.",
+    "Root must independently inspect current14-source hashes and issue a distinct exact protocol decision before final T image reconciliation.",
+    "Linux/macOS no-close diagnostics require actual source-linked measurements and fresh applicability decisions; Windows handling cannot silently cover them.",
+    "All original source/global ledgers and actual whole-target matrix remain pending."
+  ]
+}

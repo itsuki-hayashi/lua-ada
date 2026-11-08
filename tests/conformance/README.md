@@ -140,6 +140,29 @@ the twenty-six prompt unit cases, have empty execution evidence. The host CLI
 prompt setup chunk requires its separate invocation contract and cannot serve
 as a standalone ordinary script.
 
+The current source audit classifies102 Lua fixtures. The closed host CLI route
+requires all112 actual Ada CLI operations, the nineteen native prompt operations
+and twenty-six source-linked named AUnit controls. `check-cli.ps1` records raw
+input/output/error captures, exact argument order, selected runtime libraries
+and native T-presence measurements. Execution and replay share the original
+case contracts in `CliFixtureCases.psm1`; default comparison delegates the setup
+chunk only after validating a fresh host CLI pair receipt. The instrumented
+build runs the full CLI campaign too. Context images freeze the selected CLI,
+all generated setup/input captures and a sixth mandatory build witness.
+
+The Windows native T no-close event is separately labelled
+`observed-native-test-teardown-diagnostic`, with passing execution evidence
+false. Its private `atexit(checkfinalmem)` assertion cannot replace the clean
+native-default no-close, Ada T no-close or native T close-true counterparts.
+Only the independently reviewed original-source direction permits collecting
+this diagnostic; final image reconciliation requires an additional independent
+review of all fourteen current protocol sources. The pending author packet
+grants none. Other hosts require fresh diagnostic applicability review. Raw
+failed input writes remain failed pipe observations, with separate write,
+close and output-drain fields; the closed prompt-before-input terminal cases
+can observe an early input close without claiming delivery or complete EOF.
+The generic process outcome continues to reject failed input pipes.
+
 Locals counterpart binding version1 keeps its original22 paths and its
 independently reviewed dated76 tuple. Current source drift does not renew that
 authority. Explicit binding schema2 requires exactly39 counterpart paths,

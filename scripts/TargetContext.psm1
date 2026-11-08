@@ -54,12 +54,13 @@ function Resolve-TargetImagePath {
 
 function Test-TargetImageDestination {
     param([Parameter(Mandatory)][string] $Path)
-    # These two generated observation inputs preserve the exact source bytes
-    # consumed by the native-module and stdin witnesses. They remain under the
+    # These generated observation inputs preserve the exact source bytes
+    # consumed by native-module, stdin and host CLI witnesses. They remain under the
     # unique reports tree: restoring them cannot overwrite implementation,
     # pinned reference or build-configuration source. The final witness readers
     # separately validate their source/hash/operation bindings.
     $sourceEvidence=$Path -cmatch '^reports/core-image/[0-9a-f]{32}/(?:native-module-(?:api|oracle)-fixtures/libs/lib(?:1|11|2|21|22)\.c|file-stdin/stdin-source\.lua)$'
+    $sourceEvidence=$sourceEvidence -or $Path -cmatch '^reports/core-image/[0-9a-f]{32}/cli-fixtures/(?:arguments|-script|empty|source-name|shebang|bom|cli_lib|cli_init|large-source|prompt-controls)\.lua$'
     # All other source-shaped paths stay forbidden, even under generated
     # library directories or beside one of those narrowly named evidence files.
     if ($Path -cnotmatch '^(?:lib/|tests/bin/|cli/bin/|build/(?:conformance/|c-api/)|reports/(?:core-image/|target-builds/|target-support/))' -or

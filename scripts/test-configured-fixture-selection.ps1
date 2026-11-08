@@ -10,6 +10,8 @@ $sources=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object source)
 $sourceLinks=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
     Where-Object selection -CEQ configured-Ada-internal-counterpart-only)[0].source_linkage.bindings.path
 $sources+=@($sourceLinks)
+$sourceClassification=Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24
+$sources+=@($sourceClassification.host_entries.path)+@($sourceClassification.host_entries.bindings.path)
 $sources+=@((Get-Content (Join-Path $root $classification) -Raw|ConvertFrom-Json -AsHashtable -Depth 24).entries|
     Where-Object{$_.Contains('retained_default_counterpart')}|ForEach-Object{$_.retained_default_counterpart.path})
 $script:cases=0
@@ -44,6 +46,21 @@ function Change-Classification([scriptblock]$Change){
     [IO.File]::WriteAllText($path,(ConvertTo-Json -InputObject $value -Depth 12),[Text.UTF8Encoding]::new($false))
 }
 Case 'source-bound complete configured selections produce no runtime authority' {}
+Case 'host CLI setup cannot masquerade as ordinary standalone execution' {
+    Change-Classification {param($v)$v.host_entries[0].selection='generic-default-source-comparison'}
+} 'closed source setup'
+Case 'host CLI delegation requires its native prompt operations' {
+    Change-Classification {param($v)$v.host_entries[0].native_prompt_operation_count=0}
+} 'closed source setup'
+Case 'host CLI delegation cannot omit required case arguments' {
+    Change-Classification {param($v)$v.host_entries[0].required_vararg_cases=@()}
+} 'closed source setup'
+Case 'host CLI source links do not invent actual executions' {
+    Change-Classification {param($v)$v.host_entries[0].execution_evidence=@('passed')}
+} 'closed source setup'
+Case 'ordinary sources cannot acquire the host-only exception' {
+    Change-Classification {param($v)$v.host_entries[0].path='tests/lua/new-fixture.lua'}
+} 'closed source setup'
 Case 'ordinary assertions remain selected for ordinary comparison' {Add-Source 'assert(1+1==2)'}
 Case 'T inside strings and comments does not omit ordinary assertions' {Add-Source "-- T.stacklevel()`nassert('T'=='T')"}
 Case 'unknown real T operations require an explicit campaign review' {Add-Source 'assert(T.stacklevel())'} 'Unclassified T-bearing fixture'

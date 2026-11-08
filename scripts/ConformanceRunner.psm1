@@ -13,7 +13,8 @@ function Invoke-ConformanceProcess {
         [hashtable] $Environment = @{},
         [ValidateRange(1024, 1073741824)][long] $CaptureLimitBytes = 67108864,
         [string] $StandardInputPath = '',
-        [ValidateRange(1, 1073741824)][long] $InputLimitBytes = 67108864
+        [ValidateRange(1, 1073741824)][long] $InputLimitBytes = 67108864,
+        [switch] $ObserveEarlyInputClose
     )
     # Streams go directly to files, preserving invalid UTF-8 and avoiding an
     # unbounded in-memory capture. Classification decodes a separate view only.
@@ -35,7 +36,7 @@ function Invoke-ConformanceProcess {
         $inputFile=[IO.File]::OpenRead($inputPath)
         $inputRecord=[ordered]@{source_path=$sourceInput;path=$inputPath;bytes=$inputFile.Length;
             sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($inputFile)).ToLowerInvariant();
-            byte_limit=$InputLimitBytes;write_completed=$false;eof_sent=$false}
+            byte_limit=$InputLimitBytes;write_completed=$false;eof_sent=$false;close_requested=$false}
         $inputFile.Position=0
     }
     $outFile = [IO.File]::Create($outPath)
@@ -64,6 +65,8 @@ function Invoke-ConformanceProcess {
     $timedOut = $false
     $captureExceeded = $false
     $drainFailed = $false
+    $outputDrainFailed=$false
+    $inputWriteFailed=$false
     $killError = $null
     $started = $false
     $startedAt = [DateTime]::UtcNow.ToString('o')
@@ -83,13 +86,13 @@ function Invoke-ConformanceProcess {
         while (-not $process.WaitForExit(50)) {
             if($null -ne $inputTask -and $inputTask.IsCompleted -and -not $inputClosed){
                 $process.StandardInput.BaseStream.Close();$inputClosed=$true
-                $inputRecord.eof_sent=$true
+                $inputRecord.close_requested=$true;$inputRecord.eof_sent=$inputTask.IsCompletedSuccessfully
             }
             $timedOut = $watch.Elapsed.TotalSeconds -ge $TimeoutSeconds
             $captureExceeded = $outFile.Length -gt $CaptureLimitBytes -or
                                $errFile.Length -gt $CaptureLimitBytes
             if ($timedOut -or $captureExceeded -or $outTask.IsFaulted -or $errTask.IsFaulted -or
-                ($null -ne $inputTask -and $inputTask.IsFaulted)) {
+                ($null -ne $inputTask -and $inputTask.IsFaulted -and -not $ObserveEarlyInputClose)) {
                 try { $process.Kill($true) } catch { $killError = $_.Exception.Message }
                 break
             }
@@ -100,6 +103,7 @@ function Invoke-ConformanceProcess {
         if (-not $process.WaitForExit(5000)) {
             try { $process.Kill($true) } catch { $killError = $_.Exception.Message }
             $drainFailed = $true
+            $outputDrainFailed=$true
         }
         [Threading.Tasks.Task[]]$tasks = @($outTask, $errTask)
         if($null -ne $inputTask){$tasks+=$inputTask}
@@ -108,13 +112,25 @@ function Invoke-ConformanceProcess {
             if (-not $combined.Wait(5000)) { $drainFailed = $true }
         }
         catch { $drainFailed = $true }
+        # Preserve the distinction between truncated output and a child that
+        # deliberately closes stdin before the producer finishes. The latter
+        # remains a failed generic pipe observation; only a source-defined
+        # protocol may interpret it as its expected before-input termination.
+        $outputDrainFailed=$outputDrainFailed -or -not $outTask.IsCompletedSuccessfully -or -not $errTask.IsCompletedSuccessfully
         if($null -ne $inputTask){
             # Close the raw stream, avoiding any text writer encoding or BOM.
             # A child which exits before reading the supplied data leaves an
             # explicit failed pipe observation even if it returned status 0.
-            if(-not $inputClosed){$process.StandardInput.BaseStream.Close();$inputClosed=$true;$inputRecord.eof_sent=$true}
+            if(-not $inputClosed){$process.StandardInput.BaseStream.Close();$inputClosed=$true;$inputRecord.close_requested=$true}
             $inputRecord.write_completed=$inputTask.IsCompletedSuccessfully
-            if(-not $inputRecord.write_completed){$drainFailed=$true}
+            # A closed writer alone does not prove delivery. A broken or
+            # partial write records its close request without claiming EOF
+            # followed a complete input stream in the child.
+            $inputRecord.eof_sent=$inputRecord.write_completed
+            if(-not $inputRecord.write_completed){
+                $drainFailed=$true;$inputWriteFailed=$true
+                $inputRecord['write_error']=if($null -ne $inputTask.Exception){$inputTask.Exception.GetBaseException().Message}else{'input task did not complete'}
+            }
         }
         if ($drainFailed) {
             $process.StandardOutput.Close()
@@ -160,6 +176,9 @@ function Invoke-ConformanceProcess {
         capture_limit_bytes = $CaptureLimitBytes
         capture_exceeded = $captureExceeded
         pipe_drain_failed = $drainFailed
+        output_drain_failed=$outputDrainFailed
+        input_write_failed=$inputWriteFailed
+        early_input_close_requested=[bool]$ObserveEarlyInputClose
         process_tree_kill_error = $killError
         stdout_path = $outPath
         stdout_bytes = (Get-Item -LiteralPath $outPath).Length

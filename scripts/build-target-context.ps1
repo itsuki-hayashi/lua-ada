@@ -19,10 +19,15 @@ if ($selected.platform -cne $hostPlatform -and -not $PlanOnly) { throw 'Target b
 $configurationPart = if ($selected.configuration -ceq 'upstream-test') {'upstream-test/'} else {''}
 $suffix = if ($selected.platform -ceq 'windows') {'.exe'} else {''}
 $paths = @{ada_launcher="tests/bin/$configurationPart$($selected.library_type)/conformance_runner$suffix";
+    ada_cli="cli/bin/$configurationPart$($selected.library_type)/lua_ada$suffix";
     c_oracle="build/conformance/$($selected.configuration)/bin/lua$suffix";
     ada_runtime="lib/$configurationPart$($selected.profile)/$($selected.library_type)";
     c_runtime="build/conformance/$($selected.configuration)/lib";
     compiler_support="reports/target-support/$($selected.id)"}
+if($selected.configuration -ceq 'upstream-test'){
+    $paths['c_default_oracle']="build/conformance/default/bin/lua$suffix"
+    $paths['c_default_runtime']='build/conformance/default/lib'
+}
 $scriptName = if ($selected.configuration -ceq 'upstream-test') {'check-instrumented.ps1'} else {'check.ps1'}
 if ($PlanOnly) {
     @{context=$Context;script=$scriptName;paths=$paths;configuration=$selected.configuration;
@@ -109,8 +114,20 @@ foreach ($directory in @((Split-Path -Parent $compiler),$runtime.Directory) | So
     }
 }
 $directories = @((Split-Path -Parent $paths.ada_launcher).Replace('\','/'),
+    (Split-Path -Parent $paths.ada_cli).Replace('\','/'),
     (Split-Path -Parent $paths.c_oracle).Replace('\','/'),$paths.ada_runtime,$paths.c_runtime,
     ('reports/target-builds/' + $selected.id),$paths.compiler_support)
+$cliPair=Get-Content $receipt.host_cli.path -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+$cliRaw=@($cliPair.ada,$cliPair.native)
+if($selected.configuration -ceq 'upstream-test'){
+    $cliRaw+=,$cliPair.native_default
+    $directories+=@((Split-Path -Parent $paths.c_default_oracle).Replace('\','/'),$paths.c_default_runtime)
+}
+foreach($raw in $cliRaw){
+    $relative=[IO.Path]::GetRelativePath($root,$raw.working_directory).Replace('\','/')
+    if($relative -cnotmatch '^reports/core-image/[0-9a-f]{32}/cli-fixtures$'){throw 'CLI fixture snapshot is outside its generated observation directory'}
+    $directories+=,$relative
+}
 $imageDirectory = Join-Path $root ('reports/target-images/' + $selected.id)
 $toolchain = @{compiler_sha256=(Get-FileHash -LiteralPath $compiler).Hash.ToLowerInvariant()}
 foreach($frontendName in @('cc1','cc1plus')){
@@ -131,6 +148,6 @@ if ($IsWindows) {
     $toolchain.nm_sha256 = (Get-FileHash -LiteralPath $nm).Hash.ToLowerInvariant()
 }
 $image = New-TargetContextImage -Root $root -Context $Context -OutputDirectory $imageDirectory -Paths $paths `
-    -Directories $directories -WitnessReports @($receiptPath,$receipt.consumer.path,$receipt.aunit.path,$buildLogPath,$receipt.configured_fixtures.path) `
+    -Directories $directories -WitnessReports @($receiptPath,$receipt.consumer.path,$receipt.aunit.path,$buildLogPath,$receipt.configured_fixtures.path,$receipt.host_cli.path) `
     -Toolchain $toolchain
 Write-Output "FROZEN: $Context image=$imageDirectory sha256=$($image.sha256); target acceptance=False"

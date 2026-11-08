@@ -3,6 +3,7 @@ $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ManagedTelemetry.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
+Import-Module (Join-Path $PSScriptRoot 'CliFixtureEvidence.psm1')
 
 function Get-ConfiguredFixtureDefinitions {
     param([ValidateSet('default','upstream-test')][string]$Configuration)
@@ -147,6 +148,9 @@ function Get-ConfiguredFixtureSources {
         'tests/lua/scalar_closing_refusal.lua','tests/lua/scalar_closing_public.lua',
         'tests/lua/scalar_closing_mutation.lua','tests/lua/materialized_vararg.lua','tests/lua/materialized_vararg_refusal.lua',
         'tests/lua/fixed_external_strings.lua','tests/lua/table_error_arguments.lua','tests/lua/locale_strings.lua',
+        'tests/lua/cli_prompt_controls.lua','scripts/CliFixtureCases.psm1','scripts/CliFixtureEvidence.psm1',
+        'scripts/check-configured-cli.ps1','scripts/check-cli.ps1',
+        'tests/src/lua-sessions-cli_prompt_tests.adb','tests/src/lua-sessions-cli_prompt_tests.ads',
         'tests/src/code_public_semantic_tests.adb','tests/src/code_public_semantic_tests.ads',
         'tests/src/lua-table_storage_inspection_tests.ads','tests/src/lua-table_storage_inspection_tests.adb',
         'tests/src/lua-engine-table_storage_probe.ads','tests/src/lua-engine-table_storage_probe.adb',
@@ -164,6 +168,7 @@ function Get-ConfiguredFixtureAudit {
     $instrumented=@(Get-ConfiguredFixtureDefinitions upstream-test|ForEach-Object source)
     $only=@(Get-ConfiguredFixtureDefinitions upstream-test|Where-Object{$_.source -cnotin $ordinary})
     $classification=Get-Content (Join-Path $Root 'tests/conformance/targets/configured-fixture-classification.json') -Raw|ConvertFrom-Json -AsHashtable
+    $hostOnly=@(Assert-CliHostClassification -Root $Root -Classification $classification)
     if($classification.schema_version -ne 1 -or $classification.kind -cne 'first-party-configured-fixture-classification' -or
         $classification.runtime_acceptance -isnot [bool] -or $classification.runtime_acceptance -or
         $classification.coverage_authority -isnot [bool] -or $classification.coverage_authority -or
@@ -284,7 +289,7 @@ function Get-ConfiguredFixtureAudit {
         # of compatibility. New T-bearing files fail closed for human review;
         # mixed ordinary/T files must appear in both configured selections.
         [ordered]@{path=$path;sha256=(Get-FileHash $file.FullName).Hash.ToLowerInvariant();T_identifiers=$references.Count;
-            selection=$(if($path -ceq 'tests/lua/code_public_semantics.lua'){'generic-default-plus-paired-configured'}elseif($path -cin $ordinary){'paired-configured-default-and-T'}elseif($path -cin $instrumented){
+            selection=$(if($path -cin $hostOnly){'configured-host-CLI-only'}elseif($path -ceq 'tests/lua/code_public_semantics.lua'){'generic-default-plus-paired-configured'}elseif($path -cin $ordinary){'paired-configured-default-and-T'}elseif($path -cin $instrumented){
                 @($classification.entries|Where-Object path -CEQ $path)[0].selection}else{'generic-default-source-comparison'})}
     })
     return [ordered]@{schema_version=1;kind='first-party-fixture-selection-audit';entries=$entries;

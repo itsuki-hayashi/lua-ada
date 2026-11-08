@@ -94,9 +94,12 @@ Case 'path traversal aliases source writes and generated input masquerades fail'
         Save $f; Reject { Replay $f } 'allowed generated artifact|escapes or aliases'
     }
 }
-Case 'only exact disposable native and stdin source evidence paths survive image replay' {
+Case 'only exact disposable native stdin and CLI source evidence paths survive image replay' {
     $f=New-Fixture;$id='f'*32
     $paths=@("reports/core-image/$id/file-stdin/stdin-source.lua")
+    foreach($name in @('arguments','-script','empty','source-name','shebang','bom','cli_lib','cli_init','large-source','prompt-controls')){
+        $paths+="reports/core-image/$id/cli-fixtures/$name.lua"
+    }
     foreach($role in @('api','oracle')){foreach($name in @('lib1','lib11','lib2','lib21','lib22')){
         $paths+="reports/core-image/$id/native-module-$role-fixtures/libs/$name.c"
     }}
@@ -110,6 +113,8 @@ Case 'only exact disposable native and stdin source evidence paths survive image
     foreach($path in @("reports/core-image/$id/native-module-api-fixtures/libs/runtime.c",
         "reports/core-image/$id/native-module-api-fixtures/libs/lib1.adb",
         "reports/core-image/$id/file-stdin/runtime.lua",'reports/core-image/not-a-guid/file-stdin/stdin-source.lua',
+        "reports/core-image/$id/cli-fixtures/runtime.lua",'reports/core-image/not-a-guid/cli-fixtures/prompt-controls.lua',
+        "reports/core-image/$id/cli-fixtures/prompt-controls.adb","reports/core-image/$id/cli-fixtures/subdir/prompt-controls.lua",
         "build/conformance/$id/native-module-api-fixtures/libs/lib1.c")){
         $changed=New-Fixture;$changed.image.files[0].path=$path;Save $changed
         Reject {Replay $changed} 'allowed generated artifact'

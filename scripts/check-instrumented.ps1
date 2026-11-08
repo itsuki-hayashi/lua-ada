@@ -36,6 +36,7 @@ function Invoke-CheckedAlire([string[]] $Arguments) {
 & (Join-Path $PSScriptRoot 'test-aunit-launch.ps1')
 & (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')
 & (Join-Path $PSScriptRoot 'test-foreign-contract-evidence.ps1')
+& (Join-Path $PSScriptRoot 'test-configured-fixture-selection.ps1')
 
 function Invoke-ObservedProcess {
     param([string] $Name, [string] $Executable, [string[]] $Arguments,
@@ -104,6 +105,8 @@ try {
     # Build serially with the same strict project switches as ordinary jobs.
     Invoke-CheckedAlire @('-n', '-C', 'tests', 'build', '--validation',
         '--profiles=lua_ada=validation', '--', "-XLUA_ADA_LIBRARY_TYPE=$LibraryType", '-XLUA_ADA_PREBUILT=false')
+    Invoke-CheckedAlire @('-n','-C','cli','build','--validation',
+        '--profiles=lua_ada=validation','--',"-XLUA_ADA_LIBRARY_TYPE=$LibraryType",'-XLUA_ADA_PREBUILT=false')
     # Shared executables need the selected compiler's support DLLs as well as
     # liblua. Obtain that search path from Alire instead of the ambient shell.
     $selectedPath = & alr exec -- pwsh -NoProfile -Command '$env:PATH'
@@ -148,6 +151,17 @@ try {
 
     Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
         'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=upstream-test')
+    Invoke-CheckedAlire @('exec', '--', 'gprbuild', '-P',
+        'experiments/conformance/oracle.gpr', '-XLUA_CONFORMANCE_CONFIGURATION=default')
+    $cliPairReport=Join-Path $root ('reports/core-image/cli-'+[guid]::NewGuid().ToString('N')+'/pair.json')
+    & "$PSScriptRoot/check-configured-cli.ps1" -Interpreter "$root/cli/bin/upstream-test/$LibraryType/lua_ada$suffix" `
+        -RuntimeDirectory $library `
+        -ReferenceInterpreter "$root/build/conformance/upstream-test/bin/lua$suffix" `
+        -ReferenceLibraryDirectory "$root/build/conformance/upstream-test/lib" `
+        -Configuration upstream-test -LibraryType $LibraryType -Report $cliPairReport
+    & "$PSScriptRoot/test-cli-fixtures.ps1" -Report $cliPairReport
+    & "$PSScriptRoot/test-cli-fixture-transport.ps1" -Interpreter "$root/build/conformance/default/bin/lua$suffix" `
+        -RuntimeDirectory "$root/build/conformance/default/lib"
     # These files need actual selected stack constants and a real T table.
     # Running their source through the default glob without setup would either
     # fail before the operation or silently miss the instrumented obligation.
@@ -189,7 +203,7 @@ try {
         $platform = if ($IsWindows) { 'windows' } elseif ($IsMacOS) { 'macos' } else { 'linux' }
         $link = if ($LibraryType -ceq 'relocatable') { 'shared' } else { $LibraryType }
         $null = Write-TargetBuildWitnesses -Root $root -Policy $targetWitnesses `
-            -Context "upstream-test/$platform/validation/$link" -PreviousReports $previousTargetReports -ConfiguredReport $configuredReport
+            -Context "upstream-test/$platform/validation/$link" -PreviousReports $previousTargetReports -ConfiguredReport $configuredReport -CliReport $cliPairReport
         Write-Output 'Target build phase completed; File/Aggregate/Heavy executions belong to immutable-image partition jobs; target acceptance=False'
     }
     Write-Output "PASS: instrumented validation/$LibraryType regressions; scope acceptance remains pending"
