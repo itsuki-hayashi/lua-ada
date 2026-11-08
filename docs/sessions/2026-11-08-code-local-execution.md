@@ -36,6 +36,10 @@ file creation. Three actual generator-process regressions verify exact approved
 creation, rejection of an existing output without changing it, and rejection of
 the pinned reference path without changing it. The generator entry script is
 not a binding in the approved Code feature graph; no approval was rehashed.
+Both guards run before the transform campaign in the routine matrix and target
+instrumented entrypoints. The broader campaign still has the separately
+recorded stale GC/verifier bindings; this ordering does not bypass them or
+claim either complete entrypoint passes.
 
 The final combined runtime builds passed all eight strict local build steps and
 2,662 AUnit cases in each configuration. This integrates the console, Nextvar,

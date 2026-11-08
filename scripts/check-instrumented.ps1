@@ -144,6 +144,10 @@ try {
         # Target builds exercise the successor validators and frozen-input
         # reconstruction tests; those tests report stale production bindings
         # explicitly and never grant runtime or target acceptance.
+        & "$PSScriptRoot/test-code-v3-installation.ps1"
+        if ($LASTEXITCODE -ne 0) { throw 'Installed Code source guards failed' }
+        & "$PSScriptRoot/test-t-transform-output.ps1"
+        if ($LASTEXITCODE -ne 0) { throw 'Disposable T source guards failed' }
         & "$PSScriptRoot/test-conformance-transforms.ps1"
         & "$PSScriptRoot/test-target-development-observer.ps1"
         & "$PSScriptRoot/test-conformance-target-matrix.ps1"
