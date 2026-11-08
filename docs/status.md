@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [public optimizer witnesses](sessions/2026-11-08-code-public-semantics.md)
+preserve numeric values/kinds, exact result counts, callback/assignment order,
+constant dump/load and constructor boundaries. Both local modes pass 2,468
+AUnit cases, including 29 new cases; the public fixture matches all eight
+producer/VM roles. Private optimizer exclusions and exact code.lua source
+decisions remain separate and pending; no opcode sequence is promised.
+
 The [table-storage inspector](sessions/2026-11-08-table-storage-inspection.md)
 checks actual Ada row/index/free-list safety and reports real row/live counts.
 Both local configurations pass 2,439 AUnit cases, including 25 new corruption,

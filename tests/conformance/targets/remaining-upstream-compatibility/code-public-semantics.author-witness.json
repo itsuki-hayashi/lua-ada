@@ -1,0 +1,889 @@
+{
+  "schema_version": 1,
+  "kind": "code-public-semantics-author-witness",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/remaining_suite",
+  "independent_review_status": "pending",
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "source": {
+    "path": "references/lua/testes/code.lua",
+    "sha256": "b63335ff980dd318f1cc4aa81bbd54952afc7ac3688c7d9042ea4c45e9993663"
+  },
+  "configurations": [
+    "default",
+    "upstream-test"
+  ],
+  "feature_review": {
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/code-private-optimizer.independent-feature-review.json",
+    "sha256": "7fa373d254f185c666841358225d5ec835dd82a15ea96f072075fd302b511e85"
+  },
+  "scope": "Public semantic witnesses only. No production change, private opcode/listk facade, source exclusion, adapted upstream source, original-anchor resolution or exact transformation approval is supplied.",
+  "numeric_call_witnesses": [
+    {
+      "witness_case": "F_Zero",
+      "source_call": {
+        "byte_offset": 6802,
+        "byte_length": 39,
+        "line": 292,
+        "end_line": 292,
+        "anchor_sha256": "a605a18241a2114bb5ca899a94fbb6dc32b432709cbbd76deb42989a44b58983",
+        "original_bytes": "checkF(function () return 0.0 end, 0.0)"
+      },
+      "expected_expression": "0.0",
+      "expected_math_type": "float",
+      "required_results": 1
+    },
+    {
+      "witness_case": "I_Captured_Zero",
+      "source_call": {
+        "byte_offset": 6842,
+        "byte_length": 36,
+        "line": 293,
+        "end_line": 293,
+        "anchor_sha256": "5119d999b48d41c9ecaaa9331ff06233a50c857cc20efcbe24c3e71f4b45b017",
+        "original_bytes": "checkI(function () return k0 end, 0)"
+      },
+      "expected_expression": "0",
+      "expected_math_type": "integer",
+      "required_results": 1
+    },
+    {
+      "witness_case": "I_Zero_Floor",
+      "source_call": {
+        "byte_offset": 6879,
+        "byte_length": 40,
+        "line": 294,
+        "end_line": 294,
+        "anchor_sha256": "f190d00245c62a01c45e0e5fdee70889750cacea13e51c87dfbe93798649be94",
+        "original_bytes": "checkI(function () return -k0//1 end, 0)"
+      },
+      "expected_expression": "0",
+      "expected_math_type": "integer",
+      "required_results": 1
+    },
+    {
+      "witness_case": "K_Reciprocal",
+      "source_call": {
+        "byte_offset": 6920,
+        "byte_length": 40,
+        "line": 295,
+        "end_line": 295,
+        "anchor_sha256": "7a5b2a68fda112ac5f0250a37d2453b3edb2964d2dd9abf17e3a5b2520031d87",
+        "original_bytes": "checkK(function () return 3^-1 end, 1/3)"
+      },
+      "expected_expression": "1/3",
+      "expected_math_type": "float",
+      "required_results": 1
+    },
+    {
+      "witness_case": "K_Power",
+      "source_call": {
+        "byte_offset": 6961,
+        "byte_length": 55,
+        "line": 296,
+        "end_line": 296,
+        "anchor_sha256": "79e14d7c5562a7d69c17c0c6995419f1205f4e0326b6b54f3ebbd12d2667821b",
+        "original_bytes": "checkK(function () return (1 + 1)^(50 + 50) end, 2^100)"
+      },
+      "expected_expression": "2^100",
+      "expected_math_type": "float",
+      "required_results": 1
+    },
+    {
+      "witness_case": "K_Negative_Power",
+      "source_call": {
+        "byte_offset": 7017,
+        "byte_length": 63,
+        "line": 297,
+        "end_line": 297,
+        "anchor_sha256": "94be38b889e803aa7c2a0269c23fef1e5ff12db8b07d6c79de22c32967d74e2c",
+        "original_bytes": "checkK(function () return (-2)^(31 - 2) end, -0x20000000 + 0.0)"
+      },
+      "expected_expression": "-0x20000000 + 0.0",
+      "expected_math_type": "float",
+      "required_results": 1
+    },
+    {
+      "witness_case": "F_Floor",
+      "source_call": {
+        "byte_offset": 7081,
+        "byte_length": 54,
+        "line": 298,
+        "end_line": 298,
+        "anchor_sha256": "87b7de9ae15fac9809bfc6eae42d95c23b6c1f7fc41a9a58cdb86f47a91374ab",
+        "original_bytes": "checkF(function () return (-k3^0 + 5) // 3.0 end, 1.0)"
+      },
+      "expected_expression": "1.0",
+      "expected_math_type": "float",
+      "required_results": 1
+    },
+    {
+      "witness_case": "I_Modulo",
+      "source_call": {
+        "byte_offset": 7136,
+        "byte_length": 41,
+        "line": 299,
+        "end_line": 299,
+        "anchor_sha256": "4596cbe2d490ecc0cd022d4ac3325f7a03ea12b445e6780feab940178e0408cd",
+        "original_bytes": "checkI(function () return -k3 % 5 end, 2)"
+      },
+      "expected_expression": "2",
+      "expected_math_type": "integer",
+      "required_results": 1
+    },
+    {
+      "witness_case": "F_Division",
+      "source_call": {
+        "byte_offset": 7178,
+        "byte_length": 69,
+        "line": 300,
+        "end_line": 300,
+        "anchor_sha256": "3f35c031d65e7c11b5bc1b9b8a03e4c39722fea0337f0828fe1cec5801878491",
+        "original_bytes": "checkF(function () return -((2.0^8 + -(-1)) % 8)/2 * 4 - 3 end, -5.0)"
+      },
+      "expected_expression": "-5.0",
+      "expected_math_type": "float",
+      "required_results": 1
+    },
+    {
+      "witness_case": "F_Floor_Modulo",
+      "source_call": {
+        "byte_offset": 7248,
+        "byte_length": 68,
+        "line": 301,
+        "end_line": 301,
+        "anchor_sha256": "0b0d677975c008fa9ff8b3580a74449760df7dfc843aa57ee082dc57e7bcdefd",
+        "original_bytes": "checkF(function () return -((2^8 + -(-1)) % 8)//2 * 4 - 3 end, -7.0)"
+      },
+      "expected_expression": "-7.0",
+      "expected_math_type": "float",
+      "required_results": 1
+    },
+    {
+      "witness_case": "I_Bitwise_Mixed",
+      "source_call": {
+        "byte_offset": 7317,
+        "byte_length": 66,
+        "line": 302,
+        "end_line": 302,
+        "anchor_sha256": "80ac6d617a048c34eff0ceb45274a678200ead9132d60883dba8dfa03764608e",
+        "original_bytes": "checkI(function () return 0xF0.0 | 0xCC.0 ~ 0xAA & 0xFD end, 0xF4)"
+      },
+      "expected_expression": "0xF4",
+      "expected_math_type": "integer",
+      "required_results": 1
+    },
+    {
+      "witness_case": "I_Bitwise_Not",
+      "source_call": {
+        "byte_offset": 7384,
+        "byte_length": 49,
+        "line": 303,
+        "end_line": 303,
+        "anchor_sha256": "ac0759ecf9d15a19fd39be6464abfff90129ac2d5cbfa668eb35e05bdb2c28a0",
+        "original_bytes": "checkI(function () return ~(~kFF0 | kFF0) end, 0)"
+      },
+      "expected_expression": "0",
+      "expected_math_type": "integer",
+      "required_results": 1
+    },
+    {
+      "witness_case": "I_Bitwise_Float",
+      "source_call": {
+        "byte_offset": 7434,
+        "byte_length": 47,
+        "line": 304,
+        "end_line": 304,
+        "anchor_sha256": "d933fd41036efd399caf7e7db2ea4f1caa41ab0015c2cbda395890e9b52a3081",
+        "original_bytes": "checkI(function () return ~~-1024.0 end, -1024)"
+      },
+      "expected_expression": "-1024",
+      "expected_math_type": "integer",
+      "required_results": 1
+    },
+    {
+      "witness_case": "I_Shifts",
+      "source_call": {
+        "byte_offset": 7482,
+        "byte_length": 60,
+        "line": 305,
+        "end_line": 305,
+        "anchor_sha256": "e9d5da980aed5ff2857e7c0002953212433fa306697caccefde72fd0d54dba70",
+        "original_bytes": "checkI(function () return ((100 << k6) << -4) >> 2 end, 100)"
+      },
+      "expected_expression": "100",
+      "expected_math_type": "integer",
+      "required_results": 1
+    }
+  ],
+  "source_linked_groups": [
+    {
+      "witness_cases": [
+        "Integer_Borders",
+        "Float_Borders"
+      ],
+      "source_span": {
+        "byte_offset": 7544,
+        "byte_length": 704,
+        "line": 307,
+        "end_line": 321,
+        "anchor_sha256": "3fc0861274703a6845adf0c0b0443fd7904aca262b778897082d5ea5c3cbb4fa",
+        "original_bytes": "-- borders around MAXARG_sBx ((((1 << 17) - 1) >> 1) == 65535)\nlocal a = 17; local sbx = ((1 << a) - 1) >> 1   -- avoid folding\nlocal border <const> = 65535\ncheckI(function () return border end, sbx)\ncheckI(function () return -border end, -sbx)\ncheckI(function () return border + 1 end, sbx + 1)\ncheckK(function () return border + 2 end, sbx + 2)\ncheckK(function () return -(border + 1) end, -(sbx + 1))\n\nlocal border <const> = 65535.0\ncheckF(function () return border end, sbx + 0.0)\ncheckF(function () return -border end, -sbx + 0.0)\ncheckF(function () return border + 1 end, (sbx + 1.0))\ncheckK(function () return border + 2 end, (sbx + 2.0))\ncheckK(function () return -(border + 1) end, -(sbx + 1.0))"
+      },
+      "required_behavior": "All five integer and five float boundary expressions return one value with the exact expected value and math.type. No instruction encoding or constant-pool count is asserted."
+    },
+    {
+      "witness_cases": [
+        "Maximum_Integer",
+        "Minimum_Integer",
+        "Negative_Hex"
+      ],
+      "source_span": {
+        "byte_offset": 14322,
+        "byte_length": 379,
+        "line": 486,
+        "end_line": 501,
+        "anchor_sha256": "f6dd0aa36fed19d80783f231789e891cffdc8fa02887b679284b765f76fe5752",
+        "original_bytes": "do   print(\"testing code for integer limits\")\n  local function checkints (n)\n    local source = string.format(\n      \"local a = {[true] = 0X%x}; return a[true]\", n)\n    local f = assert(load(source))\n    checkKlist(f, {n})\n    assert(f() == n)\n    f = load(string.dump(f))\n    assert(f() == n)\n  end\n\n  checkints(math.maxinteger)\n  checkints(math.mininteger)\n  checkints(-1)\n\nend"
+      },
+      "required_behavior": "Use the same generated hexadecimal source for maxinteger/mininteger/-1, preserve integer kind and one-result cardinality, then repeat after actual string.dump/load."
+    },
+    {
+      "witness_cases": [
+        "Nested_Constants"
+      ],
+      "source_span": {
+        "byte_offset": 12971,
+        "byte_length": 423,
+        "line": 441,
+        "end_line": 457,
+        "anchor_sha256": "0a285a6495a9ae9a60e924550b8996661596d5f21ab734c7d2b908144000c314",
+        "original_bytes": "do   -- string constants\n  local k0 <const> = \"00000000000000000000000000000000000000000000000000\"\n  local function f1 ()\n    local k <const> = k0\n    return function ()\n             return function () return k end\n           end\n  end\n\n  local f2 = f1()\n  local f3 = f2()\n  assert(f3() == k0)\n  checkK(f3, k0)\n  -- string is not needed by other functions\n  assert(T.listk(f1)[1] == nil)\n  assert(T.listk(f2)[1] == nil)\nend"
+      },
+      "required_behavior": "Execute all three nested layers with one-result cardinality; preserve the exact fifty-byte string. Dump/load each layer stripped and unstripped and execute its resulting functions. Private outer/middle constant placement is neither inspected nor emulated."
+    },
+    {
+      "witness_cases": [
+        "Callback_Sequence"
+      ],
+      "source_span": {
+        "byte_offset": 1204,
+        "byte_length": 203,
+        "line": 60,
+        "end_line": 69,
+        "anchor_sha256": "609188d1173ee93b9afa1edcef50cd785e53911233e8b08de356a31e68a8c809",
+        "original_bytes": "foo = function (f, a)\n        f(100 * 1000)\n        f(100.0 * 1000)\n        f(-100 * 1000)\n        f(-100 * 1000.0)\n        f(100000)\n        f(100000.0)\n        f(-100000)\n        f(-100000.0)\n      end"
+      },
+      "required_behavior": "Invoke the actual eight numeric expressions in original order; a public callback observes one argument each, exact +/-100000 values and alternating integer/float kinds. The caller itself returns zero values."
+    },
+    {
+      "witness_cases": [
+        "Assignment_Sequence"
+      ],
+      "source_span": {
+        "byte_offset": 1488,
+        "byte_length": 186,
+        "line": 75,
+        "end_line": 83,
+        "anchor_sha256": "ee4a79426257d96fd55037b8f6cbc544a8d64d7da46f120aec5963c118ec4543",
+        "original_bytes": "foo = function (t, a)\n  t[a] = 1; t[a] = 1.0\n  t[a] = 1; t[a] = 1.0\n  t[a] = 2; t[a] = 2.0\n  t[a] = 0; t[a] = 0.0\n  t[a] = 1; t[a] = 1.0\n  t[a] = 2; t[a] = 2.0\n  t[a] = 0; t[a] = 0.0\nend"
+      },
+      "required_behavior": "Execute all fourteen original assignment expressions in order. An absent-key __newindex recorder observes actual receiver/key/value arguments, expected numeric values and alternating integer/float kinds. It does not store into the receiver, so no assignment bypasses the callback."
+    },
+    {
+      "witness_cases": [
+        "Constructor_49",
+        "Constructor_50",
+        "Constructor_51"
+      ],
+      "source_span": {
+        "byte_offset": 13956,
+        "byte_length": 363,
+        "line": 475,
+        "end_line": 483,
+        "anchor_sha256": "82372bf541e8b6532788510e26843a913f56a1036e0072e0dd6db8e81611f63d",
+        "original_bytes": "do   -- basic check for SETLIST\n  -- create a list constructor with 50 elements\n  local source = \"local a; return {\" .. string.rep(\"a, \", 50) .. \"}\"\n  local func = assert(load(source))\n  local code = table.concat(T.listcode(func), \"\\n\")\n  local _, count = string.gsub(code, \"SETLIST\", \"\")\n  -- code uses only 1 SETLIST for the constructor\n  assert(count == 1)\nend"
+      },
+      "required_behavior": "Keep successful compilation and execution of the original nil-element construction at50 and neighboring49/51. Additional constructors check every integer prefix slot, exact trailing zero/one/multiple vararg expansion including nil/float, complete public iteration and one-table return. No SETLIST count is asserted."
+    },
+    {
+      "witness_cases": [
+        "Register_Load"
+      ],
+      "source_span": {
+        "byte_offset": 13397,
+        "byte_length": 556,
+        "line": 460,
+        "end_line": 472,
+        "anchor_sha256": "c6bc8d77a8eb476234a0e122756b3bcfe0932993bbcfaf1322837fb16c122d8f",
+        "original_bytes": "do   -- check number of available registers\n  -- 1 register for local + 1 for function + 252 arguments\n  local source = \"local a; return a(\" .. string.rep(\"a, \", 252) .. \"a)\"\n  local prog = T.listcode(assert(load(source)))\n  -- maximum valid register is 254\n  for i = 1, 254 do\n    assert(string.find(prog[2 + i], \"MOVE%s*\" .. i))\n  end\n  -- one more argument would need register #255 (but that is reserved)\n  source = \"local a; return a(\" .. string.rep(\"a, \", 253) .. \"a)\"\n  local _, msg = load(source)\n  assert(string.find(msg, \"too many registers\"))\nend"
+      },
+      "required_behavior": "Retain the original maximum valid successful load and oversized diagnostic without invoking the intentionally nil callee or inspecting MOVE registers."
+    },
+    {
+      "witness_cases": [
+        "Return_Zero"
+      ],
+      "source_span": {
+        "byte_offset": 948,
+        "byte_length": 208,
+        "line": 47,
+        "end_line": 55,
+        "anchor_sha256": "0f017a4b9d94b858fa3e5334741a4bbbb8bbc3d1abe473b60fdaafd69e5268d4",
+        "original_bytes": "local function foo ()\n  local a\n  a = k3;\n  a = 0; a = 0.0; a = -7 + 7\n  a = k3_78/4; a = k3_78_4\n  a = -k3_78/4; a = k3_78/4; a = -3.78/4\n  a = -3.79/4; a = 0.0; a = -0;\n  a = k3; a = 3.0; a = 3; a = 3.0\nend"
+      },
+      "source_relation": "Additional public return-cardinality strengthening corresponding to implicit zero-result closures; no blanket execution of opcode-only functions.",
+      "required_behavior": "A valid local-only zero-return closure and its dump/load each yield exactly zero results."
+    },
+    {
+      "witness_cases": [
+        "Return_One_Nil"
+      ],
+      "source_span": {
+        "byte_offset": 3374,
+        "byte_length": 48,
+        "line": 158,
+        "end_line": 158,
+        "anchor_sha256": "58999c13182341efde4a2b1decdd8d1b02cf0826d98db9919cf48898d138c99e",
+        "original_bytes": "check (function (a,b,c) return a end, 'RETURN1')"
+      },
+      "required_behavior": "The single-return function invoked with nil yields exactly one nil before and after dump/load."
+    },
+    {
+      "witness_cases": [
+        "Return_Multiple"
+      ],
+      "source_span": {
+        "byte_offset": 13956,
+        "byte_length": 363,
+        "line": 475,
+        "end_line": 483,
+        "anchor_sha256": "82372bf541e8b6532788510e26843a913f56a1036e0072e0dd6db8e81611f63d",
+        "original_bytes": "do   -- basic check for SETLIST\n  -- create a list constructor with 50 elements\n  local source = \"local a; return {\" .. string.rep(\"a, \", 50) .. \"}\"\n  local func = assert(load(source))\n  local code = table.concat(T.listcode(func), \"\\n\")\n  local _, count = string.gsub(code, \"SETLIST\", \"\")\n  -- code uses only 1 SETLIST for the constructor\n  assert(count == 1)\nend"
+      },
+      "source_relation": "Additional public multiple-result/expansion control requested by feature review; not a claim that an opcode-only source closure was executed.",
+      "required_behavior": "Explicit integer,nil,float,nil results retain all four positions, types and cardinality before/after dump/load."
+    }
+  ],
+  "retained_checkR": {
+    "byte_offset": 2079,
+    "byte_length": 127,
+    "sha256": "324530f639ef49280bcc33a77b56351c3369cdfd13290c63934071985bb880dc",
+    "original_bytes": "local function checkR (f, p, r, ...)\n  local r1 = f(p)\n  assert(r == r1 and math.type(r) == math.type(r1))\n  check(f, ...)\nend\n",
+    "unchanged": true,
+    "constraint": "The reference and checkR helper remain byte-identical. This packet neither rewrites it nor removes any original checkR call/assertion."
+  },
+  "witness": {
+    "source": {
+      "path": "tests/lua/code_public_semantics.lua",
+      "sha256": "a5a6f949bced42fcad5ca68451f64019247f778ef3956907ce1a0dab7b55232a"
+    },
+    "case_count": 29,
+    "case_names": [
+      "F_Zero",
+      "I_Captured_Zero",
+      "I_Zero_Floor",
+      "K_Reciprocal",
+      "K_Power",
+      "K_Negative_Power",
+      "F_Floor",
+      "I_Modulo",
+      "F_Division",
+      "F_Floor_Modulo",
+      "I_Bitwise_Mixed",
+      "I_Bitwise_Not",
+      "I_Bitwise_Float",
+      "I_Shifts",
+      "Integer_Borders",
+      "Float_Borders",
+      "Maximum_Integer",
+      "Minimum_Integer",
+      "Negative_Hex",
+      "Nested_Constants",
+      "Callback_Sequence",
+      "Assignment_Sequence",
+      "Constructor_49",
+      "Constructor_50",
+      "Constructor_51",
+      "Return_Zero",
+      "Return_One_Nil",
+      "Return_Multiple",
+      "Register_Load"
+    ],
+    "prelude": {
+      "byte_offset": 76,
+      "byte_length": 281,
+      "line": 2,
+      "end_line": 11,
+      "anchor_sha256": "acdde838483c952955bd00a3e6ee7ec46a42e41fca7844a2a228b91fe6abb1bb",
+      "original_bytes": "local k0aux <const> = 0\nlocal k0 <const> = k0aux\nlocal k3 <const> = 3\nlocal k6 <const> = k3 + (k3 << k0)\nlocal kFF0 <const> = 0xFF0\nlocal function one(f,wanted,kind)\n  local result=table.pack(f())\n  assert(result.n==1 and result[1]==wanted)\n  assert(math.type(result[1])==kind)\nend"
+    },
+    "generated_tests": {
+      "path": "tests/src/code_public_semantic_tests.adb",
+      "sha256": "31af5e9dc278556dfe24651128888cb9611ae7a2a6e78fb90ced20e0268e0d8a"
+    },
+    "test_spec": {
+      "path": "tests/src/code_public_semantic_tests.ads",
+      "sha256": "0e79dc85150a59a2b2d178f472aceffc21ba4d3ab3236ba29d5f846c2daa88db"
+    },
+    "registration": {
+      "path": "tests/src/test_runner.adb",
+      "sha256": "3a68c67bf26775c340eea2502a52d9abee492340890f892db2eb0f61d43de321"
+    },
+    "generation_contract": "Each separately named AUnit case embeds the same fixture prelude and exactly its own do/end case. The full public fixture also executes independently under native/Ada source and bytecode producers/runtimes.",
+    "per_case_sources": [
+      {
+        "name": "F_Zero",
+        "span": {
+          "byte_offset": 402,
+          "byte_length": 50,
+          "line": 14,
+          "end_line": 16,
+          "anchor_sha256": "be9111e43dfb6e5b9f376dbb75b2d80a3f59fcdd6ef58db5425500aaa6716d3a",
+          "original_bytes": "do\n  one(function()return 0.0 end,0.0,'float')\nend"
+        }
+      },
+      {
+        "name": "I_Captured_Zero",
+        "span": {
+          "byte_offset": 519,
+          "byte_length": 49,
+          "line": 19,
+          "end_line": 21,
+          "anchor_sha256": "b5849b5b4b56b41141ff7a174e5864d30dbd6a6337941e1956e99347812ea475",
+          "original_bytes": "do\n  one(function()return k0 end,0,'integer')\nend"
+        }
+      },
+      {
+        "name": "I_Zero_Floor",
+        "span": {
+          "byte_offset": 625,
+          "byte_length": 53,
+          "line": 24,
+          "end_line": 26,
+          "anchor_sha256": "20ca3a699e953c74fa680cdca03b8cfb94b92bdaf5e670ad092c091b41d92330",
+          "original_bytes": "do\n  one(function()return -k0//1 end,0,'integer')\nend"
+        }
+      },
+      {
+        "name": "K_Reciprocal",
+        "span": {
+          "byte_offset": 735,
+          "byte_length": 51,
+          "line": 29,
+          "end_line": 31,
+          "anchor_sha256": "5ad16450ac829a49e86aa2535484fea5777928eb80a485d3765b151fec420c54",
+          "original_bytes": "do\n  one(function()return 3^-1 end,1/3,'float')\nend"
+        }
+      },
+      {
+        "name": "K_Power",
+        "span": {
+          "byte_offset": 843,
+          "byte_length": 66,
+          "line": 34,
+          "end_line": 36,
+          "anchor_sha256": "c0fc8a7d3664f913da03417f7d22ba0cb8c8510c9414361aa6503f84c68e6d82",
+          "original_bytes": "do\n  one(function()return (1 + 1)^(50 + 50) end,2^100,'float')\nend"
+        }
+      },
+      {
+        "name": "K_Negative_Power",
+        "span": {
+          "byte_offset": 977,
+          "byte_length": 74,
+          "line": 39,
+          "end_line": 41,
+          "anchor_sha256": "01fadcdf2295b8d1f3ed74c8e7806486ecd2812f1641fb7e2354ddac5428c4b5",
+          "original_bytes": "do\n  one(function()return (-2)^(31 - 2) end,-0x20000000 + 0.0,'float')\nend"
+        }
+      },
+      {
+        "name": "F_Floor",
+        "span": {
+          "byte_offset": 1115,
+          "byte_length": 65,
+          "line": 44,
+          "end_line": 46,
+          "anchor_sha256": "6a22fd13501149fb35311731fd1ead1ee8d51adba39cb8666305bd821c048476",
+          "original_bytes": "do\n  one(function()return (-k3^0 + 5) // 3.0 end,1.0,'float')\nend"
+        }
+      },
+      {
+        "name": "I_Modulo",
+        "span": {
+          "byte_offset": 1227,
+          "byte_length": 54,
+          "line": 49,
+          "end_line": 51,
+          "anchor_sha256": "784a705cc6595ca3864047b071370472577990b95c4728437e9d31b32127cef1",
+          "original_bytes": "do\n  one(function()return -k3 % 5 end,2,'integer')\nend"
+        }
+      },
+      {
+        "name": "F_Division",
+        "span": {
+          "byte_offset": 1344,
+          "byte_length": 80,
+          "line": 54,
+          "end_line": 56,
+          "anchor_sha256": "1f7fc9fd37c88c9cf51f82da7e8ba30dcbbe9d0a47173d3934da2c5630e87cfb",
+          "original_bytes": "do\n  one(function()return -((2.0^8 + -(-1)) % 8)/2 * 4 - 3 end,-5.0,'float')\nend"
+        }
+      },
+      {
+        "name": "F_Floor_Modulo",
+        "span": {
+          "byte_offset": 1493,
+          "byte_length": 79,
+          "line": 59,
+          "end_line": 61,
+          "anchor_sha256": "b389bfcee6d4641bd143b3ad88d74d7059ebeff1bcf1290b161f9e60af2cefc6",
+          "original_bytes": "do\n  one(function()return -((2^8 + -(-1)) % 8)//2 * 4 - 3 end,-7.0,'float')\nend"
+        }
+      },
+      {
+        "name": "I_Bitwise_Mixed",
+        "span": {
+          "byte_offset": 1643,
+          "byte_length": 79,
+          "line": 64,
+          "end_line": 66,
+          "anchor_sha256": "21a940c4eb0e1e9fa1d41e6af78c6e8f3547334920f549ed25bed3369929e5e2",
+          "original_bytes": "do\n  one(function()return 0xF0.0 | 0xCC.0 ~ 0xAA & 0xFD end,0xF4,'integer')\nend"
+        }
+      },
+      {
+        "name": "I_Bitwise_Not",
+        "span": {
+          "byte_offset": 1779,
+          "byte_length": 62,
+          "line": 69,
+          "end_line": 71,
+          "anchor_sha256": "7f4cf8b98fff8e6051a1e6944d28a1511a94a3885d2517ddf0f6aae53295debc",
+          "original_bytes": "do\n  one(function()return ~(~kFF0 | kFF0) end,0,'integer')\nend"
+        }
+      },
+      {
+        "name": "I_Bitwise_Float",
+        "span": {
+          "byte_offset": 1904,
+          "byte_length": 60,
+          "line": 74,
+          "end_line": 76,
+          "anchor_sha256": "57d49dd155d01bfb15e29bc1fdd206e55541484685b02f17f122a160e21b6703",
+          "original_bytes": "do\n  one(function()return ~~-1024.0 end,-1024,'integer')\nend"
+        }
+      },
+      {
+        "name": "I_Shifts",
+        "span": {
+          "byte_offset": 2032,
+          "byte_length": 73,
+          "line": 79,
+          "end_line": 81,
+          "anchor_sha256": "d1ccceb4203abf78fe69f9450ca2bc01bac20bb9942b9cb42797657b5f3f7239",
+          "original_bytes": "do\n  one(function()return ((100 << k6) << -4) >> 2 end,100,'integer')\nend"
+        }
+      },
+      {
+        "name": "Integer_Borders",
+        "span": {
+          "byte_offset": 2186,
+          "byte_length": 342,
+          "line": 84,
+          "end_line": 92,
+          "anchor_sha256": "f529c70c50b4fd66f795cc9d12a0120ad5b4294f8e879468cf959980a1dd9f88",
+          "original_bytes": "do\n  local a=17;local sbx=((1 << a)-1) >> 1\n  local border <const> = 65535\n  one(function()return border end,sbx,'integer')\n  one(function()return -border end,-sbx,'integer')\n  one(function()return border+1 end,sbx+1,'integer')\n  one(function()return border+2 end,sbx+2,'integer')\n  one(function()return -(border+1)end,-(sbx+1),'integer')\nend"
+        }
+      },
+      {
+        "name": "Float_Borders",
+        "span": {
+          "byte_offset": 2604,
+          "byte_length": 348,
+          "line": 95,
+          "end_line": 103,
+          "anchor_sha256": "ee7417fa7312f8f207b432c41300437695d19b8923724e22b0eda58e4b2ae9db",
+          "original_bytes": "do\n  local a=17;local sbx=((1 << a)-1) >> 1\n  local border <const> = 65535.0\n  one(function()return border end,sbx+0.0,'float')\n  one(function()return -border end,-sbx+0.0,'float')\n  one(function()return border+1 end,sbx+1.0,'float')\n  one(function()return border+2 end,sbx+2.0,'float')\n  one(function()return -(border+1)end,-(sbx+1.0),'float')\nend"
+        }
+      },
+      {
+        "name": "Maximum_Integer",
+        "span": {
+          "byte_offset": 3033,
+          "byte_length": 219,
+          "line": 106,
+          "end_line": 114,
+          "anchor_sha256": "efbe47194f35e428543d148bf3c9779208eaa05d597ab0683dafed5f93d7eaba",
+          "original_bytes": "do\n  local n=math.maxinteger\n  local source=string.format(\n    \"local a = {[true] = 0X%x}; return a[true]\",n)\n  local f=assert(load(source))\n  one(f,n,'integer')\n  f=assert(load(string.dump(f)))\n  one(f,n,'integer')\nend"
+        }
+      },
+      {
+        "name": "Minimum_Integer",
+        "span": {
+          "byte_offset": 3333,
+          "byte_length": 219,
+          "line": 117,
+          "end_line": 125,
+          "anchor_sha256": "32f86524eecfbbb961e27e725ddecfe98e87a2f231d0dd34ad915966c2cf795f",
+          "original_bytes": "do\n  local n=math.mininteger\n  local source=string.format(\n    \"local a = {[true] = 0X%x}; return a[true]\",n)\n  local f=assert(load(source))\n  one(f,n,'integer')\n  f=assert(load(string.dump(f)))\n  one(f,n,'integer')\nend"
+        }
+      },
+      {
+        "name": "Negative_Hex",
+        "span": {
+          "byte_offset": 3630,
+          "byte_length": 206,
+          "line": 128,
+          "end_line": 136,
+          "anchor_sha256": "295a5786a8b546ea5e11512c50a53ccb9a429efdfb9d9ddc002f22bef95f3a1e",
+          "original_bytes": "do\n  local n=-1\n  local source=string.format(\n    \"local a = {[true] = 0X%x}; return a[true]\",n)\n  local f=assert(load(source))\n  one(f,n,'integer')\n  f=assert(load(string.dump(f)))\n  one(f,n,'integer')\nend"
+        }
+      },
+      {
+        "name": "Nested_Constants",
+        "span": {
+          "byte_offset": 3917,
+          "byte_length": 969,
+          "line": 139,
+          "end_line": 169,
+          "anchor_sha256": "59f98718fd45a3bffcdcc66aa43666a5d5a72f61f0d26c2f9fd5f59a8f5317f2",
+          "original_bytes": "do\n  local k0 <const> = \"00000000000000000000000000000000000000000000000000\"\n  local function f1()\n    local k <const> = k0\n    return function()\n      return function()return k end\n    end\n  end\n  local result=table.pack(f1())\n  assert(result.n==1 and type(result[1])=='function')\n  local f2=result[1]\n  result=table.pack(f2())\n  assert(result.n==1 and type(result[1])=='function')\n  local f3=result[1]\n  one(f3,k0,nil)\n  for _,f in ipairs({f1,f2,f3})do\n    for _,strip in ipairs({false,true})do\n      local loaded=assert(load(string.dump(f,strip)))\n      local returned=table.pack(loaded())\n      assert(returned.n==1)\n      if f==f1 then\n        returned=table.pack(returned[1]())\n        assert(returned.n==1 and type(returned[1])=='function')\n        one(returned[1],k0,nil)\n      elseif f==f2 then\n        assert(type(returned[1])=='function')\n        one(returned[1],k0,nil)\n      else assert(returned[1]==k0 and type(returned[1])=='string')end\n    end\n  end\nend"
+        }
+      },
+      {
+        "name": "Callback_Sequence",
+        "span": {
+          "byte_offset": 4971,
+          "byte_length": 591,
+          "line": 172,
+          "end_line": 195,
+          "anchor_sha256": "2349878b5e0abdff39e3a5149b045504a395633cb2b3bb8cab0485201aa8c51a",
+          "original_bytes": "do\n  local foo = function(f,a)\n    f(100 * 1000)\n    f(100.0 * 1000)\n    f(-100 * 1000)\n    f(-100 * 1000.0)\n    f(100000)\n    f(100000.0)\n    f(-100000)\n    f(-100000.0)\n  end\n  local seen={}\n  local result=table.pack(foo(function(...)\n    local arguments=table.pack(...)\n    assert(arguments.n==1)\n    seen[#seen+1]={arguments[1],math.type(arguments[1])}\n  end))\n  assert(result.n==0 and #seen==8)\n  local values={100000,100000,-100000,-100000,100000,100000,-100000,-100000}\n  for i=1,8 do\n    assert(seen[i][1]==values[i])\n    assert(seen[i][2]==(i%2==1 and 'integer'or'float'))\n  end\nend"
+        }
+      },
+      {
+        "name": "Assignment_Sequence",
+        "span": {
+          "byte_offset": 5647,
+          "byte_length": 682,
+          "line": 198,
+          "end_line": 220,
+          "anchor_sha256": "34ec8290977ed53cef6c0bf83ec5ffcb68016d7e808267b3b16589365219b529",
+          "original_bytes": "do\n  local foo = function(t,a)\n    t[a] = 1; t[a] = 1.0\n    t[a] = 1; t[a] = 1.0\n    t[a] = 2; t[a] = 2.0\n    t[a] = 0; t[a] = 0.0\n    t[a] = 1; t[a] = 1.0\n    t[a] = 2; t[a] = 2.0\n    t[a] = 0; t[a] = 0.0\n  end\n  local seen={};local key={};local proxy\n  proxy=setmetatable({},{__newindex=function(...)\n    local args=table.pack(...)\n    assert(args.n==3 and args[1]==proxy and args[2]==key)\n    seen[#seen+1]={args[3],math.type(args[3])}\n  end})\n  assert(select('#',foo(proxy,key))==0 and #seen==14 and next(proxy)==nil)\n  local values={1,1,1,1,2,2,0,0,1,1,2,2,0,0}\n  for i=1,14 do\n    assert(seen[i][1]==values[i])\n    assert(seen[i][2]==(i%2==1 and 'integer'or'float'))\n  end\nend"
+        }
+      },
+      {
+        "name": "Constructor_49",
+        "span": {
+          "byte_offset": 6406,
+          "byte_length": 1286,
+          "line": 223,
+          "end_line": 251,
+          "anchor_sha256": "49449cb65503aa60fa75ed2fb697f6d4f33f5d39a45884b435c3766455d703c2",
+          "original_bytes": "do\n  local n=49\n  local ordinary=\"local a; return {\"..string.rep(\"a, \",n)..\"}\"\n  local empty=table.pack(assert(load(ordinary))())\n  assert(empty.n==1 and type(empty[1])=='table'and next(empty[1])==nil)\n  local source=\"return function(...) return {\"..string.rep(\"11,\",n-1)..\"...} end\"\n  local f=assert(load(source))()\n  for _,args in ipairs({table.pack(),table.pack(23),table.pack(23,nil,41.0)})do\n    local returned=table.pack(f(table.unpack(args,1,args.n)))\n    assert(returned.n==1 and type(returned[1])=='table')\n    local t=returned[1];local count=0\n    for i=1,n-1 do assert(t[i]==11 and math.type(t[i])=='integer')end\n    if args.n==0 then assert(t[n]==nil and t[n+2]==nil)\n    elseif args.n==1 then\n      assert(t[n]==23 and math.type(t[n])=='integer'and t[n+2]==nil)\n    else\n      assert(t[n]==23 and math.type(t[n])=='integer')\n      assert(t[n+2]==41 and math.type(t[n+2])=='float')\n    end\n    for k,v in pairs(t)do\n      count=count+1;assert(math.type(k)=='integer'and k>=1)\n      if k<n then assert(v==11 and math.type(v)=='integer')\n      elseif k==n then assert(v==23 and math.type(v)=='integer')\n      else assert(k==n+2 and v==41 and math.type(v)=='float')end\n    end\n    assert(count==n-1+(args.n==3 and 2 or args.n))\n    assert(t[n+1]==nil and t[n+3]==nil)\n  end\nend"
+        }
+      },
+      {
+        "name": "Constructor_50",
+        "span": {
+          "byte_offset": 7769,
+          "byte_length": 1286,
+          "line": 254,
+          "end_line": 282,
+          "anchor_sha256": "5aa722f3e9a6f3b79eaf4304617ea57f8922b41e60fc963d6e4adc2bbced3dee",
+          "original_bytes": "do\n  local n=50\n  local ordinary=\"local a; return {\"..string.rep(\"a, \",n)..\"}\"\n  local empty=table.pack(assert(load(ordinary))())\n  assert(empty.n==1 and type(empty[1])=='table'and next(empty[1])==nil)\n  local source=\"return function(...) return {\"..string.rep(\"11,\",n-1)..\"...} end\"\n  local f=assert(load(source))()\n  for _,args in ipairs({table.pack(),table.pack(23),table.pack(23,nil,41.0)})do\n    local returned=table.pack(f(table.unpack(args,1,args.n)))\n    assert(returned.n==1 and type(returned[1])=='table')\n    local t=returned[1];local count=0\n    for i=1,n-1 do assert(t[i]==11 and math.type(t[i])=='integer')end\n    if args.n==0 then assert(t[n]==nil and t[n+2]==nil)\n    elseif args.n==1 then\n      assert(t[n]==23 and math.type(t[n])=='integer'and t[n+2]==nil)\n    else\n      assert(t[n]==23 and math.type(t[n])=='integer')\n      assert(t[n+2]==41 and math.type(t[n+2])=='float')\n    end\n    for k,v in pairs(t)do\n      count=count+1;assert(math.type(k)=='integer'and k>=1)\n      if k<n then assert(v==11 and math.type(v)=='integer')\n      elseif k==n then assert(v==23 and math.type(v)=='integer')\n      else assert(k==n+2 and v==41 and math.type(v)=='float')end\n    end\n    assert(count==n-1+(args.n==3 and 2 or args.n))\n    assert(t[n+1]==nil and t[n+3]==nil)\n  end\nend"
+        }
+      },
+      {
+        "name": "Constructor_51",
+        "span": {
+          "byte_offset": 9132,
+          "byte_length": 1286,
+          "line": 285,
+          "end_line": 313,
+          "anchor_sha256": "793196b31ddd5bcff69fcb022f061cf9eba990ded762e220ccb156b97dae751c",
+          "original_bytes": "do\n  local n=51\n  local ordinary=\"local a; return {\"..string.rep(\"a, \",n)..\"}\"\n  local empty=table.pack(assert(load(ordinary))())\n  assert(empty.n==1 and type(empty[1])=='table'and next(empty[1])==nil)\n  local source=\"return function(...) return {\"..string.rep(\"11,\",n-1)..\"...} end\"\n  local f=assert(load(source))()\n  for _,args in ipairs({table.pack(),table.pack(23),table.pack(23,nil,41.0)})do\n    local returned=table.pack(f(table.unpack(args,1,args.n)))\n    assert(returned.n==1 and type(returned[1])=='table')\n    local t=returned[1];local count=0\n    for i=1,n-1 do assert(t[i]==11 and math.type(t[i])=='integer')end\n    if args.n==0 then assert(t[n]==nil and t[n+2]==nil)\n    elseif args.n==1 then\n      assert(t[n]==23 and math.type(t[n])=='integer'and t[n+2]==nil)\n    else\n      assert(t[n]==23 and math.type(t[n])=='integer')\n      assert(t[n+2]==41 and math.type(t[n+2])=='float')\n    end\n    for k,v in pairs(t)do\n      count=count+1;assert(math.type(k)=='integer'and k>=1)\n      if k<n then assert(v==11 and math.type(v)=='integer')\n      elseif k==n then assert(v==23 and math.type(v)=='integer')\n      else assert(k==n+2 and v==41 and math.type(v)=='float')end\n    end\n    assert(count==n-1+(args.n==3 and 2 or args.n))\n    assert(t[n+1]==nil and t[n+3]==nil)\n  end\nend"
+        }
+      },
+      {
+        "name": "Return_Zero",
+        "span": {
+          "byte_offset": 10493,
+          "byte_length": 130,
+          "line": 316,
+          "end_line": 320,
+          "anchor_sha256": "cad1e3e1255a7128c4c8ea74998ccc201b5fc9dca17e481b9fb3122542bb6648",
+          "original_bytes": "do\n  local function f()local a=37 end\n  assert(table.pack(f()).n==0)\n  assert(table.pack(assert(load(string.dump(f)))()).n==0)\nend"
+        }
+      },
+      {
+        "name": "Return_One_Nil",
+        "span": {
+          "byte_offset": 10708,
+          "byte_length": 231,
+          "line": 323,
+          "end_line": 329,
+          "anchor_sha256": "61386bcbfb624e8b01ec246b3e08730fc9dbc875a29a4ceb4bb8499102723399",
+          "original_bytes": "do\n  local function f(a,b,c)return a end\n  local result=table.pack(f(nil,37,41.0))\n  assert(result.n==1 and result[1]==nil)\n  result=table.pack(assert(load(string.dump(f)))(nil,37,41.0))\n  assert(result.n==1 and result[1]==nil)\nend"
+        }
+      },
+      {
+        "name": "Return_Multiple",
+        "span": {
+          "byte_offset": 11022,
+          "byte_length": 494,
+          "line": 332,
+          "end_line": 342,
+          "anchor_sha256": "17bb840fe1d8541cc120aa33fca602322022f7fa2909795051a7240a90adff2d",
+          "original_bytes": "do\n  local function f()return 37,nil,41.0,nil end\n  local result=table.pack(f())\n  assert(result.n==4 and result[1]==37 and result[2]==nil)\n  assert(math.type(result[1])=='integer'and result[3]==41)\n  assert(math.type(result[3])=='float'and result[4]==nil)\n  local loaded=table.pack(assert(load(string.dump(f)))())\n  assert(loaded.n==4 and loaded[1]==37 and loaded[2]==nil)\n  assert(math.type(loaded[1])=='integer'and loaded[3]==41)\n  assert(math.type(loaded[3])=='float'and loaded[4]==nil)\nend"
+        }
+      },
+      {
+        "name": "Register_Load",
+        "span": {
+          "byte_offset": 11601,
+          "byte_length": 265,
+          "line": 345,
+          "end_line": 351,
+          "anchor_sha256": "5343a952609e0191176323db09ebac8e7fb3045cc7193df9ae0ada5b5f946ba1",
+          "original_bytes": "do\n  local source=\"local a; return a(\"..string.rep(\"a, \",252)..\"a)\"\n  assert(type(assert(load(source)))=='function')\n  source=\"local a; return a(\"..string.rep(\"a, \",253)..\"a)\"\n  local f,msg=load(source)\n  assert(f==nil and string.find(msg,\"too many registers\"))\nend"
+        }
+      }
+    ]
+  },
+  "observability": {
+    "private_optimizer_bytes_observable_via_dump": true,
+    "exact_instruction_sequence_public_promise": false,
+    "binary_validity_and_execution_required": true,
+    "numeric_types_and_result_arity_required": true
+  },
+  "implementation_bindings": [
+    {
+      "path": "src/lua-canonical_compiler.adb",
+      "sha256": "afd7c271850015208d5f302735ba5a7feb2cb2a6263ff3daecd033c1039f761c"
+    },
+    {
+      "path": "src/lua-canonical_compiler.ads",
+      "sha256": "17df81c04e55822d3b92428087fb190745f182f4c5340faf8554f823da7b139b"
+    },
+    {
+      "path": "src/lua-engine-canonical.adb",
+      "sha256": "6f4f0a418c64a9d931269578c00efda7902eb0b86ea36585cc4e4a6cb9caabca"
+    },
+    {
+      "path": "src/lua-chunks.ads",
+      "sha256": "8b681ec3b245bbcd6ac41d20b2260ff25039111b816c7c50feed140518d9844f"
+    },
+    {
+      "path": "src/lua-opcodes.ads",
+      "sha256": "dc84e30ffa75a708ee94d88103be5ae3e6f4e789f908a779c12e79929415f9a1"
+    }
+  ],
+  "observations": {
+    "status": "Component builds, AUnit and source/binary results inspected; no original/derived code.lua acceptance authority.",
+    "scope": "Public counterpart evidence only. This does not install exclusions, approve exact transformed bytes or resolve original anchors.",
+    "configuration_results": [
+      {
+        "configuration": "default",
+        "aunit_total": 2468,
+        "aunit_successful": 2468,
+        "aunit_failed_assertions": 0,
+        "aunit_unexpected_errors": 0,
+        "strict_test_build": {
+          "path": "reports/debug-metadata/code-public-default-tests.log",
+          "sha256": "6532a24faa97e67dbc1ca8048a85edf15ee076fb0764448e6ab7d4dae8082189"
+        },
+        "aunit_log": {
+          "path": "reports/debug-metadata/code-public-default-aunit.log",
+          "sha256": "c67159f008f46ab91edf9e4b4f8fbf3d0ac476b553bda72bc28060bc032de5c6"
+        },
+        "source_process_reports": [
+          {
+            "path": "reports/debug-metadata/code-public-source-default-native.json",
+            "sha256": "8a10f16b16640fc71f35c489929096ee9c7c69411e0742f9256a0d05dea3ee32"
+          },
+          {
+            "path": "reports/debug-metadata/code-public-source-default-ada.json",
+            "sha256": "788b71c378da7aa0bfd6fc6630ce23bd88360a2616571cfbb16dd820fde752eb"
+          }
+        ],
+        "crossing_producer_chunks": [
+          {
+            "path": "reports/debug-metadata/code-public-four-way/code_public_semantics-default-ada.luac",
+            "sha256": "35267f8a37bf6089592107ac43a5f97e49368b5047d3e037ad546e3f73d1c434"
+          },
+          {
+            "path": "reports/debug-metadata/code-public-four-way/code_public_semantics-default-c.luac",
+            "sha256": "cc1ce1e9fd24b8c4965b49d01a478ae997a4e18659ba2cf5a46552436ec3ff2e"
+          }
+        ],
+        "crossing_roles": [
+          "C-produced/C-VM",
+          "Ada-produced/C-VM",
+          "C-produced/Ada-VM",
+          "Ada-produced/Ada-VM"
+        ],
+        "matching_stdout_sha256": "e317ec4e9ce65d9aa439bdf87b8f3e92092ee23ed26b07e52404bed1c27c5534"
+      },
+      {
+        "configuration": "upstream-test",
+        "aunit_total": 2468,
+        "aunit_successful": 2468,
+        "aunit_failed_assertions": 0,
+        "aunit_unexpected_errors": 0,
+        "strict_test_build": {
+          "path": "reports/debug-metadata/code-public-t-tests.log",
+          "sha256": "33ee213c327192977ce73b844ef1bf2f598ff2428add4218b23c37ea58f63204"
+        },
+        "aunit_log": {
+          "path": "reports/debug-metadata/code-public-t-aunit.log",
+          "sha256": "c67159f008f46ab91edf9e4b4f8fbf3d0ac476b553bda72bc28060bc032de5c6"
+        },
+        "source_process_reports": [
+          {
+            "path": "reports/debug-metadata/code-public-source-upstream-test-native.json",
+            "sha256": "322ba3aa4ed23a51fe802e335f688e83f12b6bc6e047536ecee57f26951b1692"
+          },
+          {
+            "path": "reports/debug-metadata/code-public-source-upstream-test-ada.json",
+            "sha256": "7daaceb57a733d8fcf6e69fc507eba71a1ee68b84bbfd5d5a6205e2d55099086"
+          }
+        ],
+        "crossing_producer_chunks": [
+          {
+            "path": "reports/debug-metadata/code-public-four-way/code_public_semantics-upstream-test-ada.luac",
+            "sha256": "fc76d9efb84026ec3a4ba6d65b81ad0dfa5b36ebde69971ecd1a048eaf834cab"
+          },
+          {
+            "path": "reports/debug-metadata/code-public-four-way/code_public_semantics-upstream-test-c.luac",
+            "sha256": "ca8df03fcc0a521f791851fd43f7ed1e984d350ebf7625eb24f6db1df9fe4c8c"
+          }
+        ],
+        "crossing_roles": [
+          "C-produced/C-VM",
+          "Ada-produced/C-VM",
+          "C-produced/Ada-VM",
+          "Ada-produced/Ada-VM"
+        ],
+        "matching_stdout_sha256": "e317ec4e9ce65d9aa439bdf87b8f3e92092ee23ed26b07e52404bed1c27c5534"
+      }
+    ],
+    "crossing_log": {
+      "path": "reports/debug-metadata/code-public-four-way.log",
+      "sha256": "2b52c2af7a5bfc986ea158f0f0c33777ec6848ff08262afb4e0bdac9c4996e97"
+    },
+    "production_build_context": "Production/C/GPR/manifest bytes unchanged from the verified512530e six-build checkpoint through862ff67; only the two nested test builds are new.",
+    "preliminary_results": "Earlier prebuild logs remain diagnostics; the frozen source process reports and final nested AUnit logs above own this component evidence."
+  },
+  "required_next_actions": [
+    "Root independently reviews exact source links, expected numeric types, arities, callbacks and constructor controls.",
+    "Retain checkR and all original compilation/load/error/control semantics while separately revising the private optimization eligibility proposal.",
+    "Only an independently approved exact source transform may create a disposable derived code.lua. This witness packet supplies no such authority.",
+    "Refresh implementation/counterpart hashes after runtime changes, then require source/file/final-matrix evidence separately."
+  ]
+}
