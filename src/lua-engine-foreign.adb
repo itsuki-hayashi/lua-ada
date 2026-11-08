@@ -1,4 +1,5 @@
 with Lua.Diagnostic_Text;
+with Ada.Containers;
 with Ada.Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Unchecked_Conversion;
@@ -29,6 +30,7 @@ with System.Address_To_Access_Conversions;
 with System.Storage_Elements;
 
 package body Lua.Engine.Foreign is
+   use type Ada.Containers.Count_Type;
    use type File_Inputs.Outcome;
    package C renames Interfaces.C;
    package Memory renames Lua.Storage;
@@ -3501,6 +3503,11 @@ package body Lua.Engine.Foreign is
                Message_Handler : Value;
                Arguments : Values.Vector :=
                  Owned_Values (Owner.Universe.all);
+               Argument_Count : constant Natural :=
+                 Context.Foreign_Top -
+                   (if Input.Operation = Begin_Builtin then
+                       Context.Foreign_Base else Slot);
+               Workspace_Owner : Frame_Access;
                Address : System.Address;
                Cross_Context : constant Boolean :=
                  Previous /= Context and then Main_Owner.Driver /= null;
@@ -3512,7 +3519,58 @@ package body Lua.Engine.Foreign is
                Next : Calls.Object_Pointer;
                Result : Action_Status;
                Start_Error : Boolean := False;
+
+               procedure Return_Workspace;
+               procedure Return_Workspace is
+               begin
+                  if Workspace_Owner /= null then
+                     --  Start has published the callee/inputs, or failed
+                     --  while their original C slots/pins still own them.
+                     --  Return only empty capacity, before Pump can execute
+                     --  Lua or retire any real frame. The live C guard owns
+                     --  this metadata throughout that setup interval.
+                     Arguments.Clear;
+                     Values.Move
+                       (Workspace_Owner.Native_Arguments, Arguments);
+                     Workspace_Owner := null;
+                  end if;
+               end Return_Workspace;
             begin
+               if Argument_Count > 0 and then not Cross_Context and then
+                 not Root_Call and then
+                 Context.Foreign_Activation /= null and then
+                 Context.Foreign_Activation.Context = Context and then
+                 Context.Foreign_Activation.Foreign_Entered and then
+                 Context.Foreign_Activation.Native_Arguments.Is_Empty and then
+                 Context.Foreign_Activation.Native_Arguments.Capacity >=
+                   Ada.Containers.Count_Type (Argument_Count)
+               then
+                  --  A real C callback has already published its arguments
+                  --  in the traced scalar window and cleared these copies.
+                  --  Reuse that actual empty arena for the synchronous API
+                  --  setup, rather than allocating a fresh vector on every
+                  --  lua_call/pcall. No constant-reference or element address
+                  --  is retained; structural moves still check tampering.
+                  --  Precharge fill and clear before changing ownership.
+                  if Owner.Universe.Policy = Bounded then
+                     if Argument_Count >
+                       (Owner.Universe.Bounds.Instructions - Natural'Min
+                          (Owner.Universe.Steps,
+                           Owner.Universe.Bounds.Instructions)) / 2
+                     then
+                        Fail (Owner.Universe.all,
+                              "instruction limit exceeded", True);
+                     end if;
+                     Owner.Universe.Steps :=
+                       Owner.Universe.Steps + 2 * Argument_Count;
+                  end if;
+                  Values.Move
+                    (Arguments,
+                     Context.Foreign_Activation.Native_Arguments);
+                  Workspace_Owner := Context.Foreign_Activation;
+                  Workspace_Owner.Native_Arguments.Set_Owner
+                    (Workspace_Owner.Memory);
+               end if;
                for Index in
                  (if Input.Operation = Begin_Builtin then
                      Context.Foreign_Base + 1 else Slot + 1) ..
@@ -3637,6 +3695,7 @@ package body Lua.Engine.Foreign is
                         raise;
                      end if;
                end;
+               Return_Workspace;
                --  The callee/argument packet and boundary already own every
                --  input. The suspended C caller keeps only its prefix live;
                --  the published child owns the overlapping call window.
@@ -3644,6 +3703,8 @@ package body Lua.Engine.Foreign is
                Result := Pump (Start_Error);
                Leave_Context;
                return Result;
+            exception
+               when others => Return_Workspace; raise;
             end;
          when Complete_Callback =>
             if Main_Owner.Driver = null or else Input.Count < 0 or else

@@ -447,6 +447,99 @@ static void reader_injected_refusal(lua_State *L) {
     assert(local_counts.bytes == 0 && local_counts.blocks == 0);
 }
 
+static int argument_pcall_fault;
+static int argument_pcall_driver(lua_State *L) {
+    int status;
+    size_t growths;
+    assert(lua_gettop(L) == 4 && lua_isfunction(L, 1));
+    assert(lua_rawequal(L, 2, 4) && lua_isnil(L, 3));
+    lua_pushvalue(L, 1);
+    lua_pushvalue(L, 2); lua_pushnil(L); lua_pushvalue(L, 4);
+    growths = counts.growths;
+    counts.refuse = argument_pcall_fault;
+    status = lua_pcall(L, 3, 3, 0);
+    counts.refuse = 0;
+    assert(status == LUA_OK && lua_gettop(L) == 7);
+    if (argument_pcall_fault) assert(counts.growths == growths);
+    /* The caller prefix is still real C stack data. The inner call keeps
+     * its nil hole and both aliases through ordinary protected publication. */
+    assert(lua_isfunction(L, 1) && lua_isnil(L, 3));
+    assert(lua_rawequal(L, 2, 4) && lua_rawequal(L, 2, 5));
+    assert(lua_isnil(L, 6) && lua_rawequal(L, 5, 7));
+    return 3;
+}
+
+static void pcall_argument_refusal(lua_State *L) {
+    lua_pushcfunction(L, argument_pcall_driver);
+    lua_setglobal(L, "argument_pcall_driver");
+    /* Warm only this actual public call path. The old implementation still
+     * allocated a new argument vector on every call, so warming did not hide
+     * the regression. All values exist before the real refusal is enabled. */
+    argument_pcall_fault = 0;
+    run(L, "argument_pcall_target=function(a,b,c)return a,b,c end;"
+           "local t={};argument_pcall_driver(argument_pcall_target,t,nil,t)");
+    argument_pcall_fault = 1;
+    run(L, "local t={};local a,b,c=argument_pcall_driver("
+           "argument_pcall_target,t,nil,t);assert(a==t and b==nil and c==t)");
+    argument_pcall_fault = 0;
+    lua_settop(L, 0);
+}
+
+static int argument_pcall_recovery_driver(lua_State *L) {
+    assert(lua_gettop(L) == 4);
+    lua_pushvalue(L, 1); lua_pushvalue(L, 3);
+    assert(lua_pcall(L, 1, 1, 0) == LUA_ERRRUN);
+    assert(lua_rawequal(L, 3, -1)); lua_pop(L, 1);
+    lua_pushvalue(L, 2); lua_pushvalue(L, 3);
+    lua_pushnil(L); lua_pushvalue(L, 4);
+    counts.refuse = argument_pcall_fault;
+    {
+        int status = lua_pcall(L, 3, 3, 0);
+        counts.refuse = 0;
+        assert(status == LUA_OK && lua_gettop(L) == 7);
+    }
+    assert(lua_rawequal(L, 3, 5) && lua_isnil(L, 6));
+    assert(lua_rawequal(L, 5, 7));
+    return 3;
+}
+
+static void pcall_argument_error_recovery(lua_State *L) {
+    lua_pushcfunction(L, argument_pcall_recovery_driver);
+    lua_setglobal(L, "argument_pcall_recovery_driver");
+    argument_pcall_fault = 0;
+    run(L, "argument_pcall_fail=function(e)error(e,0) end;"
+           "local t={};argument_pcall_recovery_driver(argument_pcall_fail,"
+           "argument_pcall_target,t,t)");
+    argument_pcall_fault = 1;
+    run(L, "local t={};local a,b,c=argument_pcall_recovery_driver("
+           "argument_pcall_fail,argument_pcall_target,t,t);"
+           "assert(a==t and b==nil and c==t)");
+    argument_pcall_fault = 0;
+    lua_settop(L, 0);
+}
+
+static int argument_pcall_weak_driver(lua_State *L) {
+    assert(argument_pcall_driver(L) == 3);
+    /* Retire all actual C input/result slots while this caller is still
+     * active. Returned scratch capacity must contain no hidden Lua roots. */
+    lua_settop(L, 0);
+    lua_gc(L, LUA_GCCOLLECT);
+    lua_getglobal(L, "argument_pcall_weak"); lua_rawgeti(L, -1, 1);
+    assert(lua_isnil(L, -1)); lua_pop(L, 2);
+    return 0;
+}
+
+static void pcall_argument_weak_release(lua_State *L) {
+    lua_pushcfunction(L, argument_pcall_weak_driver);
+    lua_setglobal(L, "argument_pcall_weak_driver");
+    argument_pcall_fault = 0;
+    run(L, "argument_pcall_weak=setmetatable({},{__mode='v'});"
+           "local function make()local t={};argument_pcall_weak[1]=t;"
+           "return argument_pcall_target,t,nil,t end;"
+           "argument_pcall_weak_driver(make())");
+    lua_settop(L, 0);
+}
+
 static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     assert(lua_gettop(L) == 0); body(L); assert(lua_gettop(L) == 0);
     printf("PASS: builtin-%s\n", name); fflush(stdout);
@@ -571,6 +664,9 @@ int main(int argc, char **argv) {
     check("reader-direct-error", reader_direct_error, L);
     check("reader-direct-extra-root", reader_direct_extra_root, L);
     check("reader-injected-refusal", reader_injected_refusal, L);
+    check("pcall-argument-refusal", pcall_argument_refusal, L);
+    check("pcall-argument-error-recovery", pcall_argument_error_recovery, L);
+    check("pcall-argument-weak-release", pcall_argument_weak_release, L);
     }
     lua_close(L);
     if (!console_trial) assert(counts.bytes == 0 && counts.blocks == 0);
