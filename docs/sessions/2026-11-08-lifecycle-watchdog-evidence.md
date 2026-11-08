@@ -38,3 +38,10 @@ This does not repair the previous failed step, bypass source acceptance or
 claim complete context acceptance. It allows native backend investigation
 while retaining the unrelated lifecycle/source failures and all raw artifacts.
 The new macOS coroutine capture and Unix backend results remain pending.
+
+The same development job separately collects all nineteen native prompt cases
+with the existing explicit development-only observer. Every collected row
+stays unaccepted, including matches. This retains actual default readline
+behavior for protocol review when the strict historical fallback expectations
+stop the ordinary campaign. It does not disable readline or change expected
+bytes, and never replaces the failed full-target operation with a pass.

@@ -93,6 +93,24 @@ jobs:
             -Configuration $configuration `
             -OutputDirectory "$PWD/reports/core-image/readline-diagnostic/${{ matrix.id }}"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve all native CLI prompt observations
+        if: always()
+        shell: pwsh
+        run: |
+          # Every collected row remains unaccepted, including matching rows.
+          # The default readline backend is retained to review its protocol.
+          $configuration = '${{ matrix.context }}'.Split('/')[0]
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          $native = "$PWD/build/conformance/$configuration/bin/lua$suffix"
+          if (-not (Test-Path -LiteralPath $native -PathType Leaf)) {
+            throw 'Native prompt observation not run: no built C oracle'
+          }
+          ./scripts/check-cli.ps1 -Interpreter $native -PromptProtocol `
+            -RuntimeRole ReferenceC -Configuration $configuration `
+            -RuntimeDirectory "$PWD/build/conformance/$configuration/lib" `
+            -CollectAllObservations -DevelopmentObservation `
+            -Report "$PWD/reports/core-image/native-cli-diagnostic/${{ matrix.id }}/result.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Record diagnostic scope
         if: always()
         shell: pwsh
