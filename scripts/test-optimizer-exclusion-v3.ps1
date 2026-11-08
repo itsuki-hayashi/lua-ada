@@ -10,6 +10,7 @@ $temporary=Join-Path $root ('reports/optimizer-v3-selftest/'+[guid]::NewGuid().T
 $bytes=[IO.File]::ReadAllBytes((Join-Path $root 'references/lua/testes/code.lua'))
 $original=@(Get-ConformanceCoverageUnits -Path code.lua -Bytes $bytes)
 $feature=Get-Content (Join-Path $root "$base/reviews/code-private-optimizer.independent-feature-review.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 48
+$feature.source_bindings+=@(@{path='scripts/ConformanceInventory.psm1';sha256=(Get-FileHash (Join-Path $root 'scripts/ConformanceInventory.psm1')).Hash.ToLowerInvariant()})
 $retention=Get-Content (Join-Path $root "$base/reviews/code-optimizer-semantic-retention.independent-review.json") -Raw|ConvertFrom-Json -AsHashtable -Depth 48
 $scopes=(Get-Content (Join-Path $root 'tests/conformance/targets/remaining-upstream-compatibility.exclusions.json') -Raw|ConvertFrom-Json -AsHashtable).protected_scopes
 $paths=@('references/lua/testes/code.lua')+@($feature.source_bindings.path)+@($retention.witness_sources.path)+@($retention.witness.path)+@($scopes.path)
@@ -103,6 +104,7 @@ Case 'feature-only input cannot replace the retention decision' {$f=Fixture;$f.r
 Case 'a feature decision cannot widen one child' {$f=Fixture;$f.feature.candidates[0].byte_length++;Bind $f;Reject {Validate $f} 'candidate widened or changed'}
 Case 'public witness byte drift rejects even a rehashed review' {$f=Fixture;$f.retention.witness_sources[0].sha256='0'*64;Bind $f;Reject {Validate $f} 'hash differs'}
 Case 'stale implementation bindings require a fresh feature decision' {$f=Fixture;$f.feature.source_bindings[0].sha256='0'*64;Bind $f;Reject {Validate $f} 'hash differs'}
+Case 'current original-anchor/review validator identity cannot be omitted' {$f=Fixture;$f.feature.source_bindings=@($f.feature.source_bindings|Where-Object path -CNE scripts/ConformanceInventory.psm1);Bind $f;Reject {Validate $f} 'current implementation/source bindings'}
 Case 'checkR source retention cannot be weakened' {$f=Fixture;$f.retention.protected_checkR.byte_length--;Bind $f;Reject {Validate $f} 'exact checkR'}
 Case 'source retention cannot invent runtime evidence' {$f=Fixture;$f.retention.execution_evidence=@('passed');Bind $f;Reject {Validate $f} 'invent execution evidence'}
 Case 'a pending author packet cannot act as retention authority' {$f=Fixture;$f.retention.kind='code-public-semantics-author-witness';Bind $f;Reject {Validate $f} 'public semantic retention'}

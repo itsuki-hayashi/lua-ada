@@ -556,7 +556,7 @@ function Assert-ConformanceOptimizerReviews {
     }
     $featurePaths=@('references/lua/manual/manual.of','references/lua/ltests.c','src/lua-canonical_compiler.adb',
         'src/lua-canonical_compiler.ads','src/lua-opcodes.ads','src/lua-chunks.ads',
-        'scripts/ConformanceExclusionEligibility.psm1','scripts/ConformanceTransforms.psm1')
+        'scripts/ConformanceExclusionEligibility.psm1','scripts/ConformanceInventory.psm1','scripts/ConformanceTransforms.psm1')
     if($feature.source_bindings -isnot [Array] -or (($feature.source_bindings.path|Sort-Object)-join '|') -cne (($featurePaths|Sort-Object)-join '|')){
         throw 'V3 feature lacks current implementation/source bindings'
     }
