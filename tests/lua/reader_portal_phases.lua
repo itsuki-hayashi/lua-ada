@@ -220,4 +220,39 @@ do
   assert(f and f()==83 and calls==2,tostring(e))
 end
 
+-- Protected_Success_Hook: A raw load result edit retains one private true prefix.
+do
+  local replacement=function()return 89 end;local count=0
+  debug.sethook(function(event)
+    if event=='return' then local i=debug.getinfo(2,'fr')
+      if i.func==load then
+        assert(i.ntransfer==1)
+        assert(debug.setlocal(2,i.ftransfer,replacement))
+      end
+    end
+  end,'r')
+  local result=table.pack(pcall(load,function()
+    count=count+1;if count==1 then return 'return 1' end
+  end))
+  debug.sethook()
+  assert(result.n==2 and result[1]==true and result[2]==replacement)
+end
+
+-- Protected_Failure_Hook: Internal status stays separate from an editable nil tuple.
+do
+  debug.sethook(function(event)
+    if event=='return' then local i=debug.getinfo(2,'fr')
+      if i.func==load then
+        assert(i.ntransfer==2)
+        assert(debug.setlocal(2,i.ftransfer,false))
+        assert(debug.setlocal(2,i.ftransfer+1,nil))
+      end
+    end
+  end,'r')
+  local result=table.pack(pcall(load,function()return 'local = x' end))
+  debug.sethook()
+  assert(result.n==3 and result[1]==true and
+    result[2]==false and result[3]==nil)
+end
+
 print('reader portal phases OK')

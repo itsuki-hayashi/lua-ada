@@ -7,6 +7,12 @@ passes five focused cases and 2,359 AUnit cases per local configuration.
 Continue unchanged errors.lua at generated parser/compiler limits: compatible
 load must report a catchable syntax failure while bounded Ada policies retain
 their host quotas. Preserve the final source, T and platform obligations.
+The [reader refusal/lifecycle follow-up](sessions/2026-11-08-reader-refusal-lifecycle.md)
+completes its nine focused behaviors within 2,363 passing AUnit cases per
+configuration. Preserve the separately failed native partial-reader cleanup
+observations for final review; require Ada's zero selected-byte/block invariant.
+Continue the measured T API hook count/line sequence mismatch without changing
+the original source. Whole-source/T and platform acceptance remain open.
 
 The [Context failure-text migration](sessions/2026-11-08-runtime-failure-storage.md)
 is implemented and locally verified. Continue the actual C call metadata and

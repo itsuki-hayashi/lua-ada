@@ -5,6 +5,7 @@ Observation: [retained T source replay](2026-11-08-retained-t-source-replay.md).
 Source review: [exact API/calls equivalents](2026-11-08-exact-api-calls-equivalents.md).
 
 Component: [assert argument presence](2026-11-08-assert-arguments.md).
+Component: [reader refusal and self-close](2026-11-08-reader-refusal-lifecycle.md).
 
 Component: [runtime failure storage](2026-11-08-runtime-failure-storage.md).
 Component: [public T traceback command](2026-11-08-t-traceback-command.md).

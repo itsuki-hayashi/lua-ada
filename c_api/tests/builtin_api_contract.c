@@ -356,14 +356,117 @@ static void reader_direct_extra_root(lua_State *L) {
            "nil,'t',_ENV,make_extra());assert(f and f()==61,tostring(e))");
 }
 
+static int reader_self_returned;
+static int reader_close_self(lua_State *L) {
+    lua_closethread(L, L);
+    reader_self_returned++;
+    return 0;
+}
+
+static void reader_self_close_case(lua_State *L, int partial, int direct) {
+    lua_State *co;
+    int n;
+    /* Native partial-reader self-close leaks parser scratch on this pinned
+       host (separate counted diagnostics: 128 bytes/two blocks). Isolate
+       these semantic trials from the retained counted state; these trials
+       do not establish balanced cleanup. Ada AUnit checks its own selected
+       bytes/blocks separately. Never emulate the native scratch leak. */
+    (void)L;
+    L = luaL_newstate(); assert(L); luaL_openlibs(L);
+    lua_pushcfunction(L, forward_load); lua_setglobal(L, "forward_load");
+    /* The real reader resets its running thread. Every waiting parser and
+       load-portal guard must acknowledge that base-level transfer before
+       metadata reuse; neither C nor Lua code after reset may run. */
+    reader_self_returned = 0;
+    lua_pushcfunction(L, reader_close_self);
+    lua_setglobal(L, "reader_close_self");
+    lua_pushboolean(L, partial); lua_setglobal(L, "reader_partial");
+    lua_pushboolean(L, direct); lua_setglobal(L, "reader_direct");
+    run(L, "reader_closed=0;return coroutine.create(function()"
+           "local guard<close> = setmetatable({},"
+           "{__close=function()reader_closed=reader_closed+1 end});"
+           "local n=0;local loader=reader_direct and forward_load or load;"
+           "return loader(function()n=n+1;"
+           "if reader_partial and n==1 then return 'local value = ' end;"
+           "reader_close_self();error('self-closed reader resumed')end)end)");
+    co = lua_tothread(L, -1); assert(co);
+    assert(lua_resume(co, L, 0, &n) == LUA_OK && n == 0);
+    assert(!reader_self_returned && lua_gettop(co) == 0);
+    assert(lua_status(co) == LUA_OK);
+    lua_getglobal(L, "reader_closed");
+    assert(lua_tointeger(L, -1) == 1);
+    lua_settop(L, 0);
+    run(L, "assert(assert(load('return 67'))()==67)");
+    puts("OBSERVED: reader self-close semantics; teardown follows");
+    fflush(stdout);
+    lua_close(L);
+}
+
+static void reader_self_close(lua_State *L) {
+    reader_self_close_case(L, 0, 0);
+}
+
+static void reader_partial_self_close(lua_State *L) {
+    reader_self_close_case(L, 1, 0);
+}
+
+static void reader_direct_self_close(lua_State *L) {
+    reader_self_close_case(L, 1, 1);
+}
+
+static int reader_refuse_growth(lua_State *L) {
+    void *data;
+    (void)lua_getallocf(L, &data);
+    ((struct allocation_counts *)data)->refuse = 1;
+    lua_pushvalue(L, lua_upvalueindex(1));
+    return 1;
+}
+
+static void reader_injected_refusal(lua_State *L) {
+    struct allocation_counts local_counts = {0};
+    lua_State *trial = lua_newstate(counted_allocator, &local_counts, 977U);
+    int status;
+    (void)L;
+    assert(trial); luaL_openlibs(trial);
+    /* Inject only after the actual reader C body has entered. A cold load
+       completion must retain its protected nil/error tuple under permanent
+       refusal, rather than failing a later private result allocation. */
+    lua_getglobal(trial, "load");
+    lua_pushliteral(trial, "return 71");
+    lua_pushcclosure(trial, reader_refuse_growth, 1);
+    status = lua_pcall(trial, 1, 2, 0);
+    local_counts.refuse = 0;
+    assert(status == LUA_OK && lua_gettop(trial) == 2);
+    assert(lua_isnil(trial, 1));
+    assert(strcmp(lua_tostring(trial, 2), "not enough memory") == 0);
+    lua_settop(trial, 0);
+    run(trial, "assert(assert(load('return 73'))()==73)");
+    lua_close(trial);
+    assert(local_counts.bytes == 0 && local_counts.blocks == 0);
+}
+
 static void check(const char *name, void (*body)(lua_State *), lua_State *L) {
     assert(lua_gettop(L) == 0); body(L); assert(lua_gettop(L) == 0);
     printf("PASS: builtin-%s\n", name); fflush(stdout);
 }
 
-int main(void) {
+int main(int argc, char **argv) {
     lua_State *L = lua_newstate(counted_allocator, &counts, 971U);
     assert(L); luaL_openlibs(L);
+    if (argc == 2) {
+        /* Keep known-failing native T partial-parser teardown isolated.
+           These modes still call lua_close: a failed oracle is recorded as
+           failed, never transformed into a passing balanced consumer. */
+        direct_load = field(L, NULL, "load"); lua_pop(L, 1);
+        if (strcmp(argv[1], "--reader-self-close") == 0)
+            check("reader-self-close", reader_self_close, L);
+        else if (strcmp(argv[1], "--reader-partial-self-close") == 0)
+            check("reader-partial-self-close", reader_partial_self_close, L);
+        else if (strcmp(argv[1], "--reader-direct-self-close") == 0)
+            check("reader-direct-self-close", reader_direct_self_close, L);
+        else assert(!"unknown reader lifecycle trial");
+    } else {
+    assert(argc == 1);
     check("exposed-functions", exposed_functions, L);
     check("stateless-roundtrip", stateless_roundtrip, L);
     check("repeated-opener-identity", repeated_opener_identity, L);
@@ -393,6 +496,8 @@ int main(void) {
     check("reader-direct-roots", reader_direct_roots, L);
     check("reader-direct-error", reader_direct_error, L);
     check("reader-direct-extra-root", reader_direct_extra_root, L);
+    check("reader-injected-refusal", reader_injected_refusal, L);
+    }
     lua_close(L); assert(counts.bytes == 0 && counts.blocks == 0);
     puts("PASS: public builtin contract");
     return 0;

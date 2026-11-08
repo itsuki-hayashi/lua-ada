@@ -682,6 +682,13 @@ package body Lua.Engine.Loaders is
                if Arg (2).Kind = Nil_Kind then
                   Chunk_Name.Set_Value ("=(load)");
                end if;
+               --  The protected parser can return nil/error after a reader
+               --  has permanently refused provider growth. Reserve this
+               --  actual C completion packet before entering user code;
+               --  constructing it after guard acknowledgement would turn
+               --  load's protected memory result into an outer call error.
+               Activation.Native_Results.Reserve_Capacity
+                 (Ada.Containers.Count_Type (2 + Activation.Protection));
                --  The current activation owns these immutable C strings
                --  throughout every reader callback. The actual streaming
                --  parser starts only after Step returns to its C guard;

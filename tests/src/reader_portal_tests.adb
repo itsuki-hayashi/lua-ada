@@ -378,6 +378,62 @@ package body Reader_Portal_Tests is
          "end");
    end Retired_Extra_Argument;
 
+   procedure Protected_Success_Hook;
+   procedure Protected_Success_Hook is
+   begin
+      --  A raw load result edit retains one private true prefix.
+      Check
+        ("do" & ASCII.LF &
+         "  local replacement=function()return 89 " &
+         "end;local count=0" & ASCII.LF &
+         "  debug.sethook(function(event)" & ASCII.LF &
+         "    if event=='return' then local i=debu" &
+         "g.getinfo(2,'fr')" & ASCII.LF &
+         "      if i.func==load then" & ASCII.LF &
+         "        assert(i.ntransfer==1)" & ASCII.LF &
+         "        assert(debug.setlocal(2,i.ftrans" &
+         "fer,replacement))" & ASCII.LF &
+         "      end" & ASCII.LF &
+         "    end" & ASCII.LF &
+         "  end,'r')" & ASCII.LF &
+         "  local result=table.pack(pcall(load,fun" &
+         "ction()" & ASCII.LF &
+         "    count=count+1;if count==1 then retur" &
+         "n 'return 1' end" & ASCII.LF &
+         "  end))" & ASCII.LF &
+         "  debug.sethook()" & ASCII.LF &
+         "  assert(result.n==2 and result[1]==true" &
+         " and result[2]==replacement)" & ASCII.LF &
+         "end");
+   end Protected_Success_Hook;
+
+   procedure Protected_Failure_Hook;
+   procedure Protected_Failure_Hook is
+   begin
+      --  Internal status stays separate from an editable nil tuple.
+      Check
+        ("do" & ASCII.LF &
+         "  debug.sethook(function(event)" & ASCII.LF &
+         "    if event=='return' then local i=debu" &
+         "g.getinfo(2,'fr')" & ASCII.LF &
+         "      if i.func==load then" & ASCII.LF &
+         "        assert(i.ntransfer==2)" & ASCII.LF &
+         "        assert(debug.setlocal(2,i.ftrans" &
+         "fer,false))" & ASCII.LF &
+         "        assert(debug.setlocal(2,i.ftrans" &
+         "fer+1,nil))" & ASCII.LF &
+         "      end" & ASCII.LF &
+         "    end" & ASCII.LF &
+         "  end,'r')" & ASCII.LF &
+         "  local result=table.pack(pcall(load,fun" &
+         "ction()return 'local = x' end))" & ASCII.LF &
+         "  debug.sethook()" & ASCII.LF &
+         "  assert(result.n==3 and result[1]==true" &
+         " and" & ASCII.LF &
+         "    result[2]==false and result[3]==nil)" & ASCII.LF &
+         "end");
+   end Protected_Failure_Hook;
+
    procedure Register (Suite : AUnit.Test_Suites.Access_Test_Suite) is
    begin
       Test_Support.Add
@@ -431,5 +487,11 @@ package body Reader_Portal_Tests is
       Test_Support.Add
         (Suite, "reader portal: retired extra argument",
          Retired_Extra_Argument'Access);
+      Test_Support.Add
+        (Suite, "reader portal: protected success hook",
+         Protected_Success_Hook'Access);
+      Test_Support.Add
+        (Suite, "reader portal: protected failure hook",
+         Protected_Failure_Hook'Access);
    end Register;
 end Reader_Portal_Tests;

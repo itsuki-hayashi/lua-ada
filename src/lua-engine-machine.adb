@@ -3472,7 +3472,21 @@ package body Lua.Engine.Machine is
             if Activation.Closers.Is_Empty and then
               Activation.C_Closing_Level = 0
             then
-               Complete (Self, Activation.Native_Results);
+               if Activation.Load_Reader_Portal then
+                  --  Reader code may have permanently refused provider
+                  --  growth. Its already reserved packet owns raw results;
+                  --  add only private protection statuses in that capacity.
+                  --  Keep Protection through return-hook reconstruction:
+                  --  the real C window still exposes only its raw tuple.
+                  Activation.Native_Results.Prepend
+                    (Value'(Boolean_Kind, True),
+                     Ada.Containers.Count_Type (Activation.Protection));
+                  Complete_Packet
+                    (Self, Activation.Native_Results,
+                     Activation.Native_Results);
+               else
+                  Complete (Self, Activation.Native_Results);
+               end if;
             else
                Start_Unwind
                  (Self, Activation, Return_Exit, Activation.Native_Results);

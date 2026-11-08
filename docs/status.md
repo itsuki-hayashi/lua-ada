@@ -14,6 +14,13 @@ and successful tuples. Both local configurations pass 2,359 AUnit cases and
 all eight compiler/VM roles for its five-case fixture. Unchanged errors.lua
 now reaches generated compilation-limit checks, where parser nesting still
 escapes as a host limit. Full file and final matrix acceptance remain open.
+The [reader refusal/lifecycle follow-up](sessions/2026-11-08-reader-refusal-lifecycle.md)
+preserves protected memory-result tuples without post-callback packet growth.
+Both configurations pass 2,363 AUnit cases, including nine new refusal,
+self-close and protected-hook cases; the thirty-case balanced builtin consumer
+matches native in both. Ada self-close leaves zero selected bytes/blocks.
+Native partial-reader cleanup leaks and two T teardown assertions remain
+explicit failed oracle observations requiring final acceptance review.
 
 The [runtime failure-storage migration](sessions/2026-11-08-runtime-failure-storage.md)
 uses selected immutable diagnostics and preserves original Lua error values.

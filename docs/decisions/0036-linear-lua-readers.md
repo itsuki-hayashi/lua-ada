@@ -75,6 +75,14 @@ before physical cleanup. Producer/VM and source/bytecode checks remain intact.
 
 ## Verification boundary
 
+The [refusal/lifecycle follow-up](../sessions/2026-11-08-reader-refusal-lifecycle.md)
+preflights raw results plus private protection before callbacks, then completes
+the portal from that owned capacity without a fresh Wrap vector. Keep protection
+through return-hook reconstruction. Its independent selected-memory checks
+require zero bytes/blocks after self-close. A measured native partial-reader
+cleanup leak and T teardown assertion remain failed oracle observations;
+the implementation neither emulates that leak nor bypasses reference teardown.
+
 The companion [session](../sessions/2026-11-08-linear-lua-readers.md) records
 native-paired token boundaries, direct saved-C builtin ownership, mutable
 argument/environment cells, weak-root retirement, return hooks, typed host
