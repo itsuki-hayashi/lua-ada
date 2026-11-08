@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [assert argument checkpoint](sessions/2026-11-08-assert-arguments.md)
+passes five focused cases and 2,359 AUnit cases per local configuration.
+Continue unchanged errors.lua at generated parser/compiler limits: compatible
+load must report a catchable syntax failure while bounded Ada policies retain
+their host quotas. Preserve the final source, T and platform obligations.
+
 The [Context failure-text migration](sessions/2026-11-08-runtime-failure-storage.md)
 is implemented and locally verified. Continue the actual C call metadata and
 canonical return-packet refusal paths, legacy input-sized builders, registry

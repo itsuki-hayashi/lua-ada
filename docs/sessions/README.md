@@ -1,5 +1,7 @@
 # Session Records
 
+Component: [assert argument presence](2026-11-08-assert-arguments.md).
+
 Component: [runtime failure storage](2026-11-08-runtime-failure-storage.md).
 Component: [public T traceback command](2026-11-08-t-traceback-command.md).
 

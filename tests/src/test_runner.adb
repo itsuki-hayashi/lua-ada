@@ -7,6 +7,7 @@ with Lazy_Vararg_Tests;
 with Lua.Stack_Inspection_Tests;
 with Lua.Diagnostic_Text_Tests;
 with Lua.Failure_Storage_Tests;
+with Assert_Argument_Tests;
 with Lua.Conformance_Adapter_Tests;
 with Lua.API_Command_Tests;
 with Lua.Foreign_Hook_Tests;
@@ -267,6 +268,7 @@ procedure Test_Runner is
       Lua.Stack_Inspection_Tests.Register (Result);
       Lua.Diagnostic_Text_Tests.Register (Result);
       Lua.Failure_Storage_Tests.Register (Result);
+      Assert_Argument_Tests.Register (Result);
       return Result;
    end Suite;
 

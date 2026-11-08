@@ -2,6 +2,13 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [assert argument checkpoint](sessions/2026-11-08-assert-arguments.md)
+preserves missing-versus-nil diagnostics, collecting argument-name callbacks
+and successful tuples. Both local configurations pass 2,359 AUnit cases and
+all eight compiler/VM roles for its five-case fixture. Unchanged errors.lua
+now reaches generated compilation-limit checks, where parser nesting still
+escapes as a host limit. Full file and final matrix acceptance remain open.
+
 The [runtime failure-storage migration](sessions/2026-11-08-runtime-failure-storage.md)
 uses selected immutable diagnostics and preserves original Lua error values.
 Both local configurations pass 2,300 AUnit cases, all standalone C consumers

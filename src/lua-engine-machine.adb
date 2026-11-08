@@ -2061,7 +2061,12 @@ package body Lua.Engine.Machine is
             Emit_Output (State, [Ada.Characters.Latin_1.LF]);
             Flush_Output (State);
          when Assert_Function =>
-            Require (1);
+            --  luaB_assert checks presence separately from truth. An absent
+            --  first argument is a real auxiliary argument error; explicit
+            --  nil still follows the ordinary assertion/message path below.
+            if Arguments.Is_Empty then
+               Diagnostics.Argument_Error (State, 1, "value expected");
+            end if;
             if not Truth (Arg (1)) then
                if Arguments.Length >= 2 then
                   Raise_Value (Self, Arg (2));
