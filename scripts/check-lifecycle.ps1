@@ -2,6 +2,9 @@ param(
     [Parameter(Mandatory)]
     [string] $Interpreter,
     [string] $Oracle = '',
+    [ValidateSet('default','upstream-test')]
+    [string] $Configuration = 'default',
+    [string] $ReferenceLibraryDirectory = '',
     [ValidateRange(1, 900)]
     [int] $TimeoutSeconds = 900,
     [long] $MemoryLimitBytes = 2147483648
@@ -32,6 +35,16 @@ function Invoke-Interpreter {
     foreach ($name in @('LUA_INIT', 'LUA_INIT_5_5', 'LUA_PATH',
                        'LUA_PATH_5_5', 'LUA_CPATH', 'LUA_CPATH_5_5')) {
         [void]$start.Environment.Remove($name)
+    }
+    if ($Configuration -ceq 'upstream-test') {
+        $start.Environment['MEMLIMIT'] = [string]$MemoryLimitBytes
+        $start.Environment['LUA_ADA_CONFORMANCE_ALLOCATOR'] = [string]$MemoryLimitBytes
+    }
+    if ($ReferenceLibraryDirectory -ne '') {
+        foreach ($name in @('PATH','LD_LIBRARY_PATH','DYLD_LIBRARY_PATH')) {
+            $start.Environment[$name] = $ReferenceLibraryDirectory +
+                [IO.Path]::PathSeparator + $start.Environment[$name]
+        }
     }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $start
@@ -145,6 +158,9 @@ try {
     }
     $Interpreter = (Resolve-Path -LiteralPath $Interpreter).Path
     if ($Oracle -eq '') {
+        if ($Configuration -ceq 'upstream-test') {
+            throw 'Instrumented lifecycle requires an explicit matching C oracle'
+        }
         & alr exec -- gprbuild -P experiments/abi/oracle.gpr
         if ($LASTEXITCODE -ne 0) { throw 'C reference interpreter build failed' }
         $Oracle = Join-Path $projectRoot "build/oracle/bin/lua$suffix"
@@ -152,6 +168,23 @@ try {
     $Oracle = (Resolve-Path -LiteralPath $Oracle).Path
     $runRoot = Join-Path $projectRoot ('reports/lifecycle/' + [Guid]::NewGuid().ToString('N'))
     [IO.Directory]::CreateDirectory($runRoot) | Out-Null
+    if ($Configuration -ceq 'upstream-test') {
+        # Product CLI states intentionally omit the private adapter. These
+        # unchanged upstream paths need the real instrumented launchers in
+        # both roles, with matching grammar and allocator configuration.
+        Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
+        foreach ($role in @('ReferenceC','Ada')) {
+            $exe = if ($role -ceq 'ReferenceC') { $Oracle } else { $Interpreter }
+            $probe = Invoke-Interpreter -Executable $exe -Arguments @('--conformance-config') `
+                -Directory $runRoot -OutputPrefix (Join-Path $runRoot ($role+'-configuration'))
+            if ($probe.Code -ne 0 -or $probe.Err.Length -ne 0) {
+                throw "Instrumented lifecycle configuration probe failed: $role"
+            }
+            $observed = $utf8.GetString($probe.Out) | ConvertFrom-Json -AsHashtable
+            [void](Test-ConformanceConfiguration -Observed $observed -Configuration $Configuration `
+                -Target $role -AllocatorLimitBytes $MemoryLimitBytes)
+        }
+    }
     $records = [Collections.Generic.List[object]]::new()
     foreach ($name in $primary) {
         # Each file receives fresh processes and a disposable directory.
@@ -173,10 +206,11 @@ try {
                 throw "Fixture copy changed bytes: $fixture"
             }
         }
-        $expected = Invoke-Interpreter -Executable $Oracle -Directory $directory -OutputPrefix (Join-Path $directory 'c') -Arguments @(
-            '-e', "assert(rawget(_G, 'T') == nil); package.path = './?.lua;./?/init.lua'", $name)
-        $actual = Invoke-Interpreter -Executable $Interpreter -Directory $directory -OutputPrefix (Join-Path $directory 'ada') -Arguments @(
-            '-e', "assert(rawget(_G, 'T') == nil); package.path = './?.lua;./?/init.lua'", $name)
+        $setup = if ($Configuration -ceq 'upstream-test') {
+            "assert(type(T)=='table' and type(T.testC)=='function'); package.path='./?.lua;./?/init.lua'"
+        } else { "assert(rawget(_G, 'T') == nil); package.path = './?.lua;./?/init.lua'" }
+        $expected = Invoke-Interpreter -Executable $Oracle -Directory $directory -OutputPrefix (Join-Path $directory 'c') -Arguments @('-e', $setup, $name)
+        $actual = Invoke-Interpreter -Executable $Interpreter -Directory $directory -OutputPrefix (Join-Path $directory 'ada') -Arguments @('-e', $setup, $name)
         $marker = 'OK'
         Require-Success -Result $expected -Label "C $name" -Marker $marker
         Require-Success -Result $actual -Label "Ada $name" -Marker $marker
@@ -184,12 +218,13 @@ try {
             [Convert]::ToBase64String($actual.Out)) {
             throw "RAW OUTPUT MISMATCH: $name (evidence retained in $directory)"
         }
-        # Exactly two explicit upstream omission messages are expected.
-        # New omission text must fail, never disappear through a skip filter.
+        # Only default coroutine execution permits the two explicit upstream
+        # omissions. Instrumented execution permits none; new omission text
+        # must fail, never disappear through a skip filter.
         $text = $utf8.GetString($actual.Out)
         $omission = ' >>> testC not active: skipping coroutine API tests <<<'
         $count = ([regex]::Matches($text, [regex]::Escape($omission))).Count
-        $expectedCount = if ($name -eq 'coroutine.lua') { 2 } else { 0 }
+        $expectedCount = if ($Configuration -ceq 'default' -and $name -eq 'coroutine.lua') { 2 } else { 0 }
         if ($count -ne $expectedCount) {
             throw "Unexpected upstream omission count: $name ($count)"
         }
@@ -198,18 +233,25 @@ try {
             $_ -match '(?i)skip' -and $_.TrimEnd() -cne $omission
         })
         if ($unexpected.Count -ne 0) { throw 'Unexpected upstream skip output' }
+        if ($Configuration -ceq 'upstream-test' -and $name -ceq 'coroutine.lua') {
+            if ([regex]::Matches($text,'(?m)^testing coroutine API\r?$').Count -ne 2 -or
+                [regex]::Matches($text,'(?m)^testing yields inside hooks\r?$').Count -ne 1) {
+                throw 'Instrumented coroutine API/hook witnesses are incomplete'
+            }
+        }
         $records.Add(@{ File=$name; Revision=$pin; Policy='Lua_Compatible';
             MemoryLimitBytes=$MemoryLimitBytes;
             MemoryMeaning='50ms sampled WorkingSet64 resident process bytes';
             CResidentBytes=$expected.SampledResidentBytes;
             AdaResidentBytes=$actual.SampledResidentBytes;
             TimeoutSeconds=$TimeoutSeconds; Exit=$actual.Code; Mode='standalone';
-            Flags=@(); T='absent'; Result='pass' })
+            Flags=@(); Configuration=$Configuration;
+            T=$(if($Configuration -ceq 'upstream-test'){'present'}else{'absent'}); Result='pass' })
         Write-Output "UPSTREAM PASS: $name (compatible policy; timeout=${TimeoutSeconds}s)"
     }
     [IO.File]::WriteAllText((Join-Path $runRoot 'results.json'),
         (ConvertTo-Json -InputObject @($records) -Depth 4), $utf8)
-    Write-Output 'PASS: two unchanged files; coroutine default configuration with documented T-absent omissions'
+    Write-Output "PASS: two unchanged lifecycle files; configuration=$Configuration; instrumented paths require T and zero omissions"
 }
 finally { Set-Location $originalLocation }
 exit 0

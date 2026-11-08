@@ -71,6 +71,14 @@ The corrected binary harness uses the selected measured configuration and
 retains all ten binary comparisons. Its fresh Windows T component passes all
 22 child processes; current-head CI must still pass all twelve contexts. These
 observations do not close the full target.
+The next T stage revealed that the legacy lifecycle script deliberately selected
+T-absent default grammar. The corrected checkpoint retains that default CLI
+gate and uses actual T-enabled C/Ada launchers for unchanged goto/coroutine.
+It measures both configurations, requires T.testC, retains the 2 GiB ceiling,
+compares raw output and requires both coroutine API sections and the hook
+section with zero omissions. The four Windows T file executions pass, with
+separate measured configuration probes. Independent inspection found no
+blocking defect; planner guards distinguish the mandatory T and default stages.
 The full-target workflow remains manually available and its validators reject
 incomplete receipts, stale approvals and missing global reconciliation. All
 remaining work is retained in the owning backlog and M3 contract.

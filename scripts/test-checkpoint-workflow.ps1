@@ -28,7 +28,10 @@ foreach($context in $plan.contexts){
         [Array]::IndexOf($order,'native-oracle-build') -lt [Array]::IndexOf($order,'canonical-compiler-runtime')) 'Oracle executable must exist before native-dependent consumers'
     Assert ($value.batch_cli_source_cases -eq 79 -and $value.batch_cli_package_probes -eq 2 -and $value.full_cli_processes -eq 112 -and
         -not $value.runtime_build_requested -and -not $value.runtime_acceptance -and -not $value.coverage_authority) 'Planner invented execution/acceptance or altered CLI scope'
-    if($context.configuration -ceq 'upstream-test'){Assert ('real-t-adapter' -cin $value.steps -and 'native-allocator-observer' -cin $value.steps) 'Instrumented context lost actual T gates'}
+    if($context.configuration -ceq 'upstream-test'){
+        Assert ('real-t-adapter' -cin $value.steps -and 'native-allocator-observer' -cin $value.steps -and
+            'lifecycle-t-goto-coroutine' -cin $value.steps -and 'lifecycle-default-cli' -cnotin $value.steps) 'Instrumented context lost actual T gates'
+    }else{Assert ('lifecycle-default-cli' -cin $value.steps -and 'lifecycle-t-goto-coroutine' -cnotin $value.steps) 'Default CLI lifecycle gate was replaced'}
 }
 $count++;Write-Output 'CHECKPOINT GUARD PASS: all12 plans retain the required strict compiled and paired gates'
 $output=Join-Path $temporary 'github-output'
