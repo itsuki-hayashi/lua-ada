@@ -100,7 +100,9 @@ the buffer witness does not access or certify native T lock storage.
 campaign measures both executable handshakes and supplies the matching semantic
 stack limit (1,000,000 default or 68,000 instrumented). `stack_inspection.lua`
 is mandatory in that instrumented campaign with a real T table and all four
-ordered operation markers. Neither file can become a default T-absent pass.
+ordered operation markers. `primitive_not_refusal.lua` also requires real T;
+its six actual scalar/operator cases run through the native and Ada allocator
+controls. None of these configured files becomes a default T-absent pass.
 `check.ps1` records the default pair before `compare.ps1` consumes its receipt;
 `check-instrumented.ps1` records both instrumented pairs. The generic default
 comparison requires the dedicated report and its Ada runner explicitly. Raw
@@ -112,6 +114,12 @@ image captures it and its raw sidecars as a fifth mandatory build witness;
 final replay checks its revision/context and every executable, runtime library
 and capture against the frozen file identities. A build log or matching final
 marker cannot replace the configured process set.
+
+The image transport permits source-shaped evidence only at the exact generated
+native-module fixture C paths and stdin source fixture path under a unique
+`reports/core-image/` run. Their native-fixture and file-IO consumers retain
+independent source/hash/operation checks. Implementation/reference trees and
+all other source-shaped image destinations remain forbidden.
 
 ## Candidate anchors and manual coverage
 

@@ -56,6 +56,13 @@ if($baseline.configuration -ceq 'upstream-test'){
         $p=(Row $r stack-inspection).process
         Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS: stack inspection 4`n",''))
     } 'complete ordered protocol'
+    Case 'scalar NOT allocation refusal needs its actual paired T processes' {param($r)
+        $r.processes=@($r.processes|Where-Object operation -CNE primitive-not-refusal)
+    } 'process set is incomplete'
+    Case 'scalar NOT completion cannot omit a real false or nil operation' {param($r)
+        $p=(Row $r primitive-not-refusal).process
+        Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS: primitive NOT nil`n",''))
+    } 'complete ordered protocol'
 }
 $origin=$root.Replace('\','/').TrimEnd('/')+'/'
 if(-not $baseline.repository_dirty -and @($baseline.runtimes|Where-Object{

@@ -88,8 +88,8 @@ try {
         # These are configured witnesses, not default T-absent successes.
         # The default portal pair has already run with measured matching stack
         # limits. The real-T file is mandatory in check-instrumented.ps1.
-        if($script.Name -ceq 'stack_inspection.lua'){
-            Write-Output 'CONFIGURED T REQUIRED: stack_inspection.lua (mandatory instrumented campaign; no default observation)'
+        if($script.Name -cin @('stack_inspection.lua','primitive_not_refusal.lua')){
+            Write-Output "CONFIGURED T REQUIRED: $($script.Name) (mandatory instrumented campaign; no default observation)"
             continue
         }
         if($script.Name -ceq 'coroutine_result_portal.lua' -and -not $OracleOnly){

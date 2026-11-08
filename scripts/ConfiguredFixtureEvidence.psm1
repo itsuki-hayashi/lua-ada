@@ -17,6 +17,11 @@ function Get-ConfiguredFixtureDefinitions {
             setup="$guard;print('CONFIGURED-FIXTURE: real T stack inspection')";
             stdout="CONFIGURED-FIXTURE: real T stack inspection`n"+
                 ((1..4|ForEach-Object{"PASS: stack inspection $_"})-join "`n")+"`n"}
+        $definitions+=@{id='primitive-not-refusal';source='tests/lua/primitive_not_refusal.lua';
+            setup="$guard;assert(type(T.alloccount)=='function');print('CONFIGURED-FIXTURE: real T scalar NOT refusal')";
+            stdout="CONFIGURED-FIXTURE: real T scalar NOT refusal`n"+
+                ((@('false','nil','zero','empty string','table','function')|ForEach-Object{"PASS: primitive NOT $_"})-join "`n")+
+                "`nPASS: scalar NOT under refusal`n"}
     }
     return $definitions
 }
@@ -27,7 +32,7 @@ function Get-ConfiguredFixtureSources {
     # Keep both: a freshly copied source hash cannot certify a stale binary.
     return @('scripts/ConfiguredFixtureEvidence.psm1','scripts/check-configured-fixtures.ps1',
         'scripts/ConformanceRunner.psm1','scripts/ManagedTelemetry.psm1',
-        'tests/lua/coroutine_result_portal.lua','tests/lua/stack_inspection.lua',
+        'tests/lua/coroutine_result_portal.lua','tests/lua/stack_inspection.lua','tests/lua/primitive_not_refusal.lua',
         ('src/configurations/'+$Configuration+'/lua-runtime_configuration.ads'),
         'references/lua/llimits.h','references/lua/ltests.h','references/lua/luaconf.h',
         'experiments/conformance/reference.gpr','experiments/conformance/c/conformance_cli.c',
