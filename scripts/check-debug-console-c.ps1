@@ -104,6 +104,11 @@ if($Configuration -ceq 'upstream-test'){
 if($IsWindows){$compileArguments+='-DLUA_BUILD_AS_DLL'}
 elseif($IsMacOS){$compileArguments+='-DLUA_USE_MACOSX'}
 else{$compileArguments+='-DLUA_USE_LINUX'}
+if(-not $IsWindows){
+    # The actual T constructor takes &l_memcontrol from the shared oracle.
+    # Resolve data through the GOT, avoiding an executable copy relocation.
+    $compileArguments+='-fPIC'
+}
 $compileArguments+=@(('-I'+(Join-Path $sourceRoot 'references/lua')),
     (Join-Path $sourceRoot 'c_api/tests/builtin_api_contract.c'),
     ('-L'+$nativeImage),'-lconformance_lua','-lm','-o',$nativeExecutable)
