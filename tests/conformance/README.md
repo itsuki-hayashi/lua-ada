@@ -393,6 +393,15 @@ git notes --ref=expanded-t-conformance show <tested-pr-head>
 
 Full M3 completion remains false even after this bounded scope is accepted.
 
+The foreign C consumer's native T allocator lock restricts public reentry from
+the payload allocator in hook case24. Paired T processes explicitly select
+`--without-release-reentry` and record that native case as omitted, with no
+passing claim for it. A separate complete Ada process in the same executable
+is mandatory in T contexts. Default native/Ada captures retain the full case.
+The verifier reads the hook maximum from the source-bound driver, so later
+cases after24 remain required in both paired and complete processes. This
+operation protocol is separate from any source-exclusion decision.
+
 Current AUnit collection selects `tests/alire.toml` by running `alr exec` from
 the nested test directory. Its inherited-environment child launches the actual
 test runner and sibling configuration probe from the repository root, matching

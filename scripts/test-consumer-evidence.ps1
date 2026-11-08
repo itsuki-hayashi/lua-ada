@@ -2,6 +2,7 @@ param()
 $ErrorActionPreference = 'Stop'
 Import-Module "$PSScriptRoot/ConsumerEvidence.psm1" -Force
 Import-Module "$PSScriptRoot/SdkMacroEvidence.psm1"
+Import-Module "$PSScriptRoot/ForeignContractEvidence.psm1"
 $root = Split-Path -Parent $PSScriptRoot
 $directory = Join-Path $root ('reports/consumer-evidence-selftest/' + [guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($directory)
@@ -36,12 +37,37 @@ $resolve = {param($path,$expected)
     return $path
 }
 $count = 0
+function Set-SyntheticForeignProtocol($Report){
+    # Target-only fixtures must model the complete newly required physical
+    # operation protocol too; legacy tests retain their original miniature
+    # marker contract. These are fabricated captures, never API execution.
+    $t=$Report.configuration -ceq 'upstream-test';$skip=if($t){1}else{0}
+    $arguments=@();$omitted=@();if($t){$arguments=@('--without-release-reentry');$omitted=@('foreign-hook-24')}
+    $Report.foreign_contract.hook_case_maximum=26;$Report.foreign_contract.matched_cases=59-$skip
+    $Report.foreign_contract.skipped_native_lock_cases=$skip;$Report.foreign_contract.native_omitted_cases=$omitted
+    $Report.foreign_contract.ada_full_consumer=if($t){'foreign-full-api'}else{'foreign-api'}
+    $paired=@($Report.consumers|Where-Object name -CEQ foreign-api)[0]
+    $paired.executable='synthetic-foreign-driver'
+    if($t){$full=$paired.Clone();$full.name='foreign-full-api';$full.arguments=@();$Report.consumers+=$full}
+    foreach($record in @($Report.consumers|Where-Object name -CIn @('foreign-api','foreign-oracle','foreign-full-api'))){
+        $record.executable='synthetic-foreign-driver';$record.arguments=$arguments
+        if($record.name -ceq 'foreign-full-api'){$record.arguments=@()}
+        Replace-Capture $Report $record.name stdout (Get-ForeignContractOutput -HookMaximum 26 `
+            -WithoutPrivateLockReentry:($t -and $record.name -cne 'foreign-full-api'))
+    }
+}
 function Run-Case([string]$Name,[scriptblock]$Mutation,[string]$Expected,[switch]$Foreign,[switch]$Format,[string[]]$Additional=@(),[switch]$RemainingTarget) {
     $report = $baseline | ConvertTo-Json -Depth 16 | ConvertFrom-Json -AsHashtable
     & $Mutation $report
+    $activeMapping=$mapping;$hookMaximum=0
+    if($RemainingTarget -and $Foreign){
+        Set-SyntheticForeignProtocol $report;$hookMaximum=26
+        $activeMapping=$mapping|ConvertTo-Json -Depth 16|ConvertFrom-Json -AsHashtable -Depth 16
+        foreach($case in @($activeMapping.cases|Where-Object consumer -CEQ foreign-api)){$case.exact_witnesses=@('PASS: foreign-hook-1')}
+    }
     $failure = $null
-    try { $null = Test-NamedConsumerEvidence $report $mapping $revision $context $resolve -RequireForeignContract:$Foreign -RequireFormatContract:$Format -AdditionalContracts $Additional `
-        -TargetPolicy $(if($RemainingTarget){'remaining-upstream-compatibility'}else{''}) }
+    try { $null = Test-NamedConsumerEvidence $report $activeMapping $revision $context $resolve -RequireForeignContract:$Foreign -RequireFormatContract:$Format -AdditionalContracts $Additional `
+        -TargetPolicy $(if($RemainingTarget){'remaining-upstream-compatibility'}else{''}) -ForeignHookMaximum $hookMaximum }
     catch { $failure = $_.Exception.Message }
     if (($Expected -eq '' -and $null -ne $failure) -or
         ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))) {

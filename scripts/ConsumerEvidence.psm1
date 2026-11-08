@@ -2,6 +2,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'FileConsumerIO.psm1')
 Import-Module (Join-Path $PSScriptRoot 'SdkMacroEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ForeignContractEvidence.psm1')
 
 function Test-NamedConsumerEvidence {
     param([Collections.IDictionary] $Report,
@@ -12,7 +13,8 @@ function Test-NamedConsumerEvidence {
           [switch] $RequireFormatContract,
           [ValidateSet('format','value','auxiliary','load-dump','debug','builtin','traceback','external','conversion','operator','index-type','base-closing','native-module','buffer','buffer-private-t','allocator','substitution','loadfile','pointer-identity','concat','thread-reset','macro','macro-compat')]
           [string[]] $AdditionalContracts=@(),
-          [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy='')
+          [ValidateSet('','remaining-upstream-compatibility')][string] $TargetPolicy='',
+          [int] $ForeignHookMaximum=0)
     # This replay checks actual observations, not review authority. Its caller
     # must bind the mapping and report to independently reviewed artifacts.
     $parts = $Context.Split('/')
@@ -87,6 +89,10 @@ function Test-NamedConsumerEvidence {
         if ($outputs["$kind-api"].hash -cne $outputs["$kind-oracle"].hash) {
             throw "Named consumer oracle bytes differ: $kind"
         }
+    }
+    if($RequireForeignContract -and $TargetPolicy -ceq 'remaining-upstream-compatibility'){
+        if($ForeignHookMaximum -lt 24){throw 'Target foreign operation maximum must be bound to actual driver source'}
+        Assert-ForeignContractEvidence -Report $Report -Context $Context -HookMaximum $ForeignHookMaximum -ResolveCapture $ResolveCapture
     }
     if('external' -cin $additional){
         # The five release-callback reentry cases are deliberately absent

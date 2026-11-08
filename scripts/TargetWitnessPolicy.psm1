@@ -4,6 +4,7 @@ Import-Module (Join-Path $PSScriptRoot 'ConformanceReview.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConsumerEvidence.psm1')
 Import-Module (Join-Path $PSScriptRoot 'AUnitEvidence.psm1')
 Import-Module (Join-Path $PSScriptRoot 'HeaderDeclarationProbes.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ForeignContractEvidence.psm1')
 
 function Read-TargetWitnessJson {
     param([string] $Root,[Collections.IDictionary] $Identity)
@@ -331,7 +332,8 @@ function Test-TargetNamedContextEvidence {
         }
     }}
     $c = Test-NamedConsumerEvidence -Report $consumer -Mapping $Policy.consumer -Revision $Revision -Context $Context `
-        -ResolveCapture $resolve -RequireForeignContract -AdditionalContracts $additional -TargetPolicy remaining-upstream-compatibility
+        -ResolveCapture $resolve -RequireForeignContract -AdditionalContracts $additional -TargetPolicy remaining-upstream-compatibility `
+        -ForeignHookMaximum (Get-ForeignContractHookMaximum -Root $Root)
     $activeArtifactRoot = $AUnitArtifactRoot
     $a = Test-NamedAUnitEvidence -Report $unit -Mapping $Policy.aunit -Revision $Revision -Context $Context -ResolveCapture $resolve `
         -RequireLaunchContext -Root $Root

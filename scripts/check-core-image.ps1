@@ -29,7 +29,12 @@ Import-Module (Join-Path $PSScriptRoot 'PEUnwind.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'NativeLuaFixtures.psm1')
 Import-Module (Join-Path $PSScriptRoot 'FileConsumerIO.psm1')
 Import-Module (Join-Path $PSScriptRoot 'SdkMacroEvidence.psm1')
+Import-Module (Join-Path $PSScriptRoot 'ForeignContractEvidence.psm1')
 $referenceCompilerDefines=if($IsWindows){@('-DLUA_BUILD_AS_DLL')}else{@()}
+$foreignHookMaximum=Get-ForeignContractHookMaximum -Root $projectRoot
+$foreignPrivateLockMode=$Configuration -ceq 'upstream-test'
+$foreignArguments=@()
+if($foreignPrivateLockMode){$foreignArguments=@('--without-release-reentry')}
 
 function Invoke-NativeModuleConsumer {
     param([string] $Name,[string] $Executable,[string] $Implementation,[string] $RuntimePath,[string] $Compiler)
@@ -197,7 +202,15 @@ try {
     Invoke-Consumer 'c-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/c_api_consumer$suffix") 'PASS: real Ada C API bootstrap consumer'
     Invoke-Consumer 'gc-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/gc_api_contract$suffix") 'PASS: public GC contract'
     Invoke-Consumer 'io-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/io_api_contract$suffix") 'PASS: public IO/OS contract'
-    Invoke-Consumer 'foreign-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/foreign_api_contract$suffix") 'PASS: public foreign contract'
+    $foreignConsumer=Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/foreign_api_contract$suffix"
+    Invoke-Consumer 'foreign-api' $foreignConsumer 'PASS: public foreign contract' $foreignArguments
+    if($foreignPrivateLockMode){
+        # The native T provider's private lock forbids allocator API reentry.
+        # Pair that explicit mode separately, then require the complete Ada
+        # public operation sequence in the same executable, including case24
+        # and every subsequently registered operation after that case.
+        Invoke-Consumer 'foreign-full-api' $foreignConsumer 'PASS: public foreign contract'
+    }
     Invoke-Consumer 'load-dump-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/load_dump_api_contract$suffix") 'PASS: public reader/writer contract'
     Invoke-Consumer 'debug-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/debug_api_contract$suffix") 'PASS: public debug contract'
     Invoke-Consumer 'traceback-api' (Join-Path $projectRoot "build/c-api/bin/$configurationPart$Profile/$LibraryType/traceback_api_contract$suffix") 'PASS: public traceback contract'
@@ -396,7 +409,7 @@ try {
         $env:DYLD_LIBRARY_PATH = $referenceDirectory + [IO.Path]::PathSeparator + $env:DYLD_LIBRARY_PATH
         Invoke-Consumer 'gc-oracle' $referenceConsumer 'PASS: public GC contract'
         Invoke-Consumer 'io-oracle' $referenceIOConsumer 'PASS: public IO/OS contract'
-        Invoke-Consumer 'foreign-oracle' $referenceForeignConsumer 'PASS: public foreign contract'
+        Invoke-Consumer 'foreign-oracle' $referenceForeignConsumer 'PASS: public foreign contract' $foreignArguments
         Invoke-Consumer 'load-dump-oracle' $referenceLoadDumpConsumer 'PASS: public reader/writer contract'
         Invoke-Consumer 'debug-oracle' $referenceDebugConsumer 'PASS: public debug contract'
         Invoke-Consumer 'traceback-oracle' $referenceTracebackConsumer 'PASS: public traceback contract'
@@ -685,6 +698,10 @@ try {
         io_contract = [ordered]@{ matching_output=$true; sources=$ioContractSources;
             reference_library_files=$referenceLibraries };
         foreign_contract = [ordered]@{ matching_output=$true; sources=$foreignContractSources;
+            hook_case_maximum=$foreignHookMaximum;matched_cases=(25+$foreignHookMaximum-1+5+4-$(if($foreignPrivateLockMode){1}else{0}));
+            skipped_native_lock_cases=$(if($foreignPrivateLockMode){1}else{0});
+            native_omitted_cases=@(if($foreignPrivateLockMode){'foreign-hook-24'});
+            ada_full_consumer=$(if($foreignPrivateLockMode){'foreign-full-api'}else{'foreign-api'});
             reference_library_files=$referenceLibraries };
         load_dump_contract = [ordered]@{ matching_output=$true; sources=$loadDumpContractSources;
             reference_library_files=$referenceLibraries };
@@ -726,6 +743,13 @@ try {
         value_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$valueSources;reference_library_files=$referenceLibraries}}else{$null});
         auxiliary_contract=$(if($TargetPolicy -ne ''){@{matching_output=$true;sources=$auxiliarySources;platform_defines=$platformDefines;reference_library_files=$referenceLibraries}}else{$null}) } | ConvertTo-Json -Depth 32 |
         Set-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Encoding utf8
+    $foreignReport=Get-Content -LiteralPath (Join-Path $reportDirectory 'result.json') -Raw|ConvertFrom-Json -AsHashtable -Depth 32
+    $foreignCapture={param($path,$hash)
+        if((Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant() -cne $hash){throw 'Foreign actual capture hash differs'}
+        return $path
+    }
+    $foreignContext="$Configuration/$(if($IsWindows){'windows'}elseif($IsMacOS){'macos'}else{'linux'})/$Profile/$(if($LibraryType -ceq 'relocatable'){'shared'}else{$LibraryType})"
+    Assert-ForeignContractEvidence -Report $foreignReport -Context $foreignContext -HookMaximum $foreignHookMaximum -ResolveCapture $foreignCapture
     Write-Output 'PASS: one production interpreter image; Ada/C state, pool, allocator and startup checks'
 }
 finally {

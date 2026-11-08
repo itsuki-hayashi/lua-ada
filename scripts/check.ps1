@@ -55,6 +55,7 @@ try {
     & (Join-Path $PSScriptRoot 'test-pe-unwind.ps1')
     & (Join-Path $PSScriptRoot 'test-aunit-launch.ps1')
     & (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')
+    & (Join-Path $PSScriptRoot 'test-foreign-contract-evidence.ps1')
     Invoke-Alire -Arguments @('-n', 'build', $profileArgument, '--', $scenario, '-XLUA_ADA_PREBUILT=false')
     $coreArguments=@('exec', '--', 'pwsh', '-NoProfile', '-File',
         (Join-Path $PSScriptRoot 'check-core-image.ps1'),

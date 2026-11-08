@@ -35,6 +35,7 @@ function Invoke-CheckedAlire([string[]] $Arguments) {
 
 & (Join-Path $PSScriptRoot 'test-aunit-launch.ps1')
 & (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')
+& (Join-Path $PSScriptRoot 'test-foreign-contract-evidence.ps1')
 
 function Invoke-ObservedProcess {
     param([string] $Name, [string] $Executable, [string[]] $Arguments,
