@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "kind": "source-binding-successor-graph-author-proposal",
+  "id": "api18-parser-status-lower-graph",
+  "target": "remaining-upstream-compatibility",
+  "author": "Codex /root/validation_delivery",
+  "independent_reviewer": null,
+  "review_status": "pending-independent-review",
+  "authority_installation": false,
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "execution_evidence": [],
+  "source_snapshot": {
+    "header_commit": "f8d8f0275084e0039c27e597a64430db404bf20c",
+    "repository_revision": "e40c8475789c381bf59587c3ed6349b6e13db587",
+    "runtime_pool_wip_included": false,
+    "feature_review_commit": "e40c8475789c381bf59587c3ed6349b6e13db587"
+  },
+  "accepted_feature_input": {
+    "sha256": "ddf0e8cd59e985eb0a280cd20498d80678d697e064718b970d9a70e871b7c064",
+    "scope": "accepted-feature-only; independently authored Root decision, not transformation/policy/runtime approval",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-feature-review.json"
+  },
+  "prior_graph": {
+    "sha256": "338a8f525b94a887e61fdc8850a1aa3959209677c4e31238c4a3ed6fb2a031df",
+    "path": "tests/conformance/targets/remaining-upstream-compatibility/api18-parser-status-binding-refresh.author-proposal.json"
+  },
+  "nodes": [
+    {
+      "id": "successor-exclusion-approval",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.exclusion-approval.json",
+      "current_sha256": "ca513dc6dbd79ead0ea56b19fda23de9bc6596746893c7442837fc87717113b9",
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-exclusion-approval.json",
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "dependencies": [
+        "accepted-feature-input"
+      ],
+      "requested_updates": [
+        {
+          "pointer": "/review_evidence",
+          "proposed_value": {
+            "sha256": "ddf0e8cd59e985eb0a280cd20498d80678d697e064718b970d9a70e871b7c064",
+            "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-feature-review.json"
+          }
+        },
+        {
+          "pointer": "/reviewer",
+          "proposed_value": null
+        },
+        {
+          "pointer": "/decision",
+          "proposed_value": "pending-independent-review"
+        }
+      ],
+      "independent_review_questions": [
+        "Reinspect the exact private18 eligibility and retained mixed parent against the new independently reviewed header.",
+        "Issue a fresh distinct reviewer decision; the prior accepted exclusion payload is historical input only."
+      ]
+    },
+    {
+      "id": "live-exclusion-policy",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+      "current_sha256": "c197e57cb129f0378b6d108c0807423a5577f4fc47cb107272d9caccfbed79ff",
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility.exclusions.json",
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "dependencies": [
+        "successor-exclusion-approval"
+      ],
+      "requested_updates": [
+        {
+          "pointer": "/exclusions/0/review/artifact",
+          "proposed_value": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-exclusion-approval.json"
+        },
+        {
+          "pointer": "/exclusions/0/review/artifact_sha256",
+          "proposed_value": null
+        }
+      ],
+      "independent_review_questions": [
+        "Verify the entire policy, protected scopes and exact child9001 are otherwise identical; no additional exclusions or evidence appear.",
+        "Install only after the new approval exists and its exact bytes are hashed."
+      ]
+    },
+    {
+      "id": "successor-transform-narrative",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.independent-transform-review.json",
+      "current_sha256": "4979c55ef9036249a1817835a71e40bd49f62210d17df6e204b3b8845c86247d",
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-transform-review.json",
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "dependencies": [
+        "accepted-feature-input",
+        "live-exclusion-policy"
+      ],
+      "requested_updates": [
+        {
+          "pointer": "/feature_review",
+          "proposed_value": {
+            "sha256": "ddf0e8cd59e985eb0a280cd20498d80678d697e064718b970d9a70e871b7c064",
+            "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-feature-review.json"
+          }
+        },
+        {
+          "pointer": "/reviewer",
+          "proposed_value": null
+        },
+        {
+          "pointer": "/decision",
+          "proposed_value": "pending-independent-review"
+        }
+      ],
+      "independent_review_questions": [
+        "Independently reconstruct the exact18-byte removal and verify every other source byte, original positive growth/public behavior and output51389... remain.",
+        "Reaffirm exact transformation only; do not inherit the old narrative decision or grant parent/runtime acceptance."
+      ]
+    },
+    {
+      "id": "successor-transform-approval",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.transform-approval.json",
+      "current_sha256": "0c756a649ecc78a6e3b2490e35a06361ced41abb5fe7373f5214e63f5969aaef",
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-transform-approval.json",
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "dependencies": [
+        "live-exclusion-policy",
+        "successor-transform-narrative"
+      ],
+      "requested_updates": [
+        {
+          "pointer": "/transform/exclusion_policy_sha256",
+          "proposed_value": null
+        },
+        {
+          "pointer": "/review_evidence",
+          "proposed_value": {
+            "sha256": null,
+            "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-transform-review.json"
+          }
+        },
+        {
+          "pointer": "/reviewer",
+          "proposed_value": null
+        },
+        {
+          "pointer": "/decision",
+          "proposed_value": "pending-independent-review"
+        }
+      ],
+      "independent_review_questions": [
+        "Bind newly reviewed policy/narrative identities and freshly decided exact operation; all prior per-operation accepted decisions are historical, not inherited.",
+        "Reject any altered replacement, wider span, public assertion removal, default or ReferenceC applicability."
+      ]
+    },
+    {
+      "id": "live-private18-transform",
+      "current_path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.json",
+      "current_sha256": "f3e8a7e08239fed7c2f60c97add449d22e569e9252622196119bb2fc34c90f27",
+      "proposed_path": "tests/conformance/targets/remaining-upstream-compatibility/api-fixed-buffer-private-bound.transform.json",
+      "successor_sha256": null,
+      "independent_reviewer": null,
+      "review_status": "pending-independent-review",
+      "dependencies": [
+        "accepted-feature-input",
+        "live-exclusion-policy",
+        "successor-transform-approval"
+      ],
+      "requested_updates": [
+        {
+          "pointer": "/source_feature_review",
+          "proposed_value": {
+            "sha256": "ddf0e8cd59e985eb0a280cd20498d80678d697e064718b970d9a70e871b7c064",
+            "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-feature-review.json"
+          }
+        },
+        {
+          "pointer": "/exclusion_policy_sha256",
+          "proposed_value": null
+        },
+        {
+          "pointer": "/review/artifact",
+          "proposed_value": "tests/conformance/targets/remaining-upstream-compatibility/reviews/api-fixed-buffer-private-bound.parser-status-transform-approval.json"
+        },
+        {
+          "pointer": "/review/artifact_sha256",
+          "proposed_value": null
+        }
+      ],
+      "independent_review_questions": [
+        "Recompute transitive hashes in dependency order only after independent approval; preserve the dated original author_proposal binding.",
+        "Do not refresh the API941/composite graph, source selection or runtime evidence as part of this installation."
+      ]
+    }
+  ],
+  "preserved_exact_claims": {
+    "output_sha256": "51389bf3404ab2f13ae88a8cc3f88e7188ac0639f77b7871f4c9baf1830492bc",
+    "configuration": "upstream-test",
+    "removed_bytes": " and m2 - m1 < 400",
+    "start_byte": 17053,
+    "retained_pending_parents": [
+      "LUA-API-ASSERT-CALL-0125",
+      "LUA-API-ASSERT-CALL-0195"
+    ],
+    "source": "references/lua/testes/api.lua",
+    "length_bytes": 18,
+    "exclusion_id": "LUA-API-REVIEWED-BLOCK-9001",
+    "source_span_sha256": "f89400b75cf254feed3cc991449a9e7bc1679e6cd9b5b6be1b6598dfa176bf55",
+    "source_sha256": "1601abc0d700cba2240c123afd513c2bb638e378b7cf11470edbbac8291efce0",
+    "replacement": ""
+  },
+  "composition": {
+    "reasons": [
+      "API941 Hook_Engine counterpart drift needs separate source-semantic review.",
+      "Future committed pool/adapter/Engine changes require separately captured author proposals.",
+      "No composition approval, selector hash or accepted artifact is renewed by this lower graph."
+    ],
+    "approval_inherited": false,
+    "status": "blocked-separately",
+    "proposed_changes": []
+  },
+  "preservation_rules": [
+    "Every node is a requested future action, never an executable approval or accepted payload.",
+    "Successor reviewer, decision, artifact hash and policy hash remain unset until distinct independent review.",
+    "Preserve all historical accepted artifacts, author proposals, dated observations, protected scope identities and source/API ledgers.",
+    "Only after Root exact re-review may current live policy/manifest bindings be installed coherently.",
+    "Renewed source authority confers no parent/file/runtime/global acceptance; fresh actual operation contracts and observations remain mandatory."
+  ]
+}
