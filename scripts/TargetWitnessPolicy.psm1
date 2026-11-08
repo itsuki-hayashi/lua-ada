@@ -333,7 +333,8 @@ function Test-TargetNamedContextEvidence {
     $c = Test-NamedConsumerEvidence -Report $consumer -Mapping $Policy.consumer -Revision $Revision -Context $Context `
         -ResolveCapture $resolve -RequireForeignContract -AdditionalContracts $additional -TargetPolicy remaining-upstream-compatibility
     $activeArtifactRoot = $AUnitArtifactRoot
-    $a = Test-NamedAUnitEvidence -Report $unit -Mapping $Policy.aunit -Revision $Revision -Context $Context -ResolveCapture $resolve
+    $a = Test-NamedAUnitEvidence -Report $unit -Mapping $Policy.aunit -Revision $Revision -Context $Context -ResolveCapture $resolve `
+        -RequireLaunchContext -Root $Root
     foreach ($library in $unit.library_files) {
         if (@($consumer.library_files | Where-Object { $_.file -ceq $library.file -and $_.sha256 -ceq $library.sha256 }).Count -ne 1) {
             throw 'Target named C and AUnit runtime images differ'

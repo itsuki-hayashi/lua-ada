@@ -1,5 +1,6 @@
 param()
 $ErrorActionPreference = 'Stop'
+$root=Split-Path -Parent $PSScriptRoot
 Import-Module "$PSScriptRoot/AUnitEvidence.psm1" -Force
 $directory = Join-Path (Split-Path -Parent $PSScriptRoot) ('reports/aunit-evidence-selftest/' + [guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($directory)
@@ -29,11 +30,12 @@ $resolve={param($path,$expected)
 }
 $count=0
 $context='default/windows/validation/static'
+$requireLaunchContext=$false
 function Run-Case($Name,$Mutation,$Expected) {
     $r=$baseline | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashtable
     & $Mutation $r
     $failure=$null
-    try{$null=Test-NamedAUnitEvidence $r $mapping $revision $context $resolve}
+    try{$null=Test-NamedAUnitEvidence $r $mapping $revision $context $resolve -RequireLaunchContext:$requireLaunchContext -Root $root}
     catch{$failure=$_.Exception.Message}
     if(($Expected -eq '' -and $null -ne $failure) -or
         ($Expected -ne '' -and ($null -eq $failure -or $failure -notmatch $Expected))){throw "$Name failed: $failure"}
@@ -84,4 +86,54 @@ Run-Case 'current source warning rejects a different source name' {param($r)
 } 'warning differs'
 $mapping.expected_stderr=''
 Run-Case 'empty expected warning cannot suppress stderr verification' {} 'empty or invalid'
+$mapping.Remove('expected_stderr')
+$requireLaunchContext=$true
+Run-Case 'full target cannot reuse a historical report lacking launch context' {} 'lacks bound launch context'
+# These receipts are fabricated protocol fixtures. No Alire, compiler, Ada
+# test or accepted build observation is produced by the replay tests below.
+$baseline.schema_version=2;$baseline.repository_root='C:/captured/lua-ada'
+$baseline.executable='C:/captured/lua-ada/tests/bin/static/test_runner.exe'
+$baseline.configuration_probe.executable='C:/captured/lua-ada/tests/bin/static/lua-configuration_probe.exe'
+function New-LaunchCapture($Executable) {
+    $value=@{schema_version=1;kind='aunit-process-launch';repository_root='C:/captured/lua-ada';
+        selected_environment_directory='C:/captured/lua-ada/tests';observed_environment_directory='C:/captured/lua-ada/tests';
+        working_directory='C:/captured/lua-ada';executable=$Executable;executable_sha256=$hash;
+        arguments=@();process_id=123;completed=$true;exit_code=0;runtime_acceptance=$false;coverage_authority=$false;
+        source_bindings=@(foreach($path in @('scripts/AUnitLaunch.psm1','scripts/run-aunit-in-context.ps1')){
+            @{path=$path;sha256=(Get-FileHash -LiteralPath (Join-Path $root $path)).Hash.ToLowerInvariant()}
+        })}
+    $capture=Capture (ConvertTo-Json -InputObject $value -Depth 12)
+    return @{path=$capture.path;sha256=$capture.hash}
+}
+$baseline.launch_receipt=New-LaunchCapture $baseline.executable
+$baseline.configuration_probe.launch_receipt=New-LaunchCapture $baseline.configuration_probe.executable
+function Mutate-Launch($Report,[string]$Kind,[scriptblock]$Mutation) {
+    $child=if($Kind -ceq 'probe'){$Report.configuration_probe}else{$Report}
+    $value=Get-Content -LiteralPath $child.launch_receipt.path -Raw|ConvertFrom-Json -AsHashtable -Depth 12
+    &$Mutation $value
+    $capture=Capture (ConvertTo-Json -InputObject $value -Depth 12)
+    $child.launch_receipt=@{path=$capture.path;sha256=$capture.hash}
+}
+Run-Case 'full target validates both bound launch receipts across captured path spellings' {} ''
+Run-Case 'full target rejects a missing main process receipt' {param($r)$r.Remove('launch_receipt')} 'lacks bound launch context'
+Run-Case 'full target rejects a missing configuration process receipt' {param($r)$r.configuration_probe.Remove('launch_receipt')} 'lacks bound launch context'
+Run-Case 'full target rejects the actual regression nested executable CWD' {param($r)
+    Mutate-Launch $r main {param($v)$v.working_directory='C:/captured/lua-ada/tests'}
+} 'directory differs'
+Run-Case 'full target rejects a root environment for the configuration probe' {param($r)
+    Mutate-Launch $r probe {param($v)$v.observed_environment_directory='C:/captured/lua-ada'}
+} 'directory differs'
+Run-Case 'full target rejects a receipt for another executable' {param($r)
+    Mutate-Launch $r main {param($v)$v.executable_sha256='0'*64}
+} 'process identity'
+Run-Case 'full target rejects stale launcher source' {param($r)
+    Mutate-Launch $r main {param($v)$v.source_bindings[0].sha256='0'*64}
+} 'source binding differs'
+Run-Case 'full target rejects extra runner arguments' {param($r)
+    Mutate-Launch $r main {param($v)$v.arguments=@('--skip-fixtures')}
+} 'arguments or completion differs'
+Run-Case 'full target rejects a test executable from another library path' {param($r)
+    $r.executable=$r.executable.Replace('/static/','/relocatable/')
+} 'selected build path'
+Run-Case 'full target rejects tampered launch receipt bytes' {param($r)$r.launch_receipt.sha256='0'*64} 'capture hash mismatch'
 Write-Output "PASS: $count AUnit evidence regressions; synthetic observations only"

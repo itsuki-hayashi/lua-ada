@@ -33,6 +33,9 @@ function Invoke-CheckedAlire([string[]] $Arguments) {
     if ($LASTEXITCODE -ne 0) { throw "Alire failed: $Arguments" }
 }
 
+& (Join-Path $PSScriptRoot 'test-aunit-launch.ps1')
+& (Join-Path $PSScriptRoot 'test-aunit-evidence.ps1')
+
 function Invoke-ObservedProcess {
     param([string] $Name, [string] $Executable, [string[]] $Arguments,
         [string] $Directory, [string] $Witness, [switch] $Shutdown,

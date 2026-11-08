@@ -1,9 +1,11 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path $PSScriptRoot 'AUnitLaunch.psm1')
 
 function Test-NamedAUnitEvidence {
     param([Collections.IDictionary] $Report, [Collections.IDictionary] $Mapping,
-          [string] $Revision, [string] $Context, [scriptblock] $ResolveCapture)
+          [string] $Revision, [string] $Context, [scriptblock] $ResolveCapture,
+          [switch] $RequireLaunchContext, [string] $Root = '')
     $parts = $Context.Split('/')
     $libraryType = if ($parts.Count -eq 4 -and $parts[3] -eq 'shared') { 'relocatable' } elseif ($parts.Count -eq 4) { $parts[3] } else { '' }
     if ($parts.Count -ne 4 -or $Report.repository_revision -cne $Revision -or
@@ -18,6 +20,25 @@ function Test-NamedAUnitEvidence {
         if ($library.sha256 -cnotmatch '^[0-9a-f]{64}$') { throw 'AUnit library hash invalid' }
     }
     $probe = $Report.configuration_probe
+    if ($RequireLaunchContext) {
+        if ($Root -eq '' -or -not $Report.Contains('schema_version') -or $Report.schema_version -ne 2 -or -not $Report.Contains('repository_root') -or
+            -not $Report.Contains('launch_receipt') -or -not $probe.Contains('launch_receipt')) {
+            throw 'AUnit target evidence lacks bound launch context'
+        }
+        $prefix=if($parts[0] -ceq 'upstream-test'){'upstream-test/'}else{''}
+        $suffix=if($parts[1] -ceq 'windows'){'.exe'}else{''}
+        $bin=$Report.repository_root.Replace('\','/').TrimEnd('/')+"/tests/bin/$prefix$libraryType/"
+        if ($Report.executable.Replace('\','/') -cne ($bin+"test_runner$suffix") -or
+            $probe.executable.Replace('\','/') -cne ($bin+"lua-configuration_probe$suffix")) {
+            throw 'AUnit target executable is outside the selected build path'
+        }
+        foreach ($child in @($Report,$probe)) {
+            $launchPath=& $ResolveCapture $child.launch_receipt.path $child.launch_receipt.sha256
+            $launch=Get-Content -LiteralPath $launchPath -Raw | ConvertFrom-Json -AsHashtable -Depth 12
+            Assert-AUnitLaunchReceipt -Receipt $launch -Root $Root -CapturedRepositoryRoot $Report.repository_root `
+                -Executable $child.executable -ExecutableSha256 $child.executable_sha256
+        }
+    }
     if ($probe.executable_sha256 -cnotmatch '^[0-9a-f]{64}$') { throw 'AUnit probe executable identity missing' }
     $probeOut = & $ResolveCapture $probe.stdout $probe.stdout_sha256
     $probeErr = & $ResolveCapture $probe.stderr $probe.stderr_sha256

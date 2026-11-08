@@ -389,6 +389,17 @@ git notes --ref=expanded-t-conformance show <tested-pr-head>
 
 Full M3 completion remains false even after this bounded scope is accepted.
 
+Current AUnit collection selects `tests/alire.toml` by running `alr exec` from
+the nested test directory. Its inherited-environment child launches the actual
+test runner and sibling configuration probe from the repository root, matching
+the documented repository-relative fixture paths. Version 2 raw reports bind
+both process launch receipts, the selected and observed environment directory,
+actual execution directory, executable hashes and the launcher source hashes.
+Full-target replay requires those receipts; historical scoped replay retains
+its original report contract. The launch regressions run real PowerShell child
+processes against a repository-relative fixture and inherited environment
+sentinel, without invoking Alire or claiming Ada test execution.
+
 Run from the repository root in PowerShell 7:
 
 ```text
