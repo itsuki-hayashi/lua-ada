@@ -1468,7 +1468,18 @@ package body Lua.Canonical_Compiler is
                           Integer (Targets.Length), Open_Last, Count);
                      end if;
                      Site := Item.Site;
-                     Site.Line := End_Line (Item.Children.Last_Element);
+                     --  A function statement has a direct function child;
+                     --  ordinary assignment RHSs use an expression list.
+                     --  funcstat emits its closure on the body's end line,
+                     --  then luaK_fixline attributes only its defining store
+                     --  to the opening function keyword. Keep those actual
+                     --  execution events distinct, including a failing store.
+                     Site.Line :=
+                       (if Fetch (Item.Children.Last_Element).Kind =
+                            Function_Expression
+                        then (if Item.Flag then Item.Site.Line else
+                                Fetch (Item.Children.Last_Element).Site.Line)
+                        else End_Line (Item.Children.Last_Element));
                      if Item.Flag then
                         Check_Global (Fn, Targets (1),
                           Fetch (Item.Children (1)).Text);

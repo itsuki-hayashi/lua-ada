@@ -7,6 +7,13 @@ completes unchanged vararg.lua in local default and T-enabled execution,
 matching the native output. Nine focused cases pass all eight C/Ada
 compiler/VM roles; both local configurations pass 2,194 AUnit cases. This is
 component evidence; final platform/source acceptance remains open.
+The [function store-site checkpoint](sessions/2026-11-08-function-store-sites.md)
+preserves opening definition stores, closing closure events and explicit
+global child/store sites. Twelve native-paired cases match four-way compiler/VM
+campaigns in both configurations; each local configuration passes 2,212 AUnit
+cases. Unchanged errors.lua now reaches duplicate-label syntax error lines.
+Full source/T and immutable final-head acceptance remain open.
+
 The [base setmetatable checkpoint](sessions/2026-11-08-metatable-argument-phases.md)
 preserves both argument origins, absent-versus-nil and validation order.
 Fifteen native-paired cases match four-way compiler/VM campaigns in both

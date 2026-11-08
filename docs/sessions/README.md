@@ -1,6 +1,8 @@
 # Session Records
 
 Component: [hidden named varargs](2026-11-08-hidden-named-varargs.md).
+Component: [function definition store sites](2026-11-08-function-store-sites.md).
+
 Component: [base setmetatable arguments](2026-11-08-metatable-argument-phases.md).
 Correction: [native tail return publication](2026-11-08-native-tail-return-windows.md).
 

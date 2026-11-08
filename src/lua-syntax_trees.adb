@@ -971,7 +971,6 @@ package body Lua.Syntax_Trees is
          Id : Symbol_Id;
          Value : Node;
          Method : Boolean := False;
-         Function_Site : Source_Location;
       begin
          if Take (Semicolon) then
             return Make (Empty_Statement);
@@ -991,18 +990,23 @@ package body Lua.Syntax_Trees is
             and then Peek in Identifier | Less | Star | Function_Word)
          then
             Advance;
-            Function_Site := Here;
             if not Take (Function_Word) then
                return Declaration (Global => True);
             end if;
             Result := Make (Assignment);
             Value := Fetch (Result);
             Value.Flag := True;
+            --  globalfunc attributes its defining store to GLOBAL, even
+            --  when FUNCTION and the name occur on later source lines.
+            Value.Site := Site;
             Save (Result, Value);
             Id := New_Name (Current.Text, Kind => Global_Name);
             Active.Append (Id);
             Target := Resolve (Read_Name);
-            Item := Function_Body (Function_Site);
+            --  Unlike ordinary funcstat, globalfunc supplies the current
+            --  opening-parenthesis line as the child prototype's definition
+            --  line. Keep that separate from the declaration store above.
+            Item := Function_Body (Here);
             Child (Result, Target);
             Child (Result, Item);
          elsif Take (Function_Word) then

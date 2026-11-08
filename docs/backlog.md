@@ -7,6 +7,13 @@ unchanged vararg.lua completes in default/T with native output, nine focused
 cases match all compiler/VM combinations, and 2,194 AUnit cases pass in each
 configuration. Retain final matrix obligations, actual mutable/escaping table
 behavior, and the separately open T API, memory-failure and aggregate gates.
+Function statement stores have [source-phase evidence](sessions/2026-11-08-function-store-sites.md):
+twelve native-paired behaviors, four-way compiler/VM checks in each matching
+configuration and 2,212 passing AUnit cases per configuration. Continue
+unchanged errors.lua from duplicate-label semantic errors at the trailing
+newline/EOF boundary. Keep full T memerr.lua's cold scalar output refusal and
+all remaining full-target obligations open.
+
 Base setmetatable has [argument-phase evidence](sessions/2026-11-08-metatable-argument-phases.md):
 fifteen native-paired behaviors, four-way compiler/VM checks in each matching
 configuration and 2,200 passing AUnit cases per configuration. Correct the
