@@ -91,6 +91,7 @@ with Lua.Managed_Runtime_Tests;
 with Lua.Managed_Format_Tests;
 with Lua.Runtime_Vector_Tests;
 with Lua.Frame_Cache_Tests;
+with Lua.Call_Metadata_Tests;
 with Lua.Stack_Storage_Tests;
 with Lua.Storage_Buffer_Tests;
 with Lua.Loader_Storage_Tests;
@@ -227,6 +228,7 @@ procedure Test_Runner is
       Lua.Managed_Format_Tests.Register (Result);
       Lua.Runtime_Vector_Tests.Register (Result);
       Lua.Frame_Cache_Tests.Register (Result);
+      Lua.Call_Metadata_Tests.Register (Result);
       Lua.Stack_Storage_Tests.Register (Result);
       Lua.Storage_Buffer_Tests.Register (Result);
       Lua.Loader_Storage_Tests.Register (Result);

@@ -680,6 +680,49 @@ package body Lua.Engine.Machine is
       return Nil_Value;
    end Unary_Value;
 
+   function Grown_Stack_Bound (Current, Last : Natural) return Natural;
+   function Grown_Stack_Bound (Current, Last : Natural) return Natural is
+      Maximum : constant Positive := Lua.Runtime_Configuration.Maximum_Stack;
+      Growth : constant Natural :=
+        (if Current > Maximum - Current / 2 then Maximum
+         else Current + Current / 2);
+   begin
+      return Natural'Min (Maximum, Natural'Max (Growth, Last + 1));
+   end Grown_Stack_Bound;
+
+   procedure Prepare_C_Call_Storage
+     (State : in out World; Context : not null Context_Access;
+      Window_Last : Natural)
+   is
+      Maximum : constant Positive := Lua.Runtime_Configuration.Maximum_Stack;
+      Bound : Natural := Context.Stack_Allocated_Bound;
+      C_Last : Natural;
+   begin
+      if Context.Stack_Error_Phase /= Normal_Stack or else
+        Window_Last >= Maximum
+      then
+         --  Actual overflow/error-stack handling belongs to Ensure_Stack.
+         --  Anticipating an ordinary C call cannot publish an error phase.
+         return;
+      end if;
+      if Window_Last >= Bound then
+         Bound := Grown_Stack_Bound (Bound, Window_Last);
+      end if;
+      C_Last :=
+        (if Window_Last >= Maximum - Minimum_C_Stack then Maximum
+         else Window_Last + Minimum_C_Stack);
+      if C_Last >= Bound and then Bound < Maximum then
+         Bound := (if C_Last >= Maximum then Maximum
+                   else Grown_Stack_Bound (Bound, C_Last));
+      end if;
+      --  This is backing storage only. A future actual C call still applies
+      --  Ensure_Stack's semantic checks/growth at its real function/argument
+      --  top. Reserving before the Lua window is published avoids a second
+      --  hidden allocation when already warmed Lua depth enters the C ABI.
+      --  All parallel arrays publish lengths only after every reserve fits.
+      Stacks.Reserve (State, Context, Bound + Extra_Stack);
+   end Prepare_C_Call_Storage;
+
    function Ensure_Stack
      (State : in out World; Context : not null Context_Access;
       Last : Natural; Raise_Error : Boolean := True) return Boolean
@@ -713,8 +756,7 @@ package body Lua.Engine.Machine is
       elsif Last < Maximum then
          --  Use the pinned 1.5 growth policy and mathematical needed extent.
          --  Maximum is configuration-derived, never adjusted for a fixture.
-         Bound := Natural'Min
-           (Maximum, Natural'Max (Bound + Bound / 2, Last + 1));
+         Bound := Grown_Stack_Bound (Bound, Last);
          Stacks.Reserve (State, Context, Bound + Extra_Stack);
          Context.Stack_Allocated_Bound := Bound;
          return True;
@@ -900,6 +942,9 @@ package body Lua.Engine.Machine is
       else
          Physical_Last := Activation.Stack_Base +
            Natural'Max (Width, Argument_Count);
+      end if;
+      if not Activation.Is_Native then
+         Prepare_C_Call_Storage (State, Context, Physical_Last);
       end if;
       Available := Ensure_Stack (State, Context, Physical_Last);
       if not Available then
@@ -1476,6 +1521,7 @@ package body Lua.Engine.Machine is
       Call_Base : Natural := 0; Has_Call_Window : Boolean := False);
    procedure Complete
      (Self : Driver; Result : Values.Vector; Independent : Boolean := False);
+   procedure Complete_Canonical_Return (Self : Driver);
    procedure Recover
      (Self : Driver; Prefix_Floor : Natural := Natural'Last);
    function Active_Handler (Self : Driver) return Value;
@@ -1664,10 +1710,12 @@ package body Lua.Engine.Machine is
      (Self : Driver; Event : String; Line : Natural := 0;
       Target : Frame_Access := null) is
       State : World renames Self.Universe.all;
-      Args : Values.Vector := Owned_Values (State);
+      Holder : Frame_Access;
       Callback : constant Value := Hooks.Callback (State, State.Current);
       Is_Foreign : constant Boolean :=
         State.Current.Foreign_Hook /= System.Null_Address;
+      Hook_Target : constant Frame_Access :=
+        (if Target /= null then Target else State.Current.Stack.Last_Element);
    begin
       --  A Lua hook installation and its callback mapping are independent.
       --  Public registry edits may remove/replace the entry, or leave a
@@ -1682,20 +1730,27 @@ package body Lua.Engine.Machine is
       Pin (State, Callback);
       --  The continuation suppresses hooks until the entire callback
       --  returns. Its owned arguments and function remain collector roots.
-      Args.Append (New_String (State, Event));
-      Args.Append
-        ((if Event = "line" and then Line > 0 then
-             (Integer_Kind, Integer_Value (Line))
-          else Nil_Value));
       --  A return continuation is already above its departing owner. The
       --  event still identifies that real owner, never the helper carrying
       --  its result packet. Other events target the current activation.
-      State.Current.Hook_Frame :=
-        (if Target /= null then Target else State.Current.Stack.Last_Element);
+      Schedule (Self, "@hook", Values.Empty_Vector, 0);
+      Holder := State.Current.Stack.Last_Element;
+      --  Only a published owner may install suppression. If frame/metadata
+      --  allocation fails above, no @hook exists for unwinding to retire;
+      --  setting Hook_Active earlier would suppress the next healthy call.
+      State.Current.Hook_Frame := Hook_Target;
       State.Current.Hook_Transfer := Event in "call" | "tail call" |
         "return";
       State.Current.Hook_Active := True;
-      Schedule (Self, "@hook", Values.Empty_Vector, 0);
+      --  Build the event directly in this traced continuation owner. A
+      --  fresh local vector allocated on every event, including a warmed
+      --  C return hook after its caller had begun refusing all growth. The
+      --  real holder retains its empty capacity across cached frame reuse.
+      Holder.Native_Arguments.Append (New_String (State, Event));
+      Holder.Native_Arguments.Append
+        ((if Event = "line" and then Line > 0 then
+             (Integer_Kind, Integer_Value (Line))
+          else Nil_Value));
       State.Current.Stack.Last_Element.Blocks_Yield :=
         not Is_Foreign or else State.Current.Hook_Transfer;
       if State.Current.Stack.Last_Element.Blocks_Yield then
@@ -1707,10 +1762,13 @@ package body Lua.Engine.Machine is
       --  across our explicit @hook continuation instead of inferring a name
       --  from the interrupted opcode.
       Dispatch
-        (Self, Callback, Args, 0,
+        (Self, Callback, Holder.Native_Arguments, 0,
          Call_Name => To_Unbounded_String ("?"),
          Name_Kind => To_Unbounded_String ("hook"));
       State.Current.Stack.Last_Element.Is_C_Hook_Transport := Is_Foreign;
+      --  Dispatch has published the callback's actual argument owner. Drop
+      --  these duplicate edges now, keeping only the reusable empty arena.
+      Holder.Native_Arguments.Clear;
    end Hook_Event;
 
    function Before_Step (Self : Driver) return Boolean is
@@ -2319,6 +2377,43 @@ package body Lua.Engine.Machine is
      (State : in out World; Activation : not null Frame_Access;
       Result, Retained_Result : Values.Vector) is separate;
 
+   procedure Transfer_Result_Ownership
+     (State : in out World; Target, Source : in out Values.Vector);
+   procedure Transfer_Result_Ownership
+     (State : in out World; Target, Source : in out Values.Vector) is
+   begin
+      if Target'Address = Source'Address then
+         return;
+      end if;
+      if Target.Capacity >= Source.Length then
+         --  Root-entry completion has two independent reusable owners: the
+         --  retiring frame and the context transfer packet. Preserve both
+         --  arenas when the receiver already fits, just as nested C result
+         --  delivery does. Repeated owning moves otherwise drain every warm
+         --  frame into the host packet, forcing fresh status growth later.
+         if State.Policy = Bounded then
+            declare
+               Work : constant Ada.Containers.Count_Type :=
+                 Target.Length + 3 * Source.Length;
+            begin
+               if Work > Ada.Containers.Count_Type
+                 (State.Bounds.Instructions - Natural'Min
+                    (State.Steps, State.Bounds.Instructions))
+               then
+                  Fail (State, "instruction limit exceeded", Resource => True);
+               end if;
+               State.Steps := State.Steps + Natural (Work);
+            end;
+         end if;
+         Copy_Roots (State, Target, Source);
+         Source.Clear;
+      else
+         --  A genuinely cold larger result keeps the allocation-free
+         --  ownership transfer. Its new receiver remains the sole root.
+         Move_Roots (State, Target, Source);
+      end if;
+   end Transfer_Result_Ownership;
+
    procedure Complete_Packet
      (Self : Driver; Result, Packet : Values.Vector);
 
@@ -2398,7 +2493,8 @@ package body Lua.Engine.Machine is
             end if;
          else
             State.Current.Transfer.Kind := Completed;
-            Move_Roots (State, State.Current.Transfer.Results, Source);
+            Transfer_Result_Ownership
+              (State, State.Current.Transfer.Results, Source);
          end if;
          State.Current.Stack.Delete_Last;
          Release_Frame (State, Activation);
@@ -2535,11 +2631,15 @@ package body Lua.Engine.Machine is
       Protection : constant Natural :=
         State.Current.Stack.Last_Element.Protection;
    begin
-      if Independent and Protection = 0 then
-         --  A driver action owns its packet outside the retiring frame.
-         --  Borrow it through synchronous delivery instead of allocating an
-         --  identical wrapped packet. This permits collectgarbage to return
-         --  after finalizers were deferred by a genuinely refusing allocator.
+      if Protection = 0 and then
+        (Independent or else Result'Address =
+           State.Current.Stack.Last_Element.Native_Results'Address)
+      then
+         --  Either a driver action owns this packet independently, or the
+         --  actual retiring frame owns it in Native_Results. Complete_Packet
+         --  delivers owned aliases before retirement; neither path needs an
+         --  identical fresh Wrap packet. A returned C callback must retain
+         --  the same zero-growth property as its successfully called child.
          Complete_Packet (Self, Result, Result);
       else
          declare
@@ -2550,6 +2650,82 @@ package body Lua.Engine.Machine is
          end;
       end if;
    end Complete;
+
+   procedure Complete_Canonical_Return (Self : Driver) is
+      State : World renames Self.Universe.all;
+      Activation : constant Frame_Access := State.Current.Stack.Last_Element;
+      Count : constant Natural := Activation.Transfer_Count;
+      Prefix : constant Natural := Activation.Protection;
+      Work : constant Ada.Containers.Count_Type :=
+        Activation.Native_Arguments.Length +
+        Activation.Native_Results.Length +
+        Activation.Native_Captures.Length +
+        Activation.Unwind_Results.Length + Activation.Error_Packet.Length +
+        3 * Ada.Containers.Count_Type (Count) +
+        Ada.Containers.Count_Type (Prefix);
+      procedure Reuse (Source : in out Values.Vector);
+      procedure Reuse (Source : in out Values.Vector) is
+      begin
+         if Source.Capacity > Activation.Native_Results.Capacity then
+            Values.Move (Activation.Native_Results, Source);
+            Source.Set_Owner (Activation.Memory);
+         end if;
+      end Reuse;
+   begin
+      if not Activation.Return_Window_Published or else
+        not Activation.Has_Stack_Window
+      then
+         raise Program_Error with "canonical return lost its scalar range";
+      elsif Count > Natural'Last - Prefix then
+         Fail (State, "stack overflow");
+      elsif State.Policy = Bounded then
+         if Work > Ada.Containers.Count_Type
+           (State.Bounds.Instructions - Natural'Min
+              (State.Steps, State.Bounds.Instructions))
+         then
+            Fail (State, "instruction limit exceeded", Resource => True);
+         end if;
+         State.Steps := State.Steps + Natural (Work);
+      end if;
+      if Activation.Completion /= Deliver_Results then
+         --  A real closer discards its Lua results. Scalar slots still
+         --  supply return-hook/debug observations; no packet is required
+         --  when the actual caller has requested no result delivery.
+         Complete_Packet
+           (Self, Values.Empty_Vector, Values.Empty_Vector);
+         return;
+      end if;
+      --  Actual registers/cells still root every outgoing value. Retire old
+      --  request/result copies before any capacity growth or hook can run;
+      --  otherwise dropped weak operands remain alive through a ghost packet.
+      Activation.Native_Arguments.Clear;
+      Activation.Native_Results.Clear;
+      Activation.Native_Captures.Clear;
+      Activation.Unwind_Results.Clear;
+      Activation.Error_Packet.Clear;
+      Reuse (Activation.Native_Arguments);
+      Reuse (Activation.Native_Captures);
+      Reuse (Activation.Unwind_Results);
+      Reuse (Activation.Error_Packet);
+      Activation.Native_Results.Reserve_Capacity
+        (Ada.Containers.Count_Type (Count + Prefix));
+      for Index in 1 .. Prefix loop
+         Append_Root
+           (State, Activation.Native_Results, (Boolean_Kind, True));
+      end loop;
+      for Offset in 1 .. Count loop
+         Append_Root
+           (State, Activation.Native_Results,
+            Stacks.Read
+              (State.Current, Activation.Stack_Base +
+               Activation.Transfer_First + Offset - 1));
+      end loop;
+      --  This packet belongs to the actual departing frame. Complete_Packet
+      --  delivers it before retirement and reconstructs it from these same
+      --  scalar slots after a mutable/yielding return hook when necessary.
+      Complete_Packet
+        (Self, Activation.Native_Results, Activation.Native_Results);
+   end Complete_Canonical_Return;
 
    procedure Dispatch
      (Self : Driver; Function_Value : Value; Arguments : Values.Vector;
@@ -3378,12 +3554,32 @@ package body Lua.Engine.Machine is
       procedure Return_Native (Item : Value);
       procedure Invoke (Function_Value : Value; Args : Values.Vector);
       procedure Finish_Protected_Return;
+      procedure Prefix_Foreign_Return;
       procedure Return_Native (Item : Value) is
          Result : Values.Vector := Owned_Values (State);
       begin
          Result.Append (Item);
          Complete (Self, Result);
       end Return_Native;
+      procedure Prefix_Foreign_Return is
+         Work : constant Ada.Containers.Count_Type :=
+           Activation.Native_Results.Length + 1;
+      begin
+         --  Prepend shifts the real retained result range. Meter that work
+         --  before reserving or changing its status prefix, using this same
+         --  execution epoch even for a deeply nested foreign call.
+         if State.Policy = Bounded then
+            if Work > Ada.Containers.Count_Type
+              (State.Bounds.Instructions - Natural'Min
+                 (State.Steps, State.Bounds.Instructions))
+            then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Natural (Work);
+         end if;
+         Activation.Native_Results.Reserve_Capacity (Work);
+         Activation.Native_Results.Prepend (Value'(Boolean_Kind, True));
+      end Prefix_Foreign_Return;
       procedure Finish_Protected_Return is
          Prefix : constant Natural := Activation.Protection;
          Count : constant Natural :=
@@ -3397,6 +3593,21 @@ package body Lua.Engine.Machine is
             --  the complete success prefix fits. A refused growth must use
             --  the existing protected memory-error recovery, not publish a
             --  partial status or turn that failure into a success value.
+            if Count = 0 and then
+              Activation.Native_Results.Capacity <
+                Ada.Containers.Count_Type (Count + Prefix) and then
+              Activation.Native_Arguments.Is_Empty and then
+              Activation.Native_Arguments.Capacity >=
+                Ada.Containers.Count_Type (Count + Prefix)
+            then
+               --  A zero-result child owns no output buffer. Its waiting
+               --  protected caller already reserved this empty input arena
+               --  before dispatch; retain that actual reserve rather than
+               --  growing a second packet merely to publish success.
+               Values.Move
+                 (Activation.Native_Results, Activation.Native_Arguments);
+               Activation.Native_Arguments.Set_Owner (Activation.Memory);
+            end if;
             Activation.Native_Results.Reserve_Capacity
               (Ada.Containers.Count_Type (Count + Prefix));
             for Index in 1 .. Prefix loop
@@ -3581,9 +3792,7 @@ package body Lua.Engine.Machine is
             if Activation.Native_Stage = 0 then
                --  A successful child delivers raw results. Error recovery
                --  has already installed its false/error packet at stage one.
-               Copy_Roots
-                 (State, Activation.Native_Results,
-                  Wrap (State, Activation.Native_Results, 1));
+               Prefix_Foreign_Return;
                Activation.Native_Stage := 1;
             end if;
             declare
@@ -3642,12 +3851,12 @@ package body Lua.Engine.Machine is
             end;
             return;
          end if;
-         --  A protected child has delivered one wrapped packet. Leave it in
-         --  this sentinel until the nested C pump publishes the results onto
-         --  the caller's C stack, then explicitly removes the sentinel.
-         Copy_Roots
-           (State, Activation.Native_Results,
-            Wrap (State, Activation.Native_Results, 1));
+         --  A successful child delivered raw results. Prepend the internal
+         --  success status here; error recovery already publishes stage one.
+         --  The nested C pump consumes this actual sentinel and packet.
+         --  The status belongs to this same retained packet. A fresh Wrap
+         --  vector would fail after an otherwise allocation-free Lua return.
+         Prefix_Foreign_Return;
          Activation.Native_Stage := 1;
          return;
       elsif Name = "@gc.finalize" then
@@ -3746,8 +3955,73 @@ package body Lua.Engine.Machine is
          Recover (Self);
          return;
       elsif Name = "base.primitive" then
-         Complete (Self, Native
-           (Self, Activation.Native_Id, Activation.Native_Arguments));
+         if Activation.Native_Id = Assert_Function and then
+           not Activation.Native_Arguments.Is_Empty and then
+           Truth (Activation.Native_Arguments.First_Element)
+         then
+            --  luaB_assert returns its actual argument tuple unchanged. The
+            --  live scalar window already owns it; returning a controlled
+            --  Arguments copy from Native would allocate under refusal.
+            --  Record the raw range before adding any private protection
+            --  prefix, so return hooks see/mutate only real public values.
+            if State.Policy = Bounded then
+               declare
+                  Count : constant Ada.Containers.Count_Type :=
+                    Activation.Native_Arguments.Length;
+                  Prefix : constant Ada.Containers.Count_Type :=
+                    Ada.Containers.Count_Type (Activation.Protection);
+                  Work : constant Ada.Containers.Count_Type :=
+                    Count * (Prefix + 1) + Prefix * (Prefix + 1) / 2;
+               begin
+                  if Work > Ada.Containers.Count_Type
+                    (State.Bounds.Instructions - Natural'Min
+                       (State.Steps, State.Bounds.Instructions))
+                  then
+                     Fail
+                       (State, "instruction limit exceeded", Resource => True);
+                  end if;
+                  State.Steps := State.Steps + Natural (Work);
+               end;
+            end if;
+            if Activation.Has_Stack_Window then
+               Activation.Transfer_First := 1;
+               Activation.Transfer_Count :=
+                 Natural (Activation.Native_Arguments.Length);
+               Activation.Return_Window_Published := True;
+            end if;
+            if Activation.Native_Results.Capacity >=
+              Activation.Native_Arguments.Length
+            then
+               --  A cached owner may already hold a larger result arena,
+               --  including room for a later protected status. Preserve it
+               --  and the empty input capacity; moving the smaller input
+               --  arena on every call would discard that warmed reserve.
+               Copy_Roots
+                 (State, Activation.Native_Results,
+                  Activation.Native_Arguments);
+               Activation.Native_Arguments.Clear;
+            else
+               Move_Roots
+                 (State, Activation.Native_Results,
+                  Activation.Native_Arguments);
+            end if;
+            if Activation.Protection > 0 then
+               Activation.Native_Results.Reserve_Capacity
+                 (Activation.Native_Results.Length +
+                    Ada.Containers.Count_Type (Activation.Protection));
+               for Index in 1 .. Activation.Protection loop
+                  Activation.Native_Results.Prepend
+                    (Value'(Boolean_Kind, True));
+               end loop;
+            end if;
+            Complete_Packet
+              (Self, Activation.Native_Results, Activation.Native_Results);
+         else
+            --  Missing/nil/false inputs retain the existing error ownership,
+            --  argument diagnostics and message/value behavior unchanged.
+            Complete (Self, Native
+              (Self, Activation.Native_Id, Activation.Native_Arguments));
+         end if;
          return;
       elsif Name = "base.pcall" then
          if Activation.Native_Stage = 0 then
@@ -5374,10 +5648,9 @@ package body Lua.Engine.Machine is
                          Has_Call_Window => Next.Has_Call_Window);
             when Canonical.Return_Results =>
                if Activation.Closers.Is_Empty then
-                  Complete (Self, Next.Arguments);
+                  Complete_Canonical_Return (Self);
                else
-                  Start_Unwind
-                    (Self, Activation, Return_Exit, Next.Arguments);
+                  Start_Unwind (Self, Activation, Return_Exit);
                end if;
             when Canonical.Close_From_Register =>
                Start_Unwind (Self, Activation, Scope_Exit,
@@ -6416,6 +6689,19 @@ package body Lua.Engine.Machine is
               not Packet.Is_Empty and then Packet.First_Element.Kind =
                 Boolean_Kind and then not Packet.First_Element.Boolean_Data;
          begin
+            if Activation.Native_Name = "@foreign.boundary" and then
+              Failure = No_Failure and then
+              Activation.Native_Results.Capacity < Packet.Length and then
+              Activation.Error_Packet.Is_Empty and then
+              Activation.Error_Packet.Capacity >= Packet.Length
+            then
+               --  The child completed successfully. Preserve its warmed
+               --  workspace by reusing this boundary's actual emergency
+               --  arena before copying the rooted packet into the receiver.
+               Values.Move
+                 (Activation.Native_Results, Activation.Error_Packet);
+               Activation.Error_Packet.Set_Owner (Activation.Memory);
+            end if;
             if Activation.Native_Results.Capacity < Packet.Length and then
               Activation.Native_Arguments.Is_Empty and then
               Activation.Native_Arguments.Capacity >= Packet.Length
@@ -6487,7 +6773,7 @@ package body Lua.Engine.Machine is
       if Self.Universe = null or else not Self.Done then
          raise Program_Error with "unfinished VM driver results";
       end if;
-      Move_Roots
+      Transfer_Result_Ownership
         (Self.Universe.all, Packet, Self.Root_Context.Transfer.Results);
    end Take_Results;
 
@@ -6696,6 +6982,19 @@ package body Lua.Engine.Machine is
       end if;
       Activation.Native_Results.Clear;
       if Activation.Completion = Deliver_Results then
+         if Activation.Native_Results.Capacity <
+           Ada.Containers.Count_Type (Count) and then
+           Activation.Native_Arguments.Capacity >=
+             Ada.Containers.Count_Type (Count)
+         then
+            --  The real C body has ACKed; its outgoing scalar cells root
+            --  the results. Consume old input copies and reuse their arena
+            --  before a permanently refusing provider sees a fresh request.
+            Activation.Native_Arguments.Clear;
+            Values.Move
+              (Activation.Native_Results, Activation.Native_Arguments);
+            Activation.Native_Arguments.Set_Owner (Activation.Memory);
+         end if;
          Activation.Native_Results.Reserve_Capacity
            (Ada.Containers.Count_Type (Count));
          for Index in Context.Foreign_Top - Count + 1 .. Context.Foreign_Top
@@ -6782,7 +7081,22 @@ package body Lua.Engine.Machine is
       Pin (State, Arguments);
       Pin (State, Message_Handler);
       Schedule (Self, "@foreign.boundary", Values.Empty_Vector, 0);
-      State.Current.Stack.Last_Element.Error_Packet.Reserve_Capacity (2);
+      declare
+         Holder : constant Frame_Access := State.Current.Stack.Last_Element;
+      begin
+         --  This holder has no input arguments. Reuse its empty warm arena;
+         --  keep the context result arena reserved for reentrant C calls.
+         --  Loaning the shared context arena here would make a nested call
+         --  allocate before reaching its genuine protected boundary.
+         if Holder.Error_Packet.Capacity < 2 and then
+           Holder.Native_Arguments.Is_Empty and then
+           Holder.Native_Arguments.Capacity >= 2
+         then
+            Values.Move (Holder.Error_Packet, Holder.Native_Arguments);
+            Holder.Native_Arguments.Set_Owner (Holder.Memory);
+         end if;
+         Holder.Error_Packet.Reserve_Capacity (2);
+      end;
       --  lua_call without a continuation cannot suspend its C activation.
       --  A future continuation-aware boundary must make that choice explicit,
       --  rather than treating every scheduler continuation as yieldable.
@@ -6886,7 +7200,29 @@ package body Lua.Engine.Machine is
         (if Activation.Native_Results.First_Element.Boolean_Data then 0
          else Natural'Max (2, Activation.Native_Aux));
       Handler_Called := Activation.Result_Handler_Called;
-      Move_Roots (State, Packet, Activation.Native_Results);
+      if State.Policy = Bounded then
+         declare
+            Work : constant Ada.Containers.Count_Type :=
+              3 * Activation.Native_Results.Length + Packet.Length;
+         begin
+            if Work > Ada.Containers.Count_Type
+              (State.Bounds.Instructions - Natural'Min
+                 (State.Steps, State.Bounds.Instructions))
+            then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Natural (Work);
+         end;
+      end if;
+      if Packet.Capacity >= Activation.Native_Results.Length then
+         --  Keep both already reserved arenas when they fit. The context
+         --  packet serves nested calls; the retiring holder keeps its empty
+         --  capacity for the next cached boundary. No temporary is needed.
+         Copy_Roots (State, Packet, Activation.Native_Results);
+         Activation.Native_Results.Clear;
+      else
+         Move_Roots (State, Packet, Activation.Native_Results);
+      end if;
       Packet.Delete_First;
       if Error_Status /= 0 and then Activation.Error_Guard_Owner /= null then
          declare

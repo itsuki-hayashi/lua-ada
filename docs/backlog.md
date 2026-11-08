@@ -16,6 +16,14 @@ counterpart bindings and original-anchor coverage before adapting any source.
 Preserve its original deletion/collection and insertion-refusal sweep, then
 require actual whole-file/final-context evidence. No exclusion is installed.
 
+The [C metadata/result checkpoint](sessions/2026-11-08-c-call-metadata.md)
+passes the first and nested deep(4)/M=0 entry, primitive equality, successful
+assert tuple/hook, cold-hook recovery and fresh independent checkstack
+witnesses. Both modes pass 2,448 AUnit cases; unchanged errors.lua remains
+within its mandatory 2 GiB ceiling. Continue unreduced reviewed API/memory
+source replay, the complete allocation audit and final platform/aggregate
+gates; focused witnesses do not close the source ledger.
+
 The [compiler context checkpoint](sessions/2026-11-08-compiler-limit-context.md)
 completes unchanged errors.lua in both local configurations, with 2,394 passing
 AUnit cases per mode. Revalidate it at final head in all applicable contexts;

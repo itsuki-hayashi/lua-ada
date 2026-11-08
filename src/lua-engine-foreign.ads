@@ -4,6 +4,15 @@ with Lua.Storage;
 with System;
 
 package Lua.Engine.Foreign is
+   procedure Reserve_Call_Metadata
+     (State : in out World; Context : not null Context_Access);
+   --  Reserve scalar C call records for the current real frame capacity plus
+   --  one host entry. Called before publishing a newly allocated frame;
+   --  refusal leaves the previous pool intact. No surface is created here.
+   procedure Trim_Call_Metadata (Context : not null Context_Access);
+   --  Release only unused reservations above current capacity. Outstanding
+   --  records retain their selected owner through the genuine C guard ACK.
+
    function Auxiliary_Buffer_Size return Interfaces.C.size_t
      with Export, Convention => C,
           External_Name => "lua_ada_auxiliary_buffer_size";

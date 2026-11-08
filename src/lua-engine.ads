@@ -757,6 +757,10 @@ private package Lua.Engine is
    --  roots until the scheduler hands them to the recipient activation.
 
    type Execution_Context is record
+      Frame_Capacity : Natural := 0;
+      --  Actual allocated activation records, including cached/reset/base
+      --  owners. C metadata reservations follow this capacity without forcing
+      --  an otherwise Ada-only context to construct a foreign surface.
       Cache_Head : Frame_Access;
       Cache_Count : Natural := 0;
       Reset_Frame_Head : Frame_Access;
@@ -1200,11 +1204,13 @@ private package Lua.Engine is
    --  with a fresh countdown but no Lua callback registry entry.
 
    function New_Frame
-     (State : in out World; Context : not null Context_Access)
-      return Frame_Access;
+     (State : in out World; Context : not null Context_Access;
+      Reuse_Cache : Boolean := True) return Frame_Access;
    function New_Frame (State : in out World) return Frame_Access;
    --  Borrow one clean activation from its context-owned intrusive cache.
-   --  A new record and every future buffer use State.Memory explicitly.
+   --  Reuse_Cache False reserves a dedicated reset record without consuming
+   --  ordinary depth already warmed by the program. A new record and every
+   --  future buffer use State.Memory explicitly.
    --  Publish on Context.Stack before any later allocation can collect.
 
    Reset_Continuation_Frames : constant Positive := 8;

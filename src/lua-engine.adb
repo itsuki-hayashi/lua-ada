@@ -111,8 +111,24 @@ package body Lua.Engine is
      (Heap_Object, Object_Access);
    procedure Release_Prototype is new Ada.Unchecked_Deallocation
      (Prototype, Prototype_Access);
-   procedure Free_Frame is new Ada.Unchecked_Deallocation
+   procedure Free_Frame_Storage is new Ada.Unchecked_Deallocation
      (Frame, Frame_Access);
+   procedure Free_Frame (Item : in out Frame_Access);
+   procedure Free_Frame (Item : in out Frame_Access) is
+      Context : Context_Access;
+   begin
+      if Item = null then return; end if;
+      Context := Item.Context;
+      if Context = null or else Context.Frame_Capacity = 0 then
+         raise Program_Error with "invalid physical activation owner";
+      end if;
+      --  Cached return does not reach this path. Physical destruction alone
+      --  relinquishes one metadata reservation; a live C pump may still own
+      --  its record, so trimming never frees an outstanding record.
+      Context.Frame_Capacity := Context.Frame_Capacity - 1;
+      Lua.Engine.Foreign.Trim_Call_Metadata (Context);
+      Free_Frame_Storage (Item);
+   end Free_Frame;
    --  Deallocation is confined to this owning world. Lua values themselves
    --  never free objects, which is essential for shared/cyclic graphs.
 
@@ -1423,8 +1439,8 @@ package body Lua.Engine is
    end Clear_Frame;
 
    function New_Frame
-     (State : in out World; Context : not null Context_Access)
-      return Frame_Access
+     (State : in out World; Context : not null Context_Access;
+      Reuse_Cache : Boolean := True) return Frame_Access
    is
       Item : Frame_Access;
       Retried : Boolean := False;
@@ -1432,7 +1448,9 @@ package body Lua.Engine is
       if Context.Memory /= Lua.Storage.Reference (State.Memory) then
          raise Program_Error with "activation belongs to another universe";
       end if;
-      if Context.C_Reset_Active and then Context.Reset_Frame_Head /= null then
+      if Reuse_Cache and then Context.C_Reset_Active and then
+        Context.Reset_Frame_Head /= null
+      then
          Item := Context.Reset_Frame_Head;
          if Item.Lifecycle /= Available or else Item.Context /= Context or
            else not Item.Reset_Reserve
@@ -1444,7 +1462,7 @@ package body Lua.Engine is
          Item.Cache_Next := null;
          Item.Lifecycle := Active;
          return Item;
-      elsif Context.Cache_Head /= null then
+      elsif Reuse_Cache and then Context.Cache_Head /= null then
          Item := Context.Cache_Head;
          if Item.Lifecycle /= Available or else Item.Context /= Context then
             raise Program_Error with "invalid cached activation owner";
@@ -1458,6 +1476,32 @@ package body Lua.Engine is
       loop
          begin
             Item := new (Lua.Storage.Handle (State.Memory)) Frame;
+            Item.Context := Context;
+            Item.Memory := Context.Memory;
+            if Context.Frame_Capacity >= Natural'Last - 1 then
+               Free_Frame_Storage (Item);
+               Fail (State, "activation capacity overflow");
+            end if;
+            Context.Frame_Capacity := Context.Frame_Capacity + 1;
+            begin
+               --  Charge the selected owner before exposing either new
+               --  capacity. A refusing metadata reservation cannot leave an
+               --  unowned frame or an inflated capacity count. Emergency GC
+               --  may shrink other cached frames before a later retry.
+               --  Every actual allocated frame must already fit its owning
+               --  reference vector, including the dedicated reset reserve.
+               --  A cached borrow cannot discover new metadata growth merely
+               --  because its real C/error path retains additional holders.
+               Context.Stack.Reserve_Capacity
+                 (Ada.Containers.Count_Type (Context.Frame_Capacity + 1));
+               Lua.Engine.Foreign.Reserve_Call_Metadata (State, Context);
+            exception
+               when others =>
+                  Context.Frame_Capacity := Context.Frame_Capacity - 1;
+                  Lua.Engine.Foreign.Trim_Call_Metadata (Context);
+                  Free_Frame_Storage (Item);
+                  raise;
+            end;
             exit;
          exception
             when Lua.Storage.Allocation_Error =>
@@ -1497,7 +1541,11 @@ package body Lua.Engine is
            Ada.Containers.Count_Type (Context.Deferred_Error_Depth +
              Reset_Continuation_Frames + 1));
       while Context.Reset_Frame_Count < Reset_Continuation_Frames loop
-         Item := New_Frame (State, Context);
+         --  First C exposure may occur after the program warmed ordinary
+         --  call depth, immediately before T.alloccount enables refusal.
+         --  Reserve reset owners separately; stealing that warm cache would
+         --  force a new ordinary frame inside the next protected C call.
+         Item := New_Frame (State, Context, Reuse_Cache => False);
          begin
             --  These are actual continuation-owned argument/result owners,
             --  not copies of live stack values. Three close arguments plus

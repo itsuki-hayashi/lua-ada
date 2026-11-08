@@ -36,6 +36,14 @@ package Lua.Engine.Machine is
    --  includes five hidden extra rows. First overflow installs the pinned
    --  200-row error stack; another growth request there becomes ERRERR.
 
+   procedure Prepare_C_Call_Storage
+     (State : in out World; Context : not null Context_Access;
+      Window_Last : Natural);
+   --  Before publishing a Lua window, prepare backing for its actual end
+   --  plus the public minimum C-call space, using the normal capped growth
+   --  rule. This changes no semantic bound, top or window. Allocation refusal
+   --  preserves those fields; physical buffer capacity may remain larger.
+
    procedure Shrink_Error_Stack
      (State : in out World; Context : not null Context_Access);
    --  Reevaluate the overflow latch after protected recovery. Retained

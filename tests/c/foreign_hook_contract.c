@@ -22,6 +22,215 @@ static struct allocation_counts *close_window_counts;
 static int close_window_mode, close_window_closed, close_window_failed;
 static size_t close_window_growths;
 
+static struct allocation_counts *assert_counts;
+static lua_CFunction saved_assert_function;
+static int assert_mode, assert_hits, assert_failed, assert_freeze;
+static size_t assert_growths;
+static int assert_closed;
+
+static int invoke_saved_assert(lua_State *L) {
+    /* A real saved lua_CFunction call borrows this actual C activation.
+     * It must return its complete argument tuple, including trailing nil. */
+    return saved_assert_function(L);
+}
+
+static int assert_argument_closer(lua_State *L) {
+    /* Native normal C-slot closing passes only the resource argument. */
+    if (lua_gettop(L) != 1 || !lua_istable(L, 1)) assert_failed=135;
+    ++assert_closed;
+    return 0;
+}
+
+static int invoke_saved_assert_close(lua_State *L) {
+    int n;
+    const void *resource=lua_topointer(L, 3);
+    lua_toclose(L, 3);
+    n=saved_assert_function(L);
+    /* The saved builtin must neither close this actual owner early nor
+     * relocate its arguments above the slot carrying the close marker. */
+    if (assert_closed != 0 || n != 4 || lua_gettop(L) != 4 ||
+        lua_topointer(L, 3) != resource) assert_failed=136;
+    return n;
+}
+
+static void assert_result_hook(lua_State *L, lua_Debug *ar) {
+    int selected;
+    if (ar->event != LUA_HOOKCALL && ar->event != LUA_HOOKRET) return;
+    if (!lua_getinfo(L, "fr", ar)) { assert_failed=121; return; }
+    selected=lua_tocfunction(L, -1) ==
+        (assert_mode == 2 ? invoke_saved_assert_close :
+            (assert_mode ? invoke_saved_assert : saved_assert_function));
+    lua_pop(L, 1);
+    if (!selected) return;
+    if (ar->event == LUA_HOOKCALL) {
+        if (assert_freeze) {
+            assert_growths=assert_counts->growths;
+            assert_counts->refuse=1;
+        }
+        return;
+    }
+    ++assert_hits;
+    lua_sethook(L, NULL, 0, 0);
+    if (ar->ftransfer != 1 || ar->ntransfer != 4 ||
+        lua_gettop(L) < 4 || !lua_isnil(L, 2) || !lua_isnil(L, 4)) {
+        assert_failed=122; return;
+    }
+    lua_pushinteger(L, 37);
+    lua_replace(L, 1);
+    lua_pushinteger(L, 42);
+    lua_replace(L, 3);
+}
+
+static int assert_result_contract(int saved) {
+    struct allocation_counts counts={0};
+    lua_State *L=lua_newstate(counted_allocator, &counts, 0);
+    int ref=-1, i, result=0, status;
+    if (L == NULL) return 123;
+    luaL_openlibs(L);
+    lua_getglobal(L, "assert");
+    saved_assert_function=lua_tocfunction(L, -1);
+    lua_pop(L, 1);
+    if (saved_assert_function == NULL) result=124;
+    if (!saved && !result) {
+        if (luaL_loadstring(L, "return assert(11,nil,23,nil)") != LUA_OK)
+            result=125;
+        else ref=luaL_ref(L, LUA_REGISTRYINDEX);
+    }
+    assert_counts=&counts;
+    assert_mode=saved;
+    /* Warm the actual complete path before refusing growth. The normal Lua
+     * assert call freezes only after its real argument window is published;
+     * the saved-C-function case independently checks the borrowing exposure. */
+    for (i=0; i<4 && !result; ++i) {
+        lua_settop(L, 0);
+        if (saved) {
+            lua_pushcfunction(L, saved == 2 ?
+                invoke_saved_assert_close : invoke_saved_assert);
+            lua_pushinteger(L, 11); lua_pushnil(L);
+            if (saved == 2) {
+                lua_newtable(L);
+                lua_newtable(L);
+                lua_pushcfunction(L, assert_argument_closer);
+                lua_setfield(L, -2, "__close");
+                lua_setmetatable(L, -2);
+            } else lua_pushinteger(L, 23);
+            lua_pushnil(L);
+        } else lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+        assert_hits=assert_failed=assert_closed=0;
+        assert_freeze=!saved && i==3;
+        lua_sethook(L, assert_result_hook, LUA_MASKCALL | LUA_MASKRET, 0);
+        status=lua_pcall(L, saved ? 4 : 0, LUA_MULTRET, 0);
+        counts.refuse=0;
+        lua_sethook(L, NULL, 0, 0);
+        if (status != LUA_OK || assert_hits != 1) result=126;
+        else if (assert_failed) result=assert_failed;
+        else if (saved == 2 && assert_closed != 1) result=137;
+        else if (lua_gettop(L) != 4 || lua_tointeger(L, 1) != 37 ||
+            !lua_isnil(L, 2) || lua_tointeger(L, 3) != 42 ||
+            !lua_isnil(L, 4)) result=127;
+        else if (assert_freeze && counts.growths != assert_growths) result=128;
+    }
+    lua_close(L);
+    assert_counts=NULL;
+    saved_assert_function=NULL;
+    if (counts.bytes != 0 || counts.blocks != 0) return 129;
+    return result;
+}
+
+static struct allocation_counts *event_counts;
+static int event_freeze, event_hits, event_kind;
+static size_t event_growths;
+
+static void refusing_event_hook(lua_State *L, lua_Debug *ar) {
+    (void)L;
+    if (ar->event == LUA_HOOKCALL && event_freeze) {
+        event_growths=event_counts->growths;
+        event_counts->refuse=1;
+    }
+    if (ar->event == event_kind) ++event_hits;
+}
+
+static int event_refusal_contract(int count) {
+    struct allocation_counts counts={0};
+    lua_State *L=lua_newstate(counted_allocator, &counts, 0);
+    int ref, i, status, result=0;
+    if (L == NULL) return 130;
+    luaL_openlibs(L);
+    if (luaL_loadstring(L, "local a=1\na=a+1\nreturn a") != LUA_OK) {
+        lua_close(L); return 131;
+    }
+    ref=luaL_ref(L, LUA_REGISTRYINDEX);
+    event_counts=&counts;
+    event_kind=count ? LUA_HOOKCOUNT : LUA_HOOKLINE;
+    /* Reuse exactly the same real call and hook control path. Freeze only
+     * after the fourth call's argument window and call hook are published;
+     * subsequent line/count events must reuse traced continuation capacity. */
+    for (i=0; i<4 && !result; ++i) {
+        lua_settop(L, 0);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+        event_hits=0;
+        event_freeze=i==3;
+        lua_sethook(L, refusing_event_hook,
+            LUA_MASKCALL | (count ? LUA_MASKCOUNT : LUA_MASKLINE), 1);
+        status=lua_pcall(L, 0, 1, 0);
+        counts.refuse=0;
+        lua_sethook(L, NULL, 0, 0);
+        if (status != LUA_OK || event_hits < 2 ||
+            lua_tointeger(L, -1) != 2) result=132;
+        else if (event_freeze && counts.growths != event_growths) result=133;
+    }
+    lua_close(L);
+    event_counts=NULL;
+    if (counts.bytes != 0 || counts.blocks != 0) return 134;
+    return result;
+}
+
+static int cold_hook_hits;
+static void cold_event_hook(lua_State *L, lua_Debug *ar) {
+    (void)L;
+    if (ar->event == LUA_HOOKLINE || ar->event == LUA_HOOKCALL)
+        ++cold_hook_hits;
+}
+
+static int cold_hook_refusal_contract(void) {
+    int permitted;
+    /* Inject failure at successive actual growths on the cold hook path.
+     * Every genuine memory failure must retire partial hook publication and
+     * permit a new ordinary hook installation on the same state. */
+    for (permitted=0; permitted<64; ++permitted) {
+        struct allocation_counts counts={0};
+        lua_State *L=lua_newstate(counted_allocator, &counts, 0);
+        int ref, status, result=0;
+        if (L == NULL) return 138;
+        luaL_openlibs(L);
+        if (luaL_loadstring(L, "local a=1\na=a+1\nreturn a") != LUA_OK) {
+            lua_close(L); return 139;
+        }
+        ref=luaL_ref(L, LUA_REGISTRYINDEX);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+        cold_hook_hits=0;
+        lua_sethook(L, cold_event_hook, LUA_MASKCALL | LUA_MASKLINE, 0);
+        counts.fail_after=counts.growths+(size_t)permitted+1;
+        status=lua_pcall(L, 0, 1, 0);
+        counts.fail_after=0;
+        lua_sethook(L, NULL, 0, 0);
+        if ((status != LUA_OK && status != LUA_ERRMEM) ||
+            lua_gettop(L) != 1) result=140;
+        lua_settop(L, 0);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+        cold_hook_hits=0;
+        lua_sethook(L, cold_event_hook, LUA_MASKCALL | LUA_MASKLINE, 0);
+        status=lua_pcall(L, 0, 1, 0);
+        lua_sethook(L, NULL, 0, 0);
+        if (status != LUA_OK || cold_hook_hits == 0 ||
+            lua_tointeger(L, -1) != 2) result=141;
+        lua_close(L);
+        if (counts.bytes != 0 || counts.blocks != 0) return 142;
+        if (result != 0) return result;
+    }
+    return 0;
+}
+
 static int change_c_return(lua_State *L) {
     lua_Debug parent;
     const char *name;
@@ -659,6 +868,25 @@ int lua_ada_test_hook_contract(int which) {
     memset(&observed, 0, sizeof observed);
     observed.expected = L;
     observation = &observed;
+    if (which == 35) {
+        observation=NULL;
+        lua_close(L);
+        return cold_hook_refusal_contract();
+    }
+    if (which == 34) {
+        observation=NULL;
+        lua_close(L);
+        return assert_result_contract(2);
+    }
+    if (which == 32 || which == 33) {
+        lua_close(L);
+        return event_refusal_contract(which == 33);
+    }
+    if (which == 30 || which == 31) {
+        observation=NULL;
+        lua_close(L);
+        return assert_result_contract(which == 31);
+    }
     if (which >= 27 && which <= 29) {
         observation = NULL;
         if (which == 29) {

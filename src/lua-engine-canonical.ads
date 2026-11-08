@@ -22,6 +22,8 @@ package Lua.Engine.Canonical is
    --  Every callback packet is retained in its owning frame before Step
    --  returns. Invoke_Function/Tail_Invoke borrow Native_Arguments directly;
    --  their scalar action must not copy a controlled vector on every call.
+   --  Return_Results likewise borrows the published Transfer_First/Count
+   --  scalar span until Machine delivers or starts its actual close walk.
    --  Other actions carry an owned copy where retirement needs independent
    --  lifetime. Machine publishes the packet into the next activation before
    --  ending the current operation. Destination is register index + 1.

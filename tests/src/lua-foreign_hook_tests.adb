@@ -38,6 +38,52 @@ package body Lua.Foreign_Hook_Tests is
    procedure C_Close_Return_Mutation;
    procedure C_Close_Return_Tuple;
    procedure C_Close_Return_Refusal;
+   procedure Assert_Return_Refusal;
+   procedure Saved_Assert_Return;
+   procedure Saved_Assert_Close;
+   procedure Cold_Hook_Refusal;
+   procedure Refusing_Line_Hook;
+   procedure Refusing_Count_Hook;
+
+   procedure Refusing_Line_Hook is
+   begin
+      --  Actual line callbacks run after the caller freezes all growth.
+      Assert (Contract (32) = 0, "warmed line hooks need no provider growth");
+   end Refusing_Line_Hook;
+
+   procedure Refusing_Count_Hook is
+   begin
+      --  Count callbacks retain the same budget and owned continuation.
+      Assert (Contract (33) = 0, "warmed count hooks need no provider growth");
+   end Refusing_Count_Hook;
+
+   procedure Assert_Return_Refusal is
+   begin
+      --  Freeze only after the actual assert call arguments are published.
+      --  Its C return hook edits real tuple slots without allocator growth.
+      Assert (Contract (30) = 0, "assert tuple/hook under actual refusal");
+   end Assert_Return_Refusal;
+
+   procedure Cold_Hook_Refusal is
+   begin
+      --  Partial cold event publication must unwind its traced holder and
+      --  suppression state at every refused growth, then accept new hooks.
+      Assert (Contract (35) = 0, "cold hook refusal preserves recovery");
+   end Cold_Hook_Refusal;
+
+   procedure Saved_Assert_Close is
+   begin
+      --  The saved builtin preserves the real C caller's marked argument
+      --  until its normal return closes it once, before the return hook.
+      Assert (Contract (34) = 0, "saved assert preserves C close marker");
+   end Saved_Assert_Close;
+
+   procedure Saved_Assert_Return is
+   begin
+      --  Calling a saved real C function pointer borrows its genuine C
+      --  caller. Full tuple count, nils and return-slot mutation survive.
+      Assert (Contract (31) = 0, "saved assert C function tuple/hook");
+   end Saved_Assert_Return;
 
    procedure C_Close_Return_Mutation is
    begin
@@ -307,5 +353,17 @@ package body Lua.Foreign_Hook_Tests is
                         C_Close_Return_Tuple'Access);
       Test_Support.Add (Suite, "C close: warmed result mutation under refusal",
                         C_Close_Return_Refusal'Access);
+      Test_Support.Add (Suite, "Assert: return-hook edits under refusal",
+                        Assert_Return_Refusal'Access);
+      Test_Support.Add (Suite, "Assert: saved C function tuple and hook",
+                        Saved_Assert_Return'Access);
+      Test_Support.Add
+        (Suite, "hook: refusing line events", Refusing_Line_Hook'Access);
+      Test_Support.Add
+        (Suite, "hook: refusing count events", Refusing_Count_Hook'Access);
+      Test_Support.Add
+        (Suite, "Assert: saved C marked argument", Saved_Assert_Close'Access);
+      Test_Support.Add
+        (Suite, "hook: cold refusal and reinstall", Cold_Hook_Refusal'Access);
    end Register;
 end Lua.Foreign_Hook_Tests;

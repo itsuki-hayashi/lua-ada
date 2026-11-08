@@ -1,5 +1,9 @@
 # Architecture Decision Log
 
+ADR 0037 records [reusable C call metadata](0037-reusable-c-call-metadata.md),
+frame-capacity reservations and stable owners through actual C guard ACK.
+Focused strict validation is recorded in the component session.
+
 ADR 0035 records [managed immutable diagnostic text](0035-managed-diagnostic-text.md),
 selected shared storage and allocation-free emergency/copy behavior. Engine
 failure fields now use it; the complete allocation audit remains open.

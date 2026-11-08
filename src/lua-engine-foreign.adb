@@ -188,13 +188,30 @@ package body Lua.Engine.Foreign is
       Reset_Live : Boolean := False;
       Owns_Universe : Boolean := True;
       Calls : System.Address := System.Null_Address;
+      Record_Head : System.Address := System.Null_Address;
+      Free_Record : System.Address := System.Null_Address;
+      Record_Capacity : Natural := 0;
+      Live_Records : Natural := 0;
+      Record_Generation : C.unsigned_long_long := 0;
    end record;
    --  Raw ownership metadata has no Ada finalizers or hidden allocations.
    --  Engine context cleanup releases both it and the separate state block.
    package Controls is new System.Address_To_Access_Conversions (Control);
    use type Controls.Object_Pointer;
 
+   type Call_Storage is record
+      Owner : Controls.Object_Pointer;
+      Previous : System.Address := System.Null_Address;
+      Next : System.Address := System.Null_Address;
+      Free_Next : System.Address := System.Null_Address;
+      Live : Boolean := False;
+      Generation : C.unsigned_long_long := 0;
+   end record;
+   --  Intrusive pool links have no Lua values. Unlike a C-stack temporary,
+   --  each selected-owner node survives its genuine guard's error/yield ACK,
+   --  even if ordinary execution has already retired the addressed frames.
    type Call_Record is record
+      Storage : Call_Storage;
       Previous : System.Address := System.Null_Address;
       Base : Natural := 0;
       Wanted : C.int := 0;
@@ -209,6 +226,7 @@ package body Lua.Engine.Foreign is
       --  A C call can address another context in this same universe. Its
       --  entry drive suspends only scalar driver ownership, not a Lua resume.
       Direct_Builtin : Boolean := False;
+      Reuse_Argument_Span : Boolean := False;
       Saved_Driver : Driver_View;
       Saved_Owned_Driver : VM.Driver_Access;
       Saved_Calls : System.Address := System.Null_Address;
@@ -221,6 +239,184 @@ package body Lua.Engine.Foreign is
       Original_Base : Natural := 0;
    end record;
    package Calls is new System.Address_To_Access_Conversions (Call_Record);
+   procedure Grow_Call_Pool
+     (State : in out World; Owner : not null Controls.Object_Pointer);
+   procedure Trim_Call_Pool
+     (Owner : not null Controls.Object_Pointer; Capacity : Natural);
+   procedure Destroy_Call_Pool
+     (Owner : not null Controls.Object_Pointer);
+   function Acquire_Call_Record
+     (State : in out World; Owner : not null Controls.Object_Pointer)
+      return System.Address;
+   procedure Release_Call_Record (Address : in out System.Address);
+   procedure Stamp_Call_Record
+     (Owner : not null Controls.Object_Pointer;
+      Item : not null Calls.Object_Pointer);
+
+   procedure Grow_Call_Pool
+     (State : in out World; Owner : not null Controls.Object_Pointer)
+   is
+      Address : System.Address;
+      Item : Calls.Object_Pointer;
+   begin
+      if Owner.Record_Capacity = Natural'Last then
+         Fail (State, "C call metadata capacity overflow");
+      elsif State.Policy = Bounded then
+         if State.Steps >= State.Bounds.Instructions then
+            Fail (State, "instruction limit exceeded", Resource => True);
+         end if;
+         State.Steps := State.Steps + 1;
+      end if;
+      --  Construct a complete unused node before linking it into either
+      --  owner list. Refusal cannot change a previous reservation or expose
+      --  partially initialized scalar driver/continuation metadata.
+      Address := Memory.Allocate
+        (State.Memory, Call_Record'Object_Size / System.Storage_Unit,
+         Call_Record'Alignment);
+      Item := Calls.To_Pointer (Address);
+      Item.all :=
+        (Storage => (Owner => Owner, Previous => System.Null_Address,
+          Next => Owner.Record_Head, Free_Next => Owner.Free_Record,
+          Live => False, Generation => 0), others => <>);
+      if Owner.Record_Head /= System.Null_Address then
+         Calls.To_Pointer (Owner.Record_Head).Storage.Previous := Address;
+      end if;
+      Owner.Record_Head := Address;
+      Owner.Free_Record := Address;
+      Owner.Record_Capacity := Owner.Record_Capacity + 1;
+   end Grow_Call_Pool;
+
+   procedure Trim_Call_Pool
+     (Owner : not null Controls.Object_Pointer; Capacity : Natural)
+   is
+      Address : System.Address;
+      Item : Calls.Object_Pointer;
+   begin
+      --  Frame shrink may occur inside a live API call. Only unused nodes
+      --  can leave the pool; an outstanding record remains stable until its
+      --  guard ACK, when Release_Call_Record retries this same trim.
+      while Owner.Record_Capacity > Capacity and then
+        Owner.Free_Record /= System.Null_Address
+      loop
+         Address := Owner.Free_Record;
+         Item := Calls.To_Pointer (Address);
+         if Item.Storage.Owner /= Owner or else Item.Storage.Live then
+            raise Program_Error with "invalid free C call record";
+         end if;
+         Owner.Free_Record := Item.Storage.Free_Next;
+         if Item.Storage.Previous = System.Null_Address then
+            Owner.Record_Head := Item.Storage.Next;
+         else
+            Calls.To_Pointer (Item.Storage.Previous).Storage.Next :=
+              Item.Storage.Next;
+         end if;
+         if Item.Storage.Next /= System.Null_Address then
+            Calls.To_Pointer (Item.Storage.Next).Storage.Previous :=
+              Item.Storage.Previous;
+         end if;
+         Owner.Record_Capacity := Owner.Record_Capacity - 1;
+         Memory.Release (Owner.Universe.Memory, Address);
+      end loop;
+   end Trim_Call_Pool;
+
+   procedure Destroy_Call_Pool
+     (Owner : not null Controls.Object_Pointer) is
+   begin
+      --  Physical state disposal follows every genuine callback ACK. An
+      --  active record may borrow this control, so destroying it early would
+      --  turn later host-abort/self-close cleanup into a dangling owner read.
+      if Owner.Live_Records /= 0 then
+         raise Program_Error with "disposing outstanding C call metadata";
+      end if;
+      Trim_Call_Pool (Owner, 0);
+      if Owner.Record_Capacity /= 0 or else
+        Owner.Record_Head /= System.Null_Address
+      then
+         raise Program_Error with "unlinked C call metadata ownership";
+      end if;
+   end Destroy_Call_Pool;
+
+   procedure Reserve_Call_Metadata
+     (State : in out World; Context : not null Context_Access)
+   is
+      Owner : Controls.Object_Pointer;
+   begin
+      if Context.Foreign_Control = System.Null_Address then return; end if;
+      Owner := Controls.To_Pointer (Context.Foreign_Control);
+      while Owner.Record_Capacity <= Context.Frame_Capacity loop
+         Grow_Call_Pool (State, Owner);
+      end loop;
+   end Reserve_Call_Metadata;
+
+   procedure Trim_Call_Metadata (Context : not null Context_Access) is
+   begin
+      if Context.Foreign_Control /= System.Null_Address then
+         Trim_Call_Pool
+           (Controls.To_Pointer (Context.Foreign_Control),
+            Context.Frame_Capacity + 1);
+      end if;
+   end Trim_Call_Metadata;
+
+   procedure Stamp_Call_Record
+     (Owner : not null Controls.Object_Pointer;
+      Item : not null Calls.Object_Pointer) is
+   begin
+      if Owner.Record_Generation = C.unsigned_long_long'Last then
+         raise Foreign_Error with "C call metadata generation overflow";
+      end if;
+      Owner.Record_Generation := Owner.Record_Generation + 1;
+      Item.Storage.Generation := Owner.Record_Generation;
+   end Stamp_Call_Record;
+
+   function Acquire_Call_Record
+     (State : in out World; Owner : not null Controls.Object_Pointer)
+      return System.Address
+   is
+      Address : System.Address;
+      Item : Calls.Object_Pointer;
+   begin
+      --  The frame-capacity reserve covers warmed nesting and its first
+      --  host call. A genuinely deeper cold API entry may grow through the
+      --  selected provider; it never borrows a C-stack address across ACK.
+      if Owner.Free_Record = System.Null_Address then
+         Grow_Call_Pool (State, Owner);
+      end if;
+      Address := Owner.Free_Record;
+      Item := Calls.To_Pointer (Address);
+      if Item.Storage.Owner /= Owner or else Item.Storage.Live then
+         raise Program_Error with "invalid acquired C call record";
+      end if;
+      Stamp_Call_Record (Owner, Item);
+      Owner.Free_Record := Item.Storage.Free_Next;
+      Item.Storage.Free_Next := System.Null_Address;
+      Item.Storage.Live := True;
+      Owner.Live_Records := Owner.Live_Records + 1;
+      return Address;
+   end Acquire_Call_Record;
+
+   procedure Release_Call_Record (Address : in out System.Address) is
+      Item : constant Calls.Object_Pointer := Calls.To_Pointer (Address);
+      Owner : constant Controls.Object_Pointer := Item.Storage.Owner;
+      Storage : Call_Storage := Item.Storage;
+      Context : Context_Access;
+   begin
+      if Owner = null or else not Storage.Live or else
+        Owner.Live_Records = 0
+      then
+         raise Program_Error with "invalid returned C call record";
+      end if;
+      Context := Owner.Universe.Contexts (Positive (Owner.Context));
+      Storage.Live := False;
+      Storage.Free_Next := Owner.Free_Record;
+      --  Drop stale driver/context/frame borrows before publishing the free
+      --  node. List links and the sole selected-owner association survive.
+      Item.all := (Storage => Storage, others => <>);
+      Owner.Live_Records := Owner.Live_Records - 1;
+      Owner.Free_Record := Address;
+      Address := System.Null_Address;
+      Trim_Call_Pool (Owner, Context.Frame_Capacity + 1);
+   end Release_Call_Record;
+
    function Function_Address is new Ada.Unchecked_Conversion
      (C_Function, System.Address);
    function Address_Function is new Ada.Unchecked_Conversion
@@ -413,7 +609,7 @@ package body Lua.Engine.Foreign is
          end if;
       end if;
       if not Pending.Is_Close then
-         Memory.Release (State.Memory, Address);
+         Release_Call_Record (Address);
       end if;
    end Discard_Pending;
 
@@ -432,7 +628,7 @@ package body Lua.Engine.Foreign is
          exit when Pending.Is_Root or else Pending.Context /= Context;
          Address := Owner.Calls;
          Owner.Calls := Pending.Previous;
-         Memory.Release (Owner.Universe.Memory, Address);
+         Release_Call_Record (Address);
       end loop;
    end Discard_Self_Calls;
 
@@ -513,6 +709,14 @@ package body Lua.Engine.Foreign is
       Header := Memory.Allocate
         (State.Memory, Control'Object_Size / System.Storage_Unit,
          Control'Alignment);
+      Controls.To_Pointer (Header).all :=
+        (Universe => State, Context => Context, Extra => Extra,
+         Seed => Seed,
+         Owns_Universe =>
+           (if Main = System.Null_Address then Owns_Universe else
+              Controls.To_Pointer
+                (Surfaces.To_Pointer (Main).Owner).Owns_Universe),
+         others => <>);
       Block := Memory.Allocate
         (State.Memory, Extra + Surface'Object_Size / System.Storage_Unit,
          Surface'Alignment);
@@ -523,16 +727,20 @@ package body Lua.Engine.Foreign is
       Reset_Record := Memory.Allocate
         (State.Memory, Call_Record'Object_Size / System.Storage_Unit,
          Call_Record'Alignment);
+      --  This dedicated reset record never enters the reusable pool. Give
+      --  all scalar fields a defined inactive value before publishing it;
+      --  Reset_API initializes/stamps it for each actual protected reset.
+      Calls.To_Pointer (Reset_Record).all := (others => <>);
       Result := Block + Storage_Offset (Extra);
-      Controls.To_Pointer (Header).all :=
-        (Universe => State, Context => Context, Extra => Extra,
-         Seed => Seed, Driver => null,
-         Reset_Driver => Reset_Driver, Reset_Record => Reset_Record,
-         Owns_Universe =>
-           (if Main = System.Null_Address then Owns_Universe else
-              Controls.To_Pointer
-                (Surfaces.To_Pointer (Main).Owner).Owns_Universe),
-         others => <>);
+      Controls.To_Pointer (Header).Reset_Driver := Reset_Driver;
+      Controls.To_Pointer (Header).Reset_Record := Reset_Record;
+      --  Surfaces adopt all already allocated Ada frame capacity plus one
+      --  actual host-entry spare. Pure Ada frame creation needed no surface.
+      while Controls.To_Pointer (Header).Record_Capacity <=
+        Item.Frame_Capacity
+      loop
+         Grow_Call_Pool (State.all, Controls.To_Pointer (Header));
+      end loop;
       Surfaces.To_Pointer (Result).all :=
         (Owner => Header, Guard => System.Null_Address,
          Main => (if Main = System.Null_Address then Result else Main),
@@ -564,6 +772,9 @@ package body Lua.Engine.Foreign is
    exception
       when others =>
          VM.Free_Driver (Reset_Driver);
+         if Header /= System.Null_Address then
+            Destroy_Call_Pool (Controls.To_Pointer (Header));
+         end if;
          Memory.Release (State.Memory, Reset_Record);
          Memory.Release (State.Memory, Block);
          Memory.Release (State.Memory, Header);
@@ -581,6 +792,7 @@ package body Lua.Engine.Foreign is
          raise Program_Error with "releasing an active C reset control";
       end if;
       VM.Free_Driver (Owner.Reset_Driver);
+      Destroy_Call_Pool (Owner);
       Memory.Release (State.Memory, Owner.Reset_Record);
    end Release_Context_Control;
 
@@ -1315,6 +1527,7 @@ package body Lua.Engine.Foreign is
             Saved_Borrowed => Main_Owner.Driver_Borrowed,
             Saved_Context => Previous, Saved_Native_Depth => Saved_Depth,
             others => <>);
+         Stamp_Call_Record (Owner, Next);
          Owner.Reset_Live := True;
          Main_Owner.Driver := Driver_View (Owner.Reset_Driver);
          Main_Owner.Owned_Driver := Owner.Reset_Driver;
@@ -1473,6 +1686,8 @@ package body Lua.Engine.Foreign is
          Record_Address : constant System.Address := Main_Owner.Calls;
          Pending : constant Calls.Object_Pointer :=
            Calls.To_Pointer (Main_Owner.Calls);
+         Generation : constant C.unsigned_long_long :=
+           Pending.Storage.Generation;
          Is_Resume_Entry : constant Boolean := Pending.Is_Resume;
          Is_Cross_Entry : constant Boolean := Pending.Is_Cross_Call;
          Caller : constant Context_Access := Owner.Universe.Contexts
@@ -1622,7 +1837,7 @@ package body Lua.Engine.Foreign is
                end loop;
                Address := Main_Owner.Calls;
                Main_Owner.Calls := Pending.Previous;
-               Memory.Release (Owner.Universe.Memory, Address);
+               Release_Call_Record (Address);
                return Action_Suspend;
             end if;
             begin
@@ -1733,7 +1948,9 @@ package body Lua.Engine.Foreign is
               (if Error_Status = 1 then Caller.Foreign_Base
                else Caller.Resume_Return_Top);
             Caller.Host_Stack_Top := Caller.Foreign_Top;
-         elsif not Held_Error_View then
+         elsif not Held_Error_View and then
+           not (Pending.Reuse_Argument_Span and then Error_Status = 0)
+         then
             Set_C_Top (Owner.Universe.all, Caller, Pending.Base);
          end if;
          Count := (if Error_Status not in 0 | 1 then 1
@@ -1751,6 +1968,9 @@ package body Lua.Engine.Foreign is
             Is_Panic : constant Boolean := Pending.Is_Panic;
             Is_Cross_Call : constant Boolean := Pending.Is_Cross_Call;
             Direct_Builtin : constant Boolean := Pending.Direct_Builtin;
+            Reuse_Arguments : constant Boolean :=
+              Pending.Reuse_Argument_Span and then Error_Status = 0;
+            Argument_Base : constant Natural := Pending.Original_Base;
             Saved_Driver : constant Driver_View := Pending.Saved_Driver;
             Saved_Owned : constant VM.Driver_Access :=
               Pending.Saved_Owned_Driver;
@@ -1768,7 +1988,7 @@ package body Lua.Engine.Foreign is
                Output.Abort_State := Saved_Context.Foreign_State;
             end if;
             if not Is_Close then
-               Memory.Release (Owner.Universe.Memory, Address);
+               Release_Call_Record (Address);
             end if;
             if Is_Resume or else Is_Cross_Call then
                --  Release/restore scalar driver ownership before result
@@ -1795,6 +2015,14 @@ package body Lua.Engine.Foreign is
                end if;
             end if;
             if not Held_Error_View then
+               if Reuse_Arguments then
+                  --  luaB_assert returns its existing argument span. After
+                  --  all record/driver cleanup, move only this publication
+                  --  cursor and overwrite the same initialized slots below.
+                  --  No callback, allocation or safe point intervenes; real
+                  --  C close links and values remain intact throughout.
+                  Publish_Top (Caller, Argument_Base);
+               end if;
                for Index in 1 .. Count loop
                   Push (Owner.Universe.all, Caller,
                     (if Reset_Error then Caller.Failure
@@ -1859,7 +2087,12 @@ package body Lua.Engine.Foreign is
       exception
          when others =>
             Packet.Clear;
-            if Main_Owner.Calls = Record_Address then
+            if Main_Owner.Calls = Record_Address and then
+              Calls.To_Pointer (Record_Address).Storage.Generation =
+                Generation
+            then
+               --  Result publication can reenter C after this record was
+               --  returned. Address reuse alone cannot identify this pump.
                Discard_Pending (Owner.Universe.all, Main_Owner);
             end if;
             if Is_Resume_Entry then
@@ -2338,10 +2571,7 @@ package body Lua.Engine.Foreign is
                Context.Boundary_Results.Reserve_Capacity (2);
                New_Driver := VM.New_Driver (Owner.Universe.all);
                begin
-                  Address := Memory.Allocate
-                    (Owner.Universe.Memory,
-                     Call_Record'Object_Size / System.Storage_Unit,
-                     Call_Record'Alignment);
+                  Address := Acquire_Call_Record (Owner.Universe.all, Owner);
                exception
                   when others =>
                      VM.Free_Driver (New_Driver);
@@ -2349,7 +2579,8 @@ package body Lua.Engine.Foreign is
                end;
                Next := Calls.To_Pointer (Address);
                Next.all :=
-                 (Is_Root => True, Is_Resume => True, Wanted => -1,
+                 (Storage => Next.Storage,
+                  Is_Root => True, Is_Resume => True, Wanted => -1,
                   Context => Owner.Context,
                   Saved_Driver => Main_Owner.Driver,
                   Saved_Owned_Driver => Main_Owner.Owned_Driver,
@@ -3280,19 +3511,21 @@ package body Lua.Engine.Foreign is
                   New_Driver := VM.New_Driver (Owner.Universe.all);
                end if;
                begin
-                  Address := Memory.Allocate
-                    (Owner.Universe.Memory,
-                     Call_Record'Object_Size / System.Storage_Unit,
-                     Call_Record'Alignment);
+                  Address := Acquire_Call_Record (Owner.Universe.all, Owner);
                exception
                   when others => VM.Free_Driver (New_Driver); raise;
                end;
                Next := Calls.To_Pointer (Address);
-               Next.all := (Previous => Main_Owner.Calls, Base => Slot - 1,
+               Next.all := (Storage => Next.Storage,
+                 Previous => Main_Owner.Calls, Base => Slot - 1,
                  Wanted => Input.Count,
                  Protected_Call => Input.Integer_Data /= 0,
                  Is_Root => Root_Call, Context => Owner.Context,
                  Direct_Builtin => Input.Operation = Begin_Builtin,
+                 Reuse_Argument_Span => Input.Operation = Begin_Builtin
+                   and then Callee.Native_Data = Assert_Function and then
+                   not Arguments.Is_Empty and then
+                   Truth (Arguments.First_Element),
                  Activation => Context.Foreign_Activation,
                  Entry_Depth => Natural (Context.Stack.Length),
                  Original_Top => Context.Foreign_Top,

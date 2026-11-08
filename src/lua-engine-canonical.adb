@@ -835,6 +835,30 @@ package body Lua.Engine.Canonical is
       procedure Binary_Request
         (Operator : Lua.Lexers.Token_Kind; A, B : Value; Destination : Natural;
          Test : Boolean := False);
+      function Primitive_Equal (A, B : Value) return Boolean;
+      function Primitive_Equal (A, B : Value) return Boolean is
+         Work : Natural := 0;
+      begin
+         --  Existing Equal owns numeric cross-kind/NaN and byte-string
+         --  semantics. A different long string can require a linear scan;
+         --  charge that actual possibility before bypassing helper dispatch.
+         if A.Kind = String_Kind and then B.Kind = String_Kind and then
+           A.Reference.Bytes.Address /= B.Reference.Bytes.Address and then
+           A.Reference.Bytes.Size = B.Reference.Bytes.Size
+         then
+            Work := A.Reference.Bytes.Size;
+         end if;
+         if State.Policy = Bounded then
+            if Work > State.Bounds.Instructions - Natural'Min
+              (State.Steps, State.Bounds.Instructions)
+            then
+               Fail (State, "instruction limit exceeded", Resource => True);
+            end if;
+            State.Steps := State.Steps + Work;
+         end if;
+         return Equal (A, B);
+      end Primitive_Equal;
+
       procedure Mark_Closing (Index : Natural);
       procedure Invoke_Iterator (Base, Wanted : Natural);
       procedure Freeze_Closing (From : Natural);
@@ -1252,17 +1276,35 @@ package body Lua.Engine.Canonical is
                        others => <>);
          when Op_TBC => Mark_Closing (Reg_A);
          when Op_JMP => Branch (Operand (SJ));
-         when Op_EQ | Op_LT | Op_LE =>
+         when Op_EQ =>
+            Left := Reg (Reg_A);
+            Right := Reg (Reg_B);
+            if Left.Kind /= Right.Kind or else
+              Left.Kind not in Table_Kind | Userdata_Kind or else
+              Left.Reference = Right.Reference
+            then
+               --  Only distinct tables/full userdata can invoke __eq.
+               --  Primitive and same-object tests must not allocate an
+               --  argument packet after already warmed C/Lua call depth.
+               if Primitive_Equal (Left, Right) /= (Operand (K) /= 0) then
+                  Branch (1);
+               end if;
+            else
+               Binary_Request
+                 (Lua.Lexers.Equal, Left, Right, 0, Test => True);
+            end if;
+         when Op_LT | Op_LE =>
             Binary_Request
-              ((if Op = Op_EQ then Lua.Lexers.Equal
-                elsif Op = Op_LT then Lua.Lexers.Less
+              ((if Op = Op_LT then Lua.Lexers.Less
                 else Lua.Lexers.Less_Equal),
                Reg (Reg_A), Reg (Reg_B), 0, Test => True);
          when Op_EQK | Op_EQI =>
             Right := (if Op = Op_EQK then
                         Constant_At (State, Activation, Reg_B)
                       else (Integer_Kind, Integer_Value (Operand (SB))));
-            if Equal (Reg (Reg_A), Right) /= (Operand (K) /= 0) then
+            if Primitive_Equal (Reg (Reg_A), Right) /=
+              (Operand (K) /= 0)
+            then
                Branch (1);
             end if;
          when Op_LTI | Op_LEI | Op_GTI | Op_GEI =>
@@ -1320,8 +1362,12 @@ package body Lua.Engine.Canonical is
                       elsif Op = Op_RETURN1 then 1
                       elsif Reg_B /= 0 then Reg_B - 1
                       else Activation.Canonical_Top - Reg_A);
-            Copy_Registers
-              (State, Activation.Unwind_Results, Activation, Reg_A, Count);
+            --  The real scalar range remains rooted through closing and
+            --  return hooks. A controlled Action copy would allocate for
+            --  every RETURN despite fully warmed frames and C stack space.
+            --  Machine consumes this range after Step returns, using the
+            --  frame's retained packet capacity only when delivery needs it.
+            Activation.Unwind_Results.Clear;
             --  A return hook observes the actual source register range,
             --  before result adjustment/movement to its caller. A packet's
             --  element one alone cannot recover this public stack offset.
@@ -1329,8 +1375,7 @@ package body Lua.Engine.Canonical is
             Activation.Transfer_Count := Count;
             Activation.Return_Window_Published := True;
             Freeze_Closing (0);
-            Result := (Kind => Return_Results,
-                       Arguments => Activation.Unwind_Results, others => <>);
+            Result := (Kind => Return_Results, others => <>);
          when Op_FORPREP =>
             Prepare_For (State, Activation, Reg_A, Skip);
             if Skip then Branch (Operand (Bx) + 1); end if;

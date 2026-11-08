@@ -6,6 +6,8 @@ Component: [public optimizer semantics witnesses](2026-11-08-code-public-semanti
 
 Component: [actual table-storage inspection](2026-11-08-table-storage-inspection.md).
 
+Component: [reusable C call metadata](2026-11-08-c-call-metadata.md).
+
 Correction: [declaration activation](2026-11-08-declaration-activation-correction.md).
 
 Component: [compiler limit context](2026-11-08-compiler-limit-context.md).

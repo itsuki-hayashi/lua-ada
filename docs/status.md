@@ -16,6 +16,14 @@ weak-lifetime, reuse and refusal cases; the public fixture matches all eight
 producer/VM roles. Exact locals.lua replacement/source approval and full-file
 execution remain pending. The private checker is not a passing C querytab test.
 
+The [C call metadata checkpoint](sessions/2026-11-08-c-call-metadata.md)
+reserves stable selected-owner records and physical C backing, preserves owned
+result arenas, and fixes successful assert/hook refusal paths. Both local
+configurations pass 2,448 AUnit cases and all ordinary C consumers. Seventeen
+T witnesses match all four producer/VM roles; unchanged errors.lua completes
+under 2 GiB in both modes with balanced shutdown. Full API/memory/source/platform
+and final aggregate acceptance remain open.
+
 The [declaration activation correction](sessions/2026-11-08-declaration-activation-correction.md)
 preserves folded-constant acceptance and initializer syntax precedence beyond
 the original errors.lua cases. Both local configurations pass 2,398 AUnit
