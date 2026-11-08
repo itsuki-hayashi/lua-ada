@@ -67,12 +67,22 @@ Defaults: 1,000,000 source bytes, 100,000 tokens including EOF, 200,000 syntax
 nodes/declarations, nesting 200. Runtime register limits remain independent.
 These are bounded-work/storage controls, not a hard OS memory quota.
 
-C stack exhaustion, bytecode register allocation/limits, code-size limits,
-constant folding/optimization, and exact instruction streams are excluded.
-C's 200 stack-local/255-upvalue representational constraints are not reproduced
-as grammar restrictions; Ada can accept source that fits its configured limits.
-No excluded implementation limit is counted as matching parser rejection.
-Diagnostics compare syntax/resource category and reported line, not wording.
+The standalone M2a checking comparison excludes C stack exhaustion, bytecode
+register allocation/limits, code-size limits, constant folding/optimization
+and exact instruction streams. Its grammar checker does not impose C's
+200-local/255-upvalue compiler constraints. That bounded checking domain does
+not exclude the separate M3 runtime obligations or certify their acceptance.
+M2a diagnostics compare syntax/resource category and reported line, not wording.
+
+Canonical execution enforces its actual local, upvalue and register encoding
+limits. Under Lua_Compatible policy, excessive parser nesting is a catchable
+runtime stack failure with the original C-stack error text; public lua_load
+returns LUA_ERRRUN, preserving its distinction from LUA_ERRSYNTAX. Both
+contiguous and streamed input use the same parser. Function bodies charge
+their recursive block once. Bounded Ada sessions and standalone checking keep
+their configured host-depth accounting and Resource_Error behavior. The
+[parser limit checkpoint](sessions/2026-11-08-parser-stack-limits.md) records
+focused evidence; full source and final matrix acceptance remain separate.
 
 ## Oracle workflow
 

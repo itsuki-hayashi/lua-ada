@@ -579,11 +579,14 @@ package body Lua.Engine.Loaders is
                   end Publish_Message;
                begin
                   Message.Set_Owner (Lua.Storage.Reference (State.Memory));
-                  Message.Append (Display_Name);
-                  Message.Append (":");
-                  Message.Append (Ada.Strings.Fixed.Trim
-                    (State.Current.Failure_At.Line'Image, Ada.Strings.Both));
-                  Message.Append (": ");
+                  if State.Current.Failure_Class = Syntax_Failure then
+                     Message.Append (Display_Name);
+                     Message.Append (":");
+                     Message.Append (Ada.Strings.Fixed.Trim
+                       (State.Current.Failure_At.Line'Image,
+                        Ada.Strings.Both));
+                     Message.Append (": ");
+                  end if;
                   --  Pending syntax text is already managed. Borrow it into
                   --  the destination builder, avoiding concatenation through
                   --  an input-sized ordinary Ada String during error handling.

@@ -3649,10 +3649,18 @@ package body Lua.Engine.Foreign is
                          Owner.Universe.Bounds.Tokens,
                          Owner.Universe.Bounds.Syntax_Nodes,
                          Owner.Universe.Bounds.Syntax_Depth),
-                        Memory.Reference (Owner.Universe.Memory));
+                        Memory.Reference (Owner.Universe.Memory),
+                        Catchable_Nesting =>
+                          Owner.Universe.Policy = Lua_Compatible);
                      if Unit.Result.Status = Lua.Syntax.Resource_Error then
                         Fail (Owner.Universe.all,
                               "source loading resource limit", True);
+                     elsif Unit.Result.Stack_Overflow then
+                        --  Lua's parser uses the same C-stack guard as calls.
+                        --  Its protected loader returns LUA_ERRRUN, with the
+                        --  original unprefixed object, not LUA_ERRSYNTAX.
+                        Error_Result ("C stack overflow");
+                        Output.Integer_Data := 2;
                      elsif Unit.Result.Status /= Lua.Syntax.Success then
                         Error_Result
                           (Inspection.Short_Source (Name) & ":" &

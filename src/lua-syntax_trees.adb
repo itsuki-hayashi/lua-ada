@@ -39,12 +39,14 @@ package body Lua.Syntax_Trees is
       Limits : Lua.Syntax.Check_Limits;
       Memory : Lua.Storage.Owner_Access := null;
       Compatible_Global : Boolean :=
-        Lua.Runtime_Configuration.Compatible_Global)
+        Lua.Runtime_Configuration.Compatible_Global;
+      Catchable_Nesting : Boolean := False)
    is
       Input : Lua.Inputs.Source;
    begin
       Input.Borrow (Source'Address, Source'Length);
-      Parse (Unit, Input, Name, Limits, Memory, Compatible_Global);
+      Parse (Unit, Input, Name, Limits, Memory, Compatible_Global,
+             Catchable_Nesting);
    end Parse;
 
    procedure Parse
@@ -52,7 +54,8 @@ package body Lua.Syntax_Trees is
       Name : String; Limits : Lua.Syntax.Check_Limits;
       Memory : Lua.Storage.Owner_Access := null;
       Compatible_Global : Boolean :=
-        Lua.Runtime_Configuration.Compatible_Global)
+        Lua.Runtime_Configuration.Compatible_Global;
+      Catchable_Nesting : Boolean := False)
    is
       Selected : constant not null Lua.Storage.Owner_Access :=
         (if Memory /= null then Memory
@@ -373,7 +376,17 @@ package body Lua.Syntax_Trees is
       begin
          Depth := Depth + 1;
          if Depth > Limits.Nesting then
-            Error ("syntax nesting limit exceeded", Resource => True);
+            --  Compatible execution still needs a finite parser stack. Its
+            --  ceiling rejects a chunk like Lua's parser stack check; it must
+            --  not escape load/pcall as an embedding host-policy abort.
+            --  Explicit checking/session quotas retain their typed resource
+            --  failure and are never made catchable by source code.
+            if Catchable_Nesting then
+               Unit.Result.Stack_Overflow := True;
+               Error ("C stack overflow", Near_Token => False);
+            else
+               Error ("syntax nesting limit exceeded", Resource => True);
+            end if;
          end if;
       end Enter;
 
@@ -583,7 +596,11 @@ package body Lua.Syntax_Trees is
          --  goto visibility, break targets, and vararg eligibility restart at
          --  each function boundary. Restore all parent context on success;
          --  failures discard the entire owned compilation unit.
-         Enter;
+         --  Compatible parsing charges the body block, like Lua's statement
+         --  recursion, without charging the same function boundary twice.
+         --  The standalone/bounded checker retains its original host-depth
+         --  accounting. Expression recursion has its own independent charge.
+         if not Catchable_Nesting then Enter; end if;
          Function_Node := Result;
          Item.Site := Definition;
          Item.Target := Saved_Function;
@@ -627,7 +644,7 @@ package body Lua.Syntax_Trees is
          Varargs := Saved_Varargs;
          Loop_Depth := Saved_Loops;
          Scope := Saved_Scope;
-         Leave;
+         if not Catchable_Nesting then Leave; end if;
          return Result;
       end Function_Body;
 
@@ -1259,7 +1276,7 @@ package body Lua.Syntax_Trees is
       Unit.Result := (Status => Lua.Syntax.Success,
                       Error => (Source => Own (Name),
                                 others => <>),
-                      Incomplete_Input => False);
+                      Incomplete_Input => False, Stack_Overflow => False);
       if Source.Available > Limits.Source_Bytes then
          Error ("source byte limit exceeded", Resource => True);
       end if;

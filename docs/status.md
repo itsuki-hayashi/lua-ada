@@ -2,6 +2,12 @@
 
 ## Remaining upstream compatibility (2026-11-07)
 
+The [parser stack checkpoint](sessions/2026-11-08-parser-stack-limits.md)
+preserves native runtime-error status/text and bounded Ada host quotas.
+Both local configurations pass 2,384 AUnit cases, all standalone C consumers
+and eight compiler/VM roles for the limit fixture. Unchanged errors.lua now
+reaches original line768's upvalue diagnostic context; the file remains open.
+
 The [retained T replay](sessions/2026-11-08-retained-t-source-replay.md)
 completes the reviewed calls.lua equivalent locally with unchanged native
 stdout. The API lifecycle composition advances to original line1090's ordinary

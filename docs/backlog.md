@@ -2,6 +2,12 @@
 
 ## Active remaining-suite delivery
 
+The [parser stack checkpoint](sessions/2026-11-08-parser-stack-limits.md)
+passes sixteen focused cases within 2,384 AUnit cases per configuration.
+Continue unchanged errors.lua at original line768: excessive upvalues must
+retain their defining function's line context. Preserve final target gates
+and the separately pending allocation, hooks, native/CLI and aggregate work.
+
 The [assert argument checkpoint](sessions/2026-11-08-assert-arguments.md)
 passes five focused cases and 2,359 AUnit cases per local configuration.
 Continue unchanged errors.lua at generated parser/compiler limits: compatible

@@ -800,6 +800,40 @@ static void test_reader_avoids_prefix_reconstruction(void) {
     puts("C API PASS: many reader pieces avoid prefix reconstruction");
 }
 
+static void test_parser_depth_status(lua_State *state, int streaming) {
+    char source[1009];
+    struct chunk_reader reader = {0};
+    int status;
+    /* The protected parser's own stack check is a runtime error, distinct
+     * from malformed grammar. Keep an existing stack value intact, recover
+     * on the same state, and exercise both contiguous and streamed input. */
+    memcpy(source, "return ", 7);
+    memset(source + 7, '(', 500);
+    source[507] = '1';
+    memset(source + 508, ')', 500);
+    source[1008] = '\0';
+    lua_settop(state, 0);
+    lua_pushinteger(state, 37);
+    if (streaming) {
+        reader.bytes = source;
+        reader.size = 1008;
+        reader.piece = sizeof(reader.scratch);
+        status = lua_load(state, read_chunk, &reader, "=parser-depth", "t");
+    } else {
+        status = luaL_loadbufferx(state, source, 1008, "=parser-depth", "t");
+    }
+    assert(status == LUA_ERRRUN);
+    assert(lua_gettop(state) == 2 && lua_tointeger(state, 1) == 37);
+    assert(strcmp(lua_tostring(state, 2), "C stack overflow") == 0);
+    lua_pop(state, 1);
+    assert(luaL_loadstring(state, "return 42") == LUA_OK);
+    assert(lua_pcall(state, 0, 1, 0) == LUA_OK);
+    assert(lua_gettop(state) == 2 && lua_tointeger(state, 2) == 42);
+    lua_settop(state, 0);
+    puts(streaming ? "C API PASS: streamed parser depth runtime status" :
+                     "C API PASS: buffer parser depth runtime status");
+}
+
 static void test_load_dump_contract(lua_State *state) {
     test_reader_piece_lifetime(state);
     test_reader_preserves_stack(state);
@@ -829,6 +863,8 @@ static void test_load_dump_contract(lua_State *state) {
     test_fixed_binary_piece_requirements(state);
     test_partial_binary_reader_error_cleanup(state);
     test_reader_avoids_prefix_reconstruction();
+    test_parser_depth_status(state, 0);
+    test_parser_depth_status(state, 1);
 }
 
 #endif
