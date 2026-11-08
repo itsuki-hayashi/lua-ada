@@ -42,5 +42,34 @@
     "author": "Codex /root/validation_delivery",
     "artifact_sha256": null,
     "status": "pending"
+  },
+  "counterpart_source_snapshot": {
+    "kind": "author-only-source-bindings",
+    "revision": "9ce9f00c545c8aab111bd4f74d5f578705b2e29e",
+    "independent_review_status": "pending",
+    "runtime_acceptance": false,
+    "coverage_authority": false,
+    "bindings": [
+      {
+        "path": "c_api/tests/pointer_identity_contract.c",
+        "sha256": "818f9704798b6983887ba0b50a6e114b2770c1026ae6a4453b8a09e51f106c14"
+      },
+      {
+        "path": "references/lua/ltests.c",
+        "sha256": "62a7015b036d366addd131e4f046f38557d66b8f48aae120e8aad992f3d90199"
+      },
+      {
+        "path": "references/lua/manual/manual.of",
+        "sha256": "4dacf28ab4e5219380494ff53d798a38237d5a80377b3118301576df0f61be24"
+      },
+      {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/calls-undump-string-values.author.lua",
+        "sha256": "d1ef08edca513407c8906b7f2542a274e00d6e3c46b1091de04620f34ada8795"
+      },
+      {
+        "path": "tests/conformance/targets/remaining-upstream-compatibility/reviews/calls-undump-constant-pool.independent-feature-review.json",
+        "sha256": "641b9541139b53f56c054b59d29e965c80dfd8f0dee99264465e592f35e72ff4"
+      }
+    ]
   }
 }

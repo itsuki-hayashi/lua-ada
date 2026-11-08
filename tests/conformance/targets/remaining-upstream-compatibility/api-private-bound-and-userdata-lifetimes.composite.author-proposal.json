@@ -20,7 +20,7 @@
     },
     {
       "manifest": {
-        "sha256": "f514dc673fd9b129aa0ff0edb6cdf9a19b4135c67250edf5d89f21c8b9341502",
+        "sha256": "8de28e53ca1a85abf6f72f7651e7c6029347aa344ee98429b2ea2ff3311e2b68",
         "path": "tests/conformance/targets/remaining-upstream-compatibility/api-finalized-userdata-reclamation.equivalent.author-proposal.json"
       },
       "output_sha256": "2838c5b9183c835b3581f829657d30451c16be1bfca952e5b8638d67e5966897",
