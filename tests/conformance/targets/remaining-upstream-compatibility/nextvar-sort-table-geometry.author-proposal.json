@@ -1,0 +1,779 @@
+{
+  "schema_version": 1,
+  "kind": "author-feature-proposal",
+  "id": "nextvar-sort-private-table-geometry",
+  "date": "2026-11-08",
+  "author": "Codex /root/remaining_suite",
+  "review": {
+    "status": "pending",
+    "reviewer": null
+  },
+  "reference_revision": "7579fc9d7ed90240487251dfb69168f8e64e9294",
+  "base_revision": "0fe25700cfc31e2a5a8b2d6acdb32fd6692ed7b3",
+  "source_files": [
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "sha256": "a49a917beb9e5c000d60baed697cefcdcb4ca985bba27b71d587cff8776b5029",
+      "bytes": 22750
+    },
+    {
+      "path": "references/lua/testes/sort.lua",
+      "sha256": "283f72b600acda62016689c92a694f2b91c1fc49dbcba377a9a5ed78b2784dc3",
+      "bytes": 9625
+    }
+  ],
+  "native_facility": {
+    "path": "references/lua/ltests.c",
+    "start_line": 1130,
+    "end_line": 1169,
+    "start_byte": 30407,
+    "length_bytes": 1092,
+    "sha256": "69a47f008ef9979ad7f14236d77f79e5abde8402a5a5717bacfde1322bf4b112",
+    "original_text": "static int table_query (lua_State *L) {\n  const Table *t;\n  int i = cast_int(luaL_optinteger(L, 2, -1));\n  unsigned int asize;\n  luaL_checktype(L, 1, LUA_TTABLE);\n  t = hvalue(obj_at(L, 1));\n  asize = t->asize;\n  if (i == -1) {\n    lua_pushinteger(L, cast_Integer(asize));\n    lua_pushinteger(L, cast_Integer(allocsizenode(t)));\n    lua_pushinteger(L, cast_Integer(asize > 0 ? *lenhint(t) : 0));\n    return 3;\n  }\n  else if (cast_uint(i) < asize) {\n    lua_pushinteger(L, i);\n    if (!tagisempty(*getArrTag(t, i)))\n      arr2obj(t, cast_uint(i), s2v(L->top.p));\n    else\n      setnilvalue2s(L->top.p);\n    api_incr_top(L);\n    lua_pushnil(L);\n  }\n  else if (cast_uint(i -= cast_int(asize)) < sizenode(t)) {\n    TValue k;\n    getnodekey(L, &k, gnode(t, i));\n    if (!isempty(gval(gnode(t, i))) ||\n        ttisnil(&k) ||\n        ttisnumber(&k)) {\n      pushobject(L, &k);\n    }\n    else\n      lua_pushliteral(L, \"<undef>\");\n    if (!isempty(gval(gnode(t, i))))\n      pushobject(L, gval(gnode(t, i)));\n    else\n      lua_pushnil(L);\n    lua_pushinteger(L, gnext(&t->node[i]));\n  }\n  return 3;\n}\n"
+  },
+  "all_direct_querytab_lines": [
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "start_line": 17,
+      "end_line": 17,
+      "start_byte": 341,
+      "length_bytes": 29,
+      "sha256": "a33f2b0411de1f96ee31b6dce5d65d677b10162e046bb74f812f712916207d14",
+      "original_text": "  local a, h = T.querytab(t)\n"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "start_line": 20,
+      "end_line": 20,
+      "start_byte": 406,
+      "length_bytes": 36,
+      "sha256": "491e5ea86257a54afec51f646686eacffba57617b8271fec55c464b4f4f04586",
+      "original_text": "    print(\"\", T.querytab(t, i - 1))\n"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "start_line": 24,
+      "end_line": 24,
+      "start_byte": 483,
+      "length_bytes": 40,
+      "sha256": "2b9c33e2e256c15b236c59d198ad3b602f571aa068fd8725cc7ccd6592664e47",
+      "original_text": "    print(\"\", T.querytab(t, a + i - 1))\n"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "start_line": 38,
+      "end_line": 38,
+      "start_byte": 823,
+      "length_bytes": 29,
+      "sha256": "a33f2b0411de1f96ee31b6dce5d65d677b10162e046bb74f812f712916207d14",
+      "original_text": "  local a, h = T.querytab(t)\n"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "start_line": 237,
+      "end_line": 237,
+      "start_byte": 5285,
+      "length_bytes": 31,
+      "sha256": "71944e7137b8fef19530ab24ac48ad44213a252a2a1f1215c0ddcc1ee807cf5d",
+      "original_text": "  local na, nh = T.querytab(t)\n"
+    },
+    {
+      "path": "references/lua/testes/nextvar.lua",
+      "start_line": 243,
+      "end_line": 243,
+      "start_byte": 5390,
+      "length_bytes": 35,
+      "sha256": "d722ff7ac1d4b2d514b87bceb873bffe545f390f7d12bff596c90910e406bc83",
+      "original_text": "    local nna, nnh = T.querytab(t)\n"
+    },
+    {
+      "path": "references/lua/testes/sort.lua",
+      "start_line": 29,
+      "end_line": 29,
+      "start_byte": 649,
+      "length_bytes": 38,
+      "sha256": "5575aab0e7e43a13d3e93b8f6aa3138dc7ff24b65e85e43551ae79dabfd33269",
+      "original_text": "  assert(not T or T.querytab(t) == N)\n"
+    },
+    {
+      "path": "references/lua/testes/sort.lua",
+      "start_line": 36,
+      "end_line": 36,
+      "start_byte": 858,
+      "length_bytes": 52,
+      "sha256": "e21e681555443a4d6a4abd2b5b71a9dc3a9ff2a6fb96d45041f5fea88ea90b9c",
+      "original_text": "  assert(not T or select(2, T.querytab(t)) == 1024)\n"
+    }
+  ],
+  "size_check_callsite_count": 29,
+  "groups": [
+    {
+      "id": "sort-create-sequence-geometry",
+      "span": {
+        "path": "references/lua/testes/sort.lua",
+        "start_line": 29,
+        "end_line": 29,
+        "start_byte": 649,
+        "length_bytes": 38,
+        "sha256": "5575aab0e7e43a13d3e93b8f6aa3138dc7ff24b65e85e43551ae79dabfd33269",
+        "original_text": "  assert(not T or T.querytab(t) == N)\n"
+      },
+      "classification": "private exact C array size",
+      "candidate": "reviewed Ada storage invariant at same table, retain public fills/length/content and ordinary memory bound",
+      "retained_context": {
+        "path": "references/lua/testes/sort.lua",
+        "start_line": 16,
+        "end_line": 41,
+        "start_byte": 286,
+        "length_bytes": 847,
+        "sha256": "6558a3ea939093936b1ccbf03d492a4dac425678d7ee7cb737575af9faea4ed9",
+        "original_text": "do print \"testing 'table.create'\"\n  local N = 10000\n  collectgarbage()\n  local m = collectgarbage(\"count\") * 1024\n  local t = table.create(N)\n  local memdiff = collectgarbage(\"count\") * 1024 - m\n  assert(memdiff > N * 4)\n  for i = 1, 20 do\n    assert(#t == i - 1)\n    t[i] = 0\n  end\n  for i = 1, 20 do  t[#t + 1] = i * 10  end\n  assert(#t == 40 and t[39] == 190)\n  assert(not T or T.querytab(t) == N)\n  t = nil\n  collectgarbage()\n  m = collectgarbage(\"count\") * 1024\n  t = table.create(0, 1024)\n  memdiff = collectgarbage(\"count\") * 1024 - m\n  assert(memdiff > 1024 * 12)\n  assert(not T or select(2, T.querytab(t)) == 1024)\n\n  local maxint1 = 1 << (string.packsize(\"i\") * 8 - 1)\n  checkerror(\"out of range\", table.create, maxint1)\n  checkerror(\"out of range\", table.create, 0, maxint1)\n  checkerror(\"table overflow\", table.create, 0, maxint1 - 1)\n"
+      },
+      "original_anchors": [
+        {
+          "id": "LUA-SORT-ASSERT-CALL-0005",
+          "kind": "assert-call",
+          "byte_offset": 651,
+          "byte_length": 6,
+          "line": 29,
+          "end_line": 29,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        },
+        {
+          "id": "LUA-SORT-INTERNAL-REFERENCE-0001",
+          "kind": "internal-reference",
+          "byte_offset": 667,
+          "byte_length": 10,
+          "line": 29,
+          "end_line": 29,
+          "anchor_sha256": "85a7feb78cbcd09da43e8e0bcdcc4894d236ac4f886fac9806a595ea873261d9",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        }
+      ],
+      "approval": "pending"
+    },
+    {
+      "id": "sort-create-hash-geometry",
+      "span": {
+        "path": "references/lua/testes/sort.lua",
+        "start_line": 36,
+        "end_line": 36,
+        "start_byte": 858,
+        "length_bytes": 52,
+        "sha256": "e21e681555443a4d6a4abd2b5b71a9dc3a9ff2a6fb96d45041f5fea88ea90b9c",
+        "original_text": "  assert(not T or select(2, T.querytab(t)) == 1024)\n"
+      },
+      "classification": "private exact C hash-node allocation size",
+      "candidate": "reviewed Ada storage invariant at same table, retain memory bound and table.create argument/overflow behavior",
+      "original_anchors": [
+        {
+          "id": "LUA-SORT-ASSERT-CALL-0007",
+          "kind": "assert-call",
+          "byte_offset": 860,
+          "byte_length": 6,
+          "line": 36,
+          "end_line": 36,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        },
+        {
+          "id": "LUA-SORT-INTERNAL-REFERENCE-0002",
+          "kind": "internal-reference",
+          "byte_offset": 886,
+          "byte_length": 10,
+          "line": 36,
+          "end_line": 36,
+          "anchor_sha256": "85a7feb78cbcd09da43e8e0bcdcc4894d236ac4f886fac9806a595ea873261d9",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        }
+      ],
+      "approval": "pending"
+    },
+    {
+      "id": "nextvar-size-check-helper",
+      "span": {
+        "path": "references/lua/testes/nextvar.lua",
+        "start_line": 36,
+        "end_line": 43,
+        "start_byte": 763,
+        "length_bytes": 168,
+        "sha256": "8072c4038dca23171eed29ba579196263ff03adac856e6ef95096a3a79fae06a",
+        "original_text": "local function check (t, na, nh)\n  if not T then return end\n  local a, h = T.querytab(t)\n  if a ~= na or h ~= nh then\n    print(na, nh, a, h)\n    assert(nil)\n  end\nend\n"
+      },
+      "classification": "private array/hash geometry assertion helper",
+      "candidate": "actual read-only Verify_Table_Storage plus live count vs real iteration; preserve all callsites and expected-argument evaluation including mp2 assertions",
+      "callsites": [
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 61,
+          "end_line": 61,
+          "start_byte": 1282,
+          "length_bytes": 19,
+          "sha256": "c95d330e68bcaf5f43e71e38dbe569c141517ba9b011291bca495eca3c18eccb",
+          "original_text": "  check(a, 128, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 64,
+          "end_line": 64,
+          "start_byte": 1336,
+          "length_bytes": 19,
+          "sha256": "c95d330e68bcaf5f43e71e38dbe569c141517ba9b011291bca495eca3c18eccb",
+          "original_text": "  check(a, 128, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 67,
+          "end_line": 67,
+          "start_byte": 1392,
+          "length_bytes": 61,
+          "sha256": "3b7cc12deccf31f27a093cdd6219bca64b79369700ce6a5bf393526f3a8e00ca",
+          "original_text": "  check(a, 4, 8)   -- keys larger than 4 go to the hash part\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 78,
+          "end_line": 78,
+          "start_byte": 1685,
+          "length_bytes": 20,
+          "sha256": "2aede57e938e2aad6afc249e0cc8307272a3c3fde69035c07358ac0ea121242e",
+          "original_text": "  check(a, 1000, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 80,
+          "end_line": 80,
+          "start_byte": 1716,
+          "length_bytes": 55,
+          "sha256": "e1bed1981545e2809c7ec47ab050d30497b73931d05dfd0273158f64090796a3",
+          "original_text": "  check(a, 1000, 1)   -- array part keeps its elements\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 91,
+          "end_line": 91,
+          "start_byte": 1931,
+          "length_bytes": 17,
+          "sha256": "46d3344b47206add3e889dfef07be531b5f00e38f90ab6db15dc01c49dd8f237",
+          "original_text": "  check(a, N, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 163,
+          "end_line": 163,
+          "start_byte": 3351,
+          "length_bytes": 25,
+          "sha256": "7e33f69b566655e9dcd3408152176eb031eceaf26cee7372de973bbcc656e199",
+          "original_text": "  check(math, 0, mp2(s))\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 193,
+          "end_line": 193,
+          "start_byte": 4331,
+          "length_bytes": 26,
+          "sha256": "15b17f5b75d9f0c24844d99fa7eda6bc8fd9477b52d7f021187100b7062d552c",
+          "original_text": "    check(t, sa, mp2(sh))\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 204,
+          "end_line": 204,
+          "start_byte": 4566,
+          "length_bytes": 17,
+          "sha256": "ad98914a99ebd9383eafefd549395ffcbb33bda3489f12f9aa45bd6538de3618",
+          "original_text": "  check(t, k, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 206,
+          "end_line": 206,
+          "start_byte": 4617,
+          "length_bytes": 19,
+          "sha256": "30171d7f1e08d66894302065487d78d2a86b00c4decfc67d6f07d44d6fb98916",
+          "original_text": "  check(t, k+3, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 213,
+          "end_line": 213,
+          "start_byte": 4716,
+          "length_bytes": 39,
+          "sha256": "437c9aa0e36b1dce108be67f7f014b039f31327e92e5216ef198d8bfe51a0819",
+          "original_text": "local a = {}; a[2] = 1; check(a, 2, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 214,
+          "end_line": 214,
+          "start_byte": 4755,
+          "length_bytes": 34,
+          "sha256": "e6d4cf714cd453b9a5b9f3f5ce9876072f8757d6c6ab1c986574a88bbf1a287a",
+          "original_text": "a = {}; a[0] = 1; check(a, 0, 1);\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 215,
+          "end_line": 215,
+          "start_byte": 4789,
+          "length_bytes": 25,
+          "sha256": "0b7a4212455084a1f6fd51cddd290a782a7e47f27d34dc5a0b6ec4da20a883ab",
+          "original_text": "a[2] = 1; check(a, 2, 1)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 216,
+          "end_line": 216,
+          "start_byte": 4814,
+          "length_bytes": 43,
+          "sha256": "352920319546b2171bfe688a557fb6a1bef277eac2bf05b2c11bea5098fa7409",
+          "original_text": "a = {}; a[0] = 1; a[1] = 1; check(a, 1, 1)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 221,
+          "end_line": 221,
+          "start_byte": 4910,
+          "length_bytes": 22,
+          "sha256": "d34c588985f3838acaa1c92bc7d4e164c3e4905df2c280674294673c119cc238",
+          "original_text": "  check(a, mp2(i), 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 228,
+          "end_line": 228,
+          "start_byte": 4995,
+          "length_bytes": 22,
+          "sha256": "6a58e444f06b527eafda536ae010df9d6d19ea4a9f392264f8be14398e25b849",
+          "original_text": "  check(a, 0, mp2(i))\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 251,
+          "end_line": 251,
+          "start_byte": 5509,
+          "length_bytes": 18,
+          "sha256": "a440eb7b0822b7386e7c6b69159f1b0409201d35fdbed22b2fc6affcd2f627d1",
+          "original_text": "  check(a, 16, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 253,
+          "end_line": 253,
+          "start_byte": 5560,
+          "length_bytes": 18,
+          "sha256": "a440eb7b0822b7386e7c6b69159f1b0409201d35fdbed22b2fc6affcd2f627d1",
+          "original_text": "  check(a, 16, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 256,
+          "end_line": 256,
+          "start_byte": 5630,
+          "length_bytes": 61,
+          "sha256": "e08ae4bc170cebf7514115e8b46502cb9395cfafdded79a7ce118ffcd173b691",
+          "original_text": "  check(a, 0, 8)   -- 5 elements in the hash part: [12]-[16]\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 259,
+          "end_line": 259,
+          "start_byte": 5720,
+          "length_bytes": 18,
+          "sha256": "6d685b9580a74b18a193b690d9c2f23d886df5df13eda8ee4bc1714e4f4578a5",
+          "original_text": "  check(a, 16, 1)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 261,
+          "end_line": 261,
+          "start_byte": 5784,
+          "length_bytes": 36,
+          "sha256": "dc60ade9da433cac0ab33e8744f2251c41f129bd67a8cb520bc415b766da8101",
+          "original_text": "  check(a, 16, 1)   -- no rehash...\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 263,
+          "end_line": 263,
+          "start_byte": 5869,
+          "length_bytes": 45,
+          "sha256": "b514c8f12ddfc3ede157d4d428d3b485e46810728c9da54eb2691b59a6692ed8",
+          "original_text": "  check(a, 0, 4)   -- [15], [16], [31], [32]\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 271,
+          "end_line": 271,
+          "start_byte": 6029,
+          "length_bytes": 22,
+          "sha256": "e591d4a6ecb370890b0fa2e1ea02ec1894efa245068f32d31fef31cc0a406afc",
+          "original_text": "  check(a, mp2(N), 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 282,
+          "end_line": 282,
+          "start_byte": 6269,
+          "length_bytes": 26,
+          "sha256": "1d33bf742dd91da6301026e0cdbeefe7d8e0461d262505bf25981284eae59313",
+          "original_text": "      check(a, mp2(i), 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 297,
+          "end_line": 297,
+          "start_byte": 6632,
+          "length_bytes": 43,
+          "sha256": "ef5d011d506452a5cf54b8d4e0f01e115894d5fe7576bda53ebfe6cf0c9b2e22",
+          "original_text": "  check(a, 0, 256)    -- hash part is full\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 303,
+          "end_line": 303,
+          "start_byte": 6896,
+          "length_bytes": 19,
+          "sha256": "b665bcc8b523a3d288756f357d4fc18e4a6ecddd6e76c1d62802320f066c99a7",
+          "original_text": "  check(a, 0, 512)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 311,
+          "end_line": 311,
+          "start_byte": 7003,
+          "length_bytes": 19,
+          "sha256": "02e338caf26a2aafe9eba56805e4a804e7dcc867ecfa42ddaaa8ed7ce5d5c779",
+          "original_text": "  check(arg, n, 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 314,
+          "end_line": 314,
+          "start_byte": 7072,
+          "length_bytes": 26,
+          "sha256": "a736ced151c0aee19c49244782cbecb1861dfb694d6dcf092b4575ab9e61dc95",
+          "original_text": "  check(arg, mp2(n+1), 0)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 316,
+          "end_line": 316,
+          "start_byte": 7113,
+          "length_bytes": 26,
+          "sha256": "afe69646e072619bd5b2826d653a5a2c6b06d5744b4161cc0c6fecfba0fe95b2",
+          "original_text": "  check(arg, mp2(n+1), 1)\n"
+        }
+      ],
+      "approval": "pending"
+    },
+    {
+      "id": "nextvar-constructor-counts",
+      "span": {
+        "path": "references/lua/testes/nextvar.lua",
+        "start_line": 179,
+        "end_line": 193,
+        "start_byte": 3881,
+        "length_bytes": 476,
+        "sha256": "cfc6e18408aba0135ce9743a342127fdc177db402bb239e817c886e992d3684f",
+        "original_text": "    local prog = table.concat(arr)\n    local f = assert(load(prog))\n    collectgarbage(\"stop\")\n    f()    -- call once to ensure stack space\n    -- make sure table is not resized after being created\n    if sa == 0 or sh == 0 then\n      T.alloccount(2);  -- header + array or hash part\n    else\n      T.alloccount(3);  -- header + array part + hash part\n    end\n    local t = f()\n    T.alloccount();\n    collectgarbage(\"restart\")\n    assert(#t == sa)\n    check(t, sa, mp2(sh))\n"
+      },
+      "classification": "mixed constructor execution/length and private C header-array-hash allocation counts2or3",
+      "candidate": "separate feature decision required for exact counts; retain generated program, warm invocation, real construction, GC stop/restart, #t and public values; add actual provider refusal/retry counterpart before resolving counts",
+      "original_anchors": [
+        {
+          "id": "LUA-NEXTVAR-ASSERT-CALL-0018",
+          "kind": "assert-call",
+          "byte_offset": 3930,
+          "byte_length": 6,
+          "line": 180,
+          "end_line": 180,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        },
+        {
+          "id": "LUA-NEXTVAR-CONDITIONAL-GUARD-0004",
+          "kind": "conditional-guard",
+          "byte_offset": 4084,
+          "byte_length": 2,
+          "line": 184,
+          "end_line": 184,
+          "anchor_sha256": "935f68319d4f227e02bfd54a0ddf85b8a242e42a4277aa5ef5eaab691710924e",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        },
+        {
+          "id": "LUA-NEXTVAR-INTERNAL-REFERENCE-0005",
+          "kind": "internal-reference",
+          "byte_offset": 4117,
+          "byte_length": 12,
+          "line": 185,
+          "end_line": 185,
+          "anchor_sha256": "041ab5b94079ad05d0ee3c750a1bc79ad7a737e69236cb6109facb0c438c58fd",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        },
+        {
+          "id": "LUA-NEXTVAR-INTERNAL-REFERENCE-0006",
+          "kind": "internal-reference",
+          "byte_offset": 4181,
+          "byte_length": 12,
+          "line": 187,
+          "end_line": 187,
+          "anchor_sha256": "041ab5b94079ad05d0ee3c750a1bc79ad7a737e69236cb6109facb0c438c58fd",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        },
+        {
+          "id": "LUA-NEXTVAR-INTERNAL-REFERENCE-0007",
+          "kind": "internal-reference",
+          "byte_offset": 4264,
+          "byte_length": 12,
+          "line": 190,
+          "end_line": 190,
+          "anchor_sha256": "041ab5b94079ad05d0ee3c750a1bc79ad7a737e69236cb6109facb0c438c58fd",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        },
+        {
+          "id": "LUA-NEXTVAR-ASSERT-CALL-0019",
+          "kind": "assert-call",
+          "byte_offset": 4314,
+          "byte_length": 6,
+          "line": 192,
+          "end_line": 192,
+          "anchor_sha256": "25450689bdd44d014020b238021b313431cb1f7a86f24e29cecbd1e442edae0a",
+          "status": "pending",
+          "disposition": "pending",
+          "invariant": null,
+          "configurations": [],
+          "evidence": [],
+          "review": null
+        }
+      ],
+      "approval": "pending"
+    },
+    {
+      "id": "nextvar-physical-rehash-trigger",
+      "span": {
+        "path": "references/lua/testes/nextvar.lua",
+        "start_line": 232,
+        "end_line": 245,
+        "start_byte": 5023,
+        "length_bytes": 437,
+        "sha256": "5fa3dce8eb2bc849461b7422de052926869f5ba62a95e0a19cca9e5e319762de",
+        "original_text": "-- insert and delete elements until a rehash occur. Caller must ensure\n-- that a rehash will change the shape of the table. Must repeat because\n-- the insertion may collide with the deleted element, and then there is\n-- no rehash.\nlocal function forcerehash (t)\n  local na, nh = T.querytab(t)\n  local i = 10000\n  repeat\n    i = i + 1\n    t[i] = true\n    t[i] = undef\n    local nna, nnh = T.querytab(t)\n  until nna ~= na or nnh ~= nh\nend\n"
+      },
+      "classification": "private physical shape controls loop termination; mixed real insertion/deletion",
+      "candidate": "separately reviewed bounded real churn/storage-safety counterpart; never substitute rows/live for geometry in existing repeat condition",
+      "callsite_spans": [
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 258,
+          "end_line": 258,
+          "start_byte": 5703,
+          "length_bytes": 17,
+          "sha256": "9d2f7b32619e4b76045e291b68cf20b9ae5bb57e84bdedd695c02888c53de36e",
+          "original_text": "  forcerehash(a)\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 300,
+          "end_line": 300,
+          "start_byte": 6728,
+          "length_bytes": 63,
+          "sha256": "60954d94345294a88365c1ff0f998e7c85ad3476f9232f0f4bff62b1c7550420",
+          "original_text": "  -- table has only 255 elements, but it got some extra space;\n"
+        }
+      ],
+      "retained_contexts": [
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 248,
+          "end_line": 264,
+          "start_byte": 5462,
+          "length_bytes": 456,
+          "sha256": "03b716a9e9101a975c93793c75c3bc9b17587cf7afa24662b469a22669a049bd",
+          "original_text": "do\n  local a = {}\n  for i=1,16 do a[i] = i end\n  check(a, 16, 0)\n  for i=1,11 do a[i] = undef end\n  check(a, 16, 0)\n  a[30] = true    -- force a rehash\n  a[30] = undef\n  check(a, 0, 8)   -- 5 elements in the hash part: [12]-[16]\n  a[10] = 1\n  forcerehash(a)\n  check(a, 16, 1)\n  for i=1,14 do a[i] = true; a[i] = undef end\n  check(a, 16, 1)   -- no rehash...\n  a[31] = true; a[32] = true   -- force a rehash\n  check(a, 0, 4)   -- [15], [16], [31], [32]\nend\n"
+        },
+        {
+          "path": "references/lua/testes/nextvar.lua",
+          "start_line": 289,
+          "end_line": 304,
+          "start_byte": 6318,
+          "length_bytes": 601,
+          "sha256": "7b1952053fd18f89f4eda48ec612badcf1e9a3c5ec6b2b74bcb9f4b7aa50ae11",
+          "original_text": "  -- alternate insertions and deletions should give some extra\n  -- space for the hash part. Otherwise, a mix of insertions/deletions\n  -- could cause too many rehashes. (See the other test for \"alternate\n  -- insertions and deletions\" in this file.)\n  local a = {}\n  for i = 1, 256 do\n    a[i .. \"\"] = true\n  end\n  check(a, 0, 256)    -- hash part is full\n  a[\"256\"] = nil    -- delete a key\n  forcerehash(a)\n  -- table has only 255 elements, but it got some extra space;\n  -- otherwise, almost each delete-insert would rehash the table again.\n  assert(countentries(a) == 255)\n  check(a, 0, 512)\nend\n"
+        }
+      ],
+      "approval": "pending; no algorithm/replacement chosen"
+    },
+    {
+      "id": "nextvar-unused-table-printer",
+      "span": {
+        "path": "references/lua/testes/nextvar.lua",
+        "start_line": 16,
+        "end_line": 26,
+        "start_byte": 311,
+        "length_bytes": 222,
+        "sha256": "30bfc6aec195d2b7d43dccf13e48c681aa5e3084bf69d5efba69f49da0308a38",
+        "original_text": "local function printTable (t)\n  local a, h = T.querytab(t)\n  print(\"array:\")\n  for i = 1, a do\n    print(\"\", T.querytab(t, i - 1))\n  end\n  print(\"hash:\")\n  for i = 1, h do\n    print(\"\", T.querytab(t, a + i - 1))\n  end\nend\n"
+      },
+      "classification": "uncalled diagnostic helper with indexed private physical rows",
+      "candidate": "preserve bytes, do not claim executed or implement fake indexed querytab",
+      "callsite_count": 0,
+      "approval": "not proposed for adaptation"
+    },
+    {
+      "id": "nextvar-public-churn",
+      "span": {
+        "path": "references/lua/testes/nextvar.lua",
+        "start_line": 127,
+        "end_line": 142,
+        "start_byte": 2602,
+        "length_bytes": 362,
+        "sha256": "ef91a20573b694af55e8d137ecba48777f2e630082c14c0327270b14d4cd8fe5",
+        "original_text": "do\n  -- alternate insertions and deletions in an almost full hash.\n  -- In versions pre-5.5, that causes constant rehashings and\n  -- takes a long time to complete.\n  local a = {}\n  for i = 1, 2^11 - 1 do\n    a[i .. \"\"] = true\n  end\n\n  for i = 1, 1e5 do\n    local key = i .. \".\"\n    a[key] = true\n    a[key] = nil\n  end\n  assert(countentries(a) == 2^11 - 1)\nend\n"
+      },
+      "classification": "ordinary runtime stress and live-entry cardinality",
+      "candidate": "must remain byte-identical and unreduced, including100000insert/delete cycles and2047 retained values",
+      "approval": "preserve"
+    },
+    {
+      "id": "nextvar-power-bound-assertions",
+      "span": {
+        "path": "references/lua/testes/nextvar.lua",
+        "start_line": 151,
+        "end_line": 157,
+        "start_byte": 3104,
+        "length_bytes": 162,
+        "sha256": "92ba9e951d1d7ad697d202ea3858238f73283ba4c9dfbcacef529999d0b0e529",
+        "original_text": "-- minimum power of 2 (or zero) >= n\nlocal function mp2 (n)\n  local mp = 2^math.ceil(math.log(n, 2))\n  assert((mp == 0 or mp/2 < n) and n <= mp)\n  return mp\nend\n\n"
+      },
+      "classification": "public math behavior used by private expected-size computations",
+      "candidate": "preserve function and evaluated arguments; do not erase math.log/ceil/power assertions when geometry is reviewed",
+      "approval": "preserve"
+    }
+  ],
+  "existing_counterparts": [
+    {
+      "path": "tests/src/lua-conformance_adapter.ads",
+      "sha256": "f845a5e1b2f79a5c21b8be8840bf250ff758130dc14c0d9c345cb4d4ffb71b21",
+      "bytes": 1691
+    },
+    {
+      "path": "tests/src/lua-conformance_adapter.adb",
+      "sha256": "03b0099c242763b48459450902928bdb546a8c3a686c693fb2c813314ebf91b3",
+      "bytes": 33803
+    },
+    {
+      "path": "tests/src/lua-engine-table_storage_probe.ads",
+      "sha256": "67d9cb92e436c029c76f85e25ce8f8528ceea01265ae384ef33d50b51e687ab2",
+      "bytes": 300
+    },
+    {
+      "path": "tests/src/lua-engine-table_storage_probe.adb",
+      "sha256": "a30f62f83f16307ed0180de33dc80c61a03dd5e455a000880ab5eb9ca1933579",
+      "bytes": 517
+    },
+    {
+      "path": "tests/src/lua-table_storage_inspection_tests.adb",
+      "sha256": "99a4bec40c9bf041785e4b232316dacb9975c42f32985f713d795bc6f4ee0dc8",
+      "bytes": 19973
+    },
+    {
+      "path": "tests/src/table_storage_public_tests.adb",
+      "sha256": "d72e02ad4a62b20a5809ed08c098dfea032e02f5b3c9ac9faf97e4e379c58d0c",
+      "bytes": 4034
+    },
+    {
+      "path": "tests/lua/table_storage_public.lua",
+      "sha256": "4e7c949594d81e29b4f065485ab6dd7060a88c68392a63acd4fef00dc6ba8838",
+      "bytes": 1717
+    },
+    {
+      "path": "tests/src/lua-table_reservation_tests.adb",
+      "sha256": "0239b41c77496565c39600da7576ceca7d43af806b127766f3a101292fdb4bf4",
+      "bytes": 5900
+    },
+    {
+      "path": "tests/src/table_algorithm_tests.adb",
+      "sha256": "5f81afeab10cdbf037683c234a601709a749a6fd1bd8db4d2bde1995335a17cd",
+      "bytes": 16358
+    }
+  ],
+  "counterpart_limits": [
+    "22 table-storage inspection AUnit cases plus3 public weak/live/reuse cases are existing component evidence, not execution of these source blocks",
+    "Actual inspector returns retained member rows and nonnil entries, not C array/hash capacities",
+    "Real preallocation dense/hash refusal and partial reserve retry cover Ada reservation behavior; they do not certify C constructor allocation counts2/3",
+    "Table create embedding-budget abort is not a substitute for a Lua allocator-refusal witness",
+    "Measure actual checker cost across529generated constructors and repeated growing tables before source-equivalent acceptance; bounded walks/heap-membership validation may be expensive"
+  ],
+  "must_preserve": [
+    "All original guards and mixed block operations unless separately exact-reviewed",
+    "Both sort ordinary collectgarbage-count thresholds and GC operations",
+    "Original table.create hints, writes, #t and contents; no invented capacity values",
+    "All nextvar constructor source generation/load/call cardinality and values",
+    "Public length, next/pairs/ipairs, deletions, weak/GC key lifetime, table-key updates",
+    "Every sorting comparator/callback/invalid-order/move/unpack behavior outside two geometry assertions",
+    "All mp2 evaluated math assertions",
+    "Original100000cycle public churn and2047entry count",
+    "No T=nil or broad helper fake geometry, no silent loop nontermination"
+  ],
+  "forbidden": [
+    "adapted source emission or execution from this author packet",
+    "production implementation or private C table clone",
+    "automatically approved helper-body/whole-T-block skip",
+    "claiming uncalled diagnostic querytab modes passed",
+    "replacing forcerehash termination with unrelated rows/live counters",
+    "source exclusions or ledger status changes without independent exact approval"
+  ],
+  "runtime_acceptance": false,
+  "coverage_authority": false,
+  "adaptation_authority": false,
+  "source_exclusions": [],
+  "replacements": [],
+  "execution_evidence": []
+}
