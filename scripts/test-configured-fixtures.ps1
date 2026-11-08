@@ -49,6 +49,20 @@ Case 'component observations cannot claim whole runtime acceptance' {param($r)$r
 Case 'public optimizer semantics need actual paired source observations in every configuration' {param($r)
     $r.processes=@($r.processes|Where-Object operation -CNE code-public-semantics)
 } 'process set is incomplete'
+Case 'ordinary length campaigns cannot omit the empty-result selector' {param($r)
+    $r.processes=@($r.processes|Where-Object operation -CNE length-result-empty)
+} 'process set is incomplete'
+Case 'ordinary length first-result receipt cannot substitute the failure selector' {param($r)
+    (Row $r length-result-first).process.arguments[3]='failure'
+} 'explicit setup or source'
+Case 'nextvar public invocation must retain its exact one-integer result check' {param($r)
+    $p=(Row $r nextvar-storage-public).process
+    $p.arguments[1]=$p.arguments[1].Replace('r.n==1','r.n>=0')
+} 'explicit setup or source'
+Case 'nextvar complete source mode cannot acquire a one-case filter' {param($r)
+    $p=(Row $r nextvar-storage-public).process
+    $p.arguments[1]=$p.arguments[1].Replace("('public')","('public','Library')")
+} 'explicit setup or source'
 Case 'iterator instruction counts require the actual C graph producer' {param($r)
     $r.processes=@($r.processes|Where-Object operation -CNE produce-debug-iterator-counts)
 } 'process set is incomplete'
@@ -109,6 +123,16 @@ if($baseline.configuration -ceq 'upstream-test'){
     Case 'a native T process cannot substitute for the actual Ada invariant inspector' {param($r)
         (Row $r table-storage-private).role='ReferenceC'
     } 'actual process is missing or duplicated'
+    Case 'actual __len result refusal campaigns cannot disappear behind ordinary tests' {param($r)
+        $r.processes=@($r.processes|Where-Object operation -CNE length-empty-result-refusal)
+    } 'process set is incomplete'
+    Case 'nextvar actual storage cannot be replaced by a native T facade' {param($r)
+        (Row $r nextvar-storage-private).role='ReferenceC'
+    } 'actual process is missing or duplicated'
+    Case 'nextvar storage completion cannot omit object reclamation and reuse' {param($r)
+        $p=(Row $r nextvar-storage-private).process
+        Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS nextvar storage Object_Lifetime`n",''))
+    } 'complete ordered protocol'
     Case 'Ada table storage completion must retain all three actual phases' {param($r)
         $p=(Row $r table-storage-private).process
         Replace-Capture $p stdout ([IO.File]::ReadAllText($p.stdout_path).Replace("`r`n","`n").Replace("PASS: Ada table storage Deleted_Key_Reclamation`n",''))
@@ -238,4 +262,22 @@ if(-not $baseline.repository_dirty -and @($baseline.runtimes|Where-Object{
 }else{
     Write-Output 'NOT RUN: image-membership replay requires clean repository-local actual runtimes; component captures remain observations only'
 }
+$reuse=Join-Path $temporary 'reused-capture-directory'
+[void][IO.Directory]::CreateDirectory($reuse)
+$sentinel=Join-Path $reuse 'ReferenceC-configuration.stdout'
+[IO.File]::WriteAllText($sentinel,'SYNTHETIC preserved capture fixture',[Text.UTF8Encoding]::new($false))
+$sentinelHash=(Get-FileHash $sentinel).Hash
+$reuseReport=Join-Path $reuse 'other-configuration.json'
+$failure=$null
+try{
+    & (Join-Path $PSScriptRoot 'check-configured-fixtures.ps1') -Interpreter 'must-not-execute' `
+        -ReferenceInterpreter 'must-not-execute' -RuntimeDirectory 'must-not-resolve' `
+        -ReferenceLibraryDirectory 'must-not-resolve' -Configuration default -Report $reuseReport
+}catch{$failure=$_.Exception.Message}
+if($failure -notmatch 'capture directory must be new' -or (Test-Path $reuseReport) -or
+    (Get-FileHash $sentinel).Hash -cne $sentinelHash){
+    throw 'Reusing a capture directory reached execution or changed preserved bytes'
+}
+$script:cases++
+Write-Output 'CONFIGURED FIXTURE PASS: a different report/configuration cannot overwrite prior captures'
 Write-Output "PASS: $script:cases configured fixture rejection regressions over actual observations; mutations are non-execution fixtures"

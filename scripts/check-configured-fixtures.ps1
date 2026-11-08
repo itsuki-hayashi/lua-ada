@@ -14,12 +14,15 @@ $root=Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot 'ConfiguredFixtureEvidence.psm1') -Force
 Import-Module (Join-Path $PSScriptRoot 'ConformanceRunner.psm1')
 Import-Module (Join-Path $PSScriptRoot 'ConformanceInventory.psm1')
-& (Join-Path $PSScriptRoot 'test-configured-fixture-selection.ps1')
 if($Report -eq ''){$Report=Join-Path $root ('reports/core-image/configured-'+[guid]::NewGuid().ToString('N')+'/result.json')}
 $Report=[IO.Path]::GetFullPath($Report)
 if(-not ([IO.Path]::GetRelativePath($root,$Report).Replace('\','/')).StartsWith('reports/',[StringComparison]::Ordinal) -or
     (Test-Path -LiteralPath $Report)){throw 'Configured fixture report must be a new first-party observation under reports'}
 $directory=Split-Path -Parent $Report;[void][IO.Directory]::CreateDirectory($directory)
+if(@(Get-ChildItem -LiteralPath $directory -File | Where-Object Name -Match '^(ReferenceC|Ada)-configuration\.').Count){
+    throw 'Configured fixture capture directory must be new; preserve previous observation bytes'
+}
+& (Join-Path $PSScriptRoot 'test-configured-fixture-selection.ps1')
 $revision=(&git -C $root rev-parse HEAD).Trim()
 if($LASTEXITCODE -ne 0){throw 'Configured fixture source revision is unknown'}
 $dirty=@(&git -C $root status --porcelain=v1 --untracked-files=normal).Count -ne 0
